@@ -1,0 +1,54 @@
+"""
+PRO-KOM Serwis — Accounts App — Django Admin
+"""
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
+from .models import User, StaffProfile, LoginActivity
+
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    """Panel admina dla custom User model."""
+
+    list_display = ["email", "first_name", "last_name", "role", "is_active", "date_joined"]
+    list_filter = ["role", "is_active", "is_staff"]
+    search_fields = ["email", "first_name", "last_name", "phone"]
+    ordering = ["-date_joined"]
+
+    fieldsets = (
+        (_("Dane logowania"), {"fields": ("email", "password")}),
+        (_("Dane osobowe"), {"fields": ("first_name", "last_name", "phone")}),
+        (_("Rola i uprawnienia"), {
+            "fields": ("role", "is_active", "is_staff", "is_superuser", "groups", "user_permissions"),
+        }),
+        (_("Daty"), {"fields": ("date_joined", "last_login")}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "first_name", "last_name", "role", "password1", "password2"),
+        }),
+    )
+
+    readonly_fields = ["date_joined", "last_login"]
+
+
+@admin.register(StaffProfile)
+class StaffProfileAdmin(admin.ModelAdmin):
+    """Panel admina dla profili pracowników."""
+
+    list_display = ["user", "position", "is_available", "total_repairs", "active_repairs"]
+    list_filter = ["is_available"]
+    search_fields = ["user__email", "user__first_name", "user__last_name", "position"]
+    raw_id_fields = ["user"]
+
+
+@admin.register(LoginActivity)
+class LoginActivityAdmin(admin.ModelAdmin):
+    list_display = ["user", "login_status", "ip_address", "logged_in_at"]
+    list_filter = ["login_status", "logged_in_at"]
+    search_fields = ["user__email", "ip_address"]
+    readonly_fields = ["user", "ip_address", "user_agent", "login_status", "logged_in_at"]
+    date_hierarchy = "logged_in_at"

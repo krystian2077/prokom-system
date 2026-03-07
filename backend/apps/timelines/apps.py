@@ -1,0 +1,8 @@
+"""PRO-KOM Serwis — Timelines App."""
+from django.apps import AppConfig
+
+
+class TimelinesConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.timelines"
+    verbose_name = "Timeline i historia"
