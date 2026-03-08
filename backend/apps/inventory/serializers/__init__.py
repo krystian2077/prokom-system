@@ -1,6 +1,6 @@
 """PRO-KOM Serwis — Inventory serializers."""
 from .supplier import SupplierSerializer, SupplierListSerializer
-from .part import PartSerializer, PartListSerializer
+from .part import PartSerializer, PartListSerializer, PartCreateUpdateSerializer
 from .purchase_order import (
     PurchaseOrderSerializer,
     PurchaseOrderListSerializer,
@@ -13,6 +13,7 @@ __all__ = [
     "SupplierListSerializer",
     "PartSerializer",
     "PartListSerializer",
+    "PartCreateUpdateSerializer",
     "PurchaseOrderSerializer",
     "PurchaseOrderListSerializer",
     "PurchaseOrderItemSerializer",

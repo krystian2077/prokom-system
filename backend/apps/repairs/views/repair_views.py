@@ -38,6 +38,9 @@ from apps.repairs.selectors import (
     repair_by_id,
     repair_by_number,
     staff_dashboard_data,
+    staff_dashboard_quality_metrics,
+    staff_health_score,
+    pickup_panel_data,
     repairs_overdue,
 )
 from apps.repairs.services import (
@@ -65,7 +68,10 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             return [IsAuthenticated(), IsStaffOrAdmin()]
         return [IsAuthenticated()]
-    filterset_fields = ["status", "priority", "assigned_to", "client", "is_incomplete", "repair_type"]
+    filterset_fields = [
+        "status", "priority", "assigned_to", "client", "is_incomplete",
+        "repair_type", "complaint_warranty_status",
+    ]
     search_fields = [
         "repair_number",
         "client__first_name",
@@ -92,12 +98,14 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         return RepairRequestSerializer
 
     def get_queryset(self):
+        tags_param = self.request.query_params.getlist("tags") or self.request.query_params.getlist("tag")
         qs = repair_list(
             status=self.request.query_params.get("status"),
             status_in=self.request.query_params.getlist("status_in") or None,
             assigned_to_id=self.request.query_params.get("assigned_to"),
             client_id=self.request.query_params.get("client"),
             search=self.request.query_params.get("search"),
+            tags=tags_param or None,
             ordering=self.request.query_params.get("ordering", "-created_at"),
         )
         # Klient widzi tylko swoje naprawy; jeśli rola client ale brak profilu — pusty zbiór
@@ -218,6 +226,9 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         days = int(request.query_params.get("days_without_update", 3))
         limit = int(request.query_params.get("recent_limit", 10))
         data = staff_dashboard_data(user_id, days_without_update=days, recent_activity_limit=limit)
+        quality = staff_dashboard_quality_metrics(user_id)
+        health = staff_health_score(user_id)
+        quality["health_score"] = {"level": health["level"], "factors": health["factors"]}
 
         list_serializer = RepairRequestListSerializer
         return Response({
@@ -229,6 +240,24 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             "ready_for_pickup": list_serializer(data["ready_for_pickup"], many=True).data,
             "without_update": list_serializer(data["without_update"], many=True).data,
             "recent_activity": RecentActivityEntrySerializer(data["recent_activity"], many=True).data,
+            "quality": quality,
+        })
+
+    @action(detail=False, url_path="pickup-panel", permission_classes=[IsStaffOrAdmin])
+    def pickup_panel(self, request):
+        """
+        GET /api/v1/repairs/pickup-panel/?assigned_to=<uuid>
+        Panel odbiorów: gotowe do odbioru, nieodebrane 3/7 dni, do wysyłki zwrotnej, wydane dziś.
+        """
+        assigned_to_id = request.query_params.get("assigned_to")
+        data = pickup_panel_data(assigned_to_id=assigned_to_id)
+        list_serializer = RepairRequestListSerializer
+        return Response({
+            "ready_for_pickup": list_serializer(data["ready_for_pickup"], many=True).data,
+            "unclaimed_3_days": list_serializer(data["unclaimed_3_days"], many=True).data,
+            "unclaimed_7_days": list_serializer(data["unclaimed_7_days"], many=True).data,
+            "to_prepare_shipment": list_serializer(data["to_prepare_shipment"], many=True).data,
+            "issued_today": list_serializer(data["issued_today"], many=True).data,
         })
 
     # ---------- Etap 4: Timeline ----------
@@ -274,6 +303,8 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             note_type=ser.validated_data.get("note_type", RepairNote.NOTE_TYPE_INTERNAL),
             pinned=ser.validated_data.get("pinned", False),
         )
+        from apps.accounts.services.notification_service import notify_note_added
+        notify_note_added(repair, note_author_id=request.user.id, assigned_to_id=repair.assigned_to_id)
         return Response(RepairNoteSerializer(note).data, status=status.HTTP_201_CREATED)
 
     # ---------- Etap 4: Szybkie akcje — zdjęcie ----------
@@ -296,6 +327,8 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         assigned_to_id = ser.validated_data.get("assigned_to_id") or request.user.id
         notes = ser.validated_data.get("notes", "")
         assign_repair(repair, assigned_to_id=assigned_to_id, assigned_by_id=request.user.id, notes=notes)
+        from apps.accounts.services.notification_service import notify_repair_assigned
+        notify_repair_assigned(repair, assigned_to_id)
         return Response(RepairRequestSerializer(repair).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="suggest-assignment", permission_classes=[IsStaffOrAdmin])
@@ -385,6 +418,11 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             )
         except ValueError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        from apps.accounts.services.notification_service import notify_quote_accepted, notify_quote_rejected
+        if action_value == "accept":
+            notify_quote_accepted(repair)
+        else:
+            notify_quote_rejected(repair)
         return Response(RepairRequestSerializer(repair, context={"request": request}).data, status=status.HTTP_200_OK)
 
     # ---------- Ankieta satysfakcji (klient) ----------
@@ -471,15 +509,19 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         repair = self.get_object()
         if request.method == "GET":
             from apps.inventory.serializers import PartUsageSerializer
-            qs = repair.part_usages.select_related("part").order_by("-created_at")
+            qs = repair.part_usages.select_related("part", "supplier").order_by("-created_at")
             return Response(PartUsageSerializer(qs, many=True).data)
         from apps.inventory.models import PartUsage
         from apps.inventory.serializers import PartUsageCreateSerializer
         ser = PartUsageCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        PartUsage.objects.create(repair=repair, **ser.validated_data)
+        PartUsage.objects.create(
+            repair=repair,
+            added_by=request.user,
+            **ser.validated_data,
+        )
         from apps.inventory.serializers import PartUsageSerializer
-        qs = repair.part_usages.select_related("part").order_by("-created_at")
+        qs = repair.part_usages.select_related("part", "supplier").order_by("-created_at")
         return Response(PartUsageSerializer(qs, many=True).data, status=status.HTTP_201_CREATED)
 
     # ---------- Etap 6: Podsumowanie kosztów i zysk ----------
@@ -494,7 +536,8 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         parts_cost = Decimal("0")
         parts_revenue = Decimal("0")
         for u in repair.part_usages.select_related("part"):
-            parts_cost += u.quantity * u.part.purchase_price
+            cost_per_unit = u.purchase_cost if u.purchase_cost is not None else (u.part.purchase_price or 0)
+            parts_cost += u.quantity * cost_per_unit
             parts_revenue += u.quantity * u.unit_price_used
         revenue = repair.final_cost or repair.estimated_cost or Decimal("0")
         accepted_quote = repair.quotes.filter(status="accepted").order_by("-version").first()

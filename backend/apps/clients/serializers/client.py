@@ -1,11 +1,14 @@
 """Serializery dla modelu Client."""
 from rest_framework import serializers
-from apps.common.enums import ContactPreference
+from apps.common.enums import ContactPreference, ClientType, ClientSegment
 from ..models import Client
 
 
 class ClientListSerializer(serializers.ModelSerializer):
     """Krótka lista klientów (lista, wyszukiwanie)."""
+    full_name = serializers.SerializerMethodField()
+    client_type_display = serializers.CharField(source="get_client_type_display", read_only=True)
+    client_segment_display = serializers.CharField(source="get_client_segment_display", read_only=True)
 
     class Meta:
         model = Client
@@ -15,19 +18,22 @@ class ClientListSerializer(serializers.ModelSerializer):
             "full_name",
             "email",
             "phone",
+            "client_type",
+            "client_type_display",
+            "client_segment",
+            "client_segment_display",
+            "visit_count",
             "total_repairs",
             "created_at",
         ]
-        read_only_fields = ["id", "client_number", "total_repairs", "created_at"]
+        read_only_fields = ["id", "client_number", "total_repairs", "visit_count", "created_at"]
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data["full_name"] = instance.get_full_name()
-        return data
+    def get_full_name(self, obj):
+        return obj.get_full_name()
 
 
 class ClientCreateUpdateSerializer(serializers.ModelSerializer):
-    """Tworzenie i aktualizacja klienta."""
+    """Tworzenie i aktualizacja klienta (osoba prywatna / firma)."""
 
     class Meta:
         model = Client
@@ -37,6 +43,13 @@ class ClientCreateUpdateSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "phone",
+            "client_type",
+            "client_segment",
+            "company_name",
+            "nip",
+            "contact_person",
+            "company_email",
+            "company_phone",
             "street",
             "city",
             "postal_code",
@@ -60,6 +73,8 @@ class ClientSerializer(serializers.ModelSerializer):
     """Pełny serializer klienta (szczegóły)."""
     full_name = serializers.SerializerMethodField()
     addresses = serializers.SerializerMethodField()
+    client_type_display = serializers.CharField(source="get_client_type_display", read_only=True)
+    client_segment_display = serializers.CharField(source="get_client_segment_display", read_only=True)
 
     class Meta:
         model = Client
@@ -71,6 +86,17 @@ class ClientSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "phone",
+            "client_type",
+            "client_type_display",
+            "client_segment",
+            "client_segment_display",
+            "visit_count",
+            "last_visit_at",
+            "company_name",
+            "nip",
+            "contact_person",
+            "company_email",
+            "company_phone",
             "street",
             "city",
             "postal_code",
@@ -87,7 +113,7 @@ class ClientSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = [
-            "id", "client_number", "total_repairs", "total_spent",
+            "id", "client_number", "total_repairs", "total_spent", "visit_count",
             "created_at", "updated_at",
         ]
 

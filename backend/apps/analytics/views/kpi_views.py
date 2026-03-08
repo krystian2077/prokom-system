@@ -257,3 +257,205 @@ class HealthOverviewView(APIView):
             "yellow": yellow[:50],
             "red": red[:50],
         })
+
+
+def _is_admin(request):
+    return getattr(request.user, "role", None) == UserRole.ADMIN
+
+
+class AdminDashboardView(APIView):
+    """
+    GET /api/v1/analytics/admin-dashboard/?days=30&assigned_to=<uuid>
+    Rozbudowany dashboard admina (N5): KPI, tabele dynamiczne, wykresy.
+    Dostęp: tylko admin.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not _is_admin(request):
+            return Response({"detail": "Tylko administrator."}, status=403)
+        days = int(request.query_params.get("days", 30))
+        assigned_to = request.query_params.get("assigned_to")  # opcjonalny filtr
+        since = timezone.now() - timedelta(days=days)
+        today = timezone.now().date()
+
+        base_qs = RepairRequest.objects.filter(created_at__gte=since)
+        if assigned_to:
+            base_qs = base_qs.filter(assigned_to_id=assigned_to)
+
+        # ---------- KPI ----------
+        all_open = RepairRequest.objects.exclude(
+            status__in=[
+                RepairStatus.CANCELLED, RepairStatus.ABANDONED,
+                RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED,
+            ]
+        )
+        if assigned_to:
+            all_open = all_open.filter(assigned_to_id=assigned_to)
+        new_count = RepairRequest.objects.filter(status=RepairStatus.NEW)
+        if assigned_to:
+            new_count = new_count.filter(assigned_to_id=assigned_to)
+        new_count = new_count.count()
+        in_progress_statuses = [
+            RepairStatus.ACCEPTED, RepairStatus.IN_DIAGNOSTICS, RepairStatus.DIAGNOSTICS_DONE,
+            RepairStatus.QUOTE_PENDING, RepairStatus.QUOTE_SENT, RepairStatus.QUOTE_ACCEPTED,
+            RepairStatus.WAITING_FOR_PARTS, RepairStatus.IN_REPAIR, RepairStatus.REPAIR_DONE,
+            RepairStatus.IN_TESTING, RepairStatus.TESTING_FAILED, RepairStatus.TESTING_PASSED,
+        ]
+        in_progress_qs = RepairRequest.objects.filter(status__in=in_progress_statuses)
+        if assigned_to:
+            in_progress_qs = in_progress_qs.filter(assigned_to_id=assigned_to)
+        in_progress_count = in_progress_qs.count()
+        ready_qs = RepairRequest.objects.filter(status=RepairStatus.READY_FOR_PICKUP)
+        if assigned_to:
+            ready_qs = ready_qs.filter(assigned_to_id=assigned_to)
+        ready_for_pickup_count = ready_qs.count()
+        overdue_qs = RepairRequest.objects.filter(
+            status__in=in_progress_statuses,
+            estimated_completion_date__lt=today,
+            estimated_completion_date__isnull=False,
+        )
+        if assigned_to:
+            overdue_qs = overdue_qs.filter(assigned_to_id=assigned_to)
+        overdue_count = overdue_qs.count()
+        # Nieodebrane: gotowe do odbioru dłużej niż 7 dni
+        unclaimed_threshold = timezone.now() - timedelta(days=7)
+        unclaimed_qs = RepairRequest.objects.filter(
+            status=RepairStatus.READY_FOR_PICKUP,
+            ready_for_pickup_at__lt=unclaimed_threshold,
+        )
+        if assigned_to:
+            unclaimed_qs = unclaimed_qs.filter(assigned_to_id=assigned_to)
+        unclaimed_count = unclaimed_qs.count()
+        revenue_agg = base_qs.filter(
+            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+        ).aggregate(s=Sum("final_cost"))
+        revenue_total = revenue_agg["s"] or Decimal("0")
+        quote_value_agg = base_qs.filter(
+            status__in=[RepairStatus.QUOTE_SENT, RepairStatus.QUOTE_ACCEPTED],
+        ).aggregate(s=Sum("estimated_cost"))
+        quote_value_total = quote_value_agg["s"] or Decimal("0")
+        complaints_count = base_qs.filter(repair_type="complaint").count()
+        warranties_count = base_qs.filter(repair_type="warranty").count()
+
+        kpi = {
+            "new_count": new_count,
+            "in_progress_count": in_progress_count,
+            "ready_for_pickup_count": ready_for_pickup_count,
+            "overdue_count": overdue_count,
+            "unclaimed_count": unclaimed_count,
+            "revenue_total": str(revenue_total),
+            "quote_value_total": str(quote_value_total),
+            "complaints_count": complaints_count,
+            "warranties_count": warranties_count,
+        }
+
+        # ---------- Tabele (listy napraw / ranking) ----------
+        from apps.repairs.serializers import RepairRequestListSerializer
+
+        most_overdue = (
+            overdue_qs.select_related("client", "device", "assigned_to")
+            .order_by("estimated_completion_date")[:20]
+        )
+        no_quote_repairs = (
+            RepairRequest.objects.filter(
+                status__in=[
+                    RepairStatus.ACCEPTED, RepairStatus.IN_DIAGNOSTICS,
+                    RepairStatus.DIAGNOSTICS_DONE, RepairStatus.QUOTE_PENDING,
+                ],
+                repair_type="standard",
+            )
+            .select_related("client", "device", "assigned_to")
+            .order_by("created_at")[:20]
+        )
+        if assigned_to:
+            no_quote_repairs = no_quote_repairs.filter(assigned_to_id=assigned_to)
+        unclaimed_repairs = (
+            unclaimed_qs.select_related("client", "device", "assigned_to")
+            .order_by("ready_for_pickup_at")[:20]
+        )
+        active_complaints = (
+            RepairRequest.objects.filter(repair_type="complaint")
+            .exclude(
+                status__in=[RepairStatus.CANCELLED, RepairStatus.ABANDONED],
+                complaint_warranty_status="closed",
+            )
+            .select_related("client", "device", "assigned_to", "parent_repair")
+            .order_by("-updated_at")[:20]
+        )
+        active_warranties = (
+            RepairRequest.objects.filter(repair_type="warranty")
+            .exclude(
+                status__in=[RepairStatus.CANCELLED, RepairStatus.ABANDONED],
+                complaint_warranty_status="closed",
+            )
+            .select_related("client", "device", "assigned_to", "parent_repair")
+            .order_by("-updated_at")[:20]
+        )
+
+        tables = {
+            "most_overdue": RepairRequestListSerializer(most_overdue, many=True).data,
+            "no_quote_repairs": RepairRequestListSerializer(no_quote_repairs, many=True).data,
+            "unclaimed_repairs": RepairRequestListSerializer(unclaimed_repairs, many=True).data,
+            "active_complaints": RepairRequestListSerializer(active_complaints, many=True).data,
+            "active_warranties": RepairRequestListSerializer(active_warranties, many=True).data,
+        }
+
+        # Top pracownicy (w okresie)
+        staff_ids = list(User.objects.filter(role=UserRole.STAFF).values_list("id", flat=True))
+        completed = (
+            RepairRequest.objects.filter(
+                assigned_to_id__in=staff_ids,
+                status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+                updated_at__gte=since,
+            )
+            .values("assigned_to_id")
+            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+        )
+        by_user = {r["assigned_to_id"]: r for r in completed}
+        top_staff = []
+        for uid in staff_ids:
+            u = User.objects.filter(id=uid).first()
+            if not u:
+                continue
+            r = by_user.get(uid) or {"count": 0, "revenue": Decimal("0")}
+            top_staff.append({
+                "user_id": str(uid),
+                "full_name": u.get_full_name(),
+                "email": getattr(u, "email", ""),
+                "completed_repairs": r["count"],
+                "revenue": str(r["revenue"] or "0"),
+            })
+        top_staff.sort(key=lambda x: (x["completed_repairs"], float(x["revenue"])), reverse=True)
+        tables["top_staff"] = top_staff[:15]
+
+        # ---------- Wykresy ----------
+        qs_chart = RepairRequest.objects.filter(created_at__gte=since)
+        if assigned_to:
+            qs_chart = qs_chart.filter(assigned_to_id=assigned_to)
+        by_status = dict(
+            qs_chart.values_list("status").annotate(c=Count("id")).values_list("status", "c")
+        )
+        repairs_over_time = list(
+            qs_chart.annotate(period=TruncDate("created_at"))
+            .values("period")
+            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+            .order_by("period")
+        )
+        charts = {
+            "repairs_by_status": by_status,
+            "repairs_over_time": [
+                {"period": str(r["period"]), "count": r["count"], "revenue": str(r["revenue"] or "0")}
+                for r in repairs_over_time
+            ],
+        }
+
+        return Response(
+            {
+                "period_days": days,
+                "kpi": kpi,
+                "tables": tables,
+                "charts": charts,
+            },
+            status=200,
+        )

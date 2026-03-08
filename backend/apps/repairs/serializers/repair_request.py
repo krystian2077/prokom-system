@@ -7,6 +7,26 @@ from apps.clients.serializers import ClientListSerializer
 from apps.devices.serializers import DeviceListSerializer
 
 
+class RelatedComplaintWarrantySerializer(serializers.ModelSerializer):
+    """Minimalny serializer dla powiązanych reklamacji/gwarancji (w szczegółach naprawy)."""
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+    complaint_warranty_status_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RepairRequest
+        fields = [
+            "id", "repair_number", "repair_type", "status", "status_display",
+            "complaint_warranty_status", "complaint_warranty_status_display",
+            "created_at",
+        ]
+
+    def get_complaint_warranty_status_display(self, obj):
+        if not obj.complaint_warranty_status:
+            return None
+        from apps.common.enums import ComplaintWarrantyStatus
+        return dict(ComplaintWarrantyStatus.choices).get(obj.complaint_warranty_status, obj.complaint_warranty_status)
+
+
 class RepairRequestListSerializer(serializers.ModelSerializer):
     """Krótka lista zgłoszeń napraw."""
     client_name = serializers.SerializerMethodField()
@@ -14,6 +34,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     priority_display = serializers.CharField(source="get_priority_display", read_only=True)
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
+    auto_tags = serializers.SerializerMethodField()
+    waiting_for_client_days = serializers.SerializerMethodField()
 
     class Meta:
         model = RepairRequest
@@ -36,6 +58,10 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "estimated_duration_days_max",
             "is_incomplete",
             "repair_type",
+            "requires_attention",
+            "complaint_warranty_status",
+            "auto_tags",
+            "waiting_for_client_days",
             "created_at",
         ]
 
@@ -44,6 +70,12 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
 
     def get_device_name(self, obj):
         return obj.device.get_device_name()
+
+    def get_auto_tags(self, obj):
+        return getattr(obj, "get_auto_tags", lambda: [])()
+
+    def get_waiting_for_client_days(self, obj):
+        return getattr(obj, "waiting_for_client_days", None)
 
 
 class RepairRequestCreateSerializer(serializers.ModelSerializer):
@@ -141,6 +173,9 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     accessory_offers = serializers.SerializerMethodField()
     hammer_glass_offers = serializers.SerializerMethodField()
+    related_complaints_warranties = serializers.SerializerMethodField()
+    auto_tags = serializers.SerializerMethodField()
+    waiting_for_client_days = serializers.SerializerMethodField()
 
     class Meta:
         model = RepairRequest
@@ -185,6 +220,11 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "is_incomplete",
             "parent_repair",
             "repair_type",
+            "requires_attention",
+            "last_client_message_at",
+            "last_staff_reply_at",
+            "last_activity_at",
+            "complaint_warranty_status",
             "package_received_at",
             "package_received_by",
             "package_ok",
@@ -203,6 +243,10 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "images",
             "accessory_offers",
             "hammer_glass_offers",
+            "related_complaints_warranties",
+            "auto_tags",
+            "waiting_for_client_days",
+            "quote_sent_at",
         ]
         read_only_fields = [
             "id", "repair_number", "created_at", "updated_at",
@@ -261,10 +305,24 @@ class RepairRequestSerializer(serializers.ModelSerializer):
         except Exception:
             return []
 
+    def get_related_complaints_warranties(self, obj):
+        """Powiązane reklamacje i gwarancje (dla naprawy źródłowej)."""
+        if not obj.id:
+            return []
+        children = obj.complaint_repairs.order_by("-created_at")
+        return RelatedComplaintWarrantySerializer(children, many=True, context=self.context).data
+
+    def get_auto_tags(self, obj):
+        return getattr(obj, "get_auto_tags", lambda: [])()
+
+    def get_waiting_for_client_days(self, obj):
+        return getattr(obj, "waiting_for_client_days", None)
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         request = self.context.get("request")
         if request and getattr(request.user, "role", None) == "client":
             data.pop("internal_notes", None)
             data.pop("internal_status", None)
+            data.pop("related_complaints_warranties", None)
         return data

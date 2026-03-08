@@ -7,7 +7,15 @@ from django.db.models import Q
 from apps.clients.models import Client
 
 
-def client_list(*, search=None, is_vip=None, is_blacklisted=None, ordering="-created_at"):
+def client_list(
+    *,
+    search=None,
+    is_vip=None,
+    is_blacklisted=None,
+    client_type=None,
+    client_segment=None,
+    ordering="-created_at",
+):
     """
     Lista klientów z opcjonalnym wyszukiwaniem i filtrami.
     Domyślnie wyklucza soft-deleted.
@@ -21,11 +29,16 @@ def client_list(*, search=None, is_vip=None, is_blacklisted=None, ordering="-cre
             | Q(email__icontains=search)
             | Q(phone__icontains=search)
             | Q(client_number__icontains=search)
+            | Q(company_name__icontains=search)
         )
     if is_vip is not None:
         qs = qs.filter(is_vip=is_vip)
     if is_blacklisted is not None:
         qs = qs.filter(is_blacklisted=is_blacklisted)
+    if client_type:
+        qs = qs.filter(client_type=client_type)
+    if client_segment:
+        qs = qs.filter(client_segment=client_segment)
 
     return qs.order_by(ordering)
 
@@ -43,3 +56,25 @@ def client_by_number(client_number):
 def client_by_email(email):
     """Pobierz klienta po adresie e-mail."""
     return Client.objects.filter(email=email, is_deleted=False).first()
+
+
+def client_search(q, *, limit=20):
+    """
+    Wyszukiwanie klientów po telefonie, nazwisku, imieniu, e-mailu (do „klient wraca”).
+    Zwraca listę dopasowań, limit wyników.
+    """
+    if not q or not str(q).strip():
+        return Client.objects.filter(is_deleted=False).none()
+    term = str(q).strip()
+    return (
+        Client.objects.filter(is_deleted=False)
+        .filter(
+            Q(phone__icontains=term)
+            | Q(first_name__icontains=term)
+            | Q(last_name__icontains=term)
+            | Q(email__icontains=term)
+            | Q(client_number__icontains=term)
+            | Q(company_name__icontains=term)
+        )
+        .order_by("-visit_count", "-last_visit_at", "-created_at")[:limit]
+    )

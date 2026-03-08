@@ -82,6 +82,11 @@ def create_repair_request(
             repair.assigned_to = suggested
             repair.save(update_fields=["assigned_to"])
 
+    # Klient wraca: aktualizacja visit_count i segmentu (tylko dla naprawy standardowej)
+    if repair_type == "standard":
+        from apps.clients.services import update_client_visit_and_segment
+        update_client_visit_and_segment(client_id)
+
     return repair
 
 

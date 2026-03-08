@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 from apps.common.models import BaseModel, SoftDeleteModel
-from apps.common.enums import ContactPreference, ConsentType
+from apps.common.enums import ContactPreference, ConsentType, ClientType, ClientSegment
 from apps.common.validators import validate_polish_phone
 from apps.common.utils import generate_client_number
 
@@ -56,6 +56,58 @@ class Client(BaseModel, SoftDeleteModel):
     city = models.CharField(_("miasto"), max_length=100, blank=True)
     postal_code = models.CharField(_("kod pocztowy"), max_length=10, blank=True)
     country = models.CharField(_("kraj"), max_length=100, default="Polska", blank=True)
+
+    # Typ i segment (karta premium, segmentacja)
+    client_type = models.CharField(
+        _("typ klienta"),
+        max_length=20,
+        choices=ClientType.choices,
+        default=ClientType.INDIVIDUAL,
+        db_index=True,
+    )
+    client_segment = models.CharField(
+        _("segment klienta"),
+        max_length=20,
+        choices=ClientSegment.choices,
+        default=ClientSegment.NEW,
+        blank=True,
+        db_index=True,
+    )
+    visit_count = models.PositiveIntegerField(
+        _("liczba wizyt"),
+        default=0,
+        help_text=_("Liczba przyjęć / napraw (do badge „klient wraca”)"),
+    )
+    last_visit_at = models.DateTimeField(
+        _("ostatnia wizyta"),
+        null=True,
+        blank=True,
+    )
+    # Dane firmy (gdy client_type=business)
+    company_name = models.CharField(
+        _("nazwa firmy"),
+        max_length=200,
+        blank=True,
+    )
+    nip = models.CharField(
+        _("NIP"),
+        max_length=20,
+        blank=True,
+    )
+    contact_person = models.CharField(
+        _("osoba kontaktowa"),
+        max_length=150,
+        blank=True,
+    )
+    company_email = models.EmailField(
+        _("e-mail firmowy"),
+        blank=True,
+    )
+    company_phone = models.CharField(
+        _("telefon firmowy"),
+        max_length=20,
+        blank=True,
+    )
 
     # Preferencje komunikacji
     preferred_contact = models.CharField(

@@ -2,8 +2,10 @@
 PRO-KOM Serwis — Selectory dashboardu staff
 ============================================
 Kubełki widoczne na dashboardzie: moje nowe, pilne, do kontaktu, w toku, zaległe, gotowe do odbioru, bez aktualizacji, ostatnia aktywność.
+Blok jakościowy: wiadomości do klientów, niezamknięte sprawy, średni czas odpowiedzi, reklamacje/gwarancje, wskaźnik reklamacyjności.
 """
-from django.db.models import Q
+from django.db.models import Q, Avg, F
+from django.db.models import DurationField, ExpressionWrapper
 from django.utils import timezone
 from datetime import timedelta
 
@@ -130,6 +132,50 @@ def staff_repairs_without_update(user_id, days=3):
     return qs.order_by("updated_at")
 
 
+def pickup_panel_data(*, assigned_to_id=None):
+    """
+    Dane do panelu odbiorów: gotowe do odbioru, nieodebrane 3/7 dni,
+    do przygotowania wysyłki zwrotnej, wydane dziś.
+    assigned_to_id=None = wszystkie (admin), inaczej filtruj po pracowniku.
+    """
+    from apps.common.enums import ReturnMethod
+    today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
+    threshold_3d = timezone.now() - timedelta(days=3)
+    threshold_7d = timezone.now() - timedelta(days=7)
+
+    base = RepairRequest.objects.select_related(
+        "client", "device", "assigned_to"
+    ).filter(status=RepairStatus.READY_FOR_PICKUP)
+    if assigned_to_id:
+        base = base.filter(assigned_to_id=assigned_to_id)
+
+    ready = base.order_by("-ready_for_pickup_at")
+    unclaimed_3d = base.filter(ready_for_pickup_at__lt=threshold_3d).order_by("ready_for_pickup_at")
+    unclaimed_7d = base.filter(ready_for_pickup_at__lt=threshold_7d).order_by("ready_for_pickup_at")
+    to_prepare_shipment = base.exclude(return_method=ReturnMethod.IN_PERSON).order_by("-ready_for_pickup_at")
+
+    issued_today = (
+        RepairRequest.objects.filter(
+            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+            picked_up_at__gte=today_start,
+            picked_up_at__lt=today_end,
+        )
+        .select_related("client", "device", "assigned_to")
+        .order_by("-picked_up_at")
+    )
+    if assigned_to_id:
+        issued_today = issued_today.filter(assigned_to_id=assigned_to_id)
+
+    return {
+        "ready_for_pickup": ready,
+        "unclaimed_3_days": unclaimed_3d,
+        "unclaimed_7_days": unclaimed_7d,
+        "to_prepare_shipment": to_prepare_shipment,
+        "issued_today": issued_today,
+    }
+
+
 def staff_recent_activity(user_id, limit=15):
     """Ostatnie zmiany statusu wykonane przeze mnie (do timeline na dashboard)."""
     return (
@@ -153,4 +199,133 @@ def staff_dashboard_data(user_id, *, days_without_update=3, recent_activity_limi
         "ready_for_pickup": staff_repairs_ready_for_pickup(user_id),
         "without_update": staff_repairs_without_update(user_id, days=days_without_update),
         "recent_activity": staff_recent_activity(user_id, limit=recent_activity_limit),
+    }
+
+
+# ---------- Blok jakościowy (N3) ----------
+
+def staff_dashboard_quality_metrics(user_id):
+    """
+    KPI jakościowe pracownika: wiadomości do klientów, niezamknięte sprawy,
+    średni czas odpowiedzi, reklamacje/gwarancje do moich napraw, wskaźnik reklamacyjności,
+    sprawy po SLA, bez aktualizacji.
+    """
+    from apps.communications.models import CommunicationLog
+
+    my_repairs_qs = RepairRequest.objects.filter(assigned_to_id=user_id)
+    not_finished = my_repairs_qs.exclude(
+        status__in=[
+            RepairStatus.CANCELLED, RepairStatus.ABANDONED,
+            RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED,
+        ]
+    )
+    open_repairs_count = not_finished.count()
+
+    # Wiadomości do klientów (wysłane przeze mnie w ramach moich napraw)
+    messages_to_clients = CommunicationLog.objects.filter(
+        repair__assigned_to_id=user_id,
+        sent_by_id=user_id,
+    ).count()
+
+    # Średni czas odpowiedzi: last_staff_reply_at - last_client_message_at (w godzinach)
+    avg_response = (
+        RepairRequest.objects.filter(
+            assigned_to_id=user_id,
+            last_client_message_at__isnull=False,
+            last_staff_reply_at__isnull=False,
+        )
+        .annotate(
+            response_time=ExpressionWrapper(
+                F("last_staff_reply_at") - F("last_client_message_at"),
+                output_field=DurationField(),
+            ),
+        )
+        .aggregate(avg=Avg("response_time"))["avg"]
+    )
+    average_response_time_hours = (
+        round(avg_response.total_seconds() / 3600, 1) if avg_response else None
+    )
+
+    # Reklamacje do moich napraw (child repairs typu complaint gdzie parent jest mój)
+    complaints_to_my_repairs = RepairRequest.objects.filter(
+        parent_repair__assigned_to_id=user_id,
+        repair_type="complaint",
+    ).count()
+    # Gwarancje do moich napraw
+    warranties_to_my_repairs = RepairRequest.objects.filter(
+        parent_repair__assigned_to_id=user_id,
+        repair_type="warranty",
+    ).count()
+
+    # Zakończone naprawy (standard) przypisane do mnie (mianownik wskaźnika reklamacyjności)
+    completed_standard = my_repairs_qs.filter(
+        repair_type="standard",
+        status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+    ).count()
+    reclamation_rate = (
+        round(complaints_to_my_repairs / completed_standard, 2)
+        if completed_standard and completed_standard > 0
+        else None
+    )
+
+    # Zaległe (po SLA) — count
+    over_sla_count = staff_repairs_my_overdue(user_id).count()
+    # Bez aktualizacji — count
+    without_update_count = staff_repairs_without_update(user_id, days=3).count()
+
+    return {
+        "messages_to_clients_count": messages_to_clients,
+        "open_repairs_count": open_repairs_count,
+        "average_response_time_hours": average_response_time_hours,
+        "complaints_to_my_repairs_count": complaints_to_my_repairs,
+        "warranties_to_my_repairs_count": warranties_to_my_repairs,
+        "reclamation_rate": reclamation_rate,
+        "over_sla_count": over_sla_count,
+        "without_update_count": without_update_count,
+    }
+
+
+def staff_health_score(user_id):
+    """
+    Health score pracownika: zielony / żółty / czerwony na podstawie jakości pracy.
+    Zwraca level i opcjonalnie factors (przyczyny).
+    """
+    q = staff_dashboard_quality_metrics(user_id)
+    over_sla = q.get("over_sla_count") or 0
+    without_update = q.get("without_update_count") or 0
+    reclamation = q.get("reclamation_rate") or 0
+    avg_response = q.get("average_response_time_hours")
+    complaints = q.get("complaints_to_my_repairs_count") or 0
+
+    factors = []
+    # Czerwony: poważne problemy
+    if over_sla >= 3:
+        factors.append("zaległe_sprawy_3+")
+    if without_update >= 5:
+        factors.append("brak_aktualizacji_5+")
+    if reclamation and reclamation >= 0.15:
+        factors.append("wysoka_reklamacyjnosc")
+    # Żółty: wymaga uwagi
+    if over_sla >= 1:
+        factors.append("zaległe_sprawy")
+    if without_update >= 2:
+        factors.append("brak_aktualizacji")
+    if avg_response is not None and avg_response > 24:
+        factors.append("dlugi_czas_odpowiedzi")
+    if reclamation and reclamation >= 0.05:
+        factors.append("reklamacje")
+    if complaints >= 2:
+        factors.append("reklamacje_do_napraw")
+
+    if any(f in factors for f in ("zaległe_sprawy_3+", "brak_aktualizacji_5+", "wysoka_reklamacyjnosc")):
+        level = "red"
+    elif factors:
+        level = "yellow"
+    else:
+        level = "green"
+
+    return {
+        "level": level,
+        "factors": factors,
+        "metrics": q,
     }

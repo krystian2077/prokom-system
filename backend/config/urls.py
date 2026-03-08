@@ -29,9 +29,12 @@ urlpatterns = [
     path("api/v1/documents/", include("apps.documents.urls")),
     path("api/v1/compliance/", include("apps.compliance.urls")),
     path("api/v1/analytics/", include("apps.analytics.urls")),
-    path("api/v1/search/", GlobalSearchView.as_view(), name="global-search"),
+    path("api/v1/search/", include("apps.search.urls")),
     path("api/v1/config/parcel-locker-address/", ParcelLockerAddressView.as_view(), name="parcel-locker-address"),
     path("api/v1/inventory/", include("apps.inventory.urls")),
+    path("api/v1/orders/", include("apps.orders.urls")),
+    path("api/v1/tasks/", include("apps.tasks.urls")),
+    path("api/v1/availability/", include("apps.availability.urls")),
     path("api/v1/pricing/", include("apps.pricing.urls")),
 
     # API Schema / Dokumentacja (dostępna tylko w DEBUG)

@@ -73,6 +73,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Status konta
     is_active = models.BooleanField(_("aktywny"), default=True)
     is_staff = models.BooleanField(_("dostęp do panelu admina"), default=False)
+    # Superadmin: konto nie może być usunięte ani trwale zablokowane (odzyskiwanie systemu)
+    is_superadmin = models.BooleanField(
+        _("superadministrator"),
+        default=False,
+        help_text=_("Konto nie może być usunięte; służy do odzyskania systemu"),
+    )
+    must_change_password = models.BooleanField(
+        _("wymuś zmianę hasła przy pierwszym logowaniu"),
+        default=False,
+        help_text=_("Po zalogowaniu użytkownik zostanie przekierowany do zmiany hasła"),
+    )
 
     # Daty
     date_joined = models.DateTimeField(_("data rejestracji"), default=timezone.now)
@@ -153,6 +164,11 @@ class StaffProfile(models.Model):
     display_name = models.CharField(_("nazwa do podpisu"), max_length=100, blank=True)
     login_alias = models.CharField(_("alias w logach"), max_length=50, blank=True)
     is_visible_in_rankings = models.BooleanField(_("widoczny w rankingach"), default=True)
+    accepts_shipment_repairs = models.BooleanField(
+        _("przyjmuje naprawy wysyłkowe"),
+        default=True,
+        help_text=_("Czy pracownik może być przypisywany do napraw wysyłkowych"),
+    )
 
     # Statystyki (będą aktualizowane przez sygnały / serwisy)
     total_repairs = models.PositiveIntegerField(_("łączna liczba napraw"), default=0)
@@ -195,3 +211,84 @@ class LoginActivity(models.Model):
 
     def __str__(self):
         return f"{self.get_login_status_display()} — {self.user or '?'} @ {self.logged_in_at}"
+
+
+class StaffNotification(models.Model):
+    """
+    Powiadomienie dla pracownika (Staff Notifications Center).
+    Tylko w systemie (bez e-mail/SMS do staffu).
+    """
+    LOW = "low"
+    STANDARD = "standard"
+    IMPORTANT = "important"
+    URGENT = "urgent"
+    PRIORITY_CHOICES = [
+        (LOW, _("niski")),
+        (STANDARD, _("standardowy")),
+        (IMPORTANT, _("ważny")),
+        (URGENT, _("pilny")),
+    ]
+    UNREAD = "unread"
+    READ = "read"
+    ARCHIVED = "archived"
+    STATUS_CHOICES = [
+        (UNREAD, _("nieprzeczytane")),
+        (READ, _("przeczytane")),
+        (ARCHIVED, _("zarchiwizowane")),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="staff_notifications",
+        verbose_name=_("pracownik"),
+    )
+    notification_type = models.CharField(
+        _("typ"),
+        max_length=50,
+        db_index=True,
+        help_text=_("np. repair_assigned, client_message, note_added, quote_accepted, part_arrived, sla_exceeded"),
+    )
+    priority = models.CharField(
+        _("priorytet"),
+        max_length=20,
+        choices=PRIORITY_CHOICES,
+        default=STANDARD,
+        db_index=True,
+    )
+    repair = models.ForeignKey(
+        "repairs.RepairRequest",
+        on_delete=models.CASCADE,
+        related_name="staff_notifications",
+        verbose_name=_("naprawa"),
+        null=True,
+        blank=True,
+    )
+    title = models.CharField(_("tytuł"), max_length=200)
+    description = models.TextField(_("opis"), blank=True)
+    status = models.CharField(
+        _("status"),
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=UNREAD,
+        db_index=True,
+    )
+    link = models.CharField(
+        _("link"),
+        max_length=500,
+        blank=True,
+        help_text=_("Ścieżka do widoku, np. /staff/repairs/xxx"),
+    )
+    created_at = models.DateTimeField(_("data utworzenia"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("powiadomienie pracownika")
+        verbose_name_plural = _("powiadomienia pracowników")
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user", "status", "-created_at"]),
+            models.Index(fields=["user", "notification_type"]),
+        ]
+
+    def __str__(self):
+        return f"{self.title} — {self.user.get_full_name()}"

@@ -64,8 +64,13 @@ def change_repair_status(repair, new_status, changed_by_id=None, notes=""):
             repair.picked_up_at = now
         elif new_status == RepairStatus.DELIVERED and not repair.picked_up_at:
             repair.picked_up_at = now  # traktujemy dostawę jako „odbior”
+        elif new_status == RepairStatus.QUOTE_SENT and not repair.quote_sent_at:
+            repair.quote_sent_at = now
 
-        repair.save(update_fields=["status", "updated_at", "accepted_at", "completed_at", "ready_for_pickup_at", "picked_up_at"])
+        repair.save(update_fields=[
+            "status", "updated_at", "accepted_at", "completed_at",
+            "ready_for_pickup_at", "picked_up_at", "quote_sent_at",
+        ])
 
         RepairStatusHistory.objects.create(
             repair=repair,

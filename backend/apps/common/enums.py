@@ -92,6 +92,21 @@ class ContactPreference(models.TextChoices):
     PANEL = "panel", _("Panel klienta")
 
 
+class ClientType(models.TextChoices):
+    """Typ klienta: osoba prywatna lub firma."""
+    INDIVIDUAL = "individual", _("Osoba prywatna")
+    BUSINESS = "business", _("Firma")
+
+
+class ClientSegment(models.TextChoices):
+    """Segment klienta (do analityki i badge'ów)."""
+    NEW = "new", _("Nowy klient")
+    RETURNING = "returning", _("Klient powracający")
+    REGULAR = "regular", _("Klient stały")
+    PREMIUM = "premium", _("Klient premium")
+    BUSINESS = "business", _("Klient biznesowy")
+
+
 class ConsentType(models.TextChoices):
     """Typy zgód."""
     CONTACT = "contact", _("Zgoda na kontakt")
@@ -140,6 +155,17 @@ class RepairType(models.TextChoices):
     WARRANTY = "warranty", _("Gwarancyjna")
     COMPLAINT = "complaint", _("Reklamacja")
     SCHEDULED = "scheduled", _("Z umówionym terminem")
+
+
+class ComplaintWarrantyStatus(models.TextChoices):
+    """Status reklamacji / gwarancji (osobny od statusu naprawy)."""
+    ACCEPTED = "accepted", _("Przyjęta")
+    VERIFICATION = "verification", _("Weryfikacja")
+    AWAITING_DECISION = "awaiting_decision", _("Oczekuje na decyzję")
+    RECOGNIZED = "recognized", _("Uznana")
+    REJECTED = "rejected", _("Odrzucona")
+    IN_PROGRESS = "in_progress", _("W trakcie realizacji")
+    CLOSED = "closed", _("Zakończona")
 
 
 class RepairSource(models.TextChoices):

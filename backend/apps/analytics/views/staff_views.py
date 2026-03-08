@@ -1,5 +1,6 @@
 """
 Widok menedżerski pracownika i snapshoty statystyk (tylko admin).
+Health score pracownika (Etap 4).
 """
 from datetime import datetime
 from django.utils import timezone
@@ -11,6 +12,7 @@ from rest_framework.exceptions import NotFound
 
 from apps.accounts.models import User, UserRole
 from apps.repairs.models import RepairRequest
+from apps.repairs.selectors import staff_health_score
 from apps.common.enums import RepairStatus
 from apps.analytics.models import EmployeeStatsSnapshot
 from apps.repairs.services.health_score import get_repair_health_score
@@ -151,10 +153,35 @@ class StaffManagerView(APIView):
             for e in audit
         ]
 
+        # Health score pracownika (jakość pracy: zielony / żółty / czerwony)
+        health_score_data = staff_health_score(user_id)
+
         return Response({
             "employee": employee_data,
             "stats": stats,
             "health": health,
+            "health_score": health_score_data,
             "repairs": repairs_data,
             "recent_audit": audit_data,
         })
+
+
+class StaffHealthScoreView(APIView):
+    """
+    GET /api/v1/analytics/staff/<user_id>/health-score/
+    Health score pracownika (zielony/żółty/czerwony) + czynniki. Tylko admin.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        if not _is_admin(request):
+            return Response({"detail": "Tylko administrator."}, status=403)
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            raise NotFound("Użytkownik nie znaleziony.")
+        if user.role != UserRole.STAFF:
+            return Response({"detail": "Nie jest pracownikiem serwisu."}, status=400)
+        data = staff_health_score(user_id)
+        data["employee_id"] = str(user_id)
+        data["employee_name"] = user.get_full_name()
+        return Response(data)

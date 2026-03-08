@@ -14,6 +14,9 @@ from .repair_list import (
 )
 from .staff_dashboard import (
     staff_dashboard_data,
+    staff_dashboard_quality_metrics,
+    staff_health_score,
+    pickup_panel_data,
     staff_repairs_my_new,
     staff_repairs_my_urgent,
     staff_repairs_today_to_contact,
@@ -33,6 +36,9 @@ __all__ = [
     "repairs_waiting_for_client_decision",
     "repairs_overdue",
     "staff_dashboard_data",
+    "staff_dashboard_quality_metrics",
+    "staff_health_score",
+    "pickup_panel_data",
     "staff_repairs_my_new",
     "staff_repairs_my_urgent",
     "staff_repairs_today_to_contact",

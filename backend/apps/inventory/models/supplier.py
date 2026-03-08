@@ -15,7 +15,8 @@ class Supplier(TimestampedModel):
     country = models.CharField(_("kraj"), max_length=100, default="Polska", blank=True)
     phone = models.CharField(_("telefon"), max_length=30, blank=True)
     email = models.EmailField(_("e-mail"), blank=True)
-    notes = models.TextField(_("notatki"), blank=True)
+    website_url = models.URLField(_("link do hurtowni"), blank=True, max_length=500)
+    notes = models.TextField(_("notatka wewnętrzna"), blank=True)
     is_active = models.BooleanField(_("aktywny"), default=True)
 
     class Meta:

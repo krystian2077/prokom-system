@@ -207,6 +207,24 @@ class Device(BaseModel):
         help_text=_("Jeśli model nie jest w bazie")
     )
 
+    # „Inne urządzenie” (kategoria other) — pola ręczne przy przyjęciu stacjonarnym
+    manual_device_name = models.CharField(
+        _("nazwa urządzenia (inne)"),
+        max_length=200,
+        blank=True,
+        help_text=_("Dla kategorii „inne urządzenie”"),
+    )
+    manual_brand = models.CharField(
+        _("marka (ręcznie)"),
+        max_length=100,
+        blank=True,
+    )
+    manual_model = models.CharField(
+        _("model (ręcznie)"),
+        max_length=150,
+        blank=True,
+    )
+
     # Identyfikatory urządzenia
     serial_number = models.CharField(
         _("numer seryjny"),
@@ -279,14 +297,19 @@ class Device(BaseModel):
 
     def get_device_name(self):
         """Zwraca nazwę urządzenia."""
+        if self.manual_device_name:
+            return self.manual_device_name
         if self.device_model:
             return str(self.device_model)
-        elif self.brand and self.model_name:
+        if self.manual_brand and self.manual_model:
+            return f"{self.manual_brand} {self.manual_model}"
+        if self.brand and self.model_name:
             return f"{self.brand.name} {self.model_name}"
-        elif self.model_name:
+        if self.model_name:
             return self.model_name
-        else:
-            return f"{self.get_category_display()}"
+        if self.manual_brand:
+            return self.manual_brand
+        return f"{self.get_category_display()}"
 
     def get_brand_name(self):
         """Zwraca nazwę marki."""

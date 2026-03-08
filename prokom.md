@@ -29269,3 +29269,2326 @@ Najlepszy kolejny ruch to teraz przejście do dokładnych modeli Django dla pier
 
 
 ````
+
+1. Inteligentny system powiadomień dla pracowników
+
+To powinien być osobny moduł: Staff Notifications Center.
+
+Co ma wywoływać powiadomienie
+
+Pracownik dostaje powiadomienie, gdy:
+
+została przypisana do niego nowa naprawa,
+
+wpłynęła nowa wiadomość od klienta do jego naprawy,
+
+inny pracownik lub admin dodał notatkę do jego naprawy,
+
+ktoś dodał komentarz zespołowy z oznaczeniem jego osoby,
+
+klient zaakceptował wycenę,
+
+klient odrzucił wycenę,
+
+klient nie odpowiedział w wymaganym czasie,
+
+część do jego naprawy została oznaczona jako dotarła,
+
+naprawa zbliża się do terminu,
+
+naprawa przekracza SLA,
+
+pojawiła się reklamacja lub gwarancja przypisana do niego.
+
+Typy powiadomień
+
+Każde powiadomienie powinno mieć:
+
+typ,
+
+priorytet,
+
+powiązaną naprawę,
+
+krótki tytuł,
+
+krótki opis,
+
+status przeczytane / nieprzeczytane,
+
+datę utworzenia,
+
+link do właściwego widoku.
+
+Priorytety
+
+niski
+
+standardowy
+
+ważny
+
+pilny
+
+Gdzie to pokazujemy
+
+W panelu staff:
+
+ikona dzwonka w top barze,
+
+dropdown z ostatnimi powiadomieniami,
+
+osobna zakładka „Powiadomienia”.
+
+Inteligencja systemu
+
+Powiadomienia nie mogą spamować.
+Dlatego:
+
+grupujemy podobne zdarzenia,
+
+nie wysyłamy 5 identycznych notyfikacji w minutę,
+
+oznaczenie jednej sprawy jako przeczytanej może czyścić powiązane mikroalerty.
+
+Przykłady
+
+„Nowa naprawa przypisana do Ciebie: PROKOM-0042-2026”
+
+„Klient odpisał w sprawie wyceny: PROKOM-0042-2026”
+
+„Rafał dodał notatkę do Twojej naprawy”
+
+„Naprawa przekroczyła 24h bez wyceny”
+
+2. Statystyki dla pracowników
+
+Każdy pracownik powinien mieć własny mini-dashboard.
+
+Staff dashboard — KPI
+
+liczba moich nowych napraw,
+
+liczba moich napraw w toku,
+
+liczba moich pilnych,
+
+liczba gotowych do odbioru,
+
+liczba zaległych,
+
+liczba napraw bez wyceny,
+
+liczba napraw bez odpowiedzi klienta,
+
+liczba reklamacji/gwarancji,
+
+sprzedaż dodatkowa,
+
+sprzedaż Hammer Glass,
+
+liczba zakończonych napraw w danym okresie.
+
+Wykresy dla staff
+
+naprawy dzisiaj / tydzień / miesiąc,
+
+statusy moich napraw,
+
+sprzedaż dodatkowa w czasie,
+
+skuteczność wycen,
+
+średni czas od przyjęcia do diagnozy,
+
+średni czas od diagnozy do wyceny.
+
+Widoki czasu
+
+Tak jak ustaliliśmy:
+
+dziś
+
+jutro
+
+bieżący tydzień
+
+wybierz okres
+
+3. Rozbudowany dashboard admina
+
+Dla admina robimy osobny poziom analityki.
+
+KPI główne
+
+nowe zgłoszenia,
+
+naprawy w toku,
+
+gotowe do odbioru,
+
+nieodebrane urządzenia,
+
+przychód,
+
+zysk,
+
+wartość wycen,
+
+liczba reklamacji,
+
+liczba gwarancji,
+
+sprzedaż Hammer Glass,
+
+sprzedaż akcesoriów,
+
+skuteczność kontaktu z klientem.
+
+Dynamiczne wykresy i diagramy
+
+Admin powinien mieć:
+
+wykres napraw w czasie,
+
+wykres przychodu i zysku,
+
+wykres statusów,
+
+wykres reklamacji i gwarancji,
+
+wykres sprzedaży Hammer Glass,
+
+wykres sprzedaży akcesoriów,
+
+porównanie pracowników,
+
+średni czas realizacji napraw,
+
+skuteczność wycen,
+
+udział źródeł zgłoszeń,
+
+udział kategorii urządzeń,
+
+najczęściej naprawiane marki i modele.
+
+Tabele dynamiczne
+
+top pracownicy,
+
+najbardziej zaległe naprawy,
+
+naprawy bez wyceny,
+
+nieodebrane urządzenia,
+
+reklamacje aktywne,
+
+gwarancje aktywne,
+
+najczęściej sprzedawane akcesoria,
+
+najlepiej konwertujące upselle.
+
+Filtry
+
+zakres dat,
+
+pracownik,
+
+typ urządzenia,
+
+źródło zgłoszenia,
+
+status,
+
+reklamacja / gwarancja / standard.
+
+4. Konta pracowników i adminów
+
+Tak — warto je utworzyć od razu.
+
+Role
+
+admin
+
+staff
+
+Konta startowe
+
+kuba
+
+rafal
+
+pawel
+
+krystian
+
+szef
+
+Co zapisujemy w profilu pracownika
+
+imię i nazwisko,
+
+login,
+
+rola,
+
+specjalizacja,
+
+kolor w kalendarzu,
+
+aktywny / nieaktywny,
+
+widoczność w rankingach,
+
+domyślny zakres urządzeń,
+
+domyślne powiadomienia.
+
+Specjalizacje
+
+Jakub Filas — telefony, tablety, smartwatche, odzyskiwanie danych
+
+Rafał Smółka — laptopy, komputery, drukarki, konsole
+
+Paweł Górka — proste naprawy
+
+Krystian Potaczek — admin
+
+Szef — admin
+
+5. „Inne urządzenie” przy przyjęciu stacjonarnym
+
+Tak — to musi być obsłużone elegancko.
+
+Logika
+
+Jeśli urządzenie nie pasuje do standardowych kategorii:
+
+pracownik wybiera kategorię: inne urządzenie
+
+system pokazuje ręczne pola.
+
+Pola dla „inne urządzenie”
+
+nazwa urządzenia,
+
+marka,
+
+model,
+
+typ urządzenia,
+
+opis problemu,
+
+numer seryjny, jeśli jest,
+
+notatka dodatkowa.
+
+Dodatkowo
+
+Warto dodać pole:
+
+„czy dodać jako nową kategorię do przyszłej obsługi”
+tylko wewnętrznie dla admina / staff.
+
+To pozwoli później rozwijać bazę modeli bez chaosu.
+
+6. Reklamacje i gwarancje — dopracowanie
+
+To powinien być pełny moduł, a nie tylko flaga.
+
+Typy spraw
+
+standardowa naprawa
+
+gwarancja
+
+reklamacja
+
+Różnica
+Gwarancja
+
+Dotyczy naprawy lub części objętej gwarancją przez PRO-KOM.
+
+Reklamacja
+
+Dotyczy sytuacji, gdy klient zgłasza problem z wykonaną usługą lub efektem naprawy.
+
+Kluczowa zasada
+
+Reklamacja / gwarancja powinna być:
+
+osobną sprawą,
+
+ale powiązaną z wcześniejszą naprawą.
+
+Czyli:
+
+nowy rekord zgłoszenia,
+
+link do poprzedniej naprawy,
+
+widoczne powiązanie w obu kierunkach.
+
+Co zapisujemy
+
+typ: reklamacja / gwarancja,
+
+naprawa źródłowa,
+
+data zgłoszenia,
+
+opis problemu,
+
+osoba przyjmująca,
+
+przypisany serwisant,
+
+status,
+
+decyzja,
+
+wynik,
+
+koszt po stronie firmy, jeśli wystąpił.
+
+Statusy reklamacji / gwarancji
+
+przyjęta
+
+weryfikacja
+
+oczekuje na decyzję
+
+uznana
+
+odrzucona
+
+w trakcie realizacji
+
+zakończona
+
+Zakładka w panelu staff/admin
+
+Osobna sekcja:
+
+Reklamacje
+
+Gwarancje
+
+Widoki
+
+wszystkie reklamacje
+
+wszystkie gwarancje
+
+moje reklamacje
+
+moje gwarancje
+
+pilne reklamacje
+
+reklamacje bez decyzji
+
+gwarancje w toku
+
+W szczegółach reklamacji / gwarancji
+
+numer nowej sprawy,
+
+numer naprawy źródłowej,
+
+klient,
+
+urządzenie,
+
+przyczyna,
+
+historia,
+
+decyzje,
+
+koszt,
+
+komunikacja,
+
+zdjęcia.
+
+Statystyki admina
+
+liczba reklamacji,
+
+liczba gwarancji,
+
+uznane / odrzucone,
+
+reklamacje per pracownik,
+
+reklamacje per typ urządzenia,
+
+reklamacje per marka,
+
+koszt reklamacji dla firmy,
+
+średni czas zamknięcia reklamacji.
+
+7. Co dopisałbym jeszcze do tych modułów
+A. Powiadomienia — widok „wymaga reakcji”
+
+Dla staff:
+
+nie tylko lista powiadomień,
+
+ale osobna sekcja:
+„Wymaga reakcji”
+
+Czyli:
+
+nowa wiadomość od klienta,
+
+brak odpowiedzi,
+
+naprawa po SLA,
+
+reklamacja oczekuje,
+
+gwarancja oczekuje.
+
+B. Reklamacje / gwarancje — badge na liście napraw
+
+Na głównej liście napraw:
+
+badge reklamacja
+
+badge gwarancja
+
+C. Powiązania z poprzednią naprawą
+
+W szczegółach zwykłej naprawy:
+
+sekcja: „Powiązane reklamacje / gwarancje”
+
+D. Dashboard staff — jakość pracy
+
+Można dodać:
+
+liczba reklamacji do moich napraw,
+
+wskaźnik reklamacyjności,
+
+średni czas odpowiedzi do klienta.
+
+To będzie bardzo cenne.
+
+8. Jak to dołożyć do backendu
+Nowe modele, które warto dodać
+
+StaffNotification
+
+NotificationPreference
+
+RepairRelatedCase albo rozszerzenie RepairRequest
+
+ComplaintDecision
+
+WarrantyDecision
+
+EmployeeStatsSnapshot
+
+Minimalna wersja
+
+Najprościej:
+
+rozszerzyć RepairRequest o:
+
+parent_repair
+
+case_kind = standard / complaint / warranty
+
+dodać model StaffNotification
+
+To będzie bardzo skuteczne i nieprzekombinowane.
+
+9. Moja rekomendacja
+
+To, co proponujesz, jest bardzo trafne i warto to wdrożyć od razu do architektury.
+
+Najbardziej sensowna kolejność:
+
+dodać moduł powiadomień staffu
+
+dodać dashboardy i statystyki
+
+dopracować obsługę innego urządzenia
+
+wdrożyć pełny moduł reklamacji i gwarancji
+
+10. Dwa krótkie pytania, żeby to domknąć idealnie
+
+Chcę doprecyzować 4 rzeczy:
+
+1.
+
+Czy powiadomienia staffu mają być tylko w systemie, czy też chcesz opcjonalnie:
+
+e-mail dla staff
+
+SMS dla staff
+przy najważniejszych zdarzeniach?
+
+2.
+
+Czy reklamacja i gwarancja mają mieć własny numer sprawy, np.:
+
+PROKOM-0042-2026-R1
+czy normalny nowy numer jak każda naprawa?
+
+3.
+
+Czy przy gwarancji / reklamacji chcesz pole:
+
+„czy uznano na koszt firmy”
+
+„czy części pokrywa firma”
+
+„czy robocizna pokrywa firma”
+
+4.
+
+Czy w statystykach pracownika chcesz też widzieć:
+
+liczbę wiadomości do klientów,
+
+średni czas odpowiedzi,
+
+liczbę niezamkniętych spraw,
+czy tylko naprawy i sprzedaż?
+
+Jak odpowiesz, zaktualizuję Ci to do finalnej specyfikacji i mogę od razu przejść do rozbudowy backend scaffold o te moduły.
+
+A. Powiadomienia — widok „wymaga reakcji” - chce to ,B. Reklamacje / gwarancje — badge na liście napraw - chce to, Powiązania z poprzednią naprawą-chce to ,Dashboard staff — jakość pracy - chce to 
+Czy powiadomienia staffu mają być tylko w systemie, czy też chcesz opcjonalnie: tylko w systemie,
+Czy reklamacja i gwarancja mają mieć własny numer sprawy, tak własny numer
+
+Czy w statystykach pracownika chcesz też widzieć:
+liczbę wiadomości do klientów,
+
+
+liczbę niezamkniętych spraw,
+czy tylko naprawy i sprzedaż
+
+Super — dopinamy to.
+
+Przyjmuję finalnie, że wdrażamy:
+
+widok „Wymaga reakcji”
+
+badge reklamacja / gwarancja na liście napraw
+
+powiązania z poprzednią naprawą
+
+jakość pracy na dashboardzie staff
+
+powiadomienia staffu tylko w systemie
+
+reklamacje i gwarancje mają własny numer sprawy
+
+W statystykach pracownika dodajemy:
+
+liczbę wiadomości do klientów
+
+liczbę niezamkniętych spraw
+
+Dorzuciłbym też od razu średni czas odpowiedzi do klienta, bo to bardzo wartościowy wskaźnik jakości pracy i dobrze pasuje do tego zestawu.
+
+Finalna decyzja dla tych modułów
+1. Staff Notifications Center
+
+Nowy moduł powiadomień wewnętrznych w systemie.
+
+Typy powiadomień
+
+Pracownik dostaje powiadomienie, gdy:
+
+przypisano mu nową naprawę
+
+klient napisał nową wiadomość
+
+inny pracownik/admin dodał notatkę do jego naprawy
+
+ktoś oznaczył go w komunikacji zespołowej
+
+klient zaakceptował wycenę
+
+klient odrzucił wycenę
+
+część dotarła do jego naprawy
+
+naprawa wymaga kontaktu dziś
+
+naprawa przekracza SLA
+
+pojawiła się reklamacja lub gwarancja przypisana do niego
+
+reklamacja / gwarancja czeka na decyzję
+
+jego szybkie przyjęcie nadal jest nieuzupełnione
+
+Priorytet powiadomień
+
+niski
+
+standardowy
+
+ważny
+
+pilny
+
+Status powiadomień
+
+nieprzeczytane
+
+przeczytane
+
+zarchiwizowane
+
+Widoki
+
+dzwonek w top barze
+
+dropdown ostatnich powiadomień
+
+osobna zakładka Powiadomienia
+
+osobna sekcja Wymaga reakcji
+
+2. Widok „Wymaga reakcji”
+
+To będzie bardzo ważny blok na dashboardzie staff.
+
+Trafiają tam sprawy:
+
+nowa wiadomość od klienta
+
+brak odpowiedzi klientowi
+
+brak wyceny po SLA
+
+zaakceptowana wycena bez zamówienia części
+
+reklamacja bez decyzji
+
+gwarancja bez decyzji
+
+szybkie przyjęcie nieuzupełnione
+
+naprawa bez aktualizacji od X czasu
+
+nieodebrane urządzenie po przekroczeniu progu
+
+notatka zespołowa z oznaczeniem pracownika
+
+To nie jest zwykła lista powiadomień, tylko praktyczna kolejka reakcji.
+
+3. Reklamacje i gwarancje jako pełny moduł
+
+To wdrażamy jako osobne sprawy, ale powiązane z naprawą źródłową.
+
+Każda reklamacja / gwarancja ma:
+
+własny numer sprawy
+
+własny rekord
+
+własne statusy
+
+własną historię
+
+powiązanie do wcześniejszej naprawy
+
+Numeracja
+
+Rekomenduję nadal spójny styl, np.:
+
+PROKOM-0101-2026
+
+a typ sprawy będzie widoczny w polu:
+
+case_kind = standard / complaint / warranty
+
+To utrzyma porządek w numeracji, a jednocześnie każda sprawa będzie osobna.
+
+Powiązanie z poprzednią naprawą
+
+Każda reklamacja / gwarancja ma pole:
+
+parent_repair
+
+W szczegółach standardowej naprawy pokażemy:
+
+Powiązane reklamacje
+
+Powiązane gwarancje
+
+W szczegółach reklamacji / gwarancji pokażemy:
+
+Naprawa źródłowa
+
+Badge na liście napraw
+
+Na liście napraw:
+
+Reklamacja
+
+Gwarancja
+
+Możemy też dodać kolorystyczne rozróżnienie:
+
+reklamacja — pomarańcz / czerwony
+
+gwarancja — niebieski
+
+Statusy reklamacji / gwarancji
+
+przyjęta
+
+weryfikacja
+
+oczekuje na decyzję
+
+uznana
+
+odrzucona
+
+w trakcie realizacji
+
+zakończona
+
+Zakładki w panelu
+
+Dla staff/admin:
+
+Reklamacje
+
+Gwarancje
+
+Widoki:
+
+wszystkie reklamacje
+
+wszystkie gwarancje
+
+moje reklamacje
+
+moje gwarancje
+
+pilne
+
+bez decyzji
+
+w toku
+
+4. Dashboard staff — jakość pracy
+
+Dodajemy osobny blok jakościowy.
+
+KPI jakościowe pracownika
+
+liczba wiadomości do klientów
+
+liczba niezamkniętych spraw
+
+średni czas odpowiedzi do klienta
+
+liczba reklamacji do moich napraw
+
+liczba gwarancji do moich napraw
+
+wskaźnik reklamacyjności
+
+liczba spraw po SLA
+
+liczba spraw bez aktualizacji
+
+Wykresy / podsumowania
+
+moje naprawy w czasie
+
+moje statusy
+
+moje zaległości
+
+moje wiadomości do klientów
+
+moje reklamacje / gwarancje
+
+moja sprzedaż dodatkowa
+
+5. „Inne urządzenie” przy przyjęciu stacjonarnym
+
+To też wdrażamy jako finalny element.
+
+Gdy staff wybierze „inne urządzenie”
+
+System pokaże ręczne pola:
+
+nazwa urządzenia
+
+marka
+
+model
+
+typ urządzenia
+
+opis problemu
+
+numer seryjny
+
+dodatkowa notatka
+
+W modelu danych
+
+Najbezpieczniej:
+
+zachować standardową kategorię other
+
+mieć pola manual_brand, manual_model, manual_device_name
+
+To pozwoli przyjąć niestandardowe urządzenie bez psucia struktury bazy.
+
+6. Jak to dołożyć do backendu
+
+Do scaffoldu backendu dołożymy:
+
+Rozszerzenia RepairRequest
+
+case_kind
+
+parent_repair
+
+requires_attention
+
+last_client_message_at
+
+last_staff_reply_at
+
+last_activity_at
+
+Nowe modele
+
+StaffNotification
+
+EmployeeStatsSnapshot
+
+opcjonalnie ComplaintDecision
+
+opcjonalnie WarrantyDecision
+
+W praktyce na start wystarczy:
+
+RepairRequest z rozróżnieniem typu sprawy
+
+StaffNotification
+
+snapshot statystyk pracownika
+
+7. Rekomendacja implementacyjna
+
+Najbardziej sensownie wdrożyć to tak:
+
+Etap 1
+
+Rozszerzyć RepairRequest o:
+
+standard / complaint / warranty
+
+parent repair
+
+badge logic
+
+flags do dashboardów
+
+Etap 2
+
+Dodać StaffNotification
+
+Etap 3
+
+Dodać dashboard staff quality metrics
+
+Etap 4
+
+Dodać osobne widoki reklamacji i gwarancji
+
+Etap 5
+
+Dodać statystyki admina dla reklamacji / gwarancji
+
+
+Wdrażamy więc te rozszerzenia:
+
+1. Health score pracownika
+
+To będzie osobny wskaźnik jakości pracy pracownika.
+
+Co wpływa na wynik
+
+liczba zaległych spraw,
+
+liczba spraw po SLA,
+
+liczba napraw bez wyceny,
+
+liczba napraw bez odpowiedzi do klienta,
+
+liczba reklamacji i gwarancji,
+
+liczba niezamkniętych spraw,
+
+średni czas odpowiedzi do klienta,
+
+liczba ukończonych napraw,
+
+sprzedaż dodatkowa,
+
+terminowość aktualizacji statusów.
+
+Skala
+
+zielony — dobra organizacja
+
+żółty — wymaga uwagi
+
+czerwony — problemy operacyjne
+
+Gdzie to pokazujemy
+
+dashboard staff — mój health score
+
+dashboard admina — health score każdego pracownika
+
+widok pracownika dla admina
+
+2. Karta klienta premium
+
+To bardzo mocny moduł i warto go mieć.
+
+Co ma zawierać
+
+dane klienta,
+
+typ klienta,
+
+telefon, e-mail,
+
+preferowany kontakt,
+
+historia napraw,
+
+lista urządzeń,
+
+reklamacje / gwarancje,
+
+wcześniejsze wiadomości,
+
+wcześniejsze wyceny,
+
+wcześniejsze zakupy Hammer Glass,
+
+wcześniejsze zakupy akcesoriów,
+
+notatki wewnętrzne o kliencie,
+
+informację, czy klient wrócił kolejny raz.
+
+Efekt praktyczny
+
+Gdy klient przychodzi drugi raz:
+
+staff wyszukuje klienta po numerze telefonu / nazwisku,
+
+widzi jego kartę,
+
+może od razu przejść do przyjmowania kolejnego urządzenia,
+
+nie musi wpisywać wszystkiego od nowa.
+
+To jest dokładnie to, czego chcesz: każdy klient ma być zapisywany i rozpoznawany przy kolejnych wizytach.
+
+3. Segmentacja klientów
+
+Tak — dodajemy.
+
+Typy klientów
+
+nowy klient
+
+klient stały
+
+klient powracający
+
+klient premium
+
+klient biznesowy
+
+Dla zwykłego klienta proponuję nazwę:
+
+klient indywidualny
+
+To brzmi profesjonalnie i jest czytelne.
+
+Logika
+
+jeśli klient jest osobą prywatną i pierwszy raz — nowy / indywidualny
+
+jeśli wraca — powracający / stały
+
+jeśli firma — biznesowy
+
+4. Tryb klient biznesowy / firma
+
+Na ten moment robimy to prosto i dobrze:
+
+W formularzu
+
+pole wyboru:
+
+osoba prywatna
+
+firma
+
+Jeśli firma
+
+pokazują się dodatkowe pola:
+
+nazwa firmy
+
+NIP
+
+osoba kontaktowa
+
+e-mail firmowy
+
+telefon firmowy
+
+To wystarczy na start i już dobrze przygotowuje system na dalszy rozwój.
+
+5. Kolejka części do zamówienia
+
+To bardzo praktyczny moduł.
+
+Widoki
+
+do zamówienia
+
+zamówione
+
+dotarły
+
+opóźnione
+
+przypisane do napraw
+
+Co widzi staff/admin
+
+nazwa części
+
+do jakiej naprawy
+
+klient
+
+kto zamawia
+
+dostawca
+
+koszt
+
+data zamówienia
+
+status
+
+czy część blokuje naprawę
+
+Główna korzyść
+
+Widać od razu:
+
+co trzeba zamówić,
+
+co już jedzie,
+
+co dotarło,
+
+które naprawy stoją przez brak części.
+
+6. Automatyczne tagi napraw
+
+Tak — to warto wdrożyć.
+
+Tagi systemowe
+
+pilne
+
+same day
+
+Apple
+
+Samsung
+
+wysyłkowe
+
+reklamacja
+
+gwarancja
+
+Hammer Glass
+
+sprzedaż dodatkowa
+
+czeka na część
+
+niekompletne
+
+klient wraca
+
+firma
+
+odzyskiwanie danych
+
+zalanie
+
+Jak działają
+
+System nadaje je automatycznie na podstawie:
+
+kategorii urządzenia,
+
+typu sprawy,
+
+źródła,
+
+statusów,
+
+sprzedaży,
+
+relacji klienta z systemem.
+
+To poprawi:
+
+filtrowanie,
+
+szukanie,
+
+dashboardy,
+
+analitykę.
+
+7. Status „czeka na klienta od X dni”
+
+To bardzo dobre ulepszenie.
+
+Jak pokazujemy
+
+czeka 1 dzień
+
+czeka 3 dni
+
+czeka 7 dni
+
+czeka 14 dni
+
+Gdzie
+
+lista napraw
+
+sekcja „Wymaga reakcji”
+
+dashboard admina
+
+dashboard staff
+
+To ma duży sens, bo od razu pokazuje, które sprawy utknęły po stronie klienta.
+
+8. Panel odbiorów
+
+To powinien być osobny widok.
+
+Sekcje panelu odbiorów
+
+gotowe do odbioru
+
+dziś do wydania
+
+nieodebrane od 3 dni
+
+nieodebrane od 7 dni
+
+przygotować wysyłkę zwrotną
+
+wydane dziś
+
+Co ma być widoczne
+
+numer naprawy
+
+klient
+
+urządzenie
+
+status
+
+data gotowości
+
+licznik dni od gotowości
+
+płatność
+
+czy jest Hammer Glass / akcesoria
+
+czy zwrot osobisty czy wysyłkowy
+
+To bardzo uporządkuje końcówkę procesu.
+
+9. Moduł zdjęć „przed / po”
+
+Tak — bardzo dobry pomysł.
+
+Typy zdjęć
+
+przed naprawą
+
+w trakcie
+
+po naprawie
+
+paczka po odbiorze
+
+uszkodzenie szczegółowe
+
+Widoczność
+
+staff/admin widzi wszystko
+
+klient widzi tylko te zdjęcia, które mają flagę widoczne dla klienta
+
+Korzyści
+
+lepsza dokumentacja
+
+mniej sporów
+
+większe zaufanie klienta
+
+porządek przy reklamacjach i gwarancjach
+
+10. Moduł „klient wraca”
+
+To wdrażamy dokładnie tak, jak opisałeś.
+
+Główna zasada
+
+Każdy klient ma być zapisywany przy pierwszej naprawie.
+
+Przy kolejnej wizycie
+
+staff:
+
+wyszukuje klienta po telefonie / nazwisku / e-mailu,
+
+otwiera jego kartę,
+
+widzi historię,
+
+widzi wcześniejsze urządzenia,
+
+może wybrać istniejące urządzenie albo dodać nowe,
+
+od razu przechodzi do przyjęcia bez wpisywania wszystkiego od zera.
+
+Dodatkowo
+
+System może pokazać badge:
+
+klient wraca
+
+stały klient
+
+To jest bardzo przydatne operacyjnie i wizerunkowo.
+
+11. Jak to wdrożyć w modelu danych
+
+Najlepiej dodać lub rozszerzyć:
+
+Client
+
+client_type → individual / business
+
+client_segment → new / returning / regular / premium / business
+
+visit_count
+
+last_visit_at
+
+RepairRequest
+
+waiting_for_client_days
+
+auto_tags
+
+case_kind
+
+parent_repair
+
+ClientDevice
+
+rozszerzona historia urządzeń klienta
+
+Nowe modele
+
+StaffNotification
+
+EmployeeStatsSnapshot
+
+RepairPhoto
+
+PartOrderQueueItem albo rozszerzenie zamówień części
+
+12. Moja rekomendacja wdrożeniowa
+
+Najlepiej wdrożyć to w tej kolejności:
+
+Etap 1
+
+karta klienta premium
+
+klient wraca
+
+typ klienta: osoba prywatna / firma
+
+segmentacja klientów
+
+Etap 2
+
+automatyczne tagi
+
+status „czeka na klienta od X dni”
+
+panel odbiorów
+
+Etap 3
+
+kolejka części do zamówienia
+
+moduł zdjęć „przed / po”
+
+Etap 4
+
+health score pracownika
+
+statystyki jakościowe staffu
+
+rozbudowane dashboardy admina
+
+13. Mój werdykt
+
+To są bardzo dobre rozszerzenia.
+Nie są „na siłę” — one naprawdę:
+
+przyspieszą pracę,
+
+poprawią obsługę klienta,
+
+zwiększą porządek,
+
+dadzą adminowi lepszy nadzór.
+
+Najmocniejsze z nich to:
+
+karta klienta premium
+
+klient wraca
+
+panel odbiorów
+
+kolejka części do zamówienia
+
+health score pracownika
+
+Moduł: Zarządzanie pracownikami (Staff Management)
+
+Dostęp tylko dla adminów.
+
+Panel pozwala adminowi zarządzać całym zespołem.
+
+1. Lista pracowników
+
+Admin ma widok tabeli wszystkich pracowników.
+
+W tabeli
+
+imię i nazwisko
+
+login
+
+rola
+
+specjalizacja
+
+liczba aktywnych napraw
+
+liczba zakończonych napraw
+
+health score
+
+status konta (aktywny / zablokowany)
+
+data ostatniego logowania
+
+Filtry
+
+rola
+
+aktywny / nieaktywny
+
+specjalizacja
+
+liczba napraw
+
+health score
+
+2. Dodawanie nowego pracownika
+
+Admin może utworzyć konto pracownika.
+
+Formularz
+
+Dane podstawowe:
+
+imię
+
+nazwisko
+
+login
+
+e-mail
+
+telefon (opcjonalnie)
+
+Uprawnienia:
+
+rola
+
+Role systemowe:
+
+Admin
+
+pełny dostęp
+
+zarządzanie systemem
+
+zarządzanie pracownikami
+
+statystyki
+
+konfiguracja
+
+Staff
+
+obsługa napraw
+
+kontakt z klientem
+
+notatki
+
+zdjęcia
+
+upsell
+
+Dodatkowe pola pracownika
+
+specjalizacja
+
+kolor w kalendarzu
+
+czy widoczny w rankingach
+
+czy przyjmuje naprawy wysyłkowe
+
+czy może przyjmować naprawy
+
+3. Edycja pracownika
+
+Admin może zmieniać:
+
+imię
+
+nazwisko
+
+login
+
+email
+
+telefon
+
+specjalizację
+
+rolę
+
+kolor kalendarza
+
+dostęp do funkcji
+
+aktywność konta
+
+4. Reset hasła pracownika
+
+Admin może:
+
+wygenerować nowe hasło
+
+wysłać link resetu
+
+wymusić zmianę hasła przy następnym logowaniu
+
+5. Dezaktywacja konta
+
+Nie usuwamy pracownika z bazy (bo ma historię napraw).
+
+Zamiast tego:
+
+status:
+
+aktywny
+zablokowany
+
+Zablokowany pracownik:
+
+nie może się zalogować
+
+nadal istnieje w historii napraw
+
+6. Usunięcie pracownika
+
+System powinien pozwalać tylko na:
+
+soft delete
+
+czyli:
+
+konto zablokowane
+
+oznaczone jako archiwalne
+
+Historia napraw zostaje.
+
+7. Uprawnienia (permissions)
+
+Role są proste, ale można dodać uprawnienia granularne.
+
+Przykładowe
+
+czy może:
+
+zmieniać status napraw
+
+edytować wyceny
+
+dodawać części
+
+dodawać zdjęcia
+
+wysyłać wiadomości do klientów
+
+zarządzać reklamacjami
+
+zarządzać gwarancjami
+
+przeglądać statystyki
+
+eksportować dane
+
+8. Panel szczegółów pracownika
+
+Admin widzi pełny profil pracownika.
+
+Dane
+
+dane osobowe
+
+rola
+
+specjalizacja
+
+Statystyki
+
+liczba napraw
+
+liczba zakończonych
+
+liczba reklamacji
+
+liczba gwarancji
+
+średni czas naprawy
+
+średni czas odpowiedzi
+
+sprzedaż Hammer Glass
+
+sprzedaż akcesoriów
+
+Health score
+
+wskaźnik jakości pracy
+
+9. Historia aktywności pracownika
+
+Admin może zobaczyć:
+
+zmiana statusów
+
+dodane wyceny
+
+wiadomości do klientów
+
+dodane notatki
+
+przypisane naprawy
+
+zamknięte naprawy
+
+To jest audit trail.
+
+10. Logi logowania
+
+Admin może zobaczyć:
+
+kiedy pracownik się logował
+
+z jakiego IP
+
+czy logowanie było poprawne
+
+To zwiększa bezpieczeństwo.
+
+11. Automatyczne przypisywanie napraw
+
+Można dodać system:
+
+auto assign
+
+np.
+
+telefony → Jakub
+laptopy → Rafał
+drukarki → Rafał
+proste naprawy → Paweł
+
+Admin może zmieniać te reguły.
+
+12. Ranking pracowników
+
+Opcjonalnie.
+
+Widok:
+
+liczba napraw
+
+sprzedaż dodatkowa
+
+średni czas realizacji
+
+health score
+
+Może być tylko dla admina.
+
+13. W modelu danych
+
+Potrzebujemy rozszerzyć modele.
+
+User
+role
+is_active
+EmployeeProfile
+display_name
+specialization
+calendar_color
+is_visible_in_rankings
+LoginActivity
+ip_address
+login_time
+success
+EmployeeStatsSnapshot
+employee
+date
+repairs_completed
+repairs_active
+messages_to_clients
+upsell_value
+hammer_glass_sales
+health_score
+14. Dlaczego to ważne
+
+Ten moduł daje:
+
+kontrolę adminowi
+
+porządek w zespole
+
+bezpieczeństwo
+
+historię działań
+
+analizę pracy
+
+15. Bardzo ważna rzecz (często pomijana)
+
+W systemie powinien być superadmin.
+
+To konto:
+
+nie może być usunięte
+
+ma pełny dostęp
+
+służy do odzyskania systemu
+
+16. Jak to wygląda w architekturze
+
+Nowy moduł backendu:
+
+apps/
+   staff/
+      models/
+      views/
+      serializers/
+      permissions/
+      stats/
+17. W panelu admina pojawi się sekcja
+
+Zespół
+
+Podsekcje:
+
+pracownicy
+
+role i uprawnienia
+
+aktywność
+
+statystyki zespołu
+
+Podsumowanie
+
+Admin w systemie PRO-KOM będzie mógł:
+
+✔ dodawać pracowników
+✔ edytować dane
+✔ resetować hasła
+✔ blokować konta
+✔ zarządzać rolami
+✔ ustawiać uprawnienia
+✔ przeglądać statystyki pracowników
+✔ sprawdzać aktywność
+✔ zarządzać przypisywaniem napraw
+
+To jest pełnoprawny panel zarządzania zespołem.
+
+Tak — wdrażamy pełny moduł wyszukiwania premium jako centralny element systemu.
+
+To będzie jeden z filarów PRO-KOM i projektujemy go tak, żeby był:
+
+bardzo szybki,
+
+intuicyjny,
+
+bez duplikatów,
+
+przydatny operacyjnie,
+
+wygodny dla staff i admina.
+
+Finalna wersja modułu wyszukiwania
+1. 3 poziomy wyszukiwania
+A. Global Search
+
+Widoczne w top barze panelu staff/admin.
+
+Służy do błyskawicznego szukania:
+
+klientów,
+
+firm,
+
+napraw,
+
+urządzeń,
+
+numerów napraw,
+
+telefonów,
+
+e-maili,
+
+NIP,
+
+IMEI,
+
+numerów seryjnych,
+
+fragmentów opisu naprawy.
+
+B. Intake Search
+
+Specjalny tryb przy tworzeniu nowej naprawy.
+
+Flow:
+
+najpierw wyszukujemy klienta / firmę
+
+system pokazuje dopasowania
+
+jeśli znalazł podobny rekord, wymaga wyboru istniejącego klienta
+
+dopiero potem pozwala przejść dalej
+
+po wyborze klienta pokazuje jego urządzenia
+
+staff wybiera urządzenie lub dodaje nowe
+
+dopiero potem otwiera się formularz naprawy
+
+To jest kluczowe, bo nie chcemy duplikatów.
+
+C. Advanced Search
+
+Osobny ekran do dokładnego wyszukiwania i filtrowania.
+
+Dla admina i staff:
+
+klienci
+
+firmy
+
+naprawy
+
+urządzenia
+
+reklamacje
+
+gwarancje
+
+statusy
+
+daty
+
+pracownik
+
+źródło zgłoszenia
+
+2. Co wyszukujemy
+Klient / firma
+
+imię
+
+nazwisko
+
+telefon
+
+e-mail
+
+nazwa firmy
+
+NIP
+
+Naprawa
+
+numer naprawy
+
+tytuł
+
+opis usterki
+
+status
+
+typ sprawy
+
+przypisany pracownik
+
+Urządzenie
+
+marka
+
+model
+
+IMEI
+
+numer seryjny
+
+ręcznie wpisana nazwa dla „inne urządzenie”
+
+Powiązane sprawy
+
+reklamacje
+
+gwarancje
+
+poprzednie naprawy
+
+powiązane urządzenia
+
+3. Jak pokazujemy wyniki
+
+Nie robimy jednej listy. Wyniki są grupowane:
+
+Klienci
+
+Jan Kowalski
+
+tel. 600…
+
+3 naprawy
+
+2 urządzenia
+
+ostatnia naprawa: iPhone 13 — gotowe do odbioru
+
+Firmy
+
+ABC Serwis Sp. z o.o.
+
+NIP…
+
+7 napraw
+
+5 urządzeń
+
+ostatnia sprawa: Brother HL…
+
+Naprawy
+
+PROKOM-0042-2026
+
+iPhone 13 — wymiana LCD
+
+status: w trakcie naprawy
+
+klient: Jan Kowalski
+
+Urządzenia
+
+iPhone 13 Pro
+
+IMEI…
+
+klient: Jan Kowalski
+
+2 naprawy w historii
+
+4. Dane widoczne od razu przy kliencie
+
+Przy wyniku klienta pokazujemy:
+
+ostatnią naprawę
+
+liczbę napraw
+
+liczbę urządzeń
+
+typ klienta
+
+badge klient wraca
+
+badge firma, jeśli dotyczy
+
+badge reklamacja aktywna, jeśli dotyczy
+
+badge nieodebrane urządzenie, jeśli dotyczy
+
+5. Akcje w wynikach wyszukiwania
+Dla klienta
+
+Otwórz kartę klienta
+
+Dodaj zgłoszenie
+
+Dodaj urządzenie
+
+Pokaż historię napraw
+
+Dla firmy
+
+Otwórz kartę firmy
+
+Dodaj zgłoszenie dla firmy
+
+Dodaj urządzenie firmowe
+
+Pokaż historię spraw
+
+Dla naprawy
+
+Otwórz naprawę
+
+Wyślij wiadomość
+
+Zmień status
+
+Przejdź do wydania
+
+Dla urządzenia
+
+Otwórz kartę urządzenia
+
+Dodaj zgłoszenie dla tego urządzenia
+
+Pokaż historię napraw urządzenia
+
+6. Antyduplikaty
+
+To będzie jedna z najważniejszych reguł systemu.
+
+Klient indywidualny
+
+Szukanie po:
+
+telefonie
+
+e-mailu
+
+imię + nazwisko
+
+Firma
+
+Szukanie po:
+
+NIP
+
+nazwie firmy
+
+telefonie
+
+e-mailu
+
+Reguła systemowa
+
+Jeśli system znajdzie mocne dopasowanie:
+
+nie pozwala od razu przejść dalej
+
+wymaga wyboru istniejącego rekordu
+
+dopiero świadoma akcja pozwala utworzyć nowy rekord
+
+Jeśli nic nie znajdzie:
+
+pokaż Dodaj nowego klienta
+
+pokaż Dodaj nową firmę
+
+7. Model danych
+
+Zostajemy przy jednym modelu Client.
+
+Rozszerzamy Client o:
+
+client_type = individual / business
+
+company_name
+
+tax_id
+
+visit_count
+
+last_visit_at
+
+is_returning_client
+
+client_segment
+
+Rozszerzamy ClientDevice o:
+
+łatwiejsze powiązanie z historią klienta
+
+wsparcie dla ręcznie wpisanych danych przy other
+
+Rozszerzamy RepairRequest o:
+
+case_kind
+
+parent_repair
+
+waiting_for_client_days
+
+auto_tags
+
+last_client_message_at
+
+last_staff_reply_at
+
+last_activity_at
+
+8. Endpointy backendu
+Global search
+
+GET /api/search/global/?q=...
+
+Zwraca:
+
+clients
+
+repairs
+
+devices
+
+Frontend wyświetla firmy jako osobną grupę na podstawie client_type=business.
+
+Intake search
+
+GET /api/search/intake/?q=...
+
+Ten endpoint zwraca lepiej dopracowany wynik do przyjęcia naprawy:
+
+klient / firma
+
+liczba napraw
+
+liczba urządzeń
+
+ostatnia naprawa
+
+badge klient wraca
+
+urządzenia klienta do szybkiego wyboru
+
+Advanced search
+
+GET /api/search/advanced/?q=...&type=...&status=...
+
+9. Wydajność
+
+Żeby to działało jak najlepszy system:
+
+indeksy na repair_number
+
+indeksy na phone
+
+indeksy na email
+
+indeksy na last_name
+
+indeksy na company_name
+
+indeksy na tax_id
+
+indeksy na imei
+
+indeksy na serial_number
+
+Do tego:
+
+debounce po stronie frontendu
+
+limity wyników
+
+osobne lekkie serializery do search
+
+priorytetyzacja wyników exact match > partial match
+
+10. UX premium
+
+Dorzucamy:
+
+ostatnio wyszukiwane rekordy
+
+szybkie akcje w dropdownie
+
+badge w wynikach
+
+możliwość otwarcia pierwszego wyniku Enterem
+
+strzałki do poruszania się po wynikach
+
+wyraźne sekcje wyników
+
+szybki przycisk „Nowa naprawa”
+
+szybki przycisk „Dodaj nowego klienta”
+
+szybki przycisk „Dodaj nową firmę”
+
+11. Jak to wdrażamy
+Etap 1
+
+Rozszerzamy modele:
+
+Client
+
+ClientDevice
+
+RepairRequest
+
+Etap 2
+
+Tworzymy moduł search:
+
+apps/search/
+
+serializers/
+
+views/
+
+selectors/
+
+Etap 3
+
+Dodajemy:
+
+global search endpoint
+
+intake search endpoint
+
+advanced search endpoint
+
+Etap 4
+
+Frontend:
+
+top bar global search
+
+intake search flow
+
+advanced search page
+
+Etap 5
+
+Dopracowanie:
+
+debounce
+
+priorytety
+
+ostatnio wyszukiwane
+
+keyboard navigation
+
+szybkie akcje
+
+12. Finalna decyzja
+
+Global search w PRO-KOM będzie:
+
+centralnym elementem systemu,
+
+obowiązkowym pierwszym krokiem przy nowej naprawie,
+
+oparty o antyduplikaty,
+
+połączony z kartą klienta premium,
+
+połączony z historią urządzeń i napraw,
+
+zaprojektowany jako najlepszy możliwy moduł wyszukiwania dla serwisu.

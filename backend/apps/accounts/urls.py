@@ -1,11 +1,39 @@
 """PRO-KOM Serwis — Accounts API URLs."""
 from django.urls import path
-from .views import LoginView, LogoutView, CurrentUserView
+from .views import LoginView, LogoutView, CurrentUserView, RegisterView
+from .views.notification_views import (
+    StaffNotificationListView,
+    StaffNotificationDetailView,
+    StaffNotificationMarkAllReadView,
+    StaffNotificationRequiresActionView,
+)
+from .views.staff_management_views import (
+    StaffListView,
+    StaffDetailView,
+    StaffUpdateView,
+    StaffResetPasswordView,
+    StaffDeactivateView,
+    StaffActivateView,
+    StaffLoginActivityView,
+)
 
 app_name = "accounts"
 
 urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
+    path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", CurrentUserView.as_view(), name="me"),
+    path("notifications/", StaffNotificationListView.as_view(), name="notifications-list"),
+    path("notifications/requires-action/", StaffNotificationRequiresActionView.as_view(), name="notifications-requires-action"),
+    path("notifications/mark-all-read/", StaffNotificationMarkAllReadView.as_view(), name="notifications-mark-all-read"),
+    path("notifications/<int:pk>/", StaffNotificationDetailView.as_view(), name="notifications-detail"),
+    # Zarządzanie pracownikami (tylko admin)
+    path("staff/", StaffListView.as_view(), name="staff-list"),
+    path("staff/<uuid:pk>/", StaffDetailView.as_view(), name="staff-detail"),
+    path("staff/<uuid:pk>/update/", StaffUpdateView.as_view(), name="staff-update"),
+    path("staff/<uuid:pk>/reset-password/", StaffResetPasswordView.as_view(), name="staff-reset-password"),
+    path("staff/<uuid:pk>/deactivate/", StaffDeactivateView.as_view(), name="staff-deactivate"),
+    path("staff/<uuid:pk>/activate/", StaffActivateView.as_view(), name="staff-activate"),
+    path("staff/<uuid:pk>/login-activity/", StaffLoginActivityView.as_view(), name="staff-login-activity"),
 ]

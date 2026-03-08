@@ -16,6 +16,7 @@ from apps.common.enums import (
     ReturnMethod,
     RepairSource,
     RepairType,
+    ComplaintWarrantyStatus,
     InternalRepairStatus,
     PaymentStatus,
 )
@@ -298,6 +299,49 @@ class RepairRequest(BaseModel):
         help_text=_("Szybkie przyjęcie — do uzupełnienia później"),
     )
 
+    # Flagi i daty do dashboardów / powiadomień (Staff Notifications Center, „wymaga reakcji”)
+    requires_attention = models.BooleanField(
+        _("wymaga reakcji"),
+        default=False,
+        db_index=True,
+        help_text=_("Ustawiane przez logikę: nowa wiadomość, brak odpowiedzi, SLA, reklamacja bez decyzji itd."),
+    )
+    last_client_message_at = models.DateTimeField(
+        _("ostatnia wiadomość od klienta"),
+        null=True,
+        blank=True,
+    )
+    last_staff_reply_at = models.DateTimeField(
+        _("ostatnia odpowiedź staffu do klienta"),
+        null=True,
+        blank=True,
+    )
+    last_activity_at = models.DateTimeField(
+        _("ostatnia aktywność"),
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text=_("Ostatnia zmiana statusu, notatka lub wiadomość"),
+    )
+
+    # Czeka na klienta (np. wycena wysłana) — do licznika „czeka X dni”
+    quote_sent_at = models.DateTimeField(
+        _("data wysłania wyceny"),
+        null=True,
+        blank=True,
+        help_text=_("Ustawiane przy zmianie statusu na wycena wysłana"),
+    )
+
+    # Status reklamacji/gwarancji (tylko gdy repair_type in (complaint, warranty))
+    complaint_warranty_status = models.CharField(
+        _("status reklamacji/gwarancji"),
+        max_length=20,
+        choices=ComplaintWarrantyStatus.choices,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
     # Odbior paczki (wysyłka do serwisu) — ręczny proces MVP
     package_received_at = models.DateTimeField(_("odebrano paczkę"), null=True, blank=True)
     package_received_by = models.ForeignKey(
@@ -379,6 +423,66 @@ class RepairRequest(BaseModel):
     def is_waiting_for_client_decision(self):
         """Czy naprawa czeka na decyzję klienta?"""
         return self.status == RepairStatus.QUOTE_SENT
+
+    @property
+    def waiting_for_client_days(self):
+        """Ile dni naprawa czeka na reakcję klienta (np. od wysłania wyceny). None jeśli nie dotyczy."""
+        from django.utils import timezone
+        if self.status != RepairStatus.QUOTE_SENT or not self.quote_sent_at:
+            return None
+        delta = timezone.now() - self.quote_sent_at
+        return delta.days
+
+    def get_auto_tags(self):
+        """
+        Tagi systemowe nadawane automatycznie na podstawie danych naprawy.
+        Zwraca listę slugów do filtrowania i badge'y.
+        """
+        from apps.common.enums import RepairPriority
+        tags = []
+        if self.is_urgent or self.priority in (RepairPriority.HIGH, RepairPriority.URGENT, RepairPriority.SAME_DAY):
+            tags.append("pilne")
+        if self.is_same_day:
+            tags.append("same_day")
+        if self.delivery_method != "in_person" or self.return_method != "in_person":
+            tags.append("wysyłkowe")
+        if self.repair_type == "complaint":
+            tags.append("reklamacja")
+        if self.repair_type == "warranty":
+            tags.append("gwarancja")
+        if self.is_incomplete:
+            tags.append("niekompletne")
+        if self.status == RepairStatus.WAITING_FOR_PARTS:
+            tags.append("czeka_na_czesc")
+        try:
+            if self.client and getattr(self.client, "visit_count", 0) >= 2:
+                tags.append("klient_wraca")
+            if self.client and getattr(self.client, "client_type", None) == "business":
+                tags.append("firma")
+        except Exception:
+            pass
+        try:
+            brand_name = (self.device.brand.name if self.device and getattr(self.device, "brand", None) else None) or ""
+            if "apple" in brand_name.lower():
+                tags.append("apple")
+            if "samsung" in brand_name.lower():
+                tags.append("samsung")
+        except Exception:
+            pass
+        try:
+            if self.device and getattr(self.device, "category", None) == "data_recovery":
+                tags.append("odzyskiwanie_danych")
+        except Exception:
+            pass
+        # Hammer Glass / sprzedaż dodatkowa — z relacji (można rozszerzyć gdy modele są dostępne)
+        try:
+            if hasattr(self, "hammer_glass_offers") and self.hammer_glass_offers.exists():
+                tags.append("hammer_glass")
+            if hasattr(self, "accessory_offers") and self.accessory_offers.exists():
+                tags.append("sprzedaz_dodatkowa")
+        except Exception:
+            pass
+        return tags
 
     def get_estimated_duration_display(self):
         """Tekst szacowanego czasu realizacji, np. '2–3 dni robocze' (do komunikatów)."""
@@ -545,6 +649,8 @@ class RepairImage(TimestampedModel):
             ("before", _("Przed naprawą")),
             ("during", _("W trakcie")),
             ("after", _("Po naprawie")),
+            ("package", _("Paczka po odbiorze")),
+            ("damage_detail", _("Uszkodzenie szczegółowe")),
             ("issue", _("Uszkodzenie/Problem")),
             ("other", _("Inne")),
         ],
