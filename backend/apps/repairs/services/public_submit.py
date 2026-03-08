@@ -36,6 +36,9 @@ def submit_repair_from_public_form(
     delivery_city="",
     delivery_postal_code="",
     delivery_country="Polska",
+    hammer_glass_interest=None,
+    accessory_product_ids=None,
+    accessory_choose_for_me=False,
 ):
     """
     Tworzy zgłoszenie z formularza publicznego:
@@ -122,5 +125,26 @@ def submit_repair_from_public_form(
         requires_data_backup=False,
         source="online",
     )
+
+    if hammer_glass_interest:
+        repair.hammer_glass_interest = hammer_glass_interest
+        repair.save(update_fields=["hammer_glass_interest"])
+
+    from apps.accessories.models import RepairAccessoryInterest
+    product_ids = list(accessory_product_ids or [])
+    for pid in product_ids:
+        RepairAccessoryInterest.objects.create(
+            repair=repair,
+            product_id=pid,
+            source="client",
+            choose_for_me=False,
+        )
+    if accessory_choose_for_me:
+        RepairAccessoryInterest.objects.create(
+            repair=repair,
+            product=None,
+            source="client",
+            choose_for_me=True,
+        )
 
     return repair, client_created

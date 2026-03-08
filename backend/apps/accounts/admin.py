@@ -39,10 +39,21 @@ class UserAdmin(BaseUserAdmin):
 class StaffProfileAdmin(admin.ModelAdmin):
     """Panel admina dla profili pracowników."""
 
-    list_display = ["user", "position", "is_available", "total_repairs", "active_repairs"]
-    list_filter = ["is_available"]
-    search_fields = ["user__email", "user__first_name", "user__last_name", "position"]
+    list_display = [
+        "user", "position", "specialization", "is_available",
+        "calendar_color", "is_visible_in_rankings",
+        "total_repairs", "active_repairs",
+    ]
+    list_filter = ["is_available", "specialization"]
+    search_fields = ["user__email", "user__first_name", "user__last_name", "position", "display_name", "login_alias"]
     raw_id_fields = ["user"]
+    fieldsets = (
+        (None, {"fields": ("user", "position", "bio", "avatar", "is_available")}),
+        (_("Specjalizacja i kalendarz"), {
+            "fields": ("specialization", "calendar_color", "display_name", "login_alias", "is_visible_in_rankings"),
+        }),
+        (_("Statystyki"), {"fields": ("total_repairs", "active_repairs")}),
+    )
 
 
 @admin.register(LoginActivity)

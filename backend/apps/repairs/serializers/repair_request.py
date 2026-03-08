@@ -34,6 +34,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "estimated_completion_date",
             "estimated_duration_days_min",
             "estimated_duration_days_max",
+            "is_incomplete",
+            "repair_type",
             "created_at",
         ]
 
@@ -63,15 +65,25 @@ class RepairRequestCreateSerializer(serializers.ModelSerializer):
             "is_warranty",
             "requires_data_backup",
             "source",
+            "parent_repair",
+            "repair_type",
+            "assigned_to",
         ]
         extra_kwargs = {
             "source": {"default": "online"},
+            "parent_repair": {"required": False},
+            "repair_type": {"default": "standard"},
+            "assigned_to": {"required": False},
         }
 
     def validate(self, attrs):
         if attrs.get("delivery_method") != "in_person" and not attrs.get("delivery_address"):
             raise serializers.ValidationError(
                 {"delivery_address": "Adres dostawy jest wymagany przy wysyłce."}
+            )
+        if attrs.get("repair_type") == "complaint" and not attrs.get("parent_repair"):
+            raise serializers.ValidationError(
+                {"parent_repair": "Reklamacja wymaga wskazania naprawy nadrzędnej."}
             )
         return attrs
 
@@ -124,6 +136,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     days_in_repair = serializers.IntegerField(read_only=True)
     can_be_picked_up = serializers.BooleanField(read_only=True)
     is_waiting_for_client_decision = serializers.BooleanField(read_only=True)
+    health_score = serializers.SerializerMethodField()
+    health_issues = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     accessory_offers = serializers.SerializerMethodField()
     hammer_glass_offers = serializers.SerializerMethodField()
@@ -168,6 +182,15 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "final_cost",
             "internal_notes",
             "source",
+            "is_incomplete",
+            "parent_repair",
+            "repair_type",
+            "package_received_at",
+            "package_received_by",
+            "package_ok",
+            "request_number_attached",
+            "package_notes",
+            "package_photo",
             "created_by",
             "created_at",
             "updated_at",
@@ -175,6 +198,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "days_in_repair",
             "can_be_picked_up",
             "is_waiting_for_client_decision",
+            "health_score",
+            "health_issues",
             "images",
             "accessory_offers",
             "hammer_glass_offers",
@@ -195,6 +220,16 @@ class RepairRequestSerializer(serializers.ModelSerializer):
 
     def get_estimated_duration_display(self, obj):
         return obj.get_estimated_duration_display()
+
+    def get_health_score(self, obj):
+        from apps.repairs.services.health_score import get_repair_health_score
+        level, _ = get_repair_health_score(obj)
+        return level
+
+    def get_health_issues(self, obj):
+        from apps.repairs.services.health_score import get_repair_health_score
+        _, issues = get_repair_health_score(obj)
+        return issues
 
     def get_images(self, obj):
         request = self.context.get("request")

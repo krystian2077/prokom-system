@@ -11,6 +11,7 @@ from .models import (
     RepairAssignment,
     RepairImage,
     RepairNote,
+    ReminderLog,
     SatisfactionSurvey,
     RepairVisitSchedule,
     ChecklistTemplate,
@@ -98,6 +99,8 @@ class RepairRequestAdmin(admin.ModelAdmin):
         "is_same_day",
         "is_warranty",
         "source",
+        "repair_type",
+        "is_incomplete",
         "created_at",
     ]
     search_fields = [
@@ -123,7 +126,7 @@ class RepairRequestAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Informacje podstawowe", {
-            "fields": ("repair_number", "client", "device", "assigned_to")
+            "fields": ("repair_number", "client", "device", "assigned_to", "parent_repair", "repair_type", "is_incomplete")
         }),
         ("Status i priorytet", {
             "fields": ("status", "priority", "internal_status", "is_urgent", "is_same_day", "is_warranty")
@@ -137,6 +140,17 @@ class RepairRequestAdmin(admin.ModelAdmin):
                 "return_method",
                 "delivery_address",
                 "return_address",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("Odbior paczki", {
+            "fields": (
+                "package_received_at",
+                "package_received_by",
+                "package_ok",
+                "request_number_attached",
+                "package_notes",
+                "package_photo",
             ),
             "classes": ("collapse",),
         }),
@@ -350,12 +364,15 @@ class RepairNoteAdmin(admin.ModelAdmin):
         "repair",
         "short_note",
         "note_type",
+        "pinned",
         "is_important",
         "author",
         "created_at",
     ]
     list_filter = [
         "is_internal",
+        "note_type",
+        "pinned",
         "is_important",
         "created_at",
     ]
@@ -391,6 +408,14 @@ class RepairVisitScheduleAdmin(admin.ModelAdmin):
     list_display = ["repair", "visit_date", "visit_time", "no_show", "confirmed_at"]
     list_filter = ["no_show"]
     raw_id_fields = ["repair"]
+
+
+@admin.register(ReminderLog)
+class ReminderLogAdmin(admin.ModelAdmin):
+    list_display = ["repair", "event_name", "sent_at"]
+    list_filter = ["event_name", "sent_at"]
+    raw_id_fields = ["repair"]
+    readonly_fields = ["sent_at"]
 
 
 class ChecklistTemplateItemInline(admin.TabularInline):

@@ -2,6 +2,7 @@
 from decimal import Decimal
 from django.db import models
 from django.db.models import Sum
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
@@ -128,3 +129,73 @@ class QuoteItem(TimestampedModel):
         self.total = self.quantity * self.unit_price
         super().save(*args, **kwargs)
         self.quote.recalculate_total()
+
+
+class QuoteVersion(TimestampedModel):
+    """Snapshot wersji wyceny (historia: kto, kiedy, jaka suma i pozycje)."""
+    quote = models.ForeignKey(
+        Quote,
+        on_delete=models.CASCADE,
+        related_name="versions",
+        verbose_name=_("wycena"),
+    )
+    version_number = models.PositiveSmallIntegerField(_("numer wersji"))
+    total_amount = models.DecimalField(
+        _("suma"),
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0"),
+    )
+    items_snapshot = models.JSONField(
+        _("snapshot pozycji"),
+        default=list,
+        help_text=_("Lista dict: item_type, description, quantity, unit_price, total"),
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="created_quote_versions",
+        verbose_name=_("utworzone przez"),
+    )
+
+    class Meta:
+        verbose_name = _("wersja wyceny")
+        verbose_name_plural = _("wersje wyceny")
+        ordering = ["quote", "-version_number"]
+        unique_together = [["quote", "version_number"]]
+
+    def __str__(self):
+        return f"Wycena {self.quote_id} v{self.version_number}"
+
+
+class QuoteDecision(models.Model):
+    """Decyzja klienta: akceptacja lub odrzucenie wyceny (jedna na wycenę)."""
+    quote = models.OneToOneField(
+        Quote,
+        on_delete=models.CASCADE,
+        related_name="decision",
+        verbose_name=_("wycena"),
+    )
+    decision = models.CharField(
+        _("decyzja"),
+        max_length=20,
+        choices=[("accepted", _("Zaakceptowano")), ("rejected", _("Odrzucono"))],
+    )
+    decided_at = models.DateTimeField(_("data decyzji"), default=timezone.now)
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="quote_decisions",
+        verbose_name=_("zdecydował (klient)"),
+    )
+    comment = models.TextField(_("komentarz"), blank=True)
+
+    class Meta:
+        verbose_name = _("decyzja wyceny")
+        verbose_name_plural = _("decyzje wycen")
+
+    def __str__(self):
+        return f"{self.get_decision_display()} — {self.quote}"

@@ -2,7 +2,14 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import AccessoryCategory, AccessoryProduct, RepairAccessoryOffer, RepairAccessoryInterest
+from .models import (
+    AccessoryCategory,
+    AccessoryProduct,
+    AccessoryBundle,
+    AccessoryBundleItem,
+    RepairAccessoryOffer,
+    RepairAccessoryInterest,
+)
 
 
 class AccessoryProductInline(admin.TabularInline):
@@ -33,6 +40,29 @@ class AccessoryProductAdmin(admin.ModelAdmin):
     list_editable = ["price", "is_active", "sort_order"]
 
 
+class AccessoryBundleItemInline(admin.TabularInline):
+    model = AccessoryBundleItem
+    extra = 1
+    raw_id_fields = ["product"]
+
+
+@admin.register(AccessoryBundle)
+class AccessoryBundleAdmin(admin.ModelAdmin):
+    list_display = ["name", "slug", "is_active", "sort_order"]
+    list_filter = ["is_active"]
+    search_fields = ["name"]
+    prepopulated_fields = {"slug": ("name",)}
+    inlines = [AccessoryBundleItemInline]
+
+
+@admin.register(RepairAccessoryOffer)
+class RepairAccessoryOfferAdmin(admin.ModelAdmin):
+    list_display = ["repair", "product", "quantity", "unit_price_snapshot", "accepted", "offered_at", "offered_by"]
+    list_filter = ["accepted", "offered_at"]
+    search_fields = ["repair__repair_number", "product__name"]
+    readonly_fields = ["offered_at", "offered_by", "unit_price_snapshot"]
+
+
 class RepairAccessoryOfferInline(admin.TabularInline):
     model = RepairAccessoryOffer
     extra = 0
@@ -45,11 +75,3 @@ class RepairAccessoryInterestAdmin(admin.ModelAdmin):
     list_display = ["repair", "product", "source", "choose_for_me", "created_at"]
     list_filter = ["source"]
     raw_id_fields = ["repair", "product"]
-
-
-@admin.register(RepairAccessoryOffer)
-class RepairAccessoryOfferAdmin(admin.ModelAdmin):
-    list_display = ["repair", "product", "quantity", "unit_price_snapshot", "accepted", "offered_at", "offered_by"]
-    list_filter = ["accepted", "offered_at"]
-    search_fields = ["repair__repair_number", "product__name"]
-    readonly_fields = ["offered_at", "offered_by", "unit_price_snapshot"]

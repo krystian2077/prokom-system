@@ -39,6 +39,16 @@ class PublicSubmitDeviceSerializer(serializers.Serializer):
     imei = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     problem_description = serializers.CharField(required=True, trim_whitespace=True)
 
+    def validate(self, attrs):
+        category = attrs.get("category")
+        # Dla phone/tablet/smartwatch wymagane: model (nazwa lub wybór z listy)
+        if category in (DeviceCategory.PHONE, DeviceCategory.TABLET, DeviceCategory.SMARTWATCH):
+            if not (attrs.get("model_name") or "").strip() and not attrs.get("device_model_id"):
+                raise serializers.ValidationError(
+                    {"model": "Dla telefonu/tabletu/smartwatcha podaj nazwę modelu lub wybierz z listy."}
+                )
+        return attrs
+
 
 class PublicRepairSubmitSerializer(serializers.Serializer):
     """Cały payload formularza publicznego."""
@@ -59,6 +69,24 @@ class PublicRepairSubmitSerializer(serializers.Serializer):
     delivery_postal_code = serializers.CharField(max_length=10, required=False, allow_blank=True, default="")
     delivery_country = serializers.CharField(max_length=100, required=False, default="Polska")
 
+    hammer_glass_interest = serializers.ChoiceField(
+        choices=["yes", "no", "ask_later", "free_with_quote"],
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+    accessory_interest = serializers.ListField(
+        child=serializers.UUIDField(),
+        required=False,
+        allow_empty=True,
+        help_text="Lista ID produktów akcesoriów (AccessoryProduct).",
+    )
+    accessory_choose_for_me = serializers.BooleanField(
+        default=False,
+        required=False,
+        help_text="Klient prosi o dobór akcesoriów przez serwis.",
+    )
+
     def validate(self, attrs):
         delivery = attrs.get("delivery_method", DeliveryMethod.IN_PERSON)
         if delivery != DeliveryMethod.IN_PERSON:
@@ -71,6 +99,15 @@ class PublicRepairSubmitSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"device": "Podaj nazwę modelu urządzenia lub wybierz model z listy."}
             )
+        aid = attrs.get("accessory_interest", [])
+        if aid:
+            from apps.accessories.models import AccessoryProduct
+            valid_ids = set(AccessoryProduct.objects.filter(id__in=aid, is_active=True).values_list("id", flat=True))
+            invalid = [str(x) for x in aid if x not in valid_ids]
+            if invalid:
+                raise serializers.ValidationError(
+                    {"accessory_interest": f"Nierozpoznane lub nieaktywne produkty: {invalid}"}
+                )
         return attrs
 
 

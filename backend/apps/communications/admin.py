@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import MessageTemplate, CommunicationLog
+from .models import MessageTemplate, CommunicationLog, NotificationRule
 
 
 @admin.register(MessageTemplate)
@@ -11,6 +11,14 @@ class MessageTemplateAdmin(admin.ModelAdmin):
     list_filter = ["channel", "message_type", "is_active"]
     search_fields = ["name", "subject", "body"]
     list_editable = ["is_active", "sort_order"]
+
+
+@admin.register(NotificationRule)
+class NotificationRuleAdmin(admin.ModelAdmin):
+    list_display = ["event_name", "send_panel", "send_email", "send_sms", "is_active", "template"]
+    list_filter = ["event_name", "is_active"]
+    list_editable = ["send_panel", "send_email", "send_sms", "is_active"]
+    autocomplete_fields = ["template"]
 
 
 @admin.register(CommunicationLog)

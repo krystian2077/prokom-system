@@ -15,6 +15,7 @@ from apps.common.enums import (
     DeliveryMethod,
     ReturnMethod,
     RepairSource,
+    RepairType,
     InternalRepairStatus,
     PaymentStatus,
 )
@@ -50,6 +51,23 @@ class RepairRequest(BaseModel):
         on_delete=models.PROTECT,
         related_name="repairs",
         verbose_name=_("urządzenie")
+    )
+
+    # Reklamacja: powiązanie z naprawą, której dotyczy
+    parent_repair = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="complaint_repairs",
+        verbose_name=_("naprawa nadrzędna (reklamacja)"),
+    )
+    repair_type = models.CharField(
+        _("typ sprawy"),
+        max_length=20,
+        choices=RepairType.choices,
+        default=RepairType.STANDARD,
+        db_index=True,
     )
 
     # Przypisanie do pracownika
@@ -252,6 +270,52 @@ class RepairRequest(BaseModel):
         choices=RepairSource.choices,
         default=RepairSource.ONLINE,
         db_index=True
+    )
+
+    # Z formularza publicznego: zainteresowanie folią Hammer Glass
+    HAMMER_GLASS_YES = "yes"
+    HAMMER_GLASS_NO = "no"
+    HAMMER_GLASS_ASK_LATER = "ask_later"
+    HAMMER_GLASS_FREE_WITH_QUOTE = "free_with_quote"
+    HAMMER_GLASS_CHOICES = [
+        (HAMMER_GLASS_YES, _("Tak, proszę o ofertę")),
+        (HAMMER_GLASS_NO, _("Nie")),
+        (HAMMER_GLASS_ASK_LATER, _("Zapytam później")),
+        (HAMMER_GLASS_FREE_WITH_QUOTE, _("Gratis przy wycenie")),
+    ]
+    hammer_glass_interest = models.CharField(
+        _("zainteresowanie Hammer Glass"),
+        max_length=20,
+        choices=HAMMER_GLASS_CHOICES,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
+    is_incomplete = models.BooleanField(
+        _("niekompletne zgłoszenie"),
+        default=False,
+        help_text=_("Szybkie przyjęcie — do uzupełnienia później"),
+    )
+
+    # Odbior paczki (wysyłka do serwisu) — ręczny proces MVP
+    package_received_at = models.DateTimeField(_("odebrano paczkę"), null=True, blank=True)
+    package_received_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="package_received_repairs",
+        verbose_name=_("paczkę odebrał"),
+    )
+    package_ok = models.BooleanField(_("paczka bez zastrzeżeń"), null=True, blank=True)
+    request_number_attached = models.BooleanField(_("numer zgłoszenia dołączony do przesyłki"), null=True, blank=True)
+    package_notes = models.TextField(_("notatki do odbioru paczki"), blank=True)
+    package_photo = models.ImageField(
+        _("zdjęcie paczki/urządzenia"),
+        upload_to="repairs/package_photos/%Y/%m/",
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -544,10 +608,31 @@ class RepairNote(TimestampedModel):
         default=False
     )
 
+    NOTE_TYPE_INTERNAL = "internal"
+    NOTE_TYPE_SYSTEM = "system"
+    NOTE_TYPE_CLIENT_CONTACT = "client_contact"
+    NOTE_TYPE_CHOICES = [
+        (NOTE_TYPE_INTERNAL, _("wewnętrzna")),
+        (NOTE_TYPE_SYSTEM, _("systemowa")),
+        (NOTE_TYPE_CLIENT_CONTACT, _("kontakt z klientem")),
+    ]
+    note_type = models.CharField(
+        _("typ notatki"),
+        max_length=20,
+        choices=NOTE_TYPE_CHOICES,
+        default=NOTE_TYPE_INTERNAL,
+        db_index=True,
+    )
+    pinned = models.BooleanField(
+        _("przypięta"),
+        default=False,
+        help_text=_("Przypięte notatki wyświetlane na górze"),
+    )
+
     class Meta:
         verbose_name = _("notatka naprawy")
         verbose_name_plural = _("notatki napraw")
-        ordering = ["-created_at"]
+        ordering = ["-pinned", "-created_at"]
 
     def __str__(self):
         note_type = "🔒 Wewnętrzna" if self.is_internal else "👁️ Publiczna"
@@ -617,6 +702,36 @@ class RepairVisitSchedule(models.Model):
 
     def __str__(self):
         return f"Wizyta: {self.repair.repair_number} — {self.visit_date}"
+
+
+class ReminderLog(models.Model):
+    """
+    Log wysłanego przypomnienia — ogranicza spam (np. raz na 24h per typ).
+    """
+    repair = models.ForeignKey(
+        RepairRequest,
+        on_delete=models.CASCADE,
+        related_name="reminder_logs",
+        verbose_name=_("naprawa"),
+    )
+    event_name = models.CharField(
+        _("zdarzenie"),
+        max_length=50,
+        db_index=True,
+        help_text=_("np. reminder_no_quote, reminder_unclaimed, reminder_scheduled_visit, reminder_quick_accept_incomplete"),
+    )
+    sent_at = models.DateTimeField(_("wysłano"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("log przypomnienia")
+        verbose_name_plural = _("logi przypomnień")
+        ordering = ["-sent_at"]
+        indexes = [
+            models.Index(fields=["repair", "event_name", "-sent_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.event_name} — {self.repair.repair_number} @ {self.sent_at}"
 
 
 class ChecklistTemplate(models.Model):

@@ -32,6 +32,7 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "drf_spectacular",
     "simple_history",
+    "django_celery_beat",
 ]
 
 LOCAL_APPS = [
@@ -173,6 +174,25 @@ SPECTACULAR_SETTINGS = {
 # CORS
 # =============================================================================
 CORS_ALLOW_CREDENTIALS = True
+
+# =============================================================================
+# CELERY
+# =============================================================================
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+# =============================================================================
+# PRO-KOM — Adres paczkomatu (formularz zgłoszenia, etykiety)
+# =============================================================================
+PARCEL_LOCKER_ADDRESS = env(
+    "PARCEL_LOCKER_ADDRESS",
+    default="Zakopiańska 10f, Rabka-Zdrój 34-700, przy stacji benzynowej Moya",
+)
 
 # =============================================================================
 # LOGGING

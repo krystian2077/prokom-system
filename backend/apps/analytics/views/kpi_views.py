@@ -216,3 +216,44 @@ class SummaryStatsView(APIView):
             },
             status=200,
         )
+
+
+class HealthOverviewView(APIView):
+    """
+    GET /api/v1/analytics/health-overview/
+    Lista napraw z żółtym/czerwonym health score (wymagają uwagi). Dostęp: staff, admin.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not _staff_or_admin(request):
+            return Response({"detail": "Brak uprawnień."}, status=403)
+        from apps.repairs.services.health_score import get_repair_health_score
+        from apps.repairs.serializers import RepairRequestListSerializer
+
+        open_statuses = [
+            RepairStatus.NEW, RepairStatus.ACCEPTED, RepairStatus.IN_DIAGNOSTICS,
+            RepairStatus.DIAGNOSTICS_DONE, RepairStatus.QUOTE_PENDING, RepairStatus.QUOTE_SENT,
+            RepairStatus.QUOTE_ACCEPTED, RepairStatus.WAITING_FOR_PARTS, RepairStatus.IN_REPAIR,
+            RepairStatus.REPAIR_DONE, RepairStatus.IN_TESTING, RepairStatus.TESTING_PASSED,
+            RepairStatus.TESTING_FAILED, RepairStatus.READY_FOR_PICKUP,
+        ]
+        qs = (
+            RepairRequest.objects.filter(status__in=open_statuses)
+            .select_related("client", "device", "assigned_to")
+            .order_by("-updated_at")[:200]
+        )
+        yellow = []
+        red = []
+        for repair in qs:
+            level, issues = get_repair_health_score(repair)
+            if level == "yellow":
+                yellow.append({"repair": RepairRequestListSerializer(repair).data, "issues": issues})
+            elif level == "red":
+                red.append({"repair": RepairRequestListSerializer(repair).data, "issues": issues})
+        return Response({
+            "yellow_count": len(yellow),
+            "red_count": len(red),
+            "yellow": yellow[:50],
+            "red": red[:50],
+        })

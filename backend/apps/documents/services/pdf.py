@@ -60,3 +60,62 @@ def build_acceptance_protocol_pdf(repair, request=None):
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def build_acceptance_protocol_short_pdf(repair, request=None):
+    """
+    Skrócony protokół A4 dla naprawy z umówionym terminem (RepairVisitSchedule).
+    Zawiera: numer naprawy, klient, urządzenie, zakres, godzina przyjęcia, przewidywana godzina odbioru.
+    repair — z select_related client, device i prefetch/related visit_schedule.
+    Zwraca bytes.
+    """
+    from apps.repairs.models import RepairVisitSchedule
+    schedule = getattr(repair, "visit_schedule", None)
+    if schedule is None:
+        try:
+            schedule = RepairVisitSchedule.objects.get(repair=repair)
+        except RepairVisitSchedule.DoesNotExist:
+            schedule = None
+    if not schedule:
+        raise ValueError("Naprawa nie ma umówionego terminu (RepairVisitSchedule).")
+
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    c.setFont("Helvetica-Bold", 14)
+    c.drawCentredString(width / 2, height - 20 * mm, "PRO-KOM Serwis")
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(width / 2, height - 26 * mm, "Protokół przyjęcia (skrócony) — umówiony termin")
+
+    y = height - 38 * mm
+    c.setFont("Helvetica", 10)
+
+    def line(lbl, val):
+        nonlocal y
+        c.drawString(20 * mm, y, str(lbl) + ":")
+        c.drawString(65 * mm, y, str(val or "—")[:60])
+        y -= 5 * mm
+
+    line("Numer naprawy", repair.repair_number)
+    line("Klient", repair.client.get_full_name())
+    line("Telefon", repair.client.phone)
+    line("Urządzenie", repair.device.get_device_name())
+    line("Zakres", (repair.problem_description or "")[:150])
+    time_in = repair.accepted_at or repair.created_at
+    line("Godzina przyjęcia", time_in.strftime("%d.%m.%Y %H:%M") if time_in else "—")
+    pickup = ""
+    if schedule.visit_date:
+        pickup = schedule.visit_date.strftime("%d.%m.%Y")
+        if schedule.estimated_pickup_time:
+            pickup += " " + schedule.estimated_pickup_time.strftime("%H:%M")
+        elif schedule.visit_time:
+            pickup += " " + schedule.visit_time.strftime("%H:%M")
+    line("Przewidywany odbiór", pickup or "—")
+    y -= 8 * mm
+    c.setFont("Helvetica", 8)
+    c.drawString(20 * mm, y, "Podpis klienta: _________________________")
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer.getvalue()

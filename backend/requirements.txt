@@ -40,6 +40,11 @@ qrcode[pil]>=7.4,<7.5
 python-dateutil>=2.9,<3.0
 httpx>=0.27,<0.28
 
+# Celery + Redis (zadania w tle, backup, remindery)
+celery>=5.4,<5.5
+redis>=5.2,<5.3
+django-celery-beat>=2.7,<2.8
+
 # Development quality
 pytest>=8.3,<8.4
 pytest-django>=4.9,<5.0

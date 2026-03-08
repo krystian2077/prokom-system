@@ -51,6 +51,9 @@ class PublicRepairSubmitView(APIView):
                 delivery_city=data.get("delivery_city", ""),
                 delivery_postal_code=data.get("delivery_postal_code", ""),
                 delivery_country=data.get("delivery_country", "Polska"),
+                hammer_glass_interest=data.get("hammer_glass_interest") or None,
+                accessory_product_ids=data.get("accessory_interest") or [],
+                accessory_choose_for_me=data.get("accessory_choose_for_me", False),
             )
         except Exception as e:
             return Response(

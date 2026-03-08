@@ -117,6 +117,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.role == UserRole.CLIENT
 
 
+class StaffSpecialization(models.TextChoices):
+    """Specjalizacja pracownika (do auto-przypisania)."""
+    PHONE_TABLET = "phone_tablet", _("Telefony, tablety, smartwatche, odzyskiwanie danych")
+    LAPTOP_PRINTER = "laptop_printer", _("Laptopy, komputery, konsole, drukarki")
+    GENERAL = "general", _("Ogólne / proste naprawy")
+
+
 class StaffProfile(models.Model):
     """
     Profil pracownika serwisu.
@@ -133,6 +140,19 @@ class StaffProfile(models.Model):
     bio = models.TextField(_("opis"), blank=True)
     avatar = models.FileField(_("zdjęcie"), upload_to="staff/avatars/", null=True, blank=True)
     is_available = models.BooleanField(_("dostępny do przypisania"), default=True)
+
+    # Rozszerzenie (prokom.md): specjalizacja, kalendarz, podpisy
+    specialization = models.CharField(
+        _("specjalizacja"),
+        max_length=30,
+        choices=StaffSpecialization.choices,
+        blank=True,
+        db_index=True,
+    )
+    calendar_color = models.CharField(_("kolor w kalendarzu"), max_length=7, default="#3498db", blank=True)
+    display_name = models.CharField(_("nazwa do podpisu"), max_length=100, blank=True)
+    login_alias = models.CharField(_("alias w logach"), max_length=50, blank=True)
+    is_visible_in_rankings = models.BooleanField(_("widoczny w rankingach"), default=True)
 
     # Statystyki (będą aktualizowane przez sygnały / serwisy)
     total_repairs = models.PositiveIntegerField(_("łączna liczba napraw"), default=0)

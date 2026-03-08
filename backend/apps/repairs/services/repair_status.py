@@ -75,4 +75,13 @@ def change_repair_status(repair, new_status, changed_by_id=None, notes=""):
             notes=notes or "",
         )
 
+    # Powiadomienia (NotificationRule) przy wybranych zdarzeniach
+    if new_status == RepairStatus.READY_FOR_PICKUP:
+        from apps.communications.tasks import send_notification_for_repair_event
+        send_notification_for_repair_event.delay(
+            str(repair.id),
+            "ready_for_pickup",
+            sent_by_id=changed_by_id,
+        )
+
     return repair

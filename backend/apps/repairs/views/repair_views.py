@@ -27,6 +27,8 @@ from apps.repairs.serializers.quick_actions import (
     AddRepairNoteSerializer,
     AssignRepairSerializer,
     QuoteRespondSerializer,
+    QuickAcceptSerializer,
+    MarkPackageReceivedSerializer,
 )
 from apps.repairs.serializers.satisfaction_survey import SatisfactionSurveySubmitSerializer
 from apps.repairs.serializers.timeline import RepairMessageSerializer
@@ -36,12 +38,17 @@ from apps.repairs.selectors import (
     repair_by_id,
     repair_by_number,
     staff_dashboard_data,
+    repairs_overdue,
 )
 from apps.repairs.services import (
     create_repair_request,
     change_repair_status,
     assign_repair,
 )
+from apps.repairs.services.repair_creation import quick_accept_repair
+from apps.repairs.services.assignment_suggest import suggest_assignment
+from datetime import timedelta
+from django.utils import timezone
 
 
 class RepairRequestViewSet(viewsets.ModelViewSet):
@@ -58,7 +65,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             return [IsAuthenticated(), IsStaffOrAdmin()]
         return [IsAuthenticated()]
-    filterset_fields = ["status", "priority", "assigned_to", "client"]
+    filterset_fields = ["status", "priority", "assigned_to", "client", "is_incomplete", "repair_type"]
     search_fields = [
         "repair_number",
         "client__first_name",
@@ -125,6 +132,9 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             device_id=data["device"].id,
             problem_description=data["problem_description"],
             created_by_id=request.user.id if request.user.is_authenticated else None,
+            assigned_to_id=data.get("assigned_to").id if data.get("assigned_to") else None,
+            parent_repair_id=data.get("parent_repair").id if data.get("parent_repair") else None,
+            repair_type=data.get("repair_type", "standard"),
             delivery_method=data.get("delivery_method", "in_person"),
             return_method=data.get("return_method", "in_person"),
             delivery_address_id=data.get("delivery_address").id if data.get("delivery_address") else None,
@@ -140,6 +150,36 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             RepairRequestSerializer(repair).data,
             status=status.HTTP_201_CREATED,
             headers=self.get_success_headers(RepairRequestSerializer(repair).data),
+        )
+
+    @action(detail=False, methods=["post"], url_path="quick-accept", permission_classes=[IsStaffOrAdmin])
+    def quick_accept(self, request):
+        """
+        POST /api/v1/repairs/quick-accept/
+        Szybkie przyjęcie (prokom.md): minimalne dane, is_incomplete=True, source=in_person.
+        Body: problem_description + (client_id i device_id) LUB (first_name, last_name, phone, email, device_category [, device_model_name]).
+        """
+        ser = QuickAcceptSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.validated_data
+        try:
+            repair = quick_accept_repair(
+                created_by_id=request.user.id,
+                problem_description=data["problem_description"],
+                client_id=data.get("client_id"),
+                device_id=data.get("device_id"),
+                first_name=data.get("first_name") or None,
+                last_name=data.get("last_name") or None,
+                phone=data.get("phone") or None,
+                email=data.get("email") or None,
+                device_category=data.get("device_category"),
+                device_model_name=data.get("device_model_name") or None,
+            )
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            RepairRequestSerializer(repair).data,
+            status=status.HTTP_201_CREATED,
         )
 
     @action(detail=True, methods=["post"], url_path="change-status", permission_classes=[IsStaffOrAdmin])
@@ -231,6 +271,8 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             note=ser.validated_data["note"],
             is_internal=ser.validated_data.get("is_internal", True),
             is_important=ser.validated_data.get("is_important", False),
+            note_type=ser.validated_data.get("note_type", RepairNote.NOTE_TYPE_INTERNAL),
+            pinned=ser.validated_data.get("pinned", False),
         )
         return Response(RepairNoteSerializer(note).data, status=status.HTTP_201_CREATED)
 
@@ -256,6 +298,52 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         assign_repair(repair, assigned_to_id=assigned_to_id, assigned_by_id=request.user.id, notes=notes)
         return Response(RepairRequestSerializer(repair).data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"], url_path="suggest-assignment", permission_classes=[IsStaffOrAdmin])
+    def suggest_assignment_view(self, request, pk=None):
+        """GET /api/v1/repairs/<id>/suggest-assignment/ — sugerowany pracownik według kategorii urządzenia."""
+        repair = self.get_object()
+        user = suggest_assignment(repair)
+        if not user:
+            return Response({"suggested_user_id": None, "suggested_user": None})
+        return Response({
+            "suggested_user_id": str(user.id),
+            "suggested_user": {"id": str(user.id), "email": user.email, "full_name": user.get_full_name()},
+        })
+
+    @action(detail=True, methods=["post"], url_path="mark-package-received", permission_classes=[IsStaffOrAdmin])
+    def mark_package_received(self, request, pk=None):
+        """
+        POST /api/v1/repairs/<id>/mark-package-received/
+        Oznaczenie odbioru paczki z urządzeniem (package_ok, request_number_attached, notes, opcjonalnie zdjęcie).
+        """
+        repair = self.get_object()
+        ser = MarkPackageReceivedSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.validated_data
+        repair.package_received_at = timezone.now()
+        repair.package_received_by_id = request.user.id
+        repair.package_ok = data.get("package_ok")
+        repair.request_number_attached = data.get("request_number_attached")
+        repair.package_notes = data.get("package_notes", "") or repair.package_notes
+        if request.FILES.get("package_photo"):
+            repair.package_photo = request.FILES["package_photo"]
+        repair.save(update_fields=[
+            "package_received_at", "package_received_by_id", "package_ok",
+            "request_number_attached", "package_notes", "package_photo",
+        ])
+        new_status = data.get("change_status_to")
+        if new_status:
+            try:
+                change_repair_status(
+                    repair,
+                    new_status=new_status,
+                    changed_by_id=request.user.id,
+                    notes="Odebrano paczkę z urządzeniem.",
+                )
+            except ValueError:
+                pass
+        return Response(RepairRequestSerializer(repair).data, status=status.HTTP_200_OK)
+
     # ---------- Etap 5: Panel klienta — odpowiedź na wycenę ----------
     @action(detail=True, methods=["post"], url_path="quote-respond")
     def quote_respond(self, request, pk=None):
@@ -275,6 +363,18 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         ser = QuoteRespondSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         action_value = ser.validated_data["action"]
+        comment = ser.validated_data.get("comment", "")
+        # Znajdź wycenę w statusie "sent" i zapisz decyzję (QuoteDecision)
+        from apps.pricing.models import Quote
+        from apps.pricing.services import save_quote_decision
+        sent_quote = repair.quotes.filter(status="sent").order_by("-sent_at").first()
+        if sent_quote:
+            save_quote_decision(
+                sent_quote,
+                decision="accepted" if action_value == "accept" else "rejected",
+                decided_by_id=request.user.id if request.user.is_authenticated else None,
+                comment=comment,
+            )
         new_status = RepairStatus.QUOTE_ACCEPTED if action_value == "accept" else RepairStatus.QUOTE_REJECTED
         try:
             change_repair_status(
@@ -410,4 +510,99 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             "revenue": str(revenue),
             "quote_total": str(quote_total) if quote_total is not None else None,
             "profit": str(profit),
+        })
+
+    # ---------- Widoki specjalne (prokom.md) ----------
+    @action(detail=False, url_path="special-views/requires-action", permission_classes=[IsStaffOrAdmin])
+    def requires_action(self, request):
+        """
+        GET /api/v1/repairs/special-views/requires-action/
+        Co dziś wymaga reakcji: do wyceny, do kontaktu, do zamówienia, szybkie przyjęcia do uzupełnienia, gotowe do odbioru, zaległe.
+        Query: assigned_to (uuid), date (optional).
+        """
+        from django.db.models import Q
+        user_id = request.query_params.get("assigned_to")
+        qs = repair_list(assigned_to_id=user_id)
+        statuses_action = [
+            RepairStatus.QUOTE_PENDING,
+            RepairStatus.QUOTE_SENT,
+            RepairStatus.QUOTE_ACCEPTED,
+            RepairStatus.READY_FOR_PICKUP,
+        ]
+        overdue_ids = list(repairs_overdue().values_list("id", flat=True))
+        qs = qs.filter(
+            Q(status__in=statuses_action) | Q(is_incomplete=True) | Q(id__in=overdue_ids)
+        ).distinct().order_by("-created_at")[:100]
+        return Response(RepairRequestListSerializer(qs, many=True).data)
+
+    @action(detail=False, url_path="special-views/unclaimed-devices", permission_classes=[IsStaffOrAdmin])
+    def unclaimed_devices(self, request):
+        """
+        GET /api/v1/repairs/special-views/unclaimed-devices/?days_min=3
+        Urządzenia gotowe do odbioru nieodebrane od N dni (3, 7, 14, 30).
+        """
+        days_min = int(request.query_params.get("days_min", 3))
+        threshold = timezone.now() - timedelta(days=days_min)
+        qs = (
+            RepairRequest.objects.filter(
+                status=RepairStatus.READY_FOR_PICKUP,
+                ready_for_pickup_at__lt=threshold,
+            )
+            .select_related("client", "device", "assigned_to")
+            .order_by("ready_for_pickup_at")[:100]
+        )
+        return Response(RepairRequestListSerializer(qs, many=True).data)
+
+    @action(detail=False, url_path="special-views/requires-decision", permission_classes=[IsStaffOrAdmin])
+    def requires_decision(self, request):
+        """
+        GET /api/v1/repairs/special-views/requires-decision/
+        Wymaga decyzji: czeka na decyzję klienta (quote_sent), czeka na odpowiedź staff, czeka na część.
+        """
+        qs = repair_list(
+            status_in=[
+                RepairStatus.QUOTE_SENT,
+                RepairStatus.QUOTE_ACCEPTED,
+                RepairStatus.WAITING_FOR_PARTS,
+            ],
+        ).order_by("-updated_at")[:100]
+        return Response(RepairRequestListSerializer(qs, many=True).data)
+
+    # ---------- Inteligentny system dopierania do sprzedaży (prokom.md) ----------
+    @action(detail=True, url_path="recommended-products", permission_classes=[IsStaffOrAdmin])
+    def recommended_products(self, request, pk=None):
+        """
+        GET /api/v1/repairs/<id>/recommended-products/
+        Rekomendowane akcesoria, pakiety i Hammer Glass dla tej naprawy (dopasowanie do kategorii urządzenia).
+        """
+        repair = self.get_object()
+        category = repair.device.category if repair.device else None
+        if not category:
+            return Response({"accessories": [], "bundles": [], "hammer_glass": []})
+
+        from apps.accessories.models import AccessoryProduct, AccessoryBundle
+        from apps.accessories.serializers import AccessoryProductListSerializer
+        from apps.accessories.serializers.bundle import AccessoryBundleListSerializer
+        from apps.hammer_glass.models import HammerGlassProduct
+        from apps.hammer_glass.serializers import HammerGlassProductListSerializer
+
+        accessories = [
+            p for p in AccessoryProduct.objects.filter(is_active=True).select_related("category")
+            if p.compatible_with_category(category)
+        ][:15]
+        # Pakiety zawierające co najmniej jeden produkt dopasowany do kategorii
+        bundle_ids = set()
+        for bundle in AccessoryBundle.objects.filter(is_active=True).prefetch_related("items__product"):
+            if any(bi.product.compatible_with_category(category) for bi in bundle.items.all()):
+                bundle_ids.add(bundle.id)
+        bundles = AccessoryBundle.objects.filter(id__in=bundle_ids).order_by("sort_order", "name")[:10]
+        hammer_glass = [
+            p for p in HammerGlassProduct.objects.filter(is_active=True)
+            if p.compatible_with_category(category)
+        ][:15]
+
+        return Response({
+            "accessories": AccessoryProductListSerializer(accessories, many=True).data,
+            "bundles": AccessoryBundleListSerializer(bundles, many=True).data,
+            "hammer_glass": HammerGlassProductListSerializer(hammer_glass, many=True).data,
         })

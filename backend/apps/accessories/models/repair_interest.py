@@ -21,6 +21,9 @@ class RepairAccessoryInterest(TimestampedModel):
         on_delete=models.PROTECT,
         related_name="repair_interests",
         verbose_name=_("produkt"),
+        null=True,
+        blank=True,
+        help_text=_("Puste przy „wybierz za mnie” z formularza publicznego."),
     )
     source = models.CharField(
         _("źródło"),

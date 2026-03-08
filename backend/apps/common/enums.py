@@ -134,6 +134,14 @@ class DocumentType(models.TextChoices):
     QR_CODE = "qr_code", _("Kod QR")
 
 
+class RepairType(models.TextChoices):
+    """Typ sprawy (standardowa, gwarancyjna, reklamacja, z umówionym terminem)."""
+    STANDARD = "standard", _("Standardowa")
+    WARRANTY = "warranty", _("Gwarancyjna")
+    COMPLAINT = "complaint", _("Reklamacja")
+    SCHEDULED = "scheduled", _("Z umówionym terminem")
+
+
 class RepairSource(models.TextChoices):
     """Źródło zgłoszenia naprawy."""
     ONLINE = "online", _("Formularz online")

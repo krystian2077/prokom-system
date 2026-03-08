@@ -1,6 +1,6 @@
 """PRO-KOM Serwis — Pricing Admin."""
 from django.contrib import admin
-from .models import LabourType, Quote, QuoteItem, Deposit
+from .models import LabourType, Quote, QuoteItem, QuoteVersion, QuoteDecision, Deposit
 
 
 class QuoteItemInline(admin.TabularInline):
@@ -23,6 +23,22 @@ class QuoteAdmin(admin.ModelAdmin):
     search_fields = ["repair__repair_number"]
     inlines = [QuoteItemInline]
     autocomplete_fields = ["repair"]
+
+
+@admin.register(QuoteVersion)
+class QuoteVersionAdmin(admin.ModelAdmin):
+    list_display = ["quote", "version_number", "total_amount", "created_at", "created_by"]
+    list_filter = ["created_at"]
+    search_fields = ["quote__repair__repair_number"]
+    readonly_fields = ["quote", "version_number", "total_amount", "items_snapshot", "created_at", "created_by"]
+
+
+@admin.register(QuoteDecision)
+class QuoteDecisionAdmin(admin.ModelAdmin):
+    list_display = ["quote", "decision", "decided_at", "decided_by"]
+    list_filter = ["decision"]
+    search_fields = ["quote__repair__repair_number"]
+    readonly_fields = ["quote", "decision", "decided_at", "decided_by", "comment"]
 
 
 @admin.register(Deposit)

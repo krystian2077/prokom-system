@@ -7,6 +7,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+from apps.common.views import GlobalSearchView, ParcelLockerAddressView
+
 # Tytuł panelu admina
 admin.site.site_header = "PRO-KOM Serwis — Panel Admina"
 admin.site.site_title = "PRO-KOM Admin"
@@ -27,6 +29,8 @@ urlpatterns = [
     path("api/v1/documents/", include("apps.documents.urls")),
     path("api/v1/compliance/", include("apps.compliance.urls")),
     path("api/v1/analytics/", include("apps.analytics.urls")),
+    path("api/v1/search/", GlobalSearchView.as_view(), name="global-search"),
+    path("api/v1/config/parcel-locker-address/", ParcelLockerAddressView.as_view(), name="parcel-locker-address"),
     path("api/v1/inventory/", include("apps.inventory.urls")),
     path("api/v1/pricing/", include("apps.pricing.urls")),
 

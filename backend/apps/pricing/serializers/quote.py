@@ -1,6 +1,6 @@
 """Serializery wycen."""
 from rest_framework import serializers
-from apps.pricing.models import Quote, QuoteItem
+from apps.pricing.models import Quote, QuoteItem, QuoteDecision
 from apps.inventory.serializers import PartListSerializer
 
 
@@ -64,8 +64,15 @@ class QuoteListSerializer(serializers.ModelSerializer):
         ]
 
 
+class QuoteDecisionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuoteDecision
+        fields = ["decision", "decided_at", "decided_by", "comment"]
+
+
 class QuoteSerializer(serializers.ModelSerializer):
     items = QuoteItemSerializer(many=True, read_only=True)
+    decision = QuoteDecisionSerializer(read_only=True)
 
     class Meta:
         model = Quote
@@ -80,6 +87,7 @@ class QuoteSerializer(serializers.ModelSerializer):
             "notes",
             "created_by",
             "items",
+            "decision",
             "created_at",
             "updated_at",
         ]
