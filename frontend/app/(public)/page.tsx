@@ -1,11 +1,10 @@
 import { Hero } from "@/sections/Hero";
 import { TrustStats } from "@/sections/TrustStats";
 import { DeviceCategories } from "@/sections/DeviceCategories";
-import { Services } from "@/sections/Services";
 import { HowItWorks } from "@/sections/HowItWorks";
 import { HammerGlass } from "@/sections/HammerGlass";
 import { Accessories } from "@/sections/Accessories";
-import { CommonPhoneIssues } from "@/sections/CommonPhoneIssues";
+import { MostCommonRepairs } from "@/sections/MostCommonRepairs";
 import { CTA } from "@/sections/CTA";
 import { Reviews } from "@/sections/Reviews";
 import { FAQ } from "@/sections/FAQ";
@@ -18,12 +17,11 @@ export default function HomePage() {
       <TrustStats />
       <DeviceCategories />
       <HowItWorks />
-      <Services />
+      <MostCommonRepairs />
+      <Reviews />
       <HammerGlass />
       <Accessories />
-      <CommonPhoneIssues />
       <CTA />
-      <Reviews />
       <FAQ />
       <Contact />
     </div>
