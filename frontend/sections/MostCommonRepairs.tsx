@@ -41,42 +41,43 @@ const LOGO_FILES: Record<string, string> = {
   Gigabyte: "gigabyte.jpg",
 };
 
-/** Zdjęcia urządzeń z /public/images/urzadzenia/ — po kategoriach (slider) */
+/** Zdjęcia urządzeń z /public/images/urzadzenia/ i /urzadzenia2 (telefony) — po kategoriach (slider) */
 const DEVICE_IMAGES: Record<string, string[]> = {
   telefony: [
-    "/images/urzadzenia/iphone.jpg",
-    "/images/urzadzenia/samsung.jpg",
-    "/images/urzadzenia/motorola.jpg",
-    "/images/urzadzenia/xiaomi.jpg",
+    "/images/urzadzenia2/iphone.png",
+    "/images/urzadzenia2/Samsung.png",
+    "/images/urzadzenia2/motorola.png",
+    "/images/urzadzenia2/xiaomi.png",
+    "/images/urzadzenia2/realme.png",
   ],
   laptopy: [
-    "/images/urzadzenia/dell.jpg",
-    "/images/urzadzenia/hp.jpg",
-    "/images/urzadzenia/macbook.jpg",
-    "/images/urzadzenia/lenovo.jpg",
+    "/images/urzadzenia2/dell.png",
+    "/images/urzadzenia2/hp.png",
+    "/images/urzadzenia2/lenovo.png",
+    "/images/urzadzenia2/macbook.png",
   ],
   tablety: [
-    "/images/urzadzenia/ipadjpg.jpg",
-    "/images/urzadzenia/galaxy-tab.jpg",
-    "/images/urzadzenia/lenovo-tablet.jpg",
-    "/images/urzadzenia/tablet-microsoft.jpg",
+    "/images/urzadzenia2/galaxy-tab.png",
+    "/images/urzadzenia2/ipadjpg.png",
+    "/images/urzadzenia2/lenovo-tablet.png",
+    "/images/urzadzenia2/tablet-microsoft.png",
   ],
   komputery: [
-    "/images/urzadzenia/dell-komputeri.jpg",
-    "/images/urzadzenia/asus-komputer.jpg",
-    "/images/urzadzenia/lenovo-komputer.jpg",
-    "/images/urzadzenia/msi-komputer.jpg",
+    "/images/urzadzenia2/dell-komputeri.png",
+    "/images/urzadzenia2/lenovo-komputer.png",
+    "/images/urzadzenia2/msi-komputer.png",
+    "/images/urzadzenia2/asus-komputer.png",
   ],
   drukarki: [
-    "/images/urzadzenia/brotherjpg.jpg",
-    "/images/urzadzenia/canon.jpg",
-    "/images/urzadzenia/epson.jpg",
-    "/images/urzadzenia/hp-drukarka.jpg",
+    "/images/urzadzenia2/brotherjpg.png",
+    "/images/urzadzenia2/canon.png",
+    "/images/urzadzenia2/hp-drukarka.png",
+    "/images/urzadzenia2/epson.png",
   ],
   konsole: [
-    "/images/urzadzenia/playstation.jpg",
-    "/images/urzadzenia/xbox.jpg",
-    "/images/urzadzenia/nintendojpg.jpg",
+    "/images/urzadzenia2/xbox.png",
+    "/images/urzadzenia2/playstation.png",
+    "/images/urzadzenia2/nintendojpg.png",
   ],
 };
 
@@ -501,15 +502,15 @@ export function MostCommonRepairs() {
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         {/* Header */}
         <div className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#dc1e1e] px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
             <span
               className="h-1.5 w-1.5 animate-pulse rounded-full bg-white"
               aria-hidden
             />
             {BADGE_LABEL}
           </span>
-          <h2 className="font-syne mt-4 text-5xl font-extrabold tracking-tight text-[#0f0f0f] sm:text-6xl">
-            Najczęstsze <em className="not-italic text-[#dc1e1e]">naprawy</em>
+          <h2 className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
+            Najczęstsze <span className="text-primary">naprawy</span>
           </h2>
           <p
             className="mx-auto mt-6 max-w-2xl text-lg text-[#666] sm:text-xl"
@@ -613,7 +614,8 @@ export function MostCommonRepairs() {
                         {repair.icon}
                       </div>
                       <h3
-                        className="font-syne mt-3.5 text-base font-extrabold text-[#0f0f0f] sm:text-lg"
+                        className="mt-3.5 text-lg font-bold text-dark sm:text-xl"
+                        style={{ lineHeight: 1.25 }}
                       >
                         {repair.name}
                       </h3>
@@ -659,11 +661,7 @@ export function MostCommonRepairs() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="sticky top-20 flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border border-[#e8e8e8] p-6 sm:p-8"
-                style={{
-                  background: "linear-gradient(160deg, #fafafa, #f4f4f4)",
-                  borderWidth: "1.5px",
-                }}
+                className="sticky top-20 flex h-full min-h-0 flex-col p-4 sm:p-6"
               >
                 <div
                   className="absolute left-0 top-0 h-[3px] w-full bg-[#dc1e1e]"
@@ -673,40 +671,29 @@ export function MostCommonRepairs() {
                   }}
                   aria-hidden
                 />
-                {/* Slider zdjęć urządzeń — większy, czystszy wygląd */}
-                <div
-                  className="relative overflow-hidden rounded-2xl border border-[#eee] bg-[#fafafa] px-6 py-8 sm:px-8 sm:py-10"
-                  style={{
-                    boxShadow: "0 1px 0 rgba(255,255,255,.8) inset, 0 4px 24px rgba(0,0,0,.06)",
-                  }}
-                >
+                {/* Slider zdjęć urządzeń — przezroczyste tło, zachowany układ slidera */}
+                <div className="relative overflow-hidden rounded-2xl bg-transparent px-6 py-8 sm:px-8 sm:py-10">
                   {hasImages ? (
                     <>
-                      <div className="relative h-[220px] sm:h-[260px]">
-                        {images.map((src, i) => (
-                          <div
-                            key={src}
-                            className="absolute inset-0 flex items-center justify-center transition-all duration-[450ms]"
+                      <div className="relative h-[220px] overflow-hidden sm:h-[260px]">
+                        <AnimatePresence mode="wait">
+                          <motion.img
+                            key={images[slideIndex]}
+                            src={images[slideIndex]}
+                            alt=""
+                            className="absolute inset-0 m-auto h-full w-auto max-h-[230px] object-contain sm:max-h-[260px]"
                             style={{
-                              opacity: slideIndex === i ? 1 : 0,
-                              transform:
-                                slideIndex === i
-                                  ? "scale(1) translateY(0)"
-                                  : "scale(0.96) translateY(6px)",
-                              transitionTimingFunction:
-                                "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                              filter: "drop-shadow(0 18px 45px rgba(0,0,0,.28))",
                             }}
-                          >
-                            <img
-                              src={src}
-                              alt=""
-                              className="h-full w-auto max-h-[200px] object-contain sm:max-h-[240px]"
-                              style={{
-                                filter: "drop-shadow(0 12px 32px rgba(0,0,0,.12))",
-                              }}
-                            />
-                          </div>
-                        ))}
+                            initial={{ opacity: 0, x: 60, scale: 0.98 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -60, scale: 0.98 }}
+                            transition={{
+                              duration: 0.55,
+                              ease: [0.22, 0.61, 0.36, 1],
+                            }}
+                          />
+                        </AnimatePresence>
                       </div>
                       {images.length > 1 && (
                         <div className="mt-5 flex justify-center gap-2">
@@ -731,10 +718,7 @@ export function MostCommonRepairs() {
                     </div>
                   )}
                 </div>
-                <h3
-                  className="font-syne mt-5 text-[19px] font-extrabold text-[#0f0f0f]"
-                  style={{ fontWeight: 800 }}
-                >
+                <h3 className="mt-5 text-xl font-bold text-[#111] sm:text-2xl">
                   {category.deviceName}
                 </h3>
                 <p
@@ -780,10 +764,10 @@ export function MostCommonRepairs() {
 
         {/* CTA */}
         <div className="mt-16 text-center">
-          <h3 className="font-syne text-2xl font-extrabold text-[#0f0f0f] sm:text-3xl">
+          <h3 className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
             {CTA_TITLE}
           </h3>
-          <p className="mx-auto mt-2 max-w-xl text-[#666] sm:text-lg">
+          <p className="mx-auto mt-3 max-w-2xl text-neutral" style={{ lineHeight: 1.6 }}>
             {CTA_SUBTITLE}
           </p>
           <Link

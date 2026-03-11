@@ -1,94 +1,173 @@
 import Link from "next/link";
 
 const services = [
-  { href: "/serwis-telefonow", label: "Serwis telefonów" },
-  { href: "/serwis-tabletow", label: "Serwis tabletów" },
-  { href: "/serwis-laptopow", label: "Serwis laptopów" },
-  { href: "/serwis-komputerow", label: "Serwis komputerów" },
-  { href: "/serwis-drukarek", label: "Serwis drukarek" },
-  { href: "/serwis-konsol", label: "Serwis konsol" },
-  { href: "/serwis-smartwatchy", label: "Smartwatche" },
-  { href: "/hammer-glass", label: "Hammer Glass" },
-  { href: "/akcesoria", label: "Akcesoria" },
+  { href: "/serwis-telefonow", label: "Naprawa telefonów" },
+  { href: "/serwis-laptopow", label: "Naprawa laptopów" },
+  { href: "/serwis-tabletow", label: "Naprawa tabletów" },
+  { href: "/serwis-drukarek", label: "Naprawa drukarek" },
+  { href: "/serwis-konsol", label: "Naprawa konsol" },
+  { href: "/serwis-komputerow", label: "Komputery stacjonarne" },
 ];
 
-const repairCategories = [
-  { href: "/serwis-telefonow", label: "Telefony" },
-  { href: "/serwis-tabletow", label: "Tablety" },
-  { href: "/serwis-laptopow", label: "Laptopy" },
-  { href: "/serwis-komputerow", label: "Komputery" },
-  { href: "/serwis-drukarek", label: "Drukarki" },
-  { href: "/serwis-konsol", label: "Konsole" },
+const shop = [
+  { href: "/akcesoria", label: "Akcesoria GSM" },
+  { href: "/akcesoria", label: "Ładowarki i kable" },
+  { href: "/akcesoria", label: "Etui i ochrona" },
+  { href: "/hammer-glass", label: "Hammer Glass CUT", badge: "Nowość" },
+  { href: "/hammer-glass", label: "Folie ochronne" },
 ];
 
-const contact = [
-  { href: "/kontakt", label: "Kontakt" },
+const info = [
+  { href: "/o-nas", label: "O nas" },
   { href: "/faq", label: "FAQ" },
-  { href: "/zgloszenie", label: "Zgłoś naprawę" },
-];
-
-const legal = [
-  { href: "/regulamin", label: "Regulamin" },
+  { href: "/kontakt", label: "Kontakt" },
   { href: "/polityka-prywatnosci", label: "Polityka prywatności" },
+  { href: "/regulamin", label: "Regulamin" },
 ];
 
 export function PublicFooter() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="bg-dark text-white">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-2">
-            <p className="text-2xl font-bold tracking-tight">PRO-KOM</p>
-            <p className="mt-4 max-w-sm text-sm text-gray-400">
-              Profesjonalny serwis elektroniki. Naprawy, Hammer Glass i akcesoria. Szybka diagnostyka i transparentne ceny.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Usługi</h3>
-            <ul className="mt-4 space-y-3">
-              {services.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-gray-300 hover:text-white transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Kategorie napraw</h3>
-            <ul className="mt-4 space-y-3">
-              {repairCategories.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-gray-300 hover:text-white transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Kontakt i legal</h3>
-            <ul className="mt-4 space-y-3">
-              {contact.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-gray-300 hover:text-white transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-              {legal.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className="text-sm text-gray-300 hover:text-white transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+    <footer className="bg-[#050505] text-white">
+      <div className="mx-auto max-w-6xl px-4 pb-6 pt-12 sm:px-6 lg:px-8">
+        {/* Górny układ kolumnowy */}
+        <div className="border-b border-white/5 pb-8 lg:pb-10">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+            {/* Kolumna opisowa */}
+            <div>
+              <p className="text-xl font-extrabold tracking-tight sm:text-2xl">
+                PRO – KOM
+              </p>
+              <p className="mt-3 max-w-xs text-sm text-white/70">
+                Profesjonalny serwis elektroniki w Rabce‑Zdroju. Naprawiamy
+                telefony, laptopy, tablety, drukarki i więcej. Szybko,
+                uczciwie, z gwarancją.
+              </p>
+              <div className="mt-5 space-y-2 text-sm text-white/80">
+                <p className="flex items-center gap-2">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-primary">
+                    <span className="text-xs">📞</span>
+                  </span>
+                  <a
+                    href="tel:883200151"
+                    className="hover:text-primary transition-colors"
+                  >
+                    883 200 151
+                  </a>
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-primary">
+                    <span className="text-xs">✉️</span>
+                  </span>
+                  <a
+                    href="mailto:sklep@pro-kom.eu"
+                    className="hover:text-primary transition-colors"
+                  >
+                    sklep@pro-kom.eu
+                  </a>
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-primary">
+                    <span className="text-xs">📍</span>
+                  </span>
+                  <span>ul. Orkana 16B, Rabka‑Zdrój</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Kolumna: Usługi */}
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/50">
+                Usługi
+              </h3>
+              <ul className="mt-4 space-y-2.5 text-sm">
+                {services.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="text-white/80 transition-colors hover:text-white"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Kolumna: Sklep */}
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/50">
+                Sklep
+              </h3>
+              <ul className="mt-4 space-y-2.5 text-sm">
+                {shop.map(({ href, label, badge }) => (
+                  <li key={href} className="flex items-center gap-2">
+                    <Link
+                      href={href}
+                      className="text-white/80 transition-colors hover:text-white"
+                    >
+                      {label}
+                    </Link>
+                    {badge && (
+                      <span className="rounded-full bg-primary px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-white">
+                        {badge}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Kolumna: Informacje */}
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/50">
+                Informacje
+              </h3>
+              <ul className="mt-4 space-y-2.5 text-sm">
+                {info.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="text-white/80 transition-colors hover:text-white"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} PRO-KOM. Wszelkie prawa zastrzeżone.
+
+        {/* Dolny pasek */}
+        <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-4 text-[12px] text-white/50 sm:flex-row">
+          <p className="order-2 sm:order-1">
+            © {year}{" "}
+            <span className="font-semibold text-white">PRO‑KOM</span>. Wszelkie
+            prawa zastrzeżone.
+          </p>
+
+          <div className="order-1 flex flex-wrap items-center gap-3 sm:order-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-[11px] font-semibold text-emerald-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Otwarte Pn–Pt 9:00–17:00
+            </span>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/polityka-prywatnosci"
+                className="hover:text-white transition-colors"
+              >
+                Polityka prywatności
+              </Link>
+              <Link
+                href="/regulamin"
+                className="hover:text-white transition-colors"
+              >
+                Regulamin
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

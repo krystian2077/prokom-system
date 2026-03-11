@@ -83,9 +83,9 @@ export function Reviews() {
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center font-syne text-3xl font-extrabold tracking-tight text-[#0f0f0f] sm:text-4xl"
+          className="text-center mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl"
         >
-          <span className="text-[#dc1e1e]">Zaufanie</span> klientów to nasza najlepsza rekomendacja
+          <span className="text-primary">Zaufanie</span> klientów to nasza najlepsza rekomendacja
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 16 }}

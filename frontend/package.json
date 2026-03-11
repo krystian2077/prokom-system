@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "node -e \"try{require('fs').rmSync('.next',{recursive:true,force:true});console.log('Usunieto .next');}catch(e){}\"",
+    "dev:clean": "npm run clean && next dev"
   },
   "dependencies": {
     "next": "14.2.18",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -21,11 +22,16 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="pl" className={`${syne.variable} ${dmSans.variable}`}>
-      <body className={`min-h-screen font-sans antialiased ${dmSans.className}`}>{children}</body>
+      <body
+        className={`min-h-screen font-sans antialiased ${dmSans.className}`}
+        style={{ backgroundColor: "#fff", color: "#0f0f0f" }}
+      >
+        {children}
+      </body>
     </html>
   );
 }
