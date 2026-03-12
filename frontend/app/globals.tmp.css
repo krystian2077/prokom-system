@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #e11d1d;
+  --dark: #0f0f0f;
+  --neutral: #6b7280;
+  --prokom-white: #ffffff;
+  --prokom-black: #0f0f0f;
+  --prokom-accent: #e11d1d;
+  --prokom-gray: #6b7280;
+  --prokom-success: #16a34a;
+  --prokom-warning: #ea580c;
+  --prokom-error: #dc2626;
+  --prokom-info: #2563eb;
+}
+
+body {
+  @apply bg-white text-dark antialiased;
+}

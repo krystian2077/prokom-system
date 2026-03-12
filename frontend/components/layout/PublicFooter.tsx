@@ -102,7 +102,7 @@ export function PublicFooter() {
               </h3>
               <ul className="mt-4 space-y-2.5 text-sm">
                 {shop.map(({ href, label, badge }) => (
-                  <li key={href} className="flex items-center gap-2">
+                  <li key={`${href}-${label}`} className="flex items-center gap-2">
                     <Link
                       href={href}
                       className="text-white/80 transition-colors hover:text-white"
