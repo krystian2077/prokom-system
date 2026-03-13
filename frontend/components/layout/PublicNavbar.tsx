@@ -9,7 +9,7 @@ import { PremiumButton } from "@/components/ui/PremiumButton";
 
 const navItems = [
   { href: "/", label: "Strona główna" },
-  { href: "/serwis-telefonow", label: "Usługi" },
+  { href: "/uslugi", label: "Usługi" },
   { href: "/hammer-glass", label: "Hammer Glass" },
   { href: "/akcesoria", label: "Akcesoria" },
   { href: "/kontakt", label: "Kontakt" },

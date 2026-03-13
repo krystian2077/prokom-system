@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const services = [
-  { href: "/serwis-telefonow", label: "Naprawa telefonów" },
+  { href: "/uslugi", label: "Naprawa telefonów" },
   { href: "/serwis-laptopow", label: "Naprawa laptopów" },
   { href: "/serwis-tabletow", label: "Naprawa tabletów" },
   { href: "/serwis-drukarek", label: "Naprawa drukarek" },

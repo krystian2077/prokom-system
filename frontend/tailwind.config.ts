@@ -11,6 +11,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        zgl: "860px",
+      },
       colors: {
         primary: "#e11d1d",
         dark: "#0f0f0f",
@@ -25,16 +28,47 @@ const config: Config = {
           error: "#dc2626",
           info: "#2563eb",
         },
+        zgl: {
+          red: "#e02020",
+          "red-h": "#c51a1a",
+          "red-glow": "rgba(224,32,32,.25)",
+          "red-l": "rgba(224,32,32,.10)",
+          "red-border": "rgba(224,32,32,.30)",
+          dark: "#0b0c10",
+          dark2: "#11131a",
+          card: "#171921",
+          card2: "#1c1f28",
+          card3: "#21252f",
+          white: "#ffffff",
+          ink: "#cdd0d8",
+          ink2: "#9ba3b0",
+          muted: "#5c6474",
+          faint: "#2e323d",
+          border: "rgba(255,255,255,.065)",
+          border2: "rgba(255,255,255,.11)",
+          "border-r": "rgba(224,32,32,.28)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
         syne: ["var(--font-syne)", "system-ui", "sans-serif"],
+        unbounded: ["var(--font-unbounded)", "system-ui", "sans-serif"],
+        "plus-jakarta": ["var(--font-plus-jakarta)", "system-ui", "sans-serif"],
       },
       boxShadow: {
         soft: "0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
         card: "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08)",
       },
+      borderRadius: {
+        "zgl-card": "22px",
+        "zgl-field": "12px",
+        "zgl-pill": "9999px",
+      },
       keyframes: {
+        stepIn: {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "none" },
+        },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
@@ -61,6 +95,7 @@ const config: Config = {
         },
       },
       animation: {
+        "step-in": "stepIn 0.28s ease both",
         float: "float 4s ease-in-out infinite",
         blink: "blink 1.6s infinite",
         fadeUp: "fadeUp 0.7s ease both",

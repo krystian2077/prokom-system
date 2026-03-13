@@ -16,8 +16,20 @@
   --prokom-info: #2563eb;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-white text-dark antialiased;
+}
+
+/* Zgłoszenie — ukrycie scrollbara w sidebarze */
+.zgl-scrollbar-hide {
+  scrollbar-width: none;
+}
+.zgl-scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Akcesoria hero noise / texture */
