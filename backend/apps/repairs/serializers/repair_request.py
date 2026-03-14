@@ -173,6 +173,7 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     accessory_offers = serializers.SerializerMethodField()
     hammer_glass_offers = serializers.SerializerMethodField()
+    accessory_choose_for_me = serializers.SerializerMethodField()
     related_complaints_warranties = serializers.SerializerMethodField()
     auto_tags = serializers.SerializerMethodField()
     waiting_for_client_days = serializers.SerializerMethodField()
@@ -247,6 +248,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "auto_tags",
             "waiting_for_client_days",
             "quote_sent_at",
+            "hammer_glass_interest",
+            "accessory_choose_for_me",
         ]
         read_only_fields = [
             "id", "repair_number", "created_at", "updated_at",
@@ -304,6 +307,12 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             ).data
         except Exception:
             return []
+
+    def get_accessory_choose_for_me(self, obj):
+        """Czy klient wybrał w formularzu „Dobierz mi akcesoria”."""
+        if not obj.id:
+            return False
+        return getattr(obj, "accessory_interests", None) and obj.accessory_interests.filter(choose_for_me=True).exists()
 
     def get_related_complaints_warranties(self, obj):
         """Powiązane reklamacje i gwarancje (dla naprawy źródłowej)."""

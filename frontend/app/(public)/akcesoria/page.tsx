@@ -650,27 +650,32 @@ export default function AkcesoriaPage() {
         </div>
       </section>
 
-      {/* FILTER BAR */}
-      <div className="sticky top-16 z-[400] mt-4 border-b border-[#e5e5e3] bg-white/95 px-4 backdrop-blur sm:mt-6">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-center gap-3 overflow-x-auto py-3 px-2 sm:px-[52px]">
-          {CATEGORIES.map((cat) => {
-            const active = activeFilter === cat.slug;
-            return (
-              <button
-                key={cat.slug}
-                type="button"
-                onClick={() => setActiveFilter(cat.slug)}
-                className={`whitespace-nowrap rounded-full border text-[14px] font-semibold transition-colors px-[22px] py-[9px] ${
-                  active
-                    ? "border-[#0d0d0d] bg-[#0d0d0d] text-white"
-                    : "border-transparent bg-transparent text-[#888] hover:bg-[#f0f0ee] hover:text-[#0d0d0d]"
-                }`}
-              >
-                {cat.emoji && <span className="mr-1.5">{cat.emoji}</span>}
-                {cat.label}
-              </button>
-            );
-          })}
+      {/* FILTER BAR — na mobile przewijanie w poziomie, padding żeby nic nie było ucięte */}
+      <div className="sticky top-16 z-[400] mt-4 border-b border-[#e5e5e3] bg-white/95 backdrop-blur sm:mt-6">
+        <div
+          className="akcesoria-categories-scroll mx-auto max-w-[1280px] overflow-x-auto py-3 sm:overflow-visible sm:px-[52px]"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          <div className="flex min-w-max items-center justify-start gap-3 px-4 sm:min-w-0 sm:justify-center sm:px-0">
+            {CATEGORIES.map((cat) => {
+              const active = activeFilter === cat.slug;
+              return (
+                <button
+                  key={cat.slug}
+                  type="button"
+                  onClick={() => setActiveFilter(cat.slug)}
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 text-[13px] font-semibold transition-colors sm:px-[22px] sm:py-[9px] sm:text-[14px] ${
+                    active
+                      ? "border-[#0d0d0d] bg-[#0d0d0d] text-white"
+                      : "border-transparent bg-transparent text-[#888] hover:bg-[#f0f0ee] hover:text-[#0d0d0d]"
+                  }`}
+                >
+                  {cat.emoji && <span className="mr-1.5">{cat.emoji}</span>}
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

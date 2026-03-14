@@ -5,7 +5,7 @@ Znajdź lub utwórz klienta, utwórz urządzenie i zgłoszenie. Bez logowania.
 """
 from django.db import transaction
 from apps.clients.models import Client, ClientAddress
-from apps.clients.selectors import client_by_email
+from apps.clients.selectors import client_by_email, client_by_id
 from apps.devices.models import Device, Brand, DeviceModel
 from apps.common.enums import DeliveryMethod
 from apps.repairs.services.repair_creation import create_repair_request
@@ -39,36 +39,23 @@ def submit_repair_from_public_form(
     hammer_glass_interest=None,
     accessory_product_ids=None,
     accessory_choose_for_me=False,
+    client_id=None,
 ):
     """
     Tworzy zgłoszenie z formularza publicznego:
-    - szuka klienta po email; jeśli brak — tworzy nowego
-    - tworzy adres wysyłkowy/zwrotu jeśli potrzeba
-    - tworzy urządzenie
-    - tworzy zgłoszenie (source=online)
+    - Jeśli podano client_id (zalogowany klient), używany jest ten klient i dane z formularza aktualizują profil.
+    - W przeciwnym razie: szuka klienta po email; jeśli brak — tworzy nowego.
+    - Tworzy adres wysyłkowy/zwrotu jeśli potrzeba, urządzenie i zgłoszenie (source=online).
 
     Zwraca: (repair, client_created: bool)
     """
     email = email.strip().lower()
-    client = client_by_email(email)
     client_created = False
 
-    if client is None:
-        client = Client(
-            first_name=first_name.strip(),
-            last_name=last_name.strip(),
-            email=email,
-            phone=phone.strip(),
-            preferred_contact=preferred_contact,
-            street=street.strip() or "",
-            city=city.strip() or "",
-            postal_code=postal_code.strip() or "",
-            country=(country or "Polska").strip(),
-        )
-        client.save()
-        client_created = True
-    else:
-        # Aktualizuj dane kontaktowe jeśli się zmieniły
+    if client_id:
+        client = client_by_id(client_id)
+        if not client:
+            raise ValueError("Nie znaleziono konta klienta.")
         client.first_name = first_name.strip() or client.first_name
         client.last_name = last_name.strip() or client.last_name
         client.phone = phone.strip() or client.phone
@@ -79,6 +66,33 @@ def submit_repair_from_public_form(
             client.postal_code = postal_code.strip() or client.postal_code
             client.country = (country or "Polska").strip() or client.country
         client.save(update_fields=["first_name", "last_name", "phone", "preferred_contact", "street", "city", "postal_code", "country", "updated_at"])
+    else:
+        client = client_by_email(email)
+        if client is None:
+            client = Client(
+                first_name=first_name.strip(),
+                last_name=last_name.strip(),
+                email=email,
+                phone=phone.strip(),
+                preferred_contact=preferred_contact,
+                street=street.strip() or "",
+                city=city.strip() or "",
+                postal_code=postal_code.strip() or "",
+                country=(country or "Polska").strip(),
+            )
+            client.save()
+            client_created = True
+        else:
+            client.first_name = first_name.strip() or client.first_name
+            client.last_name = last_name.strip() or client.last_name
+            client.phone = phone.strip() or client.phone
+            client.preferred_contact = preferred_contact or client.preferred_contact
+            if street or city or postal_code:
+                client.street = street.strip() or client.street
+                client.city = city.strip() or client.city
+                client.postal_code = postal_code.strip() or client.postal_code
+                client.country = (country or "Polska").strip() or client.country
+            client.save(update_fields=["first_name", "last_name", "phone", "preferred_contact", "street", "city", "postal_code", "country", "updated_at"])
 
     delivery_address_id = None
     return_address_id = None

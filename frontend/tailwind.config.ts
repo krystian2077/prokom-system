@@ -12,6 +12,7 @@ const config: Config = {
   theme: {
     extend: {
       screens: {
+        xs: "400px",
         zgl: "860px",
       },
       colors: {
@@ -48,6 +49,32 @@ const config: Config = {
           border2: "rgba(255,255,255,.11)",
           "border-r": "rgba(224,32,32,.28)",
         },
+        zglf: {
+          red: "#dc1e1e",
+          "red-h": "#b81818",
+          "red-l": "rgba(220,30,30,.08)",
+          "red-m": "rgba(220,30,30,.18)",
+          "red-glow": "rgba(220,30,30,.35)",
+          "red-border": "rgba(220,30,30,.25)",
+          bg: "#f2f2f0",
+          white: "#ffffff",
+          border: "#e4e4e2",
+          border2: "#cecece",
+          field: "#f7f7f5",
+          text: "#111111",
+          text2: "#4a4a4a",
+          muted: "#9a9a9a",
+          divider: "#ebebea",
+          sdark: "#0a0b0f",
+          scard: "#14161d",
+          scard2: "#1a1d26",
+          scard3: "#20242f",
+          sink: "#c8cbd4",
+          sink2: "#8a93a2",
+          smuted: "#4e5669",
+          sborder: "rgba(255,255,255,.06)",
+          sborder2: "rgba(255,255,255,.10)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
@@ -78,8 +105,48 @@ const config: Config = {
           "50%": { opacity: "0.2" },
         },
         fadeUp: {
-          from: { opacity: "0", transform: "translateY(24px)" },
+          from: { opacity: "0", transform: "translateY(18px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        fadeIn: {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        eyebrowSlide: {
+          from: { opacity: "0", transform: "translateX(-12px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        stepSlide: {
+          from: { opacity: "0", transform: "translateX(20px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        stepSlideBack: {
+          from: { opacity: "0", transform: "translateX(-20px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        ringPulse: {
+          "0%": { boxShadow: "0 0 0 0 rgba(220,30,30,.35)" },
+          "70%": { boxShadow: "0 0 0 10px rgba(220,30,30,0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(220,30,30,0)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+        dotPop: {
+          "0%": { transform: "scale(0)" },
+          "65%": { transform: "scale(1.3)" },
+          "100%": { transform: "scale(1)" },
+        },
+        checkPop: {
+          "0%": { transform: "scale(0) rotate(-10deg)" },
+          "60%": { transform: "scale(1.2) rotate(3deg)" },
+          "100%": { transform: "scale(1) rotate(0)" },
+        },
+        successBounce: {
+          "0%": { opacity: "0", transform: "scale(.6) translateY(10px)" },
+          "60%": { transform: "scale(1.05) translateY(-4px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
         },
         ring: {
           "0%": { transform: "scale(0.8)", opacity: "0.55" },
@@ -96,6 +163,16 @@ const config: Config = {
       },
       animation: {
         "step-in": "stepIn 0.28s ease both",
+        "step-slide": "stepSlide 0.3s ease both",
+        "step-slide-back": "stepSlideBack 0.3s ease both",
+        "fade-in": "fadeIn 0.3s ease both",
+        "eyebrow-slide": "eyebrowSlide 0.5s ease both",
+        "ring-pulse": "ringPulse 2s ease infinite",
+        "ring-pulse-delay": "ringPulse 2.5s 1s ease infinite",
+        shimmer: "shimmer 3s linear infinite",
+        "dot-pop": "dotPop 0.3s cubic-bezier(.34,1.56,.64,1) both",
+        "check-pop": "checkPop 0.3s cubic-bezier(.34,1.56,.64,1) both",
+        "success-bounce": "successBounce 0.6s cubic-bezier(.34,1.4,.64,1) both",
         float: "float 4s ease-in-out infinite",
         blink: "blink 1.6s infinite",
         fadeUp: "fadeUp 0.7s ease both",

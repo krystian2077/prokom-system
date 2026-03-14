@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { ClientTopbar } from "@/components/layout/ClientTopbar";
+import { PublicNavbar } from "@/components/layout/PublicNavbar";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 
 export function ClientGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -45,6 +47,15 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
   }
 
   if (!token) {
+    if (isPublicClientPage) {
+      return (
+        <>
+          <PublicNavbar />
+          <main className="min-h-[calc(100vh-8rem)]">{children}</main>
+          <PublicFooter />
+        </>
+      );
+    }
     return <>{children}</>;
   }
 

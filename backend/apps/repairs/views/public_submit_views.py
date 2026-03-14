@@ -1,13 +1,15 @@
 """
 PRO-KOM Serwis — Publiczne zgłoszenie naprawy (formularz online)
 ================================================================
-Endpoint AllowAny — bez logowania.
+Endpoint AllowAny — bez logowania. Jeśli request jest z tokenem (zalogowany klient),
+naprawa jest przypisywana do konta tego klienta.
 """
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
+from apps.common.permissions import get_client_for_user
 from apps.repairs.serializers.public_submit import PublicRepairSubmitSerializer
 from apps.repairs.services import submit_repair_from_public_form
 
@@ -26,6 +28,11 @@ class PublicRepairSubmitView(APIView):
         data = serializer.validated_data
         client_data = data["client"]
         device_data = data["device"]
+        linked_client_id = None
+        if request.user and request.user.is_authenticated:
+            client_profile = get_client_for_user(request.user)
+            if client_profile is not None:
+                linked_client_id = client_profile.id
 
         try:
             repair, _client_created = submit_repair_from_public_form(
@@ -54,6 +61,7 @@ class PublicRepairSubmitView(APIView):
                 hammer_glass_interest=data.get("hammer_glass_interest") or None,
                 accessory_product_ids=data.get("accessory_interest") or [],
                 accessory_choose_for_me=data.get("accessory_choose_for_me", False),
+                client_id=linked_client_id,
             )
         except Exception as e:
             return Response(

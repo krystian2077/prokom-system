@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { User, Smartphone, Truck, Package, CheckCircle } from "lucide-react";
@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/Textarea";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import { api } from "@/lib/api";
+import { getStoredToken } from "@/lib/auth-storage";
+import { useAuth } from "@/contexts/AuthContext";
 import type {
   PublicSubmitPayload,
   PublicSubmitResponse,
@@ -65,8 +67,21 @@ const emptyDevice: PublicSubmitDevice = {
 
 const validCategoryValues = DEVICE_CATEGORIES.map((c) => c.value);
 
+interface ClientProfileForForm {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  postal_code: string;
+  country: string;
+  preferred_contact: string;
+}
+
 export function SubmissionForm() {
   const searchParams = useSearchParams();
+  const { token, user: authUser, loading: authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [client, setClient] = useState<PublicSubmitClient>(emptyClient);
   const [device, setDevice] = useState<PublicSubmitDevice>(emptyDevice);
@@ -77,6 +92,48 @@ export function SubmissionForm() {
       setDevice((d) => ({ ...d, category }));
     }
   }, [searchParams]);
+
+  const prefillDoneRef = useRef(false);
+
+  // 1) Od razu uzupełnij z obiektu user (AuthContext) — imię, nazwisko, email, telefon
+  useEffect(() => {
+    if (authLoading || !authUser || authUser.role !== "client" || prefillDoneRef.current) return;
+    setClient((prev) => ({
+      ...prev,
+      first_name: authUser.first_name ?? "",
+      last_name: authUser.last_name ?? "",
+      email: authUser.email ?? "",
+      phone: authUser.phone ?? "",
+    }));
+    prefillDoneRef.current = true;
+  }, [authUser, authLoading]);
+
+  // 2) Uzupełnij pełny profil z /clients/me/ (adres, preferowany kontakt) gdy jest token
+  useEffect(() => {
+    if (!token || authLoading) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const profile = await api.get<ClientProfileForForm>("/clients/me/", token);
+        if (cancelled || !profile) return;
+        setClient((prev) => ({
+          ...prev,
+          first_name: profile.first_name ?? prev.first_name,
+          last_name: profile.last_name ?? prev.last_name,
+          email: profile.email ?? prev.email,
+          phone: profile.phone ?? prev.phone,
+          preferred_contact: (profile.preferred_contact as PublicSubmitClient["preferred_contact"]) || prev.preferred_contact,
+          street: profile.street ?? "",
+          city: profile.city ?? "",
+          postal_code: profile.postal_code ?? "",
+          country: profile.country ?? "Polska",
+        }));
+      } catch {
+        // Brak profilu klienta lub błąd sieci — dane z authUser już są w formularzu
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [token, authLoading]);
   const [deliveryMethod, setDeliveryMethod] = useState("in_person");
   const [returnMethod, setReturnMethod] = useState("in_person");
   const [deliveryStreet, setDeliveryStreet] = useState("");
@@ -172,7 +229,8 @@ export function SubmissionForm() {
       accessory_choose_for_me: accessoryChooseForMe,
     };
     try {
-      const res = await api.post<PublicSubmitResponse>("/repairs/submit/", payload);
+      const authToken = token ?? getStoredToken();
+      const res = await api.post<PublicSubmitResponse>("/repairs/submit/", payload, authToken ?? undefined);
       setResult(res as PublicSubmitResponse);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Wystąpił błąd. Spróbuj ponownie.";

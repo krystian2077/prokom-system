@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { PremiumButton } from "@/components/ui/PremiumButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { href: "/", label: "Strona główna" },
@@ -60,6 +61,8 @@ export function PublicNavbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { token, user, logout } = useAuth();
+  const isLoggedInAsClient = Boolean(token && user?.role === "client");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -71,17 +74,18 @@ export function PublicNavbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isDark
           ? "border-b border-white/10 bg-dark shadow-[0_4px 24px -8px rgba(0,0,0,0.3)] backdrop-blur-xl"
           : "border-b border-gray-100 bg-white/90 backdrop-blur-lg"
       }`}
+      style={{ paddingTop: "env(safe-area-inset-top, 0)" }}
     >
-      <div className="mx-auto flex h-20 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:gap-8 lg:px-8 xl:px-10">
-        {/* Logo */}
+      <div className="mx-auto flex h-14 min-h-[56px] w-full max-w-[1600px] items-center justify-between gap-4 px-4 sm:h-16 sm:min-h-[64px] sm:px-6 lg:h-20 lg:gap-8 lg:px-8 xl:px-10">
+        {/* Logo — mniejszy na telefonie */}
         <Link
           href="/"
-          className={`shrink-0 text-3xl font-bold tracking-tight transition-opacity duration-200 hover:opacity-90 ${
+          className={`shrink-0 text-xl font-bold tracking-tight transition-opacity duration-200 hover:opacity-90 sm:text-2xl lg:text-3xl ${
             isDark ? "text-white" : "text-dark"
           }`}
         >
@@ -109,7 +113,7 @@ export function PublicNavbar() {
         {/* Prawa strona — Panel + przyciski */}
         <div className="hidden shrink-0 items-center gap-4 lg:flex xl:gap-5">
           <Link
-            href="/client"
+            href={isLoggedInAsClient ? "/client/dashboard" : "/client"}
             className={`whitespace-nowrap text-xl font-medium transition-colors duration-200 ${
               isDark
                 ? "text-gray-300 hover:text-white"
@@ -118,8 +122,21 @@ export function PublicNavbar() {
           >
             Panel klienta
           </Link>
-          <PremiumButton
-            href="/client/login"
+          {isLoggedInAsClient ? (
+            <button
+              type="button"
+              onClick={() => logout()}
+              className={`min-h-[40px] shrink-0 rounded-xl border-2 px-4 text-lg font-semibold transition-all duration-200 ${
+                isDark
+                  ? "border-white/50 bg-transparent text-white hover:border-white hover:bg-white/10"
+                  : "border-gray-200 bg-white text-dark hover:border-primary/40 hover:bg-gray-50 hover:text-dark"
+              }`}
+            >
+              Wyloguj
+            </button>
+          ) : (
+            <PremiumButton
+              href="/client/login"
             variant="outline"
             size="md"
             className={`min-h-[40px] shrink-0 rounded-xl border-2 px-4 text-lg font-semibold transition-all duration-200 ${
@@ -127,9 +144,10 @@ export function PublicNavbar() {
                 ? "border-white/50 bg-transparent text-white hover:border-white hover:bg-white/10"
                 : "border-gray-200 bg-white text-dark hover:border-primary/40 hover:bg-gray-50 hover:text-dark"
             }`}
-          >
-            Zaloguj się / Zarejestruj się
-          </PremiumButton>
+            >
+              Zaloguj się / Zarejestruj się
+            </PremiumButton>
+          )}
           <PremiumButton
             href="/zgloszenie"
             variant="primary"
@@ -140,23 +158,23 @@ export function PublicNavbar() {
           </PremiumButton>
         </div>
 
-        {/* Mobile: hamburger */}
+        {/* Mobile: hamburger — min 44px touch */}
         <button
           type="button"
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 lg:hidden ${
+          className={`flex h-11 min-h-[44px] w-11 min-w-[44px] shrink-0 items-center justify-center rounded-xl transition-colors duration-200 lg:hidden ${
             isDark
-              ? "text-white hover:bg-white/10"
-              : "text-dark hover:bg-gray-100"
+              ? "text-white hover:bg-white/10 active:bg-white/15"
+              : "text-dark hover:bg-gray-100 active:bg-gray-200"
           }`}
           onClick={() => setMobileOpen((o) => !o)}
-          aria-label="Otwórz menu"
+          aria-label={mobileOpen ? "Zamknij menu" : "Otwórz menu"}
           aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Menu mobilne */}
+      {/* Menu mobilne — tło zgodne z nagłówkiem, duże pola dotykowe */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -164,48 +182,63 @@ export function PublicNavbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
-            className="overflow-hidden border-t border-gray-100 bg-white lg:hidden"
+            className={`overflow-hidden border-t lg:hidden ${
+              isDark ? "border-white/10 bg-dark" : "border-gray-100 bg-white"
+            }`}
           >
-            <nav
-              className="flex flex-col px-4 py-5"
-              aria-label="Menu mobilne"
-            >
+            <nav className="flex flex-col px-4 py-4 pb-6 sm:px-5 sm:py-5" aria-label="Menu mobilne">
               {navItems.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className={`rounded-xl px-4 py-4 text-xl font-medium transition-colors ${
+                  className={`flex min-h-[48px] items-center rounded-xl px-4 py-3.5 text-base font-medium transition-colors sm:text-lg ${
                     pathname === href
-                      ? "bg-primary/10 text-primary"
-                      : "text-dark hover:bg-gray-50"
+                      ? isDark ? "bg-white/10 text-primary" : "bg-primary/10 text-primary"
+                      : isDark ? "text-gray-300 hover:bg-white/5 hover:text-white" : "text-dark hover:bg-gray-50"
                   }`}
                 >
                   {label}
                 </Link>
               ))}
-              <div className="mt-3 border-t border-gray-100 pt-4">
+              <div className={`mt-2 border-t pt-4 ${isDark ? "border-white/10" : "border-gray-100"}`}>
                 <Link
-                  href="/client"
+                  href={isLoggedInAsClient ? "/client/dashboard" : "/client"}
                   onClick={() => setMobileOpen(false)}
-                  className="block rounded-xl px-4 py-4 text-xl font-medium text-neutral hover:bg-gray-50 hover:text-dark"
+                  className={`flex min-h-[48px] items-center rounded-xl px-4 py-3.5 text-base font-medium transition-colors sm:text-lg ${
+                    isDark ? "text-gray-300 hover:bg-white/5 hover:text-white" : "text-neutral hover:bg-gray-50 hover:text-dark"
+                  }`}
                 >
                   Panel klienta
                 </Link>
                 <div className="mt-3 flex flex-col gap-3">
-                  <PremiumButton
-                    href="/client/login"
-                    variant="outline"
-                    size="md"
-                    className="w-full rounded-xl border-2 border-gray-200 py-3.5 text-xl font-semibold text-dark"
-                  >
-                    Zaloguj się / Zarejestruj się
-                  </PremiumButton>
+                  {isLoggedInAsClient ? (
+                    <button
+                      type="button"
+                      onClick={() => { setMobileOpen(false); logout(); }}
+                      className={`w-full min-h-[48px] rounded-xl border-2 py-3.5 text-base font-semibold sm:text-lg ${
+                        isDark ? "border-white/30 text-white hover:bg-white/10" : "border-gray-200 text-dark"
+                      }`}
+                    >
+                      Wyloguj
+                    </button>
+                  ) : (
+                    <PremiumButton
+                      href="/client/login"
+                      variant="outline"
+                      size="md"
+                      className={`w-full min-h-[48px] rounded-xl border-2 py-3.5 text-base font-semibold sm:text-lg ${
+                        isDark ? "border-white/30 text-white hover:bg-white/10" : "border-gray-200 text-dark"
+                      }`}
+                    >
+                      Zaloguj się / Zarejestruj się
+                    </PremiumButton>
+                  )}
                   <PremiumButton
                     href="/zgloszenie"
                     variant="primary"
                     size="md"
-                    className="w-full rounded-xl py-3.5 text-xl font-semibold shadow-[0_3px 16px -4px rgba(225,29,29,0.4)]"
+                    className="w-full min-h-[48px] rounded-xl py-3.5 text-base font-semibold shadow-[0_3px_16px_-4px_rgba(225,29,29,0.4)] sm:text-lg"
                   >
                     Zgłoś naprawę
                   </PremiumButton>

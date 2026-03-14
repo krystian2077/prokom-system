@@ -77,7 +77,7 @@ const categories = [
 
 export function Accessories() {
   return (
-    <section className="bg-[#fbfbfc] py-20 sm:py-24">
+    <section className="bg-[#fbfbfc] py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <motion.div

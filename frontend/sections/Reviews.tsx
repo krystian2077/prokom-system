@@ -77,7 +77,7 @@ export function Reviews() {
   }, []);
 
   return (
-    <section className="bg-[#fafafa] py-20 sm:py-24">
+    <section className="bg-[#fafafa] py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <motion.h2
           initial={{ opacity: 0, y: 16 }}

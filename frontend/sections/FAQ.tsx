@@ -20,7 +20,7 @@ export function FAQ() {
   const sectionsOrder = ["Naprawa i czas realizacji", "Cena i płatność", "Gwarancja i wysyłka"];
 
   return (
-    <section className="bg-white py-20 sm:py-24">
+    <section className="bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:items-start">
           {/* Lewa kolumna – nagłówek + box CTA */}
@@ -38,7 +38,7 @@ export function FAQ() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl"
+              className="mt-4 text-2xl font-extrabold tracking-tight text-dark xs:text-3xl sm:text-4xl lg:text-5xl"
               style={{ lineHeight: 1.25 }}
             >
               Masz pytania?{" "}

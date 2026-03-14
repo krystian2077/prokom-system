@@ -75,7 +75,7 @@ const item = {
 
 export function TrustStats() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50/40 to-white py-20 sm:py-24 lg:py-28">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50/40 to-white py-12 sm:py-20 lg:py-24 xl:py-28">
       {/* Subtle decorative elements */}
       <div
         className="pointer-events-none absolute -right-64 top-1/4 h-96 w-96 rounded-full opacity-[0.04] blur-3xl"
@@ -113,7 +113,7 @@ export function TrustStats() {
                 {BADGE}
               </span>
             </span>
-            <h2 className="mt-8 text-3xl font-bold leading-tight tracking-tight text-dark sm:mt-9 sm:text-4xl lg:mt-10 lg:text-[2.25rem] lg:leading-[1.2] xl:text-[2.5rem]">
+            <h2 className="mt-6 text-2xl font-bold leading-tight tracking-tight text-dark xs:text-3xl sm:mt-9 sm:text-4xl lg:mt-10 lg:text-[2.25rem] lg:leading-[1.2] xl:text-[2.5rem]">
               {TITLE}
             </h2>
           </div>

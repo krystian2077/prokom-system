@@ -14,13 +14,43 @@ interface RepairDetail {
   status_display: string;
   public_status?: string;
   device_name?: string;
+  device?: { category?: string };
   problem_description?: string;
   created_at: string;
   estimated_completion_date?: string | null;
   quote_sent_at?: string | null;
   is_waiting_for_client_decision?: boolean;
   estimated_cost?: string | null;
+  delivery_method?: string;
+  return_method?: string;
+  hammer_glass_interest?: string | null;
+  accessory_choose_for_me?: boolean;
 }
+
+const CATEGORY_LABELS: Record<string, string> = {
+  phone: "Telefon",
+  tablet: "Tablet",
+  smartwatch: "Smartwatch",
+  laptop: "Laptop",
+  desktop: "Komputer stacjonarny",
+  printer: "Drukarka",
+  console: "Konsola",
+  data_recovery: "Odzyskiwanie danych",
+  other: "Inne",
+};
+
+const DELIVERY_LABELS: Record<string, string> = {
+  in_person: "Osobiście w serwisie",
+  courier: "Kurier",
+  parcel_locker: "Paczkomat",
+};
+
+const HAMMER_GLASS_LABELS: Record<string, string> = {
+  yes: "Tak — interesuje mnie folia",
+  no: "Nie",
+  ask_later: "Zapytam później",
+  free_with_quote: "Gratis przy wycenie",
+};
 
 export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
   const { token } = useAuth();
@@ -100,9 +130,14 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
           <h2 className="font-semibold text-prokom-black">Szczegóły</h2>
         </CardHeader>
         <CardContent className="space-y-2">
+          <p><span className="text-prokom-gray">Kategoria urządzenia:</span> {repair.device?.category ? (CATEGORY_LABELS[repair.device.category] ?? repair.device.category) : "—"}</p>
           <p><span className="text-prokom-gray">Urządzenie:</span> {repair.device_name ?? "—"}</p>
           <p><span className="text-prokom-gray">Opis problemu:</span> {repair.problem_description ?? "—"}</p>
           <p><span className="text-prokom-gray">Data przyjęcia:</span> {repair.created_at ? new Date(repair.created_at).toLocaleDateString("pl-PL") : "—"}</p>
+          <p><span className="text-prokom-gray">Sposób dostarczenia:</span> {repair.delivery_method ? (DELIVERY_LABELS[repair.delivery_method] ?? repair.delivery_method) : "—"}</p>
+          <p><span className="text-prokom-gray">Sposób odbioru:</span> {repair.return_method ? (DELIVERY_LABELS[repair.return_method] ?? repair.return_method) : "—"}</p>
+          <p><span className="text-prokom-gray">Hammer Glass (folia):</span> {repair.hammer_glass_interest ? (HAMMER_GLASS_LABELS[repair.hammer_glass_interest] ?? repair.hammer_glass_interest) : "—"}</p>
+          <p><span className="text-prokom-gray">Dobierz akcesoria:</span> {repair.accessory_choose_for_me ? "Tak — proszę doradzić przy odbiorze" : "Nie"}</p>
           {repair.estimated_completion_date && (
             <p><span className="text-prokom-gray">Szacowany termin:</span> {new Date(repair.estimated_completion_date).toLocaleDateString("pl-PL")}</p>
           )}

@@ -1,4 +1,3 @@
-import { AuthProvider } from "@/contexts/AuthContext";
 import { ClientGate } from "./ClientGate";
 
 export default function ClientLayout({
@@ -6,9 +5,5 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AuthProvider>
-      <ClientGate>{children}</ClientGate>
-    </AuthProvider>
-  );
+  return <ClientGate>{children}</ClientGate>;
 }

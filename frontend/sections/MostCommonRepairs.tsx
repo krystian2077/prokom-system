@@ -498,7 +498,7 @@ export function MostCommonRepairs() {
   }, [activeIndex, hasImages, images.length]);
 
   return (
-    <section className="w-full bg-white py-20 sm:py-24">
+    <section className="w-full bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         {/* Header */}
         <div className="text-center">
@@ -509,22 +509,22 @@ export function MostCommonRepairs() {
             />
             {BADGE_LABEL}
           </span>
-          <h2 className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
+          <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-dark xs:text-3xl sm:text-4xl lg:text-5xl">
             Najczęstsze <span className="text-primary">naprawy</span>
           </h2>
           <p
-            className="mx-auto mt-6 max-w-2xl text-lg text-[#666] sm:text-xl"
+            className="mx-auto mt-4 max-w-2xl text-sm text-[#666] sm:mt-6 sm:text-lg lg:text-xl"
             style={{ lineHeight: 1.75 }}
           >
             {SUBTITLE}
           </p>
         </div>
 
-        {/* Segmented control (iOS-style) */}
-        <div className="mt-10 flex justify-center">
+        {/* Segmented control (iOS-style) — na mobile przewijanie w poziomie */}
+        <div className="most-common-tabs-scroll mt-10 flex justify-start overflow-x-auto px-1 pb-2 sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0" style={{ WebkitOverflowScrolling: "touch" }}>
           <div
             ref={wrapperRef}
-            className="relative inline-flex items-center gap-2 rounded-full p-2"
+            className="relative inline-flex min-w-max flex-shrink-0 items-center gap-2 rounded-full p-2 sm:min-w-0"
             style={{
               background: "#f4f4f4",
               borderRadius: "100px",
@@ -551,13 +551,13 @@ export function MostCommonRepairs() {
                 }}
                 type="button"
                 onClick={() => setActiveIndex(i)}
-                className={`relative z-10 flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors sm:px-6 sm:py-3.5 sm:text-base ${
+                className={`relative z-10 flex shrink-0 items-center gap-2 rounded-full px-4 py-3 text-sm font-medium transition-colors sm:px-6 sm:py-3.5 sm:text-base ${
                   activeIndex === i
                     ? "text-white"
                     : "text-[#999] hover:text-[#555]"
                 }`}
               >
-                <span className="text-lg" aria-hidden>
+                <span className="text-base sm:text-lg" aria-hidden>
                   {tab.emoji}
                 </span>
                 {tab.label}
@@ -577,8 +577,7 @@ export function MostCommonRepairs() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="grid gap-[14px] sm:grid-cols-2"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[14px]"
               >
                 {category.repairs.map((repair, i) => (
                   <motion.div

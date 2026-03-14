@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Syne, DM_Sans } from "next/font/google";
+import { ClientAuthWrapper } from "@/components/providers/ClientAuthWrapper";
 import "./globals.css";
 
 const syne = Syne({
@@ -30,7 +31,7 @@ export default function RootLayout({
         className={`min-h-screen font-sans antialiased ${dmSans.className}`}
         style={{ backgroundColor: "#fff", color: "#0f0f0f" }}
       >
-        {children}
+        <ClientAuthWrapper>{children}</ClientAuthWrapper>
       </body>
     </html>
   );

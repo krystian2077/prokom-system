@@ -20,7 +20,33 @@ from apps.common.enums import (
     InternalRepairStatus,
     PaymentStatus,
 )
-from apps.common.utils import generate_repair_number
+from django.db import transaction
+from django.utils import timezone
+
+
+class RepairNumberSequence(models.Model):
+    """
+    Singleton (pk=1) przechowujący ostatni numer zgłoszenia.
+    Używane do generowania numerów w formacie PROKOM/RMA/N/rok.
+    """
+    last_value = models.PositiveIntegerField(_("ostatni numer"), default=0)
+    updated_at = models.DateTimeField(_("aktualizacja"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("licznik numerów napraw")
+        verbose_name_plural = _("liczniki numerów napraw")
+
+
+def get_next_prokom_rma_number():
+    """
+    Zwraca kolejny numer zgłoszenia w formacie PROKOM/RMA/{N}/{rok}.
+    N = które to zgłoszenie w całym systemie (licznik globalny).
+    """
+    with transaction.atomic():
+        seq = RepairNumberSequence.objects.select_for_update().get(pk=1)
+        seq.last_value += 1
+        seq.save(update_fields=["last_value", "updated_at"])
+        return f"PROKOM/RMA/{seq.last_value}/{timezone.now().year}"
 
 
 class RepairRequest(BaseModel):
@@ -379,9 +405,9 @@ class RepairRequest(BaseModel):
         return f"{self.repair_number} — {self.device.get_device_name()} — {self.get_status_display()}"
 
     def save(self, *args, **kwargs):
-        """Generuj repair_number przy pierwszym zapisie."""
+        """Generuj repair_number przy pierwszym zapisie (format PROKOM/RMA/N/rok)."""
         if not self.repair_number:
-            self.repair_number = generate_repair_number()
+            self.repair_number = get_next_prokom_rma_number()
         super().save(*args, **kwargs)
 
     @property

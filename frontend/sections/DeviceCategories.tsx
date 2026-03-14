@@ -98,14 +98,14 @@ const sectionPanelStyle = {
 
 export function DeviceCategories() {
   return (
-    <section className="devices-section bg-white py-[80px] px-12">
+    <section className="devices-section bg-white py-8 px-4 sm:py-14 sm:px-6 md:py-16 lg:py-[80px] lg:px-12">
       <div
-        className="devices-section-inner relative mx-auto max-w-[1200px] overflow-hidden rounded-[28px] pt-20 px-14 pb-[90px]"
+        className="devices-section-inner relative mx-auto max-w-[1200px] overflow-hidden rounded-xl pt-8 px-4 pb-8 sm:rounded-2xl sm:pt-14 sm:px-6 sm:pb-12 lg:rounded-[28px] lg:pt-20 lg:px-14 lg:pb-[90px]"
         style={sectionPanelStyle}
       >
-        {/* Czerwona linia na górze sekcji (::after) */}
+        {/* Czerwona linia na górze */}
         <div
-          className="pointer-events-none absolute left-[5%] right-[5%] top-0 h-[3px] rounded-b-[4px]"
+          className="pointer-events-none absolute left-[5%] right-[5%] top-0 h-[2px] rounded-b sm:h-[3px]"
           style={{
             background: "linear-gradient(90deg, transparent, rgba(220,30,30,0.85) 25%, rgba(220,30,30,0.85) 75%, transparent)",
           }}
@@ -117,22 +117,22 @@ export function DeviceCategories() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <div className="mb-6 flex justify-center">
+            <div className="mb-4 flex justify-center sm:mb-6">
               <Link
                 href="/zgloszenie"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-white shadow-sm transition-opacity hover:opacity-95"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm transition-opacity hover:opacity-95 sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
               >
-                <span className="h-2 w-2 shrink-0 rounded-full bg-red-900 ring-2 ring-white/80" aria-hidden />
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-900 ring-2 ring-white/80" aria-hidden />
                 {PILL_LABEL}
               </Link>
             </div>
             <div className="text-center">
-              <h2 className="text-4xl font-bold leading-tight tracking-tight text-dark sm:text-5xl lg:text-[3rem]">
+              <h2 className="text-xl font-bold leading-tight tracking-tight text-dark xs:text-2xl sm:text-4xl lg:text-5xl lg:text-[3rem]">
                 {TITLE_LINE1}
                 <br />
-                <span className="mt-3 block text-primary sm:mt-4">{TITLE_LINE2}</span>
+                <span className="mt-1.5 block text-primary sm:mt-4">{TITLE_LINE2}</span>
               </h2>
-              <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-neutral sm:text-lg">
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-neutral sm:mt-5 sm:text-base lg:text-lg">
                 {SUBTITLE}
               </p>
             </div>
@@ -143,13 +143,13 @@ export function DeviceCategories() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="mt-20 grid gap-9 sm:mt-24 sm:grid-cols-2 sm:gap-10 lg:mt-28 lg:grid-cols-4"
+            className="mt-8 grid grid-cols-1 gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-8 lg:mt-28 lg:grid-cols-4 lg:gap-10"
           >
             {categories.map(({ label, href, image, imageAlt, highlight }) => (
               <motion.div key={href} variants={item}>
                 <Link href={href} className="block h-full">
                   <motion.div
-                    className="group relative flex h-full flex-col overflow-hidden rounded-[28px]"
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl sm:rounded-[24px] lg:rounded-[28px]"
                     style={{
                       background: "#fffafa",
                       border: "1px solid rgba(220, 30, 30, 0.12)",
@@ -165,7 +165,7 @@ export function DeviceCategories() {
                     }}
                   >
                     {/* Device media area — product spotlight */}
-                    <div className="relative flex h-52 w-full shrink-0 items-center justify-center overflow-hidden border-b border-gray-200/80 sm:h-56">
+                    <div className="relative flex h-40 w-full shrink-0 items-center justify-center overflow-hidden border-b border-gray-200/80 sm:h-52 lg:h-56">
                       <div
                         className="absolute inset-0"
                         style={{
@@ -194,11 +194,11 @@ export function DeviceCategories() {
                       </div>
                     </div>
 
-                    <div className="relative flex flex-1 flex-col justify-end bg-white px-7 py-6 sm:px-8 sm:py-7">
-                      <h3 className="text-lg font-bold text-dark sm:text-xl">
+                    <div className="relative flex flex-1 flex-col justify-end bg-white px-4 py-4 sm:px-7 sm:py-6 lg:px-8 lg:py-7">
+                      <h3 className="text-base font-bold text-dark sm:text-lg lg:text-xl">
                         {label}
                       </h3>
-                      <span className="mt-2.5 inline-flex items-center text-sm font-medium text-primary transition-all duration-200 group-hover:font-semibold group-hover:tracking-wide">
+                      <span className="mt-2 inline-flex items-center text-sm font-medium text-primary transition-all duration-200 group-hover:font-semibold group-hover:tracking-wide">
                         Przejdź do zgłoszenia
                         <ChevronRight className="ml-1 h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-2 group-hover:opacity-100 opacity-90" />
                       </span>
@@ -209,7 +209,7 @@ export function DeviceCategories() {
             ))}
           </motion.div>
 
-        <p className="mt-12 flex items-center justify-center gap-2 text-sm text-neutral sm:mt-14">
+        <p className="mt-8 flex flex-wrap items-center justify-center gap-2 px-2 text-center text-xs text-neutral sm:mt-14 sm:text-sm">
           <Info className="h-4 w-4 shrink-0" aria-hidden />
           <span>{FOOTER_NOTE}</span>
         </p>

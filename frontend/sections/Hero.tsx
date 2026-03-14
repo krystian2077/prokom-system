@@ -105,8 +105,8 @@ export function Hero() {
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-[1600px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 xl:px-10">
-        <div className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 xl:gap-20">
+      <div className="relative mx-auto max-w-[1600px] px-4 py-10 sm:px-6 sm:py-16 sm:py-20 lg:px-8 lg:py-24 xl:px-10">
+        <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 xl:gap-20">
           {/* ——— LEFT COLUMN ——— */}
           <div className="flex flex-col justify-center lg:max-w-[540px]">
             <motion.div
@@ -157,7 +157,7 @@ export function Hero() {
               {/* 2. Headline — refined, subtle red emphasis */}
               <motion.h1
                 variants={staggerItem}
-                className="mt-7 text-3xl font-bold leading-[1.2] tracking-tight text-dark sm:mt-8 sm:text-4xl sm:leading-[1.18] lg:text-[2.35rem] lg:leading-[1.22] xl:text-[2.6rem] xl:leading-[1.2]"
+                className="mt-6 text-2xl font-bold leading-[1.22] tracking-tight text-dark xs:text-3xl sm:mt-8 sm:text-4xl sm:leading-[1.18] lg:text-[2.35rem] lg:leading-[1.22] xl:text-[2.6rem] xl:leading-[1.2]"
               >
                 Profesjonalny serwis elektroniki,
                 <br />
@@ -222,13 +222,13 @@ export function Hero() {
               {/* 6. CTA row */}
               <motion.div
                 variants={staggerItem}
-                className="mt-9 flex flex-wrap items-center gap-5 sm:mt-11 sm:gap-6"
+                className="mt-7 flex flex-col gap-3 sm:mt-11 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6"
               >
                 <PremiumButton
                   href="/zgloszenie"
                   variant="primary"
                   size="lg"
-                  className="min-h-[50px] rounded-xl px-7 text-base font-semibold shadow-[0_6px 24px -6px rgba(225,29,29,0.4)] transition-all duration-300 hover:shadow-[0_10px 32px -8px rgba(225,29,29,0.45)] hover:-translate-y-0.5 sm:px-8"
+                  className="min-h-[48px] w-full rounded-xl px-6 py-3.5 text-base font-semibold shadow-[0_6px_24px_-6px_rgba(225,29,29,0.4)] transition-all duration-300 hover:shadow-[0_10px_32px_-8px_rgba(225,29,29,0.45)] hover:-translate-y-0.5 sm:min-h-[50px] sm:w-auto sm:px-8"
                 >
                   Zgłoś naprawę
                   <ChevronRight className="ml-2.5 h-5 w-5" />
@@ -237,7 +237,7 @@ export function Hero() {
                   href="/kontakt"
                   variant="outline"
                   size="lg"
-                  className="min-h-[50px] rounded-xl border-2 border-gray-300 bg-white px-7 text-base font-semibold text-dark transition-all duration-300 hover:border-dark/30 hover:bg-gray-50 sm:px-8"
+                  className="min-h-[48px] w-full rounded-xl border-2 border-gray-300 bg-white px-6 py-3.5 text-base font-semibold text-dark transition-all duration-300 hover:border-dark/30 hover:bg-gray-50 sm:min-h-[50px] sm:w-auto sm:px-8"
                 >
                   Kontakt
                   <ChevronRight className="ml-2.5 h-5 w-5" />
@@ -268,7 +268,7 @@ export function Hero() {
                 style={{ background: "#0f0f0f" }}
               />
               {/* Image container — stronger shadow, frame feel */}
-              <div className="relative h-[440px] w-full overflow-hidden rounded-3xl border border-white/60 bg-gray-100 shadow-[0_32px 64px -20px rgba(0,0,0,0.18),0_0_0_1px rgba(0,0,0,0.04)] sm:h-[540px] lg:h-[620px] xl:h-[700px]">
+              <div className="relative h-[280px] w-full overflow-hidden rounded-2xl border border-white/60 bg-gray-100 shadow-[0_24px_48px_-16px_rgba(0,0,0,0.18)] sm:h-[540px] sm:rounded-3xl lg:h-[620px] xl:h-[700px]">
                 <Image
                   src="/images/unnamed.webp"
                   alt="PRO-KOM — siedziba serwisu elektroniki"

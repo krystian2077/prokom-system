@@ -20,7 +20,7 @@ const CONTACT = {
 
 export function Contact() {
   return (
-    <section className="bg-white py-20 sm:py-24">
+    <section className="bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Nagłówek sekcji */}
         <motion.div
@@ -31,7 +31,7 @@ export function Contact() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
             Znajdź nas
           </p>
-          <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
+          <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-dark xs:text-3xl sm:text-4xl lg:text-5xl">
             Odwiedź nas lub <span className="text-primary">napisz —</span>
             <br />
             chętnie pomożemy.

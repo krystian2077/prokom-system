@@ -29,17 +29,17 @@ export function PublicFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#050505] text-white">
-      <div className="mx-auto max-w-6xl px-4 pb-6 pt-12 sm:px-6 lg:px-8">
-        {/* Górny układ kolumnowy */}
-        <div className="border-b border-white/5 pb-8 lg:pb-10">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+    <footer className="bg-[#050505] text-white" style={{ paddingBottom: "env(safe-area-inset-bottom, 0)" }}>
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-10 sm:px-6 sm:pb-8 sm:pt-12 lg:px-8">
+        {/* Górny układ kolumnowy — na mobile jedna kolumna, większe odstępy */}
+        <div className="border-b border-white/5 pb-8 sm:pb-8 lg:pb-10">
+          <div className="grid gap-10 sm:gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
             {/* Kolumna opisowa */}
             <div>
-              <p className="text-xl font-extrabold tracking-tight sm:text-2xl">
+              <p className="text-lg font-extrabold tracking-tight sm:text-xl lg:text-2xl">
                 PRO – KOM
               </p>
-              <p className="mt-3 max-w-xs text-sm text-white/70">
+              <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
                 Profesjonalny serwis elektroniki w Rabce‑Zdroju. Naprawiamy
                 telefony, laptopy, tablety, drukarki i więcej. Szybko,
                 uczciwie, z gwarancją.
@@ -81,12 +81,12 @@ export function PublicFooter() {
               <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/50">
                 Usługi
               </h3>
-              <ul className="mt-4 space-y-2.5 text-sm">
+              <ul className="mt-4 space-y-3 text-sm sm:space-y-2.5">
                 {services.map(({ href, label }) => (
                   <li key={href}>
                     <Link
                       href={href}
-                      className="text-white/80 transition-colors hover:text-white"
+                      className="inline-block py-1.5 text-white/80 transition-colors hover:text-white"
                     >
                       {label}
                     </Link>
@@ -100,12 +100,12 @@ export function PublicFooter() {
               <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/50">
                 Sklep
               </h3>
-              <ul className="mt-4 space-y-2.5 text-sm">
+              <ul className="mt-4 space-y-3 text-sm sm:space-y-2.5">
                 {shop.map(({ href, label, badge }) => (
                   <li key={`${href}-${label}`} className="flex items-center gap-2">
                     <Link
                       href={href}
-                      className="text-white/80 transition-colors hover:text-white"
+                      className="inline-block py-1.5 text-white/80 transition-colors hover:text-white"
                     >
                       {label}
                     </Link>
@@ -124,12 +124,12 @@ export function PublicFooter() {
               <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/50">
                 Informacje
               </h3>
-              <ul className="mt-4 space-y-2.5 text-sm">
+              <ul className="mt-4 space-y-3 text-sm sm:space-y-2.5">
                 {info.map(({ href, label }) => (
                   <li key={href}>
                     <Link
                       href={href}
-                      className="text-white/80 transition-colors hover:text-white"
+                      className="inline-block py-1.5 text-white/80 transition-colors hover:text-white"
                     >
                       {label}
                     </Link>
@@ -141,7 +141,7 @@ export function PublicFooter() {
         </div>
 
         {/* Dolny pasek */}
-        <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-4 text-[12px] text-white/50 sm:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-5 text-[12px] text-white/50 sm:flex-row sm:gap-3 sm:pt-4">
           <p className="order-2 sm:order-1">
             © {year}{" "}
             <span className="font-semibold text-white">PRO‑KOM</span>. Wszelkie

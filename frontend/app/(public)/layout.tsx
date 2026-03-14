@@ -1,17 +1,10 @@
 import type { ReactNode } from "react";
-import { PublicNavbar } from "@/components/layout/PublicNavbar";
-import { PublicFooter } from "@/components/layout/PublicFooter";
+import { ConditionalPublicLayout } from "@/components/layout/ConditionalPublicLayout";
 
 export default function PublicLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  return (
-    <>
-      <PublicNavbar />
-      <main className="min-h-[calc(100vh-8rem)]">{children}</main>
-      <PublicFooter />
-    </>
-  );
+  return <ConditionalPublicLayout>{children}</ConditionalPublicLayout>;
 }

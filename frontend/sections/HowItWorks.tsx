@@ -74,10 +74,10 @@ function StepCardContent({
       >
         {step.label}
       </span>
-      <h3 className="mt-2 text-xl font-extrabold text-dark sm:text-2xl" style={{ fontWeight: 800 }}>
+      <h3 className="mt-2 text-lg font-extrabold text-dark sm:text-xl lg:text-2xl" style={{ fontWeight: 800 }}>
         {step.title}
       </h3>
-      <p className="mt-3 text-neutral" style={{ lineHeight: 1.7 }}>
+      <p className="mt-3 text-sm text-neutral sm:text-base" style={{ lineHeight: 1.7 }}>
         {step.description}
       </p>
       <span
@@ -127,62 +127,51 @@ export function HowItWorks() {
   return (
     <section
       ref={sectionRef}
-      className="w-full bg-white py-[90px]"
+      className="w-full bg-white py-12 sm:py-16 lg:py-[90px]"
       style={{ background: "#ffffff" }}
     >
-      <div className="mx-auto max-w-[1160px] px-4">
+      <div className="mx-auto max-w-[1160px] px-4 sm:px-6">
         {/* Header */}
         <div className="text-center">
           <span className="inline-block rounded bg-primary px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-white sm:text-base">
             {BADGE_LABEL}
           </span>
-          <h2 className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
+          <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-dark xs:text-3xl sm:text-4xl lg:text-5xl">
             Jak to{" "}
             <span className="text-primary">{TITLE_RED}</span>
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-neutral" style={{ lineHeight: 1.6 }}>
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-neutral sm:text-base" style={{ lineHeight: 1.6 }}>
             {SUBTITLE}
           </p>
         </div>
 
-        {/* Timeline */}
-        <div className="relative mt-16">
-          {/* Pionowa linia */}
+        {/* Timeline — na mobile jedna kolumna (karta pod kropką), od md dwie kolumny */}
+        <div className="relative mt-10 sm:mt-16">
           <div
             ref={lineRef}
-            className="absolute left-1/2 top-0 w-0.5 -translate-x-1/2 bg-primary transition-all duration-500 ease-out"
-            style={{
-              height: `${lineHeight}%`,
-              minHeight: 0,
-            }}
+            className="absolute left-1/2 top-0 hidden w-0.5 -translate-x-1/2 bg-primary transition-all duration-500 ease-out md:block"
+            style={{ height: `${lineHeight}%`, minHeight: 0 }}
           />
 
-          <div ref={stepsRef} className="space-y-12 sm:space-y-16">
+          <div ref={stepsRef} className="space-y-8 sm:space-y-12 lg:space-y-16">
             {steps.map((step, i) => {
               const isLeft = i % 2 === 0;
+              const cardClass = "group/card relative w-full max-w-[460px] overflow-hidden rounded-2xl border-[1.5px] border-[#eaeaea] bg-white py-5 px-4 transition-all duration-300 sm:py-6 sm:px-6 lg:py-[26px] lg:px-[28px] lg:rounded-[20px]";
+              const cardStyle = { boxShadow: "0 2px 6px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.07)" };
+              const cardHover = { y: -5, borderColor: "rgba(220,30,30,0.22)", boxShadow: "0 8px 24px rgba(220,30,30,0.12), 0 4px 12px rgba(0,0,0,0.06)", transition: { duration: 0.28, ease: [0.25, 0.1, 0.25, 1] } };
               return (
-                <div
-                  key={step.label}
-                  className="relative flex min-h-[200px] items-center"
-                >
-                  {/* Lewa połowa — karta albo pusta */}
-                  <div className="flex min-w-0 flex-1 items-center justify-end pr-[30px]">
+                <div key={step.label} className="relative flex min-h-0 flex-col items-center md:min-h-[200px] md:flex-row md:items-center">
+                  {/* Desktop: lewa połowa */}
+                  <div className="hidden min-w-0 flex-1 items-center justify-end pr-[30px] md:flex">
                     {isLeft && (
                       <motion.div
                         initial={{ opacity: 0, x: -40 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-80px" }}
                         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                        className="group/card relative w-full max-w-[460px] overflow-hidden rounded-[20px] border-[1.5px] border-[#eaeaea] bg-white py-[26px] px-[28px] transition-all duration-300"
-                        style={{
-                          boxShadow: "0 2px 6px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.07)",
-                        }}
-                        whileHover={{
-                          y: -5,
-                          borderColor: "rgba(220,30,30,0.22)",
-                          boxShadow:
-                            "0 8px 24px rgba(220,30,30,0.12), 0 4px 12px rgba(0,0,0,0.06)",
-                        }}
+                        className={cardClass}
+                        style={cardStyle}
+                        whileHover={cardHover}
                       >
                         <div className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover/card:scale-x-100" aria-hidden />
                         <StepCardContent step={step} />
@@ -190,29 +179,35 @@ export function HowItWorks() {
                     )}
                   </div>
 
-                  {/* Dot — dokładnie na środku sekcji (na linii), wyśrodkowany w pionie */}
-                  <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+                  {/* Kropka — na mobile nad kartą, na desktop na środku */}
+                  <div className="relative z-10 flex shrink-0 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
                     <TimelineDot emoji={step.emoji} />
                   </div>
 
-                  {/* Prawa połowa — karta albo pusta */}
-                  <div className="flex min-w-0 flex-1 items-center justify-start pl-[30px]">
-                    {!isLeft && (
+                  {/* Mobile: karta zawsze pod kropką; Desktop: prawa połowa */}
+                  <div className="flex w-full flex-1 flex-col items-center pt-4 md:min-w-0 md:items-start md:justify-start md:pl-[30px] md:pt-0">
+                    {(isLeft && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-40px" }}
+                        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                        className={`w-full ${cardClass} md:hidden`}
+                        style={cardStyle}
+                        whileHover={cardHover}
+                      >
+                        <div className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover/card:scale-x-100" aria-hidden />
+                        <StepCardContent step={step} />
+                      </motion.div>
+                    )) || (
                       <motion.div
                         initial={{ opacity: 0, x: 40 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-80px" }}
                         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                        className="group/card relative w-full max-w-[460px] overflow-hidden rounded-[20px] border-[1.5px] border-[#eaeaea] bg-white py-[26px] px-[28px] transition-all duration-300"
-                        style={{
-                          boxShadow: "0 2px 6px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.07)",
-                        }}
-                        whileHover={{
-                          y: -5,
-                          borderColor: "rgba(220,30,30,0.22)",
-                          boxShadow:
-                            "0 8px 24px rgba(220,30,30,0.12), 0 4px 12px rgba(0,0,0,0.06)",
-                        }}
+                        className={`w-full ${cardClass} md:max-w-[460px]`}
+                        style={cardStyle}
+                        whileHover={cardHover}
                       >
                         <div className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover/card:scale-x-100" aria-hidden />
                         <StepCardContent step={step} />
@@ -226,13 +221,11 @@ export function HowItWorks() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 flex justify-center">
+        <div className="mt-10 flex justify-center sm:mt-16">
           <Link
             href="/zgloszenie"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-lg font-semibold text-white shadow-lg transition-opacity hover:opacity-95"
-            style={{
-              boxShadow: "0 4px 14px rgba(220,30,30,0.35)",
-            }}
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-opacity hover:opacity-95 sm:px-8 sm:py-4 sm:text-lg"
+            style={{ boxShadow: "0 4px 14px rgba(220,30,30,0.35)" }}
           >
             <span aria-hidden>📋</span>
             Zgłoś naprawę teraz
