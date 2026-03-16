@@ -1,0 +1,47 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Zgłoszenie przyjęte — {{ repair_number }} | PRO-KOM Serwis{% endblock %}
+{% block content %}
+  <p>Dzień dobry{% if client_name %}, {{ client_name }}{% endif %},</p>
+  <p>Przyjęliśmy Twoje zlecenie naprawy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, by potwierdzić przyjęcie zlecenia i ustalić szczegóły.</p>
+  <div class="code-box">
+    <div class="code">{{ repair_number }}</div>
+    <div class="hint">Zapisz ten numer — jest ważny. Użyj go w kontakcie z serwisem.</div>
+  </div>
+  <p><strong>Podsumowanie zgłoszenia</strong></p>
+  <table class="summary-table" cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse; margin:0 0 20px; font-size:14px; line-height:1.5;">
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; width:140px; vertical-align:top;">Urządzenie</td><td style="padding:10px 0; color:#171717;">{{ device_name }}</td></tr>
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Opis problemu</td><td style="padding:10px 0; color:#171717;">{{ problem_description }}</td></tr>
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Dostawa</td><td style="padding:10px 0; color:#171717;">{{ delivery_display }}</td></tr>
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Zwrot</td><td style="padding:10px 0; color:#171717;">{{ return_display }}</td></tr>
+    {% if hammer_glass_display %}
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Hammer Glass</td><td style="padding:10px 0; color:#171717;">{{ hammer_glass_display }}</td></tr>
+    {% endif %}
+    {% if accessories_summary %}
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Dobierz Akcesoria</td><td style="padding:10px 0; color:#171717;">{{ accessories_summary }}</td></tr>
+    {% endif %}
+    {% if client_notes %}
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Dodatkowe uwagi</td><td style="padding:10px 0; color:#171717;">{{ client_notes }}</td></tr>
+    {% endif %}
+    {% if device_turns_on is not None %}
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Czy urządzenie się włącza</td><td style="padding:10px 0; color:#171717;">{% if device_turns_on %}Tak{% else %}Nie{% endif %}</td></tr>
+    {% endif %}
+    {% if visual_condition_description %}
+    <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 12px 10px 0; color:#6b7280; font-weight:600; vertical-align:top;">Stan wizualny</td><td style="padding:10px 0; color:#171717;">{{ visual_condition_description }}</td></tr>
+    {% endif %}
+  </table>
+  {% if delivery_by_courier %}
+  <div class="code-box" style="background-color:#f0fdf4; border-color:#22c55e;">
+    <p style="margin:0 0 8px; font-weight:700; font-size:14px; color:#166534;">Adres do wysyłki urządzenia do serwisu</p>
+    <p style="margin:0; font-size:15px; font-weight:600; color:#171717;">{{ service_address.name }}</p>
+    <p style="margin:4px 0 0; font-size:14px; color:#171717;">{{ service_address.street }}, {{ service_address.city }}</p>
+    <p style="margin:4px 0 0; font-size:13px; color:#525252;">{{ service_address.hours }} · Tel. {{ service_address.phone }} · E-mail: <a href="mailto:{{ service_address.email }}" style="color:#dc1e1e;">{{ service_address.email }}</a></p>
+    <p style="margin:14px 0 0; font-size:13px; line-height:1.5; color:#525252;">Wysyłkę paczki do nas opłacasz we własnym zakresie. Po naprawie odsyłamy Ci sprzęt za darmo — zwrot do domu jest po naszej stronie.</p>
+    <p style="margin:10px 0 0; font-size:13px; line-height:1.5; color:#525252;">Prosimy o <strong>staranne zabezpieczenie urządzenia</strong> przed wysyłką (np. oryginalne opakowanie, wypełniacz, folia bąbelkowa), aby sprzęt dotarł do nas bez uszkodzeń.</p>
+    <p style="margin:10px 0 0; font-size:13px; color:#525252;">Po nadaniu paczki możesz dodać <strong>numer listu przewozowego</strong> w panelu klienta — ułatwi to nam śledzenie przesyłki.</p>
+  </div>
+  {% endif %}
+  {% if claim_url %}
+  <p style="font-size:13px;">Chcesz przypisać tę naprawę do konta w panelu klienta? <a href="{{ claim_url }}" class="button" style="display:inline-block; padding:10px 20px; font-size:14px;">Przypisz naprawę do konta</a> (link ważny 7 dni).</p>
+  {% endif %}
+  <p>Z poważaniem,<br><strong>Zespół PRO-KOM Serwis</strong></p>
+{% endblock %}

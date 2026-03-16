@@ -23,7 +23,7 @@ class LoginSerializer(serializers.Serializer):
         if not user:
             raise serializers.ValidationError(_("Nieprawidłowy e-mail lub hasło."))
         if not user.is_active:
-            raise serializers.ValidationError(_("Konto jest nieaktywne."))
+            raise serializers.ValidationError(_("Nieprawidłowy e-mail lub hasło."))
 
         attrs["user"] = user
         return attrs

@@ -13,6 +13,7 @@ export interface User {
   role: UserRole;
   is_active: boolean;
   is_staff: boolean;
+  email_verified?: boolean;
   date_joined?: string;
   last_login?: string | null;
 }

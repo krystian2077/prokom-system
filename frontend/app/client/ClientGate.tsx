@@ -3,7 +3,9 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { ClientTopbar } from "@/components/layout/ClientTopbar";
+import { PanelNav } from "@/components/panel/PanelNav";
+import { UnverifiedBanner } from "@/components/panel/UnverifiedBanner";
+import { useClientProfile } from "@/hooks/useClientProfile";
 import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 
@@ -11,10 +13,19 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { token, user, loading } = useAuth();
+  const { profile } = useClientProfile();
 
   const isLoginPage = pathname === "/client/login";
   const isRegisterPage = pathname === "/client/rejestracja";
-  const isPublicClientPage = isLoginPage || isRegisterPage;
+  const isVerifyEmailPage = pathname === "/client/verify-email";
+  const isForgotPasswordPage = pathname === "/client/forgot-password";
+  const isResetPasswordPage = pathname === "/client/reset-password";
+  const isPublicClientPage =
+    isLoginPage ||
+    isRegisterPage ||
+    isVerifyEmailPage ||
+    isForgotPasswordPage ||
+    isResetPasswordPage;
 
   useEffect(() => {
     if (loading) return;
@@ -27,7 +38,7 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (isLoginPage || isRegisterPage) {
+    if (isLoginPage || isRegisterPage || isVerifyEmailPage) {
       router.replace("/client/dashboard");
       return;
     }
@@ -36,12 +47,12 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
       router.replace("/");
       return;
     }
-  }, [loading, token, user, isLoginPage, isRegisterPage, isPublicClientPage, pathname, router]);
+  }, [loading, token, user, isLoginPage, isRegisterPage, isVerifyEmailPage, isPublicClientPage, pathname, router]);
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <p className="text-prokom-gray">Ładowanie…</p>
+      <div className="client-panel flex min-h-[40vh] items-center justify-center">
+        <p style={{ color: "var(--ink2)" }}>Ładowanie…</p>
       </div>
     );
   }
@@ -60,11 +71,13 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
   }
 
   if (user?.role === "client") {
+    const showUnverifiedBanner = !user?.email_verified && user?.email;
     return (
-      <>
-        <ClientTopbar />
-        <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
-      </>
+      <div className="client-panel relative min-h-screen">
+        <PanelNav user={profile} />
+        {showUnverifiedBanner && <UnverifiedBanner email={user.email} />}
+        <main className="relative z-10 min-h-[calc(100vh-62px)]">{children}</main>
+      </div>
     );
   }
 

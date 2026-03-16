@@ -144,6 +144,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # =============================================================================
+# FRONTEND (linki w e-mailach: śledzenie, claim-repair)
+# =============================================================================
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
+
+# =============================================================================
 # DJANGO REST FRAMEWORK
 # =============================================================================
 REST_FRAMEWORK = {

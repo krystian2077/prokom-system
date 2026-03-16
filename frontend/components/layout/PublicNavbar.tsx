@@ -2,15 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LayoutDashboard, Wrench, UserCircle, LogOut } from "lucide-react";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 import { useAuth } from "@/contexts/AuthContext";
+
+const clientMenuItems = [
+  { href: "/client/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/client/naprawy", label: "Moje Naprawy", icon: Wrench },
+  { href: "/client/profil", label: "Profil", icon: UserCircle },
+] as const;
 
 const navItems = [
   { href: "/", label: "Strona główna" },
   { href: "/uslugi", label: "Usługi" },
+  { href: "/oferta", label: "Oferta" },
   { href: "/hammer-glass", label: "Hammer Glass" },
   { href: "/akcesoria", label: "Akcesoria" },
   { href: "/kontakt", label: "Kontakt" },
@@ -61,6 +68,8 @@ export function PublicNavbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const { token, user, logout } = useAuth();
   const isLoggedInAsClient = Boolean(token && user?.role === "client");
 
@@ -69,6 +78,17 @@ export function PublicNavbar() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [userMenuOpen]);
 
   const isDark = scrolled;
 
@@ -112,28 +132,101 @@ export function PublicNavbar() {
 
         {/* Prawa strona — Panel + przyciski */}
         <div className="hidden shrink-0 items-center gap-4 lg:flex xl:gap-5">
-          <Link
-            href={isLoggedInAsClient ? "/client/dashboard" : "/client"}
-            className={`whitespace-nowrap text-xl font-medium transition-colors duration-200 ${
-              isDark
-                ? "text-gray-300 hover:text-white"
-                : "text-neutral hover:text-dark"
-            }`}
-          >
-            Panel klienta
-          </Link>
           {isLoggedInAsClient ? (
-            <button
-              type="button"
-              onClick={() => logout()}
-              className={`min-h-[40px] shrink-0 rounded-xl border-2 px-4 text-lg font-semibold transition-all duration-200 ${
-                isDark
-                  ? "border-white/50 bg-transparent text-white hover:border-white hover:bg-white/10"
-                  : "border-gray-200 bg-white text-dark hover:border-primary/40 hover:bg-gray-50 hover:text-dark"
-              }`}
-            >
-              Wyloguj
-            </button>
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className={`group flex items-center gap-2.5 rounded-xl py-1.5 pl-1.5 pr-3 transition-all duration-300 ${
+                  userMenuOpen
+                    ? isDark
+                      ? "bg-white/15 shadow-[0_0_0_2px_rgba(255,255,255,0.2)]"
+                      : "bg-primary/10 shadow-[0_0_0_2px_rgba(220,29,29,0.25)]"
+                    : isDark
+                      ? "hover:bg-white/10"
+                      : "hover:bg-gray-100"
+                }`}
+                aria-label="Menu konta"
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+              >
+                <span
+                  className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                    userMenuOpen
+                      ? isDark
+                        ? "bg-white/20 text-white"
+                        : "bg-primary/20 text-primary"
+                      : isDark
+                        ? "bg-white/15 text-white group-hover:bg-white/25"
+                        : "bg-primary/10 text-primary group-hover:bg-primary/20"
+                  }`}
+                >
+                  <User className="h-5 w-5" strokeWidth={2.25} />
+                  <span
+                    className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 ${
+                      isDark ? "border-dark bg-emerald-400" : "border-white bg-emerald-500"
+                    }`}
+                    title="Zalogowany"
+                  />
+                </span>
+                <span
+                  className={`max-w-[120px] truncate text-left text-[15px] font-semibold transition-colors xl:max-w-[140px] ${
+                    userMenuOpen
+                      ? isDark ? "text-white" : "text-primary"
+                      : isDark ? "text-gray-200 group-hover:text-white" : "text-dark"
+                  }`}
+                >
+                  {user?.first_name || user?.email?.split("@")[0] || "Konto"}
+                </span>
+              </button>
+              <AnimatePresence>
+                {userMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+                    className={`absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-xl border py-1.5 shadow-xl ${
+                      isDark
+                        ? "border-white/15 bg-dark/95 backdrop-blur-md"
+                        : "border-gray-200/90 bg-white/95 backdrop-blur-md"
+                    }`}
+                    role="menu"
+                  >
+                    {clientMenuItems.map(({ href, label, icon: Icon }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setUserMenuOpen(false)}
+                        className={`group/item flex items-center gap-3 px-4 py-3 text-left text-[15px] font-medium transition-all duration-200 ${
+                          isDark
+                            ? "text-gray-200 hover:bg-white/10 hover:pl-5 hover:text-white"
+                            : "text-dark hover:bg-primary/5 hover:pl-5 hover:text-primary"
+                        }`}
+                        role="menuitem"
+                      >
+                        <Icon className="h-5 w-5 shrink-0 opacity-80 transition-transform duration-200 group-hover/item:scale-110" />
+                        {label}
+                      </Link>
+                    ))}
+                    <div className={`my-1 border-t ${isDark ? "border-white/10" : "border-gray-100"}`} />
+                    <button
+                      type="button"
+                      onClick={() => { setUserMenuOpen(false); logout(); }}
+                      className={`group/item flex w-full items-center gap-3 px-4 py-3 text-left text-[15px] font-medium transition-all duration-200 ${
+                        isDark
+                          ? "text-red-300 hover:bg-red-500/15 hover:pl-5 hover:text-red-200"
+                          : "text-red-600 hover:bg-red-50 hover:pl-5"
+                      }`}
+                      role="menuitem"
+                    >
+                      <LogOut className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover/item:scale-110" />
+                      Wyloguj
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ) : (
             <PremiumButton
               href="/client/login"
@@ -202,27 +295,47 @@ export function PublicNavbar() {
                 </Link>
               ))}
               <div className={`mt-2 border-t pt-4 ${isDark ? "border-white/10" : "border-gray-100"}`}>
-                <Link
-                  href={isLoggedInAsClient ? "/client/dashboard" : "/client"}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex min-h-[48px] items-center rounded-xl px-4 py-3.5 text-base font-medium transition-colors sm:text-lg ${
-                    isDark ? "text-gray-300 hover:bg-white/5 hover:text-white" : "text-neutral hover:bg-gray-50 hover:text-dark"
-                  }`}
-                >
-                  Panel klienta
-                </Link>
-                <div className="mt-3 flex flex-col gap-3">
-                  {isLoggedInAsClient ? (
+                {isLoggedInAsClient ? (
+                  <>
+                    {clientMenuItems.map(({ href, label, icon: Icon }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex min-h-[48px] items-center gap-3 rounded-xl px-4 py-3.5 text-base font-medium transition-colors sm:text-lg ${
+                          pathname === href
+                            ? isDark ? "bg-white/10 text-primary" : "bg-primary/10 text-primary"
+                            : isDark ? "text-gray-300 hover:bg-white/5 hover:text-white" : "text-dark hover:bg-gray-50"
+                        }`}
+                      >
+                        <Icon className="h-5 w-5 shrink-0 opacity-80" />
+                        {label}
+                      </Link>
+                    ))}
                     <button
                       type="button"
                       onClick={() => { setMobileOpen(false); logout(); }}
-                      className={`w-full min-h-[48px] rounded-xl border-2 py-3.5 text-base font-semibold sm:text-lg ${
-                        isDark ? "border-white/30 text-white hover:bg-white/10" : "border-gray-200 text-dark"
+                      className={`flex min-h-[48px] w-full items-center gap-3 rounded-xl px-4 py-3.5 text-left text-base font-medium transition-colors sm:text-lg ${
+                        isDark ? "text-red-300 hover:bg-white/5" : "text-red-600 hover:bg-red-50"
                       }`}
                     >
+                      <LogOut className="h-5 w-5 shrink-0" />
                       Wyloguj
                     </button>
-                  ) : (
+                  </>
+                ) : (
+                  <Link
+                    href="/client"
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex min-h-[48px] items-center rounded-xl px-4 py-3.5 text-base font-medium transition-colors sm:text-lg ${
+                      isDark ? "text-gray-300 hover:bg-white/5 hover:text-white" : "text-neutral hover:bg-gray-50 hover:text-dark"
+                    }`}
+                  >
+                    Panel klienta
+                  </Link>
+                )}
+                <div className="mt-3 flex flex-col gap-3">
+                  {!isLoggedInAsClient && (
                     <PremiumButton
                       href="/client/login"
                       variant="outline"

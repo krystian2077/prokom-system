@@ -1,10 +1,11 @@
 """
 Renderowanie szablonu (zmienne {{...}}) i wysyłka e-mail / SMS.
-E-mail: Django send_mail. SMS: stub (konfiguracja SMSAPI później).
+E-mail: Django send_mail / EmailMultiAlternatives (HTML). SMS: stub (konfiguracja SMSAPI później).
 """
 import re
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 
@@ -54,7 +55,7 @@ def render_template_body(text, context):
 
 
 def send_email(to_email, subject, body, fail_silently=True):
-    """Wysyła e-mail (Django send_mail)."""
+    """Wysyła e-mail zwykły (plain text)."""
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@prokom.pl")
     return send_mail(
         subject,
@@ -63,6 +64,169 @@ def send_email(to_email, subject, body, fail_silently=True):
         [to_email],
         fail_silently=fail_silently,
     )
+
+
+def send_email_html(to_email, subject, body_plain, html_content, fail_silently=True):
+    """Wysyła e-mail w wersji plain text + HTML (klient zobaczy HTML, fallback: plain)."""
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@prokom.pl")
+    msg = EmailMultiAlternatives(subject, body_plain, from_email, [to_email])
+    msg.attach_alternative(html_content, "text/html")
+    return msg.send(fail_silently=fail_silently)
+
+
+def send_repair_submission_confirmation(repair, fail_silently=True):
+    """
+    Wysyła e-mail potwierdzenia przyjęcia zlecenia na podany adres klienta (dla każdego zgłoszenia).
+    Zawiera: przyjęcie zlecenia, numer naprawy, prośbę o zapisanie numeru, podsumowanie (urządzenie, problem, dostawa, zwrot).
+    Dla gości: opcjonalnie link do przypisania naprawy do konta. Bez linku do śledzenia bez logowania.
+    """
+    to_email = (getattr(repair.client, "email", None) or "").strip()
+    if not to_email:
+        return False
+    base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3000").rstrip("/")
+    client_name = repair.client.get_full_name() if repair.client else ""
+    device_name = repair.device.get_device_name() if repair.device else ""
+    delivery_display = repair.get_delivery_method_display() if hasattr(repair, "get_delivery_method_display") else (repair.delivery_method or "")
+    return_display = repair.get_return_method_display() if hasattr(repair, "get_return_method_display") else (repair.return_method or "")
+    claim_url = ""
+    if getattr(repair, "claim_token", None) and getattr(repair, "claim_token_expires_at", None) and repair.claim_token_expires_at and repair.claim_token_expires_at > timezone.now():
+        claim_url = f"{base}/claim-repair?token={repair.claim_token}"
+    hammer_glass_display = ""
+    if getattr(repair, "hammer_glass_interest", None):
+        hg = repair.hammer_glass_interest
+        if hg == "yes":
+            hammer_glass_display = "Tak, proszę o ofertę"
+        elif hg == "no":
+            hammer_glass_display = "Nie"
+        elif hg == "ask_later":
+            hammer_glass_display = "Zapytam później"
+        elif hg == "free_with_quote":
+            hammer_glass_display = "Gratis przy wycenie"
+    accessories_summary = ""
+    if getattr(repair, "accessory_interests", None):
+        from apps.accessories.models import RepairAccessoryInterest
+        interests = list(repair.accessory_interests.all().order_by("created_at"))
+        choose_for_me = [i for i in interests if i.choose_for_me and (i.note or "").strip()]
+        products = [i for i in interests if not i.choose_for_me and i.product_id]
+        if choose_for_me:
+            accessories_summary = (choose_for_me[0].note or "").strip() or "Proszę doradzić przy odbiorze"
+        elif products:
+            names = [getattr(i.product, "name", str(i.product_id)) for i in products if i.product]
+            accessories_summary = ", ".join(names) if names else "Tak"
+        elif any(i.choose_for_me for i in interests):
+            accessories_summary = "Proszę doradzić przy odbiorze"
+    client_notes = (getattr(repair, "client_notes", None) or "").strip()[:2000]
+    device_turns_on = getattr(repair, "device_turns_on", None)
+    visual_condition_description = (getattr(repair, "visual_condition_description", None) or "").strip()[:1000]
+    delivery_by_courier = (getattr(repair, "delivery_method", None) or "") in ("courier", "parcel_locker")
+    service_address = {
+        "name": "PRO-KOM Tadeusz Wójciak",
+        "street": "ul. Orkana 16B",
+        "city": "34-700 Rabka-Zdrój",
+        "hours": "pon.–pt. 9:00–17:00, sob. 9:00–14:00",
+        "phone": "883 200 151",
+        "email": "serwisprokomrabka@gmail.com",
+    }
+    context = {
+        "client_name": client_name,
+        "repair_number": repair.repair_number,
+        "device_name": device_name,
+        "problem_description": (repair.problem_description or "")[:1000],
+        "delivery_display": delivery_display,
+        "return_display": return_display,
+        "claim_url": claim_url,
+        "hammer_glass_display": hammer_glass_display,
+        "accessories_summary": accessories_summary,
+        "client_notes": client_notes,
+        "device_turns_on": device_turns_on,
+        "visual_condition_description": visual_condition_description,
+        "delivery_by_courier": delivery_by_courier,
+        "service_address": service_address,
+    }
+    subject = f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Serwis"
+    body_plain = (
+        f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
+        "Przyjęliśmy Twoje zlecenie naprawy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, "
+        "by potwierdzić przyjęcie zlecenia i ustalić szczegóły.\n\n"
+        f"Numer naprawy: {repair.repair_number}\n"
+        "Zapisz ten numer — jest ważny. Użyj go w kontakcie z serwisem.\n\n"
+        "Podsumowanie zgłoszenia:\n"
+        f"- Urządzenie: {device_name}\n"
+        f"- Opis problemu: {repair.problem_description or ''}\n"
+        f"- Dostawa: {delivery_display}\n"
+        f"- Zwrot: {return_display}\n"
+    )
+    if hammer_glass_display:
+        body_plain += f"- Hammer Glass: {hammer_glass_display}\n"
+    if accessories_summary:
+        body_plain += f"- Dobierz Akcesoria: {accessories_summary}\n"
+    if client_notes:
+        body_plain += f"- Dodatkowe uwagi: {client_notes}\n"
+    if device_turns_on is not None:
+        body_plain += f"- Czy urządzenie się włącza: {'Tak' if device_turns_on else 'Nie'}\n"
+    if visual_condition_description:
+        body_plain += f"- Stan wizualny: {visual_condition_description}\n"
+    body_plain += "\n"
+    if delivery_by_courier:
+        body_plain += (
+            "Wysyłka kurierem — nasz adres do nadania paczki:\n"
+            f"{service_address['name']}\n"
+            f"{service_address['street']}, {service_address['city']}\n"
+            f"Godziny: {service_address['hours']}\n"
+            f"Tel. {service_address['phone']}\n"
+            f"E-mail: {service_address['email']}\n\n"
+            "Wysyłkę paczki do nas opłacasz we własnym zakresie. Po naprawie odsyłamy Ci sprzęt za darmo — zwrot do domu jest po naszej stronie.\n\n"
+            "Prosimy o staranne zabezpieczenie urządzenia przed wysyłką (np. oryginalne opakowanie, wypełniacz, folia bąbelkowa). "
+            "Dzięki temu sprzęt dotrze do nas bez uszkodzeń.\n"
+            "Po nadaniu paczki możesz dodać numer listu przewozowego w panelu klienta — ułatwi to nam śledzenie przesyłki.\n\n"
+        )
+    if claim_url:
+        body_plain += f"Chcesz przypisać tę naprawę do konta? Link (ważny 7 dni): {claim_url}\n\n"
+    body_plain += "Z poważaniem,\nZespół PRO-KOM Serwis"
+    try:
+        html_content = render_to_string("emails/repair_submission_confirmation.html", context)
+        return send_email_html(to_email, subject, body_plain, html_content, fail_silently=fail_silently)
+    except Exception:
+        if not fail_silently:
+            raise
+        return False
+
+
+def send_guest_repair_confirmation(repair, fail_silently=True):
+    """
+    (Przestarzałe) Wysyła e-mail do gościa z linkiem do śledzenia.
+    Zastąpione przez send_repair_submission_confirmation — używane dla wszystkich zgłoszeń.
+    """
+    from django.conf import settings
+    base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3000").rstrip("/")
+    track_url = f"{base}/track?ref={repair.repair_number}"
+    claim_url = f"{base}/claim-repair?token={repair.claim_token}" if repair.claim_token else ""
+    to_email = repair.client.email or ""
+    if not to_email:
+        return False
+    subject = f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Serwis"
+    body = (
+        f"Dzień dobry,\n\n"
+        f"Twoje zgłoszenie naprawy zostało przyjęte.\n\n"
+        f"Numer zgłoszenia: {repair.repair_number}\n\n"
+        f"Śledź status naprawy (bez logowania):\n{track_url}\n"
+        f"Potrzebujesz numeru zgłoszenia oraz ostatnich 4 cyfr numeru telefonu podanego w zgłoszeniu.\n\n"
+    )
+    if claim_url:
+        body += (
+            f"Chcesz przypisać tę naprawę do konta w panelu klienta?\n"
+            f"Kliknij link (ważny 7 dni):\n{claim_url}\n\n"
+        )
+    body += (
+        "Załóż konto w panelu klienta, aby na stałe śledzić naprawy i zarządzać profilem:\n"
+        f"{base}/client/rejestracja\n\n"
+        "— PRO-KOM Serwis"
+    )
+    try:
+        send_email(to_email, subject, body, fail_silently=fail_silently)
+        return True
+    except Exception:
+        return False
 
 
 def send_sms(to_phone, body):

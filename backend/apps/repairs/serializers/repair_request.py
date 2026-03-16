@@ -62,6 +62,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "complaint_warranty_status",
             "auto_tags",
             "waiting_for_client_days",
+            "delivery_method",
+            "return_method",
             "created_at",
         ]
 
@@ -174,6 +176,7 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     accessory_offers = serializers.SerializerMethodField()
     hammer_glass_offers = serializers.SerializerMethodField()
     accessory_choose_for_me = serializers.SerializerMethodField()
+    accessory_wishlist = serializers.SerializerMethodField()
     related_complaints_warranties = serializers.SerializerMethodField()
     auto_tags = serializers.SerializerMethodField()
     waiting_for_client_days = serializers.SerializerMethodField()
@@ -250,6 +253,11 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "quote_sent_at",
             "hammer_glass_interest",
             "accessory_choose_for_me",
+            "accessory_wishlist",
+            "client_notes",
+            "device_turns_on",
+            "visual_condition_description",
+            "client_tracking_number",
         ]
         read_only_fields = [
             "id", "repair_number", "created_at", "updated_at",
@@ -313,6 +321,15 @@ class RepairRequestSerializer(serializers.ModelSerializer):
         if not obj.id:
             return False
         return getattr(obj, "accessory_interests", None) and obj.accessory_interests.filter(choose_for_me=True).exists()
+
+    def get_accessory_wishlist(self, obj):
+        """Tekst od klienta: co dobrać (z formularza zgłoszenia)."""
+        if not obj.id or not getattr(obj, "accessory_interests", None):
+            return None
+        interest = obj.accessory_interests.filter(choose_for_me=True).order_by("created_at").first()
+        if interest and getattr(interest, "note", None) and interest.note.strip():
+            return interest.note.strip()
+        return None
 
     def get_related_complaints_warranties(self, obj):
         """Powiązane reklamacje i gwarancje (dla naprawy źródłowej)."""

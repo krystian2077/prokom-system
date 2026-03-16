@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PRO-KOM SERWIS Rabka-Zdrój{% endblock %}</title>
+  <!--[if mso]>
+  <noscript>
+    <p style="color:#333;">Twoja skrzynka może nie obsługiwać stylów. Treść wiadomości znajduje się poniżej.</p>
+  </noscript>
+  <![endif]-->
+  <style>
+    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0a; }
+    .wrapper { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background-color: #000000; color: #ffffff; padding: 28px 32px; text-align: center; border-bottom: 4px solid #dc1e1e; }
+    .header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: 0.02em; }
+    .header .tagline { margin: 8px 0 0; font-size: 13px; color: #a3a3a3; }
+    .content { padding: 32px 32px 24px; color: #171717; font-size: 15px; line-height: 1.65; }
+    .content p { margin: 0 0 16px; }
+    .footer { padding: 28px 32px; background-color: #0a0a0a; color: #a3a3a3; font-size: 12px; }
+    .footer a { color: #dc1e1e; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .footer-about { color: #d4d4d4; line-height: 1.55; margin-bottom: 20px; max-width: 520px; }
+    .footer-address { margin-bottom: 16px; line-height: 1.6; }
+    .footer-address strong { color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .footer-bottom { margin-top: 20px; padding-top: 16px; border-top: 1px solid #262626; color: #737373; font-size: 11px; text-align: center; }
+    .button { display: inline-block; padding: 14px 28px; background-color: #dc1e1e; color: #ffffff !important; text-decoration: none; font-weight: 600; border-radius: 8px; font-size: 15px; }
+    .button:hover { background-color: #b81818; }
+    .code-box { background-color: #fafafa; border: 2px dashed #dc1e1e; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0; }
+    .code-box .code { font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #171717; font-family: 'Consolas', 'Monaco', monospace; }
+    .code-box .hint { font-size: 13px; color: #525252; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>PRO-KOM SERWIS Rabka-Zdrój</h1>
+      <p class="tagline">Naprawy sprzętu — szybko i rzetelnie</p>
+    </div>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+      <p class="footer-about">
+        <strong style="color:#fff; font-size:12px;">O nas</strong><br>
+        Profesjonalny serwis elektroniki w Rabce-Zdroju. Naprawiamy telefony, laptopy, tablety, drukarki i nie tylko — szybko, uczciwie, z gwarancją.
+      </p>
+      <div class="footer-address">
+        <strong>Adres</strong><br>
+        ul. Orkana 16B<br>
+        34-700 Rabka-Zdrój
+      </div>
+      <div class="footer-address">
+        <strong>Telefon</strong><br>
+        <a href="tel:+48883200151">883 200 151</a>
+      </div>
+      <div class="footer-address">
+        <strong>E-mail</strong><br>
+        <a href="mailto:sklep@pro-kom.eu">sklep@pro-kom.eu</a>
+      </div>
+      <div class="footer-address">
+        <strong>Godziny otwarcia</strong><br>
+        Poniedziałek – Piątek: 9:00 – 17:00<br>
+        Sobota: 9:00 – 14:00 · Niedziela: zamknięte
+      </div>
+      <div class="footer-bottom">
+        <p style="margin:0 0 4px;">© {% now "Y" %} PRO-KOM Serwis. Wszystkie prawa zastrzeżone.</p>
+        <p style="margin:0;">Ta wiadomość została wysłana automatycznie. Nie odpowiadaj na ten e-mail.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

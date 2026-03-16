@@ -1,0 +1,382 @@
+/* Oferta page — design tokens (scope) */
+.oferta-page {
+  --red: #dc1e1e;
+  --red-h: #b81818;
+  --red-l: rgba(220, 30, 30, 0.08);
+  --red-border: rgba(220, 30, 30, 0.22);
+
+  --dark: #09090d;
+  --dark2: #11131b;
+  --dark3: #181b25;
+
+  --bg: #f2f2f0;
+  --bg2: #ebebea;
+  --white: #ffffff;
+
+  --text: #0f0f0f;
+  --text2: #444444;
+  --muted: #888888;
+  --faint: #cccccc;
+
+  --border: #e2e2e0;
+  --border2: #cccccc;
+
+  --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Keyframes */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 30, 30, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(220, 30, 30, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 30, 30, 0);
+  }
+}
+
+@keyframes rgbPulse {
+  0% {
+    background: rgba(220, 30, 30, 0.6);
+    box-shadow: 0 0 8px rgba(220, 30, 30, 0.5);
+  }
+  33% {
+    background: rgba(100, 0, 255, 0.6);
+    box-shadow: 0 0 8px rgba(100, 0, 255, 0.5);
+  }
+  66% {
+    background: rgba(0, 180, 255, 0.6);
+    box-shadow: 0 0 8px rgba(0, 180, 255, 0.5);
+  }
+  100% {
+    background: rgba(220, 30, 30, 0.6);
+    box-shadow: 0 0 8px rgba(220, 30, 30, 0.5);
+  }
+}
+
+/* Hero grid texture */
+.oferta-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 100% 80% at 60% 40%, black 15%, transparent 80%);
+  pointer-events: none;
+}
+
+/* Device shapes (CSS-only mocks) */
+.device-shape.samsung-s26 {
+  width: 80px;
+  height: 160px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #1a1a3e, #2d2d6e);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1.5px rgba(255, 255, 255, 0.12);
+}
+.device-shape.samsung-s26::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.device-shape.samsung-s26::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(100, 120, 255, 0.3), rgba(50, 50, 150, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.device-shape.iphone17 {
+  width: 72px;
+  height: 148px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #2a2a4e, #1a1a3a);
+}
+.device-shape.iphone17::before {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.device-shape.xiaomi-r15 {
+  width: 74px;
+  height: 152px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3e1010, #2a0a0a);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1.5px rgba(255, 80, 80, 0.15);
+}
+
+.device-shape.laptop-shape {
+  width: 160px;
+  height: 100px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(135deg, #0a1628, #0f2040);
+  animation: float 5s 1s ease infinite;
+}
+.device-shape.laptop-shape::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: -10px;
+  right: -10px;
+  height: 8px;
+  border-radius: 0 0 4px 4px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Buttons */
+.oferta-page .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  background: linear-gradient(135deg, var(--red), var(--red-h));
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.oferta-page .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(220, 30, 30, 0.35);
+}
+
+.oferta-page .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border2);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.oferta-page .btn-ghost:hover {
+  border-color: var(--red-border);
+  background: var(--red-l);
+}
+
+/* Cat card hover overlay */
+.oferta-page .cat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: var(--red);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+  pointer-events: none;
+}
+.oferta-page .cat-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+.oferta-page .cat-card:hover::before {
+  opacity: 0.06;
+}
+
+/* Wy-card bottom line on hover */
+/* Wy-card: obramowanie, delikatny czerwony cień i animacja */
+@keyframes wyCardGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(220, 30, 30, 0.06), 0 4px 24px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(220, 30, 30, 0.1), 0 4px 24px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.oferta-page .wy-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(220, 30, 30, 0.06), 0 4px 24px rgba(0, 0, 0, 0.2);
+  animation: wyCardGlow 4s ease-in-out infinite;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.oferta-page .wy-card:hover {
+  border-color: rgba(220, 30, 30, 0.35);
+  box-shadow: 0 0 36px rgba(220, 30, 30, 0.14), 0 8px 32px rgba(0, 0, 0, 0.25);
+  animation: none;
+}
+
+.oferta-page .wy-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: var(--red);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.oferta-page .wy-card:hover::after {
+  opacity: 1;
+}
+
+/* Formularz — custom dropdown premium */
+.oferta-page .cf-select-trigger {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+.oferta-page .cf-select-option {
+  border-left: 3px solid transparent;
+}
+.oferta-page .cf-select-option:hover {
+  border-left-color: var(--red);
+}
+.oferta-page .cf-select-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+.oferta-page .cf-select-dropdown::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+}
+.oferta-page .cf-select-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(220, 30, 30, 0.35);
+  border-radius: 4px;
+}
+.oferta-page .cf-select-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 30, 30, 0.5);
+}
+
+/* Form shimmer */
+.oferta-page .cf-form::before {
+  content: "";
+  display: block;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #dc1e1e 25%,
+    #ff5555 50%,
+    #dc1e1e 75%,
+    transparent
+  );
+  background-size: 300% 100%;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .oferta-page .cat-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .oferta-page .oferta-hero-inner {
+    grid-template-columns: 1fr;
+  }
+  .oferta-page .hero-right {
+    display: none;
+  }
+  .oferta-page .section-padding {
+    padding: 60px 24px;
+  }
+  .oferta-page .sm-head,
+  .oferta-page .cf-layout,
+  .oferta-page .druk-layout,
+  .oferta-page .gam-layout {
+    grid-template-columns: 1fr;
+  }
+  .oferta-page .lb-grid,
+  .oferta-page .biz-grid {
+    grid-template-columns: 1fr;
+  }
+  .oferta-page .lb-head,
+  .oferta-page .biz-head {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .oferta-page .tablets-grid,
+  .oferta-page .poleasing-grid {
+    grid-template-columns: 1fr;
+  }
+  .oferta-page .phone-panels-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .oferta-page .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .oferta-page .phone-panels-grid {
+    grid-template-columns: 1fr;
+  }
+  .oferta-page .druk-brands-grid {
+    grid-template-columns: 1fr;
+  }
+  .oferta-page .hero-ctas {
+    flex-direction: column;
+  }
+  .oferta-page .fct-btns {
+    flex-direction: column;
+  }
+}

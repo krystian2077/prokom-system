@@ -325,6 +325,50 @@ class RepairRequest(BaseModel):
         help_text=_("Szybkie przyjęcie — do uzupełnienia później"),
     )
 
+    # Z formularza publicznego: dodatkowe uwagi klienta, stan urządzenia
+    client_notes = models.TextField(
+        _("dodatkowe uwagi klienta"),
+        blank=True,
+        default="",
+        help_text=_("Uwagi przekazane przez klienta przy zgłoszeniu (np. hasło, historia naprawy)."),
+    )
+    device_turns_on = models.BooleanField(
+        _("czy urządzenie się włącza"),
+        null=True,
+        blank=True,
+        help_text=_("Czy urządzenie włącza się przy zgłoszeniu (z formularza)."),
+    )
+    visual_condition_description = models.TextField(
+        _("opis stanu wizualnego"),
+        blank=True,
+        default="",
+        help_text=_("Rysy, pęknięcia, uszkodzenia obudowy — opis od klienta."),
+    )
+    client_tracking_number = models.CharField(
+        _("numer listu przewozowego od klienta"),
+        max_length=100,
+        blank=True,
+        default="",
+        help_text=_("Opcjonalnie: numer przesyłki podany przez klienta (wysyłka kurierem do serwisu)."),
+    )
+
+    # Gościnne zgłoszenie: token do przypisania naprawy do konta (link z e-maila)
+    claim_token = models.CharField(
+        _("token przypisania"),
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text=_("Jednorazowy token do /claim-repair, ważny 7 dni. Tylko dla zgłoszeń gościnnych."),
+    )
+    claim_token_expires_at = models.DateTimeField(
+        _("token ważny do"),
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
     # Flagi i daty do dashboardów / powiadomień (Staff Notifications Center, „wymaga reakcji”)
     requires_attention = models.BooleanField(
         _("wymaga reakcji"),
@@ -522,6 +566,28 @@ class RepairRequest(BaseModel):
         if max_d is not None:
             return f"do {max_d} dni robocze"
         return ""
+
+
+class RepairClaimSmsCode(models.Model):
+    """
+    Jednorazowy kod SMS do przypisania naprawy gościnnej w panelu (numer ref + ostatnie 4 cyfry).
+    Ważny ok. 10 minut.
+    """
+    repair = models.OneToOneField(
+        RepairRequest,
+        on_delete=models.CASCADE,
+        related_name="claim_sms_code",
+        verbose_name=_("naprawa"),
+    )
+    code = models.CharField(_("kod"), max_length=6, db_index=True)
+    expires_at = models.DateTimeField(_("ważny do"), db_index=True)
+
+    class Meta:
+        verbose_name = _("kod SMS przypisania naprawy")
+        verbose_name_plural = _("kody SMS przypisania naprawy")
+
+    def __str__(self):
+        return f"{self.repair.repair_number} — ***"
 
 
 class RepairStatusHistory(TimestampedModel):

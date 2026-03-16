@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { api } from "@/lib/api";
+import { api, getErrorMessageFromBody } from "@/lib/api";
 import { getStoredToken, setStoredToken, clearStoredToken } from "@/lib/auth-storage";
 import type { User } from "@/types/auth";
 
@@ -30,8 +30,10 @@ export interface RegisterData {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  register: (data: RegisterData) => Promise<{ ok: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string; user?: User }>;
+  register: (data: RegisterData) => Promise<{ ok: boolean; error?: string; email?: string }>;
+  verifyEmail: (email: string, code: string) => Promise<{ ok: boolean; error?: string }>;
+  resendVerificationCode: (email: string) => Promise<{ ok: boolean; error?: string; retryAfterSeconds?: number }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -75,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshUser]);
 
   const login = useCallback(
-    async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+    async (email: string, password: string): Promise<{ ok: boolean; error?: string; user?: User }> => {
       try {
         const res = await api.post<{ token: string; user: User }>("/accounts/login/", {
           email: email.trim().toLowerCase(),
@@ -85,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setStoredToken(data.token);
         setToken(data.token);
         setUser(data.user);
-        return { ok: true };
+        return { ok: true, user: data.user };
       } catch (e) {
         const raw = e instanceof Error ? e.message : "Nieprawidłowy e-mail lub hasło.";
         const msg =
@@ -99,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback(
-    async (data: RegisterData): Promise<{ ok: boolean; error?: string }> => {
+    async (data: RegisterData): Promise<{ ok: boolean; error?: string; email?: string }> => {
       try {
         const body = {
           email: data.email.trim().toLowerCase(),
@@ -111,12 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           city: (data.city || "").trim(),
           postal_code: (data.postal_code || "").trim(),
         };
-        const res = await api.post<{ token: string; user: User }>("/accounts/register/", body);
-        const out = res as { token: string; user: User };
-        setStoredToken(out.token);
-        setToken(out.token);
-        setUser(out.user);
-        return { ok: true };
+        const res = await api.post<{ email: string }>("/accounts/register/", body);
+        const out = res as { email: string };
+        return { ok: true, email: out.email };
       } catch (e) {
         const raw = e instanceof Error ? e.message : "Rejestracja nie powiodła się.";
         const msg =
@@ -124,6 +123,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             ? "Nie można połączyć z serwerem. Upewnij się, że backend jest uruchomiony (np. python manage.py runserver na porcie 8000)."
             : raw;
         return { ok: false, error: msg };
+      }
+    },
+    []
+  );
+
+  const verifyEmail = useCallback(
+    async (email: string, code: string): Promise<{ ok: boolean; error?: string }> => {
+      try {
+        const res = await api.post<{ token: string; user: User }>("/accounts/verify-email/", {
+          email: email.trim().toLowerCase(),
+          code: code.trim(),
+        });
+        const data = res as { token: string; user: User };
+        setStoredToken(data.token);
+        setToken(data.token);
+        setUser(data.user);
+        return { ok: true };
+      } catch (e) {
+        const raw = e instanceof Error ? e.message : "Nieprawidłowy kod.";
+        const msg =
+          raw === "Failed to fetch" || raw.includes("fetch")
+            ? "Nie można połączyć z serwerem."
+            : raw;
+        return { ok: false, error: msg };
+      }
+    },
+    []
+  );
+
+  const resendVerificationCode = useCallback(
+    async (email: string): Promise<{ ok: boolean; error?: string; retryAfterSeconds?: number }> => {
+      const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/accounts/resend-verification-code/`;
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        });
+        const errBody = await res.text();
+        if (res.ok) {
+          return { ok: true };
+        }
+        const body = (() => { try { return JSON.parse(errBody); } catch { return {}; } })();
+        const detail = getErrorMessageFromBody(errBody, "Wystąpił błąd.");
+        const retryAfter = res.headers.get("Retry-After");
+        const retryAfterSeconds = retryAfter ? parseInt(retryAfter, 10) : (body?.retry_after_seconds as number | undefined);
+        return { ok: false, error: detail, retryAfterSeconds: Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined };
+      } catch {
+        return { ok: false, error: "Nie można połączyć z serwerem." };
       }
     },
     []
@@ -149,6 +197,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     login,
     register,
+    verifyEmail,
+    resendVerificationCode,
     logout,
     refreshUser,
   };

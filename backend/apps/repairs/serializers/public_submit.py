@@ -38,6 +38,11 @@ class PublicSubmitDeviceSerializer(serializers.Serializer):
     serial_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     imei = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     problem_description = serializers.CharField(required=True, trim_whitespace=True)
+    device_turns_on = serializers.BooleanField(required=False, allow_null=True)
+    visual_condition_description = serializers.CharField(
+        max_length=2000, required=False, allow_blank=True, default="",
+        help_text="Opis stanu wizualnego: rysy, pęknięcia, uszkodzenia obudowy.",
+    )
 
     def validate(self, attrs):
         category = attrs.get("category")
@@ -85,6 +90,20 @@ class PublicRepairSubmitSerializer(serializers.Serializer):
         default=False,
         required=False,
         help_text="Klient prosi o dobór akcesoriów przez serwis.",
+    )
+    accessory_wishlist = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+        max_length=1000,
+        help_text="Tekst od klienta: co dobrać (np. zasilacz, torba).",
+    )
+    additional_notes = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+        max_length=2000,
+        help_text="Dodatkowe uwagi klienta (np. hasło, historia naprawy).",
     )
 
     def validate(self, attrs):

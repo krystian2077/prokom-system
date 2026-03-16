@@ -73,6 +73,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Status konta
     is_active = models.BooleanField(_("aktywny"), default=True)
     is_staff = models.BooleanField(_("dostęp do panelu admina"), default=False)
+    email_verified = models.BooleanField(
+        _("e-mail zweryfikowany"),
+        default=False,
+        help_text=_("Klient: po weryfikacji kodem OTP z e-maila"),
+    )
+    verification_blocked_until = models.DateTimeField(
+        _("weryfikacja zablokowana do"),
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text=_("Po 5 błędnych kodach OTP — blokada 15 min."),
+    )
     # Superadmin: konto nie może być usunięte ani trwale zablokowane (odzyskiwanie systemu)
     is_superadmin = models.BooleanField(
         _("superadministrator"),
@@ -292,3 +304,133 @@ class StaffNotification(models.Model):
 
     def __str__(self):
         return f"{self.title} — {self.user.get_full_name()}"
+
+
+class EmailVerificationCode(models.Model):
+    """
+    Jednorazowy kod OTP (6 cyfr) do weryfikacji e-maila przy rejestracji.
+    Ważny 15 minut. Maks. 5 prób wpisania. Po 5 błędach kod unieważniany.
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="email_verification_codes",
+        verbose_name=_("użytkownik"),
+    )
+    code = models.CharField(_("kod"), max_length=6, db_index=True)
+    expires_at = models.DateTimeField(_("ważny do"), db_index=True)
+    failed_attempts = models.PositiveSmallIntegerField(_("błędne próby"), default=0)
+    created_at = models.DateTimeField(_("utworzono"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("kod weryfikacji e-mail")
+        verbose_name_plural = _("kody weryfikacji e-mail")
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user", "expires_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} — *** (wygaś. {self.expires_at})"
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_max_attempts_reached(self):
+        return self.failed_attempts >= 5
+
+
+class EmailVerificationAttempt(models.Model):
+    """
+    Log każdej próby weryfikacji e-maila (IP, czas, sukces/porażka).
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="verification_attempts",
+        null=True,
+        blank=True,
+        verbose_name=_("użytkownik"),
+    )
+    email = models.CharField(_("e-mail"), max_length=255, db_index=True)
+    ip_address = models.CharField(_("adres IP"), max_length=45, blank=True)
+    success = models.BooleanField(_("sukces"), default=False)
+    created_at = models.DateTimeField(_("data"), auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = _("próba weryfikacji e-mail")
+        verbose_name_plural = _("próby weryfikacji e-mail")
+        ordering = ["-created_at"]
+
+
+class LoginFailureLog(models.Model):
+    """
+    Log nieudanych prób logowania (do limitów: 10 z IP / 15 min, 20 na konto / 15 min).
+    """
+    ip_address = models.CharField(_("adres IP"), max_length=45, db_index=True)
+    email_lower = models.CharField(_("e-mail"), max_length=255, db_index=True)
+    created_at = models.DateTimeField(_("data"), auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = _("log nieudanego logowania")
+        verbose_name_plural = _("logi nieudanych logowań")
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["ip_address", "-created_at"]),
+            models.Index(fields=["email_lower", "-created_at"]),
+        ]
+
+
+class EmailVerificationSendLog(models.Model):
+    """
+    Log wysyłki kodu OTP (do limitów: 60s cooldown, max 5/godzinę na adres).
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="verification_send_logs",
+        verbose_name=_("użytkownik"),
+    )
+    sent_at = models.DateTimeField(_("wysłano"), auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = _("log wysyłki kodu weryfikacji")
+        verbose_name_plural = _("logi wysyłki kodu weryfikacji")
+        ordering = ["-sent_at"]
+        indexes = [
+            models.Index(fields=["user", "-sent_at"]),
+        ]
+
+
+class PasswordResetToken(models.Model):
+    """
+    Token do resetu hasła (link w e-mailu). Ważny 1 godzina. Jednorazowy.
+    Tylko dla klientów (role=client) — staff/admin reset przez panel.
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="password_reset_tokens",
+        verbose_name=_("użytkownik"),
+    )
+    token = models.CharField(_("token"), max_length=64, unique=True, db_index=True)
+    expires_at = models.DateTimeField(_("ważny do"), db_index=True)
+    created_at = models.DateTimeField(_("utworzono"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("token resetu hasła")
+        verbose_name_plural = _("tokeny resetu hasła")
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["token", "expires_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} — do {self.expires_at}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at

@@ -2,17 +2,60 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import type { RepairListItem } from "@/types/repair-client";
+import { StatusBadge } from "@/components/panel/StatusBadge";
+import { apiRepairListItemToPanel, type ApiRepairListItem } from "@/lib/panel-api";
+import { formatDate } from "@/lib/format";
+import { formatPrice, getDeviceEmoji } from "@/types/panel";
+import { truncate } from "@/lib/format";
+import type { Repair } from "@/types/panel";
+
+const ITEMS_PER_PAGE = 10;
+const FILTERS = ["Wszystkie", "W naprawie", "Gotowe", "Oczekuje", "Zakończone"] as const;
+
+function filterRepairs(repairs: Repair[] | null, activeFilter: string): Repair[] {
+  if (!repairs) return [];
+  if (activeFilter === "Wszystkie") return repairs;
+  if (activeFilter === "W naprawie") return repairs.filter((r) => r.status === "in_progress");
+  if (activeFilter === "Gotowe") return repairs.filter((r) => r.status === "ready" || r.status === "done");
+  if (activeFilter === "Oczekuje") return repairs.filter((r) => r.status === "wait_decision" || r.status === "diagnosed");
+  if (activeFilter === "Zakończone") return repairs.filter((r) => r.status === "done");
+  return repairs;
+}
+
+function getFilterCounts(repairs: Repair[] | null): Record<string, number> {
+  if (!repairs) return { Wszystkie: 0, "W naprawie": 0, Gotowe: 0, Oczekuje: 0, Zakończone: 0 };
+  return {
+    Wszystkie: repairs.length,
+    "W naprawie": repairs.filter((r) => r.status === "in_progress").length,
+    Gotowe: repairs.filter((r) => r.status === "ready" || r.status === "done").length,
+    Oczekuje: repairs.filter((r) => r.status === "wait_decision" || r.status === "diagnosed").length,
+    Zakończone: repairs.filter((r) => r.status === "done").length,
+  };
+}
 
 export function ClientNaprawyList() {
   const { token } = useAuth();
-  const [list, setList] = useState<RepairListItem[]>([]);
+  const router = useRouter();
+  const [repairs, setRepairs] = useState<Repair[] | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("Wszystkie");
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const filteredRepairs = filterRepairs(repairs, activeFilter);
+  const filterCounts = getFilterCounts(repairs);
+  const totalPages = Math.max(1, Math.ceil(filteredRepairs.length / ITEMS_PER_PAGE));
+  const pageRepairs = filteredRepairs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter]);
 
   useEffect(() => {
     if (!token) return;
@@ -20,12 +63,11 @@ export function ClientNaprawyList() {
     setLoading(true);
     setError(null);
     api
-      .get<{ results: RepairListItem[] } | RepairListItem[]>("/repairs/", token)
+      .get<ApiRepairListItem[] | { results: ApiRepairListItem[] }>("/repairs/", token)
       .then((res) => {
-        if (!cancelled) {
-          const arr = res && typeof res === "object" && "results" in res ? (res as { results: RepairListItem[] }).results : Array.isArray(res) ? res : [];
-          setList(arr);
-        }
+        if (cancelled) return;
+        const arr = Array.isArray(res) ? res : (res as { results: ApiRepairListItem[] }).results ?? [];
+        setRepairs(arr.map(apiRepairListItemToPanel));
       })
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Błąd ładowania.");
@@ -33,94 +75,217 @@ export function ClientNaprawyList() {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
-  if (loading) {
+  if (error && !repairs) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <p className="text-prokom-gray">Ładowanie…</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <p className="text-red-600">{error}</p>
-        <Button href="/client/naprawy" variant="outline" size="sm" className="mt-4">
-          Odśwież
-        </Button>
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="panel-card p-6" style={{ color: "var(--ink)" }}>
+          <p style={{ color: "var(--red)" }}>{error}</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-4 rounded border border-[var(--border)] px-3 py-2 text-sm hover:bg-[var(--island2)]"
+          >
+            Odśwież
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold text-prokom-black">Moje naprawy</h1>
-      <p className="mt-2 text-prokom-gray">
-        Lista Twoich zgłoszeń. Kliknij, aby zobaczyć szczegóły.
-      </p>
-
-      {list.length === 0 ? (
-        <Card className="mt-6">
-          <CardContent className="p-6">
-            <p className="text-prokom-gray">Brak napraw do wyświetlenia.</p>
-            <Button href="/zgloszenie" variant="outline" size="sm" className="mt-4">
-              Zgłoś naprawę
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="border border-gray-200 px-3 py-2 text-left text-sm font-medium text-prokom-black">
-                  Numer
-                </th>
-                <th className="border border-gray-200 px-3 py-2 text-left text-sm font-medium text-prokom-black">
-                  Urządzenie
-                </th>
-                <th className="border border-gray-200 px-3 py-2 text-left text-sm font-medium text-prokom-black">
-                  Status
-                </th>
-                <th className="border border-gray-200 px-3 py-2 text-left text-sm font-medium text-prokom-black">
-                  Data przyjęcia
-                </th>
-                <th className="border border-gray-200 px-3 py-2 text-left text-sm font-medium text-prokom-black">
-                  Akcja
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50">
-                  <td className="border border-gray-200 px-3 py-2 font-medium">{r.repair_number}</td>
-                  <td className="border border-gray-200 px-3 py-2">{r.device_name}</td>
-                  <td className="border border-gray-200 px-3 py-2">{r.status_display}</td>
-                  <td className="border border-gray-200 px-3 py-2 text-sm text-prokom-gray">
-                    {r.created_at ? new Date(r.created_at).toLocaleDateString("pl-PL") : "—"}
-                  </td>
-                  <td className="border border-gray-200 px-3 py-2">
-                    <Link
-                      href={`/client/naprawy/${r.id}`}
-                      className="text-sm text-prokom-accent hover:underline"
-                    >
-                      Szczegóły
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="panel-card">
+        <div className="panel-card-header flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+              PANEL KLIENTA
+            </p>
+            <h1 className="font-extrabold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(20px, 2.2vw, 28px)" }}>
+              Moje naprawy
+            </h1>
+            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+              Lista Twoich zgłoszeń — kliknij wiersz, aby zobaczyć szczegóły
+            </p>
+          </div>
+          <Link
+            href="/zgloszenie"
+            className="shrink-0 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+            style={{ background: "var(--red)" }}
+          >
+            + Zgłoś naprawę
+          </Link>
         </div>
-      )}
 
-      <div className="mt-6">
-        <Button href="/zgloszenie" variant="outline" size="sm">
-          Zgłoś naprawę
-        </Button>
+        {/* Filter tabs */}
+        <div className="flex flex-wrap gap-2 border-b border-[var(--border)] px-5 py-3">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setActiveFilter(f)}
+              className="rounded-lg px-3 py-2 text-sm font-medium transition"
+              style={{
+                background: activeFilter === f ? "var(--red)" : "transparent",
+                color: activeFilter === f ? "#fff" : "var(--ink2)",
+              }}
+            >
+              {f} {filterCounts[f] != null ? filterCounts[f] : 0}
+            </button>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="p-5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-4 border-b border-[var(--border)] py-4" style={{ animation: `rowIn .4s ${i * 0.06}s ease both` }}>
+                  <div className="skeleton h-10 w-10 shrink-0 rounded-lg" />
+                  <div className="min-w-0 flex-1">
+                    <div className="skeleton mb-2 h-4 w-3/4 rounded" />
+                    <div className="skeleton h-3 w-32 rounded font-mono" />
+                  </div>
+                  <div className="skeleton h-4 w-24 shrink-0 rounded" />
+                  <div className="skeleton h-6 w-28 shrink-0 rounded-full" />
+                  <div className="skeleton h-4 w-16 shrink-0 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : pageRepairs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl text-3xl" style={{ background: "var(--island3)" }}>
+                🔧
+              </div>
+              <p className="font-semibold text-white">Brak napraw</p>
+              <p className="text-sm" style={{ color: "var(--ink2)" }}>
+                {activeFilter === "Wszystkie" ? "Nie masz jeszcze zgłoszeń." : "Brak napraw w tej kategorii."}
+              </p>
+              <Link
+                href="/zgloszenie"
+                className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+                style={{ background: "var(--red)" }}
+              >
+                Zgłoś naprawę
+              </Link>
+            </div>
+          ) : (
+            <>
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="text-left text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                    <th className="p-4 font-medium" style={{ width: "2fr" }}>Urządzenie / Naprawa</th>
+                    <th className="p-4 font-medium" style={{ width: "1.2fr" }}>Data przyjęcia</th>
+                    <th className="p-4 font-medium" style={{ width: "1fr" }}>Status</th>
+                    <th className="p-4 font-medium" style={{ width: "1fr" }}>Koszt</th>
+                    <th className="w-[100px] p-4" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {pageRepairs.map((repair, index) => (
+                    <tr
+                      key={repair.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => router.push(`/client/naprawy/${repair.id}`)}
+                      onKeyDown={(e) => e.key === "Enter" && router.push(`/client/naprawy/${repair.id}`)}
+                      className="group cursor-pointer border-t border-[var(--border)] transition hover:bg-[rgba(255,255,255,.025)]"
+                      style={{ animation: `rowIn .4s ${index * 0.06}s ease both` }}
+                    >
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg" style={{ background: "var(--island3)" }}>
+                            {getDeviceEmoji(repair.deviceCategory)}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-medium text-white">
+                              {truncate(repair.problemDescription ? `${repair.deviceModel} – ${repair.problemDescription}` : repair.deviceModel, 55)}
+                            </p>
+                            <p className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs" style={{ color: "var(--muted)", fontFamily: "'Courier New', monospace" }}>
+                              <span>{repair.repairNumber}</span>
+                              {(repair.deliveryMethod === "kurier" || repair.pickupMethod === "kurier") && (
+                                <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{ background: "rgba(220,30,30,.15)", color: "var(--red)", border: "1px solid rgba(220,30,30,.35)" }}>
+                                  <span aria-hidden>📦</span> Kurier
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-sm" style={{ color: "var(--ink)" }}>
+                        {formatDate(repair.createdAt)}
+                      </td>
+                      <td className="p-4">
+                        <StatusBadge status={repair.status} />
+                      </td>
+                      <td className="p-4 text-sm font-medium text-white">
+                        {formatPrice(repair.totalPrice)}
+                      </td>
+                      <td className="p-4">
+                        <span className="inline-block opacity-0 transition group-hover:opacity-100" aria-hidden>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--ink2)]">
+                            <path d="M9 18l6-6-6-6" />
+                          </svg>
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {!loading && filteredRepairs.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--border)] px-5 py-4">
+            <p className="text-xs" style={{ color: "var(--muted)" }}>
+              Wyświetlono {pageRepairs.length} z {filteredRepairs.length} napraw
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="rounded p-2 transition disabled:opacity-40 hover:bg-[var(--island3)]"
+                aria-label="Poprzednia strona"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setCurrentPage(p)}
+                  className="min-w-[36px] rounded px-2 py-1.5 text-sm font-medium transition"
+                  style={{
+                    background: currentPage === p ? "var(--red)" : "transparent",
+                    color: currentPage === p ? "#fff" : "var(--ink2)",
+                  }}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                type="button"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="rounded p-2 transition disabled:opacity-40 hover:bg-[var(--island3)]"
+                aria-label="Następna strona"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

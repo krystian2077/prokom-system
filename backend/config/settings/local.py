@@ -57,9 +57,25 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # =============================================================================
-# EMAIL — lokalnie wyświetlaj w konsoli
+# EMAIL — SMTP gdy podane w .env, inaczej konsola (development)
 # =============================================================================
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Aby wysyłać prawdziwe e-maile: uzupełnij w .env:
+#   EMAIL_HOST_USER=...
+#   EMAIL_HOST_PASSWORD=...
+# (opcjonalnie EMAIL_HOST, EMAIL_PORT, DEFAULT_FROM_EMAIL)
+# Gdy tych zmiennych brak lub są puste — e-maile trafiają do konsoli (runserver).
+_use_smtp = bool(env("EMAIL_HOST_USER", default="").strip() and env("EMAIL_HOST_PASSWORD", default="").strip())
+if _use_smtp:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=env("EMAIL_HOST_USER", default="noreply@prokom-serwis.pl"))
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@prokom-serwis.pl")
 
 # =============================================================================
 # DEBUG TOOLBAR — opcjonalnie

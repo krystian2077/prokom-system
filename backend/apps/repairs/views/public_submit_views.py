@@ -35,7 +35,7 @@ class PublicRepairSubmitView(APIView):
                 linked_client_id = client_profile.id
 
         try:
-            repair, _client_created = submit_repair_from_public_form(
+            repair, client_created = submit_repair_from_public_form(
                 first_name=client_data["first_name"],
                 last_name=client_data["last_name"],
                 email=client_data["email"],
@@ -61,6 +61,10 @@ class PublicRepairSubmitView(APIView):
                 hammer_glass_interest=data.get("hammer_glass_interest") or None,
                 accessory_product_ids=data.get("accessory_interest") or [],
                 accessory_choose_for_me=data.get("accessory_choose_for_me", False),
+                accessory_wishlist=data.get("accessory_wishlist", "") or "",
+                additional_notes=data.get("additional_notes", "") or "",
+                device_turns_on=device_data.get("device_turns_on"),
+                visual_condition_description=(device_data.get("visual_condition_description") or "").strip(),
                 client_id=linked_client_id,
             )
         except Exception as e:
@@ -69,14 +73,20 @@ class PublicRepairSubmitView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        tracking_url = (
+            f"/track?ref={repair.repair_number}"
+            if linked_client_id is None
+            else f"/client/naprawy"
+        )
         return Response(
             {
                 "repair_number": repair.repair_number,
                 "message": (
                     "Zgłoszenie zostało przyjęte. "
                     "Skontaktujemy się w celu potwierdzenia lub po diagnozie."
+                    + (" Na podany e-mail wysłaliśmy link do śledzenia statusu i przypisania naprawy do konta." if linked_client_id is None else "")
                 ),
-                "tracking_url": f"/naprawy/{repair.repair_number}/",
+                "tracking_url": tracking_url,
             },
             status=status.HTTP_201_CREATED,
         )

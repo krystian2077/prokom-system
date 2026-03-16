@@ -2,12 +2,16 @@
 PRO-KOM Serwis — Publiczne zgłoszenie naprawy (formularz online)
 ================================================================
 Znajdź lub utwórz klienta, utwórz urządzenie i zgłoszenie. Bez logowania.
+Dla gościa (client_id=None): generowany claim_token, e-mail z linkami do śledzenia i przypisania.
 """
+import secrets
+from datetime import timedelta
 from django.db import transaction
+from django.utils import timezone
 from apps.clients.models import Client, ClientAddress
 from apps.clients.selectors import client_by_email, client_by_id
 from apps.devices.models import Device, Brand, DeviceModel
-from apps.common.enums import DeliveryMethod
+from apps.common.enums import DeliveryMethod, ReturnMethod
 from apps.repairs.services.repair_creation import create_repair_request
 
 
@@ -39,6 +43,10 @@ def submit_repair_from_public_form(
     hammer_glass_interest=None,
     accessory_product_ids=None,
     accessory_choose_for_me=False,
+    accessory_wishlist="",
+    additional_notes="",
+    device_turns_on=None,
+    visual_condition_description="",
     client_id=None,
 ):
     """
@@ -96,8 +104,11 @@ def submit_repair_from_public_form(
 
     delivery_address_id = None
     return_address_id = None
+    needs_address = (delivery_street or "").strip() or (delivery_city or "").strip()
+    delivery_needs_addr = delivery_method != DeliveryMethod.IN_PERSON
+    return_needs_addr = return_method != ReturnMethod.IN_PERSON
 
-    if delivery_method != DeliveryMethod.IN_PERSON and (delivery_street or delivery_city):
+    if (delivery_needs_addr or return_needs_addr) and needs_address:
         addr = ClientAddress.objects.create(
             client=client,
             label="Wysyłka",
@@ -106,8 +117,10 @@ def submit_repair_from_public_form(
             postal_code=delivery_postal_code.strip() or "",
             country=(delivery_country or "Polska").strip(),
         )
-        delivery_address_id = addr.id
-        return_address_id = addr.id  # ten sam na zwrot, chyba że dodamy osobne pola
+        if delivery_needs_addr:
+            delivery_address_id = addr.id
+        if return_needs_addr:
+            return_address_id = addr.id
 
     brand = Brand.objects.filter(id=brand_id).first() if brand_id else None
     device_model = DeviceModel.objects.filter(id=device_model_id).first() if device_model_id else None
@@ -140,9 +153,27 @@ def submit_repair_from_public_form(
         source="online",
     )
 
+    is_guest = client_id is None
+    if is_guest:
+        repair.claim_token = secrets.token_urlsafe(32)
+        repair.claim_token_expires_at = timezone.now() + timedelta(days=7)
+        repair.save(update_fields=["claim_token", "claim_token_expires_at"])
+
+    update_fields = []
     if hammer_glass_interest:
         repair.hammer_glass_interest = hammer_glass_interest
-        repair.save(update_fields=["hammer_glass_interest"])
+        update_fields.append("hammer_glass_interest")
+    if additional_notes is not None:
+        repair.client_notes = (additional_notes or "").strip()[:2000]
+        update_fields.append("client_notes")
+    if device_turns_on is not None:
+        repair.device_turns_on = device_turns_on
+        update_fields.append("device_turns_on")
+    if visual_condition_description is not None:
+        repair.visual_condition_description = (visual_condition_description or "").strip()[:2000]
+        update_fields.append("visual_condition_description")
+    if update_fields:
+        repair.save(update_fields=update_fields)
 
     from apps.accessories.models import RepairAccessoryInterest
     product_ids = list(accessory_product_ids or [])
@@ -153,12 +184,16 @@ def submit_repair_from_public_form(
             source="client",
             choose_for_me=False,
         )
-    if accessory_choose_for_me:
+    if accessory_choose_for_me or (accessory_wishlist or "").strip():
         RepairAccessoryInterest.objects.create(
             repair=repair,
             product=None,
             source="client",
             choose_for_me=True,
+            note=(accessory_wishlist or "").strip()[:1000],
         )
+
+    from apps.communications.services.send import send_repair_submission_confirmation
+    send_repair_submission_confirmation(repair, fail_silently=True)
 
     return repair, client_created

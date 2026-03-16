@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RegisterData } from "@/contexts/AuthContext";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 const unbounded = Unbounded({
   subsets: ["latin"],
@@ -74,6 +75,10 @@ export default function ClientLoginPage() {
     const result = await login(email, password);
     setSubmitting(false);
     if (result.ok) {
+      if (result.user && !result.user.email_verified) {
+        router.push(`/client/verify-email?email=${encodeURIComponent(result.user.email)}`);
+        return;
+      }
       router.push(returnUrl);
       return;
     }
@@ -92,6 +97,10 @@ export default function ClientLoginPage() {
     };
     const result = await register(data);
     setSubmitting(false);
+    if (result.ok && result.email) {
+      router.push(`/client/verify-email?email=${encodeURIComponent(result.email)}`);
+      return;
+    }
     if (result.ok) {
       router.push(returnUrl);
       return;
@@ -186,9 +195,9 @@ export default function ClientLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <a href="#" className="forgot-link">Zapomniałeś hasła?</a>
+                  <Link href="/client/forgot-password" className="forgot-link">Zapomniałeś hasła?</Link>
                 </div>
-                {error && <p className="text-[12px]" style={{ color: "#dc1e1e" }}>{error}</p>}
+                {error && <ErrorMessage message={error} className="mb-3" />}
                 <button type="button" className="btn-primary group" onClick={handleLogin} disabled={submitting}>
                   {submitting ? "Logowanie…" : "Zaloguj się"}
                   <IconArrow />
@@ -284,7 +293,7 @@ export default function ClientLoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                {error && <p className="text-[12px]" style={{ color: "#dc1e1e" }}>{error}</p>}
+                {error && <ErrorMessage message={error} className="mb-3" />}
                 <button type="button" className="btn-primary group" onClick={handleRegister} disabled={submitting}>
                   {submitting ? "Tworzenie konta…" : "Utwórz konto"}
                   <IconArrow />

@@ -1,0 +1,12 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Kod weryfikacyjny — PRO-KOM Serwis{% endblock %}
+{% block content %}
+  <p>Dzień dobry,</p>
+  <p>Oto Twój kod weryfikacyjny do dokończenia rejestracji w panelu klienta PRO-KOM Serwis:</p>
+  <div class="code-box">
+    <div class="code">{{ code }}</div>
+    <div class="hint">Kod jest ważny przez 15 minut.</div>
+  </div>
+  <p>Wpisz powyższy kod na stronie weryfikacji. Jeśli to nie Ty zakładałeś konto, zignoruj tę wiadomość.</p>
+  <p>Z poważaniem,<br><strong style="color:#171717;">Zespół PRO-KOM Serwis</strong></p>
+{% endblock %}

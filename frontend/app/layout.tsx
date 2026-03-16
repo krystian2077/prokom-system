@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Syne, DM_Sans } from "next/font/google";
+import { Syne, DM_Sans, Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { ClientAuthWrapper } from "@/components/providers/ClientAuthWrapper";
 import "./globals.css";
 
@@ -14,6 +14,16 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
   variable: "--font-dm-sans",
 });
+const unbounded = Unbounded({
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  variable: "--font-unbounded",
+});
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-jakarta",
+});
 
 export const metadata: Metadata = {
   title: "PRO-KOM Serwis",
@@ -26,7 +36,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="pl" className={`${syne.variable} ${dmSans.variable}`}>
+    <html lang="pl" className={`${syne.variable} ${dmSans.variable} ${unbounded.variable} ${plusJakarta.variable}`}>
       <body
         className={`min-h-screen font-sans antialiased ${dmSans.className}`}
         style={{ backgroundColor: "#fff", color: "#0f0f0f" }}

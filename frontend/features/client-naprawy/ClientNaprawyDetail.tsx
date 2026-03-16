@@ -4,186 +4,439 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { StatusBadge } from "@/components/panel/StatusBadge";
+import { apiRepairDetailToPanel, type ApiRepairDetail } from "@/lib/panel-api";
+import { formatDate, formatDateTime } from "@/lib/format";
+import { formatPrice, formatTotalPrice, getDeviceEmoji } from "@/types/panel";
+import type { Repair } from "@/types/panel";
 
-interface RepairDetail {
-  id: string;
-  repair_number: string;
-  status: string;
-  status_display: string;
-  public_status?: string;
-  device_name?: string;
-  device?: { category?: string };
-  problem_description?: string;
-  created_at: string;
-  estimated_completion_date?: string | null;
-  quote_sent_at?: string | null;
-  is_waiting_for_client_decision?: boolean;
-  estimated_cost?: string | null;
-  delivery_method?: string;
-  return_method?: string;
-  hammer_glass_interest?: string | null;
-  accessory_choose_for_me?: boolean;
+function DetailItem({
+  label,
+  value,
+  full,
+  mono,
+  tag,
+}: {
+  label: string;
+  value: string | null | undefined;
+  full?: boolean;
+  mono?: boolean;
+  tag?: boolean;
+}) {
+  if (value == null || value === "") return null;
+  return (
+    <div className={full ? "col-span-full" : ""}>
+      <p className="text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>{label}</p>
+      <p
+        className={`mt-1 text-sm ${mono ? "font-mono" : ""}`}
+        style={{ color: "var(--ink)", fontFamily: mono ? "'Courier New', monospace" : undefined }}
+      >
+        {tag ? (
+          <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs" style={{ background: "var(--green-l)", color: "var(--green)", border: "1px solid var(--green-b)" }}>
+            ✓ {value}
+          </span>
+        ) : (
+          value
+        )}
+      </p>
+    </div>
+  );
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  phone: "Telefon",
-  tablet: "Tablet",
-  smartwatch: "Smartwatch",
-  laptop: "Laptop",
-  desktop: "Komputer stacjonarny",
-  printer: "Drukarka",
-  console: "Konsola",
-  data_recovery: "Odzyskiwanie danych",
-  other: "Inne",
-};
-
-const DELIVERY_LABELS: Record<string, string> = {
-  in_person: "Osobiście w serwisie",
-  courier: "Kurier",
-  parcel_locker: "Paczkomat",
-};
-
-const HAMMER_GLASS_LABELS: Record<string, string> = {
-  yes: "Tak — interesuje mnie folia",
-  no: "Nie",
-  ask_later: "Zapytam później",
-  free_with_quote: "Gratis przy wycenie",
-};
+function InfoRow({ label, value, color, mono }: { label: string; value: string; color?: "amber" | "green"; mono?: boolean }) {
+  return (
+    <div className="flex justify-between gap-4 py-2 text-sm">
+      <span style={{ color: "var(--muted)" }}>{label}</span>
+      <span
+        className={`shrink-0 font-medium ${mono ? "font-mono" : ""}`}
+        style={{ color: color === "amber" ? "var(--amber)" : color === "green" ? "var(--green)" : "var(--ink)", fontFamily: mono ? "'Courier New', monospace" : undefined }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
 
 export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
   const { token } = useAuth();
-  const [repair, setRepair] = useState<RepairDetail | null>(null);
+  const [repair, setRepair] = useState<Repair | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [quoteSubmitting, setQuoteSubmitting] = useState<"accept" | "reject" | null>(null);
-  const [quoteError, setQuoteError] = useState<string | null>(null);
-
-  const refetchRepair = () => {
-    if (!token) return;
-    api
-      .get<RepairDetail>(`/repairs/${repairId}/`, token)
-      .then((r) => setRepair(r as RepairDetail))
-      .catch(() => {});
-  };
+  const [trackingInput, setTrackingInput] = useState("");
+  const [trackingSaving, setTrackingSaving] = useState(false);
+  const [trackingMessage, setTrackingMessage] = useState<"ok" | "err" | null>(null);
 
   useEffect(() => {
     if (!token) return;
     setLoading(true);
+    setNotFound(false);
     setError(null);
     api
-      .get<RepairDetail>(`/repairs/${repairId}/`, token)
-      .then((r) => setRepair(r as RepairDetail))
-      .catch((e) => setError(e instanceof Error ? e.message : "Błąd ładowania."))
+      .get<ApiRepairDetail>(`/repairs/${repairId}/`, token)
+      .then((data) => {
+        const r = apiRepairDetailToPanel(data);
+        setRepair(r);
+        setTrackingInput(r.clientTrackingNumber ?? "");
+      })
+      .catch((e) => {
+        if (e instanceof Error && e.message.includes("404")) setNotFound(true);
+        else setError(e instanceof Error ? e.message : "Błąd ładowania.");
+      })
       .finally(() => setLoading(false));
   }, [token, repairId]);
 
-  const handleQuoteRespond = async (action: "accept" | "reject") => {
-    if (!token) return;
-    setQuoteError(null);
-    setQuoteSubmitting(action);
-    try {
-      await api.post(`/repairs/${repairId}/quote-respond/`, { action, comment: "" }, token);
-      refetchRepair();
-    } catch (e) {
-      setQuoteError(e instanceof Error ? e.message : "Wystąpił błąd.");
-    } finally {
-      setQuoteSubmitting(null);
-    }
-  };
-
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <p className="text-prokom-gray">Ładowanie…</p>
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="skeleton mb-8 h-12 w-64 rounded" />
+        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-6">
+            <div className="panel-card skeleton h-64" />
+            <div className="panel-card skeleton h-80" />
+          </div>
+          <div className="space-y-6">
+            <div className="panel-card skeleton h-48" />
+            <div className="panel-card skeleton h-56" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="panel-card p-8 text-center">
+          <p className="font-semibold text-white">Nie znaleziono naprawy</p>
+          <p className="mt-2 text-sm" style={{ color: "var(--ink2)" }}>
+            Nie znaleziono naprawy o podanym numerze.
+          </p>
+          <Link href="/client/naprawy" className="mt-4 inline-block text-sm font-medium" style={{ color: "var(--red)" }}>
+            ← Wróć do listy napraw
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (error || !repair) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <p className="text-red-600">{error || "Nie znaleziono naprawy."}</p>
-        <Link href="/client/naprawy" className="mt-4 inline-block text-sm text-prokom-accent hover:underline">
-          Wróć do listy napraw
-        </Link>
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="panel-card p-8 text-center">
+          <p className="font-semibold text-white">Błąd</p>
+          <p className="mt-2 text-sm" style={{ color: "var(--ink2)" }}>{error ?? "Nie udało się załadować szczegółów."}</p>
+          <Link href="/client/naprawy" className="mt-4 inline-block text-sm font-medium" style={{ color: "var(--red)" }}>
+            ← Wróć do listy napraw
+          </Link>
+        </div>
       </div>
     );
   }
 
-  const showQuoteActions = repair.status === "quote_sent" || repair.is_waiting_for_client_decision;
+  const deliveryLabel = repair.deliveryMethod === "osobiscie" ? "Osobiście w serwisie" : "Wysyłka kurierem do serwisu";
+  const pickupLabel = repair.pickupMethod === "osobiscie" ? "Odbiór osobisty" : "Zwrot kurierem do domu";
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <Link href="/client/naprawy" className="text-sm text-prokom-accent hover:underline">
-        ← Wróć do listy napraw
-      </Link>
-
-      <div className="mt-6">
-        <h1 className="text-2xl font-bold text-prokom-black">{repair.repair_number}</h1>
-        <p className="mt-1 text-prokom-gray">{repair.status_display}</p>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Hero row */}
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <Link href="/client/naprawy" className="text-sm font-medium transition hover:text-white" style={{ color: "var(--ink2)" }}>
+            ← Wróć do listy napraw
+          </Link>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
+              style={{ background: "var(--island3)" }}
+            >
+              {getDeviceEmoji(repair.deviceCategory)}
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold text-white" style={{ fontFamily: "'Courier New', monospace" }}>
+                {repair.repairNumber}
+              </p>
+              <p className="text-sm" style={{ color: "var(--ink2)" }}>
+                {repair.deviceModel} – {repair.problemDescription ? `${repair.problemDescription.slice(0, 40)}…` : "Naprawa"} – Przyjęto {formatDate(repair.createdAt)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <StatusBadge status={repair.status} large />
       </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <h2 className="font-semibold text-prokom-black">Szczegóły</h2>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p><span className="text-prokom-gray">Kategoria urządzenia:</span> {repair.device?.category ? (CATEGORY_LABELS[repair.device.category] ?? repair.device.category) : "—"}</p>
-          <p><span className="text-prokom-gray">Urządzenie:</span> {repair.device_name ?? "—"}</p>
-          <p><span className="text-prokom-gray">Opis problemu:</span> {repair.problem_description ?? "—"}</p>
-          <p><span className="text-prokom-gray">Data przyjęcia:</span> {repair.created_at ? new Date(repair.created_at).toLocaleDateString("pl-PL") : "—"}</p>
-          <p><span className="text-prokom-gray">Sposób dostarczenia:</span> {repair.delivery_method ? (DELIVERY_LABELS[repair.delivery_method] ?? repair.delivery_method) : "—"}</p>
-          <p><span className="text-prokom-gray">Sposób odbioru:</span> {repair.return_method ? (DELIVERY_LABELS[repair.return_method] ?? repair.return_method) : "—"}</p>
-          <p><span className="text-prokom-gray">Hammer Glass (folia):</span> {repair.hammer_glass_interest ? (HAMMER_GLASS_LABELS[repair.hammer_glass_interest] ?? repair.hammer_glass_interest) : "—"}</p>
-          <p><span className="text-prokom-gray">Dobierz akcesoria:</span> {repair.accessory_choose_for_me ? "Tak — proszę doradzić przy odbiorze" : "Nie"}</p>
-          {repair.estimated_completion_date && (
-            <p><span className="text-prokom-gray">Szacowany termin:</span> {new Date(repair.estimated_completion_date).toLocaleDateString("pl-PL")}</p>
-          )}
-          {repair.estimated_cost != null && repair.estimated_cost !== "" && (
-            <p><span className="text-prokom-gray">Szacowana kwota:</span> {repair.estimated_cost} zł</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {showQuoteActions && (
-        <Card className="mt-6 border-prokom-accent/30">
-          <CardHeader>
-            <h2 className="font-semibold text-prokom-black">Wycena do zaakceptowania</h2>
-            <p className="text-sm text-prokom-gray">Zaakceptuj lub odrzuć wycenę od serwisu.</p>
-          </CardHeader>
-          <CardContent>
-            {quoteError && <p className="mb-2 text-sm text-red-600">{quoteError}</p>}
-            <div className="flex flex-wrap gap-3">
-              <Button
-                onClick={() => handleQuoteRespond("accept")}
-                disabled={!!quoteSubmitting}
-              >
-                {quoteSubmitting === "accept" ? "Wysyłanie…" : "Zaakceptuj wycenę"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleQuoteRespond("reject")}
-                disabled={!!quoteSubmitting}
-              >
-                {quoteSubmitting === "reject" ? "Wysyłanie…" : "Odrzuć wycenę"}
-              </Button>
+      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        {/* Left column */}
+        <div className="space-y-6">
+          {/* Szczegóły zgłoszenia */}
+          <div className="panel-card">
+            <div className="panel-card-header flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)" }}>
+                🔧
+              </span>
+              <div>
+                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                  Szczegóły zgłoszenia
+                </h2>
+                <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>Dane podane przez aplikację</p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div className="grid gap-4 p-5 sm:grid-cols-2">
+              <DetailItem label="Kategoria" value={repair.deviceCategory} />
+              <DetailItem label="Urządzenie" value={repair.deviceModel} />
+              <DetailItem label="Opis problemu" value={repair.problemDescription} full />
+              <DetailItem label="Data przyjęcia" value={formatDate(repair.createdAt)} />
+              {repair.imei && <DetailItem label="Numer IMEI" value={repair.imei} mono />}
+              <DetailItem label="Dostawa urządzenia" value={deliveryLabel} />
+              <DetailItem label="Odbiór urządzenia" value={pickupLabel} />
+              {repair.hammerGlass != null && (
+                <DetailItem
+                  label="Hammer Glass"
+                  value={repair.hammerGlass === "tak" ? "Tak – interesuje mnie folia" : "Nie, dziękuję"}
+                  tag
+                />
+              )}
+              <DetailItem
+                label="Akcesoria"
+                value={repair.accessoryWishlist ?? (repair.wantsAccessories ? "Proszę doradzić przy odbiorze" : "—")}
+                tag={!!(repair.wantsAccessories || repair.accessoryWishlist)}
+              />
+              {repair.clientNotes && <DetailItem label="Dodatkowe uwagi" value={repair.clientNotes} full />}
+              {repair.deviceTurnsOn != null && (
+                <DetailItem label="Czy urządzenie się włącza" value={repair.deviceTurnsOn ? "Tak" : "Nie"} />
+              )}
+              {repair.visualConditionDescription && <DetailItem label="Opis stanu wizualnego" value={repair.visualConditionDescription} full />}
+              {repair.deliveryMethod === "kurier" && (
+                <div className="col-span-full mt-4 rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+                  <p className="text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Numer listu przewozowego (opcjonalnie)</p>
+                  <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--ink2)" }}>Jeśli wysłałeś paczkę do nas kurierem, możesz podać numer śledzenia.</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <input
+                      type="text"
+                      className="min-w-[200px] flex-1 rounded-lg border bg-[var(--island)] px-3 py-2 text-sm font-mono"
+                      style={{ borderColor: "var(--border)", color: "var(--ink)" }}
+                      placeholder="np. 1234567890123456"
+                      value={trackingInput}
+                      onChange={(e) => { setTrackingInput(e.target.value); setTrackingMessage(null); }}
+                      maxLength={100}
+                    />
+                    <button
+                      type="button"
+                      disabled={trackingSaving}
+                      onClick={async () => {
+                        if (!token) return;
+                        setTrackingSaving(true);
+                        setTrackingMessage(null);
+                        try {
+                          const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/set-inbound-tracking/`, { tracking_number: trackingInput.trim() }, token);
+                          setRepair(apiRepairDetailToPanel(data));
+                          setTrackingMessage("ok");
+                        } catch {
+                          setTrackingMessage("err");
+                        } finally {
+                          setTrackingSaving(false);
+                        }
+                      }}
+                      className="rounded-lg border-0 px-4 py-2 text-[13px] font-bold text-white disabled:opacity-60"
+                      style={{ background: "var(--red)" }}
+                    >
+                      {trackingSaving ? "Zapisywanie…" : "Zapisz"}
+                    </button>
+                  </div>
+                  {trackingMessage === "ok" && <p className="mt-2 text-xs font-medium" style={{ color: "var(--green)" }}>Zapisano.</p>}
+                  {trackingMessage === "err" && <p className="mt-2 text-xs font-medium" style={{ color: "var(--red)" }}>Nie udało się zapisać. Spróbuj ponownie.</p>}
+                </div>
+              )}
+            </div>
+          </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <h2 className="font-semibold text-prokom-black">Wiadomości</h2>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-prokom-gray">
-            Historia wiadomości z serwisem — w następnym kroku. Masz pytanie? Skontaktuj się telefonicznie lub e-mailem.
-          </p>
-        </CardContent>
-      </Card>
+          {/* Postęp naprawy */}
+          <div className="panel-card">
+            <div className="panel-card-header flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)" }}>
+                ⏱️
+              </span>
+              <div>
+                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                  Postęp naprawy
+                </h2>
+                <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>Aktualny status realizacji</p>
+              </div>
+            </div>
+            <div className="p-5">
+              {(repair.timeline?.length ? repair.timeline : []).map((step, i) => (
+                <div
+                  key={step.key}
+                  className={`tl-step relative flex gap-4 pb-6 last:pb-0 ${step.status}`}
+                  style={{
+                    borderLeft: i < (repair.timeline?.length ?? 0) - 1 ? "2px solid var(--border)" : "none",
+                    marginLeft: 7,
+                    paddingLeft: 20,
+                  }}
+                >
+                  <div
+                    className={`tl-node absolute left-0 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
+                      step.status === "done" ? "bg-[var(--green)] text-white" : step.status === "active" ? "bg-[var(--amber)] text-white ring-4 ring-[var(--amber)]/30" : "bg-[var(--island4)]"
+                    }`}
+                    style={step.status === "active" ? { animation: "ringPulseAmber 1.5s ease infinite" } : undefined}
+                  >
+                    {step.status === "done" ? "✓" : step.status === "active" ? "●" : ""}
+                  </div>
+                  <div className="tl-body min-w-0 flex-1">
+                    <p className="font-medium text-white">{step.label}</p>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+                      {step.date ? formatDateTime(step.date) : "Oczekuje"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Wiadomości z serwisem */}
+          <div className="panel-card">
+            <div className="panel-card-header flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--blue-l)", border: "1px solid var(--blue-b)" }}>
+                💬
+              </span>
+              <div>
+                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                  Wiadomości z serwisem
+                </h2>
+                <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>Historia komunikacji</p>
+              </div>
+            </div>
+            <div className="p-5">
+              <p className="py-6 text-center text-sm font-medium" style={{ color: "var(--ink)" }}>Brak wiadomości</p>
+              <p className="mt-2 text-sm" style={{ color: "var(--ink)" }}>
+                Masz pytanie dotyczące tej naprawy? Podaj numer ref:{" "}
+                <code className="font-mono font-semibold" style={{ fontFamily: "'Courier New', monospace", color: "var(--red)" }}>{repair.repairNumber}</code>.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href="tel:883200151"
+                  className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition hover:border-[var(--red-border)] hover:bg-[var(--red-l)]"
+                  style={{ background: "var(--island3)", borderColor: "var(--border)", color: "var(--red)" }}
+                >
+                  <span aria-hidden>📞</span> Zadzwoń
+                </a>
+                <a
+                  href="mailto:sklep@pro-kom.eu"
+                  className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition hover:border-[var(--red-border)] hover:bg-[var(--red-l)]"
+                  style={{ background: "var(--island3)", borderColor: "var(--border)", color: "var(--red)" }}
+                >
+                  <span aria-hidden>✉️</span> E-mail
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <aside className="space-y-6">
+          {/* Kosztorys */}
+          <div className="panel-card">
+            <div className="panel-card-header flex items-start gap-3">
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg font-bold"
+                style={{ background: "var(--red-l)", border: "1px solid var(--red-border)", color: "var(--red)" }}
+              >
+                $
+              </span>
+              <div>
+                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                  Kosztorys
+                </h2>
+              </div>
+            </div>
+            <div className="p-5">
+              {repair.priceItems.map((item) => (
+                <div key={item.name} className="flex justify-between gap-4 py-2 text-sm">
+                  <span style={{ color: "var(--ink)" }}>{item.name}</span>
+                  <span className="text-white">{formatPrice(item.price)}</span>
+                </div>
+              ))}
+              <div className="mt-3 border-t border-[var(--border)] pt-3 font-medium text-white">
+                Łącznie: {formatTotalPrice(repair.priceItems)} brutto
+              </div>
+              {repair.totalPrice === null && (
+                <p className="mt-3 rounded-lg bg-[var(--island3)] p-3 text-xs" style={{ color: "var(--ink2)" }}>
+                  Ostateczna cena zostanie ustalona po zakończeniu diagnostyki. Wszelkie zmiany będą uzgodnione z Tobą przed przystąpieniem do naprawy.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Informacje serwisowe */}
+          <div className="panel-card">
+            <div className="panel-card-header flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--island4)", border: "1px solid var(--border)" }}>
+                ⚙️
+              </span>
+              <div>
+                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                  Informacje serwisowe
+                </h2>
+              </div>
+            </div>
+            <div className="p-5">
+              <InfoRow label="Numer zlecenia" value={repair.repairNumber} mono />
+              <InfoRow label="Przyjął" value={typeof repair.serviceInfo.technicianName === "string" ? repair.serviceInfo.technicianName : "Do przypisania"} />
+              <InfoRow label="Szacowany czas" value={repair.serviceInfo.estimatedTime ?? "Do ustalenia"} color="amber" />
+              <InfoRow label="Gwarancja" value={`${repair.serviceInfo.warrantyMonths} miesięcy`} color="green" />
+              {repair.serviceInfo.notes && (
+                <div className="mt-3 rounded-lg bg-[var(--island3)] p-3 text-xs" style={{ color: "var(--ink2)" }}>
+                  {repair.serviceInfo.notes}
+                </div>
+              )}
+              <div className="mt-4 border-t border-[var(--border)] pt-4 text-xs" style={{ color: "var(--muted)" }}>
+                <p>ul. Orkana 16B, 34-700 Rabka-Zdrój</p>
+                <p className="mt-1">Pon–Pt 9:00–17:00 · Sob 9:00–14:00</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Akcje */}
+          <div className="panel-card">
+            <div className="panel-card-header flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--red-l)", border: "1px solid var(--red-border)" }}>
+                ⚡
+              </span>
+              <div>
+                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                  Akcje
+                </h2>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 p-5">
+              {(() => {
+                const canDownloadConfirmation =
+                  repair.status === "in_progress" || repair.status === "ready" || repair.status === "done";
+                return (
+                  <>
+                    <button
+                      type="button"
+                      disabled={!canDownloadConfirmation}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 hover:opacity-90"
+                      style={{
+                        background: canDownloadConfirmation ? "var(--red)" : "var(--island3)",
+                        color: canDownloadConfirmation ? "#fff" : "var(--muted)",
+                      }}
+                    >
+                      <span aria-hidden>📄</span> Pobierz potwierdzenie
+                    </button>
+                    {!canDownloadConfirmation && (
+                      <p className="text-xs" style={{ color: "var(--muted)" }}>
+                        Dostępne po zaakceptowaniu wyceny i rozpoczęciu naprawy.
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

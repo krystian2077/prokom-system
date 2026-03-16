@@ -207,15 +207,30 @@ export default function ZgloszeniePage() {
   const [pickup, setPickup] = useState<"osobiscie" | "kurier">("osobiscie");
   const [hammer, setHammer] = useState("");
   const [wantsAccessories, setWantsAccessories] = useState(false);
+  const [accessoryWishlist, setAccessoryWishlist] = useState("");
   const [notes, setNotes] = useState("");
+  const [deviceTurnsOn, setDeviceTurnsOn] = useState<"" | "tak" | "nie">("");
+  const [visualCondition, setVisualCondition] = useState("");
   const [howtoTab, setHowtoTab] = useState<"ios" | "android">("ios");
   const [howtoModalOpen, setHowtoModalOpen] = useState(false);
   const [refNumber, setRefNumber] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [deliveryAddressConfirmed, setDeliveryAddressConfirmed] = useState(false);
 
   const barWidth = submitted ? "100%" : BAR_WIDTHS[currentStep - 1];
+
+  const SERVICE_ADDRESS = {
+    name: "PRO-KOM Tadeusz Wójciak",
+    street: "ul. Orkana 16B",
+    city: "34-700 Rabka-Zdrój",
+    hours: "pon.–pt. 9:00–17:00, sob. 9:00–14:00",
+    phone: "883 200 151",
+    email: "serwisprokomrabka@gmail.com",
+  };
+
+  const isPhoneOrTablet = category === "Telefon" || category === "Tablet";
 
   const categoryToApi: Record<string, string> = {
     Telefon: "phone",
@@ -226,6 +241,21 @@ export default function ZgloszeniePage() {
     Konsola: "console",
     Inne: "other",
   };
+
+  useEffect(() => {
+    if (!isPhoneOrTablet) setHammer("");
+  }, [isPhoneOrTablet]);
+
+  const accessorySuggestionsByCategory: Record<string, string> = {
+    Laptop: "Zasilacz, Myszka, Torba, Zestaw do czyszczenia",
+    Drukarka: "Toner, Tusz, Wlewki, Papier",
+    Konsola: "brak",
+    Inne: "brak",
+    Komputer: "Sprężone powietrze, Zestaw do czyszczenia, Ipa",
+    Telefon: "Kabel, ładowarka GaN, etui, powerbank — doradzimy przy odbiorze",
+    Tablet: "Kabel, ładowarka GaN, etui, powerbank — doradzimy przy odbiorze",
+  };
+  const accessorySuggestionText = category ? (accessorySuggestionsByCategory[category] ?? "brak") : "";
 
   const goNext = (from: number) => {
     setGoingBack(false);
@@ -293,16 +323,20 @@ export default function ZgloszeniePage() {
         problem_description: (problem.trim() || "—").slice(0, 2000),
         serial_number: "",
         imei: imei.trim(),
+        device_turns_on: deviceTurnsOn === "tak" ? true : deviceTurnsOn === "nie" ? false : null,
+        visual_condition_description: visualCondition.trim().slice(0, 2000),
       },
       delivery_method: deliveryMethod,
       return_method: returnMethod,
-      delivery_street: delivery === "kurier" ? street.trim() : "",
-      delivery_city: delivery === "kurier" ? city.trim() : "",
-      delivery_postal_code: delivery === "kurier" ? zip.trim() : "",
+      delivery_street: (delivery === "kurier" || pickup === "kurier") ? street.trim() : "",
+      delivery_city: (delivery === "kurier" || pickup === "kurier") ? city.trim() : "",
+      delivery_postal_code: (delivery === "kurier" || pickup === "kurier") ? zip.trim() : "",
       delivery_country: "Polska",
       hammer_glass_interest: hammer === "tak" ? "yes" : hammer === "nie" ? "no" : null,
       accessory_interest: [],
-      accessory_choose_for_me: wantsAccessories,
+      accessory_choose_for_me: wantsAccessories || (accessoryWishlist.trim() !== ""),
+      accessory_wishlist: accessoryWishlist.trim(),
+      additional_notes: notes.trim().slice(0, 2000),
     };
     try {
       const res = await api.post<{ repair_number: string; message?: string }>(
@@ -368,9 +402,58 @@ export default function ZgloszeniePage() {
             <h1 className="mt-3 font-black leading-[0.88] tracking-[-0.055em] max-[480px]:text-[24px] sm:text-[clamp(26px,3.4vw,44px)]" style={{ fontFamily: "var(--font-unbounded)", color: "var(--white)", animation: "zgl-fadeUp .55s .06s ease both" }}>
               Zgłoś naprawę <span style={{ color: "var(--red)" }}>online.</span>
             </h1>
-            <p className="mt-3 mb-9 max-w-[540px] text-[14px] leading-[1.75]" style={{ color: "var(--ink2)", animation: "zgl-fadeUp .55s .12s ease both" }}>
+            <p className="mt-3 max-w-[540px] text-[14px] leading-[1.75]" style={{ color: "var(--ink2)", animation: "zgl-fadeUp .55s .12s ease both" }}>
               Wypełnij formularz w 5 krokach...
             </p>
+
+            {/* Zachęta do konta — tylko gdy niezalogowany */}
+            {!token && (
+              <div
+                className="mb-8 mt-6 flex flex-col gap-4 rounded-xl border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:px-6 sm:py-4"
+                style={{
+                  borderColor: "rgba(220,30,30,.25)",
+                  background: "rgba(220,30,30,.06)",
+                  boxShadow: "0 0 0 1px rgba(220,30,30,.08)",
+                  animation: "zgl-fadeUp .55s .14s ease both",
+                }}
+              >
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--red)" }}>
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-white" style={{ background: "var(--red)" }}>
+                      <IconUser />
+                    </span>
+                    Załóż konto
+                  </p>
+                  <p className="mt-2 text-[13px] leading-[1.55]" style={{ color: "var(--ink2)" }}>
+                    Przed złożeniem zgłoszenia załóż konto w panelu klienta — będziesz miał <strong style={{ color: "var(--ink)" }}>podgląd na przebieg naprawy</strong>, dostęp do wycen, historię zleceń, szybszy kontakt z serwisem i lepszą komunikację. Wszystko w jednym miejscu.
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap items-center gap-3">
+                  <Link
+                    href="/client/login?returnUrl=%2Fzgloszenie"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-[13px] font-bold text-white transition-all hover:-translate-y-0.5"
+                    style={{
+                      borderColor: "var(--red)",
+                      background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)",
+                      boxShadow: "0 3px 14px rgba(220,30,30,.35)",
+                    }}
+                  >
+                    Zaloguj się
+                  </Link>
+                  <Link
+                    href="/client/rejestracja?returnUrl=%2Fzgloszenie"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-[13px] font-bold transition-all hover:-translate-y-0.5"
+                    style={{
+                      borderColor: "rgba(255,255,255,.25)",
+                      background: "transparent",
+                      color: "var(--white)",
+                    }}
+                  >
+                    Zarejestruj się
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Stepper */}
             <div style={{ animation: "zgl-fadeUp .55s .18s ease both" }}>
@@ -435,15 +518,18 @@ export default function ZgloszeniePage() {
                   <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-zglf-red-border bg-gradient-to-br from-zglf-red-l to-zglf-red-l/60 text-zglf-red shadow-[0_0_0_10px_rgba(220,30,30,.05),0_8px_28px_rgba(220,30,30,.15)] animate-success-bounce">
                     <IconCheckLarge />
                   </div>
-                  <h2 className="mt-6 font-unbounded text-[22px] font-black tracking-[-0.04em] text-zglf-text animate-fade-up" style={{ fontFamily: "var(--font-unbounded)", animationDelay: "0.15s" }}>
+                  <h2 className="mt-6 font-unbounded text-[22px] font-black tracking-[-0.04em] text-white animate-fade-up" style={{ fontFamily: "var(--font-unbounded)", animationDelay: "0.15s" }}>
                     Zgłoszenie wysłane!
                   </h2>
-                  <p className="mx-auto mt-3 max-w-[320px] text-[14px] text-zglf-text2 animate-fade-up" style={{ animationDelay: "0.25s" }}>
-                    Dziękujemy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, by potwierdzić przyjęcie sprzętu i ustalić szczegóły.
+                  <p className="mx-auto mt-3 max-w-[360px] text-[15px] leading-[1.6] text-white/90 animate-fade-up" style={{ animationDelay: "0.25s" }}>
+                    Dziękujemy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, by potwierdzić przyjęcie zlecenia i ustalić szczegóły.
                   </p>
-                  <div className="mt-6 inline-flex items-center gap-2 animate-fade-up" style={{ animationDelay: "0.35s" }}>
-                    <span className="text-[13px] text-zglf-muted">Numer ref:</span>
-                    <span className="text-[15px] font-extrabold text-zglf-red">{refNumber}</span>
+                  <div className="mt-6 flex flex-col items-center gap-1.5 animate-fade-up" style={{ animationDelay: "0.35s" }}>
+                    <span className="text-[13px] font-semibold text-white/90">Numer naprawy:</span>
+                    <span className="text-[17px] font-extrabold text-zglf-red">{refNumber}</span>
+                    <p className="mt-1 max-w-[320px] text-[12px] text-white/80">
+                      Zapisz ten numer — jest ważny. Potwierdzenie z numerem naprawy wysłaliśmy także na Twój adres e-mail. Jeśli nie widzisz wiadomości, sprawdź folder spam / niechciane.
+                    </p>
                   </div>
                   <div className="mt-8 flex flex-col items-center gap-3 animate-fade-up" style={{ animationDelay: "0.45s" }}>
                     {token && authUser?.role === "client" && (
@@ -630,6 +716,32 @@ export default function ZgloszeniePage() {
                           <label className="flabel text-[var(--muted)] italic normal-case">IMEI (opcjonalnie)</label>
                           <input type="text" className="fi mt-1.5" placeholder="15 cyfr · szybki sposób: zadzwoń pod *#06# na klawiaturze" value={imei} onChange={(e) => setImei(e.target.value)} />
                         </div>
+                        <div>
+                          <label className="flabel text-[var(--muted)] italic normal-case">Czy urządzenie się włącza?</label>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {(["tak", "nie"] as const).map((opt) => (
+                              <button
+                                key={opt}
+                                type="button"
+                                onClick={() => setDeviceTurnsOn(deviceTurnsOn === opt ? "" : opt)}
+                                className={`rounded-full border px-4 py-[9px] text-[13px] font-semibold transition-all ${deviceTurnsOn === opt ? "-translate-y-px" : "hover:-translate-y-px"}`}
+                                style={deviceTurnsOn === opt ? { borderColor: "var(--red)", background: "var(--red)", color: "var(--white)", boxShadow: "0 3px 12px rgba(220,30,30,.3)" } : { borderColor: "var(--border)", background: "var(--island4)", color: "var(--ink)" }}
+                              >
+                                {opt === "tak" ? "Tak" : "Nie"}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="flabel text-[var(--muted)] italic normal-case">Opis stanu wizualnego (opcjonalnie)</label>
+                          <textarea
+                            className="fi fta mt-1.5 min-h-[80px]"
+                            placeholder="Jeśli są rysy, pęknięcia, uszkodzenia obudowy lub ekranu — opisz to (np. pęknięta szybka, zarysowany tył, wgniecenie)."
+                            value={visualCondition}
+                            onChange={(e) => setVisualCondition(e.target.value)}
+                            maxLength={2000}
+                          />
+                        </div>
                       </div>
                       <div className="card-ft">
                         <button type="button" onClick={() => goBack(2)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px]" style={{ color: "var(--muted)" }}>
@@ -664,7 +776,7 @@ export default function ZgloszeniePage() {
                           <div className="mt-2 space-y-2">
                             {[
                               { v: "osobiscie" as const, title: "Osobiście w serwisie", desc: "ul. Orkana 16B, 34-700 Rabka-Zdrój · pon–pt 9:00–17:00, sob 9:00–14:00", emoji: "🚶" },
-                              { v: "kurier" as const, title: "Wysyłka kurierska", desc: "Prześlemy gotową etykietę na Twój e-mail — spakuj sprzęt i nadaj paczkę", emoji: "📦" },
+                              { v: "kurier" as const, title: "Wysyłka kurierska", desc: "Wyślij paczkę na nasz adres. Zwrot naprawionego sprzętu do Ciebie — za darmo.", emoji: "📦" },
                             ].map((opt) => (
                               <button
                                 key={opt.v}
@@ -713,6 +825,47 @@ export default function ZgloszeniePage() {
                             ))}
                           </div>
                         </div>
+                        {delivery === "kurier" && (
+                          <div className="rounded-xl border p-4" style={{ borderColor: "rgba(220,30,30,.25)", background: "rgba(220,30,30,.06)" }}>
+                            <p className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--red)" }}>Nasz adres do wysyłki</p>
+                            <p className="mt-2 text-[13.5px] font-semibold" style={{ color: "var(--ink)" }}>{SERVICE_ADDRESS.name}</p>
+                            <p className="mt-0.5 text-[13px]" style={{ color: "var(--ink2)" }}>{SERVICE_ADDRESS.street}<br />{SERVICE_ADDRESS.city}</p>
+                            <p className="mt-1.5 text-[12px]" style={{ color: "var(--muted)" }}>{SERVICE_ADDRESS.hours}</p>
+                            <p className="mt-0.5 text-[12px]" style={{ color: "var(--ink2)" }}>Tel. <a href={`tel:${SERVICE_ADDRESS.phone}`} className="font-semibold text-[var(--red)]">{SERVICE_ADDRESS.phone}</a></p>
+                            <p className="mt-0.5 text-[12px]" style={{ color: "var(--ink2)" }}>E-mail: <a href={`mailto:${SERVICE_ADDRESS.email}`} className="font-semibold text-[var(--red)]">{SERVICE_ADDRESS.email}</a></p>
+                            <p className="mt-3 text-[12px]" style={{ color: "var(--ink2)" }}>Wysyłkę paczki do nas opłacasz we własnym zakresie. Po naprawie odsyłamy Ci sprzęt za darmo — zwrot do domu jest po naszej stronie.</p>
+                          </div>
+                        )}
+                        {pickup === "kurier" && (
+                          <div className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+                            <p className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>Adres do odbioru przesyłki po naprawie</p>
+                            <p className="mt-1.5 text-[11.5px]" style={{ color: "var(--ink2)" }}>Dane z kroku „Kontakt”. Możesz je tutaj poprawić.</p>
+                            <div className="mt-3 space-y-3">
+                              <div>
+                                <label className="flabel text-[var(--muted)] italic normal-case">Ulica i numer</label>
+                                <input type="text" className="fi mt-1" placeholder="Ulica i numer" value={street} onChange={(e) => setStreet(e.target.value)} />
+                              </div>
+                              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div>
+                                  <label className="flabel text-[var(--muted)] italic normal-case">Miasto</label>
+                                  <input type="text" className="fi mt-1" placeholder="Miasto" value={city} onChange={(e) => setCity(e.target.value)} />
+                                </div>
+                                <div>
+                                  <label className="flabel text-[var(--muted)] italic normal-case">Kod pocztowy</label>
+                                  <input type="text" className="fi mt-1" placeholder="00-000" value={zip} onChange={(e) => setZip(e.target.value)} />
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setDeliveryAddressConfirmed(true)}
+                              className="mt-4 inline-flex items-center gap-2 rounded-lg border-0 px-4 py-2.5 text-[13px] font-bold text-white transition-all hover:-translate-y-px disabled:opacity-70"
+                              style={{ background: deliveryAddressConfirmed ? "var(--green)" : "var(--red)", boxShadow: "0 2px 10px rgba(220,30,30,.3)" }}
+                            >
+                              {deliveryAddressConfirmed ? "✓ Dane potwierdzone" : "Potwierdź dane do wysyłki"}
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <div className="card-ft">
                         <button type="button" onClick={() => goBack(3)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px]" style={{ color: "var(--muted)" }}>
@@ -740,46 +893,75 @@ export default function ZgloszeniePage() {
                         <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 4 z 5</span>
                       </div>
                       <div className="space-y-4 px-7 py-6" style={{ background: "var(--island)", padding: "26px 28px" }}>
-                        <div>
-                          <label className="flabel text-[var(--muted)] italic normal-case">Zainteresowanie folią Hammer Glass (opcjonalnie)</label>
-                          <select className="fi mt-1.5 appearance-none pr-9" value={hammer} onChange={(e) => setHammer(e.target.value)}>
+                        <div className={!isPhoneOrTablet ? "opacity-60" : ""}>
+                          <label className="flabel text-[var(--muted)] italic normal-case">
+                            Zainteresowanie folią Hammer Glass (opcjonalnie)
+                            {!isPhoneOrTablet && <span className="ml-1.5 text-[11px]">— dostępne dla Telefon, Tablet</span>}
+                          </label>
+                          <select
+                            className="fi mt-1.5 appearance-none pr-9"
+                            value={hammer}
+                            onChange={(e) => setHammer(e.target.value)}
+                            disabled={!isPhoneOrTablet}
+                          >
                             <option value="">Wybierz opcję (opcjonalnie)</option>
                             <option value="tak">Tak — interesuje mnie folia ochronna Hammer Glass</option>
                             <option value="nie">Nie, dziękuję</option>
                           </select>
                         </div>
-                        <div className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
-                          <div className="flex flex-wrap items-center gap-2 border-b pb-3" style={{ borderColor: "var(--border)" }}>
-                            <span className="rounded-full px-2.5 py-1 text-[9px] font-extrabold text-white" style={{ background: "var(--red)", boxShadow: "0 2px 6px rgba(220,30,30,.3)" }}>HAMMER GLASS CUT</span>
-                            <span className="text-[13px] font-bold" style={{ color: "var(--ink)" }}>Folia precyzyjnie cięta na Twój model</span>
+                        {isPhoneOrTablet && (
+                          <div className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+                            <div className="flex flex-wrap items-center gap-2 border-b pb-3" style={{ borderColor: "var(--border)" }}>
+                              <span className="rounded-full px-2.5 py-1 text-[9px] font-extrabold text-white" style={{ background: "var(--red)", boxShadow: "0 2px 6px rgba(220,30,30,.3)" }}>HAMMER GLASS CUT</span>
+                              <span className="text-[13px] font-bold" style={{ color: "var(--ink)" }}>Folia precyzyjnie cięta na Twój model</span>
+                            </div>
+                            <p className="mt-3 text-[11.5px] leading-relaxed" style={{ color: "var(--ink2)" }}>
+                              Wycinamy folię na miejscu przy użyciu plotera VersaBlade X Pro z dokładnością do 0,1 mm. Montaż ~5 min. Baza 10 000+ modeli. PZH+RoHS.
+                            </p>
+                            <div className="mt-3 flex flex-wrap gap-1.5">
+                              {["⚡ Montaż ~5 min", "📐 Precyzja 0,1 mm", "📱 10 000+ modeli", "✅ PZH · RoHS"].map((tag) => (
+                                <span key={tag} className="rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors hover:border-[var(--red)] hover:text-[var(--red)]" style={{ borderColor: "var(--border2)", background: "rgba(255,255,255,.04)", color: "var(--ink2)" }}>
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                          <p className="mt-3 text-[11.5px] leading-relaxed" style={{ color: "var(--ink2)" }}>
-                            Wycinamy folię na miejscu przy użyciu plotera VersaBlade X Pro z dokładnością do 0,1 mm. Montaż ~5 min. Baza 10 000+ modeli. PZH+RoHS.
-                          </p>
-                          <div className="mt-3 flex flex-wrap gap-1.5">
-                            {["⚡ Montaż ~5 min", "📐 Precyzja 0,1 mm", "📱 10 000+ modeli", "✅ PZH · RoHS"].map((tag) => (
-                              <span key={tag} className="rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors hover:border-[var(--red)] hover:text-[var(--red)]" style={{ borderColor: "var(--border2)", background: "rgba(255,255,255,.04)", color: "var(--ink2)" }}>
-                                {tag}
+                        )}
+                        <div className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+                          <p className="text-[13px] font-bold" style={{ color: "var(--ink)" }}>Dobierz mi akcesoria</p>
+                          {category && (
+                            <p className="mt-1 text-[12px]" style={{ color: "var(--ink2)" }}>
+                              {category === "Telefon" || category === "Tablet" ? "Dla telefonów / tabletów: " : `Dla ${category === "Komputer" ? "komputerów" : category === "Laptop" ? "laptopów" : category === "Drukarka" ? "drukarek" : category === "Konsola" ? "konsol" : "innych"}: `}
+                              {accessorySuggestionText}
+                            </p>
+                          )}
+                          {isPhoneOrTablet && (
+                            <label className="mt-3 flex cursor-pointer items-start gap-3">
+                              <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-[1.5px]`} style={wantsAccessories ? { borderColor: "var(--red)", background: "var(--red)", boxShadow: "0 2px 8px rgba(220,30,30,.3)" } : { borderColor: "var(--border2)", background: "var(--island5)" }}>
+                                {wantsAccessories && (
+                                  <span className="text-white [&>svg]:h-3 [&>svg]:w-3" style={{ animation: "zgl-dotBounce .35s ease" }}>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                  </span>
+                                )}
                               </span>
-                            ))}
+                              <input type="checkbox" className="sr-only" checked={wantsAccessories} onChange={(e) => setWantsAccessories(e.target.checked)} />
+                              <span className="text-[12px]" style={{ color: "var(--ink2)" }}>Proszę doradzić przy odbiorze (telefon/tablet)</span>
+                            </label>
+                          )}
+                          <div className="mt-3">
+                            <label className="flabel text-[var(--muted)] italic normal-case">Co dobrać? (wpisz np. konkretne akcesoria)</label>
+                            <input
+                              type="text"
+                              className="fi mt-1.5"
+                              placeholder={category && accessorySuggestionText && accessorySuggestionText !== "brak" ? `np. ${accessorySuggestionText.split(", ")[0]?.trim() || "akcesoria"}` : "np. zasilacz, etui"}
+                              value={accessoryWishlist}
+                              onChange={(e) => setAccessoryWishlist(e.target.value)}
+                              maxLength={1000}
+                            />
                           </div>
                         </div>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-[14px] border p-4 transition-all hover:-translate-y-px" style={{ borderColor: "var(--border)", background: "var(--island4)" }}>
-                          <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-[1.5px] ${wantsAccessories ? "" : ""}`} style={wantsAccessories ? { borderColor: "var(--red)", background: "var(--red)", boxShadow: "0 2px 8px rgba(220,30,30,.3)" } : { borderColor: "var(--border2)", background: "var(--island5)" }}>
-                            {wantsAccessories && (
-                              <span className="text-white [&>svg]:h-3 [&>svg]:w-3" style={{ animation: "zgl-dotBounce .35s ease" }}>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                              </span>
-                            )}
-                          </span>
-                          <input type="checkbox" className="sr-only" checked={wantsAccessories} onChange={(e) => setWantsAccessories(e.target.checked)} />
-                          <div>
-                            <p className="text-[14px] font-bold" style={{ color: "var(--ink)" }}>Dobierz mi akcesoria przy odbiorze</p>
-                            <p className="mt-0.5 text-[12px]" style={{ color: "var(--ink2)" }}>Kabel, ładowarka GaN, etui, powerbank — doradzimy co najlepiej pasuje</p>
-                          </div>
-                        </label>
                         <div>
                           <label className="flabel text-[var(--muted)] italic normal-case">Dodatkowe uwagi (opcjonalnie)</label>
                           <textarea className="fi mt-1.5 min-h-[90px] resize-y leading-[1.7]" placeholder="Cokolwiek chcesz nam przekazać — np. hasło ekranu blokady, specyficzne zachowanie urządzenia, historia naprawy..." value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -820,8 +1002,10 @@ export default function ZgloszeniePage() {
                             { key: "Dostawa", val: delivery === "osobiscie" ? "Osobiście w serwisie" : "Wysyłka kurierska" },
                             { key: "Odbiór", val: pickup === "osobiscie" ? "Odbiór osobisty" : "Kurier do domu" },
                             { key: "Hammer Glass", val: hammer === "tak" ? "Tak — interesuje mnie folia" : hammer === "nie" ? "Nie" : "—" },
-                            { key: "Akcesoria", val: wantsAccessories ? "Proszę doradzić przy odbiorze" : "—" },
+                            { key: "Akcesoria", val: accessoryWishlist.trim() ? accessoryWishlist.trim() : wantsAccessories ? "Proszę doradzić przy odbiorze" : "—" },
                             { key: "Uwagi", val: notes.trim() || "—" },
+                            ...(deviceTurnsOn ? [{ key: "Czy urządzenie się włącza", val: deviceTurnsOn === "tak" ? "Tak" : "Nie" }] : []),
+                            ...(visualCondition.trim() ? [{ key: "Stan wizualny", val: visualCondition.trim() }] : []),
                           ].map((row) => (
                             <div key={row.key} className="flex gap-4 border-b py-[13px] transition-colors hover:bg-[var(--faint)]" style={{ borderColor: "var(--border)" }}>
                               <span className="min-w-[92px] text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--muted)" }}>{row.key}</span>
@@ -833,7 +1017,7 @@ export default function ZgloszeniePage() {
                           📋 Sprawdź dane przed wysłaniem. Po wysłaniu skontaktujemy się z Tobą w celu potwierdzenia zlecenia lub po przeprowadzonej <strong style={{ color: "var(--ink)" }}>bezpłatnej diagnozie</strong> urządzenia.
                         </div>
                         {submitError && (
-                          <div className="mt-4 rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-3 text-[13px] text-red-200">
+                          <div className="mt-4 rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-3 text-[13px] text-red-200 whitespace-pre-line">
                             {submitError}
                           </div>
                         )}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useAuth } from "@/contexts/AuthContext";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export default function ClientRejestracjaPage() {
   const router = useRouter();
@@ -38,8 +39,8 @@ export default function ClientRejestracjaPage() {
       postal_code: postal_code || undefined,
     });
     setSubmitting(false);
-    if (result.ok) {
-      router.push("/client/dashboard");
+    if (result.ok && result.email) {
+      router.push(`/client/verify-email?email=${encodeURIComponent(result.email)}`);
       return;
     }
     setError(result.error || "Rejestracja nie powiodła się.");
@@ -124,7 +125,7 @@ export default function ClientRejestracjaPage() {
                 onChange={(e) => setPostalCode(e.target.value)}
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <ErrorMessage message={error} className="mb-3" />}
             <Button type="submit" disabled={submitting} className="w-full">
               {submitting ? "Rejestracja…" : "Zarejestruj się"}
             </Button>

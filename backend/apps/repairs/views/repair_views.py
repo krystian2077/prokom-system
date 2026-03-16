@@ -462,6 +462,23 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             qs = repair.notes.all().order_by("-created_at")
         return Response(RepairMessageSerializer(qs, many=True).data)
 
+    @action(detail=True, methods=["post"], url_path="set-inbound-tracking")
+    def set_inbound_tracking(self, request, pk=None):
+        """
+        POST /api/v1/repairs/<id>/set-inbound-tracking/
+        Body: { "tracking_number": "..." } — opcjonalny numer listu przewozowego (wysyłka do serwisu).
+        Klient może ustawić tylko dla własnej naprawy.
+        """
+        repair = self.get_object()
+        if getattr(request.user, "role", None) == "client":
+            client_profile = get_client_for_user(request.user)
+            if client_profile is None or repair.client_id != client_profile.id:
+                raise PermissionDenied("Brak dostępu do tej naprawy.")
+        tracking = (request.data.get("tracking_number") or "").strip()[:100]
+        repair.client_tracking_number = tracking
+        repair.save(update_fields=["client_tracking_number", "updated_at"])
+        return Response(RepairRequestSerializer(repair, context={"request": request}).data, status=status.HTTP_200_OK)
+
     # ---------- Etap 5: Panel klienta — status (polling) ----------
     @action(detail=True, url_path="status")
     def status(self, request, pk=None):

@@ -1,6 +1,16 @@
 """PRO-KOM Serwis — Accounts API URLs."""
 from django.urls import path
-from .views import LoginView, LogoutView, CurrentUserView, RegisterView
+from .views import (
+    LoginView,
+    LogoutView,
+    CurrentUserView,
+    RegisterView,
+    VerifyEmailView,
+    ResendVerificationCodeView,
+    RequestPasswordResetView,
+    ResetPasswordView,
+    ChangePasswordView,
+)
 from .views.notification_views import (
     StaffNotificationListView,
     StaffNotificationDetailView,
@@ -22,6 +32,11 @@ app_name = "accounts"
 urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
+    path("verify-email/", VerifyEmailView.as_view(), name="verify-email"),
+    path("resend-verification-code/", ResendVerificationCodeView.as_view(), name="resend-verification-code"),
+    path("request-password-reset/", RequestPasswordResetView.as_view(), name="request-password-reset"),
+    path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
+    path("change-password/", ChangePasswordView.as_view(), name="change-password"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", CurrentUserView.as_view(), name="me"),
     path("notifications/", StaffNotificationListView.as_view(), name="notifications-list"),
