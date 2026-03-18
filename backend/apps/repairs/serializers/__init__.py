@@ -7,6 +7,11 @@ from .repair_request import (
 )
 from .repair_note import RepairNoteSerializer
 from .repair_image import RepairImageSerializer
+from .checklist import (
+    ChecklistRunSerializer,
+    ChecklistRunItemSerializer,
+    ChecklistRunItemUpdateSerializer,
+)
 
 __all__ = [
     "RepairRequestSerializer",
@@ -15,4 +20,7 @@ __all__ = [
     "RepairStatusUpdateSerializer",
     "RepairNoteSerializer",
     "RepairImageSerializer",
+    "ChecklistRunSerializer",
+    "ChecklistRunItemSerializer",
+    "ChecklistRunItemUpdateSerializer",
 ]

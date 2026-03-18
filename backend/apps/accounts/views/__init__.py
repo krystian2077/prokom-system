@@ -9,10 +9,12 @@ from .auth_views import (
     RequestPasswordResetView,
     ResetPasswordView,
     ChangePasswordView,
+    StaffLoginView,
 )
 
 __all__ = [
     "LoginView",
+    "StaffLoginView",
     "LogoutView",
     "CurrentUserView",
     "RegisterView",

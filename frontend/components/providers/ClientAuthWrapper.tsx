@@ -2,6 +2,7 @@
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import type { ReactNode } from "react";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 /**
  * Opakowuje całą aplikację w AuthProvider, żeby stan logowania
@@ -10,5 +11,9 @@ import type { ReactNode } from "react";
  * przy nawigacji między stronami.
  */
 export function ClientAuthWrapper({ children }: { children: ReactNode }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <AuthProvider>
+      <QueryProvider>{children}</QueryProvider>
+    </AuthProvider>
+  );
 }

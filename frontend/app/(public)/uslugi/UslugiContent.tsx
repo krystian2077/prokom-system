@@ -162,12 +162,30 @@ const SECTIONS_DATA: SectionData[] = [
       "Komputer nie startuje, ekran się nie włącza, system zawiesza — dziesiątki przyczyn. Zaczynamy od systematycznej diagnostyki: zasilacz, RAM, dysk, płyta główna, CPU/GPU.\n\nNaprawy sprzętowe i oprogramowanie. Reinstalacja systemu, usuwanie malware, **odzysk danych z uszkodzonego dysku** — wykonujemy to regularnie i skutecznie.",
     blockEmoji: "🖥",
     repairs: [
-      { name: "Wymiana i rozbudowa RAM", sub: "DDR3 / DDR4 / DDR5, dual channel" },
-      { name: "Wymiana dysku HDD / SSD", sub: "Klonowanie systemu, NVMe i SATA" },
-      { name: "Naprawa zasilacza ATX", sub: "Diagnoza, wymiana kondensatorów lub jednostki" },
-      { name: "Naprawa płyty głównej", sub: "Lutowanie SMD, naprawa VRM" },
-      { name: "Instalacja i konfiguracja systemu", sub: "Windows 10/11, sterowniki, usuwanie malware" },
-      { name: "Odzyskiwanie danych", sub: "Uszkodzone HDD, skasowane partycje" },
+      {
+        name: "Instalacja sterowników / Aktualizacja BIOSU",
+        sub: "Instalujemy sterowniki i wykonujemy aktualizację BIOS/UEFI, a potem weryfikujemy stabilność po restarcie.",
+      },
+      {
+        name: "Wymiana dysku SSD / HDD",
+        sub: "Wymiana dysku i przygotowanie systemu lub klonowanie danych (NVMe i SATA).",
+      },
+      {
+        name: "Naprawa płyty głównej",
+        sub: "Lutowanie SMD i naprawa sekcji zasilania (VRM) przywracająca stabilną pracę.",
+      },
+      {
+        name: "Czyszczenie komputera",
+        sub: "Czyszczenie układu chłodzenia, kontrola temperatur i sprawdzenie działania wentylatorów.",
+      },
+      {
+        name: "Reinstalacja systemu Windows",
+        sub: "Reinstalujemy Windows i usuwamy problemy, żeby komputer działał szybko i stabilnie.",
+      },
+      {
+        name: "Rozbudowa pamięci RAM",
+        sub: "Dobieramy moduły RAM, konfigurujemy system pod dual channel i testujemy stabilność.",
+      },
     ],
     cta: "Zgłoś komputer do serwisu",
   },
@@ -284,7 +302,7 @@ export function UslugiContent() {
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--red)] ring-pulse-dot" aria-hidden />
                 PROFESJONALNY SERWIS ELEKTRONIKI
               </p>
-              <h1 className="text-[clamp(48px,6.8vw,100px)] font-black leading-[1.2] tracking-[-0.058em] text-white" style={{ fontFamily: "var(--font-unbounded)" }}>
+              <h1 className="text-[clamp(48px,6.8vw,100px)] font-black leading-[1.2] tracking-[-0.058em] text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
                 Usługi <span style={{ color: "var(--red)" }}>serwisowe.</span>
               </h1>
               <p className="mt-5 max-w-[420px] text-[15.5px] leading-[1.82]" style={{ color: "rgba(255,255,255,0.78)" }}>
@@ -354,7 +372,7 @@ export function UslugiContent() {
                   e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,.25)";
                 }}
               >
-                <p className="text-[22px] font-black tracking-tight text-white" style={{ fontFamily: "var(--font-unbounded)" }}>
+                <p className="text-[22px] font-black tracking-tight text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
                   {item.main}
                   <span style={{ color: "var(--red)" }}>{item.accent}</span>
                   {item.main2}
@@ -397,7 +415,7 @@ export function UslugiContent() {
                 <p className="mb-2 text-[11px] font-semibold tracking-wide" style={{ color: "var(--red)", fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
                   — {sec.dataNum}
                 </p>
-                <h2 className="text-[clamp(34px,4vw,62px)] font-black leading-[0.9] tracking-[-0.04em]" style={{ fontFamily: "var(--font-unbounded)" }}>
+                <h2 className="text-[clamp(34px,4vw,62px)] font-black leading-[0.9] tracking-[-0.04em]" style={{ fontFamily: "var(--font-dm-sans)" }}>
                   <span style={{ color: "#000" }}>{sec.titleWord} </span>
                   <span style={{ color: "var(--red)" }}>{sec.titleAccent}</span>
                 </h2>
@@ -470,7 +488,7 @@ export function UslugiContent() {
             >
               <div className="guarantee-after absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-[var(--red)] to-transparent opacity-0 transition-opacity" />
               <span className="flex h-12 w-12 items-center justify-center rounded-[13px] text-xl" style={{ background: "rgba(220,30,30,.07)", border: "1px solid rgba(220,30,30,.22)" }}>{item.emoji}</span>
-              <h3 className="mt-4 text-[12.5px] font-bold leading-snug text-white" style={{ fontFamily: "var(--font-unbounded)", letterSpacing: "-0.025em" }}>{item.titlePrefix}<span style={{ color: "var(--red)" }}>{item.titleAccent}</span></h3>
+              <h3 className="mt-4 text-[12.5px] font-bold leading-snug text-white" style={{ fontFamily: "var(--font-dm-sans)", letterSpacing: "-0.01em" }}>{item.titlePrefix}<span style={{ color: "var(--red)" }}>{item.titleAccent}</span></h3>
               <p className="mt-2 text-[13px] leading-[1.72]" style={{ color: "#3e4255" }}>{item.desc}</p>
             </div>
           ))}
@@ -481,7 +499,7 @@ export function UslugiContent() {
       <section className="relative px-5 py-20 text-center md:px-[52px]" style={{ background: "var(--dark)", paddingTop: 88, paddingBottom: 88 }}>
         <div className="absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 pointer-events-none rounded-full" style={{ background: "radial-gradient(ellipse, rgba(220,30,30,.065), transparent 65%)" }} aria-hidden />
         <p className="relative text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "rgba(255,255,255,0.72)", marginBottom: 24 }}>ul. Orkana 16B · Rabka-Zdrój · Bezpłatna diagnostyka</p>
-        <h2 className="relative text-[clamp(42px,6vw,80px)] font-black leading-[0.87] tracking-[-0.055em] text-white" style={{ fontFamily: "var(--font-unbounded)" }}>
+        <h2 className="relative text-[clamp(42px,6vw,80px)] font-black leading-[0.87] tracking-[-0.055em] text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
           Zepsute? <span style={{ color: "var(--red)" }}>Naprawimy.</span>
         </h2>
         <p className="relative mx-auto mt-6 max-w-[500px] text-[15px] leading-[1.8] mb-10" style={{ color: "rgba(255,255,255,0.78)" }}>

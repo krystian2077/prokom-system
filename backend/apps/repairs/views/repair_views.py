@@ -8,7 +8,14 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 from apps.common.permissions import get_client_for_user, IsStaffOrAdmin
 from apps.common.enums import RepairStatus
-from apps.repairs.models import RepairRequest, RepairNote, RepairImage
+from apps.repairs.models import (
+    RepairRequest,
+    RepairNote,
+    RepairImage,
+    ChecklistRun,
+    ChecklistRunItem,
+    ChecklistTemplate,
+)
 from apps.repairs.serializers import (
     RepairRequestSerializer,
     RepairRequestListSerializer,
@@ -16,6 +23,9 @@ from apps.repairs.serializers import (
     RepairStatusUpdateSerializer,
     RepairNoteSerializer,
     RepairImageSerializer,
+    ChecklistRunSerializer,
+    ChecklistRunItemSerializer,
+    ChecklistRunItemUpdateSerializer,
 )
 from apps.repairs.serializers.staff_dashboard import RecentActivityEntrySerializer
 from apps.repairs.serializers.timeline import (
@@ -287,6 +297,132 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
                 result.append(TimelineCommunicationSerializer(obj).data)
         return Response(result)
 
+    # ---------- Etap 4.5: Checklista (pracownik) ----------
+    @action(detail=True, methods=["get"], url_path="checklist", permission_classes=[IsStaffOrAdmin])
+    def checklist(self, request, pk=None):
+        """
+        GET /api/v1/repairs/<id>/checklist/
+        - jeśli checklist run nie istnieje: tworzymy run na podstawie szablonu dla kategorii urządzenia
+        - zwracamy run + pozycje (dla UI pracownika)
+        """
+        repair = self.get_object()
+
+        device_category = getattr(getattr(repair, "device", None), "category", None)
+        templates_qs = ChecklistTemplate.objects.filter(is_active=True)
+        if device_category:
+            templates_qs = templates_qs.filter(device_category_code=device_category)
+        template = templates_qs.order_by("-created_at").first()
+        if not template:
+            template = ChecklistTemplate.objects.filter(is_active=True).order_by("-created_at").first()
+
+        if not template:
+            return Response({"run": None, "items": []})
+
+        run = (
+            repair.checklist_runs.select_related("template", "started_by")
+            .order_by("-started_at")
+            .first()
+        )
+
+        # Jeśli run nie istnieje — utwórz domyślną listę pozycji z szablonu
+        if not run:
+            run = ChecklistRun.objects.create(repair=repair, template=template, started_by=request.user, status="in_progress")
+            items = template.items.all().order_by("sort_order")
+            for ti in items:
+                ChecklistRunItem.objects.create(run=run, template_item=ti, result="", note="")
+        else:
+            # Dopilnujmy spójności (jeśli szablon zmienił się po utworzeniu run)
+            existing_ids = set(run.items.values_list("template_item_id", flat=True))
+            for ti in template.items.all().order_by("sort_order"):
+                if ti.id in existing_ids:
+                    continue
+                ChecklistRunItem.objects.create(run=run, template_item=ti, result="", note="")
+
+        items_qs = run.items.select_related("template_item", "checked_by").order_by("template_item__sort_order")
+        return Response(
+            {
+                "run": ChecklistRunSerializer(run).data,
+                "items": ChecklistRunItemSerializer(items_qs, many=True).data,
+            }
+        )
+
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_path="checklist/item",
+        permission_classes=[IsStaffOrAdmin],
+    )
+    def checklist_item(self, request, pk=None):
+        """
+        PATCH /api/v1/repairs/<id>/checklist/item/
+        Body: { item_id, checked?, result?, note? }
+        """
+        repair = self.get_object()
+        ser = ChecklistRunItemUpdateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+
+        item_id = ser.validated_data["item_id"]
+        try:
+            item = (
+                ChecklistRunItem.objects.select_related(
+                    "run",
+                    "run__repair",
+                    "checked_by",
+                    "template_item",
+                )
+                .get(id=item_id, run__repair=repair)
+            )
+        except ChecklistRunItem.DoesNotExist:
+            raise NotFound("Pozycja checklista nie istnieje.")
+
+        checked = ser.validated_data.get("checked")
+        result = ser.validated_data.get("result")
+        note = ser.validated_data.get("note")
+
+        # checkbox: checked -> result (niepuste = odhaczone)
+        if checked is not None:
+            if checked:
+                if result is not None and str(result).strip():
+                    item.result = str(result)
+                else:
+                    item.result = "checked"
+                item.checked_by = request.user
+                item.checked_at = timezone.now()
+            else:
+                item.result = ""
+                item.checked_by = None
+                item.checked_at = None
+
+        if result is not None:
+            item.result = result or ""
+            if str(result).strip():
+                item.checked_by = request.user
+                item.checked_at = timezone.now()
+            else:
+                item.checked_by = None
+                item.checked_at = None
+
+        if note is not None:
+            item.note = note or ""
+
+        item.save(update_fields=["result", "note", "checked_by", "checked_at"])
+
+        # Aktualizuj status run (prosto: gdy wszystkie mają wynik niepusty => completed)
+        run = item.run
+        all_items = run.items.all()
+        if all(i.result and str(i.result).strip() for i in all_items):
+            run.status = "completed"
+            if not run.completed_at:
+                run.completed_at = timezone.now()
+            run.save(update_fields=["status", "completed_at"])
+        else:
+            run.status = "in_progress"
+            if run.completed_at:
+                run.completed_at = None
+            run.save(update_fields=["status", "completed_at"])
+
+        return Response(ChecklistRunItemSerializer(item).data)
+
     # ---------- Etap 4: Szybkie akcje — notatka ----------
     @action(detail=True, methods=["post"], url_path="notes", permission_classes=[IsStaffOrAdmin])
     def add_note(self, request, pk=None):
@@ -320,12 +456,27 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
     # ---------- Etap 4: Szybkie akcje — przypisanie ----------
     @action(detail=True, methods=["post"], url_path="assign", permission_classes=[IsStaffOrAdmin])
     def assign(self, request, pk=None):
-        """POST /api/v1/repairs/<id>/assign/ — przypisz do siebie (brak body) lub do assigned_to_id."""
+        """
+        POST /api/v1/repairs/<id>/assign/
+        Admin: może przypisać do dowolnego pracownika (assigned_to_id w body).
+        Staff: może tylko przypisać do siebie (body ignorowane).
+        """
+        from django.contrib.auth import get_user_model
         repair = self.get_object()
         ser = AssignRepairSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        assigned_to_id = ser.validated_data.get("assigned_to_id") or request.user.id
         notes = ser.validated_data.get("notes", "")
+        if getattr(request.user, "role", None) == "admin":
+            assigned_to_id = ser.validated_data.get("assigned_to_id") or request.user.id
+            if assigned_to_id:
+                assignee = get_user_model().objects.filter(pk=assigned_to_id).first()
+                if not assignee or getattr(assignee, "role", None) not in ("staff", "admin"):
+                    return Response(
+                        {"detail": "Przypisanie tylko do pracownika lub administratora."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+        else:
+            assigned_to_id = request.user.id
         assign_repair(repair, assigned_to_id=assigned_to_id, assigned_by_id=request.user.id, notes=notes)
         from apps.accounts.services.notification_service import notify_repair_assigned
         notify_repair_assigned(repair, assigned_to_id)

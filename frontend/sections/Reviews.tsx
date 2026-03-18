@@ -63,7 +63,7 @@ const REVIEWS = [
   },
 ];
 
-const ROTATE_INTERVAL_MS = 5500;
+const ROTATE_INTERVAL_MS = 15000;
 
 export function Reviews() {
   const [index, setIndex] = useState(0);

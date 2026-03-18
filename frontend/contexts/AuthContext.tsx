@@ -31,6 +31,7 @@ export interface RegisterData {
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<{ ok: boolean; error?: string; user?: User }>;
+  staffLogin: (email: string, password: string) => Promise<{ ok: boolean; error?: string; user?: User }>;
   register: (data: RegisterData) => Promise<{ ok: boolean; error?: string; email?: string }>;
   verifyEmail: (email: string, code: string) => Promise<{ ok: boolean; error?: string }>;
   resendVerificationCode: (email: string) => Promise<{ ok: boolean; error?: string; retryAfterSeconds?: number }>;
@@ -80,6 +81,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (email: string, password: string): Promise<{ ok: boolean; error?: string; user?: User }> => {
       try {
         const res = await api.post<{ token: string; user: User }>("/accounts/login/", {
+          email: email.trim().toLowerCase(),
+          password,
+        });
+        const data = res as { token: string; user: User };
+        setStoredToken(data.token);
+        setToken(data.token);
+        setUser(data.user);
+        return { ok: true, user: data.user };
+      } catch (e) {
+        const raw = e instanceof Error ? e.message : "Nieprawidłowy e-mail lub hasło.";
+        const msg =
+          raw === "Failed to fetch" || raw.includes("fetch")
+            ? "Nie można połączyć z serwerem. Upewnij się, że backend jest uruchomiony (port 8000)."
+            : raw;
+        return { ok: false, error: msg };
+      }
+    },
+    []
+  );
+
+  const staffLogin = useCallback(
+    async (email: string, password: string): Promise<{ ok: boolean; error?: string; user?: User }> => {
+      try {
+        const res = await api.post<{ token: string; user: User }>("/accounts/staff-login/", {
           email: email.trim().toLowerCase(),
           password,
         });
@@ -196,6 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     loading,
     login,
+    staffLogin,
     register,
     verifyEmail,
     resendVerificationCode,

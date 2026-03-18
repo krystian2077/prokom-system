@@ -1,6 +1,5 @@
 """Serializery dla modelu Client."""
 from rest_framework import serializers
-from apps.common.enums import ContactPreference, ClientType, ClientSegment
 from ..models import Client
 
 
@@ -24,9 +23,22 @@ class ClientListSerializer(serializers.ModelSerializer):
             "client_segment_display",
             "visit_count",
             "total_repairs",
+            "last_visit_at",
+            "company_name",
+            "nip",
+            "contact_person",
+            "is_vip",
+            "is_blacklisted",
             "created_at",
         ]
-        read_only_fields = ["id", "client_number", "total_repairs", "visit_count", "created_at"]
+        read_only_fields = [
+            "id",
+            "client_number",
+            "total_repairs",
+            "visit_count",
+            "created_at",
+            "last_visit_at",
+        ]
 
     def get_full_name(self, obj):
         return obj.get_full_name()

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -9,11 +9,15 @@ import { getStoredToken } from "@/lib/auth-storage";
 
 export default function ClaimRepairPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tokenFromUrl = searchParams.get("token") ?? "";
+  const [tokenFromUrl, setTokenFromUrl] = useState("");
   const { token, user, loading: authLoading } = useAuth();
   const [status, setStatus] = useState<"idle" | "claiming" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    setTokenFromUrl(sp.get("token") ?? "");
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;

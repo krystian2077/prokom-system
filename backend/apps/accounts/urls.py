@@ -10,6 +10,7 @@ from .views import (
     RequestPasswordResetView,
     ResetPasswordView,
     ChangePasswordView,
+    StaffLoginView,
 )
 from .views.notification_views import (
     StaffNotificationListView,
@@ -31,6 +32,7 @@ app_name = "accounts"
 
 urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
+    path("staff-login/", StaffLoginView.as_view(), name="staff-login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("verify-email/", VerifyEmailView.as_view(), name="verify-email"),
     path("resend-verification-code/", ResendVerificationCodeView.as_view(), name="resend-verification-code"),

@@ -210,7 +210,13 @@ export function OfertaContent() {
             <Link href="#smartfony" className="hs-cell relative min-h-[250px] rounded-tr-[24px] overflow-hidden bg-gradient-to-br from-[#2a2a5a] to-[#1a1a3a] group hover:scale-[1.02] hover:z-[2] transition-transform duration-300">
               <div className="absolute inset-0 flex items-center justify-center p-4">
                 <div className="relative w-[180px] h-[240px]" style={{ animation: "float 4.2s .2s ease infinite" }}>
-                  <Image src={`${OFFERTA_IMG}/iphone17.png`} alt="iPhone 17" fill className="object-contain object-center" sizes="180px" />
+                  <Image
+                    src={`${OFFERTA_IMG}/${encodeURIComponent("AppleWhite Phone17.png")}`}
+                    alt="iPhone 17"
+                    fill
+                    className="object-contain object-center"
+                    sizes="180px"
+                  />
                 </div>
               </div>
               <span className="absolute top-3 left-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-medium text-white z-10 backdrop-blur-sm">Nowość 2026</span>
@@ -313,7 +319,7 @@ export function OfertaContent() {
             <div className="bg-white rounded-[18px] border border-[var(--border)] p-6">
               <p className="font-[family-name:var(--font-unbounded)] font-bold text-[var(--text)] mb-4">Dlaczego warto kupić u nas</p>
               <ul className="space-y-3">
-                {["Gwarancja i serwis w jednym miejscu", "Możliwość obejrzenia przed zakupem", "Doradztwo bez wciskania", "Faktury VAT", "Partner Amso — pewny sprzęt"].map((item, i) => (
+                {["Gwarancja i serwis w jednym miejscu", "Doradztwo bez wciskania", "Faktury VAT", "Partner Amso — pewny sprzęt"].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <span className="w-2 h-2 rounded-full bg-[var(--red)] shrink-0" />
                     <span className="text-[var(--text2)] text-sm">{item}</span>
@@ -363,14 +369,14 @@ export function OfertaContent() {
           {brand === "iphone" && (
             <div className="phone-panels-grid grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { img: "17promax.png", name: "iPhone 17 Pro Max", desc: "6.9\" ProMotion · A19 Pro · Camera Control · Titanium", badge: "✦ Flagship" },
-                { img: "iphone17pro.png", name: "iPhone 17 Pro", desc: "6.3\" ProMotion · A19 Pro · 48 MP · Titanium", badge: "✦ Nowość 2025" },
-                { img: "iphone17.png", name: "iPhone 17", desc: "6.1\" · A18 · 48 MP · Dynamic Island" },
+                { img: "iPhone17 ProMax.png", name: "iPhone 17 Pro Max", desc: "6.9\" ProMotion · A19 Pro · Camera Control · Titanium", badge: "✦ Flagship" },
+                { img: "AppleiPhone17Pro.png", name: "iPhone 17 Pro", desc: "6.3\" ProMotion · A19 Pro · 48 MP · Titanium", badge: "✦ Nowość 2025" },
+                { img: "AppleWhite Phone17.png", name: "iPhone 17", desc: "6.1\" · A18 · 48 MP · Dynamic Island" },
               ].map((p) => (
                 <div key={p.name} className="product-card rounded-[20px] border border-[var(--border)] bg-white overflow-hidden hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,.1)] transition-all duration-300">
                   <div className="pc-img min-h-[320px] py-8 relative bg-gradient-to-br from-[#0a0a0f] via-[#14141c] to-[#1a1a28] flex items-center justify-center">
                     <div className="relative w-[160px] h-[260px] flex-shrink-0" style={{ animation: "float 4.2s ease infinite" }}>
-                      <Image src={`${OFFERTA_IMG}/${p.img}`} alt={p.name} fill className="object-contain object-center" sizes="200px" priority={false} />
+                      <Image src={`${OFFERTA_IMG}/${encodeURIComponent(p.img)}`} alt={p.name} fill className="object-contain object-center" sizes="200px" priority={false} />
                     </div>
                   </div>
                   <div className="pc-body p-4">

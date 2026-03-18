@@ -150,6 +150,60 @@ class LoginView(APIView):
         )
 
 
+class StaffLoginView(APIView):
+    """
+    POST /api/v1/accounts/staff-login/
+    Logowanie wyłącznie dla ról staff/admin (panel pracownika).
+
+    Body: { "email": "...", "password": "..." }
+    Zwraca: { "token": "...", "user": { ... } }
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        blocked, response = _check_login_ip_block(request)
+        if blocked:
+            return response
+
+        email_from_request = (request.data.get("email") or "").strip().lower()
+        serializer = LoginSerializer(data=request.data, context={"request": request})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception:
+            _log_login(request, None, "failed")
+            _log_failed_login_and_maybe_lock(request, email_from_request)
+            raise
+
+        user = serializer.validated_data["user"]
+
+        # Tylko role staff/admin mają dostęp do panelu pracownika.
+        if getattr(user, "role", None) not in (UserRole.STAFF, UserRole.ADMIN):
+            _log_login(request, None, "failed")
+            _log_failed_login_and_maybe_lock(request, email_from_request)
+            from rest_framework.exceptions import ValidationError
+
+            raise ValidationError("Nieprawidłowy e-mail lub hasło.")
+
+        if not user.is_active:
+            _log_login(request, None, "failed")
+            _log_failed_login_and_maybe_lock(request, email_from_request)
+            from rest_framework.exceptions import ValidationError
+
+            raise ValidationError("Nieprawidłowy e-mail lub hasło.")
+
+        _log_login(request, user, "success")
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response(
+            {
+                "token": token.key,
+                "user": UserSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
 def _send_verification_code(user):
     from apps.accounts.services.email_verification import generate_and_send_verification_code
     return generate_and_send_verification_code(user)
