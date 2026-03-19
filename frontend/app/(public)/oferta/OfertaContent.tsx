@@ -118,7 +118,6 @@ type BrandTab = "samsung" | "iphone" | "xiaomi";
 
 export function OfertaContent() {
   const [brand, setBrand] = useState<BrandTab>("samsung");
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [formSent, setFormSent] = useState(false);
   const [interestOpen, setInterestOpen] = useState(false);
   const [interestValue, setInterestValue] = useState("");
@@ -543,28 +542,40 @@ export function OfertaContent() {
               <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
                 Laptopy <span style={{ color: "var(--red)" }}>biznesowe.</span>
               </h2>
-              <p className="text-[#3e4255] max-w-[480px]">EliteBook, ThinkPad, Latitude — nowe laptopy klasy biznesowej z gwarancją producenta.</p>
+              <p className="text-[#3e4255] max-w-[480px]">
+                Dell, Lenovo, HP — nowe laptopy klasy biznesowej z gwarancją producenta.
+              </p>
             </div>
             <Link href="#formularz" className="btn-primary shrink-0">Zapytaj o ofertę →</Link>
           </div>
           <div className="lb-grid grid md:grid-cols-3 gap-5">
             {[
-              { img: "asusexpertbooklaptopbiznesowy.png", brand: "HP", name: "EliteBook 840 / 860", models: "EliteBook 840 G11 / 860 G11 · Intel Core Ultra · 14\" / 16\" IPS", desc: "Aluminiowa obudowa, Sure View, odcisk palca, certyfikat MIL-STD-810.", features: "🔒 Odcisk + kamera IR · ⚡ Intel Core Ultra · 🎯 Certyfikat MIL-STD-810" },
-              { img: "lenovoyhinkbook.png", brand: "Lenovo", name: "ThinkPad L / T / X", models: "ThinkPad T14/T16 · ThinkPad X1 Carbon · ThinkPad L15 · AMD/Intel", desc: "Kultowe ThinkPady. X1 Carbon ultrabook premium, T-series klasyka.", features: "⌨️ Kultowa klawiatura · 🔋 Bateria do 28h · 🪶 X1 Carbon od 1,12 kg" },
-              { img: "delllaptop.png", brand: "Dell", name: "Latitude 5000 / 7000", models: "Latitude 5550 / 7450 · Intel Core Ultra · 13\"/14\"/15\"", desc: "Sprawdzony wybór działów IT. TPM 2.0, LTE, łatwy serwis.", features: "🌐 Opcjonalne LTE 5G · 🛡️ TPM 2.0 + BitLocker · 🔧 Łatwy serwis" },
+              {
+                img: "asusexpertbooklaptopbiznesowy.png",
+                brand: "Asus",
+                desc: "Lekkie i wytrzymałe konstrukcje do codziennej pracy. Dopasujemy konfigurację pod Twój zespół i budżet.",
+              },
+              {
+                img: "lenovoyhinkbook.png",
+                brand: "Lenovo",
+                desc: "Ergonomia, niezawodność i świetna klawiatura. Konfigurujemy sprzęt tak, by działał stabilnie każdego dnia.",
+              },
+              {
+                img: "delllaptop.png",
+                brand: "Dell",
+                desc: "Biznesowe rozwiązania dla działów IT: prosta obsługa i szeroka kompatybilność. Wybierz wariant pod firmę.",
+              },
             ].map((item) => (
-              <Link key={item.name} href="#formularz" className="lb-card block rounded-[22px] border border-white/10 bg-white/[0.025] overflow-hidden hover:border-[rgba(220,30,30,.22)] hover:-translate-y-1 hover:shadow-[0_16px_44px_rgba(0,0,0,.35)] transition-all duration-300">
+              <Link key={item.brand} href="#formularz" className="lb-card block rounded-[22px] border border-white/10 bg-white/[0.025] overflow-hidden hover:border-[rgba(220,30,30,.22)] hover:-translate-y-1 hover:shadow-[0_16px_44px_rgba(0,0,0,.35)] transition-all duration-300">
                 <div className="lb-visual min-h-[280px] py-8 relative bg-gradient-to-br from-[#060e1a] via-[#0c1c32] to-[#122640] flex items-center justify-center">
                   <div className="relative w-[240px] h-[160px] flex-shrink-0" style={{ animation: "float 4.5s ease infinite" }}>
-                    <Image src={`${OFFERTA_IMG}/${item.img}`} alt={item.name} fill className="object-contain object-center" sizes="280px" />
+                    <Image src={`${OFFERTA_IMG}/${item.img}`} alt={`${item.brand} laptop`} fill className="object-contain object-center" sizes="280px" />
                   </div>
                 </div>
                 <div className="lb-body p-5">
                   <p className="text-[9.5px] uppercase tracking-wider text-[var(--muted)]">{item.brand}</p>
-                  <p className="font-[family-name:var(--font-unbounded)] font-black text-base text-white mt-1">{item.name}</p>
-                  <p className="text-[12px] text-[#525b6e] mt-2">{item.models}</p>
-                  <p className="text-[13px] text-[#3e4255] mt-2">{item.desc}</p>
-                  <p className="text-[12px] text-[#525b6e] mt-3">{item.features}</p>
+                  <p className="font-[family-name:var(--font-unbounded)] font-black text-base text-white mt-1">{item.brand} biznesowe</p>
+                  <p className="text-[13px] text-[#525b6e] mt-2">{item.desc}</p>
                 </div>
               </Link>
             ))}
@@ -576,7 +587,7 @@ export function OfertaContent() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="#formularz" className="btn-primary">Zapytaj o ofertę</Link>
-              <a href="tel:883200151" className="btn-ghost border-white/20 text-white hover:border-[var(--red-border)]">883 200 151</a>
+              <a href="tel:883200151" className="btn-ghost border-white/20 !text-white hover:border-[var(--red-border)] hover:!text-white">883 200 151</a>
             </div>
           </div>
         </div>
@@ -708,10 +719,13 @@ export function OfertaContent() {
         <div className="absolute inset-0 pointer-events-none opacity-60" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.01) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
         <div className="mx-auto max-w-[1300px] relative">
           <div className="biz-head flex flex-wrap justify-between items-start gap-6 mb-12">
-            <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white">
-              Komputery <span style={{ color: "var(--red)" }}>biznesowe.</span>
-            </h2>
-            <p className="text-[#3e4255] max-w-[400px]">OptiPlex, ThinkCentre, ProDesk — kompakty i wieże do biura.</p>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#525b6e] mb-2">Nowe · Biznesowe</p>
+              <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
+                Komputery <span style={{ color: "var(--red)" }}>biznesowe.</span>
+              </h2>
+              <p className="text-[#3e4255] max-w-[480px]">OptiPlex, ThinkCentre, ProDesk — kompakty i wieże do biura.</p>
+            </div>
             <Link href="#formularz" className="btn-primary shrink-0">Zapytaj o ofertę →</Link>
           </div>
           <div className="biz-grid grid md:grid-cols-3 gap-5">
@@ -734,6 +748,16 @@ export function OfertaContent() {
                 </div>
               </Link>
             ))}
+          </div>
+          <div className="mt-8 flex flex-wrap justify-between items-center gap-4 rounded-2xl border border-[rgba(220,30,30,.18)] bg-[rgba(220,30,30,.07)] p-5 sm:p-6">
+            <div>
+              <p className="font-bold text-white">Nie wiesz który model wybrać?</p>
+              <p className="text-[13px] text-[#525b6e] mt-1">Zadzwoń lub napisz — doradzimy bez wciskania.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link href="#formularz" className="btn-primary">Zapytaj o ofertę</Link>
+              <a href="tel:883200151" className="btn-ghost border-white/20 !text-white hover:border-[var(--red-border)] hover:!text-white">883 200 151</a>
+            </div>
           </div>
         </div>
       </section>
@@ -819,7 +843,7 @@ export function OfertaContent() {
               <p className="text-[#9ca3b8] mb-8">Składamy zestawy pod Twoją grę i budżet. Zero wciskania — tylko sensowna konfiguracja.</p>
               <div className="space-y-4">
                 {[
-                  { num: "01", title: "Przyjdź i powiedz nam w co grasz", desc: "Counter-Strike, Cyberpunk, Fortnite — każda gra ma inne wymagania." },
+                  { num: "01", title: "Przyjdź i powiedz nam w co grasz lub do czego używasz komputera", desc: "Counter-Strike, Cyberpunk, Fortnite, Praca kreatywna, Programowanie, AI — każdy program ma inne wymagania." },
                   { num: "02", title: "Ustalamy budżet i konfigurację", desc: "Pokażemy kilka opcji, wyjaśnimy różnice. Zero wciskania." },
                   { num: "03", title: "Zamawiamy części i składamy", desc: "Profesjonalny montaż, testy stabilności. Odbierasz gotowy komputer." },
                 ].map((step) => (
@@ -872,41 +896,7 @@ export function OfertaContent() {
         </div>
       </section>
 
-      {/* 11. FAQ */}
-      <section className="bg-white border-b border-[var(--border)] section-padding py-20 px-4 sm:px-8 lg:px-[52px]">
-        <div className="mx-auto max-w-[900px]">
-          <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-[var(--text)] text-center mb-12">
-            Masz pytania? <span style={{ color: "var(--red)" }}>Mamy odpowiedzi.</span>
-          </h2>
-          <div className="border-t border-[var(--border)]">
-            {[
-              { q: "Czy sprzęt poleasingowy jest sprawny i bezpieczny?", a: "Tak. Jako partner Amso sprzedajemy wyłącznie sprzęt z pełną diagnostyką i certyfikowanym czyszczeniem danych (NIST/DoD). Każde urządzenie ma dokument." },
-              { q: "Czy możecie zamówić model którego nie ma w sklepie?", a: "W wielu przypadkach tak. Skontaktuj się przez formularz lub telefon — sprawdzimy dostępność." },
-              { q: "Czy wystawiacie fakturę VAT?", a: "Tak, dla firm i osób prywatnych. Na miejscu lub e-mailem." },
-              { q: "Czy mogę przyjść obejrzeć sprzęt przed zakupem?", a: "Oczywiście! ul. Orkana 16B, Rabka-Zdrój, pon–pt 9:00–17:00, sob 9:00–14:00." },
-              { q: "Kiedy ruszy wysyłka?", a: "Pracujemy nad uruchomieniem wysyłki do całej Polski — wkrótce." },
-            ].map((item, i) => (
-              <div key={i} className="faq-item border-b border-[var(--border)]">
-                <button
-                  type="button"
-                  onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                  className="faq-q w-full flex justify-between items-center py-5 px-1 text-left hover:text-[var(--red)] active:text-[var(--red)] transition-colors"
-                >
-                  <span className="font-medium text-[var(--text)] pr-4">{item.q}</span>
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors ${faqOpen === i ? "bg-[var(--red)] text-white" : "bg-[var(--bg2)] text-[var(--text2)]"}`}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: faqOpen === i ? "rotate(45deg)" : "none" }}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                  </span>
-                </button>
-                <div className="faq-a overflow-hidden transition-[max-height] duration-400 ease-out" style={{ maxHeight: faqOpen === i ? 400 : 0 }}>
-                  <p className="pb-5 pt-0 px-1 text-[var(--text2)] text-[15px] leading-relaxed">{item.a}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 12. FORMULARZ */}
+      {/* 11. FORMULARZ */}
       <section id="formularz" className="relative overflow-hidden bg-[#09090d] section-padding py-20 px-4 sm:px-8 lg:px-[52px]">
         <div className="cf-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(220,30,30,.08), transparent 60%)" }} />
         <div className="mx-auto max-w-[1300px] relative">
