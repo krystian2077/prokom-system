@@ -22,10 +22,12 @@ class StaffRepairsListView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrAdmin]
 
     def get(self, request):
+        unassigned_flag = request.query_params.get("unassigned_only", "").lower() in ("1", "true", "yes")
         qs = repair_list(
             status=request.query_params.get("status"),
             status_in=request.query_params.getlist("status_in") or None,
             assigned_to_id=request.query_params.get("assigned_to"),
+            unassigned_only=unassigned_flag,
             client_id=request.query_params.get("client"),
             search=request.query_params.get("search"),
             tags=request.query_params.getlist("tags") or request.query_params.getlist("tag") or None,

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, Suspense, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { WorkerSidebar } from "@/components/panel/WorkerSidebar";
 import { PanelTopbar } from "@/components/panel/PanelTopbar";
@@ -32,7 +32,13 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
         children
       ) : (
         <div className="flex min-h-screen">
-          <WorkerSidebar />
+          <Suspense
+            fallback={
+              <aside className="relative z-[120] hidden w-[248px] shrink-0 flex-col border-r border-white/5 bg-[#0f1117] md:flex" />
+            }
+          >
+            <WorkerSidebar />
+          </Suspense>
           <div className="flex min-w-0 flex-1 flex-col">
             <PanelTopbar />
             <div className="min-w-0 flex-1">

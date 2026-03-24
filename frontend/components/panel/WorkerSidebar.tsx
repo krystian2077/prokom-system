@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,16 +15,22 @@ import {
   CircleUserRound,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
+
+const archivedRepairStatuses = new Set(["picked_up", "shipped", "delivered", "cancelled", "unrepairable", "abandoned"]);
 
 export function WorkerSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, token, logout } = useAuth();
+
+  const panelUser = user && ["staff", "admin"].includes(user.role) ? user : null;
 
   // Badge counts (minimal, non-blocking)
   const dashboardCountsQuery = useQuery({
     queryKey: ["sidebar", "dashboard-buckets"],
-    enabled: Boolean(token && user && user.role === "staff"),
+    enabled: Boolean(token && panelUser),
     queryFn: async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/repairs/dashboard/?days_without_update=3`, {
         headers: token ? { Authorization: `Token ${token}` } : {},
@@ -44,22 +50,28 @@ export function WorkerSidebar() {
   });
 
   const requiresActionCountQuery = useQuery({
-    queryKey: ["sidebar", "requires-action"],
-    enabled: Boolean(token && user && user.role === "staff"),
+    queryKey: ["sidebar", "requires-action", user?.id, user?.role],
+    enabled: Boolean(token && panelUser?.id),
     queryFn: async () => {
-      const assignedTo = user?.id;
-      if (!assignedTo) return 0;
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/repairs/special-views/requires-action/?assigned_to=${encodeURIComponent(
-          assignedTo,
-        )}`,
-        { headers: token ? { Authorization: `Token ${token}` } : {} },
-      );
-      if (!res.ok) return 0;
-      const data = await res.json();
-      if (Array.isArray(data)) return data.length;
-      if (Array.isArray(data?.items)) return data.items.length;
-      return 0;
+      if (!token || !panelUser?.id) return 0;
+      const path =
+        panelUser.role === "admin"
+          ? `/repairs/special-views/requires-action/`
+          : `/repairs/special-views/requires-action/?assigned_to=${panelUser.id}`;
+      const data = await api.get<RepairRequestListItem[]>(path, token);
+      return Array.isArray(data) ? data.length : 0;
+    },
+    staleTime: 15_000,
+  });
+
+  const unassignedCountQuery = useQuery({
+    queryKey: ["sidebar", "unassigned-count"],
+    enabled: Boolean(token && panelUser),
+    queryFn: async () => {
+      if (!token) return 0;
+      const rows = await api.get<RepairRequestListItem[]>(`/staff/repairs/?ordering=-created_at&unassigned_only=1`, token);
+      const list = rows ?? [];
+      return list.filter((r) => !archivedRepairStatuses.has((r.status ?? "").toLowerCase())).length;
     },
     staleTime: 15_000,
   });
@@ -72,10 +84,12 @@ export function WorkerSidebar() {
   }, [dashboardCountsQuery.data]);
 
   const requiresActionCount = (requiresActionCountQuery.data ?? 0) as number;
+  const unassignedCount = unassignedCountQuery.data ?? null;
+  const requiresActionNavActive = pathname === "/panel/dashboard" && searchParams.get("focus") === "requires-action";
 
   const notifBadgeCountQuery = useQuery({
     queryKey: ["sidebar", "notif-count"],
-    enabled: Boolean(token && user && user.role === "staff"),
+    enabled: Boolean(token && panelUser),
     queryFn: async () => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/accounts/notifications/requires-action/`,
@@ -110,7 +124,7 @@ export function WorkerSidebar() {
           <div className="min-w-0">
             <div className="text-[13px] font-bold tracking-[0.2em] text-[#9ca3af]">PRO-KOM</div>
             <div className="mt-1 truncate text-sm font-semibold" style={{ color: "#d0d4de" }}>
-              Panel pracownika
+              {user?.role === "admin" ? "Panel Admina" : "Panel pracownika"}
             </div>
           </div>
           <span
@@ -208,7 +222,16 @@ export function WorkerSidebar() {
                   </span>
                   <span className="truncate text-sm font-semibold">Nieprzypisane</span>
                 </div>
-                <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]">0</span>
+                <span
+                  className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]"
+                  style={{
+                    color: "white",
+                    borderColor: "rgba(59,130,246,.35)",
+                    background: "rgba(59,130,246,.14)",
+                  }}
+                >
+                  {unassignedCount ?? "…"}
+                </span>
               </Link>
 
               <Link
@@ -242,16 +265,22 @@ export function WorkerSidebar() {
 
             <div className="space-y-1">
               <Link
-                href="/panel/repairs"
+                href="/panel/dashboard?focus=requires-action"
                 className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
                 style={{
-                  background: pathname.startsWith("/panel/dashboard") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/dashboard") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/dashboard") ? "3px solid #3b82f6" : "3px solid transparent",
+                  background: requiresActionNavActive ? "rgba(59,130,246,.12)" : "transparent",
+                  color: requiresActionNavActive ? "#fff" : "rgba(208,212,222,.9)",
+                  borderLeft: requiresActionNavActive ? "3px solid #3b82f6" : "3px solid transparent",
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: "rgba(59,130,246,.18)", border: "1px solid rgba(59,130,246,.35)" }}>
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background: requiresActionNavActive ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
+                      border: requiresActionNavActive ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
                     <Bell size={18} />
                   </span>
                   <span className="text-sm font-semibold">Wymaga reakcji</span>
@@ -351,7 +380,7 @@ export function WorkerSidebar() {
       </nav>
 
       <div className="border-t border-white/5 p-4 pb-5">
-        <div className="flex items-center gap-3">
+        <Link href="/panel/profil" className="flex items-center gap-3 rounded-2xl transition hover:bg-white/5">
           <span
             className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-bold text-white"
             style={{ boxShadow: "0 0 26px rgba(59,130,246,.12)" }}
@@ -360,9 +389,9 @@ export function WorkerSidebar() {
           </span>
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-semibold text-white">{user?.full_name || user?.email || "—"}</div>
-            <div className="truncate text-xs text-[#9ca3af]">{user?.role === "admin" ? "Admin" : "Pracownik"}</div>
+            <div className="truncate text-xs text-[#9ca3af]">{user?.role === "admin" ? "Admin" : "Pracownik"} · Profil</div>
           </div>
-        </div>
+        </Link>
 
         <button
           type="button"

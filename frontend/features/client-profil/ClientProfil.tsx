@@ -144,7 +144,7 @@ export function ClientProfil() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <h1 className="font-extrabold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(22px, 2.5vw, 28px)" }}>
+        <h1 className="cp-heading font-extrabold" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(22px, 2.5vw, 28px)" }}>
           Profil
         </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
@@ -163,7 +163,7 @@ export function ClientProfil() {
               >
                 {profile.firstName?.[0]?.toUpperCase() ?? "?"}
               </div>
-              <p className="text-center font-bold text-white" style={{ fontFamily: "var(--font-unbounded)" }}>
+              <p className="cp-heading text-center font-bold" style={{ fontFamily: "var(--font-unbounded)" }}>
                 {profile.firstName} {profile.lastName}
               </p>
               <p className="mt-1 text-center text-sm" style={{ color: "var(--ink2)" }}>
@@ -178,19 +178,19 @@ export function ClientProfil() {
               <ul className="mt-4 space-y-2 text-sm">
                 <li className="flex justify-between">
                   <span style={{ color: "var(--muted)" }}>Naprawy łącznie</span>
-                  <span className="text-white">{stats?.total ?? "–"}</span>
+                  <span className="cp-heading">{stats?.total ?? "–"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span style={{ color: "var(--muted)" }}>Klient od</span>
-                  <span className="text-white">{profile.createdAt ? formatMonthYear(profile.createdAt) : "–"}</span>
+                  <span className="cp-heading">{profile.createdAt ? formatMonthYear(profile.createdAt) : "–"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span style={{ color: "var(--muted)" }}>Ostatnie zgłoszenie</span>
-                  <span className="text-white">{profile.lastRepairAt ? formatDate(profile.lastRepairAt) : "–"}</span>
+                  <span className="cp-heading">{profile.lastRepairAt ? formatDate(profile.lastRepairAt) : "–"}</span>
                 </li>
                 <li className="flex justify-between">
                   <span style={{ color: "var(--muted)" }}>Preferowany kontakt</span>
-                  <span className="text-white">
+                  <span className="cp-heading">
                     {PREFERRED_CONTACT_OPTIONS.find((o) => o.value === preferredContact)?.label ?? "E-mail"}
                   </span>
                 </li>
@@ -199,7 +199,7 @@ export function ClientProfil() {
                 <p className="text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
                   Numer klienta
                 </p>
-                <p className="mt-1 font-mono text-sm text-white" style={{ fontFamily: "'Courier New', monospace" }}>
+                <p className="mt-1 font-mono text-sm text-[var(--ink)]" style={{ fontFamily: "'Courier New', monospace" }}>
                   {profile.id}
                 </p>
               </div>
@@ -218,7 +218,7 @@ export function ClientProfil() {
                 👤
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Dane kontaktowe
                 </h2>
                 <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
@@ -235,7 +235,7 @@ export function ClientProfil() {
                   type="email"
                   readOnly
                   value={profile?.email ?? ""}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white read-only:opacity-80"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] read-only:opacity-80"
                 />
                 <p className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>tylko do odczytu</p>
               </div>
@@ -248,7 +248,7 @@ export function ClientProfil() {
                     onChange={(e) => setFirstName(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -259,7 +259,7 @@ export function ClientProfil() {
                     onChange={(e) => setLastName(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -271,7 +271,7 @@ export function ClientProfil() {
                   onChange={(e) => setPhone(e.target.value)}
                   readOnly={readOnly}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
                 />
               </div>
               <div>
@@ -280,7 +280,7 @@ export function ClientProfil() {
                   value={preferredContact}
                   onChange={(e) => setPreferredContact(e.target.value as PreferredContact)}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {PREFERRED_CONTACT_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
@@ -312,7 +312,7 @@ export function ClientProfil() {
                 📍
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Adres dostawy
                 </h2>
                 <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
@@ -330,7 +330,7 @@ export function ClientProfil() {
                   onChange={(e) => setStreet(e.target.value)}
                   readOnly={readOnly}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -343,7 +343,7 @@ export function ClientProfil() {
                     onChange={(e) => setCity(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -355,7 +355,7 @@ export function ClientProfil() {
                     onChange={(e) => setZip(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -367,7 +367,7 @@ export function ClientProfil() {
                   onChange={(e) => setCountry(e.target.value)}
                   readOnly={readOnly}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
                 />
               </div>
               <p className="text-[11px]" style={{ color: "var(--muted)" }}>Adres używany przy zleceniach kurierskich</p>
@@ -394,7 +394,7 @@ export function ClientProfil() {
                 🔒
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Hasło i bezpieczeństwo
                 </h2>
                 <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
@@ -431,7 +431,7 @@ export function ClientProfil() {
                         onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError(null); }}
                         placeholder="••••••••"
                         autoComplete="current-password"
-                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-white placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
+                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
                         style={{ borderColor: "var(--border)" }}
                       />
                     </div>
@@ -443,7 +443,7 @@ export function ClientProfil() {
                         onChange={(e) => { setNewPassword(e.target.value); setPasswordError(null); }}
                         placeholder="••••••••"
                         autoComplete="new-password"
-                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-white placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
+                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
                         style={{ borderColor: "var(--border)" }}
                       />
                     </div>
@@ -455,7 +455,7 @@ export function ClientProfil() {
                         onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(null); }}
                         placeholder="••••••••"
                         autoComplete="new-password"
-                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-white placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
+                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
                         style={{ borderColor: "var(--border)" }}
                       />
                     </div>
@@ -536,7 +536,7 @@ export function ClientProfil() {
           style={{ background: "var(--island2)", animation: "saveSuccess .3s ease both" }}
         >
           <span className="text-xl">✅</span>
-          <span className="text-sm font-medium text-white">Zmiany zostały zapisane</span>
+          <span className="cp-heading text-sm font-medium">Zmiany zostały zapisane</span>
         </div>
       )}
     </div>

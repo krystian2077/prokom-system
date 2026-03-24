@@ -12,13 +12,13 @@ export function useClientProfile(): {
   error: string | null;
   refetch: () => void;
 } {
-  const { token } = useAuth();
+  const { token, user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = () => {
-    if (!token) {
+    if (!token || user?.role !== "client") {
       setLoading(false);
       return;
     }
@@ -33,10 +33,18 @@ export function useClientProfile(): {
 
   useEffect(() => {
     let cancelled = false;
-    if (!token) {
+    if (authLoading) {
+      return () => {
+        cancelled = true;
+      };
+    }
+    if (!token || user?.role !== "client") {
       setProfile(null);
+      setError(null);
       setLoading(false);
-      return () => {};
+      return () => {
+        cancelled = true;
+      };
     }
     setLoading(true);
     setError(null);
@@ -54,7 +62,7 @@ export function useClientProfile(): {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, user?.role, authLoading]);
 
   return { profile, loading, error, refetch: fetchProfile };
 }

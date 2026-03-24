@@ -32,6 +32,9 @@ const sizes = {
 const base =
   "font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none inline-flex items-center justify-center gap-2";
 
+/** Link jako motion — animacja na samym <a>, żeby klik nie ginął w zagnieżdżonym spanie (Next + Framer). */
+const MotionLink = motion(Link);
+
 export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
   (
     {
@@ -48,16 +51,15 @@ export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
     const cls = [base, variants[variant], sizes[size], className].join(" ");
     if (href) {
       return (
-        <Link href={href} className="inline-flex">
-          <motion.span
-            className={cls + " inline-flex items-center justify-center gap-2"}
-            whileHover={!disabled ? { scale: 1.02 } : undefined}
-            whileTap={!disabled ? { scale: 0.98 } : undefined}
-            transition={{ duration: 0.2 }}
-          >
-            {children}
-          </motion.span>
-        </Link>
+        <MotionLink
+          href={href}
+          className={cls}
+          whileHover={!disabled ? { scale: 1.02 } : undefined}
+          whileTap={!disabled ? { scale: 0.98 } : undefined}
+          transition={{ duration: 0.2 }}
+        >
+          {children}
+        </MotionLink>
       );
     }
     return (

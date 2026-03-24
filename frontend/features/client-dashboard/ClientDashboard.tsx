@@ -114,7 +114,7 @@ export function ClientDashboard() {
                 PANEL KLIENTA
               </p>
               <h1
-                className="font-extrabold text-white"
+                className="font-extrabold cp-heading"
                 style={{
                   fontFamily: "var(--font-unbounded)",
                   fontSize: "clamp(22px, 2.8vw, 34px)",
@@ -175,7 +175,7 @@ export function ClientDashboard() {
                       >
                         {card.badge}
                       </span>
-                      <p className="text-2xl font-bold text-white">{card.value}</p>
+                      <p className="cp-heading text-2xl font-bold">{card.value}</p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
                         {card.label}
                       </p>
@@ -189,12 +189,12 @@ export function ClientDashboard() {
           {/* Ostatnie naprawy */}
           <div className="panel-card mt-8">
             <div className="panel-card-header flex items-center justify-between">
-              <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+              <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                 Ostatnie naprawy
               </h2>
               <Link
                 href="/client/naprawy"
-                className="text-xs font-medium transition hover:text-white"
+                className="text-xs font-medium transition hover:text-[var(--heading)]"
                 style={{ color: "var(--red)" }}
               >
                 Zobacz wszystkie →
@@ -217,7 +217,7 @@ export function ClientDashboard() {
                   <Link
                     key={repair.id}
                     href={`/client/naprawy/${repair.id}`}
-                    className="repair-row flex flex-wrap items-center gap-3.5 px-5 py-4 transition hover:bg-[rgba(255,255,255,.025)]"
+                    className="repair-row cp-row-hover flex flex-wrap items-center gap-3.5 px-5 py-4 transition"
                   >
                     <div
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg"
@@ -226,7 +226,7 @@ export function ClientDashboard() {
                       {getDeviceEmoji(repair.deviceCategory)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-white">
+                      <p className="cp-heading font-medium">
                         {truncate(repair.problemDescription ? `${repair.deviceModel} – ${repair.problemDescription}` : repair.deviceModel, 60)}
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
@@ -239,7 +239,7 @@ export function ClientDashboard() {
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="text-sm font-medium text-white">{formatPrice(repair.totalPrice)}</span>
+                      <span className="cp-heading text-sm font-medium">{formatPrice(repair.totalPrice)}</span>
                       <StatusBadge status={repair.status} />
                     </div>
                   </Link>
@@ -253,7 +253,7 @@ export function ClientDashboard() {
                     🔧
                   </div>
                   <div>
-                    <p className="font-semibold text-white">Brak napraw</p>
+                    <p className="cp-heading font-semibold">Brak napraw</p>
                     <p className="mt-1 text-sm" style={{ color: "var(--ink2)" }}>
                       Zgłoś usterkę, aby zobaczyć tutaj swoje zgłoszenia.
                     </p>
@@ -275,7 +275,7 @@ export function ClientDashboard() {
         <aside className="flex flex-col gap-5 lg:max-w-[300px]">
           <div className="panel-card" style={{ animation: "fadeUp .5s .2s ease both" }}>
             <div className="panel-card-header">
-              <h3 className="flex items-center gap-2 font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 11 }}>
+              <h3 className="cp-heading flex items-center gap-2 font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 11 }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--green)]" style={{ animation: "statusPulse 1.2s ease infinite" }} />
                 SZYBKIE AKCJE
               </h3>
@@ -310,7 +310,7 @@ export function ClientDashboard() {
 
           <div className="panel-card" style={{ animation: "fadeUp .5s .25s ease both" }}>
             <div className="panel-card-header">
-              <h3 className="flex items-center gap-2 font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 11 }}>
+              <h3 className="cp-heading flex items-center gap-2 font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 11 }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--green)]" style={{ animation: "statusPulse 1.2s ease infinite" }} />
                 TWÓJ PROFIL
               </h3>
@@ -324,14 +324,14 @@ export function ClientDashboard() {
                 </div>
               ) : (
                 <>
-                  <p className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)" }}>
+                  <p className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)" }}>
                     {profile ? `${profile.firstName} ${profile.lastName}` : "…"}
                   </p>
                   <p className="text-xs" style={{ color: "var(--blue)" }}>Konto aktywne</p>
                   <ul className="mt-3 space-y-1 text-xs">
                     <li className="flex justify-between">
                       <span style={{ color: "var(--muted)" }}>Wszystkie naprawy:</span>
-                      <span className="text-white">{stats?.total ?? "–"}</span>
+                      <span className="cp-heading">{stats?.total ?? "–"}</span>
                     </li>
                     <li className="flex justify-between">
                       <span style={{ color: "var(--muted)" }}>Aktywne:</span>
@@ -339,11 +339,11 @@ export function ClientDashboard() {
                     </li>
                     <li className="flex justify-between">
                       <span style={{ color: "var(--muted)" }}>Zakończone:</span>
-                      <span className="text-white">{(stats ? Math.max(0, (stats.total ?? 0) - (stats.active ?? 0) - (stats.ready ?? 0)) : "–")}</span>
+                      <span className="cp-heading">{(stats ? Math.max(0, (stats.total ?? 0) - (stats.active ?? 0) - (stats.ready ?? 0)) : "–")}</span>
                     </li>
                     <li className="flex justify-between">
                       <span style={{ color: "var(--muted)" }}>Klient od:</span>
-                      <span className="text-white">{profile?.createdAt ? formatMonthYear(profile.createdAt) : "–"}</span>
+                      <span className="cp-heading">{profile?.createdAt ? formatMonthYear(profile.createdAt) : "–"}</span>
                     </li>
                   </ul>
                 </>
@@ -353,7 +353,7 @@ export function ClientDashboard() {
 
           <div className="panel-card" style={{ animation: "fadeUp .5s .28s ease both" }}>
             <div className="panel-card-header">
-              <h3 className="flex items-center gap-2 font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 11 }}>
+              <h3 className="cp-heading flex items-center gap-2 font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 11 }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--green)]" style={{ animation: "statusPulse 1.2s ease infinite" }} />
                 KONTAKT Z SERWISEM
               </h3>

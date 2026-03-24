@@ -42,6 +42,7 @@ def repair_list(
     status=None,
     status_in=None,
     assigned_to_id=None,
+    unassigned_only=False,
     client_id=None,
     priority=None,
     search=None,
@@ -58,7 +59,9 @@ def repair_list(
         qs = qs.filter(status=status)
     if status_in:
         qs = qs.filter(status__in=status_in)
-    if assigned_to_id:
+    if unassigned_only:
+        qs = qs.filter(assigned_to__isnull=True)
+    elif assigned_to_id:
         qs = qs.filter(assigned_to_id=assigned_to_id)
     if client_id:
         qs = qs.filter(client_id=client_id)

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
@@ -109,8 +110,10 @@ function nextAction(item: RepairRequestListItem) {
   return { text: "▶ Kontynuuj naprawę", tone: "neutral" as const };
 }
 
-export default function StaffDashboardPage() {
+function StaffDashboardPage() {
   const { token, user } = useAuth();
+  const searchParams = useSearchParams();
+  const requiresActionSectionRef = useRef<HTMLElement | null>(null);
   const qc = useQueryClient();
 
   const scope = useWorkerStore((s) => s.dashboardScope);
@@ -155,11 +158,15 @@ export default function StaffDashboardPage() {
   });
 
   const requiresActionQuery = useQuery({
-    queryKey: ["dashboard", "requires-action", user?.id, scope],
+    queryKey: ["dashboard", "requires-action", user?.id, user?.role, scope],
     enabled: Boolean(token && user?.id),
     queryFn: async () => {
       if (!token || !user?.id) throw new Error("Missing token/user");
-      return api.get<RepairRequestListItem[]>(`/repairs/special-views/requires-action/?assigned_to=${user.id}`, token);
+      const path =
+        user.role === "admin"
+          ? `/repairs/special-views/requires-action/`
+          : `/repairs/special-views/requires-action/?assigned_to=${user.id}`;
+      return api.get<RepairRequestListItem[]>(path, token);
     },
   });
 
@@ -205,7 +212,7 @@ export default function StaffDashboardPage() {
 
   const manualRefresh = () => {
     qc.invalidateQueries({ queryKey: ["dashboard", "worker", scope] });
-    qc.invalidateQueries({ queryKey: ["dashboard", "requires-action", user?.id, scope] });
+    qc.invalidateQueries({ queryKey: ["dashboard", "requires-action", user?.id, user?.role, scope] });
     qc.invalidateQueries({ queryKey: ["dashboard", "tasks", "due-today"] });
     qc.invalidateQueries({ queryKey: ["dashboard", "team", "today"] });
     qc.invalidateQueries({ queryKey: ["dashboard", "comm", "latest"] });
@@ -239,6 +246,14 @@ export default function StaffDashboardPage() {
   }, [scope, data]);
 
   useEffect(() => {
+    if (searchParams.get("focus") !== "requires-action") return;
+    const t = window.setTimeout(() => {
+      requiresActionSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [searchParams]);
+
+  useEffect(() => {
     if (!token || !user) return;
     const intervalMs = 30_000;
     setCountdown(intervalMs / 1000);
@@ -247,7 +262,7 @@ export default function StaffDashboardPage() {
       setCountdown((c) => {
         if (c <= 1) {
           qc.invalidateQueries({ queryKey: ["dashboard", "worker", scope] });
-          qc.invalidateQueries({ queryKey: ["dashboard", "requires-action", user.id, scope] });
+          qc.invalidateQueries({ queryKey: ["dashboard", "requires-action", user.id, user.role, scope] });
           showToast(
             `✓ Dane odświeżone · ${new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`,
             "success",
@@ -550,7 +565,11 @@ export default function StaffDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+        <section
+          ref={requiresActionSectionRef}
+          id="requires-action"
+          className="scroll-mt-24 rounded-3xl border border-white/10 bg-[#0f1117] p-5"
+        >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#3b82f6]/30 bg-[#3b82f6]/10">
@@ -821,3 +840,17 @@ export default function StaffDashboardPage() {
   );
 }
 
+export default function StaffDashboardPageWithSuspense() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
+          <div className="h-10 w-48 animate-pulse rounded-xl bg-white/10" />
+          <div className="mt-6 h-40 animate-pulse rounded-3xl border border-white/10 bg-[#0f1117]" />
+        </main>
+      }
+    >
+      <StaffDashboardPage />
+    </Suspense>
+  );
+}

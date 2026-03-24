@@ -23,7 +23,7 @@ from apps.accounts.models import (
     EmailVerificationAttempt,
     PasswordResetToken,
 )
-from apps.accounts.serializers import UserSerializer, LoginSerializer, ClientRegisterSerializer
+from apps.accounts.serializers import UserSerializer, UserSelfUpdateSerializer, LoginSerializer, ClientRegisterSerializer
 from apps.clients.models import Client
 from apps.clients.selectors import client_by_email
 
@@ -616,8 +616,17 @@ class CurrentUserView(APIView):
     """
     GET /api/v1/accounts/me/
     Zwraca dane zalogowanego użytkownika.
+
+    PATCH /api/v1/accounts/me/
+    Aktualizacja imienia, nazwiska i telefonu (bez zmiany e-maila).
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        return Response(UserSerializer(request.user).data)
+
+    def patch(self, request):
+        ser = UserSelfUpdateSerializer(request.user, data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        ser.save()
         return Response(UserSerializer(request.user).data)

@@ -388,21 +388,21 @@ export default function ZgloszeniePage() {
   return (
     <div className={`zgloszenie-page min-h-screen ${unbounded.variable} ${jakarta.variable}`} style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}>
       <div
-        className="relative z-10 mx-auto grid min-h-screen max-w-[1340px] grid-cols-1 gap-7 px-6 pb-[60px] pt-10 lg:grid-cols-[1fr_340px] lg:gap-7 lg:px-7 max-[1000px]:px-5 max-[480px]:px-4 max-[480px]:pt-6 max-[480px]:pb-12"
+        className="relative z-10 mx-auto grid min-h-screen max-w-[1340px] grid-cols-1 gap-7 px-6 pb-[60px] pt-10 lg:grid-cols-[1fr_340px] lg:items-start lg:gap-7 lg:px-7 max-[1000px]:px-5 max-[480px]:px-4 max-[480px]:pt-6 max-[480px]:pb-12"
         style={{ alignContent: "start" }}
       >
         {/* MAIN COLUMN */}
-        <div className="min-w-0 max-[1000px]:max-w-full">
+        <div className="min-w-0 max-[1000px]:max-w-full lg:col-start-1 lg:row-start-1">
           <div className="main-inner w-full">
             {/* Page heading */}
             <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--muted)", animation: "zgl-eyebrowIn .5s ease both" }}>
               <span className="h-0.5 w-5 shrink-0 rounded-full" style={{ background: "linear-gradient(90deg, #dc1e1e, transparent)" }} />
               FORMULARZ ZGŁOSZENIA NAPRAWY
             </p>
-            <h1 className="mt-3 font-black leading-[0.88] tracking-[-0.055em] max-[480px]:text-[24px] sm:text-[clamp(26px,3.4vw,44px)]" style={{ fontFamily: "var(--font-unbounded)", color: "var(--white)", animation: "zgl-fadeUp .55s .06s ease both" }}>
+            <h1 className="mt-7 font-bold leading-[1.12] tracking-[-0.02em] max-[480px]:mt-6 max-[480px]:text-[24px] sm:text-[clamp(26px,3.4vw,44px)]" style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--white)", animation: "zgl-fadeUp .55s .06s ease both" }}>
               Zgłoś naprawę <span style={{ color: "var(--red)" }}>online.</span>
             </h1>
-            <p className="mt-3 max-w-[540px] text-[14px] leading-[1.75]" style={{ color: "var(--ink2)", animation: "zgl-fadeUp .55s .12s ease both" }}>
+            <p className="mt-6 max-w-[540px] pb-4 text-[14px] leading-[1.75] max-[480px]:mt-5 max-[480px]:pb-3" style={{ color: "var(--ink2)", animation: "zgl-fadeUp .55s .12s ease both" }}>
               Wypełnij formularz w 5 krokach...
             </p>
 
@@ -454,9 +454,122 @@ export default function ZgloszeniePage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
 
+        {/* Sidebar: ten sam wiersz co stepper — góra wyspy = góra paska postępu */}
+        <aside
+          className="zgl-scrollbar-hide hidden w-full min-w-0 lg:col-start-2 lg:row-start-2 lg:mt-8 lg:block lg:self-start"
+          style={{ position: "sticky", top: 36, height: "calc(100vh - 60px)", overflowY: "auto" }}
+        >
+          <div id="sbIsland" className={`sb-island ${howtoHighlight ? "hl" : ""}`} ref={sidebarHowtoRef} style={howtoHighlight ? { boxShadow: "0 0 0 2px #dc1e1e, 0 0 30px rgba(220,30,30,.25), 0 8px 32px rgba(0,0,0,.5)", transition: "box-shadow .3s" } : undefined}>
+            <div className="sb-hd flex items-center gap-2 border-b" style={{ padding: "13px 18px", borderColor: "rgba(255,255,255,.07)", background: "rgba(255,255,255,.02)", fontSize: "9.5px", fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)" }}>
+              <span className="rounded-full" style={{ width: 5, height: 5, background: "var(--red)", boxShadow: "0 0 8px rgba(220,30,30,.3)", animation: "zgl-ringPulse 2s infinite" }} />
+              Podgląd zgłoszenia
+            </div>
+            <div className="sb-bd" style={{ padding: "15px 18px" }}>
+              <div className="space-y-3 text-[12.5px]" style={{ color: "var(--ink)" }}>
+                <div
+                  className="flex min-w-0 flex-col rounded-[10px] border p-3"
+                  style={{ borderColor: "rgba(255,255,255,.08)", background: "linear-gradient(165deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.015) 100%)" }}
+                >
+                  <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-widest" style={{ color: "#4e5669" }}>
+                    Kontakt
+                  </p>
+                  <p
+                    className={`min-w-0 text-[12px] leading-snug break-words ${contactPreview ? "animate-fade-in" : "italic"}`}
+                    style={{ color: contactPreview ? "#c8cbd4" : "#4e5669" }}
+                  >
+                    {contactPreview || "Nie wypełniono"}
+                  </p>
+                </div>
+                <div
+                  className="flex min-w-0 flex-col rounded-[10px] border p-3"
+                  style={{ borderColor: "rgba(255,255,255,.08)", background: "linear-gradient(165deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.015) 100%)" }}
+                >
+                  <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-widest" style={{ color: "#4e5669" }}>
+                    Urządzenie
+                  </p>
+                  <p
+                    className={`min-w-0 text-[12px] leading-snug break-words ${devicePreview ? "animate-fade-in" : "italic"}`}
+                    style={{ color: devicePreview ? "#c8cbd4" : "#4e5669" }}
+                  >
+                    {devicePreview || "Nie wybrano"}
+                  </p>
+                </div>
+                <div
+                  className="flex min-w-0 flex-col rounded-[10px] border p-3"
+                  style={{ borderColor: "rgba(255,255,255,.08)", background: "linear-gradient(165deg, rgba(255,255,255,.035) 0%, rgba(255,255,255,.012) 100%)" }}
+                >
+                  <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-widest" style={{ color: "#4e5669" }}>
+                    Problem
+                  </p>
+                  <p
+                    className={`min-w-0 text-[12px] leading-relaxed break-words ${problemPreview ? "animate-fade-in" : "italic"}`}
+                    style={{ color: problemPreview ? "var(--ink)" : "var(--muted)" }}
+                  >
+                    {problemPreview || "Nie opisano"}
+                  </p>
+                </div>
+              </div>
+
+            <div
+              className={`mt-8 rounded-xl border transition-shadow duration-300 ${howtoHighlight ? "shadow-[0_0_0_2px_#dc1e1e,0_0_24px_rgba(220,30,30,.25)]" : ""}`}
+              style={{ borderColor: "rgba(255,255,255,.06)" }}
+            >
+              <div className="border-b px-4 py-3 -mx-[18px] mb-4" style={{ borderColor: "rgba(255,255,255,.06)" }}>
+                <span className="text-[9.5px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c8cbd4" }}>Jak sprawdzić model telefonu?</span>
+              </div>
+              <div className="flex border-b -mx-[18px]" style={{ borderColor: "rgba(255,255,255,.06)" }}>
+                <button type="button" onClick={() => setHowtoTab("ios")} className={`flex-1 px-4 py-2.5 text-[12px] font-semibold transition-colors mb-[-1px] ${howtoTab === "ios" ? "border-b-2 border-[#dc1e1e] text-white" : ""}`} style={{ color: howtoTab === "ios" ? "#fff" : "#4e5669" }}>
+                  <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black">iOS</span>
+                </button>
+                <button type="button" onClick={() => setHowtoTab("android")} className={`flex-1 px-4 py-2.5 text-[12px] font-semibold transition-colors mb-[-1px] ${howtoTab === "android" ? "border-b-2 border-[#dc1e1e] text-white" : ""}`} style={{ color: howtoTab === "android" ? "#fff" : "#4e5669" }}>
+                  <span className="rounded bg-[#3ddc84] px-1.5 py-0.5 text-[10px] font-bold text-black">Android</span>
+                </button>
+              </div>
+              <div className="space-y-3 p-4" style={{ color: "#8a93a2" }}>
+                {howtoTab === "ios" ? (
+                  <>
+                    {["Otwórz **Ustawienia** — szara ikona z kołem zębatym na ekranie głównym", "Przewiń w dół i tap w **Ogólne**", "Tap w **Informacje** — pierwsza pozycja na liście", "Znajdź pole **Nazwa modelu** — np. iPhone 15 Pro Max", "Możesz też sprawdzić tył obudowy — model wygrawerowany pod logo Apple drobną czcionką"].map((t, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-zglf-red-border bg-zglf-red-l/80 text-[9.5px] font-bold text-zglf-red">{i + 1}</span>
+                        <p className="text-[12px] leading-[1.65]" style={{ color: "#8a93a2" }} dangerouslySetInnerHTML={{ __html: t.replace(/\*\*(.*?)\*\*/g, "<strong style='color:#c8cbd4'>$1</strong>") }} />
+                      </div>
+                    ))}
+                    <div className="mt-3 rounded-[11px] border p-3" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>
+                      <p className="font-mono text-[15px] font-bold tracking-[0.06em]" style={{ color: "#dc1e1e", background: "rgba(220,30,30,.12)", border: "1px solid rgba(220,30,30,.25)", borderRadius: "7px", boxShadow: "0 0 8px rgba(220,30,30,.2)", padding: "6px 10px" }}>
+                        *#06#
+                      </p>
+                      <p className="mt-2 text-[11px]" style={{ color: "#8a93a2" }}><strong style={{ color: "#c8cbd4" }}>Szybszy sposób:</strong> zadzwoń pod ten numer — natychmiast wyświetli się IMEI i pełna nazwa modelu.</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {["Otwórz **Ustawienia** — ikona koła zębatego", "Przewiń do końca listy, tap w **Informacje o telefonie** lub **O urządzeniu**", "Znajdź pole **Model** lub **Numer modelu** — np. Samsung Galaxy S24 Ultra", "**Samsung:** Ustawienia → **O telefonie** → **Informacje o oprogramowaniu**", "**Xiaomi / MIUI:** Ustawienia → **Mój telefon** — model widoczny na górze ekranu"].map((t, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-zglf-red-border bg-zglf-red-l/80 text-[9.5px] font-bold text-zglf-red">{i + 1}</span>
+                        <p className="text-[12px] leading-[1.65]" style={{ color: "#8a93a2" }} dangerouslySetInnerHTML={{ __html: t.replace(/\*\*(.*?)\*\*/g, "<strong style='color:#c8cbd4'>$1</strong>") }} />
+                      </div>
+                    ))}
+                    <div className="mt-3 rounded-[11px] border p-3" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>
+                      <p className="font-mono text-[15px] font-bold tracking-[0.06em]" style={{ color: "#dc1e1e", background: "rgba(220,30,30,.12)", border: "1px solid rgba(220,30,30,.25)", borderRadius: "7px", boxShadow: "0 0 8px rgba(220,30,30,.2)", padding: "6px 10px" }}>
+                        *#06#
+                      </p>
+                      <p className="mt-2 text-[11px]" style={{ color: "#8a93a2" }}><strong style={{ color: "#c8cbd4" }}>Działa na każdym Androidzie:</strong> zadzwoń pod ten numer — wyświetli IMEI i model. Działa też na tabletach.</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          </div>
+        </aside>
+
+        <div className="min-w-0 max-[1000px]:max-w-full lg:col-start-1 lg:row-start-2">
+          <div className="main-inner w-full">
             {/* Stepper */}
-            <div style={{ animation: "zgl-fadeUp .55s .18s ease both" }}>
+            <div className="mt-8 max-[480px]:mt-6" style={{ animation: "zgl-fadeUp .55s .18s ease both" }}>
               <div className="relative mb-6 h-[3px] w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,.07)" }}>
                 <div
                   className="relative h-full rounded-full transition-[width] duration-[.6s] ease-[cubic-bezier(.4,0,.2,1)]"
@@ -1039,102 +1152,6 @@ export default function ZgloszeniePage() {
           </div>
         </div>
 
-        {/* SIDEBAR */}
-        <aside className="zgl-scrollbar-hide hidden lg:block" style={{ position: "sticky", top: 36, height: "calc(100vh - 60px)", overflowY: "auto" }}>
-          <div id="sbIsland" className={`sb-island ${howtoHighlight ? "hl" : ""}`} ref={sidebarHowtoRef} style={howtoHighlight ? { boxShadow: "0 0 0 2px #dc1e1e, 0 0 30px rgba(220,30,30,.25), 0 8px 32px rgba(0,0,0,.5)", transition: "box-shadow .3s" } : undefined}>
-            <div className="sb-hd flex items-center gap-2 border-b" style={{ padding: "13px 18px", borderColor: "rgba(255,255,255,.07)", background: "rgba(255,255,255,.02)", fontSize: "9.5px", fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)" }}>
-              <span className="rounded-full" style={{ width: 5, height: 5, background: "var(--red)", boxShadow: "0 0 8px rgba(220,30,30,.3)", animation: "zgl-ringPulse 2s infinite" }} />
-              Podgląd zgłoszenia
-            </div>
-            <div className="sb-bd" style={{ padding: "15px 18px" }}>
-              <div className="space-y-3 text-[12.5px]" style={{ color: "var(--ink)" }}>
-                <div>
-                  <p className="text-[9.5px] font-bold uppercase tracking-widest" style={{ color: "#4e5669" }}>KONTAKT</p>
-                  <p className={contactPreview ? "animate-fade-in" : "italic"} style={{ color: contactPreview ? "#c8cbd4" : "#4e5669" }}>{contactPreview || "Nie wypełniono"}</p>
-                </div>
-                <div>
-                  <p className="text-[9.5px] font-bold uppercase tracking-widest" style={{ color: "#4e5669" }}>URZĄDZENIE</p>
-                  <p className={devicePreview ? "animate-fade-in" : "italic"} style={{ color: devicePreview ? "#c8cbd4" : "#4e5669" }}>{devicePreview || "Nie wybrano"}</p>
-                </div>
-                <div>
-                  <p className="text-[9.5px] font-bold uppercase tracking-widest" style={{ color: "#4e5669" }}>PROBLEM</p>
-                  <p className={problemPreview ? "animate-fade-in" : "italic"} style={{ color: problemPreview ? "var(--ink)" : "var(--muted)" }}>{problemPreview || "Nie opisano"}</p>
-                </div>
-              </div>
-
-            <div
-              className={`mt-8 rounded-xl border transition-shadow duration-300 ${howtoHighlight ? "shadow-[0_0_0_2px_#dc1e1e,0_0_24px_rgba(220,30,30,.25)]" : ""}`}
-              style={{ borderColor: "rgba(255,255,255,.06)" }}
-            >
-              <div className="border-b px-4 py-3 -mx-[18px] mb-4" style={{ borderColor: "rgba(255,255,255,.06)" }}>
-                <span className="text-[9.5px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c8cbd4" }}>Jak sprawdzić model telefonu?</span>
-              </div>
-              <div className="flex border-b -mx-[18px]" style={{ borderColor: "rgba(255,255,255,.06)" }}>
-                <button type="button" onClick={() => setHowtoTab("ios")} className={`flex-1 px-4 py-2.5 text-[12px] font-semibold transition-colors mb-[-1px] ${howtoTab === "ios" ? "border-b-2 border-[#dc1e1e] text-white" : ""}`} style={{ color: howtoTab === "ios" ? "#fff" : "#4e5669" }}>
-                  <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black">iOS</span>
-                </button>
-                <button type="button" onClick={() => setHowtoTab("android")} className={`flex-1 px-4 py-2.5 text-[12px] font-semibold transition-colors mb-[-1px] ${howtoTab === "android" ? "border-b-2 border-[#dc1e1e] text-white" : ""}`} style={{ color: howtoTab === "android" ? "#fff" : "#4e5669" }}>
-                  <span className="rounded bg-[#3ddc84] px-1.5 py-0.5 text-[10px] font-bold text-black">Android</span>
-                </button>
-              </div>
-              <div className="space-y-3 p-4" style={{ color: "#8a93a2" }}>
-                {howtoTab === "ios" ? (
-                  <>
-                    {["Otwórz **Ustawienia** — szara ikona z kołem zębatym na ekranie głównym", "Przewiń w dół i tap w **Ogólne**", "Tap w **Informacje** — pierwsza pozycja na liście", "Znajdź pole **Nazwa modelu** — np. iPhone 15 Pro Max", "Możesz też sprawdzić tył obudowy — model wygrawerowany pod logo Apple drobną czcionką"].map((t, i) => (
-                      <div key={i} className="flex gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-zglf-red-border bg-zglf-red-l/80 text-[9.5px] font-bold text-zglf-red">{i + 1}</span>
-                        <p className="text-[12px] leading-[1.65]" style={{ color: "#8a93a2" }} dangerouslySetInnerHTML={{ __html: t.replace(/\*\*(.*?)\*\*/g, "<strong style='color:#c8cbd4'>$1</strong>") }} />
-                      </div>
-                    ))}
-                    <div className="mt-3 rounded-[11px] border p-3" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>
-                      <p className="font-mono text-[15px] font-bold tracking-[0.06em]" style={{ color: "#dc1e1e", background: "rgba(220,30,30,.12)", border: "1px solid rgba(220,30,30,.25)", borderRadius: "7px", boxShadow: "0 0 8px rgba(220,30,30,.2)", padding: "6px 10px" }}>
-                        *#06#
-                      </p>
-                      <p className="mt-2 text-[11px]" style={{ color: "#8a93a2" }}><strong style={{ color: "#c8cbd4" }}>Szybszy sposób:</strong> zadzwoń pod ten numer — natychmiast wyświetli się IMEI i pełna nazwa modelu.</p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {["Otwórz **Ustawienia** — ikona koła zębatego", "Przewiń do końca listy, tap w **Informacje o telefonie** lub **O urządzeniu**", "Znajdź pole **Model** lub **Numer modelu** — np. Samsung Galaxy S24 Ultra", "**Samsung:** Ustawienia → **O telefonie** → **Informacje o oprogramowaniu**", "**Xiaomi / MIUI:** Ustawienia → **Mój telefon** — model widoczny na górze ekranu"].map((t, i) => (
-                      <div key={i} className="flex gap-2.5">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-zglf-red-border bg-zglf-red-l/80 text-[9.5px] font-bold text-zglf-red">{i + 1}</span>
-                        <p className="text-[12px] leading-[1.65]" style={{ color: "#8a93a2" }} dangerouslySetInnerHTML={{ __html: t.replace(/\*\*(.*?)\*\*/g, "<strong style='color:#c8cbd4'>$1</strong>") }} />
-                      </div>
-                    ))}
-                    <div className="mt-3 rounded-[11px] border p-3" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>
-                      <p className="font-mono text-[15px] font-bold tracking-[0.06em]" style={{ color: "#dc1e1e", background: "rgba(220,30,30,.12)", border: "1px solid rgba(220,30,30,.25)", borderRadius: "7px", boxShadow: "0 0 8px rgba(220,30,30,.2)", padding: "6px 10px" }}>
-                        *#06#
-                      </p>
-                      <p className="mt-2 text-[11px]" style={{ color: "#8a93a2" }}><strong style={{ color: "#c8cbd4" }}>Działa na każdym Androidzie:</strong> zadzwoń pod ten numer — wyświetli IMEI i model. Działa też na tabletach.</p>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-8" style={{ color: "#c8cbd4" }}>
-              <div className="mb-3 flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-zglf-red shadow-[0_0_8px_rgba(220,30,30,.35)] animate-ring-pulse" />
-                <span className="text-[9.5px] font-bold uppercase tracking-[0.15em]">Masz pytanie?</span>
-              </div>
-              <div className="mt-3 space-y-0">
-                <a href="tel:883200151" className="flex items-center gap-3 border-b py-2 text-[12px] transition-all hover:pl-1 hover:text-white" style={{ borderColor: "rgba(255,255,255,.06)", color: "#c8cbd4" }}>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-[15px] transition-colors hover:border-[rgba(220,30,30,.25)] hover:bg-[#20242f]" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>📞</span>
-                  883 200 151
-                </a>
-                <a href="mailto:sklep@pro-kom.eu" className="flex items-center gap-3 border-b py-2 text-[12px] transition-all hover:pl-1 hover:text-white" style={{ borderColor: "rgba(255,255,255,.06)", color: "#c8cbd4" }}>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-[15px] transition-colors hover:border-[rgba(220,30,30,.25)] hover:bg-[#20242f]" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>✉️</span>
-                  sklep@pro-kom.eu
-                </a>
-                <div className="flex items-center gap-3 py-2 text-[12px]" style={{ color: "#c8cbd4" }}>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-[15px]" style={{ background: "#1a1d26", borderColor: "rgba(255,255,255,.1)" }}>🕐</span>
-                  Pon–Pt 9:00–17:00 / Sobota 9:00–14:00 / Niedziela – zamknięte
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        </aside>
       </div>
 
       {/* Popup „Jak sprawdzić model” — tylko na mobile (lg: sidebar) */}

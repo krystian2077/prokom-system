@@ -105,7 +105,7 @@ export function ClientNaprawyList() {
             <p className="mb-1 text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
               PANEL KLIENTA
             </p>
-            <h1 className="font-extrabold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(20px, 2.2vw, 28px)" }}>
+            <h1 className="cp-heading font-extrabold" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(20px, 2.2vw, 28px)" }}>
               Moje naprawy
             </h1>
             <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
@@ -161,7 +161,7 @@ export function ClientNaprawyList() {
               <div className="flex h-16 w-16 items-center justify-center rounded-xl text-3xl" style={{ background: "var(--island3)" }}>
                 🔧
               </div>
-              <p className="font-semibold text-white">Brak napraw</p>
+              <p className="cp-heading font-semibold">Brak napraw</p>
               <p className="text-sm" style={{ color: "var(--ink2)" }}>
                 {activeFilter === "Wszystkie" ? "Nie masz jeszcze zgłoszeń." : "Brak napraw w tej kategorii."}
               </p>
@@ -193,7 +193,7 @@ export function ClientNaprawyList() {
                       tabIndex={0}
                       onClick={() => router.push(`/client/naprawy/${repair.id}`)}
                       onKeyDown={(e) => e.key === "Enter" && router.push(`/client/naprawy/${repair.id}`)}
-                      className="group cursor-pointer border-t border-[var(--border)] transition hover:bg-[rgba(255,255,255,.025)]"
+                      className="group cp-row-hover cursor-pointer border-t border-[var(--border)] transition"
                       style={{ animation: `rowIn .4s ${index * 0.06}s ease both` }}
                     >
                       <td className="p-4">
@@ -202,7 +202,7 @@ export function ClientNaprawyList() {
                             {getDeviceEmoji(repair.deviceCategory)}
                           </span>
                           <div className="min-w-0">
-                            <p className="font-medium text-white">
+                            <p className="cp-heading font-medium">
                               {truncate(repair.problemDescription ? `${repair.deviceModel} – ${repair.problemDescription}` : repair.deviceModel, 55)}
                             </p>
                             <p className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs" style={{ color: "var(--muted)", fontFamily: "'Courier New', monospace" }}>
@@ -222,7 +222,7 @@ export function ClientNaprawyList() {
                       <td className="p-4">
                         <StatusBadge status={repair.status} />
                       </td>
-                      <td className="p-4 text-sm font-medium text-white">
+                      <td className="cp-heading p-4 text-sm font-medium">
                         {formatPrice(repair.totalPrice)}
                       </td>
                       <td className="p-4">

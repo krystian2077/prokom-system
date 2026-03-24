@@ -37,7 +37,7 @@ prokom-system/
 - Render (hosting)
 
 ### Frontend
-- Next.js 15 + React + TypeScript
+- Next.js 14 + React + TypeScript
 - Tailwind CSS
 - Render (hosting)
 

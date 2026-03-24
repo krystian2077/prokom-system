@@ -1,3 +1,4 @@
+import { ClientPanelThemeProvider } from "@/contexts/ClientPanelThemeContext";
 import { ClientGate } from "./ClientGate";
 
 export default function ClientLayout({
@@ -5,5 +6,9 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <ClientGate>{children}</ClientGate>;
+  return (
+    <ClientPanelThemeProvider>
+      <ClientGate>{children}</ClientGate>
+    </ClientPanelThemeProvider>
+  );
 }

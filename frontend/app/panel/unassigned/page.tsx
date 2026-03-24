@@ -131,13 +131,13 @@ function UnassignedPageInner() {
     enabled: Boolean(token),
     queryFn: async () => {
       if (!token) throw new Error("Missing auth/token");
-      return api.get<RepairRequestListItem[]>(`/staff/repairs/?ordering=-created_at`, token);
+      return api.get<RepairRequestListItem[]>(`/staff/repairs/?ordering=-created_at&unassigned_only=1`, token);
     },
     staleTime: 10_000,
   });
 
   const allItems = repairsQuery.data ?? [];
-  const unassigned = allItems.filter((r) => !r.assigned_to);
+  const unassigned = allItems;
 
   const pills: Array<{ key: RepairsPillKey; label: string; tone: "red" | "amber" | "gray" | "green" }> = [
     { key: "all", label: "Wszystkie", tone: "gray" },

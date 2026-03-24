@@ -108,7 +108,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="panel-card p-8 text-center">
-          <p className="font-semibold text-white">Nie znaleziono naprawy</p>
+          <p className="cp-heading font-semibold">Nie znaleziono naprawy</p>
           <p className="mt-2 text-sm" style={{ color: "var(--ink2)" }}>
             Nie znaleziono naprawy o podanym numerze.
           </p>
@@ -124,7 +124,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="panel-card p-8 text-center">
-          <p className="font-semibold text-white">Błąd</p>
+          <p className="cp-heading font-semibold">Błąd</p>
           <p className="mt-2 text-sm" style={{ color: "var(--ink2)" }}>{error ?? "Nie udało się załadować szczegółów."}</p>
           <Link href="/client/naprawy" className="mt-4 inline-block text-sm font-medium" style={{ color: "var(--red)" }}>
             ← Wróć do listy napraw
@@ -142,7 +142,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
       {/* Hero row */}
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/client/naprawy" className="text-sm font-medium transition hover:text-white" style={{ color: "var(--ink2)" }}>
+          <Link href="/client/naprawy" className="text-sm font-medium transition hover:text-[var(--heading)]" style={{ color: "var(--ink2)" }}>
             ← Wróć do listy napraw
           </Link>
           <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               {getDeviceEmoji(repair.deviceCategory)}
             </div>
             <div>
-              <p className="font-mono text-lg font-bold text-white" style={{ fontFamily: "'Courier New', monospace" }}>
+              <p className="cp-heading font-mono text-lg font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
                 {repair.repairNumber}
               </p>
               <p className="text-sm" style={{ color: "var(--ink2)" }}>
@@ -175,7 +175,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 🔧
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Szczegóły zgłoszenia
                 </h2>
                 <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>Dane podane przez aplikację</p>
@@ -257,7 +257,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 ⏱️
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Postęp naprawy
                 </h2>
                 <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>Aktualny status realizacji</p>
@@ -283,7 +283,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                     {step.status === "done" ? "✓" : step.status === "active" ? "●" : ""}
                   </div>
                   <div className="tl-body min-w-0 flex-1">
-                    <p className="font-medium text-white">{step.label}</p>
+                    <p className="cp-heading font-medium">{step.label}</p>
                     <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
                       {step.date ? formatDateTime(step.date) : "Oczekuje"}
                     </p>
@@ -300,7 +300,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 💬
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Wiadomości z serwisem
                 </h2>
                 <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>Historia komunikacji</p>
@@ -344,7 +344,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 $
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Kosztorys
                 </h2>
               </div>
@@ -353,10 +353,10 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               {repair.priceItems.map((item) => (
                 <div key={item.name} className="flex justify-between gap-4 py-2 text-sm">
                   <span style={{ color: "var(--ink)" }}>{item.name}</span>
-                  <span className="text-white">{formatPrice(item.price)}</span>
+                  <span className="cp-heading">{formatPrice(item.price)}</span>
                 </div>
               ))}
-              <div className="mt-3 border-t border-[var(--border)] pt-3 font-medium text-white">
+              <div className="cp-heading mt-3 border-t border-[var(--border)] pt-3 font-medium">
                 Łącznie: {formatTotalPrice(repair.priceItems)} brutto
               </div>
               {repair.totalPrice === null && (
@@ -374,7 +374,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 ⚙️
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Informacje serwisowe
                 </h2>
               </div>
@@ -403,7 +403,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 ⚡
               </span>
               <div>
-                <h2 className="font-bold text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
                   Akcje
                 </h2>
               </div>

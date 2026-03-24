@@ -267,7 +267,7 @@ export function OfertaContent() {
               { href: "#poleasing", name: "Laptopy poleasingowe", sub: "Dell · Lenovo · HP", iconBg: "bg-[#eff6ff]", Icon: CatIconLaptopOpen },
               { href: "#laptopy-biz", name: "Laptopy biznesowe", sub: "EliteBook · ThinkPad · Latitude", iconBg: "bg-[#eff6ff]", Icon: CatIconLaptopClosed },
               { href: "#laptopy-gamingowe", name: "Laptopy gamingowe", sub: "ASUS · MSI · Lenovo", iconBg: "bg-[#f3e8ff]", Icon: CatIconController },
-              { href: "#biznesowe", name: "Komputery biznesowe", sub: "OptiPlex · ThinkCentre · ProDesk", iconBg: "bg-[#eff6ff]", Icon: CatIconTower },
+              { href: "#biznesowe", name: "Komputery biznesowe", sub: "OptiPlex · ThinkCentre · All-in-One", iconBg: "bg-[#eff6ff]", Icon: CatIconTower },
               { href: "#drukarki", name: "Drukarki", sub: "Do domu i biura", iconBg: "bg-[#eff6ff]", Icon: CatIconPrinter },
               { href: "#gaming", name: "Gaming PC", sub: "Składaki na zamówienie", iconBg: "bg-[#eff6ff]", Icon: CatIconMonitor },
             ].map((c) => (
@@ -510,9 +510,9 @@ export function OfertaContent() {
             </div>
             <div className="flex flex-col gap-4">
               {[
-                { img: "delllaptop.png", name: "Dell Latitude", models: "Latitude 5000 / 7000 · i5/i7 · 8–16 GB RAM", desc: "Niezawodne laptopy enterprise. Militarne testy wytrzymałości, długa bateria." },
-                { img: "lenovoyhinkbook.png", name: "Lenovo ThinkPad", models: "ThinkPad T-series / X-series · i5/i7/Ryzen", desc: "Legenda wśród laptopów biznesowych. Kultowa klawiatura, trwała konstrukcja." },
-                { img: "asusexpertbooklaptopbiznesowy.png", name: "HP EliteBook", models: "EliteBook 840 / 850 · i5/i7", desc: "Aluminiowe laptopy HP. Jasne ekrany IPS, szybkie SSD, czytnik linii papilarnych." },
+                { img: "dell-amso.png", name: "Dell Latitude", models: "Latitude 5000 / 7000 · i5/i7 · 8–16 GB RAM", desc: "Niezawodne laptopy enterprise. Militarne testy wytrzymałości, długa bateria." },
+                { img: "lenovo-amso.png", name: "Lenovo ThinkPad", models: "ThinkPad T-series / X-series · i5/i7/Ryzen", desc: "Legenda wśród laptopów biznesowych. Kultowa klawiatura, trwała konstrukcja." },
+                { img: "hp-amso.png", name: "HP EliteBook", models: "EliteBook 840 / 850 · i5/i7", desc: "Aluminiowe laptopy HP. Jasne ekrany IPS, szybkie SSD, czytnik linii papilarnych." },
               ].map((item) => (
                 <Link key={item.name} href="#formularz" className="pol-card flex gap-4 rounded-[18px] border border-[var(--border)] bg-[var(--bg)] p-5 hover:border-[var(--red-border)] hover:-translate-y-0.5 transition-all">
                   <div className="relative w-[140px] h-[96px] shrink-0 rounded-xl overflow-hidden bg-[var(--bg2)]">
@@ -583,7 +583,7 @@ export function OfertaContent() {
           <div className="mt-8 flex flex-wrap justify-between items-center gap-4 rounded-2xl border border-[rgba(220,30,30,.18)] bg-[rgba(220,30,30,.07)] p-5 sm:p-6">
             <div>
               <p className="font-bold text-white">Nie wiesz który model wybrać?</p>
-              <p className="text-[13px] text-[#525b6e] mt-1">Zadzwoń lub napisz — doradzimy bez wciskania.</p>
+              <p className="text-[13px] text-[#9ca6ba] mt-1">Zadzwoń lub napisz — doradzimy bez wciskania.</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="#formularz" className="btn-primary">Zapytaj o ofertę</Link>
@@ -720,31 +720,60 @@ export function OfertaContent() {
         <div className="mx-auto max-w-[1300px] relative">
           <div className="biz-head flex flex-wrap justify-between items-start gap-6 mb-12">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[#525b6e] mb-2">Nowe · Biznesowe</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#8b95ab] mb-2">Nowe · Biznesowe</p>
               <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
                 Komputery <span style={{ color: "var(--red)" }}>biznesowe.</span>
               </h2>
-              <p className="text-[#3e4255] max-w-[480px]">OptiPlex, ThinkCentre, ProDesk — kompakty i wieże do biura.</p>
+              <p className="text-[#aeb8ca] max-w-[480px]">Stacjonarne Dell i Lenovo: kompakty, wieże oraz All-in-One — dobierzemy format pod Twoje biurko i budżet.</p>
             </div>
             <Link href="#formularz" className="btn-primary shrink-0">Zapytaj o ofertę →</Link>
           </div>
           <div className="biz-grid grid md:grid-cols-3 gap-5">
             {[
-              { img: "delloptiplex.png", brand: "Dell", name: "OptiPlex", models: "OptiPlex 3000/5000 · Micro/SFF/MT · i5/i7", desc: "Kultowe kompakty i wieże. Niezawodne, ciche. Format Micro mieści się za monitorem." },
-              { img: "thinkcenterlenovoB.png", brand: "Lenovo", name: "ThinkCentre", models: "ThinkCentre M-series · Tiny/Small/Tower · i5/i7/Ryzen", desc: "Forma Tiny (super kompaktowa) lub wieżowa. Szybkie, spokojne, długowieczne." },
-              { img: "hpprodesk.png", brand: "HP", name: "ProDesk / EliteDesk", models: "ProDesk 400/600 · EliteDesk 800 · Mini/SFF/Tower", desc: "Solidne HP z linii ProDesk i EliteDesk. Formaty od mini po pełne wieże." },
+              {
+                img: "delloptiplex.png",
+                brand: "Dell",
+                name: "OptiPlex",
+                models: "Serie 3000/5000 · Micro / SFF / MT · procesory i5 / i7",
+                desc: "Sprawdzone biurowe stacjonarne Dell: od dyskretnego Micro (często za monitorem) po pełnowymiarowe wieże. Cicha praca, stabilna platforma, łatwy serwis.",
+              },
+              {
+                img: "thinkcenterlenovoB.png",
+                brand: "Lenovo",
+                name: "ThinkCentre",
+                models: "Seria M · Tiny / Small / Tower · Intel lub Ryzen",
+                desc: "ThinkCentre daje wybór formatu: oszczędne Tiny, kompakt Small albo rozbudowywalna wieża. Ciche, wydajne pod codzienną pracę w firmie.",
+              },
+              {
+                img: "lenovo-aio.png",
+                brand: "Lenovo",
+                name: "All-in-One",
+                models: "ThinkCentre neo · IdeaCentre · ekran i komputer w jednym",
+                desc: "All-in-One to porządek na biurku: jeden przewód zamiast plątaniny, wąskie ramki i nowoczesny wygląd. Świetne do recepcji, open space i mniejszych gabinetów.",
+                visualBox: "w-[200px] h-[150px] sm:w-[260px] sm:h-[195px]",
+                imgSizes: "280px",
+              },
             ].map((item) => (
               <Link key={item.name} href="#formularz" className="biz-card block rounded-[22px] border border-white/10 bg-white/[0.02] overflow-hidden hover:border-[rgba(220,30,30,.22)] hover:-translate-y-1 transition-all duration-300">
                 <div className="biz-visual min-h-[260px] py-8 relative bg-gradient-to-br from-[#060c18] via-[#0e1a30] to-[#162848] flex items-center justify-center">
-                  <div className="relative w-[120px] h-[180px] flex-shrink-0" style={{ animation: "float 4.5s ease infinite" }}>
-                    <Image src={`${OFFERTA_IMG}/${item.img}`} alt={item.name} fill className="object-contain object-center" sizes="160px" />
+                  <div
+                    className={`relative flex-shrink-0 ${"visualBox" in item && item.visualBox ? item.visualBox : "w-[120px] h-[180px]"}`}
+                    style={{ animation: "float 4.5s ease infinite" }}
+                  >
+                    <Image
+                      src={`${OFFERTA_IMG}/${item.img}`}
+                      alt={`${item.brand} ${item.name}`}
+                      fill
+                      className="object-contain object-center"
+                      sizes={"imgSizes" in item && item.imgSizes ? item.imgSizes : "160px"}
+                    />
                   </div>
                 </div>
                 <div className="p-5">
-                  <p className="text-[9.5px] uppercase tracking-wider text-[var(--muted)]">{item.brand}</p>
+                  <p className="text-[9.5px] uppercase tracking-wider text-[#8b95ab]">{item.brand}</p>
                   <p className="font-[family-name:var(--font-unbounded)] font-black text-base text-white mt-1">{item.name}</p>
-                  <p className="text-[12px] text-[#525b6e] mt-2">{item.models}</p>
-                  <p className="text-[13px] text-[#3e4255] mt-2">{item.desc}</p>
+                  <p className="text-[12px] text-[#9ca6ba] mt-2 leading-snug">{item.models}</p>
+                  <p className="text-[13px] text-[#c8cedd] mt-2 leading-relaxed">{item.desc}</p>
                 </div>
               </Link>
             ))}
@@ -752,7 +781,7 @@ export function OfertaContent() {
           <div className="mt-8 flex flex-wrap justify-between items-center gap-4 rounded-2xl border border-[rgba(220,30,30,.18)] bg-[rgba(220,30,30,.07)] p-5 sm:p-6">
             <div>
               <p className="font-bold text-white">Nie wiesz który model wybrać?</p>
-              <p className="text-[13px] text-[#525b6e] mt-1">Zadzwoń lub napisz — doradzimy bez wciskania.</p>
+              <p className="text-[13px] text-[#9ca6ba] mt-1">Zadzwoń lub napisz — doradzimy bez wciskania.</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="#formularz" className="btn-primary">Zapytaj o ofertę</Link>

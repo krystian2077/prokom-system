@@ -999,7 +999,7 @@ b {
   }
 }
 
-/* ─── Panel klienta PRO-KOM (dark) ─── */
+/* ─── Panel klienta PRO-KOM (dark / light) ─── */
 .client-panel {
   --red: #dc1e1e;
   --red-h: #b81818;
@@ -1027,10 +1027,59 @@ b {
   --blue: #3b82f6;
   --blue-l: rgba(59, 130, 246, 0.1);
   --blue-b: rgba(59, 130, 246, 0.25);
+  --heading: #ffffff;
+  --row-hover: rgba(255, 255, 255, 0.025);
+  --panel-nav-bg: rgba(7, 8, 12, 0.92);
+  --panel-nav-border: rgba(255, 255, 255, 0.07);
+  --panel-nav-logo: #ffffff;
+  --panel-nav-link-active-bg: rgba(255, 255, 255, 0.06);
+  --panel-nav-home-hover: #d0d4de;
+  --panel-nav-divider: rgba(255, 255, 255, 0.07);
   min-height: 100vh;
   background: var(--page);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.025'/%3E%3C/svg%3E");
   position: relative;
+}
+
+.client-panel.client-panel--light {
+  --red-l: rgba(220, 30, 30, 0.08);
+  --red-border: rgba(220, 30, 30, 0.22);
+  /* Tło strony wyraźnie ciemniejsze niż karty — karty „wypływają” */
+  --page: #d4d8e3;
+  --island: #ffffff;
+  --island2: #f0f2f7;
+  --island3: #e6e9f2;
+  --island4: #dde2ee;
+  --island5: #d0d6e4;
+  --ink: #1a1d27;
+  --ink2: #5c6370;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --border: rgba(15, 23, 42, 0.11);
+  --border2: rgba(15, 23, 42, 0.17);
+  --heading: #0f1419;
+  --row-hover: rgba(15, 23, 42, 0.055);
+  --panel-nav-bg: rgba(255, 255, 255, 0.97);
+  --panel-nav-border: rgba(15, 23, 42, 0.1);
+  --panel-nav-logo: #101218;
+  --panel-nav-link-active-bg: rgba(220, 30, 30, 0.1);
+  --panel-nav-home-hover: #374151;
+  --panel-nav-divider: rgba(15, 23, 42, 0.12);
+  /* Cień kart (używany w regule .panel-card poniżej) */
+  --panel-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 6px 20px rgba(15, 23, 42, 0.07);
+  --panel-card-shadow-hover: 0 2px 4px rgba(15, 23, 42, 0.06), 0 10px 28px rgba(15, 23, 42, 0.09);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.035'/%3E%3C/svg%3E");
+}
+
+.client-panel .cp-heading {
+  color: var(--heading);
+}
+
+.client-panel .cp-row-hover:hover {
+  background: var(--row-hover);
+}
+.client-panel.client-panel--light .panel-nav {
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06), 0 4px 18px rgba(15, 23, 42, 0.06);
 }
 .client-panel::before {
   content: "";
@@ -1042,6 +1091,9 @@ b {
   background: radial-gradient(ellipse, rgba(220, 30, 30, 0.05), transparent 65%);
   pointer-events: none;
   z-index: 0;
+}
+.client-panel.client-panel--light::before {
+  background: radial-gradient(ellipse, rgba(220, 30, 30, 0.04), transparent 62%);
 }
 
 @keyframes fadeUp {
@@ -1098,6 +1150,16 @@ b {
   border-radius: 20px;
   overflow: hidden;
 }
+.client-panel.client-panel--light .panel-card {
+  border-color: rgba(15, 23, 42, 0.13);
+  box-shadow: var(--panel-card-shadow, none);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+/* Delikatne podbicie cienia tylko na interaktywnych kafelkach (np. statystyki) */
+.client-panel.client-panel--light .panel-card.group:hover {
+  box-shadow: var(--panel-card-shadow-hover, var(--panel-card-shadow, none));
+  border-color: rgba(15, 23, 42, 0.17);
+}
 .client-panel .panel-card::before {
   content: "";
   display: block;
@@ -1110,6 +1172,10 @@ b {
   padding: 16px 22px 14px;
   background: var(--island2);
   border-bottom: 1px solid var(--border);
+}
+.client-panel.client-panel--light .panel-card-header {
+  background: linear-gradient(180deg, #f4f6fa 0%, var(--island2) 100%);
+  border-bottom-color: rgba(15, 23, 42, 0.1);
 }
 .client-panel .status-badge.progress {
   background: var(--amber-l);
@@ -1141,6 +1207,9 @@ b {
   background: rgba(255, 255, 255, 0.05);
   color: var(--ink2);
   border: 1px solid var(--border2);
+}
+.client-panel.client-panel--light .status-badge.new {
+  background: rgba(0, 0, 0, 0.04);
 }
 .client-panel .skeleton {
   background: linear-gradient(90deg, var(--island2) 25%, var(--island3) 50%, var(--island2) 75%);
