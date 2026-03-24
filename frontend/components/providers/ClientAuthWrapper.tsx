@@ -3,6 +3,7 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import type { ReactNode } from "react";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ToastContainer } from "@/components/ui/Toast";
 
 /**
  * Opakowuje całą aplikację w AuthProvider, żeby stan logowania
@@ -13,7 +14,10 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 export function ClientAuthWrapper({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      <QueryProvider>{children}</QueryProvider>
+      <QueryProvider>
+        <ToastContainer />
+        {children}
+      </QueryProvider>
     </AuthProvider>
   );
 }

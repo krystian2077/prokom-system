@@ -13,15 +13,15 @@ export function WorkerStatusModalRoot() {
   const { token } = useAuth();
   const repairId = useWorkerStore((s) => s.statusModalRepairId);
   const closeStatusModal = useWorkerStore((s) => s.closeStatusModal);
-  const showToast = useWorkerStore((s) => s.showToast);
+  const showToast = useWorkerStore((s) => s.addToast);
 
   const enabled = Boolean(repairId && token);
 
-  const { data, isFetching, error } = useQuery({
-    queryKey: ["repair", repairId],
+  const { data, error } = useQuery({
+    queryKey: ["repair", "status-modal", repairId],
     queryFn: async () => {
       if (!repairId) throw new Error("Missing repairId");
-      return api.get<RepairDetail>(`/repairs/${repairId}/`, token);
+      return api.get<RepairDetail>(`/staff/repairs/${repairId}/`, token);
     },
     enabled,
     staleTime: 10_000,
@@ -42,7 +42,8 @@ export function WorkerStatusModalRoot() {
       currentStatus={data?.status}
       onClose={closeStatusModal}
       onStatusSaved={() => {
-        qc.invalidateQueries({ queryKey: ["repair", repairId] });
+        void qc.invalidateQueries({ queryKey: ["repair", repairId] });
+        void qc.invalidateQueries({ queryKey: ["repair", "status-modal", repairId] });
         showToast("✓ Status zmieniony", "success");
       }}
     />

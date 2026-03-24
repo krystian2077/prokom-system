@@ -1,14 +1,17 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
 import Link from "next/link";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useWorkerStore, type DashboardScope } from "@/stores/workerStore";
 import { Clock4, RotateCcw, Zap, Bell, MessageSquareText, Users2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { ScopeBar } from "@/components/layout/ScopeBar";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 type Scope = DashboardScope;
 
@@ -114,13 +117,10 @@ function StaffDashboardPage() {
   const { token, user } = useAuth();
   const searchParams = useSearchParams();
   const requiresActionSectionRef = useRef<HTMLElement | null>(null);
-  const qc = useQueryClient();
 
-  const scope = useWorkerStore((s) => s.dashboardScope);
-  const setScope = useWorkerStore((s) => s.setDashboardScope);
-  const showToast = useWorkerStore((s) => s.showToast);
-
-  const [countdown, setCountdown] = useState(30);
+  const scope = useWorkerStore((s) => s.scope);
+  const setScope = useWorkerStore((s) => s.setScope);
+  const showToast = useWorkerStore((s) => s.addToast);
 
   const panelLabel = user?.role === "admin" ? "Panel Admina" : "Panel pracownika";
 
@@ -140,11 +140,14 @@ function StaffDashboardPage() {
   }, [scope]);
 
   const dashboardQuery = useQuery({
-    queryKey: ["dashboard", "worker", scope],
+    queryKey: ["dashboard", "staff", scope],
     enabled: Boolean(token && user),
     queryFn: async () => {
       if (!token) throw new Error("Missing token");
-      const dashboardRes = await api.get<any>(`/repairs/dashboard/?days_without_update=${scopeDaysWithoutUpdate}`, token);
+      const dashboardRes = await api.get<any>(
+        `/staff/dashboard/?days_without_update=${scopeDaysWithoutUpdate}&recent_limit=10`,
+        token,
+      );
       return {
         my_new: dashboardRes.my_new ?? [],
         my_urgent: dashboardRes.my_urgent ?? [],
@@ -210,14 +213,26 @@ function StaffDashboardPage() {
     staleTime: 30_000,
   });
 
+  const refreshQueryKeys = useMemo(
+    () =>
+      [
+        ["dashboard", "staff", scope],
+        ["dashboard", "requires-action", user?.id, user?.role, scope],
+        ["dashboard", "tasks", "due-today"],
+        ["dashboard", "team", "today"],
+        ["dashboard", "comm", "latest"],
+      ] as const,
+    [scope, user?.id, user?.role],
+  );
+
+  const { countdown, isRefreshing, refresh: runAutoRefresh } = useAutoRefresh([...refreshQueryKeys], 30_000);
+
   const manualRefresh = () => {
-    qc.invalidateQueries({ queryKey: ["dashboard", "worker", scope] });
-    qc.invalidateQueries({ queryKey: ["dashboard", "requires-action", user?.id, user?.role, scope] });
-    qc.invalidateQueries({ queryKey: ["dashboard", "tasks", "due-today"] });
-    qc.invalidateQueries({ queryKey: ["dashboard", "team", "today"] });
-    qc.invalidateQueries({ queryKey: ["dashboard", "comm", "latest"] });
-    showToast(`✓ Dane odświeżone · ${new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`, "success");
-    setCountdown(30);
+    runAutoRefresh();
+    showToast(
+      `✓ Dane odświeżone · ${new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`,
+      "success",
+    );
   };
 
   const userFirstName = useMemo(() => {
@@ -252,29 +267,6 @@ function StaffDashboardPage() {
     }, 120);
     return () => window.clearTimeout(t);
   }, [searchParams]);
-
-  useEffect(() => {
-    if (!token || !user) return;
-    const intervalMs = 30_000;
-    setCountdown(intervalMs / 1000);
-
-    const t = window.setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 1) {
-          qc.invalidateQueries({ queryKey: ["dashboard", "worker", scope] });
-          qc.invalidateQueries({ queryKey: ["dashboard", "requires-action", user.id, user.role, scope] });
-          showToast(
-            `✓ Dane odświeżone · ${new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`,
-            "success",
-          );
-          return intervalMs / 1000;
-        }
-        return c - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(t);
-  }, [token, user, qc, scope, showToast]);
 
   const renderStatusPill = (r: RepairRequestListItem) => {
     const pill = statusPillColor(r.status);
@@ -396,7 +388,7 @@ function StaffDashboardPage() {
             {sliced.map((r) => (
               <Link
                 key={r.id}
-                href={`/panel/repairs/${r.id}`}
+                href={`/panel/naprawy/${r.id}`}
                 className="group block rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-3 transition hover:border-white/20 hover:bg-[#10131c]"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -463,7 +455,11 @@ function StaffDashboardPage() {
             <div className="flex flex-wrap items-center justify-end gap-2">
               <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-2.5 text-sm">
                 <span className="inline-flex items-center justify-center">
-                  <Clock4 size={16} className="text-[#3b82f6]" />
+                  {isRefreshing ? (
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3b82f6] border-t-transparent" />
+                  ) : (
+                    <Clock4 size={16} className="text-[#3b82f6]" />
+                  )}
                 </span>
                 <span className="text-[#9ca3af]">Auto-refresh za</span>
                 <span className="font-semibold text-white">{countdown}s</span>
@@ -491,38 +487,7 @@ function StaffDashboardPage() {
 
         {error && !loading ? <p className="text-sm text-[#fca5a5]">{error}</p> : null}
 
-        <div className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              {(["today", "tomorrow", "week", "month"] as DashboardScope[]).map((s) => {
-                const on = scope === s;
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setScope(s)}
-                    className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold transition"
-                    style={{
-                      color: on ? "#fff" : "#9ca3af",
-                      background: on ? "linear-gradient(135deg, rgba(59,130,246,.18), rgba(37,99,235,.10))" : "transparent",
-                      borderColor: on ? "rgba(59,130,246,.45)" : "rgba(255,255,255,.10)",
-                      boxShadow: on ? "0 0 0 1px rgba(59,130,246,.25)" : "none",
-                    }}
-                  >
-                    {s === "today" ? "Dziś" : s === "tomorrow" ? "Jutro" : s === "week" ? "Ten tydzień" : "Ten miesiąc"}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 px-3 py-2 border border-emerald-500/20">
-                <span className="h-2 w-2 rounded-full bg-[#22c55e]" style={{ boxShadow: "0 0 18px rgba(34,197,94,.45)", animation: "pulse 1.6s ease-in-out infinite" }} />
-                <span className="text-sm font-semibold text-[#bbf7d0]">Live</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ScopeBar value={scope} onChange={setScope} />
 
         <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-3">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
@@ -557,10 +522,16 @@ function StaffDashboardPage() {
                 accent: "#22c55e",
                 delay: "320ms",
               },
-            ].map((s, idx) => (
-              <div key={s.label} className={idx < 5 ? "animate-fadeUp" : ""} style={{ animationDelay: (idx * 70).toString() + "ms" }}>
+            ].map((s) => (
+              <motion.div
+                key={`${s.label}-${s.value ?? "load"}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="cursor-default transition-transform hover:-translate-y-0.5"
+              >
                 <SummaryCard label={s.label} value={s.value as number | null} accent={s.accent} />
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
@@ -580,7 +551,7 @@ function StaffDashboardPage() {
                 <h2 className="mt-1 text-lg font-semibold text-white">Co teraz robić?</h2>
               </div>
             </div>
-            <Link href="/panel/repairs" className="text-sm font-semibold text-[#3b82f6] hover:underline">
+            <Link href="/panel/naprawy" className="text-sm font-semibold text-[#3b82f6] hover:underline">
               Wszystkie
             </Link>
           </div>
@@ -599,8 +570,8 @@ function StaffDashboardPage() {
               return (
                 <Link
                   key={r.id}
-                  href={`/panel/repairs/${r.id}`}
-                  className="group relative rounded-2xl border border-white/10 bg-[#0c0d12] p-4 transition hover:bg-white/5 hover:border-white/20"
+                  href={`/panel/naprawy/${r.id}`}
+                  className="group relative rounded-2xl border border-white/10 bg-[#0c0d12] p-4 transition hover:translate-x-0.5 hover:bg-white/5 hover:border-white/20"
                 >
                   <div className="absolute right-3 top-3 h-2 w-2 rounded-full" style={{ background: tone === "urgent" ? "#dc1e1e" : tone === "warn" ? "#f59e0b" : "#9ca3af" }} />
                   <div className="flex flex-wrap items-center gap-2">
@@ -658,7 +629,7 @@ function StaffDashboardPage() {
                     {scope === "today" ? "Dziś" : scope === "tomorrow" ? "Jutro" : scope === "week" ? "Ten tydzień" : "Ten miesiąc"}
                   </h2>
                 </div>
-                <Link href="/panel/repairs" className="text-sm font-semibold text-[#3b82f6] hover:underline">
+                <Link href="/panel/naprawy" className="text-sm font-semibold text-[#3b82f6] hover:underline">
                   Wszystkie
                 </Link>
               </div>
@@ -685,7 +656,7 @@ function StaffDashboardPage() {
                   ) : (
                     <Link
                       key={r.id}
-                      href={`/panel/repairs/${r.id}`}
+                      href={`/panel/naprawy/${r.id}`}
                       className="group flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-white/5"
                     >
                       <div className="min-w-0">
@@ -770,7 +741,7 @@ function StaffDashboardPage() {
                   (commLogsQuery.data ?? []).map((l: any) => (
                     <Link
                       key={l.id}
-                      href={l.repair ? `/panel/repairs/${l.repair}` : "/panel/comm"}
+                      href={l.repair ? `/panel/naprawy/${l.repair}` : "/panel/comm"}
                       className="group flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-3 transition hover:bg-white/5"
                     >
                       <div className="flex min-w-0 items-center gap-3">

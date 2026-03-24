@@ -201,7 +201,7 @@ export default function AdminDashboardPage() {
                     {topOverdue.map((r) => (
                       <Link
                         key={r.id}
-                        href={`/panel/repairs/${r.id}`}
+                        href={`/admin-panel/repairs/${r.id}`}
                         className="group flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10"
                       >
                         <div className="min-w-0">
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
                     {topUnclaimed.map((r) => (
                       <Link
                         key={r.id}
-                        href={`/panel/repairs/${r.id}`}
+                        href={`/admin-panel/repairs/${r.id}`}
                         className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10"
                       >
                         <div className="truncate font-mono text-sm font-semibold text-white hover:text-[#dc1e1e]">
@@ -267,7 +267,7 @@ export default function AdminDashboardPage() {
                         {noQuoteRepairs.map((r) => (
                           <Link
                             key={r.id}
-                            href={`/panel/repairs/${r.id}`}
+                            href={`/admin-panel/repairs/${r.id}`}
                             className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
                           >
                             <div className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</div>
@@ -284,7 +284,7 @@ export default function AdminDashboardPage() {
                         {activeComplaints.map((r) => (
                           <Link
                             key={r.id}
-                            href={`/panel/repairs/${r.id}`}
+                            href={`/admin-panel/repairs/${r.id}`}
                             className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
                           >
                             <div className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</div>
@@ -301,7 +301,7 @@ export default function AdminDashboardPage() {
                         {activeWarranties.map((r) => (
                           <Link
                             key={r.id}
-                            href={`/panel/repairs/${r.id}`}
+                            href={`/admin-panel/repairs/${r.id}`}
                             className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
                           >
                             <div className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</div>

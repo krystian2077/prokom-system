@@ -1249,3 +1249,177 @@ b {
   pointer-events: none;
 }
 
+/* ═══ PRO-KOM panel staff/admin — PROKOM_DOKUMENTACJA_FRONTEND §2.1–2.2 ═══ */
+:root {
+  --page: #07080c;
+  --s1: #0f1117;
+  --s2: #141720;
+  --s3: #191d28;
+  --s4: #1c2030;
+  --s5: #212538;
+  --faint: #2c3145;
+  --white: #fff;
+  --ink: #d0d4de;
+  --ink2: #8b93a8;
+  --muted: #525b6e;
+  --border: rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.13);
+  --red: #dc1e1e;
+  --red-h: #b81818;
+  --rl: rgba(220, 30, 30, 0.08);
+  --rb: rgba(220, 30, 30, 0.22);
+  --green: #22c55e;
+  --gl: rgba(34, 197, 94, 0.1);
+  --gb: rgba(34, 197, 94, 0.25);
+  --amber: #f59e0b;
+  --al: rgba(245, 158, 11, 0.1);
+  --ab: rgba(245, 158, 11, 0.25);
+  --blue: #3b82f6;
+  --bl: rgba(59, 130, 246, 0.1);
+  --bb: rgba(59, 130, 246, 0.25);
+  --purple: #8b5cf6;
+  --pl: rgba(139, 92, 246, 0.1);
+  --pb: rgba(139, 92, 246, 0.25);
+  --orange: #f97316;
+  --ol: rgba(249, 115, 22, 0.1);
+  --ob: rgba(249, 115, 22, 0.25);
+  --cyan: #06b6d4;
+  --cl: rgba(6, 182, 212, 0.1);
+  --cb: rgba(6, 182, 212, 0.25);
+  --nav: 248px;
+}
+
+[data-theme="light"] {
+  --page: #eef1f8;
+  --s1: #ffffff;
+  --s2: #f4f6fc;
+  --s3: #eaecf4;
+  --s4: #e0e3ef;
+  --s5: #d5d9e8;
+  --faint: #c5c9d8;
+  --white: #111827;
+  --ink: #1f2334;
+  --ink2: #4b5268;
+  --muted: #7c859e;
+  --border: rgba(0, 0, 0, 0.08);
+  --border2: rgba(0, 0, 0, 0.14);
+  --red: #c81919;
+  --red-h: #a31414;
+  --rl: rgba(200, 25, 25, 0.07);
+  --rb: rgba(200, 25, 25, 0.18);
+  --green: #15803d;
+  --gl: rgba(21, 128, 61, 0.09);
+  --gb: rgba(21, 128, 61, 0.22);
+  --amber: #b45309;
+  --al: rgba(180, 83, 9, 0.09);
+  --ab: rgba(180, 83, 9, 0.22);
+  --blue: #1d4ed8;
+  --bl: rgba(29, 78, 216, 0.09);
+  --bb: rgba(29, 78, 216, 0.22);
+  --purple: #6d28d9;
+  --pl: rgba(109, 40, 217, 0.09);
+  --pb: rgba(109, 40, 217, 0.22);
+  --orange: #c2410c;
+  --ol: rgba(194, 65, 12, 0.09);
+  --ob: rgba(194, 65, 12, 0.22);
+  --cyan: #0369a1;
+  --cl: rgba(3, 105, 161, 0.09);
+  --cb: rgba(3, 105, 161, 0.22);
+}
+
+[data-theme="light"] body::before {
+  background: radial-gradient(ellipse, rgba(29, 78, 216, 0.06), transparent 65%);
+}
+
+[data-theme="light"] .topbar {
+  background: rgba(238, 241, 248, 0.92);
+  border-bottom-color: rgba(0, 0, 0, 0.09);
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .twrap,
+[data-theme="light"] .sc {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .trow:hover,
+[data-theme="light"] .rrow:hover,
+[data-theme="light"] .mi:hover,
+[data-theme="light"] .arch-row:hover {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+[data-theme="light"] .sp.new {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .sp.done {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .modal {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .finput,
+[data-theme="light"] .sel,
+[data-theme="light"] .cia-ta {
+  background: var(--s1);
+  border-color: var(--faint);
+  color: var(--ink);
+}
+
+@keyframes glowR {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 30, 30, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(220, 30, 30, 0.3);
+  }
+}
+
+@keyframes glowG {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.3);
+  }
+}
+
+@keyframes glowB {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3);
+  }
+}
+
+@keyframes tickIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

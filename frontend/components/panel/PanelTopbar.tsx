@@ -3,12 +3,14 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { Search, LogOut, Play, CheckCircle2, Bell, MessageSquareText, CircleUserRound, ChevronLeft } from "lucide-react";
+import { Search, LogOut, Play, CheckCircle2, Bell, MessageSquareText, ChevronLeft, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
 import type { GlobalSearchClient, GlobalSearchDevice, GlobalSearchResponse } from "@/types/search";
+import { getTheme, toggleTheme } from "@/lib/theme";
+import { useWorkerStore } from "@/stores/workerStore";
 
 export function PanelTopbar() {
   const { user, logout, token } = useAuth();
@@ -16,15 +18,25 @@ export function PanelTopbar() {
   const isAdmin = user?.role === "admin";
   const pathname = usePathname();
   const accent = isAdmin ? "#dc1e1e" : "#3b82f6";
+  const showToast = useWorkerStore((s) => s.addToast);
 
   const [now, setNow] = useState(() => new Date());
+  const [panelTheme, setPanelTheme] = useState<"dark" | "light">("dark");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const breadcrumb = useMemo(() => {
     if (pathname === "/panel/dashboard" || pathname.startsWith("/panel/dashboard/")) return "Dashboard";
-    if (pathname === "/panel/repairs" || pathname.startsWith("/panel/zgloszenia")) return "Naprawy";
-    if (pathname.startsWith("/panel/repairs/") || pathname.startsWith("/panel/zgloszenia/")) return "Szczegóły naprawy";
+    const repairsDetail =
+      pathname.startsWith("/panel/repairs/") ||
+      pathname.startsWith("/panel/naprawy/") ||
+      pathname.startsWith("/panel/zgloszenia/");
+    const repairsList =
+      pathname === "/panel/repairs" ||
+      pathname === "/panel/naprawy" ||
+      pathname === "/panel/zgloszenia";
+    if (repairsDetail) return "Szczegóły naprawy";
+    if (repairsList) return "Naprawy";
     if (pathname === "/panel/unassigned") return "Nieprzypisane";
     if (pathname === "/panel/all-repairs") return "Wszystkie naprawy";
     if (pathname.startsWith("/panel/intake")) return "Przyjęcie";
@@ -218,7 +230,7 @@ export function PanelTopbar() {
 
   const goToRepair = (id: string) => {
     setOpen(false);
-    void router.push(`/panel/repairs/${encodeURIComponent(id)}`);
+    void router.push(`/panel/naprawy/${encodeURIComponent(id)}`);
   };
 
   const openLatestRepairForDevice = async (device: GlobalSearchDevice) => {
@@ -237,7 +249,7 @@ export function PanelTopbar() {
       const repairs = await api.get<RepairRequestListItem[]>(`/staff/repairs/?${params.toString()}`, token);
       const latest = repairs?.[0];
       if (latest?.id) {
-        void router.push(`/panel/repairs/${encodeURIComponent(latest.id)}`);
+        void router.push(`/panel/naprawy/${encodeURIComponent(latest.id)}`);
       }
     } catch {
       // Jeśli nie uda się pobrać napraw, nie blokujemy UX - dropdown po prostu się zamyka.
@@ -261,6 +273,10 @@ export function PanelTopbar() {
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    setPanelTheme(getTheme());
   }, []);
 
   const handleLogout = async () => {
@@ -591,6 +607,21 @@ export function PanelTopbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              toggleTheme();
+              const t = getTheme();
+              setPanelTheme(t);
+              showToast(t === "dark" ? "Tryb ciemny" : "Tryb jasny", "success");
+            }}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            aria-label={panelTheme === "dark" ? "Przełącz na jasny motyw" : "Przełącz na ciemny motyw"}
+            style={{ color: accent }}
+          >
+            {panelTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
           <Link
             href="/panel/powiadomienia"
             className="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"

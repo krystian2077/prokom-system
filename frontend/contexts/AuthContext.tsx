@@ -9,7 +9,16 @@ import {
   type ReactNode,
 } from "react";
 import { api, getErrorMessageFromBody } from "@/lib/api";
-import { getStoredToken, setStoredToken, clearStoredToken } from "@/lib/auth-storage";
+import {
+  getStoredToken,
+  setStoredToken,
+  clearStoredToken,
+  setStoredRole,
+  clearStoredRole,
+  getStoredRole,
+  setSessionCookies,
+  clearSessionCookies,
+} from "@/lib/auth-storage";
 import type { User } from "@/types/auth";
 
 interface AuthState {
@@ -58,8 +67,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const me = await api.get<User>("/accounts/me/", t);
       setToken(t);
       setUser(me as User);
+      const role = (me as User).role;
+      if (role) {
+        setStoredRole(role);
+        setSessionCookies(t, role);
+      }
     } catch {
       clearStoredToken();
+      clearStoredRole();
+      clearSessionCookies();
       setToken(null);
       setUser(null);
     } finally {
@@ -74,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     setToken(t);
+    const r = getStoredRole();
+    if (r) setSessionCookies(t, r);
     refreshUser();
   }, [refreshUser]);
 
@@ -86,6 +104,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const data = res as { token: string; user: User };
         setStoredToken(data.token);
+        setStoredRole(data.user.role);
+        setSessionCookies(data.token, data.user.role);
         setToken(data.token);
         setUser(data.user);
         return { ok: true, user: data.user };
@@ -110,6 +130,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const data = res as { token: string; user: User };
         setStoredToken(data.token);
+        setStoredRole(data.user.role);
+        setSessionCookies(data.token, data.user.role);
         setToken(data.token);
         setUser(data.user);
         return { ok: true, user: data.user };
@@ -162,6 +184,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const data = res as { token: string; user: User };
         setStoredToken(data.token);
+        setStoredRole(data.user.role);
+        setSessionCookies(data.token, data.user.role);
         setToken(data.token);
         setUser(data.user);
         return { ok: true };
@@ -211,6 +235,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // ignore
       }
       clearStoredToken();
+      clearStoredRole();
+      clearSessionCookies();
     }
     setToken(null);
     setUser(null);

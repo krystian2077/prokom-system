@@ -1,7 +1,17 @@
 /**
  * PRO-KOM — centralny klient API do backendu Django.
- * Bazowy URL z NEXT_PUBLIC_API_URL (np. http://localhost:8000).
+ * Bazowy URL: NEXT_PUBLIC_API_URL + /api/v1/
+ *
+ * `api.*(path, token?, …)` — jawny token (kompatybilność wsteczna).
+ * `authApi.*` — Token z localStorage (React Query / nowy panel).
  */
+
+import {
+  getStoredToken,
+  clearStoredToken,
+  clearStoredRole,
+  clearSessionCookies,
+} from "./auth-storage";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_V1 = `${API_BASE}/api/v1`;
@@ -11,6 +21,48 @@ export type ApiMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export interface ApiOptions extends RequestInit {
   method?: ApiMethod;
   token?: string | null;
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+  readonly body?: string;
+
+  constructor(message: string, status: number, body?: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
+function isPublicClientRoute(pathname: string): boolean {
+  const pub = [
+    "/client/login",
+    "/client/rejestracja",
+    "/client/forgot-password",
+    "/client/reset-password",
+    "/client/verify-email",
+  ];
+  return pub.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
+function handleUnauthorized(): void {
+  if (typeof window === "undefined") return;
+  clearStoredToken();
+  clearStoredRole();
+  clearSessionCookies();
+  const p = window.location.pathname;
+  if (p.startsWith("/admin-panel")) {
+    window.location.assign("/panel/login");
+    return;
+  }
+  if (p.startsWith("/panel") && !p.startsWith("/panel/login")) {
+    window.location.assign("/panel/login");
+    return;
+  }
+  if (p.startsWith("/client") && !isPublicClientRoute(p)) {
+    window.location.assign("/client/login");
+  }
 }
 
 /** Bezpieczne parsowanie JSON — nigdy nie rzuca wyjątku. */
@@ -95,10 +147,7 @@ export function getErrorMessageFromBody(errBody: string, fallback = "Wystąpił 
   return fallback;
 }
 
-async function request<T = unknown>(
-  path: string,
-  options: ApiOptions = {}
-): Promise<T> {
+async function request<T = unknown>(path: string, options: ApiOptions = {}): Promise<T> {
   const { method = "GET", token, headers: customHeaders, ...rest } = options;
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -114,7 +163,11 @@ async function request<T = unknown>(
   if (!res.ok) {
     const errBody = await res.text();
     const message = getErrorMessageFromBody(errBody, `Błąd ${res.status}. Spróbuj ponownie.`);
-    throw new Error(message);
+    const hadAuth = Boolean(token);
+    if (res.status === 401 && hadAuth) {
+      handleUnauthorized();
+    }
+    throw new ApiError(message, res.status, errBody);
   }
 
   const text = await res.text();
@@ -123,9 +176,28 @@ async function request<T = unknown>(
   return (parsed ?? undefined) as T;
 }
 
+function authToken(): string | null {
+  return typeof window !== "undefined" ? getStoredToken() : null;
+}
+
+/** Żądania z nagłówkiem Authorization z aktualnego tokena (klient). */
+export const authApi = {
+  get: <T>(path: string) => request<T>(path, { method: "GET", token: authToken() }),
+
+  post: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "POST", body: body ? JSON.stringify(body) : undefined, token: authToken() }),
+
+  patch: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "PATCH", body: body ? JSON.stringify(body) : undefined, token: authToken() }),
+
+  put: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "PUT", body: body ? JSON.stringify(body) : undefined, token: authToken() }),
+
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE", token: authToken() }),
+};
+
 export const api = {
-  get: <T>(path: string, token?: string | null) =>
-    request<T>(path, { method: "GET", token }),
+  get: <T>(path: string, token?: string | null) => request<T>(path, { method: "GET", token }),
 
   post: <T>(path: string, body?: unknown, token?: string | null) =>
     request<T>(path, { method: "POST", body: body ? JSON.stringify(body) : undefined, token }),

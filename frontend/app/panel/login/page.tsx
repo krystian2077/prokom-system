@@ -22,9 +22,13 @@ export default function StaffLoginPage() {
   }, []);
 
   useEffect(() => {
-    if (user && ["staff", "admin"].includes(user.role)) {
-      router.replace(returnUrl);
+    if (!user || !["staff", "admin"].includes(user.role)) return;
+    if (user.role === "admin") {
+      router.replace("/admin-panel/dashboard");
+      return;
     }
+    const dest = returnUrl.startsWith("/panel") ? returnUrl : "/panel/dashboard";
+    router.replace(dest);
   }, [router, user, returnUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +38,12 @@ export default function StaffLoginPage() {
     const result = await staffLogin(email, password);
     setSubmitting(false);
     if (result.ok && result.user && ["staff", "admin"].includes(result.user.role)) {
-      router.push(returnUrl);
+      if (result.user.role === "admin") {
+        router.push("/admin-panel/dashboard");
+      } else {
+        const dest = returnUrl.startsWith("/panel") ? returnUrl : "/panel/dashboard";
+        router.push(dest);
+      }
       return;
     }
     setError(result.error || "Nieprawidłowy e-mail, hasło lub brak uprawnień.");

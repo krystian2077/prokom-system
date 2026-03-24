@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 /**
  * UWAGA:
@@ -72,14 +73,17 @@ export function WorkerStatusChangeModal({
   onStatusSaved?: () => void;
 }) {
   const { token } = useAuth();
+  const { confirm } = useConfirm();
 
   const [savedBanner, setSavedBanner] = useState<string | null>(null);
+  const [blocker, setBlocker] = useState("");
   const [newStatus, setNewStatus] = useState<RepairStatusValue>("in_repair");
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setSavedBanner(null);
+    setBlocker("");
     setNotes("");
     const maybe = STATUS_OPTIONS.find((s) => s.value === currentStatus) ? (currentStatus as RepairStatusValue) : null;
     if (maybe) setNewStatus(maybe);
@@ -88,16 +92,28 @@ export function WorkerStatusChangeModal({
   // Wykorzystujemy istniejący modal UI (select + notes), ale przechwytujemy zachowanie po submit:
   // StatusChangeModal niestety zamyka po submit, więc nie możemy go używać 1:1.
   // Dlatego renderujemy własny wrapper i dajemy użytkownikowi zamknięcie przyciskiem.
-  if (!open) return null;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!token) return;
+    if (newStatus === "delivered") {
+      const ok = await confirm({
+        title: "Potwierdzenie dostawy",
+        description:
+          "Status „Dostarczone” kończy proces obsługi zgłoszenia. Upewnij się, że urządzenie faktycznie dotarło do klienta.",
+        confirmLabel: "Tak, oznacz jako dostarczone",
+        variant: "warning",
+      });
+      if (!ok) return;
+    }
     setSavedBanner(null);
-    await api.post(`/repairs/${repairId}/change-status/`, { new_status: newStatus, notes: notes.trim() || "" }, token);
+    const combined = [blocker.trim(), notes.trim()].filter(Boolean).join("\n\n");
+    await api.post(`/repairs/${repairId}/change-status/`, { new_status: newStatus, notes: combined }, token);
     setSavedBanner("✓ Status zmieniony");
     onStatusSaved?.();
   };
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4 py-8" role="dialog" aria-modal>
@@ -126,6 +142,17 @@ export function WorkerStatusChangeModal({
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Blokada / przyczyna (opcjonalnie)</label>
+            <input
+              type="text"
+              value={blocker}
+              onChange={(e) => setBlocker(e.target.value)}
+              className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+              placeholder="np. czeka na część, decyzja klienta…"
+            />
+          </div>
+
+          <div>
             <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Nowy status</label>
             <select
               value={newStatus}
@@ -147,7 +174,7 @@ export function WorkerStatusChangeModal({
               onChange={(e) => setNotes(e.target.value)}
               className="mt-1 w-full resize-none rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
               rows={4}
-              placeholder="np. decyzja klienta, przyczyna zmiany, komentarz dla zespołu…"
+              placeholder="np. szczegóły dla zespołu, komentarz po zmianie…"
             />
           </div>
 

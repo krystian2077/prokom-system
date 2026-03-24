@@ -3,7 +3,7 @@
 import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
@@ -123,6 +123,7 @@ function derivePillFilter(item: RepairRequestListItem, pill: RepairsPillKey) {
 function RepairsPageInner() {
   const { token, user } = useAuth();
   const router = useRouter();
+  const qc = useQueryClient();
   const searchParams = useSearchParams();
 
   const pill = (searchParams.get("status") as RepairsPillKey) ?? "all";
@@ -131,13 +132,17 @@ function RepairsPageInner() {
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
   const assignedToId = user?.id ? String(user.id) : null;
+  const isAdmin = user?.role === "admin";
 
   const repairsQuery = useQuery({
-    queryKey: ["repairs", "staff", "list", assignedToId],
-    enabled: Boolean(token && assignedToId),
+    queryKey: ["repairs", "staff", "list", isAdmin ? "all" : assignedToId],
+    enabled: Boolean(token && user && (isAdmin || assignedToId)),
     queryFn: async () => {
-      if (!token || !assignedToId) throw new Error("Missing auth/user");
-      return api.get<RepairRequestListItem[]>(`/staff/repairs/?assigned_to=${encodeURIComponent(assignedToId)}`, token);
+      if (!token || !user) throw new Error("Missing auth/user");
+      const path = isAdmin
+        ? `/staff/repairs/?ordering=-created_at`
+        : `/staff/repairs/?assigned_to=${encodeURIComponent(assignedToId!)}`;
+      return api.get<RepairRequestListItem[]>(path, token);
     },
   });
 
@@ -196,13 +201,11 @@ function RepairsPageInner() {
       if (v === undefined || v === null || String(v).length === 0) params.delete(k);
       else params.set(k, String(v));
     });
-    router.push(`/panel/repairs?${params.toString()}`);
+    router.push(`/panel/naprawy?${params.toString()}`);
   };
 
-  const handleRefresh = async () => {
-    // W React Query refresh robimy przez invalidation – tutaj używamy prostej instancji reload.
-    // Panel pracownika ma mieć jednak auto-refresh w kolejnej iteracji.
-    router.refresh();
+  const handleRefresh = () => {
+    void qc.invalidateQueries({ queryKey: ["repairs", "staff", "list"] });
   };
 
   return (
@@ -213,8 +216,8 @@ function RepairsPageInner() {
             <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Pracownik</p>
             <h1 className="mt-2 text-2xl font-semibold text-white">Moje naprawy</h1>
             <p className="mt-1 text-sm text-[#9ca3af]">
-              Przypisane do mnie · <span className="text-white font-semibold">{allItems.filter((i) => nonArchivedStatus(i.status)).length}</span>{" "}
-              aktywnych
+              {isAdmin ? "Wszystkie widoczne w serwisie" : "Przypisane do mnie"} ·{" "}
+              <span className="font-semibold text-white">{allItems.filter((i) => nonArchivedStatus(i.status)).length}</span> aktywnych
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -312,10 +315,25 @@ function RepairsPageInner() {
                 ))}
               </div>
             ) : repairsQuery.error ? (
-              <div className="px-4 py-6 text-sm text-[#fca5a5]">Nie udało się pobrać napraw.</div>
+              <div className="px-4 py-8">
+                <p className="text-sm text-[#fca5a5]">
+                  {repairsQuery.error instanceof Error ? repairsQuery.error.message : "Nie udało się pobrać napraw."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void repairsQuery.refetch()}
+                  className="mt-4 rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  Spróbuj ponownie
+                </button>
+              </div>
+            ) : allItems.length === 0 ? (
+              <div className="px-4 py-12 text-center text-sm text-[#6b7280]">
+                {isAdmin ? "Brak napraw w systemie." : "Brak przypisanych napraw — poczekaj na przypisanie od admina."}
+              </div>
             ) : sliced.length === 0 ? (
               <div className="px-4 py-12 text-center text-sm text-[#6b7280]">
-                Brak przypisanych napraw 🔧 · Poczekaj na przypisanie od admina
+                Brak wyników dla wybranego filtra — zmień zakładkę lub sortowanie.
               </div>
             ) : (
               <div className="px-4 py-2">
@@ -330,7 +348,7 @@ function RepairsPageInner() {
                   return (
                     <Link
                       key={r.id}
-                      href={`/panel/repairs/${r.id}`}
+                      href={`/panel/naprawy/${r.id}`}
                       className="group relative mb-2 block rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-4 transition hover:bg-white/5 hover:border-white/20"
                     >
                       <div className="absolute left-0 top-0 h-full w-[2px] bg-transparent">
@@ -455,17 +473,36 @@ function RepairsPageInner() {
   );
 }
 
+function RepairsPageSkeleton() {
+  return (
+    <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
+      <div className="h-8 w-48 animate-pulse rounded-lg bg-white/10" />
+      <div className="mt-6 rounded-3xl border border-white/10 bg-[#0f1117] p-4">
+        <div className="px-4 py-3">
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <div
+              // eslint-disable-next-line react/no-array-index-key
+              key={idx}
+              className="mt-2 grid animate-pulse grid-cols-[110px_1fr_220px_140px_160px_240px_90px] gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+            >
+              <div className="h-4 w-16 rounded bg-white/10" />
+              <div className="h-4 rounded bg-white/10" />
+              <div className="h-4 rounded bg-white/10" />
+              <div className="h-4 w-24 rounded bg-white/10" />
+              <div className="h-4 w-20 rounded bg-white/10" />
+              <div className="h-4 w-28 rounded bg-white/10" />
+              <div className="h-4 w-8 rounded bg-white/10" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default function RepairsPage() {
   return (
-    <Suspense
-      fallback={
-        <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-          <div className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">
-            Ładowanie napraw...
-          </div>
-        </main>
-      }
-    >
+    <Suspense fallback={<RepairsPageSkeleton />}>
       <RepairsPageInner />
     </Suspense>
   );

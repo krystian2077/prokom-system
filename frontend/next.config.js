@@ -17,6 +17,8 @@ const nextConfig = {
         source: "/api/proxy/:path*",
         destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/:path*`,
       },
+      { source: "/panel/naprawy", destination: "/panel/repairs" },
+      { source: "/panel/naprawy/:path*", destination: "/panel/repairs/:path*" },
     ];
   },
 };

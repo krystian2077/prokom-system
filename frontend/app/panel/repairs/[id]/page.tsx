@@ -1,10 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Clock4, ArrowLeft, MessageSquareText, Receipt, History, ClipboardCheck, PlayCircle, Wrench, ShieldAlert } from "lucide-react";
+import {
+  Clock4,
+  ArrowLeft,
+  MessageSquareText,
+  Receipt,
+  History,
+  ClipboardCheck,
+  PlayCircle,
+  Wrench,
+  ShieldAlert,
+  Smartphone,
+} from "lucide-react";
 
 import { api } from "@/lib/api";
 import type { RepairDetail, RepairTimelineEvent } from "@/types/repairs";
@@ -70,7 +81,6 @@ function TabButton({
 
 export default function RepairDetailPage() {
   const { token, user } = useAuth();
-  const router = useRouter();
   const params = useParams<{ id: string }>();
   const repairId = params?.id;
 
@@ -83,7 +93,7 @@ export default function RepairDetailPage() {
     enabled: Boolean(token && user && repairId),
     queryFn: async () => {
       if (!token || !repairId) throw new Error("Missing token/repairId");
-      return api.get<RepairDetail>(`/repairs/${repairId}/`, token);
+      return api.get<RepairDetail>(`/staff/repairs/${repairId}/`, token);
     },
     staleTime: 10_000,
   });
@@ -208,10 +218,18 @@ export default function RepairDetailPage() {
   }
 
   if (repairQuery.error || !repair) {
+    const msg = repairQuery.error instanceof Error ? repairQuery.error.message : "Nie udało się pobrać szczegółów naprawy.";
     return (
       <main className="mx-auto min-h-screen max-w-[1400px] px-4 py-8">
-        <div className="rounded-3xl border border-white/10 bg-[#0f1117] p-5 text-[#fca5a5]">
-          Nie udało się pobrać szczegółów naprawy.
+        <div className="rounded-3xl border border-red-500/25 bg-[#0f1117] p-6 text-[#fca5a5]">
+          <p className="text-sm">{msg}</p>
+          <Link
+            href="/panel/naprawy"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#3b82f6] hover:underline"
+          >
+            <ArrowLeft size={16} />
+            Wróć do listy napraw
+          </Link>
         </div>
       </main>
     );
@@ -221,56 +239,82 @@ export default function RepairDetailPage() {
     <main className="mx-auto min-h-screen max-w-[1400px] px-4 py-8">
       <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
+          <Link
+            href="/panel/naprawy"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft size={18} />
-            Wróć
-          </button>
+            Wróć do napraw
+          </Link>
 
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-2 text-sm text-[#9ca3af]">
-              <Clock4 size={16} className="text-[#3b82f6]" />
-              <span>Aktualizacja:</span>
-              <span className="font-semibold text-white">{lastUpdatedText}</span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => openStatusModal(repair.id)}
-              className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
-            >
-              Zmień status
-            </button>
+          <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-2 text-sm text-[#9ca3af]">
+            <Clock4 size={16} className="text-[#3b82f6]" />
+            <span>Aktualizacja:</span>
+            <span className="font-semibold text-white">{lastUpdatedText}</span>
           </div>
         </div>
 
-        <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+        <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent opacity-90"
+            aria-hidden
+          />
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="min-w-0">
+              <div className="flex flex-wrap items-start gap-4">
+                <div
+                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-[var(--s2)]"
+                  style={{ background: "var(--s2, #141720)" }}
+                >
+                  <Smartphone size={24} className="text-[#3b82f6]" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
                   <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Naprawa</div>
-                  <h1 className="mt-2 flex flex-wrap items-baseline gap-3 text-[26px] font-semibold text-white">
-                    <span className="font-mono text-[#bcd6ff]">{repair.repair_number}</span>
+                  <h1 className="mt-2 flex flex-wrap items-baseline gap-3">
+                    <span className="font-display text-base font-bold tracking-tight text-white md:text-lg">{repair.repair_number}</span>
                     <span className="text-sm font-semibold text-[#9ca3af]">· {repair.device_name}</span>
                   </h1>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <StatusPill status_display={repair.status_display} status={repair.status} />
+                    {repair.priority_display ? (
+                      <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                        {repair.priority_display}
+                      </span>
+                    ) : null}
+                    {repair.estimated_completion_date ? (
+                      <span className="inline-flex rounded-full border border-[#3b82f6]/25 bg-[#3b82f6]/10 px-3 py-1 text-[11px] font-semibold text-[#93c5fd]">
+                        SLA: {repair.estimated_completion_date}
+                      </span>
+                    ) : null}
+                    {repair.requires_attention ? (
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#f59e0b]">
+                        <ShieldAlert size={14} />
+                        Wymaga reakcji
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
-                <StatusPill status_display={repair.status_display} status={repair.status} />
-                {repair.requires_attention ? (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#f59e0b]">
-                    <ShieldAlert size={14} />
-                    Wymaga reakcji
-                  </span>
-                ) : null}
               </div>
 
-              <p className="mt-3 text-sm text-[#9ca3af]">
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => openStatusModal(repair.id)}
+                  className="rounded-2xl bg-[#22c55e] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[#22c55e]/25 transition hover:bg-[#16a34a]"
+                >
+                  Zmień status
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("comms")}
+                  className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+                >
+                  Wiadomość
+                </button>
+              </div>
+
+              <p className="mt-4 text-sm text-[#9ca3af]">
                 Klient: <span className="font-semibold text-white">{repair.client.full_name}</span>
-                {" · "}
-                Priorytet: <span className="font-semibold text-white">{repair.priority_display}</span>
               </p>
 
               <div className="mt-3 text-sm text-[#9ca3af]">

@@ -5,6 +5,8 @@ import { type ReactNode, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminSidebar } from "@/components/panel/AdminSidebar";
 import { PanelTopbar } from "@/components/panel/PanelTopbar";
+import { WorkerStatusModalRoot } from "@/components/panel/WorkerStatusModalRoot";
+import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 
 export default function AdminPanelLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -32,13 +34,18 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
       {isLoginPage ? (
         children
       ) : (
-        <div className="flex min-h-screen">
-          <AdminSidebar />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <PanelTopbar />
-            <div className="min-w-0 flex-1">{children}</div>
+        <ConfirmProvider>
+          <div className="flex min-h-screen">
+            <AdminSidebar />
+            <div className="flex min-w-0 flex-1 flex-col">
+              <PanelTopbar />
+              <div className="min-w-0 flex-1">
+                <WorkerStatusModalRoot />
+                {children}
+              </div>
+            </div>
           </div>
-        </div>
+        </ConfirmProvider>
       )}
     </div>
   );

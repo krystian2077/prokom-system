@@ -169,20 +169,45 @@ export function WorkerSidebar() {
               </Link>
 
               <Link
-                href="/panel/repairs"
+                href="/panel/naprawy"
                 className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
                 style={{
-                  background: pathname.startsWith("/panel/repairs") || pathname.startsWith("/panel/zgloszenia") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/repairs") || pathname.startsWith("/panel/zgloszenia") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/repairs") || pathname.startsWith("/panel/zgloszenia") ? "3px solid #3b82f6" : "3px solid transparent",
+                  background:
+                    pathname.startsWith("/panel/repairs") ||
+                    pathname.startsWith("/panel/naprawy") ||
+                    pathname.startsWith("/panel/zgloszenia")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/repairs") ||
+                    pathname.startsWith("/panel/naprawy") ||
+                    pathname.startsWith("/panel/zgloszenia")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/repairs") ||
+                    pathname.startsWith("/panel/naprawy") ||
+                    pathname.startsWith("/panel/zgloszenia")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
                 }}
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
                     className="flex h-8 w-8 items-center justify-center rounded-xl"
                     style={{
-                      background: pathname.startsWith("/panel/repairs") || pathname.startsWith("/panel/zgloszenia") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
-                      border: pathname.startsWith("/panel/repairs") || pathname.startsWith("/panel/zgloszenia") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
+                      background:
+                        pathname.startsWith("/panel/repairs") ||
+                        pathname.startsWith("/panel/naprawy") ||
+                        pathname.startsWith("/panel/zgloszenia")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/repairs") ||
+                        pathname.startsWith("/panel/naprawy") ||
+                        pathname.startsWith("/panel/zgloszenia")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
                     }}
                   >
                     <ChevronRight size={18} />

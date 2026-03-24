@@ -5,8 +5,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from apps.common.permissions import IsStaffOrAdmin
-from apps.repairs.selectors import repair_list, staff_dashboard_data
+from apps.repairs.selectors import (
+    repair_list,
+    staff_dashboard_data,
+    staff_dashboard_quality_metrics,
+    staff_health_score,
+)
 from apps.repairs.serializers import RepairRequestListSerializer, RepairRequestSerializer
+from apps.repairs.serializers.staff_dashboard import RecentActivityEntrySerializer
 from apps.repairs.models import RepairRequest
 
 
@@ -72,21 +78,34 @@ class StaffDashboardView(APIView):
     """
     GET /api/v1/staff/dashboard/
 
-    Dashboard pracownika/admina — podstawowe kubełki:
-    - my_new: moje nowe zgłoszenia
-    - my_urgent: moje pilne
-    - today_to_contact: dziś do kontaktu
+    Dashboard pracownika/admina — te same kubełki co GET /api/v1/repairs/dashboard/.
+    Query: days_without_update (int, domyślnie 3), recent_limit (int, domyślnie 10).
     """
 
     permission_classes = [IsAuthenticated, IsStaffOrAdmin]
 
     def get(self, request):
-        data = staff_dashboard_data(request.user.id)
-        buckets = {
-            "my_new": RepairRequestListSerializer(data["my_new"], many=True).data,
-            "my_urgent": RepairRequestListSerializer(data["my_urgent"], many=True).data,
-            "today_to_contact": RepairRequestListSerializer(data["today_to_contact"], many=True).data,
-        }
-        return Response(buckets)
+        user_id = request.user.id
+        days = int(request.query_params.get("days_without_update", 3))
+        limit = int(request.query_params.get("recent_limit", 10))
+        data = staff_dashboard_data(user_id, days_without_update=days, recent_activity_limit=limit)
+        quality = staff_dashboard_quality_metrics(user_id)
+        health = staff_health_score(user_id)
+        quality["health_score"] = {"level": health["level"], "factors": health["factors"]}
+
+        list_serializer = RepairRequestListSerializer
+        return Response(
+            {
+                "my_new": list_serializer(data["my_new"], many=True).data,
+                "my_urgent": list_serializer(data["my_urgent"], many=True).data,
+                "today_to_contact": list_serializer(data["today_to_contact"], many=True).data,
+                "my_in_progress": list_serializer(data["my_in_progress"], many=True).data,
+                "my_overdue": list_serializer(data["my_overdue"], many=True).data,
+                "ready_for_pickup": list_serializer(data["ready_for_pickup"], many=True).data,
+                "without_update": list_serializer(data["without_update"], many=True).data,
+                "recent_activity": RecentActivityEntrySerializer(data["recent_activity"], many=True).data,
+                "quality": quality,
+            }
+        )
 
 
