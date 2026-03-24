@@ -94,7 +94,7 @@ export function PublicNavbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 w-full transition-all duration-300 ${
         isDark
           ? "border-b border-white/10 bg-dark shadow-[0_4px 24px -8px rgba(0,0,0,0.3)] backdrop-blur-xl"
           : "border-b border-gray-100 bg-white/90 backdrop-blur-lg"

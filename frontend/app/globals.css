@@ -14,16 +14,44 @@
   --prokom-warning: #ea580c;
   --prokom-error: #dc2626;
   --prokom-info: #2563eb;
+  /* Globalny scrollbar — przezroczysty tor, kciuk w kolorze marki */
+  --scrollbar-track: transparent;
 }
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  /* overflow-x na html psuje position:sticky nawigacji — clip na wrapperze treści */
+  /* Firefox — tor przezroczysty (widać tło strony pod spodem) */
+  scrollbar-width: auto;
+  scrollbar-color: var(--primary) transparent;
+}
+
+/* Chrome, Edge, Safari — główny pasek strony (viewport) */
+html::-webkit-scrollbar {
+  width: 13px;
+  height: 13px;
+}
+html::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+html::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--primary) 72%, #991b1b);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--primary) 90%, #7f1d1d);
+  background-clip: content-box;
+}
+html::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 body {
   @apply bg-white text-dark antialiased;
-  overflow-x: hidden;
+  /* overflow-x na body psuje sticky — patrz ConditionalPublicLayout overflow-x-hidden */
   /* Safe area dla notched phones */
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
