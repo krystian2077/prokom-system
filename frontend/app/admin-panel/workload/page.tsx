@@ -3,49 +3,45 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import type { RepairRequestListItem } from "@/types/repairs";
 
-type TeamDashboardResponse = {
-  open_count: number;
-  overdue_count: number;
-  urgent_count: number;
-  no_due_date_count: number;
-  by_assigned_to: Array<{
-    user_id: string;
-    user_name: string;
-    count: number;
-  }>;
+type StaffKpiItem = {
+  user_id?: string;
+  full_name?: string;
+  email?: string;
+  repairs_completed?: number;
+  avg_repair_days?: number;
+  complaint_rate?: number;
+  health_score?: number;
+  revenue?: number;
 };
 
 type AvailabilityEntry = {
-  id: number;
-  employee: string;
-  employee_name: string;
+  id: string | number;
+  employee?: string;
+  employee_name?: string;
   availability_type: string;
   availability_type_display: string;
-  date: string;
-  is_all_day: boolean;
-  start_time?: string | null;
-  end_time?: string | null;
+  date?: string;
   note?: string | null;
 };
 
-type AvailabilityWeekResponse = {
-  count?: number;
-  next?: string | null;
-  previous?: string | null;
-  results?: AvailabilityEntry[];
-} | AvailabilityEntry[];
-
-type HealthOverviewResponse = {
-  yellow_count: number;
-  red_count: number;
-  yellow: Array<{ repair: unknown; issues: string[] }>;
-  red: Array<{ repair: unknown; issues: string[] }>;
+type StaffLoad = {
+  userId: string;
+  name: string;
+  activeCount: number;
+  urgentCount: number;
+  readyCount: number;
+  complaintCount: number;
+  healthScore: number;
+  availability?: AvailabilityEntry;
 };
 
 function availabilityBadgeClass(typeDisplay: string, typeValue: string) {
   const v = (typeValue ?? "").toLowerCase();
-  if (v !== "available") return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
+  if (v.includes("dost") || v.includes("available")) return "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]";
+  if (v.includes("zaj") || v.includes("busy")) return "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]";
+  if (v.includes("zew") || v.includes("external")) return "border-[#f97316]/35 bg-[#f97316]/15 text-[#fed7aa]";
   return "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]";
 }
 
@@ -56,23 +52,28 @@ export default function AdminWorkloadPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [teamDash, setTeamDash] = useState<TeamDashboardResponse | null>(null);
-  const [availabilityWeek, setAvailabilityWeek] = useState<AvailabilityEntry[]>([]);
-  const [health, setHealth] = useState<HealthOverviewResponse | null>(null);
+  const [staffKpi, setStaffKpi] = useState<StaffKpiItem[]>([]);
+  const [availabilityToday, setAvailabilityToday] = useState<AvailabilityEntry[]>([]);
+  const [activeRepairs, setActiveRepairs] = useState<RepairRequestListItem[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("all");
 
   const load = async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const [td, av, h] = await Promise.all([
-        api.get<TeamDashboardResponse>(`/tasks/team-dashboard/`, token),
-        api.get<AvailabilityEntry[] | { results: AvailabilityEntry[] }>(`/availability/week/`, token),
-        api.get<HealthOverviewResponse>(`/analytics/health-overview/`, token),
+      const today = new Date().toISOString().slice(0, 10);
+      const [kpiRes, avRes, repairsRes] = await Promise.all([
+        api.get<StaffKpiItem[] | { results?: StaffKpiItem[] }>(`/analytics/staff-kpi/`, token),
+        api.get<AvailabilityEntry[] | { results?: AvailabilityEntry[] }>(`/availability/?date=${encodeURIComponent(today)}`, token),
+        api.get<RepairRequestListItem[] | { results?: RepairRequestListItem[] }>(
+          `/repairs/?status__in=in_progress,waiting_for_parts,ready_for_pickup&page_size=500`,
+          token,
+        ),
       ]);
-      setTeamDash(td);
-      setAvailabilityWeek(Array.isArray(av) ? av : av.results ?? []);
-      setHealth(h);
+      setStaffKpi(Array.isArray(kpiRes) ? kpiRes : kpiRes?.results ?? []);
+      setAvailabilityToday(Array.isArray(avRes) ? avRes : avRes?.results ?? []);
+      setActiveRepairs(Array.isArray(repairsRes) ? repairsRes : repairsRes?.results ?? []);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać workload.";
       setError(msg);
@@ -87,26 +88,42 @@ export default function AdminWorkloadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAdmin]);
 
-  const topAssignees = useMemo(() => {
-    const arr = teamDash?.by_assigned_to ?? [];
-    return [...arr].sort((a, b) => b.count - a.count).slice(0, 10);
-  }, [teamDash]);
-
-  const availabilityByEmployee = useMemo(() => {
-    const map = new Map<string, AvailabilityEntry[]>();
-    for (const e of availabilityWeek) {
-      const arr = map.get(e.employee) ?? [];
-      arr.push(e);
-      map.set(e.employee, arr);
+  const staffLoads = useMemo<StaffLoad[]>(() => {
+    const avMap = new Map<string, AvailabilityEntry>();
+    for (const av of availabilityToday) {
+      const key = String(av.employee ?? "");
+      if (!key) continue;
+      if (!avMap.has(key)) avMap.set(key, av);
     }
-    return map;
-  }, [availabilityWeek]);
+    return staffKpi.map((k) => {
+      const uid = String(k.user_id ?? "");
+      const mine = activeRepairs.filter((r) => {
+        if (!r.assigned_to || typeof r.assigned_to === "string") return false;
+        return String(r.assigned_to.id) === uid;
+      });
+      const urgentCount = mine.filter((r) => (r.priority ?? "").toLowerCase() === "urgent").length;
+      const readyCount = mine.filter((r) => (r.status ?? "").toLowerCase() === "ready_for_pickup").length;
+      const complaintCount = mine.filter((r) => Boolean(r.complaint_warranty_status)).length;
+      return {
+        userId: uid,
+        name: k.full_name || k.email || uid,
+        activeCount: mine.length,
+        urgentCount,
+        readyCount,
+        complaintCount,
+        healthScore: Number(k.health_score ?? 0),
+        availability: avMap.get(uid),
+      };
+    });
+  }, [availabilityToday, staffKpi, activeRepairs]);
 
-  const employeeOrder = useMemo(() => {
-    const ids = topAssignees.map((x) => x.user_id);
-    const rest = Array.from(availabilityByEmployee.keys()).filter((id) => !ids.includes(id));
-    return [...ids, ...rest];
-  }, [availabilityByEmployee, topAssignees]);
+  const visibleRepairs = useMemo(() => {
+    if (activeTab === "all") return activeRepairs;
+    return activeRepairs.filter((r) => {
+      if (!r.assigned_to || typeof r.assigned_to === "string") return false;
+      return String(r.assigned_to.id) === activeTab;
+    });
+  }, [activeRepairs, activeTab]);
 
   if (!isAdmin) {
     return (
@@ -126,104 +143,110 @@ export default function AdminWorkloadPage() {
 
       {error ? <p className="text-sm text-[#fca5a5]">{error}</p> : null}
 
-      {loading || !teamDash ? (
+      {loading ? (
         <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</section>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Otwarte</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{teamDash.open_count}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Pilne</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{teamDash.urgent_count}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Zaległe</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{teamDash.overdue_count}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Bez terminu</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{teamDash.no_due_date_count}</div>
-            </div>
-          </div>
-
-          <section className="grid gap-4 lg:grid-cols-[1.1fr,.9fr]">
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Sugerowane obciążenie</p>
-                  <h2 className="mt-2 text-lg font-semibold text-white">Zadania per pracownik</h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]">
-                    Żółte: {health?.yellow_count ?? 0}
-                  </span>
-                  <span className="inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]">
-                    Czerwone: {health?.red_count ?? 0}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 divide-y divide-white/10 rounded-2xl border border-white/10 bg-[#0b0c10] overflow-hidden">
-                {topAssignees.map((it, idx) => (
-                  <div key={it.user_id} className="flex items-center justify-between gap-3 p-3">
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">#{idx + 1}</div>
-                      <div className="truncate text-sm font-semibold text-white">{it.user_name || it.user_id}</div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {staffLoads.slice(0, 3).map((st) => {
+              const loadPercent = Math.min(100, Math.round((st.activeCount / 10) * 100));
+              const barColor = loadPercent > 80 ? "#dc1e1e" : loadPercent >= 60 ? "#f59e0b" : "#22c55e";
+              return (
+                <div key={st.userId} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold text-white">{st.name}</div>
+                      <div className="mt-1 text-xs text-[#9ca3af]">
+                        {st.availability?.availability_type_display ?? "Brak dostępności"}
+                      </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-[#9ca3af]">Otwarte</div>
-                      <div className="text-sm font-semibold text-white">{it.count}</div>
+                      <div className="text-xs text-[#9ca3af]">Health</div>
+                      <div className="text-lg font-semibold text-white">{st.healthScore || 0}</div>
                     </div>
                   </div>
-                ))}
-                {topAssignees.length === 0 ? <div className="p-4 text-sm text-[#6b7280]">Brak danych.</div> : null}
-              </div>
+
+                  <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+                    <div>
+                      <div className="text-xs text-[#9ca3af]">Aktywne</div>
+                      <div className="text-sm font-semibold text-white">{st.activeCount}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-[#9ca3af]">Pilne</div>
+                      <div className="text-sm font-semibold text-white">{st.urgentCount}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-[#9ca3af]">Gotowe</div>
+                      <div className="text-sm font-semibold text-white">{st.readyCount}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-[#9ca3af]">Rekl.</div>
+                      <div className="text-sm font-semibold text-white">{st.complaintCount}</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <div className="mb-1 flex items-center justify-between text-xs text-[#9ca3af]">
+                      <span>Obciążenie</span>
+                      <span>{loadPercent}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-white/10">
+                      <div className="h-full rounded-full" style={{ width: `${loadPercent}%`, background: barColor }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <h2 className="text-lg font-semibold text-white">Naprawy wg pracownika</h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab("all")}
+                className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${activeTab === "all" ? "border-white/20 bg-white/10 text-white" : "border-white/10 bg-white/5 text-[#9ca3af]"}`}
+              >
+                Wszyscy
+              </button>
+              {staffLoads.map((st) => (
+                <button
+                  key={st.userId}
+                  type="button"
+                  onClick={() => setActiveTab(st.userId)}
+                  className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${activeTab === st.userId ? "border-white/20 bg-white/10 text-white" : "border-white/10 bg-white/5 text-[#9ca3af]"}`}
+                >
+                  {st.name}
+                </button>
+              ))}
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Dostępność (tydzień)</p>
-              <h2 className="mt-2 text-lg font-semibold text-white">Pracownicy i wpisy</h2>
-
-              <div className="mt-4 space-y-4">
-                {employeeOrder.map((eid) => {
-                  const entries = availabilityByEmployee.get(eid) ?? [];
-                  if (!entries.length) return null;
-                  const first = entries[0];
-                  return (
-                    <div key={eid} className="rounded-2xl border border-white/10 bg-[#0b0c10] p-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-semibold text-white">{first.employee_name}</div>
-                          <div className="mt-1 text-xs text-[#9ca3af]">Wpisy: {entries.length}</div>
-                        </div>
-                        <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
-                          {entries[0]?.date}
-                        </span>
-                      </div>
-
-                      <div className="mt-3 space-y-2">
-                        {entries.slice(0, 6).map((e) => (
-                          <div key={e.id} className="flex items-center justify-between gap-3">
-                            <span className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold ${availabilityBadgeClass(e.availability_type_display, e.availability_type)}`}>
-                              {e.availability_type_display}
-                            </span>
-                            <span className="text-xs text-[#9ca3af]">
-                              {e.is_all_day
-                                ? "Cały dzień"
-                                : `${e.start_time ?? "?"} - ${e.end_time ?? "?"}`}
-                            </span>
-                          </div>
-                        ))}
-                        {entries.length > 6 ? <div className="text-xs text-[#6b7280]">+{entries.length - 6} więcej</div> : null}
-                      </div>
+            <div className="mt-4 space-y-2">
+              {visibleRepairs.map((r) => {
+                const assigned =
+                  r.assigned_to && typeof r.assigned_to !== "string"
+                    ? [r.assigned_to.first_name, r.assigned_to.last_name].filter(Boolean).join(" ").trim() ||
+                      r.assigned_to.email
+                    : "—";
+                return (
+                  <div key={r.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0b0c10] px-3 py-2">
+                    <div className="min-w-0">
+                      <div className="font-mono text-xs font-semibold text-white">{r.repair_number}</div>
+                      <div className="truncate text-xs text-[#9ca3af]">{r.device_name} · {r.client_name}</div>
                     </div>
-                  );
-                })}
-                {employeeOrder.length === 0 ? <div className="text-sm text-[#6b7280]">Brak dostępności.</div> : null}
-              </div>
+                    <div className="text-right">
+                      <div className="text-xs text-[#9ca3af]">{assigned}</div>
+                      <button
+                        type="button"
+                        className="mt-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-[#9ca3af]"
+                      >
+                        ↔ Przepisz
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+              {visibleRepairs.length === 0 ? <div className="text-sm text-[#6b7280]">Brak napraw dla wybranego filtra.</div> : null}
             </div>
           </section>
         </>

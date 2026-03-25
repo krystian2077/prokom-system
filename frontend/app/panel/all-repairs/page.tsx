@@ -2,7 +2,6 @@
 
 import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -108,8 +107,22 @@ function derivePillFilter(item: RepairRequestListItem, pill: RepairsPillKey) {
   return inProgressStatuses.includes(s);
 }
 
+function assigneeId(item: RepairRequestListItem): string | null {
+  if (!item.assigned_to) return null;
+  if (typeof item.assigned_to === "string") return item.assigned_to;
+  return item.assigned_to.id ?? null;
+}
+
+function assigneeLabel(item: RepairRequestListItem, userId: string | null | undefined): string {
+  if (!item.assigned_to) return "—";
+  if (typeof item.assigned_to === "string") return item.assigned_to === userId ? "(ja)" : "Pracownik";
+  const name = [item.assigned_to.first_name, item.assigned_to.last_name].filter(Boolean).join(" ").trim();
+  const isMe = item.assigned_to.id === userId;
+  return `${name || item.assigned_to.email}${isMe ? " (ja)" : ""}`;
+}
+
 function AllRepairsPageInner() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -179,7 +192,7 @@ function AllRepairsPageInner() {
       if (v === undefined || v === null || String(v).length === 0) params.delete(k);
       else params.set(k, String(v));
     });
-    router.push(`/panel/all-repairs?${params.toString()}`);
+    router.push(`/panel/wszystkie?${params.toString()}`);
   };
 
   return (
@@ -266,20 +279,22 @@ function AllRepairsPageInner() {
                   const sla = slaMeta(r);
                   const overdue = sla.isOverdue;
 
+                  const mine = assigneeId(r) === user?.id;
                   return (
-                    <Link
+                    <button
                       key={r.id}
-                      href={`/panel/repairs/${r.id}`}
-                      className="group relative mb-2 block rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-4 transition hover:bg-white/5 hover:border-white/20"
+                      type="button"
+                      onClick={() => router.push(mine ? `/panel/naprawy/${r.id}` : `/panel/podglad/${r.id}`)}
+                      className="group relative mb-2 block w-full rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-4 text-left transition hover:bg-white/5 hover:border-white/20"
                     >
-                      <div className="absolute left-0 top-0 h-full w-[2px] bg-transparent">
+                      <div className="absolute left-0 top-0 h-full w-[2px]" style={{ background: mine ? "#3b82f6" : "transparent" }}>
                         <div
                           className={`h-full w-full origin-top transition-transform ${overdue ? "scale-y-100" : "scale-y-0"} group-hover:scale-y-100`}
                           style={{ background: "#ff6b6b", transformOrigin: "top", transitionDuration: "180ms" }}
                         />
                       </div>
 
-                      <div className="grid grid-cols-[110px_1fr_220px_140px_160px_240px_90px] items-center gap-2">
+                      <div className="grid grid-cols-[110px_1fr_220px_150px_170px_130px_220px_90px] items-center gap-2">
                         <div className="min-w-0">
                           <span className="font-mono text-sm font-semibold" style={{ color: overdue ? "#ff6b6b" : "#9ca3af" }}>
                             {r.repair_number}
@@ -318,6 +333,9 @@ function AllRepairsPageInner() {
                           )}
                         </div>
                         <div>
+                          <span className="text-xs text-[#9ca3af]">{assigneeLabel(r, user?.id)}</span>
+                        </div>
+                        <div>
                           <div className={`text-sm font-semibold ${overdue ? "text-[#ff6b6b]" : "text-white"}`}>
                             {r.estimated_completion_date ? parseDate(r.estimated_completion_date)?.toLocaleDateString("pl-PL") : "—"}
                           </div>
@@ -329,7 +347,7 @@ function AllRepairsPageInner() {
                           <Eye size={16} className="opacity-70 transition group-hover:opacity-100" />
                         </div>
                       </div>
-                    </Link>
+                    </button>
                   );
                 })}
               </div>
@@ -367,6 +385,9 @@ function AllRepairsPageInner() {
               </div>
             </div>
           ) : null}
+        </div>
+        <div className="rounded-2xl border border-[#3b82f6]/30 bg-[#3b82f6]/10 px-4 py-3 text-sm text-[#cfe3ff]">
+          Tryb podglądu · Twoje naprawy wyróżnione niebieską linią · Przepisywanie wykonuje administrator.
         </div>
       </div>
     </main>

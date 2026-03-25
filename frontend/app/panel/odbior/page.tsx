@@ -1,196 +1,194 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWorkerStore } from "@/stores/workerStore";
 import type { RepairRequestListItem } from "@/types/repairs";
 
 type PickupPanelResponse = {
   ready_for_pickup: RepairRequestListItem[];
-  unclaimed_3_days: RepairRequestListItem[];
-  unclaimed_7_days: RepairRequestListItem[];
-  to_prepare_shipment: RepairRequestListItem[];
   issued_today: RepairRequestListItem[];
 };
 
-type PickupTabKey = "ready" | "unclaimed_3" | "unclaimed_7" | "to_prepare" | "issued_today";
-
-function statusBadgeText(statusDisplay: string) {
-  return statusDisplay || "—";
+function waitingText(createdAt: string) {
+  const d = new Date(createdAt).getTime();
+  const diffH = Math.max(0, Math.floor((Date.now() - d) / 3600000));
+  if (diffH < 24) return `${diffH}h`;
+  const days = Math.floor(diffH / 24);
+  return `${days} dni`;
 }
 
-function priorityBadgeClass(priorityDisplay: string) {
-  const p = (priorityDisplay ?? "").toLowerCase();
-  if (p.includes("piln") || p.includes("urgent")) return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
-  if (p.includes("ważn") || p.includes("important") || p.includes("wysok")) return "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]";
-  if (p.includes("niski") || p.includes("low")) return "border-white/10 bg-white/5 text-[#9ca3af]";
-  return "border-[#3b82f6]/35 bg-[#3b82f6]/15 text-[#bcd6ff]";
+function assigneeLabel(item: RepairRequestListItem): string {
+  if (!item.assigned_to) return "—";
+  if (typeof item.assigned_to === "string") return "Pracownik";
+  return [item.assigned_to.first_name, item.assigned_to.last_name].filter(Boolean).join(" ").trim() || item.assigned_to.email;
 }
 
 export default function PickupPage() {
   const { token, user } = useAuth();
-  const isAdmin = user?.role === "admin";
-
-  const [loading, setLoading] = useState(true);
+  const addToast = useWorkerStore((s) => s.addToast);
+  const [data, setData] = useState<PickupPanelResponse>({ ready_for_pickup: [], issued_today: [] });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<PickupPanelResponse | null>(null);
+  const [sendingFor, setSendingFor] = useState<string | null>(null);
+  const [smsTemplateId, setSmsTemplateId] = useState<number | null>(null);
 
-  const [tab, setTab] = useState<PickupTabKey>("ready");
+  const userId = user?.id ?? null;
 
   const load = async () => {
-    if (!token || !user) return;
+    if (!token || !userId) return;
     setLoading(true);
     setError(null);
     try {
-      const qs = new URLSearchParams();
-      if (!isAdmin) qs.set("assigned_to", String(user.id));
-      const res = await api.get<PickupPanelResponse>(`/repairs/pickup-panel/${qs.toString() ? `?${qs.toString()}` : ""}`, token);
-      setData(res);
+      const res = await api.get<any>(`/repairs/pickup-panel/?assigned_to=${encodeURIComponent(String(userId))}`, token);
+      setData({
+        ready_for_pickup: Array.isArray(res?.ready_for_pickup) ? res.ready_for_pickup : [],
+        issued_today: Array.isArray(res?.issued_today) ? res.issued_today : [],
+      });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać panelu odbiorów.";
-      setError(msg);
+      setError(e instanceof Error ? e.message : "Nie udało się pobrać danych odbiorów.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!token || !userId) return;
     void load();
-    const interval = window.setInterval(() => {
-      void load();
-    }, 30_000);
-    return () => window.clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, user?.id, isAdmin]);
+  }, [token, userId]);
 
-  const list = (() => {
-    if (!data) return [];
-    if (tab === "ready") return data.ready_for_pickup;
-    if (tab === "unclaimed_3") return data.unclaimed_3_days;
-    if (tab === "unclaimed_7") return data.unclaimed_7_days;
-    if (tab === "to_prepare") return data.to_prepare_shipment;
-    return data.issued_today;
-  })();
+  useEffect(() => {
+    if (!token) return;
+    void api
+      .get<any>(`/communications/templates/?channel=sms&suggested_for_status=ready_for_pickup&is_active=true`, token)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
+        const firstId = Number(list[0]?.id);
+        setSmsTemplateId(Number.isFinite(firstId) ? firstId : null);
+      })
+      .catch(() => setSmsTemplateId(null));
+  }, [token]);
 
-  const tabTitle =
-    tab === "ready"
-      ? "Gotowe do odbioru"
-      : tab === "unclaimed_3"
-        ? "Nieodebrane (3 dni)"
-        : tab === "unclaimed_7"
-          ? "Nieodebrane (7 dni)"
-          : tab === "to_prepare"
-            ? "Do przygotowania wysyłki zwrotnej"
-            : "Wydane dziś";
+  const readyList = data.ready_for_pickup;
+  const issuedList = useMemo(
+    () =>
+      [...data.issued_today].sort(
+        (a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime(),
+      ),
+    [data.issued_today],
+  );
+
+  const sendReadySms = async (repairId: string) => {
+    if (!token || !smsTemplateId) {
+      addToast("Brak aktywnego szablonu SMS dla statusu gotowe do odbioru.", "error");
+      return;
+    }
+    setSendingFor(repairId);
+    try {
+      const res = await api.post<{ success: boolean }>(
+        `/communications/send/`,
+        { repair_id: repairId, template_id: smsTemplateId },
+        token,
+      );
+      if (res?.success) addToast("✓ SMS wysłany do klienta", "success");
+      else addToast("Wysłanie nie powiodło się (sprawdź log komunikacji).", "error");
+      await load();
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : "Nie udało się wysłać SMS.", "error");
+    } finally {
+      setSendingFor(null);
+    }
+  };
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      <div className="mb-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">
-          {isAdmin ? "Panel Admina" : "Panel pracownika"} · Moduł
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Odbiory i wydania</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">
-          Lista napraw do odbioru oraz sprawy, które wymagają akcji operacyjnej.
-        </p>
+    <main className="mx-auto min-h-screen max-w-[1450px] px-4 py-8">
+      <div className="mb-5 flex items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Odbiory</h1>
+          <p className="mt-1 text-sm text-[#9ca3af]">Gotowe do odbioru oraz wydane dziś (widok pracownika).</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void load()}
+          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
+        >
+          Odśwież
+        </button>
       </div>
 
-      <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {(
-              [
-                ["ready", "Gotowe"],
-                ["unclaimed_3", "Nieodebrane 3d"],
-                ["unclaimed_7", "Nieodebrane 7d"],
-                ["to_prepare", "Wysyłka zwrotna"],
-                ["issued_today", "Wydane dziś"],
-              ] as Array<[PickupTabKey, string]>
-            ).map(([k, label]) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => setTab(k)}
-                className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                  tab === k
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+      {error ? <div className="mb-4 rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-[#fca5a5]">{error}</div> : null}
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Gotowe do odbioru</h2>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{readyList.length}</span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => void load()}
-            disabled={!token || loading}
-            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
-          >
-            Odśwież
-          </button>
-        </div>
-      </div>
-
-      {loading && (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">
-          Ładowanie…
-        </div>
-      )}
-
-      {error && <p className="text-sm text-[#fca5a5]">{error}</p>}
-
-      {!loading && !error && (
-        <>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-[#9ca3af]">
-              {tabTitle}: <span className="text-white font-semibold">{list.length}</span>
-            </p>
-            <p className="text-sm text-[#9ca3af]">Kliknij naprawę, aby przejść do szczegółów.</p>
-          </div>
-
-          <div className="space-y-3">
-            {list.length === 0 ? (
-              <p className="text-sm text-[#6b7280]">Brak pozycji w tym widoku.</p>
-            ) : (
-              list.map((r) => (
-                <div key={r.id} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="min-w-[260px]">
-                      <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Naprawa</p>
-                      <Link href={`/panel/repairs/${r.id}`} className="mt-1 block text-lg font-semibold text-white hover:underline">
+          {loading ? (
+            <div className="text-sm text-[#9ca3af]">Ładowanie…</div>
+          ) : readyList.length === 0 ? (
+            <div className="text-sm text-[#6b7280]">Brak napraw gotowych do odbioru.</div>
+          ) : (
+            <div className="space-y-2">
+              {readyList.map((r) => (
+                <div key={r.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Link href={`/panel/naprawy/${r.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
                         {r.repair_number}
                       </Link>
-                      <p className="mt-2 text-sm text-[#9ca3af]">
-                        {r.device_name} · {r.client_name}
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Status</p>
-                      <p className="mt-1 text-sm font-semibold text-white">{statusBadgeText(r.status_display)}</p>
-
-                      <div className="mt-3">
-                        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${priorityBadgeClass(r.priority_display)}`}>
-                          {r.priority_display}
-                        </span>
+                      <div className="mt-1 truncate text-sm text-white">{r.device_name}</div>
+                      <div className="mt-1 text-xs text-[#9ca3af]">
+                        {r.client_name} · Czeka: {waitingText(r.created_at)} · Pracownik: {assigneeLabel(r)}
                       </div>
-
-                      {typeof r.waiting_for_client_days === "number" && (
-                        <p className="mt-2 text-xs text-[#9ca3af]">
-                          Czeka {r.waiting_for_client_days} dni na klienta
-                        </p>
-                      )}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => void sendReadySms(r.id)}
+                      disabled={sendingFor === r.id}
+                      className="shrink-0 rounded-xl border border-[#3b82f6]/35 bg-[#3b82f6]/15 px-3 py-2 text-xs font-semibold text-[#bfdbfe] hover:bg-[#3b82f6]/25 disabled:opacity-60"
+                    >
+                      {sendingFor === r.id ? "Wysyłanie…" : "Nie powiadomiony! Wyślij SMS"}
+                    </button>
                   </div>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wydane dziś</h2>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{issuedList.length}</span>
           </div>
-        </>
-      )}
+
+          {loading ? (
+            <div className="text-sm text-[#9ca3af]">Ładowanie…</div>
+          ) : issuedList.length === 0 ? (
+            <div className="text-sm text-[#6b7280]">Brak wydanych dziś.</div>
+          ) : (
+            <div className="space-y-2">
+              {issuedList.map((r) => (
+                <div key={r.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0f1117] px-3 py-2">
+                  <div className="min-w-0">
+                    <div className="font-mono text-xs font-semibold text-white">{r.repair_number}</div>
+                    <div className="truncate text-xs text-[#9ca3af]">{r.device_name}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-[#86efac]">✓ {new Date(r.created_at).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}</div>
+                    <div className="text-[11px] text-[#9ca3af]">{r.status_display}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
     </main>
   );
 }

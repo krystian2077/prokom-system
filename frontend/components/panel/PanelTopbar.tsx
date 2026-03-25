@@ -38,7 +38,7 @@ export function PanelTopbar() {
     if (repairsDetail) return "Szczegóły naprawy";
     if (repairsList) return "Naprawy";
     if (pathname === "/panel/unassigned" || pathname === "/panel/nieprzypisane") return "Nieprzypisane";
-    if (pathname === "/panel/all-repairs") return "Wszystkie naprawy";
+    if (pathname === "/panel/all-repairs" || pathname === "/panel/wszystkie") return "Wszystkie naprawy";
     if (pathname.startsWith("/panel/intake")) return "Przyjęcie";
     if (pathname.startsWith("/panel/comm")) return "Komunikacja";
     if (pathname.startsWith("/panel/powiadomienia")) return "Powiadomienia";
@@ -49,7 +49,7 @@ export function PanelTopbar() {
     if (pathname.startsWith("/panel/archive") || pathname.startsWith("/panel/historia")) return "Historia napraw";
     if (pathname.startsWith("/panel/clients") || pathname.startsWith("/panel/klienci")) return "Klienci";
     if (pathname.startsWith("/panel/search") || pathname.startsWith("/panel/wyszukiwanie")) return "Wyszukiwanie";
-    if (pathname.startsWith("/panel/pickups") || pathname.startsWith("/panel/odbior")) return "Odbiory";
+    if (pathname.startsWith("/panel/pickups") || pathname.startsWith("/panel/odbior") || pathname.startsWith("/panel/odbiory")) return "Odbiory";
     if (
       pathname.startsWith("/panel/claims") ||
       pathname.startsWith("/panel/reklamacje-gwarancje") ||

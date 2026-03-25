@@ -4,99 +4,76 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import type { RepairRequestListItem } from "@/types/repairs";
 
-type CommLogItem = {
+type RepairMessage = {
   id: number;
-  repair: string;
-  repair_number?: string;
-  template_name?: string | null;
-  channel: string;
-  channel_display: string;
-  recipient: string;
-  subject: string;
-  body_snapshot: string;
-  sent_at: string;
-  sent_by?: string | null;
-  status: string;
-  error_message?: string | null;
+  note: string;
+  is_important: boolean;
+  author_name?: string | null;
+  created_at: string;
 };
 
-type PaginatedResponse<T> = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
+type Thread = {
+  repair: RepairRequestListItem;
+  messages: RepairMessage[];
 };
 
-const PAGE_SIZE = 25;
-
-const CHANNEL_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "email", label: "E-mail" },
-  { value: "sms", label: "SMS" },
-  { value: "panel", label: "Panel klienta" },
-  { value: "phone", label: "Telefon" },
-  { value: "internal", label: "Wewnętrzna" },
-];
-
-const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "sent", label: "Wysłano" },
-  { value: "failed", label: "Błąd wysyłki" },
-];
-
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString("pl-PL");
+function dateLabel(iso: string) {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("pl-PL", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
 
 export default function CommPage() {
-  const { token, user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { token } = useAuth();
 
-  const [page, setPage] = useState(1);
-  const [channel, setChannel] = useState("");
-  const [status, setStatus] = useState("");
+  const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
-
-  const [items, setItems] = useState<CommLogItem[]>([]);
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [activeRepairId, setActiveRepairId] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [channel, setChannel] = useState<"sms" | "email">("sms");
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [count, setCount] = useState(0);
-  const [next, setNext] = useState<string | null>(null);
-  const [previous, setPrevious] = useState<string | null>(null);
+  const [suggestedReply, setSuggestedReply] = useState("");
 
-  const effectiveChannelOptions = useMemo(() => {
-    // SMS może być wyłączony w Twojej konfiguracji (hint: w poprzednich etapach pomijaliśmy),
-    // ale backend obsługuje logi po kanale.
-    return CHANNEL_OPTIONS;
-  }, []);
+  useEffect(() => {
+    const t = window.setTimeout(() => setSearch(searchDraft.trim()), 300);
+    return () => window.clearTimeout(t);
+  }, [searchDraft]);
 
-  const load = async () => {
+  const loadThreads = async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const qs: string[] = [];
-      qs.push(`page=${page}`);
-      qs.push(`page_size=${PAGE_SIZE}`);
-      if (channel) qs.push(`channel=${encodeURIComponent(channel)}`);
-      if (status) qs.push(`status=${encodeURIComponent(status)}`);
-      // backend nie ma SearchFilter, więc search zrobimy po stronie UI
-      const res = await api.get<PaginatedResponse<CommLogItem>>(`/communications/logs/?${qs.join("&")}`, token);
-      const filtered = search.trim()
-        ? res.results.filter((r) => {
-            const needle = search.trim().toLowerCase();
-            const hay =
-              `${r.repair_number ?? ""} ${r.recipient ?? ""} ${r.subject ?? ""} ${r.channel_display ?? ""}`.toLowerCase();
-            return hay.includes(needle);
-          })
-        : res.results;
+      const repairs = await api.get<RepairRequestListItem[]>(`/staff/repairs/?ordering=-created_at`, token);
+      const base = (repairs ?? []).slice(0, 30);
 
-      setItems(filtered);
-      setCount(res.count);
-      setNext(res.next);
-      setPrevious(res.previous);
+      const withMessages = await Promise.all(
+        base.map(async (r) => {
+          try {
+            const msgs = await api.get<RepairMessage[]>(`/repairs/${r.id}/messages/?note_type=client`, token);
+            return { repair: r, messages: Array.isArray(msgs) ? msgs : [] } as Thread;
+          } catch {
+            return { repair: r, messages: [] } as Thread;
+          }
+        }),
+      );
+
+      const onlyWithMessages = withMessages
+        .filter((t) => t.messages.length > 0 || t.repair.requires_attention)
+        .sort((a, b) => {
+          const at = a.messages[0]?.created_at || a.repair.created_at;
+          const bt = b.messages[0]?.created_at || b.repair.created_at;
+          return new Date(bt).getTime() - new Date(at).getTime();
+        });
+
+      setThreads(onlyWithMessages);
+      setActiveRepairId((prev) => prev || onlyWithMessages[0]?.repair.id || null);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać logów komunikacji.";
-      setError(msg);
+      setError(e instanceof Error ? e.message : "Nie udało się pobrać wątków.");
     } finally {
       setLoading(false);
     }
@@ -104,183 +81,212 @@ export default function CommPage() {
 
   useEffect(() => {
     if (!token) return;
-    void load();
+    void loadThreads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, page, channel, status, search]);
+  }, [token]);
+
+  const filteredThreads = useMemo(() => {
+    if (!search) return threads;
+    const needle = search.toLowerCase();
+    return threads.filter((t) => {
+      const head = `${t.repair.repair_number} ${t.repair.client_name} ${t.repair.device_name}`.toLowerCase();
+      const body = (t.messages[0]?.note || "").toLowerCase();
+      return head.includes(needle) || body.includes(needle);
+    });
+  }, [threads, search]);
+
+  const activeThread = filteredThreads.find((t) => t.repair.id === activeRepairId) || filteredThreads[0] || null;
 
   useEffect(() => {
-    setPage(1);
-  }, [channel, status, search]);
+    if (!activeThread) return;
+    const key = `draft-${activeThread.repair.id}`;
+    const restored = localStorage.getItem(key) || "";
+    setDraft(restored);
+  }, [activeThread?.repair.id]);
 
-  const pageCount = Math.max(1, Math.ceil(count / PAGE_SIZE));
+  useEffect(() => {
+    if (!activeThread) return;
+    const key = `draft-${activeThread.repair.id}`;
+    const t = window.setTimeout(() => {
+      if (draft.trim()) localStorage.setItem(key, draft);
+      else localStorage.removeItem(key);
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [activeThread?.repair.id, draft]);
+
+  useEffect(() => {
+    if (!token || !activeThread) return;
+    void api
+      .get<any>(`/communications/templates/?trigger=${encodeURIComponent(activeThread.repair.status)}&channel=panel`, token)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
+        const first = list[0];
+        const text = (first?.body || first?.content || first?.message || "").toString();
+        setSuggestedReply(text);
+      })
+      .catch(() => setSuggestedReply(""));
+  }, [token, activeThread?.repair.status]);
+
+  const smsMeta = useMemo(() => {
+    const len = draft.length;
+    const chunks = Math.max(1, Math.ceil(Math.max(0, len) / 160));
+    const cap = chunks * 160;
+    const tone = len >= 155 ? "red" : len >= 130 ? "amber" : "green";
+    return { len, chunks, cap, tone };
+  }, [draft]);
+
+  const sendMessage = async () => {
+    if (!token || !activeThread || !draft.trim()) return;
+    setSending(true);
+    setError(null);
+    try {
+      await api.post(`/repairs/${activeThread.repair.id}/notes/`, { note: draft.trim(), is_internal: false, note_type: "client_contact" }, token);
+      localStorage.removeItem(`draft-${activeThread.repair.id}`);
+      setDraft("");
+      await loadThreads();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Nie udało się wysłać wiadomości.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">
-            {isAdmin ? "Panel Admina" : "Panel pracownika"} · Moduł
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold text-white">Komunikacja (logi wysyłek)</h1>
-          <p className="mt-1 text-sm text-[#9ca3af]">Podgląd wysłanych wiadomości do klientów w kontekście napraw.</p>
-        </div>
-
-        <div className="w-full md:w-[520px]">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Szukaj: numer naprawy, adresat, temat…"
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
-          />
-        </div>
+    <main className="mx-auto min-h-screen max-w-[1450px] px-4 py-8">
+      <div className="mb-4">
+        <h1 className="text-2xl font-semibold text-white">Komunikacja</h1>
+        <p className="mt-1 text-sm text-[#9ca3af]">Wątki napraw z wiadomościami od klienta i szybka odpowiedź.</p>
       </div>
 
-      <section className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
-                Kanał
-              </label>
-              <select
-                value={channel}
-                onChange={(e) => setChannel(e.target.value)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-              >
-                <option value="">Wszystkie</option>
-                {effectiveChannelOptions.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+      <div className="mb-4">
+        <input
+          value={searchDraft}
+          onChange={(e) => setSearchDraft(e.target.value)}
+          placeholder="Szukaj po numerze, kliencie, urządzeniu..."
+          className="w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+        />
+      </div>
 
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
-                Status
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-              >
-                <option value="">Wszystkie</option>
-                {STATUS_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+      {error ? <div className="mb-4 rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-[#fca5a5]">{error}</div> : null}
 
-          <div className="text-right text-xs text-[#9ca3af]">
-            Wyniki: <span className="text-white font-semibold">{count}</span>
-          </div>
+      <section className="grid gap-4 lg:grid-cols-[360px_1fr]">
+        <aside className="rounded-3xl border border-white/10 bg-[#0c0d12] p-3">
+          <div className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wątki</div>
+          {loading ? (
+            <div className="px-2 py-3 text-sm text-[#9ca3af]">Ładowanie…</div>
+          ) : filteredThreads.length === 0 ? (
+            <div className="px-2 py-3 text-sm text-[#6b7280]">Brak wątków do wyświetlenia.</div>
+          ) : (
+            <div className="space-y-2">
+              {filteredThreads.map((t) => {
+                const active = t.repair.id === (activeThread?.repair.id || "");
+                const last = t.messages[0];
+                return (
+                  <button
+                    key={t.repair.id}
+                    type="button"
+                    onClick={() => setActiveRepairId(t.repair.id)}
+                    className="w-full rounded-2xl border px-3 py-3 text-left transition"
+                    style={{
+                      borderColor: active ? "rgba(59,130,246,.35)" : "rgba(255,255,255,.10)",
+                      background: active ? "rgba(59,130,246,.10)" : "rgba(255,255,255,.02)",
+                    }}
+                  >
+                    <div className="font-mono text-xs font-semibold text-white">{t.repair.repair_number}</div>
+                    <div className="mt-0.5 truncate text-sm text-[#e5e7eb]">{t.repair.client_name} · {t.repair.device_name}</div>
+                    <div className="mt-1 truncate text-xs text-[#9ca3af]">{last?.note || "Brak wiadomości"}</div>
+                    <div className="mt-1 text-[11px] text-[#6b7280]">{last ? dateLabel(last.created_at) : "—"}</div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </aside>
+
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          {!activeThread ? (
+            <div className="text-sm text-[#6b7280]">Wybierz wątek z lewej listy.</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                <div>
+                  <Link href={`/panel/naprawy/${activeThread.repair.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
+                    {activeThread.repair.repair_number}
+                  </Link>
+                  <div className="mt-1 text-sm text-white">{activeThread.repair.client_name} · {activeThread.repair.device_name}</div>
+                  <div className="mt-1 text-xs text-[#9ca3af]">Status: {activeThread.repair.status_display}</div>
+                </div>
+                <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1 text-xs">
+                  <button onClick={() => setChannel("sms")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "sms" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>SMS</button>
+                  <button onClick={() => setChannel("email")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "email" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>E-mail</button>
+                </div>
+              </div>
+
+              {suggestedReply ? (
+                <div className="rounded-2xl border border-[#3b82f6]/30 bg-[#3b82f6]/10 p-3">
+                  <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[#93c5fd]">💡 Sugerowana odpowiedź</div>
+                  <div className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{suggestedReply}</div>
+                  <button
+                    type="button"
+                    onClick={() => setDraft((v) => (v.trim() ? v : suggestedReply))}
+                    className="mt-2 rounded-lg border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-1.5 text-xs font-semibold text-[#bfdbfe] hover:bg-[#3b82f6]/25"
+                  >
+                    Użyj w polu odpowiedzi
+                  </button>
+                </div>
+              ) : null}
+
+              <div className="max-h-[340px] space-y-2 overflow-auto rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                {activeThread.messages.length === 0 ? (
+                  <div className="text-sm text-[#6b7280]">Brak wiadomości.</div>
+                ) : (
+                  activeThread.messages.map((m) => (
+                    <div key={m.id} className="rounded-xl border border-white/10 bg-[#0c0d12] p-3">
+                      <div className="text-xs text-[#9ca3af]">{m.author_name || "—"} · {dateLabel(m.created_at)}</div>
+                      <div className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.note}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  rows={4}
+                  placeholder="Napisz odpowiedź do klienta..."
+                  className="w-full resize-y rounded-2xl border border-white/10 bg-[#111318] px-4 py-3 text-sm text-white outline-none focus:border-[#3b82f6]"
+                />
+                {channel === "sms" ? (
+                  <div
+                    className="mt-2 text-xs font-semibold"
+                    style={{ color: smsMeta.tone === "red" ? "#f87171" : smsMeta.tone === "amber" ? "#fbbf24" : "#86efac" }}
+                  >
+                    {smsMeta.chunks === 1 ? `${smsMeta.len} / 160 znaków` : `${smsMeta.chunks} SMS (${smsMeta.len} / ${smsMeta.cap})`}
+                  </div>
+                ) : null}
+                <div className="mt-3 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDraft("")}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                  >
+                    Wyczyść
+                  </button>
+                  <button
+                    type="button"
+                    disabled={sending || !draft.trim()}
+                    onClick={() => void sendMessage()}
+                    className="rounded-xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60"
+                  >
+                    {sending ? "Wysyłanie…" : channel === "sms" ? "Wyślij SMS" : "Wyślij e-mail"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
-
-      {loading && (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
-      )}
-
-      {error && <p className="text-sm text-[#fca5a5]">{error}</p>}
-
-      {!loading && !error && (
-        <div className="space-y-4">
-          {items.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Brak logów dla wybranych filtrów.</p>
-          ) : (
-            items.map((l) => (
-              <div
-                key={l.id}
-                className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5 transition hover:border-white/20"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="min-w-[260px]">
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Naprawa</p>
-                    <Link
-                      href={`/panel/repairs/${l.repair}`}
-                      className="mt-1 block text-lg font-semibold text-white hover:underline"
-                    >
-                      {l.repair_number ?? l.repair}
-                    </Link>
-                    <p className="mt-2 text-sm text-[#9ca3af]">
-                      Kanał: <span className="text-white font-semibold">{l.channel_display}</span> · Do:{" "}
-                      <span className="text-white font-semibold">{l.recipient}</span>
-                    </p>
-                  </div>
-
-                  <div className="text-right">
-                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Wysłano</p>
-                    <p className="mt-1 text-sm font-semibold text-white">{formatDateTime(l.sent_at)}</p>
-                    <p
-                      className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${
-                        l.status === "failed"
-                          ? "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]"
-                          : "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]"
-                      }`}
-                    >
-                      {l.status === "failed" ? "Błąd wysyłki" : "Wysłano"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Temat</p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{l.subject || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Szablon</p>
-                    <p className="mt-1 text-sm text-[#e5e7eb]">{l.template_name ?? "—"}</p>
-                  </div>
-                </div>
-
-                {l.body_snapshot ? (
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Treść (podgląd)</p>
-                    <p className="mt-1 max-h-28 overflow-hidden text-sm text-[#9ca3af] whitespace-pre-wrap">
-                      {l.body_snapshot.slice(0, 500)}
-                      {l.body_snapshot.length > 500 ? "…" : ""}
-                    </p>
-                  </div>
-                ) : null}
-
-                {l.status === "failed" && l.error_message ? (
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Błąd</p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-[#ffb4b4]">{l.error_message}</p>
-                  </div>
-                ) : null}
-              </div>
-            ))
-          )}
-
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={!previous || page <= 1}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
-            >
-              Poprzednia
-            </button>
-            <p className="text-sm text-[#9ca3af]">
-              Strona {page} / {pageCount}
-            </p>
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-              disabled={!next || page >= pageCount}
-              className="rounded-xl bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
-            >
-              Następna
-            </button>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

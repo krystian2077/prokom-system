@@ -1,87 +1,166 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { StatCardSkeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
 
-type AdminDashboardResponse = {
-  period_days: number;
-  kpi: {
-    new_count: number;
-    in_progress_count: number;
-    ready_for_pickup_count: number;
-    overdue_count: number;
-    unclaimed_count: number;
-    revenue_total: string;
-    quote_value_total: string;
-    complaints_count: number;
-    warranties_count: number;
-  };
-  tables: {
-    most_overdue: RepairRequestListItem[];
-    no_quote_repairs: RepairRequestListItem[];
-    unclaimed_repairs: RepairRequestListItem[];
-    active_complaints: RepairRequestListItem[];
-    active_warranties: RepairRequestListItem[];
-    top_staff: Array<{
-      user_id: string;
-      full_name: string;
-      email: string;
-      completed_repairs: number;
-      revenue: string;
-    }>;
-  };
-  charts?: {
-    repairs_by_status?: Record<string, number>;
-    repairs_over_time?: Array<{ period: string; count: number; revenue: string }>;
-  };
+type RepairsResponse = {
+  count: number;
+  results: RepairRequestListItem[];
 };
 
-function statusPillStyle(status: string) {
-  const s = (status ?? "").toLowerCase();
-  const base = "rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide";
-  if (["cancelled", "unrepairable", "abandoned"].includes(s)) return `${base} border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]`;
-  if (["delivered", "picked_up"].includes(s)) return `${base} border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]`;
-  if (["shipped"].includes(s)) return `${base} border-[#3b82f6]/35 bg-[#3b82f6]/15 text-[#bcd6ff]`;
-  if (["ready_for_pickup", "repair_done"].includes(s)) return `${base} border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]`;
-  return `${base} border-white/10 bg-white/5 text-[#9ca3af]`;
+type KpiResponse = {
+  repairs_total?: number;
+  in_progress_count?: number;
+  ready_for_pickup_count?: number;
+  overdue_count?: number;
+  revenue_total?: string | number;
+  average_completion_days?: number | null;
+};
+
+type DashboardKpi = {
+  repairsTotal: number;
+  inProgress: number;
+  readyForPickup: number;
+  overdue: number;
+  revenueTotal: string | number;
+  avgCompletionDays: number | null;
+};
+
+type AlertSeverity = "red" | "amber" | "blue";
+
+type DashboardAlert = {
+  type: "unassigned" | "sla_overdue" | "waiting_response" | "uncollected";
+  count: number;
+  title: string;
+  severity: AlertSeverity;
+  href: string;
+};
+
+function toNum(v: unknown): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
 }
 
-function priorityBadgeClass(priorityDisplay: string) {
-  const p = (priorityDisplay ?? "").toLowerCase();
-  if (p.includes("piln") || p.includes("urgent")) return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
-  if (p.includes("ważn") || p.includes("important") || p.includes("wysok")) return "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]";
-  if (p.includes("niski") || p.includes("low")) return "border-white/10 bg-white/5 text-[#9ca3af]";
-  return "border-[#3b82f6]/35 bg-[#3b82f6]/15 text-[#bcd6ff]";
-}
-
-function fmtPln(value: string) {
+function fmtMoney(value: string | number): string {
   const n = Number(value);
-  if (!Number.isFinite(n)) return value;
-  return Math.round(n).toLocaleString("pl-PL") + " zł";
+  if (!Number.isFinite(n)) return "0 zł";
+  return `${Math.round(n).toLocaleString("pl-PL")} zł`;
+}
+
+function buildFallbackKpi(repairs: RepairRequestListItem[]): DashboardKpi {
+  const inProgress = repairs.filter((r) => r.status === "in_progress").length;
+  const readyForPickup = repairs.filter((r) => r.status === "ready_for_pickup").length;
+  const overdue = repairs.filter((r) => Boolean((r as { sla_overdue?: boolean }).sla_overdue)).length;
+  return {
+    repairsTotal: repairs.length,
+    inProgress,
+    readyForPickup,
+    overdue,
+    revenueTotal: "0",
+    avgCompletionDays: null,
+  };
+}
+
+function buildAlerts(repairs: RepairRequestListItem[]): DashboardAlert[] {
+  const unassigned = repairs.filter((r) => !r.assigned_to).length;
+  const slaOverdue = repairs.filter((r) => Boolean((r as { sla_overdue?: boolean }).sla_overdue)).length;
+  const waitingResponse = repairs.filter((r) => r.status === "waiting_for_quote_approval").length;
+  const uncollected = repairs.filter((r) => {
+    const daysWaiting = toNum((r as { days_waiting?: number }).days_waiting ?? r.waiting_for_client_days);
+    return r.status === "ready_for_pickup" && daysWaiting > 3;
+  }).length;
+
+  const all: DashboardAlert[] = [
+    {
+      type: "unassigned",
+      count: unassigned,
+      title: `${unassigned} napraw bez przypisanego pracownika`,
+      severity: "red",
+      href: "/admin-panel/nieprzypisane",
+    },
+    {
+      type: "sla_overdue",
+      count: slaOverdue,
+      title: `${slaOverdue} napraw z przekroczonym SLA`,
+      severity: "amber",
+      href: "/admin-panel/naprawy?sla_overdue=true",
+    },
+    {
+      type: "waiting_response",
+      count: waitingResponse,
+      title: `${waitingResponse} klientów czeka na odpowiedź`,
+      severity: "blue",
+      href: "/admin-panel/komunikacja",
+    },
+    {
+      type: "uncollected",
+      count: uncollected,
+      title: `${uncollected} gotowych urządzeń nieodebranych >3 dni`,
+      severity: "red",
+      href: "/admin-panel/odbiory",
+    },
+  ];
+
+  return all.filter((a) => a.count > 0);
+}
+
+function alertClassBySeverity(severity: AlertSeverity): string {
+  if (severity === "red") return "border-[var(--rb)] bg-[var(--rl)] text-[#ffb4b4]";
+  if (severity === "amber") return "border-[var(--ab)] bg-[var(--al)] text-[#ffe3b0]";
+  return "border-[var(--bb)] bg-[var(--bl)] text-[#bcd6ff]";
 }
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const { user, token } = useAuth();
   const isAdmin = user?.role === "admin";
-  const [days, setDays] = useState(30);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<AdminDashboardResponse | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [kpi, setKpi] = useState<DashboardKpi | null>(null);
+  const [alerts, setAlerts] = useState<DashboardAlert[]>([]);
 
   const load = async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
+
     try {
-      const res = await api.get<AdminDashboardResponse>(`/analytics/admin-dashboard/?days=${days}`, token);
-      setData(res);
+      const repairsRes = await api.get<RepairsResponse>("/repairs/?page_size=500", token);
+      const repairs = repairsRes?.results ?? [];
+      setAlerts(buildAlerts(repairs));
+
+      let nextKpi: DashboardKpi | null = null;
+      try {
+        const kpiRes = await api.get<KpiResponse>("/analytics/kpi/", token);
+        nextKpi = {
+          repairsTotal: toNum(kpiRes?.repairs_total ?? repairsRes?.count),
+          inProgress:
+            toNum(kpiRes?.in_progress_count) || repairs.filter((r) => r.status === "in_progress").length,
+          readyForPickup:
+            toNum(kpiRes?.ready_for_pickup_count) ||
+            repairs.filter((r) => r.status === "ready_for_pickup").length,
+          overdue:
+            toNum(kpiRes?.overdue_count) ||
+            repairs.filter((r) => Boolean((r as { sla_overdue?: boolean }).sla_overdue)).length,
+          revenueTotal: kpiRes?.revenue_total ?? "0",
+          avgCompletionDays:
+            typeof kpiRes?.average_completion_days === "number" ? kpiRes.average_completion_days : null,
+        };
+      } catch {
+        nextKpi = buildFallbackKpi(repairs);
+      }
+
+      setKpi(nextKpi);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać dashboardu admina.";
-      setError(msg);
+      setError(e instanceof Error ? e : new Error("Nie udało się pobrać danych dashboardu."));
+      setKpi(null);
+      setAlerts([]);
     } finally {
       setLoading(false);
     }
@@ -91,18 +170,17 @@ export default function AdminDashboardPage() {
     if (!isAdmin) return;
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, isAdmin, days]);
+  }, [token, isAdmin]);
 
-  const kpi = data?.kpi;
-  const tables = data?.tables;
-
-  const topOverdue = tables?.most_overdue.slice(0, 7) ?? [];
-  const topUnclaimed = tables?.unclaimed_repairs.slice(0, 7) ?? [];
-  const activeComplaints = tables?.active_complaints.slice(0, 6) ?? [];
-  const activeWarranties = tables?.active_warranties.slice(0, 6) ?? [];
-  const noQuoteRepairs = tables?.no_quote_repairs.slice(0, 6) ?? [];
-
-  const topStaff = useMemo(() => tables?.top_staff.slice(0, 10) ?? [], [tables]);
+  const kpiCards = useMemo(
+    () => [
+      { label: "Naprawy łącznie", value: kpi?.repairsTotal ?? 0, accent: "var(--blue)" },
+      { label: "W naprawie", value: kpi?.inProgress ?? 0, accent: "var(--amber)" },
+      { label: "Gotowe do odbioru", value: kpi?.readyForPickup ?? 0, accent: "var(--green)" },
+      { label: "Przekroczone SLA", value: kpi?.overdue ?? 0, accent: "var(--red)" },
+    ],
+    [kpi],
+  );
 
   if (!isAdmin) {
     return (
@@ -114,241 +192,95 @@ export default function AdminDashboardPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
-      <header>
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Dashboard</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">
-          KPI, alerty operacyjne, listy napraw oraz top pracownicy.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
+          <h1 className="mt-2 text-2xl font-semibold text-white">Dashboard</h1>
+          <p className="mt-1 text-sm text-[#9ca3af]">KPI zarządcze oraz alerty wymagające reakcji zespołu.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void load()}
+          disabled={loading || !token}
+          className="h-[40px] rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+        >
+          Odśwież
+        </button>
       </header>
 
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Zakres</label>
-            <select
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              className="w-[160px] rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-            >
-              <option value={7}>7 dni</option>
-              <option value={30}>30 dni</option>
-              <option value={90}>90 dni</option>
-            </select>
-          </div>
-          <button
-            type="button"
-            onClick={() => void load()}
-            disabled={!token || loading}
-            className="h-[40px] rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
-          >
-            Odśwież
-          </button>
-        </div>
+      {loading ? (
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+        </section>
+      ) : null}
 
-        {user?.email ? <p className="text-xs text-[#8b93a8]">Zalogowano jako: {user.email}</p> : null}
-      </div>
+      {!loading && error ? <ErrorState error={error} onRetry={() => void load()} /> : null}
 
-      {error ? <p className="text-sm text-[#fca5a5]">{error}</p> : null}
-
-      {loading || !kpi || !tables ? (
-        <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</section>
-      ) : (
+      {!loading && !error && kpi ? (
         <>
-          <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Nowe</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{kpi.new_count}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">W toku</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{kpi.in_progress_count}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Gotowe do odbioru</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{kpi.ready_for_pickup_count}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">Zaległe</div>
-              <div className="mt-2 text-3xl font-semibold text-white">{kpi.overdue_count}</div>
-            </div>
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {kpiCards.map((card) => (
+              <article key={card.label} className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+                <div className="absolute left-0 top-0 h-full w-[2px]" style={{ background: card.accent }} />
+                <p className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">{card.label}</p>
+                <p className="mt-2 text-3xl font-semibold text-white">{card.value}</p>
+              </article>
+            ))}
           </section>
 
-          <section className="grid gap-4 lg:grid-cols-[1.1fr,.9fr]">
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Alerty operacyjne</p>
-                  <h2 className="mt-2 text-lg font-semibold text-white">Szybkie listy</h2>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
-                    Nieodebrane: {kpi.unclaimed_count}
-                  </span>
-                  <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
-                    Reklamacje: {kpi.complaints_count}
-                  </span>
-                  <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
-                    Gwarancje: {kpi.warranties_count}
-                  </span>
-                </div>
+          <section className="grid gap-4 lg:grid-cols-[1.2fr,.8fr]">
+            <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-white">Alerty zarządcze</h2>
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                  Aktywne: {alerts.length}
+                </span>
               </div>
 
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-[#0b0c10] p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Najbardziej zaległe</p>
-                  <div className="mt-3 space-y-2">
-                    {topOverdue.map((r) => (
-                      <Link
-                        key={r.id}
-                        href={`/admin-panel/repairs/${r.id}`}
-                        className="group flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10"
-                      >
-                        <div className="min-w-0">
-                          <div className="truncate font-mono text-sm font-semibold text-white group-hover:text-[#dc1e1e]">
-                            {r.repair_number}
-                          </div>
-                          <div className="truncate text-xs text-[#9ca3af]">
-                            {r.device_name} · {r.client_name}
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <span className={statusPillStyle(r.status)}>{r.status_display}</span>
-                          <span
-                            className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${priorityBadgeClass(
-                              r.priority_display,
-                            )}`}
-                          >
-                            {r.priority_display}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                    {topOverdue.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
-                  </div>
+              {alerts.length === 0 ? (
+                <p className="rounded-xl border border-[var(--gb)] bg-[var(--gl)] px-3 py-2 text-sm text-[#bbf7d0]">
+                  Brak aktywnych alertów.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {alerts.map((alert) => (
+                    <button
+                      key={alert.type}
+                      type="button"
+                      onClick={() => router.push(alert.href)}
+                      className={`w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold transition hover:brightness-110 ${alertClassBySeverity(
+                        alert.severity,
+                      )}`}
+                    >
+                      {alert.title}
+                    </button>
+                  ))}
                 </div>
-
-                <div className="rounded-2xl border border-white/10 bg-[#0b0c10] p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Nieodebrane</p>
-                  <div className="mt-3 space-y-2">
-                    {topUnclaimed.map((r) => (
-                      <Link
-                        key={r.id}
-                        href={`/admin-panel/repairs/${r.id}`}
-                        className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10"
-                      >
-                        <div className="truncate font-mono text-sm font-semibold text-white hover:text-[#dc1e1e]">
-                          {r.repair_number}
-                        </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <span className={statusPillStyle(r.status)}>{r.status_display}</span>
-                          <span
-                            className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${priorityBadgeClass(
-                              r.priority_display,
-                            )}`}
-                          >
-                            {r.priority_display}
-                          </span>
-                        </div>
-                        <div className="mt-1 text-xs text-[#9ca3af] truncate">
-                          {r.device_name} · {r.client_name}
-                        </div>
-                      </Link>
-                    ))}
-                    {topUnclaimed.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-[#0b0c10] p-3 md:col-span-2">
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Bez wyceny</p>
-                      <div className="mt-2 space-y-2">
-                        {noQuoteRepairs.map((r) => (
-                          <Link
-                            key={r.id}
-                            href={`/admin-panel/repairs/${r.id}`}
-                            className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
-                          >
-                            <div className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</div>
-                            <div className="mt-1 text-xs text-[#9ca3af] truncate">{r.client_name}</div>
-                          </Link>
-                        ))}
-                        {noQuoteRepairs.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Aktywne reklamacje</p>
-                      <div className="mt-2 space-y-2">
-                        {activeComplaints.map((r) => (
-                          <Link
-                            key={r.id}
-                            href={`/admin-panel/repairs/${r.id}`}
-                            className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
-                          >
-                            <div className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</div>
-                            <div className="mt-1 text-xs text-[#9ca3af] truncate">{r.client_name}</div>
-                          </Link>
-                        ))}
-                        {activeComplaints.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Aktywne gwarancje</p>
-                      <div className="mt-2 space-y-2">
-                        {activeWarranties.map((r) => (
-                          <Link
-                            key={r.id}
-                            href={`/admin-panel/repairs/${r.id}`}
-                            className="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
-                          >
-                            <div className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</div>
-                            <div className="mt-1 text-xs text-[#9ca3af] truncate">{r.client_name}</div>
-                          </Link>
-                        ))}
-                        {activeWarranties.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Top pracownicy</p>
-              <h2 className="mt-2 text-lg font-semibold text-white">Ranking</h2>
-
-              <div className="mt-3 text-sm text-[#9ca3af]">
-                Przychód: <span className="text-white font-semibold">{fmtPln(kpi.revenue_total)}</span>
-              </div>
-              <div className="mt-1 text-sm text-[#9ca3af]">
-                Suma wycen: <span className="text-white font-semibold">{fmtPln(kpi.quote_value_total)}</span>
-              </div>
-
-              <div className="mt-4 divide-y divide-white/10 rounded-2xl border border-white/10 bg-[#0b0c10] overflow-hidden">
-                {topStaff.map((st, idx) => (
-                  <div key={st.user_id} className="flex items-start justify-between gap-3 p-3">
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">#{idx + 1}</div>
-                      <div className="mt-1 truncate text-sm font-semibold text-white">{st.full_name}</div>
-                      <div className="mt-1 truncate text-xs text-[#9ca3af]">{st.email}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-[#9ca3af]">Zakończone</div>
-                      <div className="text-sm font-semibold text-white">{st.completed_repairs}</div>
-                      <div className="mt-2 text-xs text-[#9ca3af]">Przychód</div>
-                      <div className="text-sm font-semibold text-white">{fmtPln(st.revenue)}</div>
-                    </div>
-                  </div>
-                ))}
-                {topStaff.length === 0 ? <div className="p-4 text-sm text-[#6b7280]">Brak danych.</div> : null}
-              </div>
+            <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+              <h2 className="text-lg font-semibold text-white">Kondycja operacyjna</h2>
+              <p className="mt-1 text-sm text-[#9ca3af]">Podstawowe wskaźniki finansowe i czasowe z dashboardu admina.</p>
+              <dl className="mt-4 space-y-3">
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <dt className="text-[#9ca3af]">Przychód</dt>
+                  <dd className="font-semibold text-white">{fmtMoney(kpi.revenueTotal)}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <dt className="text-[#9ca3af]">Śr. czas naprawy</dt>
+                  <dd className="font-semibold text-white">
+                    {kpi.avgCompletionDays === null ? "Brak danych" : `${kpi.avgCompletionDays.toFixed(1)} dnia`}
+                  </dd>
+                </div>
+              </dl>
             </div>
           </section>
         </>
-      )}
+      ) : null}
     </main>
   );
 }
