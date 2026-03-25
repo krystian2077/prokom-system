@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useParams, usePathname } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Clock4,
@@ -15,14 +15,21 @@ import {
   Wrench,
   ShieldAlert,
   Smartphone,
+  Package,
 } from "lucide-react";
 
 import { api } from "@/lib/api";
 import type { RepairDetail, RepairTimelineEvent } from "@/types/repairs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
+import { RepairPartsSection } from "@/components/panel/RepairPartsSection";
+import { RepairDetailLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 
-type TabId = "details" | "checklist" | "test" | "comms" | "pricing" | "client_history";
+type TabId = "details" | "parts" | "checklist" | "test" | "comms" | "pricing" | "client_history";
+
+/** Statusy przed zakończeniem diagnostyki — sekcja „Naprawa” w checklistie pozostaje zablokowana (Rozdz. 12). */
+const PRE_DIAGNOSTICS_REPAIR_STATUSES = new Set(["new", "accepted", "in_diagnostics"]);
 
 function StatusPill({ status_display, status }: { status_display?: string | null; status?: string | null }) {
   const s = (status ?? "").toLowerCase();
@@ -81,10 +88,19 @@ function TabButton({
 
 export default function RepairDetailPage() {
   const { token, user } = useAuth();
+  const queryClient = useQueryClient();
   const params = useParams<{ id: string }>();
+  const pathname = usePathname() ?? "";
   const repairId = params?.id;
 
+  const isAdminRepairContext = pathname.startsWith("/admin-panel");
+  const repairsListHref = isAdminRepairContext ? "/admin-panel/repairs" : "/panel/naprawy";
+  const repairsBackLabel = isAdminRepairContext ? "Wróć do listy napraw" : "Wróć do napraw";
+  const repairSiblingHref = (id: string) =>
+    isAdminRepairContext ? `/admin-panel/repairs/${encodeURIComponent(id)}` : `/panel/naprawy/${encodeURIComponent(id)}`;
+
   const openStatusModal = useWorkerStore((s) => s.openStatusModal);
+  const showToast = useWorkerStore((s) => s.addToast);
 
   const [activeTab, setActiveTab] = useState<TabId>("details");
   const [showQuickMenu, setShowQuickMenu] = useState(false);
@@ -142,8 +158,52 @@ export default function RepairDetailPage() {
       if (!token || !repairId) throw new Error("Missing token/repairId");
       return api.patch<any>(`/repairs/${repairId}/checklist/item/`, payload, token);
     },
-    onSuccess: () => {
-      void checklistQuery.refetch();
+    onMutate: async (payload) => {
+      const key = ["repair", repairId, "checklist"] as const;
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<any>(key);
+      const actor = (user?.full_name ?? "").trim() || user?.email || "Ty";
+      queryClient.setQueryData(key, (old: any) => {
+        if (!old?.items) return old;
+        const items = old.items.map((it: any) => {
+          if (it.id !== payload.item_id) return it;
+          if (payload.checked === true) {
+            return {
+              ...it,
+              result: "checked",
+              checked_at: new Date().toISOString(),
+              checked_by_name: actor,
+            };
+          }
+          if (payload.checked === false) {
+            return { ...it, result: "", checked_at: null, checked_by_name: null };
+          }
+          return it;
+        });
+        let run = old.run;
+        if (run) {
+          const allDone = items.every((it: any) => it.result && String(it.result).trim());
+          if (allDone) {
+            run = {
+              ...run,
+              status: "completed",
+              completed_at: run.completed_at || new Date().toISOString(),
+            };
+          } else {
+            run = { ...run, status: "in_progress", completed_at: null };
+          }
+        }
+        return { ...old, items, run };
+      });
+      return { previous };
+    },
+    onError: (err, _payload, ctx) => {
+      const key = ["repair", repairId, "checklist"] as const;
+      if (ctx?.previous !== undefined) queryClient.setQueryData(key, ctx.previous);
+      showToast(err instanceof Error ? err.message : "Nie udało się zapisać checklisty.", "error");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["repair", repairId, "checklist"] });
     },
   });
 
@@ -215,6 +275,17 @@ export default function RepairDetailPage() {
     [checklistItems],
   );
 
+  const repairSectionStartIndex = useMemo(() => {
+    const n = checklistItems.length;
+    if (n <= 1) return n;
+    return Math.ceil(n / 2);
+  }, [checklistItems.length]);
+
+  const repairChecklistRowsLocked = useMemo(
+    () => PRE_DIAGNOSTICS_REPAIR_STATUSES.has((repair?.status ?? "").toLowerCase()),
+    [repair?.status],
+  );
+
   useEffect(() => {
     if (!repairId) return;
     const key = `draft-${repairId}`;
@@ -241,14 +312,7 @@ export default function RepairDetailPage() {
   }, [commDraft]);
 
   if (repairQuery.isLoading) {
-    return (
-      <main className="mx-auto min-h-screen max-w-[1400px] px-4 py-8">
-        <div className="flex items-center gap-3 text-[#9ca3af]">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#3b82f6] border-t-transparent" />
-          Ładowanie szczegółów naprawy…
-        </div>
-      </main>
-    );
+    return <RepairDetailLoadingSkeleton listHref={repairsListHref} backLabel={repairsBackLabel} />;
   }
 
   if (repairQuery.error || !repair) {
@@ -258,11 +322,11 @@ export default function RepairDetailPage() {
         <div className="rounded-3xl border border-red-500/25 bg-[#0f1117] p-6 text-[#fca5a5]">
           <p className="text-sm">{msg}</p>
           <Link
-            href="/panel/naprawy"
+            href={repairsListHref}
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#3b82f6] hover:underline"
           >
             <ArrowLeft size={16} />
-            Wróć do listy napraw
+            {repairsBackLabel}
           </Link>
         </div>
       </main>
@@ -274,11 +338,11 @@ export default function RepairDetailPage() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
-            href="/panel/naprawy"
+            href={repairsListHref}
             className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft size={18} />
-            Wróć do napraw
+            {repairsBackLabel}
           </Link>
 
           <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-2 text-sm text-[#9ca3af]">
@@ -424,6 +488,7 @@ export default function RepairDetailPage() {
         <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">
           <div className="flex flex-wrap gap-3">
             <TabButton active={activeTab === "details"} onClick={() => setActiveTab("details")} icon={<Wrench size={16} />} label="Szczegóły" />
+            <TabButton active={activeTab === "parts"} onClick={() => setActiveTab("parts")} icon={<Package size={16} />} label="Części" />
             <TabButton
               active={activeTab === "checklist"}
               onClick={() => setActiveTab("checklist")}
@@ -505,6 +570,23 @@ export default function RepairDetailPage() {
           </section>
         ) : null}
 
+        {activeTab === "parts" && repairId ? (
+          <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
+            <div className="mb-4">
+              <div className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Magazyn</div>
+              <h2 className="mt-1 text-lg font-semibold text-white">Części w naprawie</h2>
+              <p className="mt-1 text-sm text-[#9ca3af]">Dodawanie części, status zamówienia i koszt — jak w zgłoszeniach.</p>
+            </div>
+            <RepairPartsSection
+              repairId={repairId}
+              token={token}
+              onAfterMutation={async () => {
+                await repairQuery.refetch();
+              }}
+            />
+          </section>
+        ) : null}
+
         {activeTab === "checklist" ? (
           <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
@@ -537,6 +619,12 @@ export default function RepairDetailPage() {
             </div>
 
             <div className="mt-4 space-y-3">
+              {repairChecklistRowsLocked && checklistItems.length > 1 ? (
+                <div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                  Sekcja <span className="font-semibold">Naprawa</span> jest zablokowana do czasu zakończenia diagnostyki
+                  (status musi być po etapie „W diagnostyce”).
+                </div>
+              ) : null}
               {checklistQuery.isLoading ? (
                 Array.from({ length: 6 }).map((_, idx) => (
                   <div
@@ -549,50 +637,77 @@ export default function RepairDetailPage() {
                   </div>
                 ))
               ) : checklistRun && checklistItems.length ? (
-                checklistItems.map((it: any) => {
+                checklistItems.map((it: any, index: number) => {
                   const checked = Boolean(it.result && String(it.result).trim());
+                  const isRepairSectionRow =
+                    checklistItems.length > 1 && index >= repairSectionStartIndex;
+                  const rowLocked = repairChecklistRowsLocked && isRepairSectionRow;
                   return (
-                    <label
-                      key={it.id}
-                      className={`flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 ${
-                        checked ? "border-emerald-500/20 bg-emerald-500/5" : "border-white/10 bg-[#0f1117]"
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <div className="text-sm font-semibold text-white">{it.template_item_label}</div>
-                          {it.item_type === "checkbox" ? (
-                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#9ca3af]">
-                              Checkbox
-                            </span>
+                    <Fragment key={it.id}>
+                      {index === 0 ? (
+                        <div className="pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8b93a8]">
+                          Diagnostyka
+                        </div>
+                      ) : null}
+                      {index === repairSectionStartIndex && checklistItems.length > 1 ? (
+                        <div className="pt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8b93a8]">
+                          Naprawa
+                        </div>
+                      ) : null}
+                      <label
+                        onClick={() => {
+                          if (rowLocked) showToast("Dokończ diagnostykę, aby odblokować kroki naprawy.", "info");
+                        }}
+                        className={`flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 ${
+                          rowLocked ? "cursor-not-allowed border-white/5 bg-[#0a0b0f] opacity-55" : ""
+                        } ${checked && !rowLocked ? "border-emerald-500/20 bg-emerald-500/5" : !rowLocked ? "border-white/10 bg-[#0f1117]" : ""}`}
+                      >
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <div className="text-sm font-semibold text-white">{it.template_item_label}</div>
+                            {it.item_type === "checkbox" ? (
+                              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#9ca3af]">
+                                Checkbox
+                              </span>
+                            ) : null}
+                            {rowLocked ? (
+                              <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-200">
+                                Zablokowane
+                              </span>
+                            ) : null}
+                          </div>
+                          {it.note ? <div className="mt-0.5 text-xs text-[#9ca3af] line-clamp-2">{it.note}</div> : null}
+                          {it.checked_at ? (
+                            <div className="mt-1 text-[11px] text-[#9ca3af]">
+                              Odhaczone:{" "}
+                              <span className="font-semibold text-white">
+                                {new Date(it.checked_at).toLocaleString("pl-PL", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                              </span>
+                              {it.checked_by_name ? ` · ${it.checked_by_name}` : ""}
+                            </div>
                           ) : null}
                         </div>
-                        {it.note ? <div className="mt-0.5 text-xs text-[#9ca3af] line-clamp-2">{it.note}</div> : null}
-                        {it.checked_at ? (
-                          <div className="mt-1 text-[11px] text-[#9ca3af]">
-                            Odhaczone:{" "}
-                            <span className="font-semibold text-white">
-                              {new Date(it.checked_at).toLocaleString("pl-PL", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
-                            </span>
-                            {it.checked_by_name ? ` · ${it.checked_by_name}` : ""}
-                          </div>
-                        ) : null}
-                      </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
-                        {it.item_type === "checkbox" ? (
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={checklistItemMutation.isPending}
-                            onChange={(e) => checklistItemMutation.mutate({ item_id: it.id, checked: e.target.checked })}
-                            className="h-5 w-5 rounded border-white/20 bg-transparent accent-[#3b82f6]"
-                          />
-                        ) : (
-                          <div className="text-xs text-[#9ca3af]">Wynik: {it.result || "—"}</div>
-                        )}
-                      </div>
-                    </label>
+                        <div className="flex items-center gap-3 shrink-0">
+                          {it.item_type === "checkbox" ? (
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              disabled={checklistItemMutation.isPending || rowLocked}
+                              onChange={(e) => {
+                                if (rowLocked) return;
+                                checklistItemMutation.mutate({ item_id: it.id, checked: e.target.checked });
+                              }}
+                              className="h-5 w-5 rounded border-white/20 bg-transparent accent-[#3b82f6]"
+                            />
+                          ) : (
+                            <div className={`text-xs ${rowLocked ? "text-[#6b7280]" : "text-[#9ca3af]"}`}>
+                              Wynik: {it.result || "—"}
+                            </div>
+                          )}
+                        </div>
+                      </label>
+                    </Fragment>
                   );
                 })
               ) : (
@@ -886,7 +1001,7 @@ export default function RepairDetailPage() {
                   .map((r: any) => (
                     <Link
                       key={r.id}
-                      href={`/panel/naprawy/${r.id}`}
+                      href={repairSiblingHref(String(r.id))}
                       className="rounded-3xl border border-white/10 bg-[#0f1117] px-4 py-3 transition hover:border-white/20 hover:bg-[#0c0d12]"
                     >
                       <div className="flex items-start justify-between gap-3">

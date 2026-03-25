@@ -12,6 +12,31 @@ import type { GlobalSearchClient, GlobalSearchDevice, GlobalSearchResponse } fro
 import { getTheme, toggleTheme } from "@/lib/theme";
 import { useWorkerStore } from "@/stores/workerStore";
 
+const RECENT_SEARCH_KEY = "prokom-panel-search-recent";
+
+function readRecentSearches(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_SEARCH_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string").slice(0, 12) : [];
+  } catch {
+    return [];
+  }
+}
+
+function pushRecentSearch(q: string) {
+  const t = q.trim();
+  if (t.length < 2) return;
+  const prev = readRecentSearches().filter((x) => x.toLowerCase() !== t.toLowerCase());
+  const next = [t, ...prev].slice(0, 8);
+  try {
+    window.localStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore quota */
+  }
+}
+
 export function PanelTopbar() {
   const { user, logout, token } = useAuth();
   const router = useRouter();
@@ -83,6 +108,13 @@ export function PanelTopbar() {
   const [globalClients, setGlobalClients] = useState<GlobalSearchClient[]>([]);
   const [globalDevices, setGlobalDevices] = useState<GlobalSearchDevice[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  const repairsDetailBase = pathname?.startsWith("/admin-panel") ? "/admin-panel/repairs" : "/panel/naprawy";
+
+  useEffect(() => {
+    setRecentSearches(readRecentSearches());
+  }, []);
 
   type NavItem =
     | { kind: "repair"; id: string }
@@ -165,6 +197,14 @@ export function PanelTopbar() {
       setGlobalDevices(globalRes?.devices ?? []);
       setSelectedIndex(0);
       setOpen(true);
+      const hits =
+        (repairsRes?.length ?? 0) +
+        (globalRes?.clients?.length ?? 0) +
+        (globalRes?.devices?.length ?? 0);
+      if (hits > 0) {
+        pushRecentSearch(q);
+        setRecentSearches(readRecentSearches());
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać wyników.";
       setError(msg);
@@ -236,7 +276,7 @@ export function PanelTopbar() {
 
   const goToRepair = (id: string) => {
     setOpen(false);
-    void router.push(`/panel/naprawy/${encodeURIComponent(id)}`);
+    void router.push(`${repairsDetailBase}/${encodeURIComponent(id)}`);
   };
 
   const openLatestRepairForDevice = async (device: GlobalSearchDevice) => {
@@ -255,7 +295,7 @@ export function PanelTopbar() {
       const repairs = await api.get<RepairRequestListItem[]>(`/staff/repairs/?${params.toString()}`, token);
       const latest = repairs?.[0];
       if (latest?.id) {
-        void router.push(`/panel/naprawy/${encodeURIComponent(latest.id)}`);
+        void router.push(`${repairsDetailBase}/${encodeURIComponent(latest.id)}`);
       }
     } catch {
       // Jeśli nie uda się pobrać napraw, nie blokujemy UX - dropdown po prostu się zamyka.
@@ -351,6 +391,26 @@ export function PanelTopbar() {
                 ⌘K
               </span>
             </div>
+
+            {recentSearches.length > 0 ? (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 px-0.5">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6b7280]">Ostatnie</span>
+                {recentSearches.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onMouseDown={(ev) => ev.preventDefault()}
+                    onClick={() => {
+                      setQuery(t);
+                      void load(t);
+                    }}
+                    className="max-w-[200px] truncate rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-[#d0d4de] transition hover:border-[rgba(59,130,246,.4)] hover:bg-[rgba(59,130,246,.12)] hover:text-white"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             {open && (
               <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-[300] max-h-[440px] overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12]">

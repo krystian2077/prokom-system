@@ -383,7 +383,11 @@ function StaffDashboardPage() {
             {subtitle && <p className="mt-1 text-sm text-[#9ca3af]">{subtitle}</p>}
           </div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: accent }}>
-            {panelLoading ? "Ładowanie" : `${(items?.length ?? 0)} pozycji`}
+            {panelLoading ? (
+              <span className="inline-block h-3 w-14 animate-pulse rounded bg-white/10" aria-hidden />
+            ) : (
+              `${items?.length ?? 0} pozycji`
+            )}
           </div>
         </div>
 

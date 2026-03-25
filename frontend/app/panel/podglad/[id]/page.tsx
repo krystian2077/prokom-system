@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairDetail } from "@/types/repairs";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { RepairPreviewLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
 
 export default function PodgladNaprawyPage() {
   const { token } = useAuth();
@@ -22,11 +24,19 @@ export default function PodgladNaprawyPage() {
   });
 
   if (query.isLoading) {
-    return <main className="mx-auto max-w-4xl px-4 py-8 text-[#9ca3af]">Ładowanie podglądu…</main>;
+    return <RepairPreviewLoadingSkeleton />;
   }
 
   if (query.error || !query.data) {
-    return <main className="mx-auto max-w-4xl px-4 py-8 text-[#fca5a5]">Nie udało się pobrać podglądu.</main>;
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-8">
+        <ErrorState
+          error={query.error instanceof Error ? query.error : new Error("Nie udało się pobrać podglądu.")}
+          onRetry={() => void query.refetch()}
+          title="Błąd podglądu"
+        />
+      </main>
+    );
   }
 
   const r = query.data;

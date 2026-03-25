@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
 import Link from "next/link";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 type PaginatedResponse<T> = {
   count: number;
@@ -13,7 +16,7 @@ type PaginatedResponse<T> = {
   results: T[];
 };
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 const KPI_DAYS = 30;
 
 const ARCHIVE_STATUSES: string[] = [
@@ -146,9 +149,18 @@ function SummaryCard({
 
 export default function ArchivePage() {
   const { user, token } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const isAdmin = user?.role === "admin";
 
-  const [page, setPage] = useState(1);
+  const page = Number(searchParams.get("page") ?? "1") || 1;
+
+  const setPage = (next: number | ((prev: number) => number)) => {
+    const nextPage = typeof next === "function" ? next(page) : next;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(nextPage));
+    router.push(`/panel/historia?${params.toString()}`);
+  };
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -188,6 +200,7 @@ export default function ArchivePage() {
   const [count, setCount] = useState(0);
   const [next, setNext] = useState<string | null>(null);
   const [previous, setPrevious] = useState<string | null>(null);
+  const [reloadTick, setReloadTick] = useState(0);
 
   const [kpiLoading, setKpiLoading] = useState(true);
   const [kpiError, setKpiError] = useState<string | null>(null);
@@ -247,7 +260,7 @@ export default function ArchivePage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, page, search, isAdmin, user?.id]);
+  }, [token, page, search, isAdmin, user?.id, reloadTick]);
 
   useEffect(() => {
     setPage(1);
@@ -362,7 +375,11 @@ export default function ArchivePage() {
               </p>
             </div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
-              {loading ? "Ładowanie" : `${items.length} z ${count} pozycji`}
+              {loading ? (
+                <span className="inline-block h-3 w-28 animate-pulse rounded bg-white/10" aria-hidden />
+              ) : (
+                `${items.length} z ${count} pozycji`
+              )}
             </div>
           </div>
 
@@ -391,11 +408,19 @@ export default function ArchivePage() {
               </div>
             )}
 
-            {!loading && error && <p className="text-sm text-[#fca5a5]">{error}</p>}
+            {!loading && error ? (
+              <div className="py-6">
+                <ErrorState error={new Error(error)} onRetry={() => setReloadTick((t) => t + 1)} title="Błąd archiwum" />
+              </div>
+            ) : null}
 
             {!loading && !error && items.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-5 py-12 text-center">
-                <p className="text-sm text-[#6b7280]">Brak pozycji w archiwum.</p>
+              <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-5 py-8">
+                <EmptyState
+                  icon={EMPTY_STATES.archive.icon}
+                  title={EMPTY_STATES.archive.title}
+                  description={EMPTY_STATES.archive.description}
+                />
               </div>
             )}
 

@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type ClientListItem = {
   id: string;
@@ -45,7 +47,7 @@ type Paginated<T> = {
 
 type FilterKey = "all" | "regular" | "vip" | "business" | "active_repair";
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 
 function computeAvatarInitials(item: ClientListItem): string {
   const raw =
@@ -147,9 +149,18 @@ function buildPageButtons(currentPage: number, totalPages: number): number[] {
 
 export default function ClientsPage() {
   const { token } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [filter, setFilter] = useState<FilterKey>("all");
-  const [page, setPage] = useState(1);
+  const page = Number(searchParams.get("page") ?? "1") || 1;
+
+  const setPage = (next: number | ((prev: number) => number)) => {
+    const nextPage = typeof next === "function" ? next(page) : next;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(nextPage));
+    router.push(`/panel/klienci?${params.toString()}`);
+  };
 
   const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
@@ -552,7 +563,11 @@ export default function ClientsPage() {
         {!selectedClientId ? (
           <div className="mt-3 text-sm text-[#6b7280]">Kliknij klienta na liście, aby pobrać szczegóły.</div>
         ) : selectedLoading ? (
-          <div className="mt-3 text-sm text-[#9ca3af]">Ładowanie szczegółów…</div>
+          <div className="mt-3 space-y-3">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-4 w-full max-w-xs" />
+            <Skeleton className="h-24 w-full rounded-2xl" />
+          </div>
         ) : selectedError ? (
           <div className="mt-3 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-[#fca5a5]">{selectedError}</div>
         ) : selectedClient ? (

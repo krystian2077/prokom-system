@@ -81,9 +81,9 @@ BRANDS = [
 
 # Przykładowe hurtownie (do --with-dicts)
 SUPPLIERS = [
-    {"name": "GSM Parts Poland", "nip": "", "email": "kontakt@example.pl", "phone": "", "city": "Warszawa"},
-    {"name": "iParts", "nip": "", "email": "biuro@example.pl", "phone": "", "city": "Kraków"},
-    {"name": "Mobilny Serwis Parts", "nip": "", "email": "sklep@example.pl", "phone": "", "city": "Poznań"},
+    {"name": "GSM Parts Poland", "nip": "", "email": "kontakt@example.pl", "phone": "", "city": "Warszawa", "average_delivery_days": 2},
+    {"name": "iParts", "nip": "", "email": "biuro@example.pl", "phone": "", "city": "Kraków", "average_delivery_days": 3},
+    {"name": "Mobilny Serwis Parts", "nip": "", "email": "sklep@example.pl", "phone": "", "city": "Poznań", "average_delivery_days": 5},
 ]
 
 
@@ -188,13 +188,14 @@ class Command(BaseCommand):
             from apps.inventory.models import Supplier
 
             for s in SUPPLIERS:
-                Supplier.objects.get_or_create(
+                Supplier.objects.update_or_create(
                     name=s["name"],
                     defaults={
                         "nip": s.get("nip", ""),
                         "email": s.get("email", ""),
                         "phone": s.get("phone", ""),
                         "city": s.get("city", ""),
+                        "average_delivery_days": s.get("average_delivery_days"),
                         "is_active": True,
                     },
                 )

@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { Skeleton, StackedRowSkeleton, StatCardSkeleton } from "@/components/ui/Skeleton";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type {
@@ -41,11 +44,26 @@ function statusBadgeStyle(status: string, kind: "customer" | "supply") {
   return "border-white/10 bg-white/5 text-[#9ca3af]";
 }
 
-export default function OrdersAdminPage() {
+function OrdersAdminPageInner() {
   const { user, token } = useAuth();
   const isAdmin = user?.role === "admin";
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [tab, setTab] = useState<OrdersTab>("dashboard");
+  const tab = useMemo<OrdersTab>(() => {
+    const t = searchParams.get("tab");
+    if (t === "today" || t === "requires_action" || t === "by_supplier") return t;
+    return "dashboard";
+  }, [searchParams]);
+
+  const setTab = (k: OrdersTab) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (k === "dashboard") p.delete("tab");
+    else p.set("tab", k);
+    const q = p.toString();
+    router.replace(q ? `${pathname}?${q}` : pathname);
+  };
 
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -203,9 +221,16 @@ export default function OrdersAdminPage() {
         {tab === "dashboard" ? (
           <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
             {dashboardLoading ? (
-              <p className="text-sm text-[#9ca3af]">Ładowanie…</p>
+              <div className="space-y-4">
+                <div className="grid gap-3 md:grid-cols-3">
+                  <StatCardSkeleton />
+                  <StatCardSkeleton />
+                  <StatCardSkeleton />
+                </div>
+                <StackedRowSkeleton rows={4} />
+              </div>
             ) : dashboardError ? (
-              <p className="text-sm text-[#fca5a5]">{dashboardError}</p>
+              <ErrorState error={new Error(dashboardError)} onRetry={() => void loadDashboard()} title="Błąd dashboardu zamówień" />
             ) : !dashboard ? (
               <p className="text-sm text-[#6b7280]">Brak danych.</p>
             ) : (
@@ -252,9 +277,12 @@ export default function OrdersAdminPage() {
         {tab === "today" ? (
           <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
             {todayLoading ? (
-              <p className="text-sm text-[#9ca3af]">Ładowanie…</p>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <StackedRowSkeleton rows={5} />
+                <StackedRowSkeleton rows={5} />
+              </div>
             ) : todayError ? (
-              <p className="text-sm text-[#fca5a5]">{todayError}</p>
+              <ErrorState error={new Error(todayError)} onRetry={() => void loadToday()} title="Błąd listy „dziś”" />
             ) : !todayData ? (
               <p className="text-sm text-[#6b7280]">Brak danych.</p>
             ) : (
@@ -276,9 +304,9 @@ export default function OrdersAdminPage() {
         {tab === "requires_action" ? (
           <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
             {requiresLoading ? (
-              <p className="text-sm text-[#9ca3af]">Ładowanie…</p>
+              <StackedRowSkeleton rows={6} />
             ) : requiresError ? (
-              <p className="text-sm text-[#fca5a5]">{requiresError}</p>
+              <ErrorState error={new Error(requiresError)} onRetry={() => void loadRequiresAction()} title="Błąd listy wymagających reakcji" />
             ) : (
               <>
                 <p className="text-sm font-semibold text-white">{tabLabel}</p>
@@ -299,9 +327,9 @@ export default function OrdersAdminPage() {
         {tab === "by_supplier" ? (
           <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
             {bySupplierLoading ? (
-              <p className="text-sm text-[#9ca3af]">Ładowanie…</p>
+              <StackedRowSkeleton rows={8} />
             ) : bySupplierError ? (
-              <p className="text-sm text-[#fca5a5]">{bySupplierError}</p>
+              <ErrorState error={new Error(bySupplierError)} onRetry={() => void loadBySupplier()} title="Błąd widoku hurtowni" />
             ) : !bySupplier ? (
               <p className="text-sm text-[#6b7280]">Brak danych.</p>
             ) : (
@@ -356,6 +384,31 @@ export default function OrdersAdminPage() {
         ) : null}
       </section>
     </main>
+  );
+}
+
+export default function OrdersAdminPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+          <Skeleton className="mb-6 h-9 w-72" />
+          <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <Skeleton className="h-10 w-full max-w-md" />
+          </div>
+          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="mb-4 grid gap-3 md:grid-cols-3">
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+            </div>
+            <StackedRowSkeleton rows={6} />
+          </div>
+        </main>
+      }
+    >
+      <OrdersAdminPageInner />
+    </Suspense>
   );
 }
 

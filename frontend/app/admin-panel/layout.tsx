@@ -7,6 +7,7 @@ import { AdminSidebar } from "@/components/panel/AdminSidebar";
 import { PanelTopbar } from "@/components/panel/PanelTopbar";
 import { WorkerStatusModalRoot } from "@/components/panel/WorkerStatusModalRoot";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
+import { ToastContainer } from "@/components/ui/Toast";
 
 export default function AdminPanelLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -35,6 +36,7 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
         children
       ) : (
         <ConfirmProvider>
+          <ToastContainer />
           <div className="flex min-h-screen">
             <AdminSidebar />
             <div className="flex min-w-0 flex-1 flex-col">

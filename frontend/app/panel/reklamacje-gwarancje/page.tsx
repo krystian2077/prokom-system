@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { StackedRowSkeleton } from "@/components/ui/Skeleton";
 
 type PhaseKey = "all" | "in_progress" | "awaiting" | "closed";
 type KindKey = "all" | "complaint" | "warranty";
@@ -219,7 +220,9 @@ export default function ComplaintsWarrantyPage() {
       ) : null}
 
       {loading ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <StackedRowSkeleton rows={8} />
+        </div>
       ) : !error && items.length === 0 ? (
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] py-6">
           <EmptyState

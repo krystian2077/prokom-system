@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { api, fetchAllPages } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { StatCardSkeleton, StackedRowSkeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
 
 type StaffKpiItem = {
@@ -47,10 +50,11 @@ function availabilityBadgeClass(typeDisplay: string, typeValue: string) {
 
 export default function AdminWorkloadPage() {
   const { user, token } = useAuth();
+  const router = useRouter();
   const isAdmin = user?.role === "admin";
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const [staffKpi, setStaffKpi] = useState<StaffKpiItem[]>([]);
   const [availabilityToday, setAvailabilityToday] = useState<AvailabilityEntry[]>([]);
@@ -63,20 +67,22 @@ export default function AdminWorkloadPage() {
     setError(null);
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const [kpiRes, avRes, repairsRes] = await Promise.all([
+      const [kpiRes, avRes, repairsList] = await Promise.all([
         api.get<StaffKpiItem[] | { results?: StaffKpiItem[] }>(`/analytics/staff-kpi/`, token),
-        api.get<AvailabilityEntry[] | { results?: AvailabilityEntry[] }>(`/availability/?date=${encodeURIComponent(today)}`, token),
-        api.get<RepairRequestListItem[] | { results?: RepairRequestListItem[] }>(
-          `/repairs/?status__in=in_progress,waiting_for_parts,ready_for_pickup&page_size=500`,
+        api.get<AvailabilityEntry[] | { results?: AvailabilityEntry[] }>(
+          `/availability/?date=${encodeURIComponent(today)}`,
+          token,
+        ),
+        fetchAllPages<RepairRequestListItem>(
+          `/repairs/?status__in=in_progress,waiting_for_parts,ready_for_pickup&page_size=200`,
           token,
         ),
       ]);
       setStaffKpi(Array.isArray(kpiRes) ? kpiRes : kpiRes?.results ?? []);
       setAvailabilityToday(Array.isArray(avRes) ? avRes : avRes?.results ?? []);
-      setActiveRepairs(Array.isArray(repairsRes) ? repairsRes : repairsRes?.results ?? []);
+      setActiveRepairs(repairsList);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać workload.";
-      setError(msg);
+      setError(e instanceof Error ? e : new Error("Nie udało się pobrać workload."));
     } finally {
       setLoading(false);
     }
@@ -141,11 +147,24 @@ export default function AdminWorkloadPage() {
         <p className="mt-1 text-sm text-[#9ca3af]">Obciążenie zespołu, dostępność i health score.</p>
       </header>
 
-      {error ? <p className="text-sm text-[#fca5a5]">{error}</p> : null}
+      {error && !loading ? (
+        <div className="mb-4">
+          <ErrorState error={error} onRetry={() => void load()} title="Nie udało się załadować workload" />
+        </div>
+      ) : null}
 
       {loading ? (
-        <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</section>
-      ) : (
+        <>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+          <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <StackedRowSkeleton rows={6} />
+          </section>
+        </>
+      ) : !error ? (
         <>
           <div className="grid gap-4 lg:grid-cols-3">
             {staffLoads.slice(0, 3).map((st) => {
@@ -238,7 +257,12 @@ export default function AdminWorkloadPage() {
                       <div className="text-xs text-[#9ca3af]">{assigned}</div>
                       <button
                         type="button"
-                        className="mt-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-[#9ca3af]"
+                        onClick={() =>
+                          router.push(
+                            `/admin-panel/repairs/${encodeURIComponent(r.id)}`,
+                          )
+                        }
+                        className="mt-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
                       >
                         ↔ Przepisz
                       </button>
@@ -250,7 +274,7 @@ export default function AdminWorkloadPage() {
             </div>
           </section>
         </>
-      )}
+      ) : null}
     </main>
   );
 }

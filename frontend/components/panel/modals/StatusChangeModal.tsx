@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { useWorkerStore } from "@/stores/workerStore";
 
 export type RepairStatusValue =
   | "new"
@@ -49,6 +51,38 @@ const STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
   { value: "abandoned", label: "Porzucone przez klienta" },
 ];
 
+const DESTRUCTIVE_CONFIRM: Partial<
+  Record<
+    RepairStatusValue,
+    { title: string; description: string; confirmLabel: string; variant: "danger" | "warning" }
+  >
+> = {
+  delivered: {
+    title: "Oznaczyć jako dostarczone?",
+    description: "Status „dostarczone” zamyka ścieżkę wydania. Upewnij się, że klient odebrał urządzenie.",
+    confirmLabel: "Tak, dostarczone",
+    variant: "danger",
+  },
+  cancelled: {
+    title: "Anulować naprawę?",
+    description: "Anulowanie jest poważną decyzją operacyjną. Sprawdź, czy klient został poinformowany.",
+    confirmLabel: "Anuluj naprawę",
+    variant: "danger",
+  },
+  unrepairable: {
+    title: "Oznaczyć jako nie do naprawy?",
+    description: "To komunikuje klientowi brak możliwości naprawy. Upewnij się, że diagnoza jest ostateczna.",
+    confirmLabel: "Tak, nie do naprawy",
+    variant: "warning",
+  },
+  abandoned: {
+    title: "Oznaczyć jako porzucone?",
+    description: "Sprawa zostanie zamknięta jako porzucona przez klienta.",
+    confirmLabel: "Tak, porzucone",
+    variant: "warning",
+  },
+};
+
 export function StatusChangeModal({
   open,
   onClose,
@@ -60,6 +94,8 @@ export function StatusChangeModal({
   currentStatus: string | null | undefined;
   onSubmit: (payload: { new_status: RepairStatusValue; notes?: string }) => Promise<void>;
 }) {
+  const { confirm } = useConfirm();
+  const addToast = useWorkerStore((s) => s.addToast);
   const [newStatus, setNewStatus] = useState<RepairStatusValue>("in_repair");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -83,13 +119,26 @@ export function StatusChangeModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    const confirmCfg = DESTRUCTIVE_CONFIRM[newStatus];
+    if (confirmCfg) {
+      const ok = await confirm({
+        title: confirmCfg.title,
+        description: confirmCfg.description,
+        confirmLabel: confirmCfg.confirmLabel,
+        variant: confirmCfg.variant,
+      });
+      if (!ok) return;
+    }
     setSubmitting(true);
     try {
       if (!newStatus) return;
       await onSubmit({ new_status: newStatus, notes: notes.trim() || undefined });
+      addToast("✓ Status zaktualizowany", "success");
       onClose();
     } catch (ex) {
-      setError(ex instanceof Error ? ex.message : "Nie udało się zmienić statusu.");
+      const msg = ex instanceof Error ? ex.message : "Nie udało się zmienić statusu.";
+      setError(msg);
+      addToast(msg, "error");
     } finally {
       setSubmitting(false);
     }

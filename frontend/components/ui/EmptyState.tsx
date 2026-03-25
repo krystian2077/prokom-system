@@ -89,4 +89,9 @@ export const EMPTY_STATES = {
     title: "Brak urządzeń do odbioru",
     description: "Gotowe urządzenia pojawią się tutaj.",
   },
+  repairs: {
+    icon: "🔧",
+    title: "Brak napraw",
+    description: "Zmień filtry lub dodaj pierwsze zgłoszenie.",
+  },
 } as const;

@@ -36,7 +36,14 @@ def parts_queue(*, status=None, assigned_to=None):
     status: ordered | arrived | used | unused
     """
     qs = PartUsage.objects.select_related(
-        "repair", "part", "supplier", "repair__client", "repair__device", "added_by"
+        "repair",
+        "part",
+        "supplier",
+        "repair__client",
+        "repair__device",
+        "repair__device__brand",
+        "repair__assigned_to",
+        "added_by",
     ).order_by("-created_at")
     if status:
         qs = qs.filter(usage_status=status)

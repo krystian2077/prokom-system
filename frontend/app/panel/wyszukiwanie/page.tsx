@@ -8,6 +8,9 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AdvancedSearchPanel from "@/components/panel/AdvancedSearchPanel";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { RepairTableSkeleton } from "@/components/ui/Skeleton";
 
 type ScopeKey = "all" | "active_repairs" | "archive" | "clients" | "parts";
 const RECENT_KEY = "prokom-recent-searches";
@@ -209,10 +212,25 @@ export default function SearchPage() {
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
-            {loading ? <div className="text-[#9ca3af]">Szukam...</div> : null}
-            {!loading && error ? <div className="text-[#fca5a5]">{error}</div> : null}
-            {!loading && !error && query.trim().length < 2 ? <div className="text-[#6b7280]">Wpisz co najmniej 2 znaki, aby zobaczyć wyniki.</div> : null}
-            {!loading && !error && query.trim().length >= 2 && !hasAny ? <div className="text-[#6b7280]">Brak wyników.</div> : null}
+            {loading ? (
+              <div className="py-2">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7280]">Szukam…</p>
+                <RepairTableSkeleton rows={6} />
+              </div>
+            ) : null}
+            {!loading && error ? (
+              <ErrorState error={new Error(error)} onRetry={() => void performSearch(query.trim())} title="Nie udało się wyszukać" />
+            ) : null}
+            {!loading && !error && query.trim().length < 2 ? (
+              <p className="py-6 text-center text-sm text-[#6b7280]">Wpisz co najmniej 2 znaki, aby zobaczyć wyniki.</p>
+            ) : null}
+            {!loading && !error && query.trim().length >= 2 && !hasAny ? (
+              <EmptyState
+                icon={EMPTY_STATES.search.icon}
+                title={EMPTY_STATES.search.title}
+                description={EMPTY_STATES.search.description}
+              />
+            ) : null}
 
             {!loading && !error && query.trim().length >= 2 && hasAny ? (
               <div className="space-y-5 animate-[fadeUp_.2s_ease]">

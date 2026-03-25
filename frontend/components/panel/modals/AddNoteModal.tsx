@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useWorkerStore } from "@/stores/workerStore";
 
 export type RepairNoteTypeValue = "internal" | "system" | "client_contact";
 
@@ -21,6 +22,7 @@ export function AddNoteModal({
     pinned?: boolean;
   }) => Promise<void>;
 }) {
+  const addToast = useWorkerStore((s) => s.addToast);
   const [note, setNote] = useState("");
   const [isInternal, setIsInternal] = useState(isInternalDefault);
   const [isImportant, setIsImportant] = useState(false);
@@ -55,9 +57,12 @@ export function AddNoteModal({
         note_type: noteType,
         pinned,
       });
+      addToast("✓ Notatka dodana", "success");
       onClose();
     } catch (ex) {
-      setError(ex instanceof Error ? ex.message : "Nie udało się dodać notatki.");
+      const msg = ex instanceof Error ? ex.message : "Nie udało się dodać notatki.";
+      setError(msg);
+      addToast(msg, "error");
     } finally {
       setSubmitting(false);
     }

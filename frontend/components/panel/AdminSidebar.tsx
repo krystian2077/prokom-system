@@ -18,6 +18,7 @@ import {
   Bell,
   MessageSquareText,
   Users2,
+  Warehouse,
 } from "lucide-react";
 
 type SidebarItem = {
@@ -47,12 +48,6 @@ const adminItems: SidebarItem[] = [
     isActive: (p) => p.startsWith("/admin-panel/repairs"),
   },
   {
-    href: "/admin-panel/archive",
-    label: "Archiwum",
-    icon: <History size={18} />,
-    isActive: (p) => p.startsWith("/admin-panel/archive"),
-  },
-  {
     href: "/admin-panel/unassigned",
     label: "Nieprzypisane",
     icon: <ClipboardList size={18} />,
@@ -60,7 +55,7 @@ const adminItems: SidebarItem[] = [
   },
   {
     href: "/admin-panel/workload",
-    label: "Workload",
+    label: "Obciążenie",
     icon: <Users2 size={18} />,
     isActive: (p) => p.startsWith("/admin-panel/workload"),
   },
@@ -113,22 +108,10 @@ const adminItems: SidebarItem[] = [
     isActive: (p) => p.startsWith("/admin-panel/parts"),
   },
   {
-    href: "/admin-panel/tasks",
-    label: "Zadania",
-    icon: <ClipboardList size={18} />,
-    isActive: (p) => p.startsWith("/admin-panel/tasks"),
-  },
-  {
-    href: "/admin-panel/availability",
-    label: "Dostępność",
-    icon: <Settings size={18} />,
-    isActive: (p) => p.startsWith("/admin-panel/availability"),
-  },
-  {
-    href: "/admin-panel/orders",
-    label: "Zamówienia",
-    icon: <Boxes size={18} />,
-    isActive: (p) => p.startsWith("/admin-panel/orders"),
+    href: "/admin-panel/hurtownie",
+    label: "Hurtownie",
+    icon: <Warehouse size={18} />,
+    isActive: (p) => p.startsWith("/admin-panel/hurtownie"),
   },
   {
     href: "/admin-panel/stats",
@@ -141,6 +124,18 @@ const adminItems: SidebarItem[] = [
     label: "Zespół",
     icon: <Users size={18} />,
     isActive: (p) => p.startsWith("/admin-panel/team"),
+  },
+  {
+    href: "/admin-panel/availability",
+    label: "Dostępność",
+    icon: <Settings size={18} />,
+    isActive: (p) => p.startsWith("/admin-panel/availability"),
+  },
+  {
+    href: "/admin-panel/orders",
+    label: "Zamówienia",
+    icon: <Boxes size={18} />,
+    isActive: (p) => p.startsWith("/admin-panel/orders"),
   },
   {
     href: "/admin-panel/config",

@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { RepairTableSkeleton } from "@/components/ui/Skeleton";
 import type { AdvancedSearchResponse, GlobalSearchClient, GlobalSearchRepair, GlobalSearchResponse } from "@/types/search";
 
 type ResultScope = "all" | "active_repairs" | "archive" | "clients";
@@ -55,13 +56,28 @@ function isArchived(status: string): boolean {
   );
 }
 
-export default function AdminSearchPage() {
+function AdminSearchPageInner() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, token } = useAuth();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [query, setQuery] = useState("");
-  const [scope, setScope] = useState<ResultScope>("all");
+  const scope = useMemo<ResultScope>(() => {
+    const s = searchParams.get("scope");
+    const allowed: ResultScope[] = ["all", "active_repairs", "archive", "clients"];
+    return s && allowed.includes(s as ResultScope) ? (s as ResultScope) : "all";
+  }, [searchParams]);
+
+  const setScope = (key: ResultScope) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (key === "all") p.delete("scope");
+    else p.set("scope", key);
+    const q = p.toString();
+    router.replace(q ? `${pathname}?${q}` : pathname);
+  };
+
   const [showFilters, setShowFilters] = useState(false);
 
   const [status, setStatus] = useState("");
@@ -340,7 +356,11 @@ export default function AdminSearchPage() {
       </section>
 
       <section className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
-        {loading ? <p className="text-sm text-[#9ca3af]">Szukam...</p> : null}
+        {loading ? (
+          <div className="py-2">
+            <RepairTableSkeleton rows={6} />
+          </div>
+        ) : null}
         {!loading && error ? <ErrorState error={new Error(error)} onRetry={() => void performSearch(query)} /> : null}
         {!loading && !error && query.trim().length < 2 ? (
           <p className="text-sm text-[#6b7280]">Wpisz min. 2 znaki, aby wyszukać wyniki.</p>
@@ -441,3 +461,25 @@ export default function AdminSearchPage() {
   );
 }
 
+export default function AdminSearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
+          <header>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
+            <h1 className="mt-2 text-2xl font-semibold text-white">Wyszukiwanie globalne</h1>
+            <p className="mt-1 text-sm text-[#9ca3af]">
+              Szukaj po: IMEI, nr tel, kliencie, nr naprawy, modelu i opisie usterki.
+            </p>
+          </header>
+          <section className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+            <RepairTableSkeleton rows={6} />
+          </section>
+        </main>
+      }
+    >
+      <AdminSearchPageInner />
+    </Suspense>
+  );
+}

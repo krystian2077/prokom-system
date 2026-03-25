@@ -9,6 +9,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
 import { useWorkerStore } from "@/stores/workerStore";
 import { Info, RotateCcw } from "lucide-react";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { RepairTableSkeleton } from "@/components/ui/Skeleton";
 
 const PAGE_SIZE = 20;
 
@@ -265,11 +268,25 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
 
         <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0f1117]">
           {repairsQuery.isLoading ? (
-            <div className="px-4 py-8 text-[#9ca3af]">Ładowanie…</div>
+            <div className="p-4">
+              <RepairTableSkeleton rows={8} />
+            </div>
           ) : repairsQuery.error ? (
-            <div className="px-4 py-8 text-sm text-[#fca5a5]">Nie udało się pobrać listy napraw.</div>
+            <div className="px-4 py-8">
+              <ErrorState
+                error={repairsQuery.error instanceof Error ? repairsQuery.error : new Error("Nie udało się pobrać listy napraw.")}
+                onRetry={() => void repairsQuery.refetch()}
+                title="Błąd listy nieprzypisanych"
+              />
+            </div>
           ) : slice.length === 0 ? (
-            <div className="px-4 py-12 text-center text-sm text-[#6b7280]">Brak nieprzypisanych zgłoszeń w statusie „nowe”.</div>
+            <div className="px-4 py-8">
+              <EmptyState
+                icon={EMPTY_STATES.unassigned.icon}
+                title={EMPTY_STATES.unassigned.title}
+                description="Brak zgłoszeń w statusie „nowe” bez przypisanego pracownika."
+              />
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">

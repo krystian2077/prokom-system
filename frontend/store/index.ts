@@ -17,13 +17,14 @@ interface AppStore {
   openStatusModal: (id: string | number) => void;
   closeStatusModal: () => void;
 
-  assignModalRepairId: number | null;
-  openAssignModal: (id: number) => void;
+  assignModalRepairId: string | null;
+  openAssignModal: (id: string | number) => void;
   closeAssignModal: () => void;
 
-  selectedRepairIds: number[];
-  toggleRepair: (id: number) => void;
-  selectAll: (ids: number[]) => void;
+  /** UUID napraw (zaznaczenie w tabeli admina) */
+  selectedRepairIds: string[];
+  toggleRepair: (id: string) => void;
+  selectAll: (ids: string[]) => void;
   clearSelection: () => void;
 
   repairFilters: Record<string, string>;
@@ -44,7 +45,7 @@ export const useStore = create<AppStore>((set) => ({
   closeStatusModal: () => set({ statusModalRepairId: null }),
 
   assignModalRepairId: null,
-  openAssignModal: (id) => set({ assignModalRepairId: id }),
+  openAssignModal: (id) => set({ assignModalRepairId: String(id) }),
   closeAssignModal: () => set({ assignModalRepairId: null }),
 
   selectedRepairIds: [],

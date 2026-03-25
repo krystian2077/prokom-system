@@ -1,9 +1,8 @@
 # PRO-KOM SERWIS — Kompletna Dokumentacja Frontendu
-## Źródło prawdy dla Cursora · Wersja finalna
+## Źródło prawdy dla Cursora · Wersja aktualna
 
-> **Zawiera:** pełny design system, wszystkie widoki (staff + admin), kompletne endpointy API `/api/v1/`, implementację brakujących elementów (empty states, skeleton, error states, potwierdzenia), poprawki UX, animacje, light/dark mode.
->
-> **Pliki HTML** `panel-pracownik.html` i `panel-admin.html` to pixel-perfect mockupy — implementuj 1:1.
+> **Dokument opisuje obecną architekturę kodu** — nie idealne wzorce z fazy planowania.
+> Jeśli kod i dokument się różnią, kod jest źródłem prawdy.
 > **Swagger UI** `http://localhost:8000/api/docs/` jest zawsze źródłem prawdy dla struktury API response.
 
 ---
@@ -17,14 +16,40 @@ frontend/
 ├── app/
 │   ├── (public)/        ✅ strona publiczna
 │   ├── client/          ✅ panel klienta
-│   ├── panel/           ⚠️  panel pracownika — istnieje, wymaga uzupełnienia
-│   └── admin-panel/     ⚠️  panel admina — istnieje, wymaga uzupełnienia
+│   ├── panel/           ✅ panel pracownika — zaimplementowany
+│   └── admin-panel/     ✅ panel admina — zaimplementowany
 ├── lib/
-│   ├── api.ts           ✅ istnieje — uzupełnij wg wzorca w tym dokumencie
-│   ├── panel-api.ts     ✅ istnieje
-│   ├── auth-storage.ts  ✅ istnieje
-│   └── format.ts        ✅ istnieje
+│   ├── api.ts           ✅ klient HTTP oparty o fetch (nie axios)
+│   ├── auth-storage.ts  ✅ przechowywanie tokena
+│   ├── format.ts        ✅ formatowanie
+│   └── queryClient.ts   ✅ konfiguracja TanStack Query
+├── store/
+│   └── index.ts         ✅ Zustand — AppStore (toasty, modal stany, filtry)
+├── stores/
+│   └── workerStore.ts   ✅ re-eksport useStore dla kompatybilności wstecznej
+├── hooks/
+│   ├── useAutoRefresh.ts ✅ odświeżanie co N sekund (queryKeys[])
+│   └── useClientProfile.ts ✅ profil klienta
+├── components/
+│   ├── panel/           ✅ WorkerSidebar, AdminSidebar, PanelTopbar, modale
+│   ├── ui/              ✅ Skeleton, EmptyState, ErrorState, Toast, ConfirmDialog
+│   └── repairs/         ✅ RepairStatusBadge, RepairPriorityBadge, NextActionBadge
 ```
+
+### Stan wdrożenia — aktualny
+
+| Obszar | Stan |
+|--------|------|
+| **lib/api.ts** | ✅ Fetch-based, `api.get/post/patch/delete(path, token?)`, `authApi.*` (auto-token), `fetchAllPages()`. |
+| **Komponenty bazowe** | ✅ Skeleton (wiele wariantów), EmptyState + EMPTY_STATES, ErrorState, ToastContainer (w layout), ConfirmDialog + useConfirm. |
+| **Zustand store** | ✅ scope, statusModal, assignModal, selectedRepairIds (string[]), repairFilters, toasts. |
+| **Panel pracownika** | ✅ Dashboard, naprawy, historia, komunikacja, zadania, czesci-hurtownie, reklamacje, powiadomienia, wyszukiwanie, kalendarz, klienci, odbiory, nieprzypisane, wszystkie. |
+| **Panel admina** | ✅ Dashboard, repairs, clients + /clients/[id], claims, pickups, calendar, search, workload, stats, hurtownie, parts, notif, unassigned, zespol, dostepnosc, zamowienia, konfiguracja. |
+| **Trasy URL** | ✅ Angielskie slug jako główny routing (`/panel/repairs`, `/admin-panel/repairs`). Aliasy polskie przez rewrite tylko dla `/panel/naprawy` → `/panel/repairs`. Pozostałe PL-nazwy jako foldery (`/panel/kalendarz`, `/panel/klienci`, `/panel/historia` itd.). |
+| **Hooki React Query** | ✅ Inline w komponentach (`useQuery`, `useMutation` bezpośrednio). Brak centralnego pliku hooków — decyzja architektoniczna. |
+| **UX reguły (rozdz. 12)** | ✅ Kluczowe zasady spełnione; pozostałe wyjątki opisane w rozdz. 12. |
+
+Szczegóły API: Swagger `http://localhost:8000/api/docs/`. Endpoint kolejki: `GET /api/v1/inventory/parts-queue/` (parametry `status`, `assigned_to`, paginacja DRF).
 
 ### Stack (z package.json)
 
@@ -36,7 +61,7 @@ frontend/
 | Tailwind CSS | 3.x | Style |
 | TanStack Query | 5.x | Data fetching, cache, optimistic updates |
 | Zustand | latest | Globalny UI state |
-| Framer Motion | latest | Animacje (fadeUp, slideDown, countUp) |
+| Framer Motion | latest | Animacje (opcjonalnie, nie wszędzie używane) |
 | lucide-react | latest | Ikony |
 
 ### API — kluczowe fakty
@@ -46,6 +71,11 @@ BASE URL: NEXT_PUBLIC_API_URL + /api/v1/
 Autentykacja: Token {token} w nagłówku Authorization
 Panel pracownika używa: /api/v1/staff/repairs/ i /api/v1/staff/dashboard/
 Panel admina używa:     /api/v1/repairs/ (pełny dostęp)
+
+Klient HTTP: fetch() przez lib/api.ts — NIE axios.
+api.get<T>(path, token?)    — token jawny (kompatybilność wsteczna)
+authApi.get<T>(path)        — token z localStorage automatycznie (nowe komponenty)
+fetchAllPages<T>(path, token) — pełne dociąganie paginowanych wyników
 ```
 
 ---
@@ -197,61 +227,53 @@ Panel admina używa:     /api/v1/repairs/ (pełny dostęp)
 }
 ```
 
-### 2.3 Fonty (Google Fonts)
+### 2.3 Fonty — aktualna implementacja
 
-```html
-<!-- W <head> layout.tsx -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet" />
-```
-
-- `Plus Jakarta Sans` — cały tekst interfejsu (font-family: sans)
-- `Unbounded` — numery napraw, wartości KPI, tytuły sekcji (font-family: display)
-
-### 2.4 Tailwind config
+Fonty ładowane przez `next/font/google` w `app/layout.tsx` (nie przez `<link>` tag):
 
 ```typescript
-// tailwind.config.ts
-import type { Config } from 'tailwindcss'
+// app/layout.tsx — aktualne
+import { Syne, DM_Sans, Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 
-const config: Config = {
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
-  theme: {
-    extend: {
-      colors: {
-        page: '#07080c',
-        s1: '#0f1117', s2: '#141720', s3: '#191d28', s4: '#1c2030', s5: '#212538',
-        faint: '#2c3145',
-        ink: '#d0d4de', ink2: '#8b93a8', muted: '#525b6e',
-        accent: {
-          red:    '#dc1e1e',
-          green:  '#22c55e',
-          amber:  '#f59e0b',
-          blue:   '#3b82f6',
-          purple: '#8b5cf6',
-          orange: '#f97316',
-          cyan:   '#06b6d4',
-        }
-      },
-      fontFamily: {
-        sans:    ['"Plus Jakarta Sans"', 'sans-serif'],
-        display: ['Unbounded', 'sans-serif'],
-      },
-      animation: {
-        'fade-up':    'fadeUp .4s ease both',
-        'shimmer':    'shimmer 4s linear infinite',
-        'pulse-slow': 'pulse 2s infinite',
-        'glow-r':     'glowR 2s infinite',
-        'glow-g':     'glowG 2s infinite',
-        'glow-b':     'glowB 2s infinite',
-        'spin':       'spin .8s linear infinite',
-        'slide-down': 'slideDown .2s ease',
-      },
-    },
-  },
+const syne        = Syne({ subsets: ["latin"], weight: ["700","800"], variable: "--font-syne" });
+const dmSans      = DM_Sans({ subsets: ["latin"], weight: ["400","500","600","700"], variable: "--font-dm-sans" });
+const unbounded   = Unbounded({ subsets: ["latin"], weight: ["700","900"], variable: "--font-unbounded" });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400","500","600","700"], variable: "--font-jakarta" });
+```
+
+Zmienne CSS fontów:
+- `--font-dm-sans`  — cały tekst interfejsu (body, font-family: sans w tailwind)
+- `--font-unbounded` — numery napraw, wartości KPI, tytuły sekcji (font-family: display)
+- `--font-syne` — nagłówki dekoracyjne (opcjonalnie)
+- `--font-jakarta` — alternatywa Plus Jakarta Sans (dostępna przez klasę `font-plus-jakarta`)
+
+**Body domyślnie używa DM Sans**, nie Plus Jakarta Sans jak w starszych mockupach.
+
+### 2.4 Tailwind config — aktualna
+
+```typescript
+// tailwind.config.ts — aktualna wersja z repozytorium
+// Pełna paleta kolorów:
+colors: {
+  page: '#07080c',  s1: '#0f1117', s2: '#141720', s3: '#191d28', s4: '#1c2030', s5: '#212538',
+  faint: '#2c3145', ink: '#d0d4de', ink2: '#8b93a8', mutedPanel: '#525b6e',
+  accent: { red:'#dc1e1e', green:'#22c55e', amber:'#f59e0b', blue:'#3b82f6', purple:'#8b5cf6', orange:'#f97316', cyan:'#06b6d4' },
+  primary: '#e11d1d', dark: '#0f0f0f', neutral: '#6b7280',
+  // Paleta formularzów klientów (prefix: zgl, zglf — używaj wg kontekstu)
+  // zgl.*  — dark UI strony zgłoszeń
+  // zglf.* — formularz online klienta (light + dark mix)
+  prokom: { white:'#fff', black:'#0f0f0f', accent:'#e11d1d', gray:'#6b7280', success:'#16a34a', warning:'#ea580c', error:'#dc2626', info:'#2563eb' }
 }
-export default config
+// fontFamily:
+//   sans:    ["var(--font-dm-sans)", "system-ui", "sans-serif"]   ← DM Sans (body domyślny)
+//   display: ["var(--font-unbounded)", "system-ui", "sans-serif"] ← Unbounded (KPI, nr napraw)
+//   syne:    ["var(--font-syne)", "system-ui", "sans-serif"]
+//   plus-jakarta: ["var(--font-plus-jakarta)", "system-ui", "sans-serif"]
+// borderRadius dodatkowe: zgl-card (22px), zgl-field (12px), zgl-pill (9999px)
+// boxShadow: soft, card
+// screens: xs (400px), zgl (860px)
+// Animacje: step-in, step-slide, fade-in, fade-up, shimmer, ring-pulse, glow-r/g/b,
+//           slide-down, count-up, spin-fast, shimmer-slow, success-bounce, check-pop itd.
 ```
 
 ### 2.5 Theme Toggle — implementacja
@@ -438,79 +460,71 @@ export interface SearchResults {
 
 ---
 
-## ROZDZIAŁ 4 — KONFIGURACJA API
+## ROZDZIAŁ 4 — KONFIGURACJA API — AKTUALNA
+
+**WAŻNE: lib/api.ts używa fetch(), NIE axios.**
 
 ```typescript
-// lib/api.ts
-import axios from 'axios'
-import { getToken, clearToken } from './auth-storage'
+// lib/api.ts — aktualna architektura
+// BASE URL: NEXT_PUBLIC_API_URL + /api/v1/
+// Klient rzuca ApiError (extends Error) z .status i .body przy !res.ok
 
-const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1'
+// Dwa tryby użycia:
+// 1. api.* — token jawny (dla stron z useAuth().token)
+api.get<T>(path, token?)
+api.post<T>(path, body?, token?)
+api.patch<T>(path, body?, token?)
+api.put<T>(path, body?, token?)
+api.delete<T>(path, token?)
 
-export const api = axios.create({ baseURL: BASE })
+// 2. authApi.* — token czytany z localStorage automatycznie (nowsze komponenty)
+authApi.get<T>(path)
+authApi.post<T>(path, body?)
+authApi.patch<T>(path, body?)
+authApi.delete<T>(path)
 
-api.interceptors.request.use(config => {
-  const token = getToken()
-  if (token) config.headers.Authorization = `Token ${token}`
-  return config
-})
+// 3. fetchAllPages<T>(firstPath, token) — dociąga wszystkie strony listy
+export type PaginatedList<T> = { count?: number; next?: string | null; results?: T[] }
 
-api.interceptors.response.use(
-  res => res.data,
-  async err => {
-    if (err.response?.status === 401) {
-      clearToken()
-      if (typeof window !== 'undefined') window.location.href = '/panel/login'
-    }
-    return Promise.reject(err)
-  }
-)
+// Obsługa błędów: getErrorMessageFromBody(errBody, fallback) → czytelny komunikat
+// handleUnauthorized() → clearToken + redirect do /panel/login
+```
 
-// lib/queryClient.ts
-import { QueryClient } from '@tanstack/react-query'
+```typescript
+// lib/queryClient.ts — aktualna konfiguracja
+import { QueryClient } from "@tanstack/react-query";
+import { ApiError } from "@/lib/api";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 10_000,
-      retry: (failureCount, error: any) => {
-        if (error?.response?.status === 404) return false
-        if (error?.response?.status === 403) return false
-        return failureCount < 2
+      retry: (failureCount, error: unknown) => {
+        if (error instanceof ApiError) {
+          if (error.status === 404 || error.status === 403) return false;
+        }
+        return failureCount < 2;
       },
       refetchOnWindowFocus: false,
     },
   },
-})
+});
 ```
 
 ```typescript
-// middleware.ts
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+// next.config.js — rewrites (aktualny)
+// Jedyny alias PL→EN: /panel/naprawy → /panel/repairs
+// Pozostałe ścieżki PL-folder są routowane bezpośrednio (np. /panel/kalendarz)
+rewrites: [
+  { source: "/panel/naprawy", destination: "/panel/repairs" },
+  { source: "/panel/naprawy/:path*", destination: "/panel/repairs/:path*" },
+]
+```
 
-export function middleware(req: NextRequest) {
-  const token = req.cookies.get('auth_token')?.value
-  const role  = req.cookies.get('user_role')?.value
-  const path  = req.nextUrl.pathname
-
-  if (!token) {
-    if (path.startsWith('/panel') && !path.startsWith('/panel/login')) {
-      return NextResponse.redirect(new URL('/panel/login', req.url))
-    }
-    if (path.startsWith('/admin-panel')) {
-      return NextResponse.redirect(new URL('/panel/login', req.url))
-    }
-  }
-
-  if (path.startsWith('/admin-panel') && role !== 'admin') {
-    return NextResponse.redirect(new URL('/panel/dashboard', req.url))
-  }
-
-  return NextResponse.next()
-}
-
-export const config = { matcher: ['/panel/:path*', '/admin-panel/:path*', '/client/:path*'] }
+```typescript
+// Uwaga — middleware.ts:
+// Auth guard jest realizowany po stronie komponentów (useAuth hook + AuthContext)
+// a NIE przez next/server middleware. Nie ma pliku middleware.ts.
 ```
 
 ---
@@ -893,419 +907,225 @@ export function NextActionBadge({ repair }: { repair: Pick<RepairListItem, 'stat
 }
 ```
 
-### 5.9 Zustand Store
+### 5.9 Zustand Store — aktualna implementacja
 
 ```typescript
-// store/index.ts
-import { create } from 'zustand'
-
-interface Toast { id: string; msg: string; type: 'success' | 'error' | 'info' }
+// store/index.ts — aktualna wersja
+// WAŻNE: selectedRepairIds to string[], nie number[]
+// statusModalRepairId / assignModalRepairId — string | null (po String(id))
 
 interface AppStore {
-  // Scope dashboardu
-  scope: 'today' | 'tomorrow' | 'week' | 'month'
-  setScope: (s: string) => void
+  scope: Scope;                          // 'today' | 'tomorrow' | 'week' | 'month'
+  setScope: (s: Scope) => void;
 
-  // Status modal
-  statusModalRepairId: number | null
-  openStatusModal:  (id: number) => void
-  closeStatusModal: () => void
+  statusModalRepairId: string | null;
+  openStatusModal: (id: string | number) => void;  // String(id) wewnątrz
+  closeStatusModal: () => void;
 
-  // Assign modal (admin)
-  assignModalRepairId: number | null
-  openAssignModal:  (id: number) => void
-  closeAssignModal: () => void
+  assignModalRepairId: string | null;
+  openAssignModal: (id: string | number) => void;
+  closeAssignModal: () => void;
 
-  // Bulk select (admin)
-  selectedRepairIds: number[]
-  toggleRepair:   (id: number) => void
-  selectAll:      (ids: number[]) => void
-  clearSelection: () => void
+  selectedRepairIds: string[];           // UUID/string — nie number!
+  toggleRepair: (id: string) => void;
+  selectAll: (ids: string[]) => void;
+  clearSelection: () => void;
 
-  // Repair filters (sync z URL)
-  repairFilters: Record<string, string>
-  setFilter:    (k: string, v: string | undefined) => void
-  clearFilters: () => void
+  repairFilters: Record<string, string>;
+  setFilter: (k: string, v: string | undefined) => void;
+  clearFilters: () => void;
 
-  // Toasts
-  toasts:     Toast[]
-  addToast:   (msg: string, type: Toast['type']) => void
-  removeToast:(id: string) => void
+  toasts: Toast[];
+  addToast: (msg: string, type: Toast["type"]) => void;  // auto-remove po 3500ms
+  removeToast: (id: string) => void;
 }
 
-export const useStore = create<AppStore>((set) => ({
-  scope: 'today',
-  setScope: s => set({ scope: s as any }),
-
-  statusModalRepairId: null,
-  openStatusModal:  id => set({ statusModalRepairId: id }),
-  closeStatusModal: ()  => set({ statusModalRepairId: null }),
-
-  assignModalRepairId: null,
-  openAssignModal:  id => set({ assignModalRepairId: id }),
-  closeAssignModal: ()  => set({ assignModalRepairId: null }),
-
-  selectedRepairIds: [],
-  toggleRepair: id => set(s => ({
-    selectedRepairIds: s.selectedRepairIds.includes(id)
-      ? s.selectedRepairIds.filter(x => x !== id)
-      : [...s.selectedRepairIds, id],
-  })),
-  selectAll:      ids => set({ selectedRepairIds: ids }),
-  clearSelection: ()  => set({ selectedRepairIds: [] }),
-
-  repairFilters: {},
-  setFilter: (k, v) => set(s => {
-    const f = { ...s.repairFilters }
-    if (v === undefined) delete f[k]; else f[k] = v
-    return { repairFilters: f }
-  }),
-  clearFilters: () => set({ repairFilters: {} }),
-
-  toasts: [],
-  addToast: (msg, type) => {
-    const id = Math.random().toString(36).slice(2)
-    set(s => ({ toasts: [...s.toasts, { id, msg, type }] }))
-    setTimeout(() => set(s => ({ toasts: s.toasts.filter(t => t.id !== id) })), 3500)
-  },
-  removeToast: id => set(s => ({ toasts: s.toasts.filter(t => t.id !== id) })),
-}))
+// Użycie:
+import { useStore } from "@/store";
+const { addToast, openStatusModal } = useStore();
+addToast("Zapisano", "success");
 ```
 
-### 5.10 Auto-refresh Hook
+### 5.10 Auto-refresh Hook — aktualna implementacja
 
 ```typescript
 // hooks/useAutoRefresh.ts
-import { useState, useEffect } from 'react'
-import { useQueryClient, type QueryKey } from '@tanstack/react-query'
+// WAŻNE: przyjmuje tablicę QueryKey[], nie pojedynczy QueryKey
+// Invaliduje wszystkie podane klucze jednocześnie
 
-export function useAutoRefresh(queryKey: QueryKey, ms = 30_000) {
-  const qc = useQueryClient()
-  const [countdown, setCountdown] = useState(ms / 1000)
-  const [isRefreshing, setIsRefreshing] = useState(false)
-
-  useEffect(() => {
-    const tick = setInterval(() => {
-      setCountdown(c => {
-        if (c <= 1) {
-          setIsRefreshing(true)
-          qc.invalidateQueries({ queryKey })
-          setTimeout(() => setIsRefreshing(false), 600)
-          return ms / 1000
-        }
-        return c - 1
-      })
-    }, 1000)
-    return () => clearInterval(tick)
-  }, [JSON.stringify(queryKey), ms])
-
-  const refresh = () => {
-    setIsRefreshing(true)
-    qc.invalidateQueries({ queryKey })
-    setCountdown(ms / 1000)
-    setTimeout(() => setIsRefreshing(false), 600)
-  }
-
-  return { countdown, isRefreshing, refresh }
+export function useAutoRefresh(queryKeys: QueryKey[], ms = 30_000) {
+  // zwraca: { countdown: number, isRefreshing: boolean, refresh: () => void }
 }
+
+// Użycie (array wrapping!):
+const { countdown, isRefreshing, refresh } = useAutoRefresh(
+  [['dashboard', 'staff', scope], ['repairs', 'my']],
+  30_000
+);
+// Nie: useAutoRefresh(['dashboard', 'staff', scope])  ← BŁĄD (płaski array)
+// Tak: useAutoRefresh([['dashboard', 'staff', scope]])  ← tablica tablic
 ```
 
 ---
 
-## ROZDZIAŁ 6 — REACT QUERY HOOKS
+## ROZDZIAŁ 6 — WZORZEC DATA FETCHING — AKTUALNA ARCHITEKTURA
+
+**Decyzja architektoniczna:** w projekcie NIE ma centralnego pliku `hooks/useRepairs.ts`.
+Hooki TanStack Query są pisane inline w komponentach (`useQuery`, `useMutation` bezpośrednio w `page.tsx`).
+Jest to celowa decyzja — unika over-abstraction.
+
+Wzorzec stosowany w stronach:
 
 ```typescript
-// hooks/useRepairs.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/lib/api'
-import type { RepairListItem, RepairRequest, PaginatedResponse, Scope } from '@/types'
+// Wzorzec query w page.tsx — stosuj konsekwentnie
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
-// ── Staff ────────────────────────────────────────────────────────────────────
+// W komponencie:
+const { token } = useAuth();
+const qc = useQueryClient();
 
-export const useStaffDashboard = (scope: Scope) => useQuery({
-  queryKey: ['dashboard', 'staff', scope],
-  queryFn: () => api.get(`/staff/dashboard/?scope=${scope}`),
-  refetchInterval: 30_000,
-})
+// Query:
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["repairs", "my", filters],
+  queryFn: () => api.get<PaginatedRepairs>(`/staff/repairs/?assigned_to=me&page_size=20`, token),
+  staleTime: 10_000,
+  enabled: !!token,
+});
 
-export const useMyRepairs = (filters: Record<string, string> = {}) => useQuery({
-  queryKey: ['repairs', 'my', filters],
-  queryFn: () => api.get<PaginatedResponse<RepairListItem>>('/staff/repairs/', {
-    params: { assigned_to: 'me', ...filters },
-  }),
-  refetchInterval: 30_000,
-})
+// Mutation z toast:
+const { addToast } = useStore();
+const mutation = useMutation({
+  mutationFn: (payload) => api.post(`/staff/repairs/${id}/change-status/`, payload, token),
+  onSuccess: () => {
+    void qc.invalidateQueries({ queryKey: ["repairs"] });
+    addToast("Status zmieniony", "success");
+  },
+  onError: (e) => {
+    addToast(e instanceof Error ? e.message : "Błąd", "error");
+  },
+});
+```
 
-export const useRepairDetail = (id: number, isAdmin = false) => useQuery({
-  queryKey: ['repair', id],
-  queryFn: () => api.get<RepairRequest>(isAdmin ? `/repairs/${id}/` : `/staff/repairs/${id}/`),
-  staleTime: 5_000,
-  enabled: id > 0,
-})
+Kilka hooków domenowych w `hooks/` istnieje:
+- `hooks/useAutoRefresh.ts` — auto-invalidacja wielu query co N sekund
+- `hooks/useClientProfile.ts` — profil klienta
 
-export const useRepairTimeline = (id: number) => useQuery({
-  queryKey: ['repair', id, 'timeline'],
-  queryFn: () => api.get(`/staff/repairs/${id}/timeline/`),
-  enabled: id > 0,
-})
+Paginacja URL:
+```typescript
+// Wzorzec stron z paginacją
+const searchParams = useSearchParams();
+const router = useRouter();
+const page = Number(searchParams.get("page") ?? 1);
+const setPage = (p: number) => {
+  const params = new URLSearchParams(searchParams.toString());
+  params.set("page", String(p));
+  router.push(`?${params.toString()}`);
+};
+// API: /staff/repairs/?page=${page}&page_size=20
+```
 
-export const useRepairMessages = (id: number) => useQuery({
-  queryKey: ['repair', id, 'messages'],
-  queryFn: () => api.get(`/staff/repairs/${id}/messages/`),
-  refetchInterval: 15_000,
-  enabled: id > 0,
-})
-
-export const useRepairParts = (id: number) => useQuery({
-  queryKey: ['repair', id, 'parts'],
-  queryFn: () => api.get(`/staff/repairs/${id}/parts/`),
-  enabled: id > 0,
-})
-
-export const useRepairCostSummary = (id: number) => useQuery({
-  queryKey: ['repair', id, 'cost'],
-  queryFn: () => api.get(`/staff/repairs/${id}/cost-summary/`),
-  enabled: id > 0,
-})
-
-export const useRepairQuotes = (repairId: number) => useQuery({
-  queryKey: ['quotes', 'repair', repairId],
-  queryFn: () => api.get(`/pricing/quotes/?repair=${repairId}`),
-  enabled: repairId > 0,
-})
-
-// ── Mutations Staff ───────────────────────────────────────────────────────────
-
-export const useChangeStatus = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, status, notes }: { id: number; status: string; notes?: string }) =>
-      api.post(`/staff/repairs/${id}/change-status/`, { status, notes }),
-    onSuccess: (data, { id }) => {
-      qc.setQueryData(['repair', id], data)           // update cache natychmiast
-      qc.invalidateQueries({ queryKey: ['repairs'] })
-      qc.invalidateQueries({ queryKey: ['dashboard'] })
-    },
-  })
-}
-
-export const useAddNote = (repairId: number) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (payload: { content: string; note_type: string }) =>
-      api.post(`/staff/repairs/${repairId}/notes/`, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['repair', repairId, 'messages'] })
-    },
-  })
-}
-
-export const useCreateRepair = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (payload: Record<string, unknown>) => api.post('/repairs/', payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['repairs'] })
-    },
-  })
-}
-
-// ── Admin ─────────────────────────────────────────────────────────────────────
-
-export const useAllRepairs = (filters: Record<string, string> = {}) => useQuery({
-  queryKey: ['repairs', 'all', filters],
-  queryFn: () => api.get<PaginatedResponse<RepairListItem>>('/repairs/', { params: filters }),
-  refetchInterval: 30_000,
-})
-
-export const useAssignRepair = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ repairId, userId }: { repairId: number; userId: number | null }) =>
-      api.post(`/repairs/${repairId}/assign/`, { assigned_to: userId }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['repairs'] })
-      qc.invalidateQueries({ queryKey: ['dashboard'] })
-    },
-  })
-}
-
-// ── Notifications ─────────────────────────────────────────────────────────────
-
-export const useNotifCount = () => useQuery({
-  queryKey: ['notif', 'count'],
-  queryFn: () => api.get<{ unread: number }>('/accounts/notifications/count/'),
-  refetchInterval: 15_000,
-})
-
-export const useNotifications = () => useQuery({
-  queryKey: ['notifications'],
-  queryFn: () => api.get('/accounts/notifications/'),
-})
-
-export const useMarkNotifRead = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (id: number) => api.patch(`/accounts/notifications/${id}/`, { is_read: true }),
-    onMutate: async (id) => {
-      // Optimistic update
-      await qc.cancelQueries({ queryKey: ['notifications'] })
-      const prev = qc.getQueryData(['notifications'])
-      qc.setQueryData(['notifications'], (old: any) => ({
-        ...old,
-        results: old?.results?.map((n: any) => n.id === id ? { ...n, is_read: true } : n),
-      }))
-      qc.setQueryData(['notif', 'count'], (old: any) => ({
-        unread: Math.max(0, (old?.unread || 1) - 1),
-      }))
-      return { prev }
-    },
-    onError: (_, __, ctx) => qc.setQueryData(['notifications'], ctx?.prev),
-  })
-}
-
-// ── Tasks ─────────────────────────────────────────────────────────────────────
-
-export const useTasks = (filters: Record<string, string> = {}) => useQuery({
-  queryKey: ['tasks', filters],
-  queryFn: () => api.get('/tasks/', { params: filters }),
-})
-
-export const useToggleTask = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, status }: { id: number; status: string }) =>
-      api.patch(`/tasks/${id}/`, { status }),
-    onMutate: async ({ id, status }) => {
-      await qc.cancelQueries({ queryKey: ['tasks'] })
-      const prev = qc.getQueryData(['tasks'])
-      qc.setQueryData(['tasks'], (old: any) => ({
-        ...old,
-        results: old?.results?.map((t: any) => t.id === id ? { ...t, status } : t),
-      }))
-      return { prev }
-    },
-    onError: (_, __, ctx) => qc.setQueryData(['tasks'], ctx?.prev),
-  })
-}
-
-// ── Analytics ─────────────────────────────────────────────────────────────────
-
-export const useAdminKPI = () => useQuery({
-  queryKey: ['analytics', 'kpi'],
-  queryFn: () => api.get('/analytics/kpi/'),
-  refetchInterval: 60_000,
-})
-
-export const useStaffKPI = () => useQuery({
-  queryKey: ['analytics', 'staff-kpi'],
-  queryFn: () => api.get('/analytics/staff-kpi/'),
-  refetchInterval: 60_000,
-})
-
-export const useRepairsChart = (period: string, start: string, end: string) => useQuery({
-  queryKey: ['analytics', 'repairs-chart', period, start, end],
-  queryFn: () => api.get('/analytics/repairs-chart/', { params: { period, start, end } }),
-})
+Wzorzec dla stron z filtrami w URL (status, search, page):
+```typescript
+const status = searchParams.get("status") ?? "";
+const search = searchParams.get("search") ?? "";
+// Buduj URL dynamicznie przed zapytaniem
+const qs = new URLSearchParams({ page_size: "20", ...(status && { status }), ...(search && { search }), page: String(page) });
+queryFn: () => api.get(`/repairs/?${qs}`, token),
+queryKey: ["repairs", "all", { status, search, page }],
 ```
 
 ---
 
-## ROZDZIAŁ 7 — LAYOUT PANELI
+## ROZDZIAŁ 7 — LAYOUT PANELI — AKTUALNA ARCHITEKTURA
 
-### 7.1 Topbar (wspólny)
+### 7.1 Topbar — aktualny komponent
 
-```typescript
-// components/layout/Topbar.tsx
-// Wyświetl:
-// LEWO:   przycisk cofnij (<- ikona) + breadcrumb tekstowy (np. "Dashboard", "Naprawy", "PK-54321")
-// ŚRODEK: Premium Search z dropdown wyników
-// PRAWO:  ThemeToggle + BellIcon (z badge) + Avatar
-
-// Premium Search:
-// - background: var(--s2), border 1.5px var(--border2), border-radius 13px, height 38px
-// - onFocus: border-color rgba(59,130,246,.45), box-shadow 0 0 0 3px rgba(59,130,246,.1)
-// - Skrót ⌘K → focus input
-// - Placeholder: "Szukaj: naprawa, klient, IMEI, nr ref…"
-// - Dropdown z 2 sekcjami: "Ostatnie naprawy" + "Klienci"
-// - oninput debounce 300ms → GET /api/v1/search/global/?q={val}
-// - Dropdown pojawia się po 2+ znakach z wynikami z API
-
-// Theme toggle button:
-// - w: 34px, h: 34px, border-radius 9px
-// - bg: var(--s2), border: 1px var(--border)
-// - hover: rotate 15deg
-// - Ikona: księżyc (dark mode) / słońce (light mode)
-// - onClick: toggleTheme() + toast "Motyw zmieniony"
-
-// Bell (powiadomienia):
-// - badge: czerwona kropka gdy unread > 0 (z useNotifCount, refetch co 15s)
-// - onClick: navigate /panel/powiadomienia lub /admin-panel/powiadomienia
-```
-
-### 7.2 Staff Sidebar — szczegółowy
+Komponent: `components/panel/PanelTopbar.tsx`
 
 ```typescript
-// components/layout/StaffSidebar.tsx
-// Szerokość: 248px, fixed, height: 100vh
-// Background: var(--s1), border-right: 1px solid var(--border)
-// Prawa krawędź: 1px linia gradientu (transparent → niebieski → transparent)
+// Układ:
+// LEWO: Logo "PRO-KOM" + badge roli
+// PRAWO: ThemeToggle + BellIcon (z badge unread) + Avatar + Logout
 
-// HEADER sidebara:
-// - Logo: czerwony kwadrat z ikoną klucza → "PRO–KOM" (myślnik niebieski)
-// - Badge roli: "Panel Pracownika", niebieskie tło, pulsująca niebieska kropka
-
-// STOPKA sidebara:
-// - Avatar: 34px okrąg, gradient niebieski #3b82f6→#2563eb, inicjały "KP"
-// - Imię: "Kuba P.", rola: "Serwisant" (niebieski)
-// - Ikona logout: hover czerwony
-
-// AKTYWNY LINK:
-// background: rgba(59,130,246,.09)
-// color: white, font-weight: 700
-// ::before: 3px niebieska linia lewa (position absolute)
-// ikona: var(--bl) tło
-
-// HOVER link:
-// background: rgba(255,255,255,.04)
-// color: var(--ink)
-
-// BADGE w sidebarze:
-// Źródło danych → skąd pobierać liczniki:
-// 'naprawy' badgeKey: 'my_active'      → z GET /staff/dashboard/ response.stats.active
-// 'historia' badgeKey: (brak)
-// 'komunikacja' badgeKey: messages_unread → response.stats.messages_unread
-// 'powiadomienia' → GET /accounts/notifications/count/ co 15s → .unread
-// 'zadania' badgeKey: tasks_open        → GET /tasks/?assigned_to=me&status=open (count)
-// 'czesci' badgeKey: parts_arrived      → GET /staff/repairs/ i sprawdź PartUsage.status=arrived
-// 'odbiory' badgeKey: ready_pickup      → GET /staff/repairs/?status=ready_for_pickup (count)
-// 'reklamacje' badgeKey: complaints     → GET /staff/repairs/?is_complaint=true (count)
-// 'nieprzypisane' badgeKey: unassigned  → GET /staff/repairs/?assigned_to__isnull=true (count)
-// 'wszystkie' badge:                    → GET /repairs/?count_only=true (count)
+// Bell: badge gdy unread > 0 → navigate /panel/powiadomienia lub /admin-panel/notif
+// Avatar: inicjały użytkownika z AuthContext
+// ThemeToggle: data-theme na <html>
 ```
 
-### 7.3 Admin Sidebar
+### 7.2 Staff Sidebar — aktualna
 
-```typescript
-// components/layout/AdminSidebar.tsx
-// Identyczny układ jak StaffSidebar ale:
-// - Kolor akcentu: czerwony #dc1e1e (nie niebieski)
-// - Aktywny link: rgba(220,30,30,.09)
-// - Linia aktywna: czerwona
-// - Badge roli: "Panel Administratora", czerwone tło
-// - Avatar admin: gradient czerwony #dc1e1e→#b81818, inicjały "JN"
+Komponent: `components/panel/WorkerSidebar.tsx`
 
-// DODATKOWA SEKCJA "ZARZĄDZANIE":
-// - Obciążenie zespołu   /admin-panel/obciazenie
-// - Statystyki           /admin-panel/statystyki
-// - Zespół               /admin-panel/zespol
-// - Zamówienia           /admin-panel/zamowienia
-// - Hurtownie            /admin-panel/hurtownie
-// - Dostępność           /admin-panel/dostepnosc
+Kanoniczne trasy panelu pracownika (foldery faktycznie istniejące):
 
-// Wyszukiwanie MUSI być w sidebarze admina:
-// - Wyszukiwanie         /admin-panel/wyszukiwanie  (BRAKOWAŁO!)
-```
+| Link w sidebar | Ścieżka URL |
+|----------------|-------------|
+| Dashboard | `/panel/dashboard` |
+| Moje naprawy | `/panel/repairs` (alias: `/panel/naprawy`) |
+| Wszystkie naprawy | `/panel/all-repairs` |
+| Historia | `/panel/archive` |
+| Komunikacja | `/panel/comm` |
+| Zadania | `/panel/tasks` |
+| Moje części | `/panel/czesci-hurtownie` |
+| Reklamacje | `/panel/reklamacje-gwarancje` |
+| Powiadomienia | `/panel/powiadomienia` |
+| Wyszukiwanie | `/panel/wyszukiwanie` |
+| Kalendarz | `/panel/kalendarz` |
+| Klienci | `/panel/klienci` |
+| Nieprzypisane | `/panel/unassigned` |
+| Odbiory | `/panel/odbior` |
+
+Aktywny link: `usePathname()` + sprawdzenie czy pathname startsWith lub === href.
+Akcent kolorystyczny: niebieski `#3b82f6`.
+
+### 7.3 Admin Sidebar — aktualna
+
+Komponent: `components/panel/AdminSidebar.tsx`
+
+Kanoniczne trasy panelu admina (foldery faktycznie istniejące):
+
+| Sekcja | Link | Ścieżka URL |
+|--------|------|-------------|
+| Główne | Dashboard | `/admin-panel/dashboard` |
+| | Przyjęcie | `/admin-panel/intake` |
+| | Naprawy | `/admin-panel/repairs` |
+| | Nieprzypisane | `/admin-panel/unassigned` |
+| | Obciążenie | `/admin-panel/workload` |
+| | Klienci | `/admin-panel/clients` |
+| | Wyszukiwanie | `/admin-panel/search` |
+| | Komunikacja | `/admin-panel/comm` |
+| | Powiadomienia | `/admin-panel/notif` |
+| | Kalendarz | `/admin-panel/calendar` |
+| | Odbiory | `/admin-panel/pickups` |
+| | Reklamacje | `/admin-panel/claims` |
+| | Części | `/admin-panel/parts` |
+| | Hurtownie | `/admin-panel/hurtownie` |
+| Zarządzanie | Statystyki | `/admin-panel/stats` |
+| | Zespół | `/admin-panel/team` |
+| | Dostępność | `/admin-panel/availability` |
+| | Zamówienia | `/admin-panel/orders` |
+| | Konfiguracja | `/admin-panel/config` |
+
+**Uwaga:** Admin-panel używa wyłącznie angielskich slugów. Brak aliasów PL.
+
+Akcent kolorystyczny: czerwony `#dc1e1e`.
+
+### 7.4 Schemat URL — uwagi
+
+**Schemat hybrydowy** — mix angielskich i polskich slugów:
+- Anglojęzyczne (główne widoki admina): `/admin-panel/repairs`, `/admin-panel/clients`, `/admin-panel/pickups`
+- Polskie folderowe (panel pracownika): `/panel/kalendarz`, `/panel/klienci`, `/panel/historia`
+- Angielski alias przez rewrite: `/panel/naprawy` → `/panel/repairs`
+- **Brak osobnego middleware.ts** — autoryzacja po stronie komponentu przez `useAuth().user?.role`
+
+Widoki duplikujące (stare i nowe — istnieją obie wersje):
+- `/panel/repairs` = `/panel/naprawy` (rewrite)
+- `/panel/archive` i `/panel/historia` (mogą być tą samą treścią)
+- `/panel/unassigned` i `/panel/nieprzypisane`
+
+Przy dodawaniu nowych linków do sidebar — używaj kanonicznej ścieżki z tabeli powyżej.
 
 ---
 
@@ -1902,30 +1722,30 @@ Typy wierszy (5 wariantów wizualnych):
 
 ```typescript
 // Jeśli /analytics/kpi/ nie istnieje → oblicz z GET /repairs/?page_size=500
-// 4 alerty zarządcze obliczaj po frontend stronie:
+// 4 alerty zarządcze obliczaj po frontend stronie (kanoniczne EN trasy admina):
 const alerts = [
   { type: 'unassigned', count: repairs.filter(r => !r.assigned_to).length,
     title: `${count} napraw bez przypisanego pracownika`,
     severity: count > 0 ? 'red' : null,
-    action: () => router.push('/admin-panel/nieprzypisane') },
+    href: '/admin-panel/unassigned' },
   { type: 'sla_overdue', count: repairs.filter(r => r.sla_overdue).length,
     title: `${count} napraw z przekroczonym SLA`,
-    action: () => router.push('/admin-panel/naprawy?sla_overdue=true') },
+    href: '/admin-panel/repairs?status=in_progress' },
   { type: 'waiting_response',
     count: repairs.filter(r => r.status === 'waiting_for_quote_approval').length,
     title: `${count} klientów czeka na odpowiedź`,
-    action: () => router.push('/admin-panel/komunikacja') },
+    href: '/admin-panel/comm' },
   { type: 'uncollected',
     count: repairs.filter(r => r.status === 'ready_for_pickup' && r.days_waiting > 3).length,
     title: `${count} gotowych urządzeń nieodebranych >3 dni`,
-    action: () => router.push('/admin-panel/odbiory') },
+    href: '/admin-panel/pickups' },
 ]
 // Jeśli count === 0 → ukryj alert (nie renderuj)
 ```
 
 ---
 
-### 9.2 Lista napraw admina `/admin-panel/naprawy`
+### 9.2 Lista napraw admina `/admin-panel/repairs`
 
 ```typescript
 // DODATKOWE vs lista pracownika:
@@ -1951,7 +1771,7 @@ const alerts = [
 
 ---
 
-### 9.3 Wyszukiwanie admina `/admin-panel/wyszukiwanie` (PEŁNA IMPLEMENTACJA — było STUB!)
+### 9.3 Wyszukiwanie admina `/admin-panel/search`
 
 **Endpoint:** `GET /api/v1/search/advanced/`
 
@@ -1990,7 +1810,7 @@ const alerts = [
 
 ---
 
-### 9.4 Klienci admina `/admin-panel/klienci` (ROZBUDOWANIE!)
+### 9.4 Klienci admina `/admin-panel/clients`
 
 **Endpoint:** `GET /api/v1/clients/`
 
@@ -2020,7 +1840,7 @@ const alerts = [
 
 ---
 
-### 9.5 Kalendarz admina `/admin-panel/kalendarz` (PEŁNA SIATKA — było bez niej!)
+### 9.5 Kalendarz admina `/admin-panel/calendar`
 
 **Endpoint:** `GET /api/v1/calendar/events/?start={date}&end={date}&assigned_to=all`
 
@@ -2044,7 +1864,7 @@ const alerts = [
 
 ---
 
-### 9.6 Reklamacje admina `/admin-panel/reklamacje` (ROZBUDOWANIE!)
+### 9.6 Reklamacje admina `/admin-panel/claims`
 
 **Endpoint:** `GET /api/v1/repairs/?is_complaint=true`
 
@@ -2069,7 +1889,7 @@ const alerts = [
 
 ---
 
-### 9.7 Powiadomienia admina `/admin-panel/powiadomienia` (ROZBUDOWANIE!)
+### 9.7 Powiadomienia admina `/admin-panel/notif`
 
 **Endpoint:** `GET /api/v1/accounts/notifications/`
 
@@ -2085,7 +1905,7 @@ const alerts = [
 
 ---
 
-### 9.8 Odbiory admina `/admin-panel/odbiory` (ROZBUDOWANIE!)
+### 9.8 Odbiory admina `/admin-panel/pickups`
 
 ```typescript
 // Grid 3 kolumny (FIX! — brakowała 3. kolumna):
@@ -2107,7 +1927,7 @@ const alerts = [
 
 ---
 
-### 9.9 Części admina `/admin-panel/czesci` (ROZBUDOWANIE!)
+### 9.9 Części admina `/admin-panel/parts`
 
 ```typescript
 // Grid 2 kolumny:
@@ -2128,7 +1948,7 @@ const alerts = [
 
 ---
 
-### 9.10 Obciążenie zespołu `/admin-panel/obciazenie`
+### 9.10 Obciążenie zespołu `/admin-panel/workload`
 
 ```typescript
 // GET /analytics/staff-kpi/ → StaffKPI[]
@@ -2140,16 +1960,15 @@ const alerts = [
 // Grid 4 statystyk: Aktywne | Pilne | Gotowe | Reklamacje
 // Pasek obciążenia: (active_count/10)*100%, kolor: green<60%, amber 60-80%, red>80%
 // Health score Unbounded font
-// Specjalny stan "zewnętrzny" (Marek): amber border + baner ⚠
 
 // Tabela pod kartami: naprawy wg pracownika
-// Przełącznik: [ Kuba P. ] [ Rafał P. ] [ Marek K. ] [ Wszyscy ]
-// Każdy wiersz: ikona przepisania → openAssignModal(repair.id)
+// Przełącznik pracownik tabs
+// Każdy wiersz: ikona przepisania → router.push(/admin-panel/repairs/{id})
 ```
 
 ---
 
-### 9.11 Statystyki `/admin-panel/statystyki`
+### 9.11 Statystyki `/admin-panel/stats`
 
 ```typescript
 // GET /analytics/kpi/
@@ -2169,7 +1988,7 @@ const alerts = [
 
 ---
 
-### 9.12 Szczegóły naprawy admina `/admin-panel/naprawy/[id]`
+### 9.12 Szczegóły naprawy admina `/admin-panel/repairs/[id]`
 
 ```typescript
 // IDENTYCZNE jak worker detail ale:
@@ -2289,93 +2108,107 @@ Prefix: `NEXT_PUBLIC_API_URL + /api/v1/`
 
 ---
 
-## ROZDZIAŁ 11 — KOLEJNOŚĆ IMPLEMENTACJI
+## ROZDZIAŁ 11 — STAN IMPLEMENTACJI (AKTUALNY)
 
-### Etap 1 — Fundament (zrób PRZED wszystkim innym)
+### Co zostało zaimplementowane ✅
 
-1. Zweryfikuj `lib/api.ts` — base URL = `/api/v1/`, token z `auth-storage.ts`
-2. `middleware.ts` — auth guard + role redirect
-3. `types/index.ts` — wszystkie typy z rozdziału 3
-4. `store/index.ts` — Zustand z rozdziału 5.9
-5. `lib/queryClient.ts` — React Query config z rozdziału 4
-6. `globals.css` — CSS variables (dark + light), animacje z rozdziału 2
-7. Komponenty bazowe z rozdziału 5:
-   - `Skeleton` + `StatCardSkeleton` + `RepairTableSkeleton`
-   - `EmptyState` z predefiniowanymi stanami
-   - `ErrorState`
-   - `Toast` + `ToastContainer`
-   - `ConfirmDialog` + `useConfirm` hook
-8. Badge komponenty: `RepairStatusBadge`, `RepairPriorityBadge`, `NextActionBadge`
-9. Render `ToastContainer` w root layout
+**Fundament:**
+- `lib/api.ts` — fetch-based, `api.*` + `authApi.*` + `fetchAllPages`
+- `lib/queryClient.ts` — TanStack Query z ApiError-aware retry
+- `store/index.ts` — Zustand AppStore (scope, modals, selectedIds: string[], filters, toasts)
+- `globals.css` — CSS variables dark + light mode, animacje Tailwind
+- Komponenty bazowe: `Skeleton`, `EmptyState` + EMPTY_STATES, `ErrorState`, `ToastContainer`
 
-### Etap 2 — Panel pracownika (rdzeń)
+**Panel pracownika (`/panel/`):**
+- login, dashboard, repairs (+ /[id]), archive, comm, tasks, czesci-hurtownie
+- reklamacje-gwarancje, powiadomienia, wyszukiwanie, kalendarz, klienci
+- unassigned, odbior, all-repairs, intake, statystyki, dostepnosc, konfiguracja
+- WorkerSidebar, PanelTopbar, StatusChangeModal, AssignModal, AddNoteModal
 
-1. `StaffSidebar` + `Topbar` (search ⌘K + notif badge + theme toggle)
-2. `/panel/login` — logowanie, token save, redirect wg role
-3. `/panel/dashboard` — scope bar z animacją + 5 kart z counter anim + next_actions + auto-refresh
-4. `/panel/naprawy` — tabela z skeleton + empty state + error state + filtry
-5. `/panel/naprawy/[id]` — hero + 7 zakładek + StatusChangeModal (poprawiona kolejność pól)
-6. `StatusChangeModal` z `ConfirmDialog` dla 'delivered'
+**Panel admina (`/admin-panel/`):**
+- dashboard, repairs (+ /[id]), clients (+ /[id]), claims, pickups
+- calendar, search, workload, stats, hurtownie, parts, notif
+- unassigned, zespol, dostepnosc, zamowienia, konfiguracja
+- AdminSidebar, SupplierFormModal, AdminAssignRepairsModal
 
-### Etap 3 — Panel pracownika (pozostałe)
+### Obszary do dalszego doskonalenia ⚠️
 
-1. `/panel/przyjecie` — 4 kroki, kategoria grid z animacją, TYPE=TEXT, sidebar preview
-2. `/panel/historia` — 5 typów wierszy
-3. `/panel/komunikacja` — licznik SMS + auto-save draftu
-4. `/panel/zadania` — inline forma + filtry scope
-5. `/panel/czesci` — filtry + sekcja hurtowni
-6. `/panel/reklamacje` — filtry + kompletna lista
-7. `/panel/powiadomienia` — grupy (Dziś/Wczoraj/Wcześniejsze) + klikalne
-8. `/panel/wyszukiwanie` — klikalne ostatnie wyszukiwania + sekcje wyników
-9. `/panel/kalendarz` — siatka 7×6 + interakcja z eventem (popup)
-10. `/panel/klienci`, `/panel/odbiory`, `/panel/nieprzypisane`, `/panel/wszystkie`
+1. **ConfirmDialog** — pokryte dla: bulk `delivered` (admin/repairs), `Zablokuj konto` (zespol), zmiana statusu (StatusChangeModal, WorkerStatusChangeModal). Pozostałe akcje nie są destruktywne.
+2. **Optimistic updates** — wdrożone na checkliście i powiadomieniach; inne mutacje nie mają rollback.
+3. **⌘K shortcut** — topbar search nie ma skrótu klawiaturowego.
 
-### Etap 4 — Panel admina (rdzeń)
+### Przy dodawaniu nowych widoków — checklist
 
-1. `AdminSidebar` (czerwony akcent, dodaj link do wyszukiwania!)
-2. `/admin-panel/dashboard` — KPI + alerty (obliczane z API)
-3. `/admin-panel/naprawy` — bulk select z wyróżnieniem + AssignModal globalny
-4. `/admin-panel/naprawy/[id]` — jak staff + "← Wróć" + "Przepisz"
-5. `/admin-panel/nieprzypisane` — z przyciskami "Przypisz"
-6. `AssignModal` (globalny, w layout)
-7. `BulkActionModal`
-
-### Etap 5 — Panel admina (pozostałe, wg priorytetu)
-
-1. `/admin-panel/wyszukiwanie` — PEŁNA implementacja (było stubem!)
-2. `/admin-panel/klienci` — z wyszukiwarką + filtrami
-3. `/admin-panel/kalendarz` — siatka 7×6 (było bez niej!)
-4. `/admin-panel/reklamacje` — filtry + pełna lista
-5. `/admin-panel/powiadomienia` — grupy
-6. `/admin-panel/odbiory` — 3 kolumny (dodaj "Nieodebrane >7 dni")
-7. `/admin-panel/czesci` — sekcja hurtowni
-8. `/admin-panel/obciazenie`, `/admin-panel/statystyki`
-9. `/admin-panel/zespol`, `/admin-panel/dostepnosc`
-10. `/admin-panel/hurtownie`, `/admin-panel/zamowienia`
+- [ ] `useQuery` z `isLoading` → `Skeleton`
+- [ ] `error` → `ErrorState` z `onRetry`
+- [ ] Pusta lista → `EmptyState` z EMPTY_STATES
+- [ ] Paginacja → `page` w URL params, `page_size=20`
+- [ ] Filtry → `status`, `search` w URL params
+- [ ] Mutacje → `addToast("...", "success")` / `addToast(e.message, "error")`
+- [ ] Destruktywne akcje → `useConfirm` przed mutacją
 
 ---
 
-## ROZDZIAŁ 12 — ZASADY UX (OBOWIĄZKOWE)
+## ROZDZIAŁ 12 — ZASADY UX
 
-1. **Skeleton zamiast spinnera** — każda lista podczas ładowania.
-2. **Empty state** przy każdej pustej liście — nie puste białe pole.
-3. **Error state** gdy API zwróci błąd — z przyciskiem retry.
-4. **Filtry w URL** (`?status=ready&page=2`) — back button i share linku działają.
-5. **Optimistic updates** dla: toggle zadania, mark notif read, checkbox checklista. Rollback na błąd.
-6. **Toasty** przy każdej mutacji — sukces (zielony) lub błąd (czerwony).
-7. **StatusModal NIE zamyka się po POST** — czeka na akcję z komunikatem.
-8. **ConfirmDialog przed destruktywnymi akcjami** — szczególnie `status = 'delivered'`.
-9. **Typ usługi = `<input type="text">`** — nigdy select.
-10. **Counter animation** przy zmianie scope w dashboardzie.
-11. **Kliknięcie kategorii w intake** — `whileTap scale(0.96)` + auto-scroll.
-12. **Licznik SMS** (160 znaków) w zakładce komunikacji.
-13. **Auto-save draftu** w komunikacji → localStorage.
-14. **Klikalne chipy wyszukiwania** → wypełniają input + uruchamiają search.
-15. **Kliknięcie eventu w kalendarzu** → popup z detalami i linkiem do naprawy.
-16. **Zaznaczone wiersze w bulk** → niebieskie tło (rgba(59,130,246,.07)).
-17. **Checklista — blokada kroków** — sekcja NAPRAWA zablokowana przed ukończeniem DIAGNOSTYKI.
-18. **Zablokowane kroki w checkliście** — `opacity: .4, pointer-events: none`.
-19. **Wyszukiwanie w sidebarze admina** — link MUSI być w menu.
-20. **"← Wróć"** w admin detail — MUSI być na górze każdego widoku szczegółów.
-21. **Paginacja** przy wszystkich listach, page_size=20, numery stron w URL.
-22. **⌘K shortcut** → focus na search input w topbarze.
+Poniżej lista z aktualnym stanem wdrożenia (✅ = zrobione, ⚠️ = częściowe, ❌ = brakuje):
+
+| # | Zasada | Stan |
+|---|--------|------|
+| 1 | **Skeleton zamiast spinnera** na każdej liście | ✅ `RepairTableSkeleton`, `Skeleton` w kluczowych widokach |
+| 2 | **Empty state** przy pustej liście — `EmptyState` z `EMPTY_STATES` | ✅ zaimplementowane; dodano klucz `repairs` do `EMPTY_STATES` |
+| 3 | **Error state** gdy API błąd — `ErrorState` z `onRetry` | ✅ zaimplementowane we wszystkich kluczowych widokach listowych; dodano do `all-repairs` i `admin-panel/calendar` |
+| 4 | **Filtry w URL** (`?status=ready&page=2`) — back button działa | ✅ zaimplementowane w `repairs`, `all-repairs`, `archive`, `admin/repairs`, `admin/clients` |
+| 5 | **Optimistic updates** dla: toggle zadania, mark notif read, checkbox checklista | ✅ zaimplementowane |
+| 6 | **Toasty** przy każdej mutacji — `addToast("...", "success/error")` | ✅ zaimplementowane; dodano do `SupplierFormModal`; admin bulk actions pokryte w `admin/repairs` |
+| 7 | **StatusModal NIE zamyka się po POST** — czeka na akcję z komunikatem | ✅ zaimplementowane |
+| 8 | **ConfirmDialog przed destruktywnymi akcjami** — `useConfirm` | ✅ pokryte dla wszystkich rzeczywistych destruktywnych akcji: bulk delivered, Zablokuj konto, zmiana statusu |
+| 9 | **Typ usługi = `<input type="text">`** — nigdy select | ✅ zaimplementowane w intake |
+| 10 | **Counter animation** przy zmianie scope w dashboardzie | ⚠️ częściowe |
+| 11 | **Kliknięcie kategorii w intake** — animacja + auto-scroll | ✅ zaimplementowane |
+| 12 | **Licznik SMS** (160 znaków) w zakładce komunikacji | ✅ zaimplementowane w `comm/page.tsx` (`smsMeta`) |
+| 13 | **Auto-save draftu** w komunikacji → localStorage | ✅ zaimplementowane w `comm`, `zgloszenia/[id]`, `repairs/[id]` |
+| 14 | **Klikalne chipy wyszukiwania** → wypełniają input + uruchamiają search | ✅ zaimplementowane |
+| 15 | **Kliknięcie eventu w kalendarzu** → popup z detalami i linkiem | ✅ zaimplementowane (`PopupState` z pozycjonowaniem x/y) |
+| 16 | **Zaznaczone wiersze w bulk** → niebieskie tło `rgba(59,130,246,.07)` | ✅ zaimplementowane |
+| 17 | **Checklista — blokada kroków** — sekcja NAPRAWA zablokowana | ✅ zaimplementowane (`rowLocked` + toast info) |
+| 18 | **Wyszukiwanie w sidebarze admina** | ✅ link `/admin-panel/search` w AdminSidebar |
+| 19 | **"← Wróć"** w każdym widoku szczegółów | ✅ zaimplementowane |
+| 20 | **Paginacja** — `page_size=20`, numer strony w URL | ✅ `PAGE_SIZE = 20` + `useSearchParams` w listach; `all-repairs`, `repairs`, `archive`, `admin/repairs`, `admin/clients` |
+| 21 | **⌘K shortcut** → focus na search input | ❌ do implementacji |
+| 22 | **`page_size=20`** na każdym żądaniu API | ✅ stosowane w zapytaniach do backendu |
+
+### Wzorzec paginacji URL (stosuj wszędzie)
+
+```typescript
+// Każda strona z listą powinna mieć:
+const searchParams = useSearchParams();
+const router = useRouter();
+const page = Number(searchParams.get("page") ?? 1);
+
+const setPage = (p: number) => {
+  const params = new URLSearchParams(searchParams.toString());
+  params.set("page", String(p));
+  router.push(`?${params.toString()}`);
+};
+
+// W query:
+queryKey: ["resource", { page, status, search }],
+queryFn: () => api.get(`/resource/?page=${page}&page_size=20&status=${status}`, token),
+```
+
+### Wzorzec toast przy mutacji (stosuj wszędzie)
+
+```typescript
+const { addToast } = useStore();
+const mutation = useMutation({
+  mutationFn: (payload) => api.post(url, payload, token),
+  onSuccess: () => {
+    void qc.invalidateQueries({ queryKey });
+    addToast("Operacja zakończona pomyślnie", "success");
+  },
+  onError: (e) => {
+    addToast(e instanceof Error ? e.message : "Błąd serwera", "error");
+  },
+});
+```

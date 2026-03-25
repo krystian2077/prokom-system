@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
+import { Skeleton, StackedRowSkeleton } from "@/components/ui/Skeleton";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStore } from "@/store";
 
 type PaginatedResponse<T> = {
   count: number;
@@ -77,11 +80,27 @@ function fmtDate(iso: string | null | undefined) {
   return d.toLocaleString("pl-PL");
 }
 
-export default function ConfigAdminPage() {
+function ConfigAdminPageInner() {
   const { user, token } = useAuth();
+  const addToast = useStore((s) => s.addToast);
   const isAdmin = user?.role === "admin";
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [tab, setTab] = useState<TabKey>("docs");
+  const tab = useMemo<TabKey>(() => {
+    const t = searchParams.get("tab");
+    if (t === "gdpr" || t === "backups") return t;
+    return "docs";
+  }, [searchParams]);
+
+  const setTab = (k: TabKey) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (k === "docs") p.delete("tab");
+    else p.set("tab", k);
+    const q = p.toString();
+    router.replace(q ? `${pathname}?${q}` : pathname);
+  };
 
   // DOCUMENTS
   const [docs, setDocs] = useState<TermsVersionItem[]>([]);
@@ -217,10 +236,12 @@ export default function ConfigAdminPage() {
         token,
       );
       setModalOpen(false);
+      addToast("Wniosek RODO zaktualizowany.", "success");
       await loadGdpr();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować wniosku.";
       setModalError(msg);
+      addToast(msg, "error");
     } finally {
       setModalSubmitting(false);
     }
@@ -231,10 +252,12 @@ export default function ConfigAdminPage() {
     setSettingActiveId(id);
     try {
       await api.post(`/compliance/admin/terms-versions/${id}/set-active/`, {}, token);
+      addToast("Dokument ustawiony jako aktywny.", "success");
       await loadDocs();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się ustawić dokumentu jako aktywnego.";
       setDocsError(msg);
+      addToast(msg, "error");
     } finally {
       setSettingActiveId(null);
     }
@@ -345,7 +368,15 @@ export default function ConfigAdminPage() {
         <>
           {docsError ? <p className="mb-4 text-sm text-[#fca5a5]">{docsError}</p> : null}
           {docsLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-3 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-3 w-full max-w-xs" />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {docs.map((d) => (
@@ -456,7 +487,9 @@ export default function ConfigAdminPage() {
           </div>
 
           {gdprLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
+            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+              <StackedRowSkeleton rows={8} />
+            </div>
           ) : (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -591,7 +624,9 @@ export default function ConfigAdminPage() {
           </div>
 
           {backupsLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
+            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+              <StackedRowSkeleton rows={8} />
+            </div>
           ) : (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -724,3 +759,22 @@ export default function ConfigAdminPage() {
   );
 }
 
+export default function ConfigAdminPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+          <Skeleton className="mb-6 h-9 w-80" />
+          <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <Skeleton className="h-10 w-64" />
+          </div>
+          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <StackedRowSkeleton rows={8} />
+          </div>
+        </main>
+      }
+    >
+      <ConfigAdminPageInner />
+    </Suspense>
+  );
+}

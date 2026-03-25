@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWorkerStore } from "@/stores/workerStore";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { NotificationFeedSkeleton } from "@/components/ui/Skeleton";
 import type { StaffNotificationItem } from "@/types/notifications";
 
 type FilterKey = "all" | "unread" | "parts" | "messages" | "tasks" | "system";
@@ -80,23 +84,43 @@ function dayBucket(createdAt: string): "today" | "yesterday" | "older" {
 export default function NotificationsPage() {
   const { token, user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isAdminOrStaff = user?.role === "admin" || user?.role === "staff";
-  const [filter, setFilter] = useState<FilterKey>("all");
+  const showToast = useWorkerStore((s) => s.addToast);
+
+  const filter = useMemo<FilterKey>(() => {
+    const f = searchParams.get("filter");
+    return FILTERS.some((x) => x.key === f) ? (f as FilterKey) : "all";
+  }, [searchParams]);
+
+  const setFilterParam = useCallback(
+    (key: FilterKey) => {
+      const p = new URLSearchParams(searchParams.toString());
+      if (key === "all") p.delete("filter");
+      else p.set("filter", key);
+      const q = p.toString();
+      router.replace(q ? `${pathname}?${q}` : pathname);
+    },
+    [pathname, router, searchParams],
+  );
+
   const [items, setItems] = useState<StaffNotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const loadAll = async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const qs: string[] = ["limit=100"];
-      const res = await api.get<StaffNotificationItem[]>(`/accounts/notifications/${qs.length ? `?${qs.join("&")}` : ""}`, token);
-      setItems(res);
+      const res = await api.get<StaffNotificationItem[] | { results?: StaffNotificationItem[] }>(
+        `/accounts/notifications/?limit=100`,
+        token,
+      );
+      setItems(Array.isArray(res) ? res : res?.results ?? []);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać powiadomień.";
-      setError(msg);
+      setError(e instanceof Error ? e : new Error("Nie udało się pobrać powiadomień."));
     } finally {
       setLoading(false);
     }
@@ -126,34 +150,52 @@ export default function NotificationsPage() {
     return g;
   }, [filteredItems]);
 
-  const patchStatus = async (id: string, next: "read" | "archived") => {
-    if (!token) return;
+  const patchStatus = async (id: string, next: "read" | "archived"): Promise<boolean> => {
+    if (!token) return false;
     try {
       await api.patch(`/accounts/notifications/${id}/`, { status: next }, token);
+      return true;
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować powiadomienia.";
-      setError(msg);
+      showToast(msg, "error");
+      return false;
     }
   };
 
   const handleOpen = async (notification: StaffNotificationItem) => {
+    const snapshot = items;
+    const wasUnread = (notification.status ?? "").toLowerCase() === "unread";
+
     setItems((prev) => prev.map((n) => (n.id === notification.id ? { ...n, status: "read" } : n)));
-    if ((notification.status ?? "").toLowerCase() === "unread") {
-      await patchStatus(notification.id, "read");
+
+    if (wasUnread) {
+      const ok = await patchStatus(notification.id, "read");
+      if (!ok) {
+        setItems(snapshot);
+        return;
+      }
     }
+
     if (notification.repair_id) {
-      router.push(`/panel/naprawy/${notification.repair_id}`);
+      const rid = encodeURIComponent(notification.repair_id);
+      const href =
+        user?.role === "admin" ? `/admin-panel/repairs/${rid}` : `/panel/naprawy/${rid}`;
+      router.push(href);
     }
   };
 
   const handleMarkAllRead = async () => {
     if (!token) return;
+    const snapshot = items;
+    setItems((prev) => prev.map((n) => ({ ...n, status: "read" })));
     try {
       await api.post(`/accounts/notifications/mark-all-read/`, undefined, token);
-      setItems((prev) => prev.map((n) => ({ ...n, status: "read" })));
+      showToast("Wszystkie oznaczone jako przeczytane.", "success");
     } catch (e) {
+      setItems(snapshot);
       const msg = e instanceof Error ? e.message : "Nie udało się oznaczyć wszystkich jako przeczytane.";
-      setError(msg);
+      setError(new Error(msg));
+      showToast(msg, "error");
     }
   };
 
@@ -173,7 +215,7 @@ export default function NotificationsPage() {
               <button
                 key={f.key}
                 type="button"
-                onClick={() => setFilter(f.key)}
+                onClick={() => setFilterParam(f.key)}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                   filter === f.key ? "border-white/20 bg-white/10 text-white" : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
                 }`}
@@ -192,13 +234,29 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {error ? <p className="mb-4 text-sm text-[#fca5a5]">{error}</p> : null}
+      {error && !loading ? (
+        <div className="mb-4">
+          <ErrorState error={error} onRetry={() => void loadAll()} title="Nie udało się załadować powiadomień" />
+        </div>
+      ) : null}
 
-      {loading ? <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div> : null}
+      {loading ? <NotificationFeedSkeleton rows={7} /> : null}
 
-      {!loading && filteredItems.length === 0 ? <p className="text-sm text-[#6b7280]">Brak powiadomień dla wybranego filtra.</p> : null}
+      {!loading && !error && filteredItems.length === 0 ? (
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] py-6">
+          <EmptyState
+            icon={EMPTY_STATES.notifications.icon}
+            title={filter === "all" ? EMPTY_STATES.notifications.title : "Brak powiadomień w tym filtrze"}
+            description={
+              filter === "all"
+                ? EMPTY_STATES.notifications.description
+                : "Zmień filtr lub sprawdź ponownie później."
+            }
+          />
+        </div>
+      ) : null}
 
-      {!loading ? (
+      {!loading && !error ? (
         <div className="space-y-7">
           {([
             ["today", "Dzisiaj"],

@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStore } from "@/store";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { StackedRowSkeleton } from "@/components/ui/Skeleton";
 
 type AvailabilityScope = "today" | "tomorrow" | "week";
 
@@ -54,11 +58,27 @@ function toISODate(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
-export default function AvailabilityPage() {
+function AvailabilityPageInner() {
   const { user, token } = useAuth();
+  const addToast = useStore((s) => s.addToast);
   const isAdmin = user?.role === "admin";
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [scope, setScope] = useState<AvailabilityScope>("today");
+  const scope = useMemo<AvailabilityScope>(() => {
+    const s = searchParams.get("scope");
+    if (s === "tomorrow" || s === "week") return s;
+    return "today";
+  }, [searchParams]);
+
+  const setScope = (val: AvailabilityScope) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (val === "today") p.delete("scope");
+    else p.set("scope", val);
+    const q = p.toString();
+    router.replace(q ? `${pathname}?${q}` : pathname);
+  };
   const [entries, setEntries] = useState<AvailabilityEntry[]>([]);
   const [entriesLoading, setEntriesLoading] = useState(false);
   const [entriesError, setEntriesError] = useState<string | null>(null);
@@ -179,10 +199,12 @@ export default function AvailabilityPage() {
     try {
       await api.post(`/availability/`, payload, token);
       setNote("");
+      addToast("Wpis dostępności dodany.", "success");
       await loadEntries();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się dodać wpisu.";
       setEntriesError(msg);
+      addToast(msg, "error");
     }
   };
 
@@ -228,13 +250,23 @@ export default function AvailabilityPage() {
               <h2 className="text-sm font-semibold text-white">
                 {scope === "today" ? "Dziś" : scope === "tomorrow" ? "Jutro" : "Tydzień"}
               </h2>
-              {entriesLoading ? <span className="text-sm text-[#9ca3af]">Ładowanie…</span> : null}
+              {entriesLoading ? <span className="inline-block h-3 w-20 animate-pulse rounded bg-white/10" aria-hidden /> : null}
             </div>
 
-            {entriesError && <p className="mt-3 text-sm text-[#fca5a5]">{entriesError}</p>}
+            {entriesError ? (
+              <div className="mt-3">
+                <ErrorState error={new Error(entriesError)} onRetry={() => void loadEntries()} title="Błąd dostępności" />
+              </div>
+            ) : null}
             {!entriesError && !entriesLoading && entries.length === 0 && (
               <p className="mt-3 text-sm text-[#6b7280]">Brak wpisów dostępności.</p>
             )}
+
+            {entriesLoading ? (
+              <div className="mt-4">
+                <StackedRowSkeleton rows={5} />
+              </div>
+            ) : null}
 
             {!entriesError && !entriesLoading && entries.length > 0 && (
               <div className="mt-4 space-y-4">
@@ -393,3 +425,17 @@ export default function AvailabilityPage() {
   );
 }
 
+export default function AvailabilityPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
+          <div className="h-8 w-64 animate-pulse rounded-lg bg-white/10" />
+          <StackedRowSkeleton rows={6} />
+        </main>
+      }
+    >
+      <AvailabilityPageInner />
+    </Suspense>
+  );
+}

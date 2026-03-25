@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorState } from "@/components/ui/ErrorState";
-import { StatCardSkeleton } from "@/components/ui/Skeleton";
+import { Skeleton, StatCardSkeleton, StackedRowSkeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
 
 type RepairsResponse = {
@@ -81,28 +81,28 @@ function buildAlerts(repairs: RepairRequestListItem[]): DashboardAlert[] {
       count: unassigned,
       title: `${unassigned} napraw bez przypisanego pracownika`,
       severity: "red",
-      href: "/admin-panel/nieprzypisane",
+      href: "/admin-panel/unassigned",
     },
     {
       type: "sla_overdue",
       count: slaOverdue,
       title: `${slaOverdue} napraw z przekroczonym SLA`,
       severity: "amber",
-      href: "/admin-panel/naprawy?sla_overdue=true",
+      href: "/admin-panel/repairs?status=in_progress",
     },
     {
       type: "waiting_response",
       count: waitingResponse,
       title: `${waitingResponse} klientów czeka na odpowiedź`,
       severity: "blue",
-      href: "/admin-panel/komunikacja",
+      href: "/admin-panel/comm",
     },
     {
       type: "uncollected",
       count: uncollected,
       title: `${uncollected} gotowych urządzeń nieodebranych >3 dni`,
       severity: "red",
-      href: "/admin-panel/odbiory",
+      href: "/admin-panel/pickups",
     },
   ];
 
@@ -209,12 +209,24 @@ export default function AdminDashboardPage() {
       </header>
 
       {loading ? (
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCardSkeleton />
-          <StatCardSkeleton />
-          <StatCardSkeleton />
-          <StatCardSkeleton />
-        </section>
+        <>
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </section>
+          <section className="grid gap-4 lg:grid-cols-[1.2fr,.8fr]">
+            <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+              <StackedRowSkeleton rows={4} />
+            </div>
+            <div className="space-y-3 rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-full max-w-sm" />
+              <Skeleton className="h-4 w-3/4 max-w-xs" />
+            </div>
+          </section>
+        </>
       ) : null}
 
       {!loading && error ? <ErrorState error={error} onRetry={() => void load()} /> : null}

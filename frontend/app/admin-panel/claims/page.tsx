@@ -4,10 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ShieldAlert } from "lucide-react";
-import { api } from "@/lib/api";
+import { fetchAllPages } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { StackedRowSkeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
 
 type TypeFilter = "all" | "complaint" | "warranty";
@@ -110,11 +111,9 @@ export default function AdminClaimsPage() {
       if (type === "warranty") params.set("repair_type", "warranty");
       const inQuery = statusInQuery(status);
       if (inQuery) params.set("complaint_warranty_status_in", inQuery);
-      const rows = await api.get<RepairRequestListItem[] | { results?: RepairRequestListItem[] }>(
-        `/repairs/?${params.toString()}`,
-        token,
-      );
-      setItems(Array.isArray(rows) ? rows : rows?.results ?? []);
+      params.set("page_size", "200");
+      const rows = await fetchAllPages<RepairRequestListItem>(`/repairs/?${params.toString()}`, token);
+      setItems(rows);
     } catch (e) {
       setError(e instanceof Error ? e : new Error("Nie udało się pobrać reklamacji."));
       setItems([]);
@@ -204,7 +203,9 @@ export default function AdminClaimsPage() {
       {error ? <ErrorState error={error} onRetry={() => void load()} /> : null}
 
       {loading ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <StackedRowSkeleton rows={6} />
+        </div>
       ) : !error && items.length === 0 ? (
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] py-8">
           <EmptyState icon="🛡️" title="Brak reklamacji w tym widoku" description="Zmień filtry albo sprawdź ponownie później." />
@@ -275,6 +276,5 @@ export default function AdminClaimsPage() {
       )}
     </main>
   );
-}
 }
 

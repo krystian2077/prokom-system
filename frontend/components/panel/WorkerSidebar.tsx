@@ -668,21 +668,121 @@ export function WorkerSidebar() {
               </Link>
 
               <Link
-                href="/panel/calendar"
+                href="/panel/kalendarz"
                 className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
                 style={{
-                  background: pathname.startsWith("/panel/calendar") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/calendar") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/calendar") ? "3px solid #3b82f6" : "3px solid transparent",
+                  background:
+                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: pathname.startsWith("/panel/calendar") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)", border: pathname.startsWith("/panel/calendar") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)" }}>
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
                     <History size={18} />
                   </span>
                   <span className="text-sm font-semibold">Kalendarz</span>
                 </div>
-                <span className={pathname.startsWith("/panel/calendar") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"} />
+                <span
+                  className={
+                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
+              </Link>
+
+              <Link
+                href="/panel/klienci"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background: pathname.startsWith("/panel/klienci") ? "rgba(59,130,246,.12)" : "transparent",
+                  color: pathname.startsWith("/panel/klienci") ? "#fff" : "rgba(208,212,222,.9)",
+                  borderLeft: pathname.startsWith("/panel/klienci") ? "3px solid #3b82f6" : "3px solid transparent",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background: pathname.startsWith("/panel/klienci") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
+                      border: pathname.startsWith("/panel/klienci") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <Users size={18} />
+                  </span>
+                  <span className="text-sm font-semibold">Klienci</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/klienci") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
+              </Link>
+
+              <Link
+                href="/panel/odbiory"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background:
+                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <ChevronRight size={18} />
+                  </span>
+                  <span className="text-sm font-semibold">Odbiory</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
               </Link>
             </div>
           </div>

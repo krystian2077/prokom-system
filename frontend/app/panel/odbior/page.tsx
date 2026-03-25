@@ -6,6 +6,9 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
 import type { RepairRequestListItem } from "@/types/repairs";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { PickupColumnSkeleton } from "@/components/ui/Skeleton";
 
 type PickupPanelResponse = {
   ready_for_pickup: RepairRequestListItem[];
@@ -119,7 +122,11 @@ export default function PickupPage() {
         </button>
       </div>
 
-      {error ? <div className="mb-4 rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-[#fca5a5]">{error}</div> : null}
+      {error ? (
+        <div className="mb-4">
+          <ErrorState error={new Error(error)} onRetry={() => void load()} title="Błąd odbiorów" />
+        </div>
+      ) : null}
 
       <section className="grid gap-4 xl:grid-cols-2">
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
@@ -129,9 +136,13 @@ export default function PickupPage() {
           </div>
 
           {loading ? (
-            <div className="text-sm text-[#9ca3af]">Ładowanie…</div>
+            <PickupColumnSkeleton rows={4} />
           ) : readyList.length === 0 ? (
-            <div className="text-sm text-[#6b7280]">Brak napraw gotowych do odbioru.</div>
+            <EmptyState
+              icon={EMPTY_STATES.pickups.icon}
+              title={EMPTY_STATES.pickups.title}
+              description={EMPTY_STATES.pickups.description}
+            />
           ) : (
             <div className="space-y-2">
               {readyList.map((r) => (
@@ -168,9 +179,9 @@ export default function PickupPage() {
           </div>
 
           {loading ? (
-            <div className="text-sm text-[#9ca3af]">Ładowanie…</div>
+            <PickupColumnSkeleton rows={3} />
           ) : issuedList.length === 0 ? (
-            <div className="text-sm text-[#6b7280]">Brak wydanych dziś.</div>
+            <div className="py-6 text-center text-sm text-[#6b7280]">Brak wydanych dziś.</div>
           ) : (
             <div className="space-y-2">
               {issuedList.map((r) => (

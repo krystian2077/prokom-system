@@ -5,6 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
 import Link from "next/link";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type PaginatedResponse<T> = {
   count: number;
@@ -116,12 +119,41 @@ function statusPillColor(status: string): { bg: string; border: string; text: st
   }
 }
 
+function KanbanBoardSkeleton() {
+  return (
+    <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {Array.from({ length: 4 }).map((_, col) => (
+          <div
+            // eslint-disable-next-line react/no-array-index-key
+            key={col}
+            className="min-w-[280px] flex-1 rounded-3xl border border-white/10 bg-[#0b0c10] p-3"
+          >
+            <Skeleton className="h-5 w-24" />
+            <div className="mt-3 space-y-3">
+              {Array.from({ length: 3 }).map((_, row) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <Skeleton key={row} variant="card" className="h-28" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function PanelZgloszeniaPage() {
   const { token, user } = useAuth();
   const [items, setItems] = useState<RepairRequestListItem[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadNonce, setReloadNonce] = useState(0);
 
   const [page, setPage] = useState(1);
 
@@ -157,6 +189,7 @@ export default function PanelZgloszeniaPage() {
 
     const load = async () => {
       try {
+        setLoading(true);
         setError(null);
 
         const params = new URLSearchParams();
@@ -400,21 +433,20 @@ export default function PanelZgloszeniaPage() {
         )}
       </section>
 
-      {loading && (
-        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0c0d12] px-5 py-4 text-[#9ca3af]">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#dc1e1e] border-t-transparent" />
-          Ładowanie napraw…
+      {loading ? <KanbanBoardSkeleton /> : null}
+      {error && !loading ? (
+        <div className="rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-8">
+          <ErrorState error={new Error(error)} onRetry={() => setReloadNonce((n) => n + 1)} title="Błąd listy zgłoszeń" />
         </div>
-      )}
-      {error && !loading && (
-        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-4 text-sm text-[#fca5a5]">
-          {error}
-        </div>
-      )}
+      ) : null}
 
       {!loading && !error && items.length === 0 && (
-        <div className="rounded-2xl border border-white/10 bg-[#0c0d12] px-8 py-12 text-center">
-          <p className="text-[#9ca3af]">Brak zgłoszeń do wyświetlenia.</p>
+        <div className="rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-8">
+          <EmptyState
+            icon={EMPTY_STATES.myRepairs.icon}
+            title={EMPTY_STATES.myRepairs.title}
+            description={EMPTY_STATES.myRepairs.description}
+          />
         </div>
       )}
 

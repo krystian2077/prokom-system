@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -13,6 +13,9 @@ import type { RepairRequestListItem } from "@/types/repairs";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { RepairTableSkeleton } from "@/components/ui/Skeleton";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { STATUS_OPTIONS, type RepairStatusValue } from "@/components/panel/WorkerStatusChangeModal";
+import { AdminAssignRepairsModal } from "@/components/panel/modals/AdminAssignRepairsModal";
 
 const PAGE_SIZE = 20;
 
@@ -56,25 +59,50 @@ function isComplaint(item: RepairRequestListItem): boolean {
   return Boolean(item.complaint_warranty_status) || (item.auto_tags ?? []).includes("reklamacja");
 }
 
+function csvEscape(v: unknown): string {
+  const s = v == null ? "" : String(v).replace(/"/g, '""');
+  return `"${s}"`;
+}
+
+function downloadRepairsCsv(rows: RepairRequestListItem[], filename: string) {
+  const headers = ["id", "repair_number", "client_name", "device_name", "status", "status_display", "assignee"];
+  const lines = [headers.join(",")];
+  for (const r of rows) {
+    const assignee = getAssigneeName(r);
+    lines.push(
+      [r.id, r.repair_number, r.client_name, r.device_name, r.status, r.status_display, assignee].map(csvEscape).join(","),
+    );
+  }
+  const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function AdminRepairsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const qc = useQueryClient();
   const { token, user } = useAuth();
-  const {
-    selectedRepairIds,
-    toggleRepair,
-    selectAll,
-    clearSelection,
-    openAssignModal,
-    addToast,
-  } = useStore();
+  const { confirm } = useConfirm();
+  const { selectedRepairIds, toggleRepair, selectAll, clearSelection, addToast } = useStore();
+
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignTargetIds, setAssignTargetIds] = useState<string[]>([]);
+
+  const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
+  const [bulkNewStatus, setBulkNewStatus] = useState<RepairStatusValue>("in_repair");
+  const [bulkStatusSaving, setBulkStatusSaving] = useState(false);
 
   const isAdmin = user?.role === "admin";
   const page = Number(searchParams.get("page") ?? "1") || 1;
   const statusFilter = searchParams.get("status") ?? "all";
   const staffFilter = searchParams.get("staff") ?? "all";
   const claimsFilter = searchParams.get("claims") ?? "all";
+  const slaOverdueFilter = searchParams.get("sla_overdue") === "true";
 
   const repairsQuery = useQuery({
     queryKey: ["repairs", "admin", "list"],
@@ -96,6 +124,15 @@ export default function AdminRepairsPage() {
   });
 
   const allItems = repairsQuery.data ?? [];
+
+  const staffAssignOptions = useMemo(
+    () =>
+      (staffQuery.data ?? []).map((s) => ({
+        id: s.id,
+        label: s.full_name || `${s.first_name ?? ""} ${s.last_name ?? ""}`.trim() || s.email || "Pracownik",
+      })),
+    [staffQuery.data],
+  );
 
   const pills = useMemo(() => {
     const team = (staffQuery.data ?? []).slice(0, 3).map((s) => ({
@@ -120,6 +157,8 @@ export default function AdminRepairsPage() {
     if (statusFilter === "ready") list = list.filter((r) => isReady(r));
     if (statusFilter === "unassigned") list = list.filter((r) => !r.assigned_to);
     if (claimsFilter === "1") list = list.filter((r) => isComplaint(r));
+    if (slaOverdueFilter)
+      list = list.filter((r) => Boolean((r as { sla_overdue?: boolean }).sla_overdue));
 
     if (staffFilter !== "all") {
       list = list.filter((r) => getAssigneeId(r) === staffFilter);
@@ -140,8 +179,56 @@ export default function AdminRepairsPage() {
     router.push(`/admin-panel/repairs?${params.toString()}`);
   };
 
-  const pageIds = pageRows.map((r) => Number(r.id)).filter((n) => Number.isFinite(n));
+  const pageIds = pageRows.map((r) => String(r.id));
   const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedRepairIds.includes(id));
+
+  const exportSelectedCsv = () => {
+    const rows = allItems.filter((r) => selectedRepairIds.includes(String(r.id)));
+    if (rows.length === 0) {
+      addToast("Najpierw zaznacz naprawy w tabeli.", "info");
+      return;
+    }
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    downloadRepairsCsv(rows, `prokom-naprawy-${stamp}.csv`);
+    addToast(`✓ Wyeksportowano ${rows.length} wierszy`, "success");
+  };
+
+  const applyBulkStatus = async () => {
+    if (!token || selectedRepairIds.length === 0) return;
+    if (bulkNewStatus === "delivered") {
+      const ok = await confirm({
+        title: "Oznaczyć jako wydane?",
+        description: `Status „Dostarczone” zostanie ustawiony dla ${selectedRepairIds.length} napraw. Ta operacja jest trudna do cofnięcia.`,
+        confirmLabel: "Tak, wydano",
+        variant: "danger",
+      });
+      if (!ok) return;
+    }
+    setBulkStatusSaving(true);
+    let okCount = 0;
+    let failCount = 0;
+    for (const id of selectedRepairIds) {
+      try {
+        await api.post(
+          `/repairs/${id}/change-status/`,
+          { new_status: bulkNewStatus, notes: "Zmiana zbiorcza (panel admin)" },
+          token,
+        );
+        okCount++;
+      } catch {
+        failCount++;
+      }
+    }
+    setBulkStatusSaving(false);
+    setBulkStatusOpen(false);
+    clearSelection();
+    void qc.invalidateQueries({ queryKey: ["repairs", "admin", "list"] });
+    if (failCount === 0) {
+      addToast(`✓ Zaktualizowano status (${okCount} napraw)`, "success");
+    } else {
+      addToast(`Częściowy sukces: ${okCount} ok, ${failCount} błędów`, "error");
+    }
+  };
 
   if (!isAdmin) {
     return (
@@ -222,8 +309,8 @@ export default function AdminRepairsPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      openAssignModal(selectedRepairIds[0]);
-                      addToast("Tryb bulk: otwarto przypisanie dla pierwszej naprawy.", "info");
+                      setAssignTargetIds([...selectedRepairIds]);
+                      setAssignOpen(true);
                     }}
                     className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/15"
                   >
@@ -231,14 +318,14 @@ export default function AdminRepairsPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => addToast("Bulk zmiana statusu będzie dodana w kolejnym etapie.", "info")}
+                    onClick={() => setBulkStatusOpen(true)}
                     className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/15"
                   >
                     Zmień status
                   </button>
                   <button
                     type="button"
-                    onClick={() => addToast("Eksport CSV będzie dodany w kolejnym etapie.", "info")}
+                    onClick={exportSelectedCsv}
                     className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/15"
                   >
                     <span className="inline-flex items-center gap-1">
@@ -286,7 +373,7 @@ export default function AdminRepairsPage() {
             ) : (
               <div className="px-4 py-2">
                 {pageRows.map((r) => {
-                  const id = Number(r.id);
+                  const id = String(r.id);
                   const selected = selectedRepairIds.includes(id);
                   return (
                     <div
@@ -322,7 +409,10 @@ export default function AdminRepairsPage() {
                           <div className="truncate text-sm text-white">{getAssigneeName(r)}</div>
                           <button
                             type="button"
-                            onClick={() => openAssignModal(id)}
+                            onClick={() => {
+                              setAssignTargetIds([id]);
+                              setAssignOpen(true);
+                            }}
                             className="mt-1 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#9ca3af] hover:bg-white/10 hover:text-white"
                           >
                             <ArrowRightLeft size={12} />
@@ -380,6 +470,69 @@ export default function AdminRepairsPage() {
           </div>
         </div>
       </div>
+
+      {bulkStatusOpen ? (
+        <div
+          className="fixed inset-0 z-[400] flex items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm"
+          role="dialog"
+          aria-modal
+          aria-labelledby="bulk-status-title"
+        >
+          <div className="w-full max-w-md rounded-[18px] border border-white/15 bg-[#0f1117] p-5 shadow-[0_20px_60px_rgba(0,0,0,.55)]">
+            <h2 id="bulk-status-title" className="text-lg font-semibold text-white">
+              Zmiana statusu ({selectedRepairIds.length} napraw)
+            </h2>
+            <p className="mt-1 text-sm text-[#9ca3af]">Wybierz nowy status techniczny. Backend zaktualizuje każdą naprawę osobno.</p>
+            <label className="mt-4 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Nowy status</label>
+            <select
+              value={bulkNewStatus}
+              onChange={(e) => setBulkNewStatus(e.target.value as RepairStatusValue)}
+              className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+            >
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setBulkStatusOpen(false)}
+                disabled={bulkStatusSaving}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white disabled:opacity-50"
+              >
+                Anuluj
+              </button>
+              <button
+                type="button"
+                onClick={() => void applyBulkStatus()}
+                disabled={bulkStatusSaving}
+                className="rounded-xl border border-[#3b82f6]/40 bg-[#3b82f6]/20 px-4 py-2 text-sm font-semibold text-white hover:bg-[#3b82f6]/30 disabled:opacity-50"
+              >
+                {bulkStatusSaving ? "Zapisywanie…" : "Zastosuj"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <AdminAssignRepairsModal
+        open={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        repairIds={assignTargetIds}
+        staff={staffAssignOptions}
+        token={token}
+        onSuccess={({ ok, failed }) => {
+          clearSelection();
+          void qc.invalidateQueries({ queryKey: ["repairs", "admin", "list"] });
+          if (failed === 0) {
+            addToast(`✓ Przypisano ${ok} ${ok === 1 ? "naprawę" : "napraw"}`, "success");
+          } else {
+            addToast(`Przypisano ${ok}, błędów: ${failed}`, "error");
+          }
+        }}
+      />
     </main>
   );
 }

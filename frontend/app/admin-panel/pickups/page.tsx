@@ -3,17 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/lib/api";
+import { fetchAllPages } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
-
-type Paginated<T> = {
-  count?: number;
-  results?: T[];
-};
-
-function toRows<T>(res: T[] | Paginated<T>): T[] {
-  return Array.isArray(res) ? res : res?.results ?? [];
-}
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { PickupColumnSkeleton } from "@/components/ui/Skeleton";
 
 function waitingDays(item: RepairRequestListItem): number {
   const byApi = Number(item.waiting_for_client_days ?? 0);
@@ -33,7 +27,7 @@ export default function AdminPickupsPage() {
   const { token, user } = useAuth();
   const isAdmin = user?.role === "admin";
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [ready, setReady] = useState<RepairRequestListItem[]>([]);
   const [uncollected, setUncollected] = useState<RepairRequestListItem[]>([]);
   const [deliveredToday, setDeliveredToday] = useState<RepairRequestListItem[]>([]);
@@ -43,17 +37,25 @@ export default function AdminPickupsPage() {
     setLoading(true);
     setError(null);
     try {
-      const [rdyRes, oldRes, delRes] = await Promise.all([
-        api.get<RepairRequestListItem[] | Paginated<RepairRequestListItem>>(`/repairs/?status=ready_for_pickup&ordering=-created_at`, token),
-        api.get<RepairRequestListItem[] | Paginated<RepairRequestListItem>>(`/repairs/?status=ready_for_pickup&days_since_ready__gt=7&ordering=-created_at`, token),
-        api.get<RepairRequestListItem[] | Paginated<RepairRequestListItem>>(`/repairs/?status=delivered&delivered_today=true&ordering=-created_at`, token),
+      const [readyList, oldList, delList] = await Promise.all([
+        fetchAllPages<RepairRequestListItem>(
+          `/repairs/?status=ready_for_pickup&ordering=-created_at&page_size=200`,
+          token,
+        ),
+        fetchAllPages<RepairRequestListItem>(
+          `/repairs/?status=ready_for_pickup&days_since_ready__gt=7&ordering=-created_at&page_size=200`,
+          token,
+        ),
+        fetchAllPages<RepairRequestListItem>(
+          `/repairs/?status=delivered&delivered_today=true&ordering=-created_at&page_size=200`,
+          token,
+        ),
       ]);
-
-      setReady(toRows(rdyRes));
-      setUncollected(toRows(oldRes));
-      setDeliveredToday(toRows(delRes));
+      setReady(readyList);
+      setUncollected(oldList);
+      setDeliveredToday(delList);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Nie udało się pobrać danych odbiorów.");
+      setError(e instanceof Error ? e : new Error("Nie udało się pobrać danych odbiorów."));
       setReady([]);
       setUncollected([]);
       setDeliveredToday([]);
@@ -94,23 +96,38 @@ export default function AdminPickupsPage() {
         <button
           type="button"
           onClick={() => void load()}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
+          disabled={loading}
+          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white disabled:opacity-50"
         >
           Odśwież
         </button>
       </div>
 
-      {error ? <div className="mb-4 rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-[#fca5a5]">{error}</div> : null}
+      {error && !loading ? (
+        <div className="mb-4">
+          <ErrorState error={error} onRetry={() => void load()} title="Nie udało się załadować odbiorów" />
+        </div>
+      ) : null}
 
       <section className="grid gap-4 xl:grid-cols-3">
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Gotowe do odbioru</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{ready.length}</span>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
+              {loading ? "…" : ready.length}
+            </span>
           </div>
-          {loading ? <div className="text-sm text-[#9ca3af]">Ładowanie…</div> : null}
-          {!loading && ready.length === 0 ? <div className="text-sm text-[#6b7280]">Brak urządzeń gotowych do odbioru.</div> : null}
-          {!loading ? (
+          {loading ? (
+            <PickupColumnSkeleton rows={5} />
+          ) : !error && ready.length === 0 ? (
+            <div className="py-4">
+              <EmptyState
+                icon={EMPTY_STATES.pickups.icon}
+                title="Brak urządzeń gotowych"
+                description="Gdy naprawy przejdą w status gotowe do odbioru, pojawią się tutaj."
+              />
+            </div>
+          ) : !error ? (
             <div className="space-y-2">
               {ready.map((r) => (
                 <div key={r.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
@@ -130,11 +147,15 @@ export default function AdminPickupsPage() {
         <div className="rounded-3xl border border-[#dc1e1e]/25 bg-[#0c0d12] p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ffb4b4]">Nieodebrane &gt;7 dni</h2>
-            <span className="rounded-full border border-[#dc1e1e]/35 bg-[#dc1e1e]/12 px-2.5 py-1 text-xs font-semibold text-[#ffb4b4]">{uncollected.length}</span>
+            <span className="rounded-full border border-[#dc1e1e]/35 bg-[#dc1e1e]/12 px-2.5 py-1 text-xs font-semibold text-[#ffb4b4]">
+              {loading ? "…" : uncollected.length}
+            </span>
           </div>
-          {loading ? <div className="text-sm text-[#9ca3af]">Ładowanie…</div> : null}
-          {!loading && uncollected.length === 0 ? <div className="text-sm text-[#6b7280]">Brak zaległych odbiorów.</div> : null}
-          {!loading ? (
+          {loading ? (
+            <PickupColumnSkeleton rows={5} />
+          ) : !error && uncollected.length === 0 ? (
+            <p className="text-sm text-[#6b7280]">Brak zaległych odbiorów.</p>
+          ) : !error ? (
             <div className="space-y-2">
               {uncollected.map((r) => (
                 <div key={r.id} className="rounded-2xl border border-[#dc1e1e]/30 bg-[#dc1e1e]/8 p-3">
@@ -160,11 +181,15 @@ export default function AdminPickupsPage() {
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wydane dziś</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{deliveredSorted.length}</span>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
+              {loading ? "…" : deliveredSorted.length}
+            </span>
           </div>
-          {loading ? <div className="text-sm text-[#9ca3af]">Ładowanie…</div> : null}
-          {!loading && deliveredSorted.length === 0 ? <div className="text-sm text-[#6b7280]">Brak wydanych dziś.</div> : null}
-          {!loading ? (
+          {loading ? (
+            <PickupColumnSkeleton rows={5} />
+          ) : !error && deliveredSorted.length === 0 ? (
+            <p className="text-sm text-[#6b7280]">Brak wydanych dziś.</p>
+          ) : !error ? (
             <div className="space-y-2">
               {deliveredSorted.map((r) => (
                 <div key={r.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0f1117] px-3 py-2">
@@ -187,4 +212,3 @@ export default function AdminPickupsPage() {
     </main>
   );
 }
-

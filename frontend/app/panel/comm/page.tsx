@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStore } from "@/store";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { CommThreadListSkeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
 
 type RepairMessage = {
@@ -26,6 +30,7 @@ function dateLabel(iso: string) {
 
 export default function CommPage() {
   const { token } = useAuth();
+  const addToast = useStore((s) => s.addToast);
 
   const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
@@ -143,9 +148,12 @@ export default function CommPage() {
       await api.post(`/repairs/${activeThread.repair.id}/notes/`, { note: draft.trim(), is_internal: false, note_type: "client_contact" }, token);
       localStorage.removeItem(`draft-${activeThread.repair.id}`);
       setDraft("");
+      addToast("Wiadomość wysłana.", "success");
       await loadThreads();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Nie udało się wysłać wiadomości.");
+      const msg = e instanceof Error ? e.message : "Nie udało się wysłać wiadomości.";
+      setError(msg);
+      addToast(msg, "error");
     } finally {
       setSending(false);
     }
@@ -167,15 +175,25 @@ export default function CommPage() {
         />
       </div>
 
-      {error ? <div className="mb-4 rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-[#fca5a5]">{error}</div> : null}
+      {error ? (
+        <div className="mb-4">
+          <ErrorState error={new Error(error)} onRetry={() => void loadThreads()} title="Błąd komunikacji" />
+        </div>
+      ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[360px_1fr]">
         <aside className="rounded-3xl border border-white/10 bg-[#0c0d12] p-3">
           <div className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wątki</div>
           {loading ? (
-            <div className="px-2 py-3 text-sm text-[#9ca3af]">Ładowanie…</div>
+            <CommThreadListSkeleton rows={6} />
           ) : filteredThreads.length === 0 ? (
-            <div className="px-2 py-3 text-sm text-[#6b7280]">Brak wątków do wyświetlenia.</div>
+            <div className="px-2 py-4">
+              <EmptyState
+                icon={EMPTY_STATES.messages.icon}
+                title="Brak wątków"
+                description="Pojawią się naprawy z wiadomościami od klienta lub oznaczone jako wymagające reakcji."
+              />
+            </div>
           ) : (
             <div className="space-y-2">
               {filteredThreads.map((t) => {

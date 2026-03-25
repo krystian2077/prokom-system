@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Plus, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
@@ -429,17 +430,37 @@ export default function CalendarPage() {
                 selectedEvents.slice(0, 6).map((ev) => {
                   const meta = CATEGORY_META[ev.category];
                   return (
-                    <div key={ev.id} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-2 w-2 rounded-full" style={{ background: meta.color }} />
+                    <button
+                      key={ev.id}
+                      type="button"
+                      onClick={(e) => {
+                        const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                        setPopup({ event: ev, x: r.left, y: r.bottom });
+                      }}
+                      className="flex w-full items-start gap-3 rounded-xl border border-transparent px-1 py-1 text-left transition hover:border-white/10 hover:bg-white/5"
+                    >
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: meta.color }} />
                       <div className="min-w-0">
                         <div className="truncate text-sm font-semibold text-[#d0d4de]">{ev.title}</div>
                         {ev.subtitle ? <div className="truncate text-xs text-[#8b93a8]">{ev.subtitle}</div> : null}
                       </div>
-                    </div>
+                    </button>
                   );
                 })
+              ) : calendarLoading ? (
+                <div className="flex flex-col gap-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Skeleton variant="circle" className="mt-1.5 h-2 w-2 shrink-0" />
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/4 max-w-[200px]" />
+                        <Skeleton className="h-3 w-1/2 max-w-[140px]" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : (
-                <div className="text-sm text-[#8b93a8]">{calendarLoading ? "Ładowanie…" : "Brak zdarzeń."}</div>
+                <div className="text-sm text-[#8b93a8]">Brak zdarzeń.</div>
               )}
             </div>
           </div>
@@ -457,17 +478,37 @@ export default function CalendarPage() {
                 tomorrowEvents.slice(0, 6).map((ev) => {
                   const meta = CATEGORY_META[ev.category];
                   return (
-                    <div key={ev.id} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-2 w-2 rounded-full" style={{ background: meta.color }} />
+                    <button
+                      key={ev.id}
+                      type="button"
+                      onClick={(e) => {
+                        const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                        setPopup({ event: ev, x: r.left, y: r.bottom });
+                      }}
+                      className="flex w-full items-start gap-3 rounded-xl border border-transparent px-1 py-1 text-left transition hover:border-white/10 hover:bg-white/5"
+                    >
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: meta.color }} />
                       <div className="min-w-0">
                         <div className="truncate text-sm font-semibold text-[#d0d4de]">{ev.title}</div>
                         {ev.subtitle ? <div className="truncate text-xs text-[#8b93a8]">{ev.subtitle}</div> : null}
                       </div>
-                    </div>
+                    </button>
                   );
                 })
+              ) : calendarLoading ? (
+                <div className="flex flex-col gap-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Skeleton variant="circle" className="mt-1.5 h-2 w-2 shrink-0" />
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/4 max-w-[200px]" />
+                        <Skeleton className="h-3 w-1/2 max-w-[140px]" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : (
-                <div className="text-sm text-[#8b93a8]">{calendarLoading ? "Ładowanie…" : "Brak zdarzeń."}</div>
+                <div className="text-sm text-[#8b93a8]">Brak zdarzeń.</div>
               )}
             </div>
           </div>

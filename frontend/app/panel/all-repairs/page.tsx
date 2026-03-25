@@ -5,10 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { RepairTableSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import type { RepairRequestListItem } from "@/types/repairs";
 import { Eye, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 type RepairsPillKey = "all" | "in_progress" | "parts_waiting" | "ready" | "urgent";
 type RepairsSortKey = "priority" | "date" | "sla";
@@ -266,9 +269,17 @@ function AllRepairsPageInner() {
 
           <div className="mt-4">
             {repairsQuery.isLoading ? (
-              <div className="px-4 py-6 text-[#9ca3af]">Ładowanie…</div>
+              <div className="px-4 py-4">
+                <RepairTableSkeleton rows={8} />
+              </div>
+            ) : repairsQuery.isError ? (
+              <div className="px-4 py-8">
+                <ErrorState onRetry={() => repairsQuery.refetch()} />
+              </div>
             ) : sliced.length === 0 ? (
-              <div className="px-4 py-12 text-center text-sm text-[#6b7280]">Brak wyników.</div>
+              <div className="px-4 py-8">
+                <EmptyState {...EMPTY_STATES.repairs} />
+              </div>
             ) : (
               <div className="px-4">
                 {sliced.map((r) => {
@@ -399,7 +410,9 @@ export default function AllRepairsPage() {
     <Suspense
       fallback={
         <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-          <div className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">Ładowanie…</div>
+          <div className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">
+            <RepairTableSkeleton rows={10} />
+          </div>
         </main>
       }
     >

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { StatCardSkeleton, StackedRowSkeleton } from "@/components/ui/Skeleton";
 
 type SummaryStatsResponse = {
   in_progress: number;
@@ -140,10 +142,30 @@ export default function StatsAdminPage() {
         </p>
       </header>
 
-      {error ? <p className="mb-4 text-sm text-[#fca5a5]">{error}</p> : null}
-
       {loading ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
+        <>
+          <section className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </section>
+          <section className="mb-6 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+              <StackedRowSkeleton rows={5} />
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+              <StackedRowSkeleton rows={5} />
+            </div>
+          </section>
+          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <StackedRowSkeleton rows={6} />
+          </div>
+        </>
+      ) : error ? (
+        <div className="mb-4">
+          <ErrorState error={new Error(error)} onRetry={() => void loadAll()} title="Błąd statystyk" />
+        </div>
       ) : (
         <>
           <section className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">

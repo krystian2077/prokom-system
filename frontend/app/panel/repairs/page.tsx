@@ -12,7 +12,7 @@ import { RepairTableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 type RepairsPillKey = "all" | "in_progress" | "parts_waiting" | "ready" | "urgent";
 type RepairsSortKey = "priority" | "date" | "sla";

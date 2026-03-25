@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useWorkerStore } from "@/stores/workerStore";
 
 export function AssignModal({
   open,
@@ -13,6 +14,7 @@ export function AssignModal({
   isAdmin: boolean;
   onSubmit: (payload: { assigned_to_id?: string | null; notes?: string }) => Promise<void>;
 }) {
+  const addToast = useWorkerStore((s) => s.addToast);
   const [assignedToId, setAssignedToId] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -41,9 +43,12 @@ export function AssignModal({
         // staff: backend i tak przypisuje do siebie, więc notatka wystarczy
         await onSubmit({ assigned_to_id: null, notes: notes.trim() || undefined });
       }
+      addToast("✓ Przypisanie zapisane", "success");
       onClose();
     } catch (ex) {
-      setError(ex instanceof Error ? ex.message : "Nie udało się przypisać naprawy.");
+      const msg = ex instanceof Error ? ex.message : "Nie udało się przypisać naprawy.";
+      setError(msg);
+      addToast(msg, "error");
     } finally {
       setSubmitting(false);
     }

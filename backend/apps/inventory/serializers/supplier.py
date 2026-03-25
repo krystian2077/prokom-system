@@ -6,7 +6,7 @@ from apps.inventory.models import Supplier
 class SupplierListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ["id", "name", "nip", "phone", "email", "website_url", "is_active"]
+        fields = ["id", "name", "nip", "phone", "email", "website_url", "average_delivery_days", "is_active"]
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -23,6 +23,7 @@ class SupplierSerializer(serializers.ModelSerializer):
             "phone",
             "email",
             "website_url",
+            "average_delivery_days",
             "notes",
             "is_active",
             "created_at",

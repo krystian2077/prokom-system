@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWorkerStore } from "@/stores/workerStore";
 import { api } from "@/lib/api";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { TaskListSkeleton } from "@/components/ui/Skeleton";
 
 type TaskStatusValue = "new" | "in_progress" | "waiting" | "done" | "completed" | "cancelled";
 type TaskPriorityValue = "low" | "normal" | "standard" | "high" | "important" | "urgent";
@@ -69,6 +71,7 @@ function priorityPillClass(priorityRaw: string | undefined): string {
 
 export default function TasksPage() {
   const { token } = useAuth();
+  const showToast = useWorkerStore((s) => s.addToast);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -159,9 +162,12 @@ export default function TasksPage() {
     );
     try {
       await api.patch(`/tasks/${task.id}/`, { status: nextStatus }, token);
+      showToast(checked ? "Zadanie oznaczone jako wykonane." : "Zadanie przywrócone do toku.", "success");
     } catch (e) {
       setTasks(prev);
-      setUpdateTaskError(e instanceof Error ? e.message : "Nie udało się zaktualizować zadania.");
+      const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować zadania.";
+      setUpdateTaskError(msg);
+      showToast(msg, "error");
     } finally {
       setUpdatingTaskId(null);
     }
@@ -295,7 +301,7 @@ export default function TasksPage() {
               </span>
             </div>
             {tasksLoading ? (
-              <p className="text-sm text-[#9ca3af]">Ładowanie...</p>
+              <TaskListSkeleton rows={5} />
             ) : openTasks.length === 0 ? (
               <EmptyState
                 icon={EMPTY_STATES.tasks.icon}
@@ -345,7 +351,7 @@ export default function TasksPage() {
               </span>
             </div>
             {tasksLoading ? (
-              <p className="text-sm text-[#9ca3af]">Ładowanie...</p>
+              <TaskListSkeleton rows={4} />
             ) : doneTasks.length === 0 ? (
               <EmptyState
                 icon={EMPTY_STATES.tasks.icon}

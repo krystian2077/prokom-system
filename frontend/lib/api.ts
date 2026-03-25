@@ -212,4 +212,23 @@ export const api = {
     request<T>(path, { method: "DELETE", token }),
 };
 
+/** Odpowiedź listy DRF z paginacją (next = pełny URL lub null). */
+export type PaginatedList<T> = { count?: number; next?: string | null; previous?: string | null; results?: T[] };
+
+/**
+ * Pobiera wszystkie strony listy (np. parts-queue), podążając za `next`.
+ * Pierwszy request: ścieżka względna `/api/v1/...` lub pełny URL; kolejne używają `next` z odpowiedzi.
+ */
+export async function fetchAllPages<T>(firstPath: string, token: string | null): Promise<T[]> {
+  const all: T[] = [];
+  let path: string | null = firstPath;
+  while (path) {
+    const res: T[] | PaginatedList<T> = await api.get<T[] | PaginatedList<T>>(path, token);
+    const rows = Array.isArray(res) ? res : res?.results ?? [];
+    all.push(...rows);
+    path = Array.isArray(res) ? null : res.next ?? null;
+  }
+  return all;
+}
+
 export { API_BASE, API_V1 };

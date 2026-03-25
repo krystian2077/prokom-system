@@ -3,12 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStore } from "@/store";
 import { api } from "@/lib/api";
 import type { RepairDetail, RepairTimelineEvent } from "@/types/repairs";
 import { AddNoteModal } from "@/components/panel/modals/AddNoteModal";
 import { AssignModal } from "@/components/panel/modals/AssignModal";
 import { StatusChangeModal, type RepairStatusValue } from "@/components/panel/modals/StatusChangeModal";
 import { RepairPartsSection } from "@/components/panel/RepairPartsSection";
+import { RepairDetailLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 const DELIVERY_LABELS: Record<string, string> = {
   in_person: "Osobiście w serwisie",
@@ -49,6 +52,7 @@ function Section({
 
 export default function PanelRepairDetailPage() {
   const { token, user } = useAuth();
+  const addToast = useStore((s) => s.addToast);
   const params = useParams<{ id: string }>();
   const router = useRouter();
 
@@ -84,6 +88,7 @@ export default function PanelRepairDetailPage() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
   const [sendEmailError, setSendEmailError] = useState<string | null>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [smsDraft, setSmsDraft] = useState("");
 
   const eligibleEmailTemplates = useMemo(() => {
     const status = data?.status ?? "";
@@ -94,6 +99,14 @@ export default function PanelRepairDetailPage() {
       return !sf || sf === status;
     });
   }, [emailTemplates, data?.status]);
+
+  const smsMeta = useMemo(() => {
+    const len = smsDraft.length;
+    const chunks = Math.max(1, Math.ceil(Math.max(0, len) / 160));
+    const cap = chunks * 160;
+    const tone = len >= 155 ? "red" : len >= 130 ? "amber" : "green";
+    return { len, chunks, cap, tone };
+  }, [smsDraft]);
 
   const commTimelineEvents = useMemo(() => {
     return timeline.filter((ev) => {
@@ -127,6 +140,25 @@ export default function PanelRepairDetailPage() {
     void loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, params.id]);
+
+  useEffect(() => {
+    const id = params.id;
+    if (!id) return;
+    const key = `draft-sms-zgloszenie-${id}`;
+    const saved = localStorage.getItem(key);
+    if (saved) setSmsDraft(saved);
+  }, [params.id]);
+
+  useEffect(() => {
+    const id = params.id;
+    if (!id) return;
+    const key = `draft-sms-zgloszenie-${id}`;
+    const t = window.setTimeout(() => {
+      if (smsDraft.trim()) localStorage.setItem(key, smsDraft);
+      else localStorage.removeItem(key);
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [params.id, smsDraft]);
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -166,20 +198,17 @@ export default function PanelRepairDetailPage() {
   }, [eligibleEmailTemplates]);
 
   if (loading) {
-    return (
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <div className="flex items-center gap-3 text-[#9ca3af]">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#dc1e1e] border-t-transparent" />
-          Ładowanie szczegółów naprawy…
-        </div>
-      </main>
-    );
+    return <RepairDetailLoadingSkeleton listHref="/panel/zgloszenia" backLabel="Wróć do zgłoszeń" />;
   }
 
   if (error || !data) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <p className="text-[#fca5a5]">{error || "Brak danych."}</p>
+        <ErrorState
+          error={error ? new Error(error) : new Error("Brak danych.")}
+          onRetry={() => void loadAll()}
+          title="Błąd szczegółów naprawy"
+        />
         <button
           type="button"
           onClick={() => router.back()}
@@ -481,11 +510,15 @@ export default function PanelRepairDetailPage() {
                         }, token);
                         if (!res?.success) {
                           setSendEmailError("Nie udało się wysłać wiadomości.");
+                          addToast("Nie udało się wysłać wiadomości.", "error");
+                        } else {
+                          addToast("E-mail wysłany.", "success");
                         }
                         await loadAll();
                       } catch (err) {
                         const msg = err instanceof Error ? err.message : "Błąd wysyłki wiadomości.";
                         setSendEmailError(msg);
+                        addToast(msg, "error");
                       } finally {
                         setSendingEmail(false);
                       }
@@ -517,6 +550,39 @@ export default function PanelRepairDetailPage() {
                     </button>
                   </form>
                 )}
+
+                {commTab === "messages" ? (
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-[#0b0c10] p-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">
+                      Robocza treść SMS
+                    </div>
+                    <p className="mt-1 text-xs text-[#6b7280]">
+                      Szkic zapisywany lokalnie w tej przeglądarce — przygotuj SMS przed wysyłką z modułu komunikacji.
+                    </p>
+                    <textarea
+                      value={smsDraft}
+                      onChange={(e) => setSmsDraft(e.target.value)}
+                      rows={3}
+                      placeholder="Treść SMS do klienta…"
+                      className="mt-3 w-full resize-y rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+                    />
+                    <div
+                      className="mt-2 text-xs font-semibold"
+                      style={{
+                        color:
+                          smsMeta.tone === "red"
+                            ? "#f87171"
+                            : smsMeta.tone === "amber"
+                              ? "#fbbf24"
+                              : "#86efac",
+                      }}
+                    >
+                      {smsMeta.chunks === 1
+                        ? `${smsMeta.len} / 160 znaków`
+                        : `${smsMeta.chunks} SMS (${smsMeta.len} / ${smsMeta.cap})`}
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               {sendEmailError && commTab === "messages" && (
@@ -533,6 +599,7 @@ export default function PanelRepairDetailPage() {
         currentStatus={data.status}
         onSubmit={async (payload) => {
           await api.post(`/repairs/${params.id}/change-status/`, payload, token);
+          addToast("Status zmieniony.", "success");
           await loadAll();
         }}
       />
@@ -543,6 +610,7 @@ export default function PanelRepairDetailPage() {
         isAdmin={isAdmin}
         onSubmit={async (payload) => {
           await api.post(`/repairs/${params.id}/assign/`, payload, token);
+          addToast("Naprawa przypisana.", "success");
           await loadAll();
         }}
       />
@@ -552,6 +620,7 @@ export default function PanelRepairDetailPage() {
         onClose={() => setNoteModalOpen(false)}
         onSubmit={async (payload) => {
           await api.post(`/repairs/${params.id}/notes/`, payload, token);
+          addToast("Notatka dodana.", "success");
           await loadAll();
         }}
       />

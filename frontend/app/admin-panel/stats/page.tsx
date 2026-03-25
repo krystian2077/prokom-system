@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { StatCardSkeleton, Skeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
 
 type AdminDashboardKpi = {
@@ -245,9 +246,23 @@ export default function AdminStatsPage() {
       ) : null}
 
       {loading && !data ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">
-          Ładowanie…
-        </div>
+        <>
+          <section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <StatCardSkeleton key={i} />
+            ))}
+          </section>
+          <section className="mb-6 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="mt-3 h-40 w-full rounded-xl" />
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="mt-3 h-40 w-full rounded-xl" />
+            </div>
+          </section>
+        </>
       ) : null}
 
       {data && kpi ? (
@@ -320,7 +335,7 @@ export default function AdminStatsPage() {
                 )}
               </div>
               <Link
-                href="/admin-panel/reklamacje"
+                href="/admin-panel/claims"
                 className="mt-3 inline-block text-xs font-semibold text-[#93c5fd] hover:underline"
               >
                 Wszystkie reklamacje →

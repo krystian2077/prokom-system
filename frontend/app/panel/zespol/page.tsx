@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStore } from "@/store";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { StaffCardSkeleton } from "@/components/ui/Skeleton";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import type { StaffListItem, StaffHealthLevel, StaffProfile } from "@/types/staff";
 import type { UserRole } from "@/types/auth";
 
@@ -59,16 +64,71 @@ function formatDateTime(iso: string | null | undefined) {
 
 export default function TeamAdminPage() {
   const { user, token } = useAuth();
+  const addToast = useStore((s) => s.addToast);
+  const { confirm } = useConfirm();
   const isAdmin = user?.role === "admin";
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<StaffListItem[]>([]);
 
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("");
-  const [isActiveFilter, setIsActiveFilter] = useState<string>("");
-  const [specializationFilter, setSpecializationFilter] = useState<string>("");
+
+  const roleFilter = searchParams.get("role") ?? "";
+  const isActiveFilter = searchParams.get("active") ?? "";
+  const specializationFilter = searchParams.get("spec") ?? "";
+  const [specInput, setSpecInput] = useState(specializationFilter);
+  const specDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setSpecInput(specializationFilter);
+  }, [specializationFilter]);
+
+  useEffect(
+    () => () => {
+      if (specDebounceRef.current) clearTimeout(specDebounceRef.current);
+    },
+    [],
+  );
+
+  const replaceQuery = (mutate: (p: URLSearchParams) => void) => {
+    const p = new URLSearchParams(searchParams.toString());
+    mutate(p);
+    const q = p.toString();
+    router.replace(q ? `${pathname}?${q}` : pathname);
+  };
+
+  const setRoleInUrl = (value: string) => {
+    replaceQuery((p) => {
+      if (!value) p.delete("role");
+      else p.set("role", value);
+    });
+  };
+
+  const setActiveInUrl = (value: string) => {
+    replaceQuery((p) => {
+      if (!value) p.delete("active");
+      else p.set("active", value);
+    });
+  };
+
+  const queueSpecInUrl = (raw: string) => {
+    if (specDebounceRef.current) clearTimeout(specDebounceRef.current);
+    specDebounceRef.current = setTimeout(() => {
+      specDebounceRef.current = null;
+      const p = new URLSearchParams(searchParamsRef.current.toString());
+      const v = raw.trim();
+      if (!v) p.delete("spec");
+      else p.set("spec", v);
+      const q = p.toString();
+      router.replace(q ? `${pathname}?${q}` : pathname);
+    }, 400);
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
@@ -192,10 +252,12 @@ export default function TeamAdminPage() {
       }
 
       setModalOpen(false);
+      addToast(modalMode === "create" ? "Pracownik dodany." : "Dane zaktualizowane.", "success");
       await load();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zapisać pracownika.";
       setFormError(msg);
+      addToast(msg, "error");
     } finally {
       setSubmitting(false);
     }
@@ -239,13 +301,24 @@ export default function TeamAdminPage() {
 
   const toggleActive = async (staffId: string, next: boolean) => {
     if (!token) return;
+    if (!next) {
+      const ok = await confirm({
+        title: "Zablokować konto?",
+        description: "Pracownik straci dostęp do systemu. Operację można cofnąć, klikając „Aktywuj".",
+        confirmLabel: "Tak, zablokuj",
+        variant: "danger",
+      });
+      if (!ok) return;
+    }
     try {
       if (next) await api.post(`/accounts/staff/${staffId}/activate/`, {}, token);
       else await api.post(`/accounts/staff/${staffId}/deactivate/`, {}, token);
+      addToast(next ? "Konto aktywowane." : "Konto zablokowane.", "success");
       await load();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zmienić statusu konta.";
       setError(msg);
+      addToast(msg, "error");
     }
   };
 
@@ -282,7 +355,7 @@ export default function TeamAdminPage() {
               <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Rola</label>
               <select
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                onChange={(e) => setRoleInUrl(e.target.value)}
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
               >
                 <option value="">Wszystkie</option>
@@ -295,7 +368,7 @@ export default function TeamAdminPage() {
               <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Aktywne</label>
               <select
                 value={isActiveFilter}
-                onChange={(e) => setIsActiveFilter(e.target.value)}
+                onChange={(e) => setActiveInUrl(e.target.value)}
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
               >
                 <option value="">Wszystkie</option>
@@ -307,8 +380,11 @@ export default function TeamAdminPage() {
             <div className="w-[220px]">
               <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Specjalizacja</label>
               <input
-                value={specializationFilter}
-                onChange={(e) => setSpecializationFilter(e.target.value)}
+                value={specInput}
+                onChange={(e) => {
+                  setSpecInput(e.target.value);
+                  queueSpecInUrl(e.target.value);
+                }}
                 placeholder="np. serwis drukarek…"
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
               />
@@ -334,9 +410,13 @@ export default function TeamAdminPage() {
         </div>
       </div>
 
-      {error && <p className="mb-4 text-sm text-[#fca5a5]">{error}</p>}
+      {error ? (
+        <div className="mb-4">
+          <ErrorState error={new Error(error)} onRetry={() => void load()} title="Błąd pobierania zespołu" />
+        </div>
+      ) : null}
       {loading ? (
-        <p className="text-sm text-[#9ca3af]">Ładowanie…</p>
+        <StaffCardSkeleton count={6} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => (

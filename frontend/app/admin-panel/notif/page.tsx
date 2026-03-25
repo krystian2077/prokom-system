@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { NotificationFeedSkeleton } from "@/components/ui/Skeleton";
 import type { StaffNotificationItem } from "@/types/notifications";
 
 type FilterKey = "all" | "unread" | "parts" | "messages" | "tasks" | "system";
@@ -85,8 +86,26 @@ function dayBucket(createdAt: string): "today" | "yesterday" | "older" {
 export default function AdminNotifPage() {
   const { token, user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isAdmin = user?.role === "admin";
-  const [filter, setFilter] = useState<FilterKey>("all");
+
+  const filter = useMemo<FilterKey>(() => {
+    const f = searchParams.get("filter");
+    return FILTERS.some((x) => x.key === f) ? (f as FilterKey) : "all";
+  }, [searchParams]);
+
+  const setFilterParam = useCallback(
+    (key: FilterKey) => {
+      const p = new URLSearchParams(searchParams.toString());
+      if (key === "all") p.delete("filter");
+      else p.set("filter", key);
+      const q = p.toString();
+      router.replace(q ? `${pathname}?${q}` : pathname);
+    },
+    [pathname, router, searchParams],
+  );
+
   const [items, setItems] = useState<StaffNotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -181,7 +200,7 @@ export default function AdminNotifPage() {
               <button
                 key={f.key}
                 type="button"
-                onClick={() => setFilter(f.key)}
+                onClick={() => setFilterParam(f.key)}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                   filter === f.key
                     ? "border-white/20 bg-white/10 text-white"
@@ -202,8 +221,12 @@ export default function AdminNotifPage() {
         </div>
       </div>
 
-      {loading ? <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div> : null}
-      {error ? <ErrorState error={error} onRetry={() => void loadAll()} /> : null}
+      {loading ? <NotificationFeedSkeleton rows={7} /> : null}
+      {error && !loading ? (
+        <div className="mb-4">
+          <ErrorState error={error} onRetry={() => void loadAll()} title="Nie udało się załadować powiadomień" />
+        </div>
+      ) : null}
 
       {!loading && !error && filteredItems.length === 0 ? (
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] py-6">

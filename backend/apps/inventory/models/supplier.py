@@ -16,6 +16,12 @@ class Supplier(TimestampedModel):
     phone = models.CharField(_("telefon"), max_length=30, blank=True)
     email = models.EmailField(_("e-mail"), blank=True)
     website_url = models.URLField(_("link do hurtowni"), blank=True, max_length=500)
+    average_delivery_days = models.PositiveSmallIntegerField(
+        _("średni czas dostawy (dni)"),
+        null=True,
+        blank=True,
+        help_text=_("Orientacyjnie: ile dni od zamówienia do dostawy."),
+    )
     notes = models.TextField(_("notatka wewnętrzna"), blank=True)
     is_active = models.BooleanField(_("aktywny"), default=True)
 

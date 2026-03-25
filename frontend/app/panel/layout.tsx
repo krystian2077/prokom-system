@@ -7,6 +7,7 @@ import { WorkerSidebar } from "@/components/panel/WorkerSidebar";
 import { PanelTopbar } from "@/components/panel/PanelTopbar";
 import { WorkerStatusModalRoot } from "@/components/panel/WorkerStatusModalRoot";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
+import { ToastContainer } from "@/components/ui/Toast";
 
 export default function PanelLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -45,6 +46,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
         children
       ) : (
         <ConfirmProvider>
+          <ToastContainer />
           <div className="flex min-h-screen">
             <Suspense
               fallback={

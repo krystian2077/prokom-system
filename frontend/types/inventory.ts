@@ -17,7 +17,36 @@ export type InventorySupplier = {
   phone?: string | null;
   email?: string | null;
   website_url?: string | null;
+  /** Średni czas dostawy w dniach (API: inventory.Supplier) */
+  average_delivery_days?: number | null;
   is_active?: boolean;
+};
+
+/** GET /api/v1/inventory/parts-queue/ — pozycja kolejki części w naprawach */
+export type PartUsageQueueItem = {
+  id: string;
+  repair: string;
+  repair_number?: string | null;
+  repair_device_name?: string | null;
+  assigned_to_name?: string | null;
+  part: { id: string; name: string; code?: string | null };
+  supplier_detail?: InventorySupplier | null;
+  usage_status: string;
+  usage_status_display?: string | null;
+  notes?: string | null;
+  created_at?: string | null;
+};
+
+/** Pełny dostawca (PATCH/POST) — SupplierSerializer */
+export type InventorySupplierDetail = InventorySupplier & {
+  nip?: string | null;
+  street?: string | null;
+  city?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  notes?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type InventoryPartListItem = {

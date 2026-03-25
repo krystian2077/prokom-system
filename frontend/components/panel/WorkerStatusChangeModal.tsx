@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { useWorkerStore } from "@/stores/workerStore";
 
 /**
  * UWAGA:
@@ -35,7 +36,8 @@ export type RepairStatusValue =
   | "unrepairable"
   | "abandoned";
 
-const STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
+/** Eksportowane dla zbiorczej zmiany statusu (lista admin). */
+export const STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
   { value: "new", label: "Nowe zgłoszenie" },
   { value: "accepted", label: "Przyjęte do serwisu" },
   { value: "in_diagnostics", label: "W diagnostyce" },
@@ -76,6 +78,7 @@ export function WorkerStatusChangeModal({
 }) {
   const { token } = useAuth();
   const { confirm } = useConfirm();
+  const addToast = useWorkerStore((s) => s.addToast);
 
   const [savedBanner, setSavedBanner] = useState<string | null>(null);
   const [blocker, setBlocker] = useState("");
@@ -137,29 +140,70 @@ export function WorkerStatusChangeModal({
       });
       if (!ok) return;
     }
+    if (newStatus === "cancelled") {
+      const ok = await confirm({
+        title: "Anulować naprawę?",
+        description: `Naprawa ${repairNumber || repairId} zostanie anulowana. Upewnij się, że klient został poinformowany.`,
+        confirmLabel: "Anuluj naprawę",
+        variant: "danger",
+      });
+      if (!ok) return;
+    }
+    if (newStatus === "unrepairable") {
+      const ok = await confirm({
+        title: "Oznaczyć jako nie do naprawy?",
+        description: "To komunikuje klientowi brak możliwości naprawy po diagnozie.",
+        confirmLabel: "Tak, nie do naprawy",
+        variant: "warning",
+      });
+      if (!ok) return;
+    }
+    if (newStatus === "abandoned") {
+      const ok = await confirm({
+        title: "Oznaczyć jako porzucone przez klienta?",
+        description: "Sprawa zostanie zamknięta jako porzucona.",
+        confirmLabel: "Tak, porzucone",
+        variant: "warning",
+      });
+      if (!ok) return;
+    }
     setSavedBanner(null);
     const combined = [blocker.trim(), notes.trim()].filter(Boolean).join("\n\n");
-    const response = await api.post<any>(`/repairs/${repairId}/change-status/`, { new_status: newStatus, notes: combined }, token);
-    const backendSuggested = typeof response?.suggested_sms === "string" ? response.suggested_sms.trim() : "";
-    if (backendSuggested) {
-      setSuggestedMessage(backendSuggested);
+    try {
+      const response = await api.post<any>(
+        `/repairs/${repairId}/change-status/`,
+        { new_status: newStatus, notes: combined },
+        token,
+      );
+      const backendSuggested = typeof response?.suggested_sms === "string" ? response.suggested_sms.trim() : "";
+      if (backendSuggested) {
+        setSuggestedMessage(backendSuggested);
+      }
+      setSavedBanner("✓ Status zmieniony");
+      onStatusSaved?.();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się zmienić statusu.";
+      addToast(msg, "error");
     }
-    setSavedBanner("✓ Status zmieniony");
-    onStatusSaved?.();
   };
 
   const sendSuggested = async (channel: "sms" | "email" | "both") => {
     if (!token || !suggestedMessage.trim()) return;
-    if (channel === "both") {
-      await Promise.all([
-        api.post(`/communications/send/`, { repair_id: repairId, channel: "sms", content: suggestedMessage }, token),
-        api.post(`/communications/send/`, { repair_id: repairId, channel: "email", content: suggestedMessage }, token),
-      ]);
-    } else {
-      await api.post(`/communications/send/`, { repair_id: repairId, channel, content: suggestedMessage }, token);
+    try {
+      if (channel === "both") {
+        await Promise.all([
+          api.post(`/communications/send/`, { repair_id: repairId, channel: "sms", content: suggestedMessage }, token),
+          api.post(`/communications/send/`, { repair_id: repairId, channel: "email", content: suggestedMessage }, token),
+        ]);
+      } else {
+        await api.post(`/communications/send/`, { repair_id: repairId, channel, content: suggestedMessage }, token);
+      }
+      addToast("✓ Wiadomość wysłana", "success");
+      setSavedBanner("✓ Status i komunikat zostały zapisane");
+      onClose();
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : "Nie udało się wysłać wiadomości.", "error");
     }
-    setSavedBanner("✓ Status i komunikat zostały zapisane");
-    onClose();
   };
 
   if (!open) return null;

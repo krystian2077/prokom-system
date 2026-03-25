@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 type CalendarEvent = {
   id: string | number;
@@ -78,6 +80,7 @@ export default function AdminCalendarPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [availability, setAvailability] = useState<AvailabilityItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<Error | null>(null);
   const [popup, setPopup] = useState<PopupState>(null);
 
   const monthStart = useMemo(() => isoDate(new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1)), [viewMonth]);
@@ -94,6 +97,7 @@ export default function AdminCalendarPage() {
     let cancelled = false;
     const run = async () => {
       setLoading(true);
+      setLoadError(null);
       try {
         const [eventRes, availRes] = await Promise.all([
           api.get<CalendarEvent[] | { results?: CalendarEvent[] }>(
@@ -108,8 +112,9 @@ export default function AdminCalendarPage() {
         if (cancelled) return;
         setEvents(Array.isArray(eventRes) ? eventRes : eventRes?.results ?? []);
         setAvailability(Array.isArray(availRes) ? availRes : availRes?.results ?? []);
-      } catch {
+      } catch (err) {
         if (cancelled) return;
+        setLoadError(err instanceof Error ? err : new Error("Nie udało się załadować kalendarza"));
         setEvents([]);
         setAvailability([]);
       } finally {
@@ -158,6 +163,12 @@ export default function AdminCalendarPage() {
         <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Kalendarz</h1>
       </header>
+
+      {loadError && (
+        <div className="mt-4">
+          <ErrorState error={loadError} onRetry={() => setLoadError(null)} title="Nie udało się załadować kalendarza" />
+        </div>
+      )}
 
       <section className="mt-4 grid gap-5 lg:grid-cols-[1fr,360px]">
         <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
@@ -253,25 +264,44 @@ export default function AdminCalendarPage() {
           <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
             <h2 className="text-sm font-semibold text-white">Dziś</h2>
             <div className="mt-3 space-y-2">
-              {loading ? <p className="text-xs text-[#9ca3af]">Ładowanie...</p> : null}
-              {!loading && todayEvents.length === 0 ? <p className="text-xs text-[#6b7280]">Brak zdarzeń.</p> : null}
-              {todayEvents.map((ev) => (
-                <div key={`today-${ev.id}`} className="text-xs text-[#cbd5e1]">
-                  {ev.title}
+              {loading ? (
+                <div className="space-y-2">
+                  {[0, 1, 2].map((i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Skeleton key={i} className="h-4 w-full max-w-[200px]" />
+                  ))}
                 </div>
-              ))}
+              ) : null}
+              {!loading && todayEvents.length === 0 ? <p className="text-xs text-[#6b7280]">Brak zdarzeń.</p> : null}
+              {!loading
+                ? todayEvents.map((ev) => (
+                    <div key={`today-${ev.id}`} className="text-xs text-[#cbd5e1]">
+                      {ev.title}
+                    </div>
+                  ))
+                : null}
             </div>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
             <h2 className="text-sm font-semibold text-white">Jutro</h2>
             <div className="mt-3 space-y-2">
-              {!loading && tomorrowEvents.length === 0 ? <p className="text-xs text-[#6b7280]">Brak zdarzeń.</p> : null}
-              {tomorrowEvents.map((ev) => (
-                <div key={`tom-${ev.id}`} className="text-xs text-[#cbd5e1]">
-                  {ev.title}
+              {loading ? (
+                <div className="space-y-2">
+                  {[0, 1, 2].map((i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Skeleton key={i} className="h-4 w-full max-w-[200px]" />
+                  ))}
                 </div>
-              ))}
+              ) : null}
+              {!loading && tomorrowEvents.length === 0 ? <p className="text-xs text-[#6b7280]">Brak zdarzeń.</p> : null}
+              {!loading
+                ? tomorrowEvents.map((ev) => (
+                    <div key={`tom-${ev.id}`} className="text-xs text-[#cbd5e1]">
+                      {ev.title}
+                    </div>
+                  ))
+                : null}
             </div>
           </div>
 
