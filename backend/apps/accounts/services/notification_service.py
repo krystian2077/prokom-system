@@ -3,7 +3,6 @@ PRO-KOM Serwis — Tworzenie powiadomień dla pracowników (Staff Notifications 
 Wywoływane przy: przypisanie naprawy, wiadomość od klienta, notatka, wycena zaakceptowana/odrzucona, część dotarła, SLA, reklamacja itd.
 """
 from django.utils import timezone
-from django.db.models import Q
 
 # Typy powiadomień (notification_type)
 TYPE_REPAIR_ASSIGNED = "repair_assigned"
@@ -18,6 +17,7 @@ TYPE_SLA_EXCEEDED = "sla_exceeded"
 TYPE_COMPLAINT_WARRANTY_ASSIGNED = "complaint_warranty_assigned"
 TYPE_COMPLAINT_WARRANTY_AWAITING_DECISION = "complaint_warranty_awaiting_decision"
 TYPE_QUICK_ACCEPT_INCOMPLETE = "quick_accept_incomplete"
+TYPE_UNASSIGNED_QUEUE_NOTE = "unassigned_queue_note"
 
 
 def create_staff_notification(
@@ -79,19 +79,56 @@ def notify_repair_assigned(repair, assigned_to_id):
     )
 
 
-def notify_note_added(repair, note_author_id, assigned_to_id):
-    """Inny pracownik dodał notatkę do naprawy przypisanej do assigned_to."""
-    if not assigned_to_id or assigned_to_id == note_author_id:
+def notify_note_added(
+    repair,
+    note_author_id,
+    assigned_to_id,
+    *,
+    is_internal=True,
+    note_preview="",
+):
+    """
+    - Gdy naprawa ma przypisanego pracownika i autor ≠ przypisany: powiadom przypisanego.
+    - Gdy brak przypisania i notatka wewnętrzna od pracownika (nie admina): powiadom wszystkich aktywnych adminów
+      (kolejka nieprzypisanych — pilne przypisanie / sugestia z panelu).
+    """
+    from apps.accounts.models import User, UserRole
+
+    if assigned_to_id and assigned_to_id != note_author_id:
+        create_staff_notification(
+            user_id=assigned_to_id,
+            notification_type=TYPE_NOTE_ADDED,
+            title=f"Dodano notatkę do Twojej naprawy: {repair.repair_number}",
+            description="",
+            repair_id=repair.id,
+            priority="low",
+            link=f"/staff/repairs/{repair.id}/",
+        )
         return
-    create_staff_notification(
-        user_id=assigned_to_id,
-        notification_type=TYPE_NOTE_ADDED,
-        title=f"Dodano notatkę do Twojej naprawy: {repair.repair_number}",
-        description="",
-        repair_id=repair.id,
-        priority="low",
-        link=f"/staff/repairs/{repair.id}/",
-    )
+
+    if assigned_to_id:
+        return
+
+    if not is_internal:
+        return
+
+    author = User.objects.filter(pk=note_author_id).only("id", "role").first()
+    if not author or getattr(author, "role", None) != UserRole.STAFF:
+        return
+
+    preview = (note_preview or "").strip()[:500]
+    admins = User.objects.filter(role=UserRole.ADMIN, is_active=True).exclude(pk=note_author_id)
+    title = f"Notatka przy nieprzypisanej naprawie: {repair.repair_number}"
+    for admin in admins:
+        create_staff_notification(
+            user_id=admin.id,
+            notification_type=TYPE_UNASSIGNED_QUEUE_NOTE,
+            title=title,
+            description=preview,
+            repair_id=repair.id,
+            priority="important",
+            link=f"/staff/repairs/{repair.id}/",
+        )
 
 
 def notify_quote_accepted(repair):

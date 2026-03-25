@@ -440,7 +440,14 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             pinned=ser.validated_data.get("pinned", False),
         )
         from apps.accounts.services.notification_service import notify_note_added
-        notify_note_added(repair, note_author_id=request.user.id, assigned_to_id=repair.assigned_to_id)
+
+        notify_note_added(
+            repair,
+            note_author_id=request.user.id,
+            assigned_to_id=repair.assigned_to_id,
+            is_internal=note.is_internal,
+            note_preview=note.note or "",
+        )
         return Response(RepairNoteSerializer(note).data, status=status.HTTP_201_CREATED)
 
     # ---------- Etap 4: Szybkie akcje — zdjęcie ----------

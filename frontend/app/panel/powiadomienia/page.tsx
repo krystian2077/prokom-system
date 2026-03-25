@@ -31,6 +31,7 @@ function typeGroup(notificationType: string): Exclude<FilterKey, "all" | "unread
       "complaint_warranty_assigned",
       "complaint_warranty_awaiting_decision",
       "quick_accept_incomplete",
+      "unassigned_queue_note",
     ].includes(t)
   ) {
     return "tasks";
@@ -45,6 +46,7 @@ function iconMeta(notificationType: string): { emoji: string; className: string 
   if (t === "quote_accepted") return { emoji: "✅", className: "bg-[#f59e0b]/15 text-[#ffe3b0] border border-[#f59e0b]/30" };
   if (t === "sla_warning" || t === "sla_exceeded") return { emoji: "⏰", className: "bg-[#dc1e1e]/15 text-[#ffb4b4] border border-[#dc1e1e]/30" };
   if (t === "repair_assigned") return { emoji: "👤", className: "bg-[#3b82f6]/15 text-[#bcd6ff] border border-[#3b82f6]/30" };
+  if (t === "unassigned_queue_note") return { emoji: "⏳", className: "bg-[#f59e0b]/15 text-[#ffe3b0] border border-[#f59e0b]/30" };
   if (t === "status_changed") return { emoji: "🔄", className: "bg-white/10 text-[#d1d5db] border border-white/20" };
   return { emoji: "🔔", className: "bg-white/10 text-[#d1d5db] border border-white/20" };
 }
