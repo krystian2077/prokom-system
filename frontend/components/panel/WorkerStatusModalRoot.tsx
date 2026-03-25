@@ -39,6 +39,7 @@ export function WorkerStatusModalRoot() {
     <WorkerStatusChangeModal
       open={Boolean(repairId)}
       repairId={repairId}
+      repairNumber={data?.repair_number}
       currentStatus={data?.status}
       onClose={closeStatusModal}
       onStatusSaved={() => {

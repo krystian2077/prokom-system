@@ -91,6 +91,7 @@ export default function RepairDetailPage() {
   const [commChannel, setCommChannel] = useState<"sms" | "email">("sms");
   const [commDraft, setCommDraft] = useState("");
   const commTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const commSectionRef = useRef<HTMLElement | null>(null);
 
   const repairQuery = useQuery({
     queryKey: ["repair", repairId],
@@ -341,7 +342,10 @@ export default function RepairDetailPage() {
                   type="button"
                   onClick={() => {
                     setActiveTab("comms");
-                    setTimeout(() => commTextareaRef.current?.focus(), 80);
+                    setTimeout(() => {
+                      commSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      commTextareaRef.current?.focus();
+                    }, 80);
                   }}
                   className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
                 >
@@ -677,7 +681,7 @@ export default function RepairDetailPage() {
         ) : null}
 
         {activeTab === "comms" ? (
-          <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
+          <section ref={commSectionRef} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Komunikacja</div>

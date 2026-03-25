@@ -29,6 +29,13 @@ type ClientListItem = {
   last_visit_at?: string | null;
 };
 
+type ClientDetail = ClientListItem & {
+  city?: string;
+  street?: string;
+  postal_code?: string;
+  preferred_contact?: string;
+};
+
 type Paginated<T> = {
   count: number;
   next: string | null;
@@ -150,6 +157,11 @@ export default function ClientsPage() {
   const [data, setData] = useState<Paginated<ClientListItem> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<ClientDetail | null>(null);
+  const [selectedRepairs, setSelectedRepairs] = useState<Array<{ id: string; repair_number: string; status_display: string; device_name: string }>>([]);
+  const [selectedLoading, setSelectedLoading] = useState(false);
+  const [selectedError, setSelectedError] = useState<string | null>(null);
 
   const [counts, setCounts] = useState({ all: 0, regular: 0, vip: 0, business: 0, activeOnPage: 0 });
 
@@ -157,7 +169,7 @@ export default function ClientsPage() {
     const t = window.setTimeout(() => {
       setSearch(searchDraft);
       setPage(1);
-    }, 400);
+    }, 300);
     return () => window.clearTimeout(t);
   }, [searchDraft]);
 
@@ -252,6 +264,38 @@ export default function ClientsPage() {
   }, [data]);
 
   const pageButtons = useMemo(() => buildPageButtons(page, totalPages), [page, totalPages]);
+  const shownCount = visibleClients.length;
+
+  useEffect(() => {
+    if (!token || !selectedClientId) return;
+    let cancelled = false;
+    const run = async () => {
+      setSelectedLoading(true);
+      setSelectedError(null);
+      try {
+        const [clientRes, repairsRes] = await Promise.all([
+          api.get<ClientDetail>(`/clients/${selectedClientId}/`, token),
+          api.get<Array<{ id: string; repair_number: string; status_display: string; device_name: string }>>(
+            `/staff/repairs/?client=${selectedClientId}&ordering=-created_at`,
+            token,
+          ),
+        ]);
+        if (cancelled) return;
+        setSelectedClient(clientRes);
+        setSelectedRepairs(Array.isArray(repairsRes) ? repairsRes : []);
+      } catch (e) {
+        if (cancelled) return;
+        setSelectedError(e instanceof Error ? e.message : "Nie udało się pobrać szczegółów klienta.");
+      } finally {
+        if (cancelled) return;
+        setSelectedLoading(false);
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, selectedClientId]);
 
   const titleForFilter: Record<FilterKey, string> = {
     all: "Wszyscy",
@@ -263,7 +307,8 @@ export default function ClientsPage() {
 
   return (
     <main className="mx-auto max-w-[1500px] px-4 py-8">
-      <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
+      <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
+        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1">
             <div className="relative">
@@ -354,7 +399,17 @@ export default function ClientsPage() {
               return (
                 <div
                   key={c.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedClientId(c.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") setSelectedClientId(c.id);
+                  }}
                   className="rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-4 transition hover:border-white/20"
+                  style={{
+                    borderColor: selectedClientId === c.id ? "rgba(59,130,246,.35)" : undefined,
+                    background: selectedClientId === c.id ? "rgba(59,130,246,.08)" : undefined,
+                  }}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 items-start gap-3">
@@ -378,9 +433,9 @@ export default function ClientsPage() {
                             <span
                               className="rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
                               style={{
-                                background: "rgba(139,92,246,.14)",
-                                border: "1px solid rgba(139,92,246,.28)",
-                                color: "#8b5cf6",
+                                background: "rgba(245,158,11,.14)",
+                                border: "1px solid rgba(245,158,11,.30)",
+                                color: "#f59e0b",
                               }}
                             >
                               VIP
@@ -489,7 +544,41 @@ export default function ClientsPage() {
             →
           </button>
         </div>
+        <div className="mt-4 text-sm text-[#9ca3af]">Wyświetlono {shownCount} z {data?.count ?? 0} klientów</div>
       </div>
+
+      <aside className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
+        <div className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Podgląd klienta</div>
+        {!selectedClientId ? (
+          <div className="mt-3 text-sm text-[#6b7280]">Kliknij klienta na liście, aby pobrać szczegóły.</div>
+        ) : selectedLoading ? (
+          <div className="mt-3 text-sm text-[#9ca3af]">Ładowanie szczegółów…</div>
+        ) : selectedError ? (
+          <div className="mt-3 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-[#fca5a5]">{selectedError}</div>
+        ) : selectedClient ? (
+          <div className="mt-3 space-y-3">
+            <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+              <div className="text-sm font-semibold text-white">{selectedClient.full_name}</div>
+              <div className="mt-1 text-xs text-[#9ca3af]">{selectedClient.email || "—"} · {selectedClient.phone || "—"}</div>
+              <div className="mt-1 text-xs text-[#9ca3af]">{selectedClient.street || ""} {selectedClient.city || ""} {selectedClient.postal_code || ""}</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Naprawy klienta</div>
+              <div className="mt-2 space-y-2">
+                {selectedRepairs.slice(0, 6).map((r) => (
+                  <Link key={r.id} href={`/panel/naprawy/${r.id}`} className="block rounded-xl border border-white/10 bg-[#0c0d12] px-3 py-2 hover:border-white/20">
+                    <div className="font-mono text-xs font-semibold text-white">{r.repair_number}</div>
+                    <div className="mt-0.5 text-xs text-[#9ca3af]">{r.device_name}</div>
+                    <div className="mt-0.5 text-[11px] text-[#93c5fd]">{r.status_display}</div>
+                  </Link>
+                ))}
+                {selectedRepairs.length === 0 ? <div className="text-xs text-[#6b7280]">Brak napraw klienta.</div> : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </aside>
+    </div>
     </main>
   );
 }

@@ -62,12 +62,14 @@ const STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
 export function WorkerStatusChangeModal({
   open,
   repairId,
+  repairNumber,
   currentStatus,
   onClose,
   onStatusSaved,
 }: {
   open: boolean;
   repairId: string;
+  repairNumber?: string | null;
   currentStatus: string | null | undefined;
   onClose: () => void;
   onStatusSaved?: () => void;
@@ -129,7 +131,7 @@ export function WorkerStatusChangeModal({
       const ok = await confirm({
         title: "Oznaczyć urządzenie jako wydane?",
         description:
-          `Ta akcja oznaczy urządzenie ${repairId} jako wydane klientowi. Nie można cofnąć.`,
+          `Ta akcja oznaczy urządzenie ${repairNumber || repairId} jako wydane klientowi. Nie można cofnąć.`,
         confirmLabel: "Tak, wydano",
         variant: "danger",
       });
@@ -137,7 +139,11 @@ export function WorkerStatusChangeModal({
     }
     setSavedBanner(null);
     const combined = [blocker.trim(), notes.trim()].filter(Boolean).join("\n\n");
-    await api.post(`/repairs/${repairId}/change-status/`, { new_status: newStatus, notes: combined }, token);
+    const response = await api.post<any>(`/repairs/${repairId}/change-status/`, { new_status: newStatus, notes: combined }, token);
+    const backendSuggested = typeof response?.suggested_sms === "string" ? response.suggested_sms.trim() : "";
+    if (backendSuggested) {
+      setSuggestedMessage(backendSuggested);
+    }
     setSavedBanner("✓ Status zmieniony");
     onStatusSaved?.();
   };
@@ -153,6 +159,7 @@ export function WorkerStatusChangeModal({
       await api.post(`/communications/send/`, { repair_id: repairId, channel, content: suggestedMessage }, token);
     }
     setSavedBanner("✓ Status i komunikat zostały zapisane");
+    onClose();
   };
 
   if (!open) return null;
