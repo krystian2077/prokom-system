@@ -41,6 +41,34 @@ const ARCHIVE_STATUSES: string[] = [
   "abandoned",
 ];
 
+type HistoryVariant = "standard" | "complaint" | "unclaimed" | "warranty" | "vip_returning";
+
+function getHistoryVariant(item: RepairRequestListItem): HistoryVariant {
+  const tags = item.auto_tags ?? [];
+  const cws = (item.complaint_warranty_status ?? "").toLowerCase();
+  if (cws.includes("complaint") || cws.includes("reklam") || tags.includes("complaint")) return "complaint";
+  if (cws.includes("warranty") || cws.includes("gwaranc") || tags.includes("warranty")) return "warranty";
+  if ((item.waiting_for_client_days ?? 0) > 7) return "unclaimed";
+  if (tags.includes("vip") || tags.includes("returning_client")) return "vip_returning";
+  return "standard";
+}
+
+function variantCardClass(v: HistoryVariant): string {
+  if (v === "complaint") return "border-[#f59e0b]/35 bg-[#f59e0b]/10";
+  if (v === "unclaimed") return "border-[#ef4444]/35 bg-[#ef4444]/10";
+  if (v === "warranty") return "border-[#8b5cf6]/35 bg-[#8b5cf6]/10";
+  if (v === "vip_returning") return "border-[#06b6d4]/35 bg-[#06b6d4]/10";
+  return "border-white/10 bg-white/[0.03]";
+}
+
+function variantBadge(v: HistoryVariant, waitingDays: number | null | undefined): string {
+  if (v === "complaint") return "Reklamacja";
+  if (v === "unclaimed") return `Nieodebrana ${waitingDays ?? 0}d!`;
+  if (v === "warranty") return "Gwarancja 90d";
+  if (v === "vip_returning") return "VIP powracający";
+  return "Odebrana ✓";
+}
+
 function statusPillStyle(status: string) {
   const s = (status ?? "").toLowerCase();
   const base = "rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide";
@@ -234,10 +262,10 @@ export default function ArchivePage() {
       <div className="flex flex-col gap-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Archiwum napraw</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Historia napraw</p>
             <h1 className="mt-2 text-2xl font-semibold text-white">Historia zakończonych napraw</h1>
             <p className="mt-1 text-sm text-[#9ca3af]">
-              Pod spodem backend mapuje „archiwum” po statusach (`status_in`), więc to widok na naprawy końcowe/anulowane.
+              Widok końcowych napraw z wariantami: standard, reklamacja, nieodebrana, gwarancja i klient powracający.
             </p>
           </div>
 
@@ -374,10 +402,18 @@ export default function ArchivePage() {
             {!loading && !error && items.length > 0 && (
               <div className="divide-y divide-white/10">
                 {items.map((r, idx) => (
+                  (() => {
+                    const v = getHistoryVariant(r);
+                    const isUnclaimed = v === "unclaimed";
+                    const isComplaint = v === "complaint";
+                    const isWarranty = v === "warranty";
+                    const isVip = v === "vip_returning";
+                    const badge = variantBadge(v, r.waiting_for_client_days);
+                    return (
                   <Link
                     key={r.id}
-                    href={`/panel/repairs/${r.id}`}
-                    className="group flex items-start justify-between gap-4 px-3 py-4 transition hover:bg-white/5"
+                    href={`/panel/naprawy/${r.id}`}
+                    className={`group flex items-start justify-between gap-4 rounded-2xl border px-3 py-4 transition hover:bg-white/5 ${variantCardClass(v)}`}
                     style={{ borderTop: idx === 0 ? "none" : undefined }}
                   >
                     <div className="min-w-0 flex-1">
@@ -386,13 +422,52 @@ export default function ArchivePage() {
                           {r.repair_number}
                         </span>
                         <span className={statusPillStyle(r.status)}>{r.status_display}</span>
+                        <span
+                          className={`rounded-full border px-3 py-1 text-[11px] font-semibold ${
+                            isComplaint
+                              ? "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd89b]"
+                              : isUnclaimed
+                                ? "border-[#ef4444]/40 bg-[#ef4444]/15 text-[#fecaca]"
+                                : isWarranty
+                                  ? "border-[#8b5cf6]/40 bg-[#8b5cf6]/15 text-[#ddd6fe]"
+                                  : isVip
+                                    ? "border-[#06b6d4]/40 bg-[#06b6d4]/15 text-[#bae6fd]"
+                                    : "border-[#22c55e]/40 bg-[#22c55e]/15 text-[#bbf7d0]"
+                          }`}
+                        >
+                          {badge}
+                        </span>
                       </div>
                       <p className="mt-1 text-sm text-[#b4b8c4]">
                         {r.device_name} · {r.client_name}
                       </p>
+                      {isComplaint ? (
+                        <p className="mt-1 text-xs text-[#fbbf24]">
+                          Uwaga: reklamacja po poprzedniej naprawie. Sprawdź historię i notatki serwisowe.
+                        </p>
+                      ) : null}
+                      {isWarranty ? (
+                        <p className="mt-1 text-xs text-[#c4b5fd]">
+                          Ważność gwarancji: 90 dni od daty odbioru.
+                        </p>
+                      ) : null}
+                      {isVip ? (
+                        <p className="mt-1 text-xs text-[#67e8f9]">
+                          Klient powracający — priorytet obsługi i kontekst poprzednich napraw.
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="flex shrink-0 items-center gap-3 text-right">
+                      {isUnclaimed ? (
+                        <button
+                          type="button"
+                          onClick={(e) => e.preventDefault()}
+                          className="rounded-full border border-[#ef4444]/40 bg-[#ef4444]/15 px-2.5 py-1 text-[11px] font-semibold text-[#fecaca]"
+                        >
+                          Zadzwoń
+                        </button>
+                      ) : null}
                       <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">
                         {r.priority_display}
                       </span>
@@ -402,6 +477,8 @@ export default function ArchivePage() {
                       <span className="text-[#9ca3af] group-hover:text-white">→</span>
                     </div>
                   </Link>
+                    );
+                  })()
                 ))}
               </div>
             )}

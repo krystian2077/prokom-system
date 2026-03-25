@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -78,31 +78,60 @@ export function WorkerStatusChangeModal({
   const [savedBanner, setSavedBanner] = useState<string | null>(null);
   const [blocker, setBlocker] = useState("");
   const [newStatus, setNewStatus] = useState<RepairStatusValue>("in_repair");
+  const [publicStatus, setPublicStatus] = useState<RepairStatusValue>("in_repair");
   const [notes, setNotes] = useState("");
+  const [suggestedMessage, setSuggestedMessage] = useState("");
+  const [loadingSuggested, setLoadingSuggested] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setSavedBanner(null);
     setBlocker("");
     setNotes("");
+    setSuggestedMessage("");
     const maybe = STATUS_OPTIONS.find((s) => s.value === currentStatus) ? (currentStatus as RepairStatusValue) : null;
-    if (maybe) setNewStatus(maybe);
+    if (maybe) {
+      setNewStatus(maybe);
+      setPublicStatus(maybe);
+    }
   }, [open, currentStatus]);
 
-  // Wykorzystujemy istniejący modal UI (select + notes), ale przechwytujemy zachowanie po submit:
-  // StatusChangeModal niestety zamyka po submit, więc nie możemy go używać 1:1.
-  // Dlatego renderujemy własny wrapper i dajemy użytkownikowi zamknięcie przyciskiem.
+  useEffect(() => {
+    if (!open || !token || !publicStatus) return;
+    setLoadingSuggested(true);
+    // Fallback dla suggested_sms: jeśli backend nie zwraca przy change-status,
+    // próbujemy pobrać szablon komunikacji per trigger statusu.
+    void api
+      .get<any>(`/communications/templates/?trigger=${encodeURIComponent(publicStatus)}&channel=panel`, token)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
+        const first = list[0];
+        const text =
+          (typeof first?.body === "string" && first.body) ||
+          (typeof first?.content === "string" && first.content) ||
+          (typeof first?.message === "string" && first.message) ||
+          "";
+        setSuggestedMessage(text);
+      })
+      .catch(() => setSuggestedMessage(""))
+      .finally(() => setLoadingSuggested(false));
+  }, [open, token, publicStatus]);
+
+  const canShowMessageBox = useMemo(
+    () => Boolean(publicStatus && (loadingSuggested || suggestedMessage.trim())),
+    [publicStatus, loadingSuggested, suggestedMessage],
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!token) return;
     if (newStatus === "delivered") {
       const ok = await confirm({
-        title: "Potwierdzenie dostawy",
+        title: "Oznaczyć urządzenie jako wydane?",
         description:
-          "Status „Dostarczone” kończy proces obsługi zgłoszenia. Upewnij się, że urządzenie faktycznie dotarło do klienta.",
-        confirmLabel: "Tak, oznacz jako dostarczone",
-        variant: "warning",
+          `Ta akcja oznaczy urządzenie ${repairId} jako wydane klientowi. Nie można cofnąć.`,
+        confirmLabel: "Tak, wydano",
+        variant: "danger",
       });
       if (!ok) return;
     }
@@ -111,6 +140,19 @@ export function WorkerStatusChangeModal({
     await api.post(`/repairs/${repairId}/change-status/`, { new_status: newStatus, notes: combined }, token);
     setSavedBanner("✓ Status zmieniony");
     onStatusSaved?.();
+  };
+
+  const sendSuggested = async (channel: "sms" | "email" | "both") => {
+    if (!token || !suggestedMessage.trim()) return;
+    if (channel === "both") {
+      await Promise.all([
+        api.post(`/communications/send/`, { repair_id: repairId, channel: "sms", content: suggestedMessage }, token),
+        api.post(`/communications/send/`, { repair_id: repairId, channel: "email", content: suggestedMessage }, token),
+      ]);
+    } else {
+      await api.post(`/communications/send/`, { repair_id: repairId, channel, content: suggestedMessage }, token);
+    }
+    setSavedBanner("✓ Status i komunikat zostały zapisane");
   };
 
   if (!open) return null;
@@ -142,7 +184,7 @@ export function WorkerStatusChangeModal({
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Blokada / przyczyna (opcjonalnie)</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">1. Bloker sprawy (opcjonalnie)</label>
             <input
               type="text"
               value={blocker}
@@ -153,7 +195,7 @@ export function WorkerStatusChangeModal({
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Nowy status</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">2. Status wewnętrzny</label>
             <select
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value as RepairStatusValue)}
@@ -168,7 +210,22 @@ export function WorkerStatusChangeModal({
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Notatka (opcjonalnie)</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">3. Status publiczny</label>
+            <select
+              value={publicStatus}
+              onChange={(e) => setPublicStatus(e.target.value as RepairStatusValue)}
+              className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+            >
+              {STATUS_OPTIONS.map((s) => (
+                <option key={`pub-${s.value}`} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">4. Notatka wewnętrzna (opcjonalnie)</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -177,6 +234,42 @@ export function WorkerStatusChangeModal({
               placeholder="np. szczegóły dla zespołu, komentarz po zmianie…"
             />
           </div>
+
+          {canShowMessageBox ? (
+            <div className="rounded-2xl border border-[#3b82f6]/30 bg-[#3b82f6]/10 p-4">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#93c5fd]">
+                5. Sugerowana wiadomość
+              </div>
+              <div className="mt-2 text-sm text-[#e5e7eb] whitespace-pre-wrap">
+                {loadingSuggested ? "Pobieram sugestię..." : suggestedMessage || "Brak gotowej sugestii dla tego statusu."}
+              </div>
+              {suggestedMessage ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void sendSuggested("sms")}
+                    className="rounded-xl border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-2 text-xs font-semibold text-[#bfdbfe] hover:bg-[#3b82f6]/25"
+                  >
+                    Wyślij SMS
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void sendSuggested("email")}
+                    className="rounded-xl border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-2 text-xs font-semibold text-[#bfdbfe] hover:bg-[#3b82f6]/25"
+                  >
+                    Wyślij e-mail
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void sendSuggested("both")}
+                    className="rounded-xl border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-2 text-xs font-semibold text-[#bfdbfe] hover:bg-[#3b82f6]/25"
+                  >
+                    Wyślij oba
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           {savedBanner ? (
             <div
@@ -188,6 +281,13 @@ export function WorkerStatusChangeModal({
           ) : null}
 
           <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            >
+              Pomiń komunikat
+            </button>
             <button type="submit" className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]">
               Zapisz status
             </button>

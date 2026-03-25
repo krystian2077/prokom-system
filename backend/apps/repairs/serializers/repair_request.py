@@ -36,6 +36,9 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
     auto_tags = serializers.SerializerMethodField()
     waiting_for_client_days = serializers.SerializerMethodField()
+    complaint_warranty_status_display = serializers.SerializerMethodField()
+    parent_repair_number = serializers.SerializerMethodField()
+    created_by_label = serializers.SerializerMethodField()
 
     class Meta:
         model = RepairRequest
@@ -60,10 +63,14 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "repair_type",
             "requires_attention",
             "complaint_warranty_status",
+            "complaint_warranty_status_display",
             "auto_tags",
             "waiting_for_client_days",
             "delivery_method",
             "return_method",
+            "problem_description",
+            "parent_repair_number",
+            "created_by_label",
             "created_at",
         ]
 
@@ -78,6 +85,28 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
 
     def get_waiting_for_client_days(self, obj):
         return getattr(obj, "waiting_for_client_days", None)
+
+    def get_complaint_warranty_status_display(self, obj):
+        if not obj.complaint_warranty_status:
+            return None
+        from apps.common.enums import ComplaintWarrantyStatus
+
+        return dict(ComplaintWarrantyStatus.choices).get(
+            obj.complaint_warranty_status, obj.complaint_warranty_status
+        )
+
+    def get_parent_repair_number(self, obj):
+        pr = obj.parent_repair
+        return pr.repair_number if pr else None
+
+    def get_created_by_label(self, obj):
+        u = obj.created_by
+        if not u:
+            return None
+        fn = (getattr(u, "first_name", None) or "").strip()
+        ln = (getattr(u, "last_name", None) or "").strip()
+        full = f"{fn} {ln}".strip()
+        return full or getattr(u, "email", None) or str(u.pk)
 
 
 class RepairRequestCreateSerializer(serializers.ModelSerializer):

@@ -2,6 +2,7 @@
 
 import type { Scope } from "@/types";
 import { LiveBadge } from "@/components/layout/LiveBadge";
+import { motion } from "framer-motion";
 
 const LABELS: Record<Scope, string> = {
   today: "Dziś",
@@ -19,13 +20,18 @@ export function ScopeBar({ value, onChange }: { value: Scope; onChange: (s: Scop
           type="button"
           onClick={() => onChange(s)}
           className={[
-            "rounded-[8px] px-4 py-[7px] text-[12px] font-semibold transition-all duration-150",
-            value === s
-              ? "bg-gradient-to-br from-[#3b82f6] to-[#2563eb] font-bold text-white shadow-[0_2px_8px_rgba(59,130,246,.3)]"
-              : "text-[var(--muted)] hover:text-[var(--ink)]",
+            "relative rounded-[8px] px-4 py-[7px] text-[12px] font-semibold transition-all duration-150",
+            value === s ? "font-bold text-white" : "text-[var(--muted)] hover:text-[var(--ink)]",
           ].join(" ")}
         >
-          {LABELS[s]}
+          {value === s ? (
+            <motion.span
+              layoutId="scope-active-pill"
+              className="absolute inset-0 rounded-[8px] bg-gradient-to-br from-[#3b82f6] to-[#2563eb] shadow-[0_2px_8px_rgba(59,130,246,.3)]"
+              transition={{ type: "spring", stiffness: 450, damping: 34 }}
+            />
+          ) : null}
+          <span className="relative z-[1]">{LABELS[s]}</span>
         </button>
       ))}
       <div className="flex-1" />

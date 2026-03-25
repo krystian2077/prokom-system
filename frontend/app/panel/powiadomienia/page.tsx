@@ -1,121 +1,146 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
-import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import type { RepairRequestListItem } from "@/types/repairs";
-import type { RequiresActionResponse, StaffNotificationItem, StaffNotificationPriorityValue, StaffNotificationStatusValue } from "@/types/notifications";
+import type { StaffNotificationItem } from "@/types/notifications";
 
-type TabKey = "all" | "requires_action";
+type FilterKey = "all" | "unread" | "parts" | "messages" | "tasks" | "system";
 
-const PRIORITY_OPTIONS: Array<{ value: StaffNotificationPriorityValue | string; label: string }> = [
-  { value: "urgent", label: "Pilne" },
-  { value: "important", label: "Ważne" },
-  { value: "standard", label: "Standard" },
-  { value: "low", label: "Niski" },
+const FILTERS: Array<{ key: FilterKey; label: string }> = [
+  { key: "all", label: "Wszystkie" },
+  { key: "unread", label: "Nieprzeczytane" },
+  { key: "parts", label: "Części" },
+  { key: "messages", label: "Wiadomości" },
+  { key: "tasks", label: "Zadania" },
+  { key: "system", label: "System" },
 ];
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString("pl-PL");
+function typeGroup(notificationType: string): Exclude<FilterKey, "all" | "unread"> {
+  const t = (notificationType ?? "").toLowerCase();
+  if (["part_arrived"].includes(t)) return "parts";
+  if (["client_message", "new_message", "note_added", "mentioned"].includes(t)) return "messages";
+  if (
+    [
+      "repair_assigned",
+      "quote_accepted",
+      "quote_rejected",
+      "repair_due_soon",
+      "sla_exceeded",
+      "complaint_warranty_assigned",
+      "complaint_warranty_awaiting_decision",
+      "quick_accept_incomplete",
+    ].includes(t)
+  ) {
+    return "tasks";
+  }
+  return "system";
 }
 
-function priorityBadgeClass(priority: string) {
-  const p = (priority ?? "").toLowerCase();
-  if (p === "urgent") return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
-  if (p === "important") return "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]";
-  if (p === "low") return "border-white/10 bg-white/5 text-[#9ca3af]";
-  return "border-[#3b82f6]/35 bg-[#3b82f6]/15 text-[#bcd6ff]";
+function iconMeta(notificationType: string): { emoji: string; className: string } {
+  const t = (notificationType ?? "").toLowerCase();
+  if (t === "part_arrived") return { emoji: "📦", className: "bg-[var(--gl)] text-[var(--green)] border border-[var(--gb)]" };
+  if (t === "new_message" || t === "client_message") return { emoji: "💬", className: "bg-[#dc1e1e]/15 text-[#ffb4b4] border border-[#dc1e1e]/30" };
+  if (t === "quote_accepted") return { emoji: "✅", className: "bg-[#f59e0b]/15 text-[#ffe3b0] border border-[#f59e0b]/30" };
+  if (t === "sla_warning" || t === "sla_exceeded") return { emoji: "⏰", className: "bg-[#dc1e1e]/15 text-[#ffb4b4] border border-[#dc1e1e]/30" };
+  if (t === "repair_assigned") return { emoji: "👤", className: "bg-[#3b82f6]/15 text-[#bcd6ff] border border-[#3b82f6]/30" };
+  if (t === "status_changed") return { emoji: "🔄", className: "bg-white/10 text-[#d1d5db] border border-white/20" };
+  return { emoji: "🔔", className: "bg-white/10 text-[#d1d5db] border border-white/20" };
 }
 
-function statusBadgeClass(status: string) {
-  const s = (status ?? "").toLowerCase();
-  if (s === "unread") return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
-  if (s === "read") return "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]";
-  if (s === "archived") return "border-white/10 bg-white/5 text-[#9ca3af]";
-  return "border-white/10 bg-white/5 text-[#9ca3af]";
+function relativeTime(createdAt: string): string {
+  const d = new Date(createdAt);
+  if (Number.isNaN(d.getTime())) return "—";
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 60) return `${Math.max(1, mins)} min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} godz`;
+  const dayDiff = Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
+  if (dayDiff === 1) return "wczoraj";
+  return d.toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit" });
+}
+
+function dayBucket(createdAt: string): "today" | "yesterday" | "older" {
+  const d = new Date(createdAt);
+  if (Number.isNaN(d.getTime())) return "older";
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const delta = Math.floor((startToday - startDay) / 86400000);
+  if (delta <= 0) return "today";
+  if (delta === 1) return "yesterday";
+  return "older";
 }
 
 export default function NotificationsPage() {
   const { token, user } = useAuth();
+  const router = useRouter();
   const isAdminOrStaff = user?.role === "admin" || user?.role === "staff";
-
-  const [tab, setTab] = useState<TabKey>("all");
-
+  const [filter, setFilter] = useState<FilterKey>("all");
   const [items, setItems] = useState<StaffNotificationItem[]>([]);
-  const [itemsLoading, setItemsLoading] = useState(false);
-  const [itemsError, setItemsError] = useState<string | null>(null);
-
-  const [requiresAction, setRequiresAction] = useState<RepairRequestListItem[]>([]);
-  const [requiresLoading, setRequiresLoading] = useState(false);
-  const [requiresError, setRequiresError] = useState<string | null>(null);
-
-  const [statusFilter, setStatusFilter] = useState<StaffNotificationStatusValue | "">("");
-  const [priorityFilter, setPriorityFilter] = useState<string>("");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-
-  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadAll = async () => {
     if (!token) return;
-    setItemsLoading(true);
-    setItemsError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const qs: string[] = [];
-      if (statusFilter) qs.push(`status=${encodeURIComponent(statusFilter)}`);
-      if (priorityFilter) qs.push(`priority=${encodeURIComponent(priorityFilter)}`);
-      if (typeFilter) qs.push(`type=${encodeURIComponent(typeFilter)}`);
-      qs.push(`limit=50`);
+      const qs: string[] = ["limit=100"];
       const res = await api.get<StaffNotificationItem[]>(`/accounts/notifications/${qs.length ? `?${qs.join("&")}` : ""}`, token);
       setItems(res);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać powiadomień.";
-      setItemsError(msg);
+      setError(msg);
     } finally {
-      setItemsLoading(false);
-    }
-  };
-
-  const loadRequiresAction = async () => {
-    if (!token) return;
-    setRequiresLoading(true);
-    setRequiresError(null);
-    try {
-      const res = await api.get<RequiresActionResponse<RepairRequestListItem>>(`/accounts/notifications/requires-action/`, token);
-      setRequiresAction(res.items);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać listy wymagań reakcji.";
-      setRequiresError(msg);
-    } finally {
-      setRequiresLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!token || !isAdminOrStaff) return;
-    if (tab === "all") void loadAll();
-    if (tab === "requires_action") void loadRequiresAction();
+    void loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, tab, statusFilter, priorityFilter, typeFilter]);
+  }, [token, isAdminOrStaff]);
 
-  const filteredItems = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    if (!needle) return items;
-    return items.filter((n) => {
-      const hay = `${n.title ?? ""} ${n.description ?? ""} ${n.repair_number ?? ""}`.toLowerCase();
-      return hay.includes(needle);
+  const filteredItems = useMemo(
+    () =>
+      items.filter((n) => {
+        if (filter === "all") return true;
+        if (filter === "unread") return (n.status ?? "").toLowerCase() === "unread";
+        return typeGroup(n.notification_type) === filter;
+      }),
+    [items, filter],
+  );
+
+  const grouped = useMemo(() => {
+    const g = { today: [] as StaffNotificationItem[], yesterday: [] as StaffNotificationItem[], older: [] as StaffNotificationItem[] };
+    filteredItems.forEach((item) => {
+      g[dayBucket(item.created_at)].push(item);
     });
-  }, [items, search]);
+    return g;
+  }, [filteredItems]);
 
-  const handlePatchStatus = async (id: string, next: StaffNotificationStatusValue) => {
+  const patchStatus = async (id: string, next: "read" | "archived") => {
     if (!token) return;
     try {
       await api.patch(`/accounts/notifications/${id}/`, { status: next }, token);
-      if (tab === "all") await loadAll();
     } catch (e) {
-      // keep it simple: show toast-like message through state
       const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować powiadomienia.";
-      setItemsError(msg);
+      setError(msg);
+    }
+  };
+
+  const handleOpen = async (notification: StaffNotificationItem) => {
+    setItems((prev) => prev.map((n) => (n.id === notification.id ? { ...n, status: "read" } : n)));
+    if ((notification.status ?? "").toLowerCase() === "unread") {
+      await patchStatus(notification.id, "read");
+    }
+    if (notification.repair_id) {
+      router.push(`/panel/naprawy/${notification.repair_id}`);
     }
   };
 
@@ -123,10 +148,10 @@ export default function NotificationsPage() {
     if (!token) return;
     try {
       await api.post(`/accounts/notifications/mark-all-read/`, undefined, token);
-      await loadAll();
+      setItems((prev) => prev.map((n) => ({ ...n, status: "read" })));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się oznaczyć wszystkich jako przeczytane.";
-      setItemsError(msg);
+      setError(msg);
     }
   };
 
@@ -135,197 +160,81 @@ export default function NotificationsPage() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">{user?.role === "admin" ? "Panel Admina" : "Panel pracownika"} · Moduł</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Powiadomienia</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Lista powiadomień + kolejka „wymaga reakcji”.</p>
+        <p className="mt-1 text-sm text-[#9ca3af]">Centrum powiadomień pracownika</p>
       </header>
 
       <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setTab("all")}
-              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                tab === "all" ? "border-white/20 bg-white/10 text-white" : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              Wszystkie
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("requires_action")}
-              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                tab === "requires_action"
-                  ? "border-white/20 bg-white/10 text-white"
-                  : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              Wymaga reakcji
-            </button>
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => setFilter(f.key)}
+                className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                  filter === f.key ? "border-white/20 bg-white/10 text-white" : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
-
-          {tab === "all" ? (
-            <button
-              type="button"
-              onClick={() => void handleMarkAllRead()}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
-            >
-              Oznacz wszystkie jako przeczytane
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={() => void handleMarkAllRead()}
+            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+          >
+            Oznacz wszystkie
+          </button>
         </div>
       </div>
 
-      <div className="mb-5 grid gap-3 lg:grid-cols-3">
-        <div className="lg:col-span-1">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Szukaj: tytuł / opis / numer naprawy…"
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
-          />
-        </div>
+      {error ? <p className="mb-4 text-sm text-[#fca5a5]">{error}</p> : null}
 
-        {tab === "all" ? (
-          <>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Status</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StaffNotificationStatusValue | "")}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-              >
-                <option value="">Wszystkie</option>
-                <option value="unread">Nieprzeczytane</option>
-                <option value="read">Przeczytane</option>
-                <option value="archived">Zarchiwizowane</option>
-              </select>
-            </div>
+      {loading ? <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div> : null}
 
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Priorytet</label>
-              <select
-                value={priorityFilter}
-                onChange={(e) => setPriorityFilter(e.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-              >
-                <option value="">Wszystkie</option>
-                {PRIORITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </>
-        ) : null}
-      </div>
+      {!loading && filteredItems.length === 0 ? <p className="text-sm text-[#6b7280]">Brak powiadomień dla wybranego filtra.</p> : null}
 
-      {tab === "all" ? (
-        <>
-          {itemsLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
-          ) : itemsError ? (
-            <p className="text-sm text-[#fca5a5]">{itemsError}</p>
-          ) : filteredItems.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Brak powiadomień dla filtrów.</p>
-          ) : (
-            <div className="space-y-4">
-              {filteredItems.map((n) => {
-                const repairLink = n.repair_id ? `/panel/repairs/${n.repair_id}` : null;
-                return (
-                  <div key={n.id} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="min-w-[260px]">
-                        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Powiadomienie</p>
-                        <p className="mt-1 text-lg font-semibold text-white">
-                          {repairLink ? <Link href={repairLink}>{n.title}</Link> : n.title}
-                        </p>
-                        {n.repair_number ? (
-                          <p className="mt-2 text-sm text-[#9ca3af]">
-                            Naprawa: <span className="text-white font-semibold">{n.repair_number}</span>
-                          </p>
-                        ) : null}
-                        {n.description ? <p className="mt-2 whitespace-pre-wrap text-sm text-[#e5e7eb]">{n.description}</p> : null}
-                      </div>
-
-                      <div className="text-right">
-                        <div className="flex flex-wrap justify-end gap-2">
-                          <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${priorityBadgeClass(n.priority)}`}>{n.priority}</span>
-                          <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusBadgeClass(n.status)}`}>{n.status}</span>
+      {!loading ? (
+        <div className="space-y-7">
+          {([
+            ["today", "Dzisiaj"],
+            ["yesterday", "Wczoraj"],
+            ["older", "Wcześniejsze"],
+          ] as const).map(([bucket, label]) =>
+            grouped[bucket].length > 0 ? (
+              <section key={bucket}>
+                <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#9ca3af]">{label}</h2>
+                <div className="space-y-2">
+                  {grouped[bucket].map((n) => {
+                    const isUnread = (n.status ?? "").toLowerCase() === "unread";
+                    const icon = iconMeta(n.notification_type);
+                    return (
+                      <button
+                        key={n.id}
+                        type="button"
+                        onClick={() => void handleOpen(n)}
+                        className="relative flex w-full items-start justify-between gap-3 rounded-2xl border border-white/10 bg-[#0c0d12] p-4 text-left transition hover:border-white/20 hover:bg-[#101118]"
+                      >
+                        {isUnread ? <span className="absolute left-2 top-1/2 h-[5px] w-[5px] -translate-y-1/2 rounded-full bg-[#dc1e1e]" aria-hidden /> : null}
+                        <div className="flex min-w-0 items-start gap-3 pl-2">
+                          <span className={`flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-lg text-sm ${icon.className}`}>{icon.emoji}</span>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">{n.title}</p>
+                            {n.description ? <p className="mt-0.5 line-clamp-2 text-xs text-[#9ca3af]">{n.description}</p> : null}
+                          </div>
                         </div>
-                        <p className="mt-3 text-xs text-[#9ca3af]">{formatDateTime(n.created_at)}</p>
-
-                        <div className="mt-4 flex flex-wrap justify-end gap-2">
-                          {n.status === "unread" ? (
-                            <button
-                              type="button"
-                              onClick={() => void handlePatchStatus(n.id, "read")}
-                              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
-                            >
-                              Oznacz przeczytane
-                            </button>
-                          ) : null}
-                          {n.status !== "archived" ? (
-                            <button
-                              type="button"
-                              onClick={() => void handlePatchStatus(n.id, "archived")}
-                              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
-                            >
-                              Zarchiwizuj
-                            </button>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          {requiresLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">Ładowanie…</div>
-          ) : requiresError ? (
-            <p className="text-sm text-[#fca5a5]">{requiresError}</p>
-          ) : requiresAction.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Brak pozycji do obsługi.</p>
-          ) : (
-            <div className="space-y-4">
-              {requiresAction.map((r) => (
-                <div key={r.id} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="min-w-[260px]">
-                      <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Naprawa</p>
-                      <Link href={`/panel/repairs/${r.id}`} className="mt-1 block text-lg font-semibold text-white hover:underline">
-                        {r.repair_number}
-                      </Link>
-                      <p className="mt-2 text-sm text-[#9ca3af]">
-                        {r.client_name} · {r.device_name}
-                      </p>
-                      <p className="mt-2 text-sm text-[#9ca3af]">
-                        Status: <span className="text-white font-semibold">{r.status_display}</span>
-                      </p>
-                      {typeof r.waiting_for_client_days === "number" ? (
-                        <p className="mt-2 text-sm text-[#9ca3af]">
-                          Czeka {r.waiting_for_client_days} dni na klienta
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="text-right">
-                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${priorityBadgeClass(r.priority)}`}>{r.priority_display}</span>
-                      <p className="mt-3 text-xs text-[#9ca3af]">{new Date(r.created_at).toLocaleString("pl-PL")}</p>
-                    </div>
-                  </div>
+                        <div className="shrink-0 text-xs text-[#9ca3af]">{relativeTime(n.created_at)}</div>
+                      </button>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              </section>
+            ) : null,
           )}
-        </>
-      )}
+        </div>
+      ) : null}
     </main>
   );
 }

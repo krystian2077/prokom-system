@@ -8,6 +8,9 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
 import { Eye, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { RepairTableSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 const PAGE_SIZE = 10;
 
@@ -297,44 +300,31 @@ function RepairsPageInner() {
             </div>
 
             {repairsQuery.isLoading ? (
-              <div className="px-4 py-3">
-                {Array.from({ length: 4 }).map((_, idx) => (
-                  <div
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={idx}
-                    className="mt-2 grid animate-pulse grid-cols-[110px_1fr_220px_140px_160px_240px_90px] gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-                  >
-                    <div className="h-4 w-16 rounded bg-white/10" />
-                    <div className="h-4 w-3/5 rounded bg-white/10" />
-                    <div className="h-4 w-4/5 rounded bg-white/10" />
-                    <div className="h-4 w-24 rounded bg-white/10" />
-                    <div className="h-4 w-20 rounded bg-white/10" />
-                    <div className="h-4 w-28 rounded bg-white/10" />
-                    <div className="h-4 w-8 rounded bg-white/10" />
-                  </div>
-                ))}
+              <div className="p-4">
+                <RepairTableSkeleton rows={6} />
               </div>
             ) : repairsQuery.error ? (
-              <div className="px-4 py-8">
-                <p className="text-sm text-[#fca5a5]">
-                  {repairsQuery.error instanceof Error ? repairsQuery.error.message : "Nie udało się pobrać napraw."}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => void repairsQuery.refetch()}
-                  className="mt-4 rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-                >
-                  Spróbuj ponownie
-                </button>
-              </div>
+              <ErrorState
+                error={repairsQuery.error instanceof Error ? repairsQuery.error : null}
+                onRetry={() => void repairsQuery.refetch()}
+                title="Nie udało się pobrać listy napraw"
+              />
             ) : allItems.length === 0 ? (
-              <div className="px-4 py-12 text-center text-sm text-[#6b7280]">
-                {isAdmin ? "Brak napraw w systemie." : "Brak przypisanych napraw — poczekaj na przypisanie od admina."}
-              </div>
+              <EmptyState
+                icon={EMPTY_STATES.myRepairs.icon}
+                title={isAdmin ? "Brak napraw w systemie" : EMPTY_STATES.myRepairs.title}
+                description={
+                  isAdmin
+                    ? "Po utworzeniu pierwszego zlecenia pojawi się ono tutaj."
+                    : EMPTY_STATES.myRepairs.description
+                }
+              />
             ) : sliced.length === 0 ? (
-              <div className="px-4 py-12 text-center text-sm text-[#6b7280]">
-                Brak wyników dla wybranego filtra — zmień zakładkę lub sortowanie.
-              </div>
+              <EmptyState
+                icon={EMPTY_STATES.search.icon}
+                title="Brak wyników dla wybranego filtra"
+                description="Zmień zakładkę statusu lub sortowanie i spróbuj ponownie."
+              />
             ) : (
               <div className="px-4 py-2">
                 {sliced.map((r) => {
@@ -479,21 +469,7 @@ function RepairsPageSkeleton() {
       <div className="h-8 w-48 animate-pulse rounded-lg bg-white/10" />
       <div className="mt-6 rounded-3xl border border-white/10 bg-[#0f1117] p-4">
         <div className="px-4 py-3">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div
-              // eslint-disable-next-line react/no-array-index-key
-              key={idx}
-              className="mt-2 grid animate-pulse grid-cols-[110px_1fr_220px_140px_160px_240px_90px] gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-            >
-              <div className="h-4 w-16 rounded bg-white/10" />
-              <div className="h-4 rounded bg-white/10" />
-              <div className="h-4 rounded bg-white/10" />
-              <div className="h-4 w-24 rounded bg-white/10" />
-              <div className="h-4 w-20 rounded bg-white/10" />
-              <div className="h-4 w-28 rounded bg-white/10" />
-              <div className="h-4 w-8 rounded bg-white/10" />
-            </div>
-          ))}
+          <RepairTableSkeleton rows={6} />
         </div>
       </div>
     </main>

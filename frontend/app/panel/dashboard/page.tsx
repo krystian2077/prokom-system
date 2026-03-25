@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -286,6 +286,29 @@ function StaffDashboardPage() {
   const SummaryCard = ({ label, value, accent }: { label: string; value: number | null; accent: string }) => {
     const isLoading = value == null;
     const v = value ?? 0;
+    const [displayValue, setDisplayValue] = useState(0);
+
+    useEffect(() => {
+      if (isLoading) return;
+      const target = Math.max(0, v);
+      const start = displayValue;
+      if (start === target) return;
+
+      const durationMs = 420;
+      const startTs = performance.now();
+      let raf = 0;
+
+      const tick = (ts: number) => {
+        const progress = Math.min(1, (ts - startTs) / durationMs);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const next = Math.round(start + (target - start) * eased);
+        setDisplayValue(next);
+        if (progress < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [v, isLoading]);
 
     return (
       <div
@@ -306,7 +329,7 @@ function StaffDashboardPage() {
         <div className="relative flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">{label}</div>
-            <div className="mt-2 text-xl font-semibold text-white">{isLoading ? "…" : v}</div>
+            <div className="mt-2 text-xl font-semibold text-white">{isLoading ? "…" : displayValue}</div>
           </div>
 
           <div
@@ -319,7 +342,7 @@ function StaffDashboardPage() {
             aria-hidden="true"
           >
             <span className="text-sm font-bold" style={{ color: accent }}>
-              {isLoading ? "…" : v}
+              {isLoading ? "…" : displayValue}
             </span>
           </div>
         </div>

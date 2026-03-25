@@ -9,6 +9,7 @@ export default function StaffLoginPage() {
   const { staffLogin, user } = useAuth();
   const router = useRouter();
   const [returnUrl, setReturnUrl] = useState("/panel/dashboard");
+  const [loginMode, setLoginMode] = useState<"staff" | "admin">("staff");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,13 +19,20 @@ export default function StaffLoginPage() {
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
     const url = sp.get("returnUrl");
-    if (url) setReturnUrl(url);
+    if (url) {
+      setReturnUrl(url);
+      setLoginMode(url.startsWith("/admin-panel") ? "admin" : "staff");
+    } else {
+      setReturnUrl("/panel/dashboard");
+      setLoginMode("staff");
+    }
   }, []);
 
   useEffect(() => {
     if (!user || !["staff", "admin"].includes(user.role)) return;
     if (user.role === "admin") {
-      router.replace("/admin-panel/dashboard");
+      const dest = returnUrl.startsWith("/admin-panel") ? returnUrl : "/admin-panel/dashboard";
+      router.replace(dest);
       return;
     }
     const dest = returnUrl.startsWith("/panel") ? returnUrl : "/panel/dashboard";
@@ -39,7 +47,8 @@ export default function StaffLoginPage() {
     setSubmitting(false);
     if (result.ok && result.user && ["staff", "admin"].includes(result.user.role)) {
       if (result.user.role === "admin") {
-        router.push("/admin-panel/dashboard");
+        const dest = returnUrl.startsWith("/admin-panel") ? returnUrl : "/admin-panel/dashboard";
+        router.push(dest);
       } else {
         const dest = returnUrl.startsWith("/panel") ? returnUrl : "/panel/dashboard";
         router.push(dest);
@@ -53,8 +62,17 @@ export default function StaffLoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-[#050509] px-4">
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#0b0c10] p-8 shadow-xl shadow-black/40">
         <div className="mb-6 text-xs uppercase tracking-[0.22em] text-[#9ca3af]">
-          <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#dc1e1e]" />
-          Panel pracownika
+          <span
+            className="mr-2 inline-block h-1.5 w-1.5 rounded-full"
+            style={{
+              background: loginMode === "admin" ? "#dc1e1e" : "#3b82f6",
+              boxShadow:
+                loginMode === "admin"
+                  ? "0 0 10px rgba(220,30,30,.55)"
+                  : "0 0 10px rgba(59,130,246,.55)",
+            }}
+          />
+          {loginMode === "admin" ? "Panel administratora" : "Panel pracownika"}
         </div>
         <h1 className="text-2xl font-semibold text-white">Logowanie do systemu</h1>
         <p className="mt-2 text-sm text-[#9ca3af]">
@@ -88,7 +106,14 @@ export default function StaffLoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 inline-flex w-full items-center justify-center rounded-xl bg-[#dc1e1e] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#dc1e1e]/40 transition hover:bg-[#b81818] disabled:opacity-60"
+            className="mt-2 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-md transition disabled:opacity-60"
+            style={{
+              background: loginMode === "admin" ? "#dc1e1e" : "#3b82f6",
+              boxShadow:
+                loginMode === "admin"
+                  ? "0 10px 28px rgba(220,30,30,.26)"
+                  : "0 10px 28px rgba(59,130,246,.22)",
+            }}
           >
             {submitting ? "Logowanie..." : "Zaloguj się"}
           </button>

@@ -49,10 +49,14 @@ def repair_list(
     tag=None,
     tags=None,
     ordering="-created_at",
+    repair_type=None,
+    repair_type_in=None,
+    complaint_warranty_status=None,
+    complaint_warranty_status_in=None,
 ):
     """Lista zgłoszeń napraw z filtrami. tag / tags = filtry po tagach systemowych."""
     qs = RepairRequest.objects.select_related(
-        "client", "device", "assigned_to", "created_by"
+        "client", "device", "assigned_to", "created_by", "parent_repair"
     ).prefetch_related("status_history", "assignments")
 
     if status:
@@ -82,6 +86,15 @@ def repair_list(
         q = _tag_to_q(t)
         if q is not None:
             qs = qs.filter(q)
+
+    if repair_type_in:
+        qs = qs.filter(repair_type__in=repair_type_in)
+    elif repair_type:
+        qs = qs.filter(repair_type=repair_type)
+    if complaint_warranty_status_in:
+        qs = qs.filter(complaint_warranty_status__in=complaint_warranty_status_in)
+    elif complaint_warranty_status:
+        qs = qs.filter(complaint_warranty_status=complaint_warranty_status)
 
     return qs.order_by(ordering)
 

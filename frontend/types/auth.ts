@@ -3,6 +3,11 @@
  */
 export type UserRole = "admin" | "staff" | "client";
 
+export interface UserStaffProfile {
+  specialization: string | null;
+  specialization_display: string | null;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -16,6 +21,8 @@ export interface User {
   email_verified?: boolean;
   date_joined?: string;
   last_login?: string | null;
+  /** Profil serwisowy (tylko gdy istnieje rekord StaffProfile). */
+  staff_profile?: UserStaffProfile | null;
 }
 
 export interface LoginResponse {

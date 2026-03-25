@@ -3,8 +3,7 @@
 import { Suspense } from "react";
 import { UnassignedRepairsView } from "@/components/panel/UnassignedRepairsView";
 
-/** Alias ścieżki — kanoniczny adres: `/panel/nieprzypisane`. */
-export default function UnassignedPage() {
+export default function NieprzypisanePage() {
   return (
     <Suspense
       fallback={
@@ -13,7 +12,7 @@ export default function UnassignedPage() {
         </main>
       }
     >
-      <UnassignedRepairsView basePath="/panel/unassigned" />
+      <UnassignedRepairsView basePath="/panel/nieprzypisane" />
     </Suspense>
   );
 }

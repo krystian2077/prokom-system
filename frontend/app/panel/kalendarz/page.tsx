@@ -4,7 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { Plus, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type CategoryKey = "sla" | "delivery" | "event" | "intake" | "eta";
 
@@ -16,6 +17,12 @@ type CalendarEvent = {
   title: string;
   subtitle?: string;
 };
+
+type PopupState = {
+  event: CalendarEvent;
+  x: number;
+  y: number;
+} | null;
 
 const CATEGORY_META: Record<
   CategoryKey,
@@ -132,6 +139,8 @@ export default function CalendarPage() {
   const today = useMemo(() => new Date(), []);
   const [viewMonth, setViewMonth] = useState<Date>(() => startOfMonth(today));
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date(today));
+  const [popup, setPopup] = useState<PopupState>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
 
   const events: CalendarEvent[] = useMemo(
     () => [
@@ -211,6 +220,33 @@ export default function CalendarPage() {
     return t.toLocaleDateString("pl-PL", { day: "2-digit", month: "long" });
   })();
 
+  useEffect(() => {
+    const onClickOutside = (ev: MouseEvent) => {
+      const target = ev.target as Node | null;
+      if (!target) return;
+      if (popupRef.current && !popupRef.current.contains(target)) {
+        setPopup(null);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  const eventClass = (category: CategoryKey) => {
+    if (category === "delivery") return "border border-[rgba(34,197,94,.28)] bg-[rgba(34,197,94,.15)] text-[var(--green)]";
+    if (category === "intake") return "border border-[rgba(245,158,11,.28)] bg-[rgba(245,158,11,.15)] text-[var(--amber)]";
+    if (category === "sla") return "border border-[rgba(220,30,30,.30)] bg-[rgba(220,30,30,.15)] text-[var(--red)]";
+    if (category === "eta") return "border border-[rgba(59,130,246,.28)] bg-[rgba(59,130,246,.15)] text-[var(--blue)]";
+    return "border border-white/10 bg-white/5 text-[#9ca3af]";
+  };
+
+  const popupActionHref = (ev: CalendarEvent) => {
+    const repairId = ev.id.split("-")[1];
+    if (["eta", "delivery", "intake"].includes(ev.category) && repairId) return `/panel/naprawy/${repairId}`;
+    if (ev.category === "event") return "/panel/zadania";
+    return null;
+  };
+
   return (
     <main className="mx-auto flex min-h-screen max-w-[1500px] flex-col gap-5 px-5 py-7">
       <header className="px-1">
@@ -281,8 +317,12 @@ export default function CalendarPage() {
 
           <div className="mt-5 px-1">
             <div className="grid grid-cols-7 gap-1">
-              {["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"].map((d) => (
-                <div key={d} className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#6b7280]">
+              {["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"].map((d, idx) => (
+                <div
+                  key={d}
+                  className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#6b7280]"
+                  style={{ opacity: idx === 5 ? 0.75 : idx === 6 ? 0.6 : 1 }}
+                >
                   {d}
                 </div>
               ))}
@@ -293,6 +333,7 @@ export default function CalendarPage() {
                 const iso = toISODate(d);
                 const inMonth = d.getMonth() === viewMonth.getMonth();
                 const isSelected = iso === selectedISO;
+                const isToday = iso === toISODate(today);
                 const cellEvents = eventsByDate.get(iso) ?? [];
                 const showEvents = cellEvents.slice(0, 3);
 
@@ -302,8 +343,9 @@ export default function CalendarPage() {
                     type="button"
                     onClick={() => setSelectedDate(new Date(d))}
                     className={[
-                      "relative min-h-[88px] rounded-2xl border border-transparent px-2 py-2 text-left transition",
+                      "relative min-h-[80px] rounded-[10px] border border-transparent px-[8px] py-[6px] text-left transition",
                       inMonth ? "bg-[#0f1117]/70" : "bg-[#0f1117]/30",
+                      isToday ? "border-[rgba(220,30,30,.2)] bg-[rgba(220,30,30,.07)]" : "",
                       isSelected ? "border-white/10 bg-white/5" : "hover:border-white/10 hover:bg-white/5",
                     ].join(" ")}
                     aria-label={`Wybierz dzień ${d.toLocaleDateString("pl-PL")}`}
@@ -329,28 +371,19 @@ export default function CalendarPage() {
 
                     {showEvents.length ? (
                       <div className="mt-2 flex flex-col gap-1">
-                        {showEvents.map((ev) => {
-                          const meta = CATEGORY_META[ev.category];
-                          return (
-                            <div
-                              key={ev.id}
-                              className="flex items-start gap-2 rounded-xl px-2 py-1 text-[11px] leading-snug"
-                              style={{
-                                background: meta.bg,
-                                border: `1px solid ${meta.border}`,
-                                color: meta.text,
-                              }}
-                            >
-                              <span
-                                className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full"
-                                style={{ background: meta.color, boxShadow: `0 0 0 3px ${meta.bg}` }}
-                              />
-                              <div className="min-w-0">
-                                <div className="truncate font-semibold">{ev.title}</div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                        {showEvents.map((ev) => (
+                          <button
+                            key={ev.id}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPopup({ event: ev, x: e.clientX, y: e.clientY });
+                            }}
+                            className={`block w-full truncate rounded-[5px] px-[6px] py-[2px] text-left text-[9.5px] font-semibold ${eventClass(ev.category)}`}
+                          >
+                            {ev.title}
+                          </button>
+                        ))}
                         {cellEvents.length > showEvents.length ? (
                           <div className="text-[11px] font-semibold text-[#8b93a8]">+{cellEvents.length - showEvents.length}</div>
                         ) : null}
@@ -440,6 +473,36 @@ export default function CalendarPage() {
           </div>
         </aside>
       </section>
+      {popup ? (
+        <div
+          ref={popupRef}
+          className="fixed z-[300] w-[320px] rounded-2xl border border-white/10 bg-[#0c0d12] p-4 shadow-2xl"
+          style={{ left: Math.min(popup.x + 10, window.innerWidth - 340), top: Math.min(popup.y + 10, window.innerHeight - 220) }}
+        >
+          <div className="text-sm font-semibold text-white">{popup.event.title}</div>
+          <div className="mt-2">
+            <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${eventClass(popup.event.category)}`}>
+              {CATEGORY_META[popup.event.category].label}
+            </span>
+          </div>
+          {popup.event.subtitle ? <p className="mt-2 text-xs text-[#9ca3af]">{popup.event.subtitle}</p> : null}
+          <div className="mt-3 text-xs text-[#9ca3af]">
+            {popup.event.date}
+            {popup.event.time ? ` · ${popup.event.time}` : ""}
+          </div>
+          {popupActionHref(popup.event) ? (
+            <div className="mt-4">
+              <Link
+                href={popupActionHref(popup.event)!}
+                className="text-xs font-semibold text-[#3b82f6] hover:underline"
+                onClick={() => setPopup(null)}
+              >
+                {popup.event.category === "event" ? "Otwórz zadanie →" : "Otwórz naprawę →"}
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </main>
   );
 }

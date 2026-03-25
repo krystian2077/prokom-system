@@ -29,6 +29,17 @@ class StaffRepairsListView(APIView):
 
     def get(self, request):
         unassigned_flag = request.query_params.get("unassigned_only", "").lower() in ("1", "true", "yes")
+        repair_types_raw = (request.query_params.get("repair_types") or "").strip()
+        repair_type_in = [x.strip() for x in repair_types_raw.split(",") if x.strip()] if repair_types_raw else None
+        cws_in_raw = (request.query_params.get("complaint_warranty_status_in") or "").strip()
+        complaint_warranty_status_in = (
+            [x.strip() for x in cws_in_raw.split(",") if x.strip()] if cws_in_raw else None
+        )
+        is_complaint = request.query_params.get("is_complaint", "").lower() in ("1", "true", "yes")
+        repair_type_single = request.query_params.get("repair_type")
+        if is_complaint and not repair_type_single and not repair_type_in:
+            repair_type_single = "complaint"
+
         qs = repair_list(
             status=request.query_params.get("status"),
             status_in=request.query_params.getlist("status_in") or None,
@@ -38,6 +49,10 @@ class StaffRepairsListView(APIView):
             search=request.query_params.get("search"),
             tags=request.query_params.getlist("tags") or request.query_params.getlist("tag") or None,
             ordering=request.query_params.get("ordering", "-created_at"),
+            repair_type=repair_type_single if not repair_type_in else None,
+            repair_type_in=repair_type_in,
+            complaint_warranty_status=request.query_params.get("complaint_warranty_status"),
+            complaint_warranty_status_in=complaint_warranty_status_in,
         )
         serializer = RepairRequestListSerializer(qs, many=True)
         return Response(serializer.data)

@@ -18,8 +18,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
 
-const archivedRepairStatuses = new Set(["picked_up", "shipped", "delivered", "cancelled", "unrepairable", "abandoned"]);
-
 export function WorkerSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,18 +30,25 @@ export function WorkerSidebar() {
     queryKey: ["sidebar", "dashboard-buckets"],
     enabled: Boolean(token && panelUser),
     queryFn: async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/repairs/dashboard/?days_without_update=3`, {
-        headers: token ? { Authorization: `Token ${token}` } : {},
-      });
-      if (!res.ok) return null;
-      return (await res.json()) as {
-        my_new?: RepairRequestListItem[];
-        my_urgent?: RepairRequestListItem[];
-        today_to_contact?: RepairRequestListItem[];
-        my_in_progress?: RepairRequestListItem[];
-        my_overdue?: RepairRequestListItem[];
-        ready_for_pickup?: RepairRequestListItem[];
-        without_update?: RepairRequestListItem[];
+      if (!token) return null;
+      // Staff dashboard buckets — zgodnie z dokumentacją (§8.1) i implementacją /panel/dashboard
+      const dashboardRes = await api.get<any>(`/staff/dashboard/?days_without_update=3&recent_limit=10`, token);
+      return {
+        my_new: dashboardRes?.my_new ?? [],
+        my_urgent: dashboardRes?.my_urgent ?? [],
+        today_to_contact: dashboardRes?.today_to_contact ?? [],
+        my_in_progress: dashboardRes?.my_in_progress ?? [],
+        my_overdue: dashboardRes?.my_overdue ?? [],
+        ready_for_pickup: dashboardRes?.ready_for_pickup ?? [],
+        without_update: dashboardRes?.without_update ?? [],
+      } as {
+        my_new: RepairRequestListItem[];
+        my_urgent: RepairRequestListItem[];
+        today_to_contact: RepairRequestListItem[];
+        my_in_progress: RepairRequestListItem[];
+        my_overdue: RepairRequestListItem[];
+        ready_for_pickup: RepairRequestListItem[];
+        without_update: RepairRequestListItem[];
       };
     },
     staleTime: 15_000,
@@ -54,12 +59,10 @@ export function WorkerSidebar() {
     enabled: Boolean(token && panelUser?.id),
     queryFn: async () => {
       if (!token || !panelUser?.id) return 0;
-      const path =
-        panelUser.role === "admin"
-          ? `/repairs/special-views/requires-action/`
-          : `/repairs/special-views/requires-action/?assigned_to=${panelUser.id}`;
-      const data = await api.get<RepairRequestListItem[]>(path, token);
-      return Array.isArray(data) ? data.length : 0;
+      const res = await api.get<any>(`/accounts/notifications/requires-action/`, token);
+      if (typeof res?.count === "number") return res.count as number;
+      if (Array.isArray(res?.items)) return res.items.length as number;
+      return 0;
     },
     staleTime: 15_000,
   });
@@ -69,9 +72,11 @@ export function WorkerSidebar() {
     enabled: Boolean(token && panelUser),
     queryFn: async () => {
       if (!token) return 0;
-      const rows = await api.get<RepairRequestListItem[]>(`/staff/repairs/?ordering=-created_at&unassigned_only=1`, token);
-      const list = rows ?? [];
-      return list.filter((r) => !archivedRepairStatuses.has((r.status ?? "").toLowerCase())).length;
+      const rows = await api.get<RepairRequestListItem[]>(
+        `/staff/repairs/?unassigned_only=1&status=new&ordering=created_at`,
+        token,
+      );
+      return (rows ?? []).length;
     },
     staleTime: 15_000,
   });
@@ -123,8 +128,21 @@ export function WorkerSidebar() {
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[13px] font-bold tracking-[0.2em] text-[#9ca3af]">PRO-KOM</div>
-            <div className="mt-1 truncate text-sm font-semibold" style={{ color: "#d0d4de" }}>
-              {user?.role === "admin" ? "Panel Admina" : "Panel pracownika"}
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold"
+                style={{
+                  background: "rgba(59,130,246,.14)",
+                  borderColor: "rgba(59,130,246,.35)",
+                  color: "#bfdbfe",
+                }}
+              >
+                <span
+                  className="h-2 w-2 rounded-full bg-[#3b82f6]"
+                  style={{ boxShadow: "0 0 14px rgba(59,130,246,.55)", animation: "statusPulse 1.6s ease infinite" }}
+                />
+                Panel Pracownika
+              </span>
             </div>
           </div>
           <span
@@ -227,20 +245,35 @@ export function WorkerSidebar() {
               </Link>
 
               <Link
-                href="/panel/unassigned"
+                href="/panel/nieprzypisane"
                 className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
                 style={{
-                  background: pathname.startsWith("/panel/unassigned") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/unassigned") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/unassigned") ? "3px solid #3b82f6" : "3px solid transparent",
+                  background:
+                    pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
                 }}
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
                     className="flex h-8 w-8 items-center justify-center rounded-xl"
                     style={{
-                      background: pathname.startsWith("/panel/unassigned") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
-                      border: pathname.startsWith("/panel/unassigned") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
+                      background:
+                        pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
                     }}
                   >
                     <Users size={18} />
@@ -281,6 +314,51 @@ export function WorkerSidebar() {
                   <span className="truncate text-sm font-semibold">Wszystkie naprawy</span>
                 </div>
                 <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]">—</span>
+              </Link>
+
+              <Link
+                href="/panel/historia"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background:
+                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
+                }}
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <History size={18} />
+                  </span>
+                  <span className="truncate text-sm font-semibold">Historia napraw</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
               </Link>
             </div>
           </div>
@@ -380,6 +458,198 @@ export function WorkerSidebar() {
                   <span className="text-sm font-semibold">Komunikacja</span>
                 </div>
                 <span className={pathname.startsWith("/panel/comm") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"} />
+              </Link>
+
+              <Link
+                href="/panel/zadania"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background:
+                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <Users size={18} />
+                  </span>
+                  <span className="text-sm font-semibold">Zadania</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
+              </Link>
+
+              <Link
+                href="/panel/wyszukiwanie"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background:
+                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <ChevronRight size={18} />
+                  </span>
+                  <span className="text-sm font-semibold">Wyszukiwanie</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
+              </Link>
+
+              <Link
+                href="/panel/reklamacje"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background:
+                    pathname.startsWith("/panel/reklamacje") ||
+                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                    pathname.startsWith("/panel/claims")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/reklamacje") ||
+                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                    pathname.startsWith("/panel/claims")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/reklamacje") ||
+                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                    pathname.startsWith("/panel/claims")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/reklamacje") ||
+                        pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                        pathname.startsWith("/panel/claims")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/reklamacje") ||
+                        pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                        pathname.startsWith("/panel/claims")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <Bell size={18} />
+                  </span>
+                  <span className="text-sm font-semibold">Reklamacje</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/reklamacje") ||
+                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                    pathname.startsWith("/panel/claims")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
+              </Link>
+
+              <Link
+                href="/panel/czesci-hurtownie"
+                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
+                style={{
+                  background:
+                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
+                      ? "rgba(59,130,246,.12)"
+                      : "transparent",
+                  color:
+                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
+                      ? "#fff"
+                      : "rgba(208,212,222,.9)",
+                  borderLeft:
+                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
+                      ? "3px solid #3b82f6"
+                      : "3px solid transparent",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-xl"
+                    style={{
+                      background:
+                        pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
+                          ? "rgba(59,130,246,.18)"
+                          : "rgba(255,255,255,.03)",
+                      border:
+                        pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
+                          ? "1px solid rgba(59,130,246,.35)"
+                          : "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <Users size={18} />
+                  </span>
+                  <span className="text-sm font-semibold">Części</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
+                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
+                      : "h-2 w-2 rounded-full bg-white/10"
+                  }
+                />
               </Link>
 
               <Link

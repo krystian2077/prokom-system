@@ -37,7 +37,7 @@ export function PanelTopbar() {
       pathname === "/panel/zgloszenia";
     if (repairsDetail) return "Szczegóły naprawy";
     if (repairsList) return "Naprawy";
-    if (pathname === "/panel/unassigned") return "Nieprzypisane";
+    if (pathname === "/panel/unassigned" || pathname === "/panel/nieprzypisane") return "Nieprzypisane";
     if (pathname === "/panel/all-repairs") return "Wszystkie naprawy";
     if (pathname.startsWith("/panel/intake")) return "Przyjęcie";
     if (pathname.startsWith("/panel/comm")) return "Komunikacja";
@@ -46,10 +46,16 @@ export function PanelTopbar() {
     if (pathname.startsWith("/panel/availability") || pathname.startsWith("/panel/dostepnosc")) return "Dostępność";
     if (pathname.startsWith("/panel/parts") || pathname.startsWith("/panel/czesci-hurtownie")) return "Części";
     if (pathname.startsWith("/panel/tasks") || pathname.startsWith("/panel/zadania")) return "Zadania";
+    if (pathname.startsWith("/panel/archive") || pathname.startsWith("/panel/historia")) return "Historia napraw";
     if (pathname.startsWith("/panel/clients") || pathname.startsWith("/panel/klienci")) return "Klienci";
     if (pathname.startsWith("/panel/search") || pathname.startsWith("/panel/wyszukiwanie")) return "Wyszukiwanie";
     if (pathname.startsWith("/panel/pickups") || pathname.startsWith("/panel/odbior")) return "Odbiory";
-    if (pathname.startsWith("/panel/claims") || pathname.startsWith("/panel/reklamacje-gwarancje")) return "Reklamacje";
+    if (
+      pathname.startsWith("/panel/claims") ||
+      pathname.startsWith("/panel/reklamacje-gwarancje") ||
+      pathname.startsWith("/panel/reklamacje")
+    )
+      return "Reklamacje";
     if (pathname.startsWith("/panel/profil")) return "Mój profil";
     return "Panel";
   }, [pathname]);

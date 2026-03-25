@@ -20,7 +20,7 @@ const navLinks: NavLink[] = [
   { href: "/panel/powiadomienia", label: "Powiadomienia" },
   { href: "/panel/kalendarz", label: "Kalendarz" },
   { href: "/panel/odbior", label: "Odbiory" },
-  { href: "/panel/reklamacje-gwarancje", label: "Reklamacje / Gwarancje" },
+  { href: "/panel/reklamacje", label: "Reklamacje / Gwarancje" },
   { href: "/panel/dostepnosc", label: "Dostępność" },
   { href: "/panel/czesci-hurtownie", label: "Części / Hurtownie" },
   // moduły tylko dla admina

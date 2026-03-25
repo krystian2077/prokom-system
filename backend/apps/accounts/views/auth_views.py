@@ -193,6 +193,7 @@ class StaffLoginView(APIView):
 
             raise ValidationError("Nieprawidłowy e-mail lub hasło.")
 
+        user = User.objects.select_related("staff_profile").get(pk=user.pk)
         _log_login(request, user, "success")
         token, _ = Token.objects.get_or_create(user=user)
         return Response(
@@ -623,10 +624,12 @@ class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response(UserSerializer(request.user).data)
+        user = User.objects.select_related("staff_profile").get(pk=request.user.pk)
+        return Response(UserSerializer(user).data)
 
     def patch(self, request):
         ser = UserSelfUpdateSerializer(request.user, data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         ser.save()
-        return Response(UserSerializer(request.user).data)
+        user = User.objects.select_related("staff_profile").get(pk=request.user.pk)
+        return Response(UserSerializer(user).data)

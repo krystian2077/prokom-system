@@ -23,6 +23,9 @@ export interface RepairRequestListItem {
   requires_attention?: boolean;
   complaint_warranty_status?: string | null;
   complaint_warranty_status_display?: string | null;
+  problem_description?: string | null;
+  parent_repair_number?: string | null;
+  created_by_label?: string | null;
   estimated_completion_date?: string | null;
   estimated_duration_days_min?: number | null;
   estimated_duration_days_max?: number | null;

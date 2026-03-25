@@ -1,101 +1,96 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 
-type TaskStatusValue = "new" | "in_progress" | "waiting" | "completed" | "cancelled";
-type TaskPriorityValue = "low" | "standard" | "important" | "urgent";
+type TaskStatusValue = "new" | "in_progress" | "waiting" | "done" | "completed" | "cancelled";
+type TaskPriorityValue = "low" | "normal" | "standard" | "high" | "important" | "urgent";
+type TasksScope = "all" | "today" | "urgent" | "done";
 
 type TaskItem = {
   id: string;
   title: string;
-  description?: string;
   status: TaskStatusValue | string;
-  status_display: string;
+  status_display?: string;
   priority: TaskPriorityValue | string;
-  priority_display: string;
-  assigned_to?: string | null;
-  assigned_to_name?: string | null;
-  created_by_name?: string | null;
+  priority_display?: string;
   due_date?: string | null;
   completed_at?: string | null;
-  is_overdue?: boolean;
-  is_archived?: boolean;
-  comment_count?: number;
-  created_at?: string;
+  related_repair?: string | null;
+  related_repair_number?: string | null;
 };
 
-type TeamAvailabilityResponse = {
-  date: string;
-  entries: Array<{
-    id: string;
-    employee?: string | null;
-    employee_name?: string | null;
-    availability_type: string;
-    availability_type_display: string;
-    date: string;
-    is_all_day: boolean;
-    start_time?: string | null;
-    end_time?: string | null;
-    note?: string;
-  }>;
+const PRIORITY_LABEL: Record<string, string> = {
+  low: "Niski",
+  normal: "Normalny",
+  standard: "Normalny",
+  high: "Wysoki",
+  important: "Wysoki",
+  urgent: "Pilny",
 };
 
-type TasksScope = "today" | "urgent" | "overdue" | "completed";
+function statusIsDone(statusRaw: string | undefined): boolean {
+  const v = (statusRaw ?? "").toLowerCase();
+  return v === "done" || v === "completed";
+}
+
+function parseDate(v: string | null | undefined): Date | null {
+  if (!v) return null;
+  const d = new Date(v);
+  return Number.isFinite(d.getTime()) ? d : null;
+}
+
+function isDueToday(task: TaskItem): boolean {
+  const d = parseDate(task.due_date);
+  if (!d) return false;
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+}
+
+function isUrgent(task: TaskItem): boolean {
+  return (task.priority ?? "").toLowerCase() === "urgent";
+}
+
+function priorityPillClass(priorityRaw: string | undefined): string {
+  const p = (priorityRaw ?? "").toLowerCase();
+  if (p === "urgent") return "border-[#dc1e1e]/40 bg-[#dc1e1e]/15 text-[#ffb4b4]";
+  if (p === "high" || p === "important") return "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd9a6]";
+  return "border-white/10 bg-white/5 text-[#9ca3af]";
+}
 
 export default function TasksPage() {
-  const { user, token } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { token } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [scope, setScope] = useState<TasksScope>("today");
+  const scope = (searchParams.get("scope") as TasksScope) || "all";
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [tasksLoading, setTasksLoading] = useState(false);
   const [tasksError, setTasksError] = useState<string | null>(null);
-  const [tasks, setTasks] = useState<TaskItem[]>([]);
-
-  const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
-  const [teamToday, setTeamToday] = useState<TeamAvailabilityResponse | null>(null);
-
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
   const [updateTaskError, setUpdateTaskError] = useState<string | null>(null);
 
-  const STATUS_OPTIONS: Array<{ value: TaskStatusValue; label: string }> = [
-    { value: "new", label: "Nowe" },
-    { value: "in_progress", label: "W trakcie" },
-    { value: "waiting", label: "Czeka" },
-    { value: "completed", label: "Wykonane" },
-    { value: "cancelled", label: "Anulowane" },
-  ];
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addingTask, setAddingTask] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newPriority, setNewPriority] = useState<TaskPriorityValue>("normal");
+  const [newDueDate, setNewDueDate] = useState("");
+  const [addError, setAddError] = useState<string | null>(null);
 
-  const PRIORITY_LABEL: Record<TaskPriorityValue, string> = {
-    low: "Niski",
-    standard: "Standardowy",
-    important: "Ważny",
-    urgent: "Pilny",
-  };
-
-  const priorityColor = (p: string | undefined) => {
-    const v = (p ?? "").toLowerCase();
-    if (v === "urgent") return "bg-[#dc1e1e]/15 text-[#ffb4b4] border-[#dc1e1e]/40";
-    if (v === "important") return "bg-[#f59e0b]/15 text-[#ffd9a6] border-[#f59e0b]/40";
-    if (v === "low") return "bg-white/5 text-[#9ca3af] border-white/10";
-    return "bg-[#3b82f6]/15 text-[#bcd6ff] border-[#3b82f6]/35";
-  };
-
-  const scopeToEndpoint = (s: TasksScope) => {
-    switch (s) {
-      case "today":
-        return "/tasks/due-today/";
-      case "urgent":
-        return "/tasks/urgent/";
-      case "overdue":
-        return "/tasks/overdue/";
-      case "completed":
-        return "/tasks/completed/";
-      default:
-        return "/tasks/due-today/";
-    }
+  const setScopeInUrl = (next: TasksScope) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === "all") params.delete("scope");
+    else params.set("scope", next);
+    router.push(`/panel/zadania?${params.toString()}`);
   };
 
   const loadTasks = async () => {
@@ -103,272 +98,289 @@ export default function TasksPage() {
     setTasksLoading(true);
     setTasksError(null);
     try {
-      const endpoint = scopeToEndpoint(scope);
-      const res = await api.get<TaskItem[]>(endpoint, token);
-      setTasks(res);
+      const params = new URLSearchParams();
+      params.set("assigned_to", "me");
+      if (scope === "done") params.set("status", "done");
+      if (scope === "urgent") params.set("priority", "urgent");
+      const res = await api.get<any>(`/tasks/?${params.toString()}`, token);
+      const list = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
+      setTasks(list as TaskItem[]);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać zadań.";
-      setTasksError(msg);
+      setTasksError(e instanceof Error ? e.message : "Nie udało się pobrać zadań.");
     } finally {
       setTasksLoading(false);
-    }
-  };
-
-  const loadTeamToday = async () => {
-    if (!token) return;
-    setAvailabilityLoading(true);
-    setAvailabilityError(null);
-    try {
-      const res = await api.get<TeamAvailabilityResponse>(`/availability/team-today/`, token);
-      setTeamToday(res);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać dostępności zespołu.";
-      setAvailabilityError(msg);
-    } finally {
-      setAvailabilityLoading(false);
     }
   };
 
   useEffect(() => {
     if (!token) return;
     void loadTasks();
-    const interval = window.setInterval(() => {
-      void loadTasks();
-    }, 30_000);
-    return () => window.clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, scope]);
 
-  useEffect(() => {
-    if (!token) return;
-    void loadTeamToday();
-    const interval = window.setInterval(() => {
-      void loadTeamToday();
-    }, 60_000);
-    return () => window.clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  const visibleTasks = useMemo(() => {
+    if (scope === "all") return tasks;
+    if (scope === "today") return tasks.filter(isDueToday);
+    if (scope === "urgent") return tasks.filter(isUrgent);
+    if (scope === "done") return tasks.filter((t) => statusIsDone(t.status));
+    return tasks;
+  }, [scope, tasks]);
 
-  const handleUpdateTaskStatus = async (taskId: string, nextStatus: TaskStatusValue) => {
+  const openTasks = useMemo(() => visibleTasks.filter((t) => !statusIsDone(t.status)), [visibleTasks]);
+  const doneTasks = useMemo(() => visibleTasks.filter((t) => statusIsDone(t.status)), [visibleTasks]);
+  const doneToday = useMemo(
+    () =>
+      doneTasks.filter((t) => {
+        const d = parseDate(t.completed_at ?? t.due_date);
+        if (!d) return false;
+        const n = new Date();
+        return d.getDate() === n.getDate() && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+      }),
+    [doneTasks],
+  );
+
+  const handleToggleDone = async (task: TaskItem, checked: boolean) => {
     if (!token) return;
     setUpdateTaskError(null);
-    setUpdatingTaskId(taskId);
+    setUpdatingTaskId(task.id);
+    const prev = tasks;
+    const nextStatus = checked ? "done" : "in_progress";
+    setTasks((curr) =>
+      curr.map((t) =>
+        t.id === task.id
+          ? {
+              ...t,
+              status: nextStatus,
+              status_display: checked ? "Wykonane" : "W trakcie",
+              completed_at: checked ? new Date().toISOString() : null,
+            }
+          : t,
+      ),
+    );
     try {
-      await api.patch(`/tasks/${taskId}/`, { status: nextStatus }, token);
-      await loadTasks();
+      await api.patch(`/tasks/${task.id}/`, { status: nextStatus }, token);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować statusu.";
-      setUpdateTaskError(msg);
+      setTasks(prev);
+      setUpdateTaskError(e instanceof Error ? e.message : "Nie udało się zaktualizować zadania.");
     } finally {
       setUpdatingTaskId(null);
     }
   };
 
-  const scopeLabel =
-    scope === "today" ? "Dziś" : scope === "urgent" ? "Pilne" : scope === "overdue" ? "Zaległe" : "Zakończone";
-
-  const scopeAccent = (s: TasksScope) => {
-    switch (s) {
-      case "today":
-        return { accent: "#3b82f6", glow: "rgba(59,130,246,.45)" };
-      case "urgent":
-        return { accent: "#dc1e1e", glow: "rgba(220,30,30,.45)" };
-      case "overdue":
-        return { accent: "#f59e0b", glow: "rgba(245,158,11,.42)" };
-      case "completed":
-        return { accent: "#22c55e", glow: "rgba(34,197,94,.40)" };
-      default:
-        return { accent: "#dc1e1e", glow: "rgba(220,30,30,.45)" };
+  const handleAddTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setAddError(null);
+    if (!newTitle.trim()) {
+      setAddError("Podaj tytuł zadania.");
+      return;
+    }
+    setAddingTask(true);
+    try {
+      await api.post(
+        `/tasks/`,
+        { title: newTitle.trim(), priority: newPriority, due_date: newDueDate || undefined },
+        token,
+      );
+      setNewTitle("");
+      setNewPriority("normal");
+      setNewDueDate("");
+      setShowAddForm(false);
+      await loadTasks();
+    } catch (e) {
+      setAddError(e instanceof Error ? e.message : "Nie udało się dodać zadania.");
+    } finally {
+      setAddingTask(false);
     }
   };
 
-  const statusPill = (statusRaw: string | undefined) => {
-    const v = (statusRaw ?? "").toString().toLowerCase();
-    if (v === "completed") return "bg-[rgba(34,197,94,.14)] text-[#86efac] border-[rgba(34,197,94,.35)]";
-    if (v === "cancelled") return "bg-[rgba(220,30,30,.14)] text-[#ffb4b4] border-[rgba(220,30,30,.35)]";
-    if (v === "waiting") return "bg-[rgba(245,158,11,.16)] text-[#ffd9a6] border-[rgba(245,158,11,.35)]";
-    if (v === "in_progress") return "bg-[rgba(59,130,246,.14)] text-[#bcd6ff] border-[rgba(59,130,246,.35)]";
-    return "bg-[rgba(255,255,255,.05)] text-[#9ca3af] border-[rgba(255,255,255,.12)]";
-  };
+  const scopeLabel =
+    scope === "all" ? "Wszystkie" : scope === "today" ? "Dziś" : scope === "urgent" ? "Pilne" : "Zakończone";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
-      <header className="mb-2">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">
-          {isAdmin ? "Panel Admina" : "Panel pracownika"} · Moduł
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Moje zlecenia</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Lista zadań w wybranym zakresie i dostępność zespołu na dziś.</p>
+    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+      <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel pracownika</p>
+          <h1 className="mt-2 text-2xl font-semibold text-white">Moje zadania</h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setShowAddForm((v) => !v);
+            setAddError(null);
+          }}
+          className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+        >
+          + Dodaj zadanie
+        </button>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-semibold text-white">{scopeLabel}</h2>
-                  <p className="mt-1 text-sm text-[#9ca3af]">
-                    {isAdmin ? "Widok zespołowy." : "Widok Twoich zadań."}
-                  </p>
-                </div>
+      <section className="mb-4 rounded-2xl border border-white/10 bg-[#0c0d12] p-3">
+        <div className="flex flex-wrap gap-2">
+          {([
+            ["all", "Wszystkie"],
+            ["today", "Dziś"],
+            ["urgent", "Pilne"],
+            ["done", "Zakończone"],
+          ] as Array<[TasksScope, string]>).map(([v, lbl]) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setScopeInUrl(v)}
+              className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${
+                scope === v
+                  ? "border-[#3b82f6]/45 bg-[#3b82f6]/15 text-white"
+                  : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              {lbl}
+            </button>
+          ))}
+        </div>
+      </section>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {(
-                    [
-                      ["today", "Dziś"],
-                      ["urgent", "Pilne"],
-                      ["overdue", "Zaległe"],
-                      ["completed", "Zakończone"],
-                    ] as Array<[TasksScope, string]>
-                  ).map(([val, label]) => {
-                    const { accent, glow } = scopeAccent(val);
-                    const on = scope === val;
-                    return (
-                      <button
-                        key={val}
-                        type="button"
-                        onClick={() => setScope(val)}
-                        className="rounded-xl border px-4 py-2 text-sm font-semibold transition"
-                        style={{
-                          color: on ? "#fff" : "#9ca3af",
-                          background: on ? `${accent}1F` : "transparent",
-                          borderColor: on ? `${accent}66` : "rgba(255,255,255,.10)",
-                          boxShadow: on ? `0 0 0 1px ${glow}` : "none",
-                        }}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+      {showAddForm ? (
+        <form
+          onSubmit={handleAddTask}
+          className="mb-4 animate-[slideDown_.25s_ease] rounded-2xl border border-white/10 bg-[#0c0d12] p-4"
+        >
+          <div className="grid gap-3 md:grid-cols-[1fr_180px_190px_auto]">
+            <input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Tytuł zadania..."
+              className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+            />
+            <select
+              value={newPriority}
+              onChange={(e) => setNewPriority(e.target.value as TaskPriorityValue)}
+              className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+            >
+              <option value="normal">Normalny</option>
+              <option value="high">Wysoki</option>
+              <option value="urgent">Pilny</option>
+              <option value="low">Niski</option>
+            </select>
+            <input
+              type="datetime-local"
+              value={newDueDate}
+              onChange={(e) => setNewDueDate(e.target.value)}
+              className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+            />
+            <button
+              type="submit"
+              disabled={addingTask}
+              className="rounded-xl bg-[#22c55e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#16a34a] disabled:opacity-60"
+            >
+              {addingTask ? "Dodaję..." : "Dodaj"}
+            </button>
+          </div>
+          {addError ? <p className="mt-2 text-sm text-[#fca5a5]">{addError}</p> : null}
+        </form>
+      ) : null}
 
-              <div className="flex items-center justify-between gap-3">
-                {tasksLoading ? <span className="text-sm text-[#9ca3af]">Ładowanie…</span> : null}
-                {!tasksLoading && !tasksError ? (
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">{tasks.length} pozycji</span>
-                ) : (
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]"> </span>
-                )}
-              </div>
+      {tasksError ? (
+        <ErrorState title="Nie udało się pobrać zadań" error={new Error(tasksError)} onRetry={() => void loadTasks()} />
+      ) : null}
+      {updateTaskError ? <p className="mb-3 text-sm text-[#fca5a5]">{updateTaskError}</p> : null}
 
-              {tasksError && <p className="text-sm text-[#fca5a5]">{tasksError}</p>}
-              {updateTaskError && <p className="text-sm text-[#fca5a5]">{updateTaskError}</p>}
-              {!tasksError && !tasksLoading && tasks.length === 0 && <p className="text-sm text-[#6b7280]">Brak zadań w tym widoku.</p>}
-
-              <div className="space-y-3">
-                {tasks.map((t) => {
-                  const due = t.due_date ? new Date(t.due_date).toLocaleString("pl-PL") : null;
-                  const pri = (t.priority as TaskPriorityValue) ?? "standard";
-
-                  return (
-                    <div key={t.id} className="rounded-2xl border border-white/10 bg-[#0b0c10] p-4">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="min-w-[240px]">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span
-                              className={`rounded-full border px-3 py-1 text-xs font-semibold ${priorityColor(
-                                t.priority,
-                              )}`}
-                            >
-                              {t.priority_display || PRIORITY_LABEL[pri] || "—"}
-                            </span>
-
-                            <span
-                              className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusPill(String(t.status))}`}
-                              title="Status"
-                            >
-                              {t.status_display || String(t.status)}
-                            </span>
-                          </div>
-
-                          <p className="mt-2 text-sm font-semibold text-white">{t.title}</p>
-
-                          <p className="mt-1 text-sm text-[#9ca3af]">
-                            Przypisane: {t.assigned_to_name ?? "—"}
-                            {t.created_by_name ? ` · Utworzył: ${t.created_by_name}` : ""}
-                          </p>
-
-                          {due ? (
-                            <p className="mt-1 text-sm text-[#9ca3af]">
-                              Termin: {due} {t.is_overdue ? "· (przeterminowane)" : ""}
-                            </p>
-                          ) : (
-                            <p className="mt-1 text-sm text-[#9ca3af]">Termin: —</p>
-                          )}
-                        </div>
-
-                        <div className="flex flex-col items-end gap-2">
-                          <div className="text-right">
-                            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Status</p>
-                            <select
-                              value={t.status}
-                              onChange={(e) => handleUpdateTaskStatus(t.id, e.target.value as TaskStatusValue)}
-                              disabled={updatingTaskId === t.id || tasksLoading}
-                              className="mt-1 rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white disabled:opacity-60 outline-none focus:border-[#dc1e1e]"
-                            >
-                              {STATUS_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                  {o.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
+      {!tasksError ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <section className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-white">Otwarte · {scopeLabel}</h2>
+              <span className="rounded-full border border-[#f59e0b]/35 bg-[#f59e0b]/15 px-2 py-0.5 text-xs font-semibold text-[#ffd9a6]">
+                {openTasks.length}
+              </span>
+            </div>
+            {tasksLoading ? (
+              <p className="text-sm text-[#9ca3af]">Ładowanie...</p>
+            ) : openTasks.length === 0 ? (
+              <EmptyState
+                icon={EMPTY_STATES.tasks.icon}
+                title={EMPTY_STATES.tasks.title}
+                description={EMPTY_STATES.tasks.description}
+              />
+            ) : (
+              <div className="space-y-2">
+                {openTasks.map((t) => (
+                  <label key={t.id} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#0f1117] p-3">
+                    <input
+                      type="checkbox"
+                      checked={false}
+                      disabled={updatingTaskId === t.id}
+                      onChange={(e) => void handleToggleDone(t, e.target.checked)}
+                      className="mt-1 h-4 w-4 accent-[#3b82f6]"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-white">{t.title}</span>
+                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}>
+                          {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-xs text-[#9ca3af]">
+                        {t.related_repair_number ? (
+                          <Link href={`/panel/naprawy/${t.related_repair ?? ""}`} className="text-[#3b82f6] hover:underline">
+                            {t.related_repair_number}
+                          </Link>
+                        ) : (
+                          "Bez powiązanej naprawy"
+                        )}
+                        {t.due_date ? ` · Termin: ${new Date(t.due_date).toLocaleString("pl-PL")}` : ""}
                       </div>
                     </div>
-                  );
-                })}
+                  </label>
+                ))}
               </div>
-            </div>
-          </div>
-        </section>
+            )}
+          </section>
 
-        <aside className="space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-white">Dostępność zespołu (dziś)</h2>
-              {availabilityLoading ? <span className="text-sm text-[#9ca3af]">Ładowanie…</span> : null}
+          <section className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-white">Zakończone dziś</h2>
+              <span className="rounded-full border border-[#22c55e]/35 bg-[#22c55e]/15 px-2 py-0.5 text-xs font-semibold text-[#bbf7d0]">
+                {doneToday.length}
+              </span>
             </div>
-            {availabilityError && <p className="mt-3 text-sm text-[#fca5a5]">{availabilityError}</p>}
-
-            {!availabilityError && teamToday?.entries?.length ? (
-              <div className="mt-4 space-y-3">
-                {teamToday.entries.map((e) => {
-                  const times = e.is_all_day ? "Cały dzień" : `${e.start_time ?? ""}-${e.end_time ?? ""}`.replace(/^-|-$/g, "");
-                  const lower = (e.availability_type_display ?? "").toLowerCase();
-                  const dotColor =
-                    lower.includes("dostęp") || lower.includes("available") || lower.includes("available")
-                      ? "#22c55e"
-                      : lower.includes("nieobec") || lower.includes("unavailable")
-                        ? "#dc1e1e"
-                        : "#3b82f6";
-                  return (
-                    <div key={e.id} className="rounded-2xl border border-white/10 bg-[#0b0c10] p-3">
-                      <div className="flex items-start gap-3">
-                        <span
-                          className="mt-[3px] h-2 w-2 rounded-full"
-                          style={{ background: dotColor, boxShadow: `0 0 20px ${dotColor}` }}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-white">{e.employee_name ?? "Pracownik"}</p>
-                          <p className="mt-1 text-sm text-[#9ca3af]">
-                            {e.availability_type_display} · {times}
-                          </p>
-                          {e.note ? <p className="mt-2 whitespace-pre-wrap text-sm text-[#e5e7eb]">{e.note}</p> : null}
-                        </div>
+            {tasksLoading ? (
+              <p className="text-sm text-[#9ca3af]">Ładowanie...</p>
+            ) : doneTasks.length === 0 ? (
+              <EmptyState
+                icon={EMPTY_STATES.tasks.icon}
+                title="Brak zakończonych zadań"
+                description="Zakończone zadania pojawią się tutaj."
+              />
+            ) : (
+              <div className="space-y-2">
+                {doneTasks.map((t) => (
+                  <label key={t.id} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#0f1117] p-3 opacity-85">
+                    <input
+                      type="checkbox"
+                      checked
+                      disabled={updatingTaskId === t.id}
+                      onChange={(e) => void handleToggleDone(t, e.target.checked)}
+                      className="mt-1 h-4 w-4 accent-[#22c55e]"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-[#9ca3af] line-through">{t.title}</span>
+                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}>
+                          {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-xs text-[#6b7280]">
+                        Ukończono: {t.completed_at ? new Date(t.completed_at).toLocaleString("pl-PL") : "—"}
                       </div>
                     </div>
-                  );
-                })}
+                  </label>
+                ))}
               </div>
-            ) : !availabilityError && !availabilityLoading ? (
-              <p className="mt-4 text-sm text-[#6b7280]">Brak wpisów dostępności na dziś.</p>
-            ) : null}
-          </div>
-        </aside>
-      </div>
+            )}
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

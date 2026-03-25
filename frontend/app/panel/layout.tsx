@@ -21,7 +21,20 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
       if (!isLoginPage) {
         router.replace("/panel/login");
       }
-    } else if (isLoginPage) {
+      return;
+    }
+
+    // Admin nie powinien korzystać z /panel/* — zawsze kieruj do /admin-panel/*
+    if (user.role === "admin") {
+      if (isLoginPage) {
+        router.replace("/admin-panel/dashboard");
+      } else if (pathname.startsWith("/panel")) {
+        router.replace("/admin-panel/dashboard");
+      }
+      return;
+    }
+
+    if (isLoginPage) {
       router.replace("/panel/dashboard");
     }
   }, [user, loading, router, isLoginPage, pathname]);

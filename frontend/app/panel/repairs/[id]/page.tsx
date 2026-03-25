@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
@@ -87,6 +87,10 @@ export default function RepairDetailPage() {
   const openStatusModal = useWorkerStore((s) => s.openStatusModal);
 
   const [activeTab, setActiveTab] = useState<TabId>("details");
+  const [showQuickMenu, setShowQuickMenu] = useState(false);
+  const [commChannel, setCommChannel] = useState<"sms" | "email">("sms");
+  const [commDraft, setCommDraft] = useState("");
+  const commTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const repairQuery = useQuery({
     queryKey: ["repair", repairId],
@@ -205,6 +209,35 @@ export default function RepairDetailPage() {
   const quoteDetail = quoteDetailQuery.data ?? null;
   const quoteVersions = quoteVersionsQuery.data ?? [];
   const clientRepairs = clientRepairsQuery.data ?? [];
+  const checklistDoneCount = useMemo(
+    () => checklistItems.filter((it) => Boolean(it.result && String(it.result).trim())).length,
+    [checklistItems],
+  );
+
+  useEffect(() => {
+    if (!repairId) return;
+    const key = `draft-${repairId}`;
+    const saved = localStorage.getItem(key);
+    if (saved) setCommDraft(saved);
+  }, [repairId]);
+
+  useEffect(() => {
+    if (!repairId) return;
+    const key = `draft-${repairId}`;
+    const t = window.setTimeout(() => {
+      if (commDraft.trim()) localStorage.setItem(key, commDraft);
+      else localStorage.removeItem(key);
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [repairId, commDraft]);
+
+  const smsMeta = useMemo(() => {
+    const len = commDraft.length;
+    const chunks = Math.max(1, Math.ceil(Math.max(0, len) / 160));
+    const cap = chunks * 160;
+    const tone = len >= 155 ? "red" : len >= 130 ? "amber" : "green";
+    return { len, chunks, cap, tone };
+  }, [commDraft]);
 
   if (repairQuery.isLoading) {
     return (
@@ -306,11 +339,36 @@ export default function RepairDetailPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("comms")}
+                  onClick={() => {
+                    setActiveTab("comms");
+                    setTimeout(() => commTextareaRef.current?.focus(), 80);
+                  }}
                   className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
                 >
                   Wiadomość
                 </button>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowQuickMenu((v) => !v)}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                  >
+                    ...
+                  </button>
+                  {showQuickMenu ? (
+                    <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-52 rounded-2xl border border-white/10 bg-[#0c0d12] p-2 shadow-xl">
+                      <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-sm text-[#d1d5db] hover:bg-white/5">
+                        Drukuj przyjęcie
+                      </button>
+                      <button type="button" className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm text-[#d1d5db] hover:bg-white/5">
+                        Duplikuj
+                      </button>
+                      <button type="button" className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm text-[#d1d5db] hover:bg-white/5">
+                        Otwórz reklamację
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
 
               <p className="mt-4 text-sm text-[#9ca3af]">
@@ -362,7 +420,12 @@ export default function RepairDetailPage() {
         <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">
           <div className="flex flex-wrap gap-3">
             <TabButton active={activeTab === "details"} onClick={() => setActiveTab("details")} icon={<Wrench size={16} />} label="Szczegóły" />
-            <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} icon={<ClipboardCheck size={16} />} label="Checklista" />
+            <TabButton
+              active={activeTab === "checklist"}
+              onClick={() => setActiveTab("checklist")}
+              icon={<ClipboardCheck size={16} />}
+              label={`Checklista (${checklistDoneCount}/${Math.max(checklistItems.length, 10)})`}
+            />
             <TabButton active={activeTab === "test"} onClick={() => setActiveTab("test")} icon={<PlayCircle size={16} />} label="Test końcowy" />
             <TabButton active={activeTab === "comms"} onClick={() => setActiveTab("comms")} icon={<MessageSquareText size={16} />} label="Komunikacja" />
             <TabButton active={activeTab === "pricing"} onClick={() => setActiveTab("pricing")} icon={<Receipt size={16} />} label="Wycena" />
@@ -626,6 +689,55 @@ export default function RepairDetailPage() {
             </div>
 
             <div className="mt-4 space-y-3">
+              <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
+                    Kompozycja wiadomości
+                  </div>
+                  <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setCommChannel("sms")}
+                      className={`rounded-lg px-3 py-1 font-semibold ${commChannel === "sms" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}
+                    >
+                      SMS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCommChannel("email")}
+                      className={`rounded-lg px-3 py-1 font-semibold ${commChannel === "email" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}
+                    >
+                      E-mail
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  ref={commTextareaRef}
+                  value={commDraft}
+                  onChange={(e) => setCommDraft(e.target.value)}
+                  className="mt-3 w-full resize-y rounded-2xl border border-white/10 bg-[#111318] px-4 py-3 text-sm text-white outline-none focus:border-[#3b82f6]"
+                  rows={4}
+                  placeholder="Napisz wiadomość do klienta…"
+                />
+                {commChannel === "sms" ? (
+                  <div
+                    className="mt-2 text-xs font-semibold"
+                    style={{
+                      color:
+                        smsMeta.tone === "red"
+                          ? "#f87171"
+                          : smsMeta.tone === "amber"
+                            ? "#fbbf24"
+                            : "#86efac",
+                    }}
+                  >
+                    {smsMeta.chunks === 1
+                      ? `${smsMeta.len} / 160 znaków`
+                      : `${smsMeta.chunks} SMS (${smsMeta.len} / ${smsMeta.cap})`}
+                  </div>
+                ) : null}
+              </div>
+
               {commTimeline.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-4 py-5 text-sm text-[#9ca3af]">
                   Brak wiadomości do wyświetlenia.
@@ -770,7 +882,7 @@ export default function RepairDetailPage() {
                   .map((r: any) => (
                     <Link
                       key={r.id}
-                      href={`/panel/repairs/${r.id}`}
+                      href={`/panel/naprawy/${r.id}`}
                       className="rounded-3xl border border-white/10 bg-[#0f1117] px-4 py-3 transition hover:border-white/20 hover:bg-[#0c0d12]"
                     >
                       <div className="flex items-start justify-between gap-3">
