@@ -304,7 +304,7 @@ export default function TeamAdminPage() {
     if (!next) {
       const ok = await confirm({
         title: "Zablokować konto?",
-        description: "Pracownik straci dostęp do systemu. Operację można cofnąć, klikając „Aktywuj".",
+        description: 'Pracownik straci dostęp do systemu. Operację można cofnąć, klikając "Aktywuj".',
         confirmLabel: "Tak, zablokuj",
         variant: "danger",
       });

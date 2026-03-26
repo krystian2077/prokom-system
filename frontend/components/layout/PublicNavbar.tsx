@@ -20,6 +20,7 @@ const navItems = [
   { href: "/oferta", label: "Oferta" },
   { href: "/hammer-glass", label: "Hammer Glass" },
   { href: "/akcesoria", label: "Akcesoria" },
+  { href: "/blog", label: "Blog" },
   { href: "/kontakt", label: "Kontakt" },
 ];
 

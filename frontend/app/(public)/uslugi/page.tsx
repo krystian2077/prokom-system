@@ -1,19 +1,36 @@
 import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { UslugiContent } from "./UslugiContent";
+import { BlogTeaser } from "@/components/blog/BlogTeaser";
 
 const unbounded = Unbounded({ weight: ["700", "900"], subsets: ["latin"], variable: "--font-unbounded" });
 const jakarta = Plus_Jakarta_Sans({ weight: ["400", "500", "600", "700"], subsets: ["latin"], variable: "--font-plus-jakarta" });
 
 export const metadata = {
-  title: "Usługi napraw | Serwis elektroniki | PRO-KOM",
+  title: "Serwis telefonów i elektroniki — Usługi napraw | PRO-KOM Rabka-Zdrój",
   description:
-    "Usługi serwisowe — naprawa telefonów, laptopów, tabletów, drukarek i konsol. Wymiana wyświetlaczy, baterii, diagnostyka. Diagnoza tego samego dnia, gwarancja.",
+    "Naprawa telefonów, laptopów, tabletów i smartwatchy w Rabce-Zdroju. Wymiana ekranu, baterii, gniazda ładowania, diagnostyka. Bezpłatna wycena. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa i okolic.",
+  alternates: {
+    canonical: "https://pro-kom.eu/uslugi",
+  },
+  openGraph: {
+    title: "Serwis telefonów i elektroniki | PRO-KOM Rabka-Zdrój",
+    description:
+      "Naprawa telefonów, laptopów, tabletów w Rabce-Zdroju. Bezpłatna diagnoza, szybka realizacja.",
+    url: "https://pro-kom.eu/uslugi",
+  },
 };
 
 export default function UslugiPage() {
   return (
     <div className={`${unbounded.variable} ${jakarta.variable}`}>
       <UslugiContent />
+      <div className="border-t border-gray-100">
+        <BlogTeaser
+          category="Naprawa telefonów"
+          limit={3}
+          heading="Poradniki serwisowe"
+        />
+      </div>
     </div>
   );
 }

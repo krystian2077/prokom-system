@@ -20,6 +20,8 @@ const shop = [
 const info = [
   { href: "/o-nas", label: "O nas" },
   { href: "/faq", label: "FAQ" },
+  { href: "/blog", label: "Blog" },
+  { href: "/obslugiwane-miejscowosci", label: "Obsługiwane miejscowości" },
   { href: "/kontakt", label: "Kontakt" },
   { href: "/polityka-prywatnosci", label: "Polityka prywatności" },
   { href: "/regulamin", label: "Regulamin" },
