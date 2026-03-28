@@ -22,6 +22,15 @@ export type InventorySupplier = {
   is_active?: boolean;
 };
 
+import type { PartUsage } from "./repairs";
+
+/** GET /api/v1/inventory/parts-dashboard-summary/ */
+export type PartsDashboardSummary = {
+  to_order: { count: number; items: PartUsage[] };
+  in_transit: { count: number; items: PartUsage[] };
+  arrived: { count: number; items: PartUsage[] };
+};
+
 /** GET /api/v1/inventory/parts-queue/ — pozycja kolejki części w naprawach */
 export type PartUsageQueueItem = {
   id: string;
@@ -29,7 +38,8 @@ export type PartUsageQueueItem = {
   repair_number?: string | null;
   repair_device_name?: string | null;
   assigned_to_name?: string | null;
-  part: { id: string; name: string; code?: string | null };
+  part: { id: string; name: string; code?: string | null } | null;
+  custom_part_name?: string | null;
   supplier_detail?: InventorySupplier | null;
   usage_status: string;
   usage_status_display?: string | null;

@@ -17,6 +17,7 @@ class RepairNoteSerializer(serializers.ModelSerializer):
             "is_important",
             "note_type",
             "pinned",
+            "thread_origin",
             "created_at",
         ]
         read_only_fields = ["id", "author", "created_at"]

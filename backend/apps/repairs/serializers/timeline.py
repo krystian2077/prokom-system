@@ -10,7 +10,7 @@ class RepairMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RepairNote
-        fields = ["id", "note", "is_important", "author_name", "created_at"]
+        fields = ["id", "note", "is_important", "author_name", "thread_origin", "created_at"]
 
     def get_author_name(self, obj):
         return obj.author.get_full_name() if obj.author else None

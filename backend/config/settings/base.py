@@ -148,6 +148,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =============================================================================
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
 
+# Webhook skrzynki przychodzącej (e-mail → wątek naprawy); pusty = endpoint zwraca 503
+EMAIL_INBOUND_WEBHOOK_SECRET = env("EMAIL_INBOUND_WEBHOOK_SECRET", default="")
+
+# Polling IMAP (np. Gmail) — hasło aplikacji; puste = komenda poll_inbound_imap kończy się komunikatem
+INBOUND_IMAP_HOST = env("INBOUND_IMAP_HOST", default="imap.gmail.com")
+INBOUND_IMAP_USER = env("INBOUND_IMAP_USER", default="")
+INBOUND_IMAP_PASSWORD = env("INBOUND_IMAP_PASSWORD", default="")
+INBOUND_IMAP_MAILBOX = env("INBOUND_IMAP_MAILBOX", default="INBOX")
+
 # =============================================================================
 # DJANGO REST FRAMEWORK
 # =============================================================================

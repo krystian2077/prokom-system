@@ -6,7 +6,7 @@ from .purchase_order import (
     PurchaseOrderListSerializer,
     PurchaseOrderItemSerializer,
 )
-from .part_usage import PartUsageSerializer, PartUsageCreateSerializer
+from .part_usage import PartUsageSerializer, PartUsageCreateSerializer, PartUsageUpdateSerializer
 
 __all__ = [
     "SupplierSerializer",
@@ -19,4 +19,5 @@ __all__ = [
     "PurchaseOrderItemSerializer",
     "PartUsageSerializer",
     "PartUsageCreateSerializer",
+    "PartUsageUpdateSerializer",
 ]

@@ -11,6 +11,7 @@ from apps.common.enums import RepairStatus
 from apps.repairs.models import (
     RepairRequest,
     RepairNote,
+    RepairNoteThreadOrigin,
     RepairImage,
     ChecklistRun,
     ChecklistRunItem,
@@ -39,9 +40,10 @@ from apps.repairs.serializers.quick_actions import (
     QuoteRespondSerializer,
     QuickAcceptSerializer,
     MarkPackageReceivedSerializer,
+    ClientRepairMessageCreateSerializer,
+    SendClientEmailSerializer,
 )
 from apps.repairs.serializers.satisfaction_survey import SatisfactionSurveySubmitSerializer
-from apps.repairs.serializers.timeline import RepairMessageSerializer
 from apps.repairs.serializers.repair_request import RepairRequestStatusSerializer
 from apps.repairs.selectors import (
     repair_list,
@@ -60,6 +62,14 @@ from apps.repairs.services import (
 )
 from apps.repairs.services.repair_creation import quick_accept_repair
 from apps.repairs.services.assignment_suggest import suggest_assignment
+from apps.repairs.services.messaging import (
+    merge_repair_thread_items,
+    apply_client_message_timestamps,
+    apply_staff_public_reply_timestamps,
+)
+from apps.communications.services.send import send_freeform_email_to_repair_client
+from apps.communications.serializers.log import CommunicationLogSerializer
+from apps.accounts.services.notification_service import notify_client_message
 from datetime import timedelta
 from django.utils import timezone
 
@@ -438,7 +448,10 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             is_important=ser.validated_data.get("is_important", False),
             note_type=ser.validated_data.get("note_type", RepairNote.NOTE_TYPE_INTERNAL),
             pinned=ser.validated_data.get("pinned", False),
+            thread_origin=RepairNoteThreadOrigin.STAFF,
         )
+        if not note.is_internal:
+            apply_staff_public_reply_timestamps(repair)
         from apps.accounts.services.notification_service import notify_note_added
 
         notify_note_added(
@@ -604,21 +617,99 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         )
 
     # ---------- Etap 5: Panel klienta — wiadomości ----------
-    @action(detail=True, url_path="messages")
+    @action(detail=True, methods=["get", "post"], url_path="messages")
     def messages(self, request, pk=None):
         """
-        GET /api/v1/repairs/<id>/messages/
-        Lista wiadomości (publicznych notatek) do klienta. Klient widzi tylko publiczne.
+        GET /api/v1/repairs/<id>/messages/ — scalony wątek (notatki publiczne + logi e-mail).
+        Query: thread_origin (opcjonalnie filtruje tylko notatki, np. client).
+        POST — tylko klient: treść wiadomości w panelu.
         """
         repair = self.get_object()
-        if getattr(request.user, "role", None) == "client":
-            client_profile = get_client_for_user(request.user)
-            if client_profile is None or repair.client_id != client_profile.id:
+        role = getattr(request.user, "role", None)
+
+        if request.method == "GET":
+            if role == "client":
+                client_profile = get_client_for_user(request.user)
+                if client_profile is None or repair.client_id != client_profile.id:
+                    raise PermissionDenied("Brak dostępu.")
+                items = merge_repair_thread_items(
+                    repair,
+                    for_client=True,
+                    thread_origin=request.query_params.get("thread_origin") or None,
+                )
+            elif role in ("staff", "admin"):
+                items = merge_repair_thread_items(
+                    repair,
+                    for_client=False,
+                    thread_origin=request.query_params.get("thread_origin") or None,
+                )
+            else:
                 raise PermissionDenied("Brak dostępu.")
-            qs = repair.notes.filter(is_internal=False).order_by("-created_at")
-        else:
-            qs = repair.notes.all().order_by("-created_at")
-        return Response(RepairMessageSerializer(qs, many=True).data)
+            return Response(items)
+
+        if role != "client":
+            raise PermissionDenied("Tylko klient może wysłać wiadomość tym endpointem.")
+        client_profile = get_client_for_user(request.user)
+        if client_profile is None or repair.client_id != client_profile.id:
+            raise PermissionDenied("Brak dostępu.")
+        ser = ClientRepairMessageCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        note = RepairNote.objects.create(
+            repair=repair,
+            author=request.user,
+            note=ser.validated_data["note"],
+            is_internal=False,
+            is_important=False,
+            note_type=RepairNote.NOTE_TYPE_CLIENT_CONTACT,
+            pinned=False,
+            thread_origin=RepairNoteThreadOrigin.CLIENT,
+        )
+        apply_client_message_timestamps(repair)
+        notify_client_message(repair)
+        return Response(
+            {
+                "kind": "note",
+                "id": note.id,
+                "note": note.note,
+                "thread_origin": note.thread_origin,
+                "is_important": note.is_important,
+                "note_type": note.note_type,
+                "author_name": request.user.get_full_name(),
+                "created_at": note.created_at,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="send-client-email",
+        permission_classes=[IsStaffOrAdmin],
+    )
+    def send_client_email(self, request, pk=None):
+        """
+        POST /api/v1/repairs/<id>/send-client-email/
+        Body: { "subject": "...", "body": "..." } — dowolny e-mail do klienta + wpis w CommunicationLog.
+        """
+        repair = self.get_object()
+        ser = SendClientEmailSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        log, success = send_freeform_email_to_repair_client(
+            repair,
+            ser.validated_data["subject"],
+            ser.validated_data["body"],
+            sent_by=request.user,
+            fail_silently=False,
+        )
+        if success:
+            apply_staff_public_reply_timestamps(repair)
+        return Response(
+            {
+                "log": CommunicationLogSerializer(log).data,
+                "success": success,
+            },
+            status=status.HTTP_201_CREATED if success else status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=["post"], url_path="set-inbound-tracking")
     def set_inbound_tracking(self, request, pk=None):
@@ -675,16 +766,28 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         })
 
     # ---------- Etap 6: Części w naprawie (part usages) ----------
-    @action(detail=True, url_path="parts", permission_classes=[IsStaffOrAdmin])
+    @action(
+        detail=True,
+        url_path="parts",
+        methods=["get", "post"],
+        permission_classes=[IsStaffOrAdmin],
+    )
     def part_usages(self, request, pk=None):
         """
         GET /api/v1/repairs/<id>/parts/ — lista użytych części.
-        POST /api/v1/repairs/<id>/parts/ — dodaj część do naprawy (body: part, quantity, unit_price_used, notes).
+        POST /api/v1/repairs/<id>/parts/ — dodaj część do naprawy
+        (body: albo part z katalogu, albo custom_part_name — wyłącznie jedno; + quantity, unit_price_used, …).
         """
         repair = self.get_object()
         if request.method == "GET":
             from apps.inventory.serializers import PartUsageSerializer
-            qs = repair.part_usages.select_related("part", "supplier").order_by("-created_at")
+            qs = repair.part_usages.select_related(
+                "part",
+                "supplier",
+                "repair__assigned_to",
+                "repair__device",
+                "repair__device__brand",
+            ).order_by("-created_at")
             return Response(PartUsageSerializer(qs, many=True).data)
         from apps.inventory.models import PartUsage
         from apps.inventory.serializers import PartUsageCreateSerializer
@@ -696,8 +799,60 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             **ser.validated_data,
         )
         from apps.inventory.serializers import PartUsageSerializer
-        qs = repair.part_usages.select_related("part", "supplier").order_by("-created_at")
+        qs = repair.part_usages.select_related(
+            "part",
+            "supplier",
+            "repair__assigned_to",
+            "repair__device",
+            "repair__device__brand",
+        ).order_by("-created_at")
         return Response(PartUsageSerializer(qs, many=True).data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        url_path=r"parts/(?P<usage_id>[0-9a-fA-F-]+)",
+        methods=["patch"],
+        permission_classes=[IsStaffOrAdmin],
+    )
+    def part_usage_update(self, request, pk=None, usage_id=None):
+        """
+        PATCH /api/v1/repairs/<id>/parts/<usage_id>/
+        Aktualizacja statusu zamówienia / użycia części w naprawie.
+        """
+        from apps.inventory.models import PartUsage
+        from apps.inventory.serializers import PartUsageSerializer, PartUsageUpdateSerializer
+
+        repair = self.get_object()
+        usage = (
+            PartUsage.objects.filter(id=usage_id, repair_id=repair.id)
+            .select_related(
+                "part",
+                "supplier",
+                "repair",
+                "repair__assigned_to",
+                "repair__device",
+                "repair__device__brand",
+            )
+            .first()
+        )
+        if not usage:
+            raise NotFound("Nie znaleziono pozycji części.")
+        ser = PartUsageUpdateSerializer(usage, data=request.data, partial=True, context={"request": request})
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        usage = (
+            PartUsage.objects.filter(id=usage_id, repair_id=repair.id)
+            .select_related(
+                "part",
+                "supplier",
+                "repair",
+                "repair__assigned_to",
+                "repair__device",
+                "repair__device__brand",
+            )
+            .first()
+        )
+        return Response(PartUsageSerializer(usage).data)
 
     # ---------- Etap 6: Podsumowanie kosztów i zysk ----------
     @action(detail=True, url_path="cost-summary", permission_classes=[IsStaffOrAdmin])
@@ -711,7 +866,8 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         parts_cost = Decimal("0")
         parts_revenue = Decimal("0")
         for u in repair.part_usages.select_related("part"):
-            cost_per_unit = u.purchase_cost if u.purchase_cost is not None else (u.part.purchase_price or 0)
+            default_cost = (u.part.purchase_price or 0) if u.part_id else 0
+            cost_per_unit = u.purchase_cost if u.purchase_cost is not None else default_cost
             parts_cost += u.quantity * cost_per_unit
             parts_revenue += u.quantity * u.unit_price_used
         revenue = repair.final_cost or repair.estimated_cost or Decimal("0")
@@ -735,22 +891,33 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
     def requires_action(self, request):
         """
         GET /api/v1/repairs/special-views/requires-action/
-        Co dziś wymaga reakcji: do wyceny, do kontaktu, do zamówienia, szybkie przyjęcia do uzupełnienia, gotowe do odbioru, zaległe.
-        Query: assigned_to (uuid), date (optional).
+        Aktywne naprawy (niezakończone) przypisane do pracownika — ta sama idea co „Moje naprawy”.
+        Wcześniejszy wąski filtr (tylko wycena/kontakt/gotowe) powodował pustą sekcję „Co teraz robić?”
+        przy zwykłych statusach (np. new, accepted, in_diagnostics).
+        Sortowanie: zaległe SLA, potem pilne, potem ostatnia aktualizacja.
+        Query: assigned_to (uuid, opcjonalnie dla admina — bez filtra cała aktywna pula w limicie).
         """
-        from django.db.models import Q
+        from django.db.models import Case, IntegerField, Value, When
+
         user_id = request.query_params.get("assigned_to")
-        qs = repair_list(assigned_to_id=user_id)
-        statuses_action = [
-            RepairStatus.QUOTE_PENDING,
-            RepairStatus.QUOTE_SENT,
-            RepairStatus.QUOTE_ACCEPTED,
-            RepairStatus.READY_FOR_PICKUP,
+        terminal = [
+            RepairStatus.PICKED_UP,
+            RepairStatus.SHIPPED,
+            RepairStatus.DELIVERED,
+            RepairStatus.CANCELLED,
+            RepairStatus.UNREPAIRABLE,
+            RepairStatus.ABANDONED,
         ]
         overdue_ids = list(repairs_overdue().values_list("id", flat=True))
-        qs = qs.filter(
-            Q(status__in=statuses_action) | Q(is_incomplete=True) | Q(id__in=overdue_ids)
-        ).distinct().order_by("-created_at")[:100]
+        qs = repair_list(assigned_to_id=user_id).exclude(status__in=terminal)
+        qs = qs.annotate(
+            _prio=Case(
+                When(id__in=overdue_ids, then=Value(0)),
+                When(is_urgent=True, then=Value(1)),
+                default=Value(2),
+                output_field=IntegerField(),
+            )
+        ).order_by("_prio", "-updated_at")[:100]
         return Response(RepairRequestListSerializer(qs, many=True).data)
 
     @action(detail=False, url_path="special-views/unclaimed-devices", permission_classes=[IsStaffOrAdmin])

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronRight, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
 import { api } from "@/lib/api";
@@ -25,6 +26,23 @@ type TaskItem = {
   completed_at?: string | null;
   related_repair?: string | null;
   related_repair_number?: string | null;
+};
+
+type TaskCommentItem = {
+  id: string;
+  body: string;
+  author_name?: string | null;
+  created_at: string;
+};
+
+type TaskDetail = TaskItem & {
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+  assigned_to_name?: string | null;
+  created_by_name?: string | null;
+  is_overdue?: boolean;
+  comments?: TaskCommentItem[];
 };
 
 const PRIORITY_LABEL: Record<string, string> = {
@@ -70,12 +88,13 @@ function priorityPillClass(priorityRaw: string | undefined): string {
 }
 
 export default function TasksPage() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const showToast = useWorkerStore((s) => s.addToast);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const scope = (searchParams.get("scope") as TasksScope) || "all";
+  const relatedRepairFilter = searchParams.get("related_repair");
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [tasksLoading, setTasksLoading] = useState(false);
   const [tasksError, setTasksError] = useState<string | null>(null);
@@ -85,9 +104,48 @@ export default function TasksPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [addingTask, setAddingTask] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newPriority, setNewPriority] = useState<TaskPriorityValue>("normal");
+  const [newPriority, setNewPriority] = useState<TaskPriorityValue>("standard");
   const [newDueDate, setNewDueDate] = useState("");
   const [addError, setAddError] = useState<string | null>(null);
+
+  const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
+  const [detailTask, setDetailTask] = useState<TaskDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+
+  const closeDetail = useCallback(() => {
+    setDetailTaskId(null);
+    setDetailTask(null);
+    setDetailError(null);
+  }, []);
+
+  const openDetail = useCallback(
+    async (id: string) => {
+      if (!token) return;
+      setDetailTaskId(id);
+      setDetailTask(null);
+      setDetailLoading(true);
+      setDetailError(null);
+      try {
+        const d = await api.get<TaskDetail>(`/tasks/${id}/`, token);
+        setDetailTask(d);
+      } catch (e) {
+        setDetailError(e instanceof Error ? e.message : "Nie udało się wczytać zadania.");
+      } finally {
+        setDetailLoading(false);
+      }
+    },
+    [token],
+  );
+
+  useEffect(() => {
+    if (!detailTaskId) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") closeDetail();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [detailTaskId, closeDetail]);
 
   const setScopeInUrl = (next: TasksScope) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -97,13 +155,14 @@ export default function TasksPage() {
   };
 
   const loadTasks = async () => {
-    if (!token) return;
+    if (!token || !user?.id) return;
     setTasksLoading(true);
     setTasksError(null);
     try {
       const params = new URLSearchParams();
-      params.set("assigned_to", "me");
-      if (scope === "done") params.set("status", "done");
+      params.set("assigned_to", user.id);
+      if (relatedRepairFilter) params.set("related_repair", relatedRepairFilter);
+      if (scope === "done") params.set("status", "completed");
       if (scope === "urgent") params.set("priority", "urgent");
       const res = await api.get<any>(`/tasks/?${params.toString()}`, token);
       const list = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
@@ -116,10 +175,10 @@ export default function TasksPage() {
   };
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !user?.id) return;
     void loadTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, scope]);
+  }, [token, user?.id, scope, relatedRepairFilter]);
 
   const visibleTasks = useMemo(() => {
     if (scope === "all") return tasks;
@@ -147,7 +206,8 @@ export default function TasksPage() {
     setUpdateTaskError(null);
     setUpdatingTaskId(task.id);
     const prev = tasks;
-    const nextStatus = checked ? "done" : "in_progress";
+    const nextStatus = checked ? "completed" : "in_progress";
+    const completedAtIso = checked ? new Date().toISOString() : null;
     setTasks((curr) =>
       curr.map((t) =>
         t.id === task.id
@@ -155,16 +215,27 @@ export default function TasksPage() {
               ...t,
               status: nextStatus,
               status_display: checked ? "Wykonane" : "W trakcie",
-              completed_at: checked ? new Date().toISOString() : null,
+              completed_at: completedAtIso,
             }
           : t,
       ),
+    );
+    setDetailTask((d) =>
+      d && d.id === task.id
+        ? {
+            ...d,
+            status: nextStatus,
+            status_display: checked ? "Wykonane" : "W trakcie",
+            completed_at: completedAtIso,
+          }
+        : d,
     );
     try {
       await api.patch(`/tasks/${task.id}/`, { status: nextStatus }, token);
       showToast(checked ? "Zadanie oznaczone jako wykonane." : "Zadanie przywrócone do toku.", "success");
     } catch (e) {
       setTasks(prev);
+      if (detailTaskId === task.id) void openDetail(task.id);
       const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować zadania.";
       setUpdateTaskError(msg);
       showToast(msg, "error");
@@ -175,7 +246,7 @@ export default function TasksPage() {
 
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
+    if (!token || !user?.id) return;
     setAddError(null);
     if (!newTitle.trim()) {
       setAddError("Podaj tytuł zadania.");
@@ -185,11 +256,16 @@ export default function TasksPage() {
     try {
       await api.post(
         `/tasks/`,
-        { title: newTitle.trim(), priority: newPriority, due_date: newDueDate || undefined },
+        {
+          title: newTitle.trim(),
+          priority: newPriority,
+          due_date: newDueDate || undefined,
+          assigned_to: user.id,
+        },
         token,
       );
       setNewTitle("");
-      setNewPriority("normal");
+      setNewPriority("standard");
       setNewDueDate("");
       setShowAddForm(false);
       await loadTasks();
@@ -209,6 +285,22 @@ export default function TasksPage() {
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel pracownika</p>
           <h1 className="mt-2 text-2xl font-semibold text-white">Moje zadania</h1>
+          {relatedRepairFilter ? (
+            <p className="mt-2 text-sm text-[#93c5fd]">
+              Widok ograniczony do zadań powiązanych z wybraną naprawą.{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  const p = new URLSearchParams(searchParams.toString());
+                  p.delete("related_repair");
+                  router.push(`/panel/zadania?${p.toString()}`);
+                }}
+                className="font-semibold text-white underline decoration-[#3b82f6] underline-offset-2 hover:text-[#bfdbfe]"
+              >
+                Pokaż wszystkie
+              </button>
+            </p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -263,8 +355,8 @@ export default function TasksPage() {
               onChange={(e) => setNewPriority(e.target.value as TaskPriorityValue)}
               className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
             >
-              <option value="normal">Normalny</option>
-              <option value="high">Wysoki</option>
+              <option value="standard">Normalny</option>
+              <option value="important">Wysoki</option>
               <option value="urgent">Pilny</option>
               <option value="low">Niski</option>
             </select>
@@ -311,33 +403,57 @@ export default function TasksPage() {
             ) : (
               <div className="space-y-2">
                 {openTasks.map((t) => (
-                  <label key={t.id} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#0f1117] p-3">
-                    <input
-                      type="checkbox"
-                      checked={false}
-                      disabled={updatingTaskId === t.id}
-                      onChange={(e) => void handleToggleDone(t, e.target.checked)}
-                      className="mt-1 h-4 w-4 accent-[#3b82f6]"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold text-white">{t.title}</span>
-                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}>
-                          {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
-                        </span>
-                      </div>
-                      <div className="mt-1 text-xs text-[#9ca3af]">
-                        {t.related_repair_number ? (
-                          <Link href={`/panel/naprawy/${t.related_repair ?? ""}`} className="text-[#3b82f6] hover:underline">
-                            {t.related_repair_number}
-                          </Link>
-                        ) : (
-                          "Bez powiązanej naprawy"
-                        )}
-                        {t.due_date ? ` · Termin: ${new Date(t.due_date).toLocaleString("pl-PL")}` : ""}
+                  <div
+                    key={t.id}
+                    className="flex flex-wrap items-stretch gap-2 rounded-xl border border-white/10 bg-[#0f1117] p-2 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
+                  >
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => void openDetail(t.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          void openDetail(t.id);
+                        }
+                      }}
+                      className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-lg px-1 py-1 text-left outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                    >
+                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[#6b7280]" aria-hidden />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-semibold text-white">{t.title}</span>
+                          <span
+                            className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}
+                          >
+                            {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-xs text-[#9ca3af]">
+                          {t.related_repair_number ? (
+                            <Link
+                              href={`/panel/naprawy/${t.related_repair ?? ""}`}
+                              className="text-[#3b82f6] hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {t.related_repair_number}
+                            </Link>
+                          ) : (
+                            "Bez powiązanej naprawy"
+                          )}
+                          {t.due_date ? ` · Termin: ${new Date(t.due_date).toLocaleString("pl-PL")}` : ""}
+                        </div>
                       </div>
                     </div>
-                  </label>
+                    <button
+                      type="button"
+                      disabled={updatingTaskId === t.id}
+                      onClick={() => void handleToggleDone(t, true)}
+                      className="shrink-0 rounded-xl bg-[#22c55e] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#16a34a] disabled:opacity-60 sm:self-center"
+                    >
+                      {updatingTaskId === t.id ? "…" : "Zakończ"}
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -361,30 +477,190 @@ export default function TasksPage() {
             ) : (
               <div className="space-y-2">
                 {doneTasks.map((t) => (
-                  <label key={t.id} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#0f1117] p-3 opacity-85">
-                    <input
-                      type="checkbox"
-                      checked
-                      disabled={updatingTaskId === t.id}
-                      onChange={(e) => void handleToggleDone(t, e.target.checked)}
-                      className="mt-1 h-4 w-4 accent-[#22c55e]"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold text-[#9ca3af] line-through">{t.title}</span>
-                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}>
-                          {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
-                        </span>
-                      </div>
-                      <div className="mt-1 text-xs text-[#6b7280]">
-                        Ukończono: {t.completed_at ? new Date(t.completed_at).toLocaleString("pl-PL") : "—"}
+                  <div
+                    key={t.id}
+                    className="flex flex-wrap items-stretch gap-2 rounded-xl border border-white/10 bg-[#0f1117] p-2 opacity-90 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
+                  >
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => void openDetail(t.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          void openDetail(t.id);
+                        }
+                      }}
+                      className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-lg px-1 py-1 text-left outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                    >
+                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[#6b7280]" aria-hidden />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-semibold text-[#9ca3af] line-through">{t.title}</span>
+                          <span
+                            className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}
+                          >
+                            {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-xs text-[#6b7280]">
+                          Ukończono: {t.completed_at ? new Date(t.completed_at).toLocaleString("pl-PL") : "—"}
+                        </div>
                       </div>
                     </div>
-                  </label>
+                    <button
+                      type="button"
+                      disabled={updatingTaskId === t.id}
+                      onClick={() => void handleToggleDone(t, false)}
+                      className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-semibold text-[#e5e7eb] transition hover:bg-white/10 disabled:opacity-60 sm:self-center"
+                    >
+                      {updatingTaskId === t.id ? "…" : "Przywróć"}
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
           </section>
+        </div>
+      ) : null}
+
+      {detailTaskId ? (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/65 px-4 py-8 backdrop-blur-[2px]"
+          role="presentation"
+          onClick={closeDetail}
+        >
+          <div
+            role="dialog"
+            aria-modal
+            aria-labelledby="task-detail-title"
+            className="max-h-[min(90vh,720px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-[#0f1117] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-white/10 bg-[#0f1117]/95 px-5 py-4 backdrop-blur">
+              <h2 id="task-detail-title" className="pr-8 text-lg font-semibold text-white">
+                {detailLoading ? "Ładowanie…" : detailTask?.title ?? "Zadanie"}
+              </h2>
+              <button
+                type="button"
+                onClick={closeDetail}
+                className="rounded-xl p-2 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                aria-label="Zamknij"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-4 px-5 py-4">
+              {detailError ? (
+                <p className="text-sm text-[#fca5a5]">{detailError}</p>
+              ) : detailLoading ? (
+                <TaskListSkeleton rows={4} />
+              ) : detailTask ? (
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${priorityPillClass(detailTask.priority)}`}
+                    >
+                      {detailTask.priority_display ||
+                        PRIORITY_LABEL[(detailTask.priority ?? "normal").toLowerCase()] ||
+                        "Priorytet"}
+                    </span>
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                      {detailTask.status_display ?? detailTask.status}
+                    </span>
+                    {detailTask.is_overdue ? (
+                      <span className="rounded-full border border-[#dc1e1e]/40 bg-[#dc1e1e]/15 px-2.5 py-1 text-[11px] font-semibold text-[#ffb4b4]">
+                        Po terminie
+                      </span>
+                    ) : null}
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Opis</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-[#d1d5db]">
+                      {(detailTask.description ?? "").trim() || "Brak opisu."}
+                    </p>
+                  </div>
+                  <dl className="grid gap-2 text-sm">
+                    <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
+                      <dt className="text-[#9ca3af]">Przypisane do</dt>
+                      <dd className="text-right font-medium text-white">{detailTask.assigned_to_name ?? "—"}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
+                      <dt className="text-[#9ca3af]">Utworzył</dt>
+                      <dd className="text-right font-medium text-white">{detailTask.created_by_name ?? "—"}</dd>
+                    </div>
+                    {detailTask.due_date ? (
+                      <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
+                        <dt className="text-[#9ca3af]">Termin</dt>
+                        <dd className="text-right font-medium text-white">
+                          {new Date(detailTask.due_date).toLocaleString("pl-PL")}
+                        </dd>
+                      </div>
+                    ) : null}
+                    {detailTask.completed_at ? (
+                      <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
+                        <dt className="text-[#9ca3af]">Ukończono</dt>
+                        <dd className="text-right font-medium text-white">
+                          {new Date(detailTask.completed_at).toLocaleString("pl-PL")}
+                        </dd>
+                      </div>
+                    ) : null}
+                    {detailTask.related_repair ? (
+                      <div className="flex justify-between gap-4 py-1.5">
+                        <dt className="text-[#9ca3af]">Naprawa</dt>
+                        <dd className="text-right">
+                          <Link
+                            href={`/panel/naprawy/${detailTask.related_repair}`}
+                            className="font-semibold text-[#3b82f6] hover:underline"
+                            onClick={closeDetail}
+                          >
+                            Otwórz zgłoszenie
+                          </Link>
+                        </dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                  {detailTask.comments && detailTask.comments.length > 0 ? (
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Komentarze</p>
+                      <ul className="mt-2 space-y-2">
+                        {detailTask.comments.map((c) => (
+                          <li key={c.id} className="rounded-xl border border-white/10 bg-[#0c0d12] px-3 py-2 text-sm">
+                            <div className="flex justify-between gap-2 text-[11px] text-[#6b7280]">
+                              <span>{c.author_name ?? "—"}</span>
+                              <span>{new Date(c.created_at).toLocaleString("pl-PL")}</span>
+                            </div>
+                            <p className="mt-1 whitespace-pre-wrap text-[#d1d5db]">{c.body}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-4">
+                    {!statusIsDone(detailTask.status) ? (
+                      <button
+                        type="button"
+                        disabled={updatingTaskId === detailTask.id}
+                        onClick={() => void handleToggleDone(detailTask, true)}
+                        className="rounded-xl bg-[#22c55e] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#16a34a] disabled:opacity-60"
+                      >
+                        {updatingTaskId === detailTask.id ? "Zapisywanie…" : "Zakończ"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={updatingTaskId === detailTask.id}
+                        onClick={() => void handleToggleDone(detailTask, false)}
+                        className="rounded-xl border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+                      >
+                        {updatingTaskId === detailTask.id ? "Zapisywanie…" : "Przywróć do toku"}
+                      </button>
+                    )}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
         </div>
       ) : null}
     </main>

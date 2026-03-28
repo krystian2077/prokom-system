@@ -8,20 +8,19 @@ import { useStore } from "@/store";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { CommThreadListSkeleton } from "@/components/ui/Skeleton";
-import type { RepairRequestListItem } from "@/types/repairs";
-
-type RepairMessage = {
-  id: number;
-  note: string;
-  is_important: boolean;
-  author_name?: string | null;
-  created_at: string;
-};
+import type { RepairRequestListItem, RepairThreadItem } from "@/types/repairs";
 
 type Thread = {
   repair: RepairRequestListItem;
-  messages: RepairMessage[];
+  messages: RepairThreadItem[];
 };
+
+function lastThreadMeta(items: RepairThreadItem[]): { at: string; preview: string } {
+  if (!items.length) return { at: "", preview: "" };
+  const last = items[items.length - 1];
+  if (last.kind === "note") return { at: last.created_at, preview: last.note };
+  return { at: last.sent_at, preview: (last.subject || last.body_snapshot || "").slice(0, 160) };
+}
 
 function dateLabel(iso: string) {
   const d = new Date(iso);
@@ -37,7 +36,8 @@ export default function CommPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeRepairId, setActiveRepairId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
-  const [channel, setChannel] = useState<"sms" | "email">("sms");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [channel, setChannel] = useState<"panel" | "email">("panel");
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export default function CommPage() {
       const withMessages = await Promise.all(
         base.map(async (r) => {
           try {
-            const msgs = await api.get<RepairMessage[]>(`/repairs/${r.id}/messages/?note_type=client`, token);
+            const msgs = await api.get<RepairThreadItem[]>(`/repairs/${r.id}/messages/`, token);
             return { repair: r, messages: Array.isArray(msgs) ? msgs : [] } as Thread;
           } catch {
             return { repair: r, messages: [] } as Thread;
@@ -70,8 +70,8 @@ export default function CommPage() {
       const onlyWithMessages = withMessages
         .filter((t) => t.messages.length > 0 || t.repair.requires_attention)
         .sort((a, b) => {
-          const at = a.messages[0]?.created_at || a.repair.created_at;
-          const bt = b.messages[0]?.created_at || b.repair.created_at;
+          const at = lastThreadMeta(a.messages).at || a.repair.created_at;
+          const bt = lastThreadMeta(b.messages).at || b.repair.created_at;
           return new Date(bt).getTime() - new Date(at).getTime();
         });
 
@@ -95,7 +95,7 @@ export default function CommPage() {
     const needle = search.toLowerCase();
     return threads.filter((t) => {
       const head = `${t.repair.repair_number} ${t.repair.client_name} ${t.repair.device_name}`.toLowerCase();
-      const body = (t.messages[0]?.note || "").toLowerCase();
+      const body = lastThreadMeta(t.messages).preview.toLowerCase();
       return head.includes(needle) || body.includes(needle);
     });
   }, [threads, search]);
@@ -107,6 +107,7 @@ export default function CommPage() {
     const key = `draft-${activeThread.repair.id}`;
     const restored = localStorage.getItem(key) || "";
     setDraft(restored);
+    setEmailSubject(localStorage.getItem(`${key}-email-subj`) || "");
   }, [activeThread?.repair.id]);
 
   useEffect(() => {
@@ -115,9 +116,11 @@ export default function CommPage() {
     const t = window.setTimeout(() => {
       if (draft.trim()) localStorage.setItem(key, draft);
       else localStorage.removeItem(key);
+      if (emailSubject.trim()) localStorage.setItem(`${key}-email-subj`, emailSubject);
+      else localStorage.removeItem(`${key}-email-subj`);
     }, 1000);
     return () => window.clearTimeout(t);
-  }, [activeThread?.repair.id, draft]);
+  }, [activeThread?.repair.id, draft, emailSubject]);
 
   useEffect(() => {
     if (!token || !activeThread) return;
@@ -132,23 +135,29 @@ export default function CommPage() {
       .catch(() => setSuggestedReply(""));
   }, [token, activeThread?.repair.status]);
 
-  const smsMeta = useMemo(() => {
-    const len = draft.length;
-    const chunks = Math.max(1, Math.ceil(Math.max(0, len) / 160));
-    const cap = chunks * 160;
-    const tone = len >= 155 ? "red" : len >= 130 ? "amber" : "green";
-    return { len, chunks, cap, tone };
-  }, [draft]);
-
   const sendMessage = async () => {
     if (!token || !activeThread || !draft.trim()) return;
+    if (channel === "email" && !emailSubject.trim()) {
+      addToast("Podaj temat e-maila.", "error");
+      return;
+    }
     setSending(true);
     setError(null);
     try {
-      await api.post(`/repairs/${activeThread.repair.id}/notes/`, { note: draft.trim(), is_internal: false, note_type: "client_contact" }, token);
-      localStorage.removeItem(`draft-${activeThread.repair.id}`);
+      if (channel === "panel") {
+        await api.post(`/repairs/${activeThread.repair.id}/notes/`, { note: draft.trim(), is_internal: false, note_type: "client_contact" }, token);
+      } else {
+        await api.post(`/repairs/${activeThread.repair.id}/send-client-email/`, {
+          subject: emailSubject.trim(),
+          body: draft.trim(),
+        }, token);
+      }
+      const key = `draft-${activeThread.repair.id}`;
+      localStorage.removeItem(key);
+      localStorage.removeItem(`${key}-email-subj`);
       setDraft("");
-      addToast("Wiadomość wysłana.", "success");
+      setEmailSubject("");
+      addToast(channel === "panel" ? "Wiadomość w panelu wysłana." : "E-mail wysłany.", "success");
       await loadThreads();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się wysłać wiadomości.";
@@ -198,7 +207,7 @@ export default function CommPage() {
             <div className="space-y-2">
               {filteredThreads.map((t) => {
                 const active = t.repair.id === (activeThread?.repair.id || "");
-                const last = t.messages[0];
+                const meta = lastThreadMeta(t.messages);
                 return (
                   <button
                     key={t.repair.id}
@@ -212,8 +221,8 @@ export default function CommPage() {
                   >
                     <div className="font-mono text-xs font-semibold text-white">{t.repair.repair_number}</div>
                     <div className="mt-0.5 truncate text-sm text-[#e5e7eb]">{t.repair.client_name} · {t.repair.device_name}</div>
-                    <div className="mt-1 truncate text-xs text-[#9ca3af]">{last?.note || "Brak wiadomości"}</div>
-                    <div className="mt-1 text-[11px] text-[#6b7280]">{last ? dateLabel(last.created_at) : "—"}</div>
+                    <div className="mt-1 truncate text-xs text-[#9ca3af]">{meta.preview || "Brak wiadomości"}</div>
+                    <div className="mt-1 text-[11px] text-[#6b7280]">{meta.at ? dateLabel(meta.at) : "—"}</div>
                   </button>
                 );
               })}
@@ -235,8 +244,8 @@ export default function CommPage() {
                   <div className="mt-1 text-xs text-[#9ca3af]">Status: {activeThread.repair.status_display}</div>
                 </div>
                 <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1 text-xs">
-                  <button onClick={() => setChannel("sms")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "sms" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>SMS</button>
-                  <button onClick={() => setChannel("email")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "email" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>E-mail</button>
+                  <button type="button" onClick={() => setChannel("panel")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "panel" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>Panel</button>
+                  <button type="button" onClick={() => setChannel("email")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "email" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>E-mail</button>
                 </div>
               </div>
 
@@ -258,46 +267,63 @@ export default function CommPage() {
                 {activeThread.messages.length === 0 ? (
                   <div className="text-sm text-[#6b7280]">Brak wiadomości.</div>
                 ) : (
-                  activeThread.messages.map((m) => (
-                    <div key={m.id} className="rounded-xl border border-white/10 bg-[#0c0d12] p-3">
-                      <div className="text-xs text-[#9ca3af]">{m.author_name || "—"} · {dateLabel(m.created_at)}</div>
-                      <div className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.note}</div>
-                    </div>
-                  ))
+                  activeThread.messages.map((m) =>
+                    m.kind === "note" ? (
+                      <div key={`n-${m.id}`} className="rounded-xl border border-white/10 bg-[#0c0d12] p-3">
+                        <div className="text-xs text-[#9ca3af]">
+                          {(m.thread_origin === "client" || m.thread_origin === "email_inbound" ? "Klient" : m.author_name) || "—"} · {dateLabel(m.created_at)}
+                        </div>
+                        <div className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.note}</div>
+                      </div>
+                    ) : (
+                      <div key={`e-${m.id}`} className="rounded-xl border border-dashed border-white/15 bg-[#0c0d12] p-3">
+                        <div className="text-[11px] font-semibold uppercase text-[#8b93a8]">E-mail</div>
+                        <div className="mt-1 text-sm font-semibold text-white">{m.subject}</div>
+                        <div className="mt-2 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.body_snapshot}</div>
+                        <div className="mt-2 text-xs text-[#9ca3af]">
+                          {m.sent_by_name || "—"} · {dateLabel(m.sent_at)}
+                        </div>
+                      </div>
+                    ),
+                  )
                 )}
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                {channel === "email" ? (
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    placeholder="Temat e-maila…"
+                    className="mb-3 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+                  />
+                ) : null}
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={4}
-                  placeholder="Napisz odpowiedź do klienta..."
+                  placeholder={channel === "email" ? "Treść e-maila (klient widzi ją w skrzynce i w historii)…" : "Napisz odpowiedź w panelu (widoczna dla klienta w jego koncie)…"}
                   className="w-full resize-y rounded-2xl border border-white/10 bg-[#111318] px-4 py-3 text-sm text-white outline-none focus:border-[#3b82f6]"
                 />
-                {channel === "sms" ? (
-                  <div
-                    className="mt-2 text-xs font-semibold"
-                    style={{ color: smsMeta.tone === "red" ? "#f87171" : smsMeta.tone === "amber" ? "#fbbf24" : "#86efac" }}
-                  >
-                    {smsMeta.chunks === 1 ? `${smsMeta.len} / 160 znaków` : `${smsMeta.chunks} SMS (${smsMeta.len} / ${smsMeta.cap})`}
-                  </div>
-                ) : null}
                 <div className="mt-3 flex items-center justify-end gap-2">
                   <button
                     type="button"
-                    onClick={() => setDraft("")}
+                    onClick={() => {
+                      setDraft("");
+                      setEmailSubject("");
+                    }}
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
                   >
                     Wyczyść
                   </button>
                   <button
                     type="button"
-                    disabled={sending || !draft.trim()}
+                    disabled={sending || !draft.trim() || (channel === "email" && !emailSubject.trim())}
                     onClick={() => void sendMessage()}
                     className="rounded-xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60"
                   >
-                    {sending ? "Wysyłanie…" : channel === "sms" ? "Wyślij SMS" : "Wyślij e-mail"}
+                    {sending ? "Wysyłanie…" : channel === "panel" ? "Wyślij do panelu klienta" : "Wyślij e-mail"}
                   </button>
                 </div>
               </div>

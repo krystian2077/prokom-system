@@ -179,6 +179,16 @@ class RepairRequest(BaseModel):
         blank=True
     )
 
+    staff_planned_work_date = models.DateField(
+        _("planowany dzień pracy (wewnętrzny)"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Kiedy pracownik planuje zająć się naprawą lub do niej wrócić; "
+            "nie zastępuje terminu komunikowanego klientowi (estimated_completion_date)."
+        ),
+    )
+
     completed_at = models.DateTimeField(
         _("data zakończenia naprawy"),
         null=True,
@@ -772,6 +782,14 @@ class RepairImage(TimestampedModel):
         return f"Zdjęcie: {self.repair.repair_number} — {self.caption}"
 
 
+class RepairNoteThreadOrigin(models.TextChoices):
+    """Pochodzenie wpisu w widocznym dla klienta wątku wiadomości."""
+    CLIENT = "client", _("Klient (panel)")
+    STAFF = "staff", _("Pracownik (panel)")
+    SYSTEM = "system", _("System")
+    EMAIL_INBOUND = "email_inbound", _("E-mail przychodzący")
+
+
 class RepairNote(TimestampedModel):
     """
     Notatki dotyczące naprawy.
@@ -826,11 +844,22 @@ class RepairNote(TimestampedModel):
         default=False,
         help_text=_("Przypięte notatki wyświetlane na górze"),
     )
+    thread_origin = models.CharField(
+        _("pochodzenie w wątku"),
+        max_length=20,
+        choices=RepairNoteThreadOrigin.choices,
+        default=RepairNoteThreadOrigin.STAFF,
+        db_index=True,
+        help_text=_("Dla widocznych dla klienta wpisów: kto/nad czym — wątek wiadomości."),
+    )
 
     class Meta:
         verbose_name = _("notatka naprawy")
         verbose_name_plural = _("notatki napraw")
         ordering = ["-pinned", "-created_at"]
+        indexes = [
+            models.Index(fields=["repair", "thread_origin"]),
+        ]
 
     def __str__(self):
         note_type = "🔒 Wewnętrzna" if self.is_internal else "👁️ Publiczna"

@@ -6,6 +6,7 @@ import { ExternalLink, Package, Phone, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchAllPages } from "@/lib/api";
 import type { InventorySupplier, PartUsageQueueItem } from "@/types/inventory";
+import { partUsageDisplayName } from "@/types/repairs";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { RepairTableSkeleton } from "@/components/ui/Skeleton";
@@ -183,7 +184,7 @@ export default function AdminPartsPage() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <Package size={16} className="shrink-0 text-[#6b7280]" />
-                          <p className="truncate text-sm font-semibold text-white">{row.part?.name ?? "Część"}</p>
+                          <p className="truncate text-sm font-semibold text-white">{partUsageDisplayName(row)}</p>
                         </div>
                         <p className="mt-1 font-mono text-xs text-[#93c5fd]">{row.repair_number ?? "—"}</p>
                         <p className="mt-1 text-xs text-[#9ca3af]">

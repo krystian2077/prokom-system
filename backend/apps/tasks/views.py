@@ -1,7 +1,7 @@
 """Widoki API zadań (staff: swoje, admin: wszystkie)."""
 from datetime import timedelta
 from django.utils import timezone
-from django.db.models import Count
+from django.db.models import Case, Count, IntegerField, Q, When
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -16,6 +16,7 @@ from .serializers import (
     TaskCommentSerializer,
 )
 from .permissions import IsStaffOrAdmin, can_see_task, can_edit_task
+from .suggestions import suggestions_for_repair
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -26,7 +27,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
     permission_classes = [IsStaffOrAdmin]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["status", "priority", "assigned_to", "created_by", "is_archived"]
+    filterset_fields = ["status", "priority", "assigned_to", "created_by", "is_archived", "related_repair"]
 
     def get_queryset(self):
         qs = Task.objects.select_related(
@@ -46,6 +47,10 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         task = serializer.save(created_by=self.request.user)
+        # Pracownik bez jawnego przypisania dostaje zadanie na siebie (żeby widział je na liście).
+        if task.assigned_to_id is None and getattr(self.request.user, "role", None) != "admin":
+            task.assigned_to = self.request.user
+            task.save(update_fields=["assigned_to"])
         self._notify_task_assigned(task)
 
     def perform_update(self, serializer):
@@ -103,6 +108,21 @@ class TaskViewSet(viewsets.ModelViewSet):
         self._notify_comment_added(task, comment)
         return Response(TaskCommentSerializer(comment).data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=["get"], url_path="suggested-for-repair")
+    def suggested_for_repair(self, request):
+        """GET /tasks/suggested-for-repair/?repair=<uuid> — propozycje zadań dla naprawy (heurystyki)."""
+        from apps.repairs.models import RepairRequest
+
+        repair_id = (request.query_params.get("repair") or "").strip()
+        if not repair_id:
+            return Response({"detail": "Parametr repair jest wymagany."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            repair = RepairRequest.objects.get(pk=repair_id)
+        except RepairRequest.DoesNotExist:
+            return Response({"detail": "Naprawa nie istnieje."}, status=status.HTTP_404_NOT_FOUND)
+        data = suggestions_for_repair(repair, request.user)
+        return Response(data)
+
     @action(detail=False, url_path="mine")
     def mine(self, request):
         """Moje zadania (alias dla list z filtrem assigned_to=current user)."""
@@ -117,6 +137,30 @@ class TaskViewSet(viewsets.ModelViewSet):
         today_end = today_start + timedelta(days=1)
         qs = qs.filter(due_date__gte=today_start, due_date__lt=today_end)
         return Response(TaskListSerializer(qs[:100], many=True).data)
+
+    @action(detail=False, url_path="dashboard-preview")
+    def dashboard_preview(self, request):
+        """
+        Podgląd zadań na dashboard pracownika: termin = dziś LUB otwarte zadanie powiązane z naprawą
+        (żeby zadania dodane przy naprawie bez terminu też były widoczne).
+        """
+        qs = self.get_queryset().exclude(status__in=[TaskStatus.COMPLETED, TaskStatus.CANCELLED])
+        today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+        qs = qs.filter(
+            Q(due_date__gte=today_start, due_date__lt=today_end) | Q(related_repair__isnull=False)
+        ).distinct()
+        qs = qs.annotate(
+            _prio=Case(
+                When(priority=TaskPriority.URGENT, then=0),
+                When(priority=TaskPriority.IMPORTANT, then=1),
+                When(priority=TaskPriority.STANDARD, then=2),
+                When(priority=TaskPriority.LOW, then=3),
+                default=4,
+                output_field=IntegerField(),
+            )
+        ).order_by("_prio", "-created_at")[:20]
+        return Response(TaskListSerializer(qs, many=True).data)
 
     @action(detail=False, url_path="urgent")
     def urgent(self, request):

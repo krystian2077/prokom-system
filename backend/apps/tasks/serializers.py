@@ -29,6 +29,7 @@ class TaskListSerializer(serializers.ModelSerializer):
     created_by_name = serializers.SerializerMethodField()
     is_overdue = serializers.BooleanField(read_only=True)
     comment_count = serializers.SerializerMethodField()
+    related_repair_number = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
@@ -36,7 +37,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             "id", "title", "assigned_to", "assigned_to_name", "created_by", "created_by_name",
             "status", "status_display", "priority", "priority_display",
             "due_date", "completed_at", "is_overdue",
-            "related_repair", "related_client", "related_customer_order", "related_store_order",
+            "related_repair", "related_repair_number", "related_client", "related_customer_order", "related_store_order",
             "is_archived", "created_at", "updated_at", "comment_count",
         ]
 
@@ -52,6 +53,12 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     def get_comment_count(self, obj):
         return getattr(obj, "comment_count", 0) or obj.comments.count()
+
+    def get_related_repair_number(self, obj):
+        r = getattr(obj, "related_repair", None)
+        if r is not None:
+            return getattr(r, "repair_number", None) or None
+        return None
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -85,7 +92,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
-    """Do tworzenia i edycji — staff nie może zmieniać assigned_to (tylko admin)."""
+    """Tworzenie: staff może przypisać tylko do siebie (lub pusto → backend ustawi siebie). Edycja: tylko admin zmienia osobę."""
 
     class Meta:
         model = Task
@@ -97,12 +104,21 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate_assigned_to(self, value):
         request = self.context.get("request")
-        if not request or not self.instance:
+        if not request:
             return value
-        if getattr(request.user, "role", None) == "admin":
+        role = getattr(request.user, "role", None)
+        if role == "admin":
             return value
-        current_id = self.instance.assigned_to_id
-        new_id = value.id if value else None
-        if new_id != current_id:
-            raise serializers.ValidationError("Tylko administrator może przepisywać zadanie do innej osoby.")
+        # Aktualizacja: staff nie przepisuje na kogoś innego
+        if self.instance:
+            current_id = self.instance.assigned_to_id
+            new_id = value.id if value else None
+            if new_id != current_id:
+                raise serializers.ValidationError("Tylko administrator może przepisywać zadanie do innej osoby.")
+            return value
+        # Tworzenie: staff tylko do siebie lub bez przypisania (uzupełni widok)
+        if value is None:
+            return value
+        if value.id != request.user.id:
+            raise serializers.ValidationError("Możesz przypisać zadanie tylko do siebie.")
         return value

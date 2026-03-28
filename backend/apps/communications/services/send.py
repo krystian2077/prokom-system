@@ -335,3 +335,66 @@ def send_template_to_repair(template, repair, sent_by=None):
             status="sent",
         )
         return log, True
+
+
+def _outbound_client_email_footer(repair):
+    """Stopka ułatwiająca dopasowanie odpowiedzi klienta (numer w temacie wątku)."""
+    rn = repair.repair_number
+    return (
+        f"\n\n---\n"
+        f"Odpowiadając na tę wiadomość, zachowaj w temacie numer zgłoszenia: {rn}\n"
+        f"(wtedy odpowiedź zostanie zapisana w panelu serwisu przy tej naprawie.)"
+    )
+
+
+def send_freeform_email_to_repair_client(repair, subject, body_plain, sent_by, *, fail_silently=True):
+    """
+    Dowolny e-mail do klienta naprawy; zapisuje CommunicationLog (bez szablonu).
+    Treść wysłana = body_plain + krótka stopka z numerem zgłoszenia (pod odbiór odpowiedzi przez webhook).
+    Zwraca (log, success).
+    """
+    from apps.communications.models import CommunicationLog
+    from apps.common.enums import CommunicationChannel
+
+    recipient = (repair.client.email or "").strip()
+    full_subject = f"[{repair.repair_number}] {subject}".strip()
+    body_with_footer = (body_plain or "").rstrip() + _outbound_client_email_footer(repair)
+    if not recipient:
+        log = CommunicationLog.objects.create(
+            repair=repair,
+            template=None,
+            channel=CommunicationChannel.EMAIL,
+            recipient="",
+            subject=full_subject,
+            body_snapshot=body_with_footer,
+            sent_by=sent_by,
+            status="failed",
+            error_message="Brak adresu e-mail u klienta.",
+        )
+        return log, False
+    try:
+        send_email(recipient, full_subject, body_with_footer, fail_silently=fail_silently)
+        log = CommunicationLog.objects.create(
+            repair=repair,
+            template=None,
+            channel=CommunicationChannel.EMAIL,
+            recipient=recipient,
+            subject=full_subject,
+            body_snapshot=body_with_footer,
+            sent_by=sent_by,
+            status="sent",
+        )
+        return log, True
+    except Exception as e:
+        log = CommunicationLog.objects.create(
+            repair=repair,
+            template=None,
+            channel=CommunicationChannel.EMAIL,
+            recipient=recipient,
+            subject=full_subject,
+            body_snapshot=body_with_footer,
+            sent_by=sent_by,
+            status="failed",
+            error_message=str(e),
+        )
+        return log, False

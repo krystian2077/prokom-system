@@ -10,6 +10,17 @@ class QuoteRespondSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False, allow_blank=True, max_length=1000)
 
 
+class ClientRepairMessageCreateSerializer(serializers.Serializer):
+    """Body: wiadomość od klienta w wątku przy naprawie (panel klienta)."""
+    note = serializers.CharField(required=True, trim_whitespace=True, max_length=5000)
+
+
+class SendClientEmailSerializer(serializers.Serializer):
+    """Body: dowolny e-mail do klienta od pracownika (treść widoczna w historii jako log)."""
+    subject = serializers.CharField(required=True, trim_whitespace=True, max_length=280)
+    body = serializers.CharField(required=True, trim_whitespace=True, max_length=8000)
+
+
 class AddRepairNoteSerializer(serializers.Serializer):
     """Body: dodaj notatkę do naprawy (szybka akcja)."""
     note = serializers.CharField(required=True, trim_whitespace=True, max_length=5000)

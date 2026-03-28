@@ -45,5 +45,5 @@ class PartUsageAdmin(admin.ModelAdmin):
         "usage_status", "added_by", "created_at",
     ]
     list_filter = ["usage_status", "repair"]
-    search_fields = ["repair__repair_number", "part__name", "part__code"]
+    search_fields = ["repair__repair_number", "part__name", "part__code", "custom_part_name"]
     autocomplete_fields = ["repair", "part", "supplier", "added_by"]

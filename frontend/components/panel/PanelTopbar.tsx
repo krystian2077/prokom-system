@@ -332,7 +332,7 @@ export function PanelTopbar() {
 
   return (
     <header className="sticky top-0 z-[110] border-b border-white/5 bg-[#0b0c10]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-[58px] max-w-[1500px] items-center justify-between px-5">
+      <div className="mx-auto flex min-h-[72px] max-w-[1500px] items-center justify-between gap-4 px-5 py-3 md:min-h-[76px] md:py-3.5">
         <div className="flex items-center gap-3 min-w-0">
           {showBack ? (
             <button
@@ -353,13 +353,13 @@ export function PanelTopbar() {
           </div>
         </div>
 
-        <div className="hidden flex-1 items-center justify-center px-6 md:flex">
-          <div ref={wrapperRef} className="relative w-full max-w-[520px]">
+        <div className="hidden min-w-0 flex-1 items-center justify-center px-4 md:flex lg:px-8">
+          <div ref={wrapperRef} className="relative w-full max-w-[min(680px,100%)]">
             <div
-              className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-[#11131a]/70 px-4 py-2 focus-within:border-[rgba(59,130,246,.65)]"
+              className="flex min-h-[44px] w-full items-center gap-2.5 rounded-2xl border border-white/10 bg-[#11131a]/70 px-4 py-2.5 focus-within:border-[rgba(59,130,246,.65)]"
               style={{ color: "#9ca3af", borderColor: "rgba(255,255,255,.10)" }}
             >
-              <Search size={16} />
+              <Search size={18} className="shrink-0 opacity-90" />
               <input
                 ref={inputRef}
                 value={query}
@@ -384,10 +384,10 @@ export function PanelTopbar() {
                     setOpen(false);
                   }
                 }}
-                className="w-full bg-transparent text-sm outline-none placeholder:text-[#6b7280]"
+                className="w-full min-w-0 bg-transparent text-sm leading-snug outline-none placeholder:text-[#6b7280]"
                 autoComplete="off"
               />
-              <span className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-[#9ca3af]">
+              <span className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] font-semibold text-[#9ca3af]">
                 ⌘K
               </span>
             </div>

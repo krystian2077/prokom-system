@@ -7,6 +7,7 @@ import { ExternalLink, Package, Phone, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchAllPages } from "@/lib/api";
 import type { InventorySupplier, PartUsageQueueItem } from "@/types/inventory";
+import { partUsageDisplayName } from "@/types/repairs";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { RepairTableSkeleton } from "@/components/ui/Skeleton";
@@ -55,7 +56,7 @@ function mapQueueItemToRow(q: PartUsageQueueItem): PartRow {
     repairId: q.repair,
     repairNumber: q.repair_number ?? "—",
     deviceName: (q.repair_device_name ?? "").trim() || "—",
-    partName: q.part?.name ?? "Część",
+    partName: partUsageDisplayName(q),
     supplierName: q.supplier_detail?.name ?? "Brak dostawcy",
     createdAt: q.created_at ?? "",
     status,

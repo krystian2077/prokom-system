@@ -1,7 +1,13 @@
 """PRO-KOM Serwis — Inventory API URLs."""
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import SupplierViewSet, PartViewSet, PartsQueueViewSet, PurchaseOrderViewSet
+from .views import (
+    SupplierViewSet,
+    PartViewSet,
+    PartsQueueViewSet,
+    PurchaseOrderViewSet,
+    PartsDashboardSummaryView,
+)
 
 router = DefaultRouter()
 router.register(r"suppliers", SupplierViewSet, basename="supplier")
@@ -10,5 +16,6 @@ router.register(r"parts-queue", PartsQueueViewSet, basename="parts-queue")
 router.register(r"purchase-orders", PurchaseOrderViewSet, basename="purchase-order")
 
 urlpatterns = [
+    path("parts-dashboard-summary/", PartsDashboardSummaryView.as_view(), name="parts-dashboard-summary"),
     path("", include(router.urls)),
 ]

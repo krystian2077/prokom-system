@@ -27,6 +27,8 @@ export interface RepairRequestListItem {
   parent_repair_number?: string | null;
   created_by_label?: string | null;
   estimated_completion_date?: string | null;
+  /** Wewnętrzny plan pracy pracownika (nie to samo co termin dla klienta). */
+  staff_planned_work_date?: string | null;
   estimated_duration_days_min?: number | null;
   estimated_duration_days_max?: number | null;
   created_at: string;
@@ -115,6 +117,9 @@ export type RepairTimelineEvent =
 
 export type PartUsageStatusValue = "ordered" | "arrived" | "used" | "unused";
 
+/** Status zamówienia pozycji (kolejka: do zamówienia / w drodze / dotarło). */
+export type PartOrderStatusValue = "to_order" | "ordered" | "arrived" | "delayed";
+
 export interface PartAutocompleteItem {
   id: string;
   name: string;
@@ -136,10 +141,43 @@ export interface PartSupplierDetail {
   is_active?: boolean;
 }
 
+/** Wpis w scalonym wątku wiadomości (GET /repairs/:id/messages/). */
+export interface RepairThreadNoteItem {
+  kind: "note";
+  id: number;
+  note: string;
+  thread_origin: string;
+  is_important: boolean;
+  note_type: string;
+  author_name: string | null;
+  created_at: string;
+}
+
+export interface RepairThreadEmailOutItem {
+  kind: "email_out";
+  id: string;
+  subject: string;
+  body_snapshot: string;
+  recipient: string;
+  sent_at: string;
+  sent_by_name: string | null;
+  status: string;
+  channel: string;
+  template_id: number | null;
+}
+
+export type RepairThreadItem = RepairThreadNoteItem | RepairThreadEmailOutItem;
+
 export interface PartUsage {
   id: string;
   repair: string | null;
-  part: PartAutocompleteItem;
+  repair_number?: string | null;
+  repair_device_name?: string | null;
+  assigned_to_name?: string | null;
+  /** Pozycja z katalogu — null, gdy użyto wyłącznie nazwy własnej. */
+  part: PartAutocompleteItem | null;
+  /** Nazwa wpisana ręcznie (bez powiązania z katalogiem). */
+  custom_part_name?: string | null;
   supplier_detail?: PartSupplierDetail | null;
   quantity: string | number;
   purchase_cost?: string | number | null;
@@ -147,7 +185,23 @@ export interface PartUsage {
   total: string | number;
   usage_status: PartUsageStatusValue;
   usage_status_display: string;
+  order_status?: PartOrderStatusValue;
+  order_status_display?: string;
+  ordered_at?: string | null;
+  /** Planowana data dostawy (YYYY-MM-DD). */
+  expected_arrival_date?: string | null;
   notes?: string | null;
   added_by?: string | null;
   created_at: string;
+}
+
+/** Etykieta części: katalog albo nazwa własna. */
+export function partUsageDisplayName(u: {
+  part?: { name?: string | null } | null;
+  custom_part_name?: string | null;
+}): string {
+  const fromCatalog = u.part?.name?.trim();
+  if (fromCatalog) return fromCatalog;
+  const custom = (u.custom_part_name ?? "").trim();
+  return custom || "Część";
 }

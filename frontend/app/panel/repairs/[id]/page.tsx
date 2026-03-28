@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
@@ -16,17 +16,21 @@ import {
   ShieldAlert,
   Smartphone,
   Package,
+  CalendarDays,
 } from "lucide-react";
 
 import { api } from "@/lib/api";
-import type { RepairDetail, RepairTimelineEvent } from "@/types/repairs";
+import type { RepairDetail, RepairThreadItem, RepairTimelineEvent } from "@/types/repairs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
 import { RepairPartsSection } from "@/components/panel/RepairPartsSection";
+import { RepairTasksPanel } from "@/components/panel/RepairTasksPanel";
 import { RepairDetailLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 type TabId = "details" | "parts" | "checklist" | "test" | "comms" | "pricing" | "client_history";
+
+const TAB_QUERY_VALUES: TabId[] = ["details", "parts", "checklist", "test", "comms", "pricing", "client_history"];
 
 /** Statusy przed zakończeniem diagnostyki — sekcja „Naprawa” w checklistie pozostaje zablokowana (Rozdz. 12). */
 const PRE_DIAGNOSTICS_REPAIR_STATUSES = new Set(["new", "accepted", "in_diagnostics"]);
@@ -91,7 +95,9 @@ export default function RepairDetailPage() {
   const queryClient = useQueryClient();
   const params = useParams<{ id: string }>();
   const pathname = usePathname() ?? "";
+  const searchParams = useSearchParams();
   const repairId = params?.id;
+  const tabInUrl = searchParams.get("tab");
 
   const isAdminRepairContext = pathname.startsWith("/admin-panel");
   const repairsListHref = isAdminRepairContext ? "/admin-panel/repairs" : "/panel/naprawy";
@@ -104,8 +110,9 @@ export default function RepairDetailPage() {
 
   const [activeTab, setActiveTab] = useState<TabId>("details");
   const [showQuickMenu, setShowQuickMenu] = useState(false);
-  const [commChannel, setCommChannel] = useState<"sms" | "email">("sms");
+  const [commChannel, setCommChannel] = useState<"panel" | "email">("panel");
   const [commDraft, setCommDraft] = useState("");
+  const [commEmailSubject, setCommEmailSubject] = useState("");
   const commTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const commSectionRef = useRef<HTMLElement | null>(null);
 
@@ -129,17 +136,98 @@ export default function RepairDetailPage() {
     staleTime: 10_000,
   });
 
+  const messagesQuery = useQuery({
+    queryKey: ["repair", repairId, "messages"],
+    enabled: Boolean(token && user && repairId && activeTab === "comms"),
+    queryFn: async () => {
+      if (!token || !repairId) throw new Error("Missing token/repairId");
+      return api.get<RepairThreadItem[]>(`/repairs/${repairId}/messages/`, token);
+    },
+    staleTime: 5_000,
+  });
+
   const repair = repairQuery.data ?? null;
   const timeline = timelineQuery.data ?? [];
+  const threadMessages = messagesQuery.data ?? [];
+
+  const [plannedWorkDateDraft, setPlannedWorkDateDraft] = useState("");
+
+  useEffect(() => {
+    const p = repair?.staff_planned_work_date;
+    if (!p) {
+      setPlannedWorkDateDraft("");
+      return;
+    }
+    setPlannedWorkDateDraft(String(p).slice(0, 10));
+  }, [repair?.id, repair?.staff_planned_work_date]);
+
+  const plannedWorkDateMutation = useMutation({
+    mutationFn: async () => {
+      if (!token || !repairId) throw new Error("Brak sesji.");
+      const raw = plannedWorkDateDraft.trim();
+      const payload =
+        raw === "" ? { staff_planned_work_date: null as null } : { staff_planned_work_date: raw };
+      return api.patch<RepairDetail>(`/repairs/${repairId}/`, payload, token);
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["repair", repairId], data);
+      void queryClient.invalidateQueries({ queryKey: ["dashboard", "staff"] });
+      void queryClient.invalidateQueries({ queryKey: ["repairs", "staff", "list"] });
+      if (isAdminRepairContext) {
+        void queryClient.invalidateQueries({ queryKey: ["repairs", "admin", "list"] });
+      }
+      void queryClient.invalidateQueries({ queryKey: ["sidebar", "dashboard-buckets"] });
+      showToast("Zapisano plan pracy.", "success");
+    },
+    onError: (err) => {
+      showToast(err instanceof Error ? err.message : "Nie udało się zapisać planu pracy.", "error");
+    },
+  });
+
+  const serverPlannedSlice = repair?.staff_planned_work_date
+    ? String(repair.staff_planned_work_date).slice(0, 10)
+    : "";
+  const plannedWorkDirty = plannedWorkDateDraft !== serverPlannedSlice;
+
+  const applyQuickPlannedDate = (daysFromToday: number) => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + daysFromToday);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    setPlannedWorkDateDraft(`${y}-${m}-${day}`);
+  };
 
   const lastUpdatedText = useMemo(() => {
     const d = repair?.updated_at ? new Date(repair.updated_at) : null;
     return d ? d.toLocaleString("pl-PL", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" }) : "—";
   }, [repair?.updated_at]);
 
-  const commTimeline = useMemo(() => timeline.filter((ev) => ev.type === "communication"), [timeline]);
-
   const showInstallCta = (repair?.status ?? "").toLowerCase() === "ready_for_pickup";
+
+  /** Nowa naprawa w widoku — start od szczegółów; potem nadpisze to drugi efekt jeśli jest ?tab=. */
+  useEffect(() => {
+    setActiveTab("details");
+  }, [repairId]);
+
+  /** Deep link (np. z dashboardu): ?tab=comms — zakładka Komunikacja. */
+  useEffect(() => {
+    const raw = (tabInUrl || "").toLowerCase().trim();
+    if (raw && TAB_QUERY_VALUES.includes(raw as TabId)) {
+      setActiveTab(raw as TabId);
+    }
+  }, [repairId, tabInUrl]);
+
+  /** Po wejściu na zakładkę Komunikacja: przewiń do sekcji i fokus w polu odpowiedzi. */
+  useEffect(() => {
+    if (activeTab !== "comms") return;
+    const id = window.setTimeout(() => {
+      commSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      commTextareaRef.current?.focus({ preventScroll: true });
+    }, 100);
+    return () => window.clearTimeout(id);
+  }, [activeTab, repairId]);
 
   // ---------- Tab: Checklista ----------
   const checklistQuery = useQuery({
@@ -286,11 +374,38 @@ export default function RepairDetailPage() {
     [repair?.status],
   );
 
+  const commSendMutation = useMutation({
+    mutationFn: async () => {
+      if (!token || !repairId) throw new Error("Brak sesji.");
+      if (!commDraft.trim()) throw new Error("Wpisz treść.");
+      if (commChannel === "email") {
+        if (!commEmailSubject.trim()) throw new Error("Podaj temat e-maila.");
+        return api.post(`/repairs/${repairId}/send-client-email/`, { subject: commEmailSubject.trim(), body: commDraft.trim() }, token);
+      }
+      return api.post(`/repairs/${repairId}/notes/`, { note: commDraft.trim(), is_internal: false, note_type: "client_contact" }, token);
+    },
+    onSuccess: (_, __) => {
+      if (!repairId) return;
+      const key = `draft-${repairId}`;
+      localStorage.removeItem(key);
+      localStorage.removeItem(`${key}-email-subj`);
+      setCommDraft("");
+      setCommEmailSubject("");
+      void queryClient.invalidateQueries({ queryKey: ["repair", repairId, "messages"] });
+      void queryClient.invalidateQueries({ queryKey: ["repair", repairId, "timeline"] });
+      showToast("Wysłano.", "success");
+    },
+    onError: (err) => {
+      showToast(err instanceof Error ? err.message : "Błąd wysyłki.", "error");
+    },
+  });
+
   useEffect(() => {
     if (!repairId) return;
     const key = `draft-${repairId}`;
     const saved = localStorage.getItem(key);
     if (saved) setCommDraft(saved);
+    setCommEmailSubject(localStorage.getItem(`${key}-email-subj`) || "");
   }, [repairId]);
 
   useEffect(() => {
@@ -299,17 +414,11 @@ export default function RepairDetailPage() {
     const t = window.setTimeout(() => {
       if (commDraft.trim()) localStorage.setItem(key, commDraft);
       else localStorage.removeItem(key);
+      if (commEmailSubject.trim()) localStorage.setItem(`${key}-email-subj`, commEmailSubject);
+      else localStorage.removeItem(`${key}-email-subj`);
     }, 1000);
     return () => window.clearTimeout(t);
-  }, [repairId, commDraft]);
-
-  const smsMeta = useMemo(() => {
-    const len = commDraft.length;
-    const chunks = Math.max(1, Math.ceil(Math.max(0, len) / 160));
-    const cap = chunks * 160;
-    const tone = len >= 155 ? "red" : len >= 130 ? "amber" : "green";
-    return { len, chunks, cap, tone };
-  }, [commDraft]);
+  }, [repairId, commDraft, commEmailSubject]);
 
   if (repairQuery.isLoading) {
     return <RepairDetailLoadingSkeleton listHref={repairsListHref} backLabel={repairsBackLabel} />;
@@ -469,6 +578,51 @@ export default function RepairDetailPage() {
                   <span className="text-[#9ca3af]">Gotowość</span>
                   <span className="font-semibold text-white">{repair.estimated_completion_date ?? "—"}</span>
                 </div>
+                <div className="border-t border-white/10 pt-3">
+                  <div className="flex items-start gap-2">
+                    <CalendarDays size={16} className="mt-0.5 shrink-0 text-[#3b82f6]" aria-hidden />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Plan pracy (wewnętrzny)</div>
+                      <p className="mt-1 text-[11px] leading-snug text-[#6b7280]">
+                        Kiedy wracasz do naprawy (np. po częściach). Osobno od terminu gotowości dla klienta.
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => applyQuickPlannedDate(1)}
+                          className="rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#e5e7eb] transition hover:bg-white/10"
+                          aria-label="Ustaw datę planu na jutro"
+                        >
+                          Jutro
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyQuickPlannedDate(2)}
+                          className="rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#e5e7eb] transition hover:bg-white/10"
+                          aria-label="Ustaw datę planu na pojutrze"
+                        >
+                          Pojutrze
+                        </button>
+                      </div>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <input
+                          type="date"
+                          value={plannedWorkDateDraft}
+                          onChange={(e) => setPlannedWorkDateDraft(e.target.value)}
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white [color-scheme:dark]"
+                        />
+                        <button
+                          type="button"
+                          disabled={!plannedWorkDirty || plannedWorkDateMutation.isPending}
+                          onClick={() => plannedWorkDateMutation.mutate()}
+                          className="rounded-xl bg-[#3b82f6] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {plannedWorkDateMutation.isPending ? "Zapisywanie…" : "Zapisz"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               {showInstallCta ? (
                 <div className="pt-2">
@@ -506,6 +660,8 @@ export default function RepairDetailPage() {
             />
           </div>
         </section>
+
+        {repair ? <RepairTasksPanel repairId={repair.id} repairNumber={repair.repair_number} /> : null}
 
         {activeTab === "details" ? (
           <section className="grid gap-4 lg:grid-cols-12">
@@ -800,7 +956,7 @@ export default function RepairDetailPage() {
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Komunikacja</div>
-                <h2 className="mt-1 text-lg font-semibold text-white">Timeline wiadomości</h2>
+                <h2 className="mt-1 text-lg font-semibold text-white">Wątek z klientem</h2>
               </div>
               <Link href="/panel/comm" className="text-sm font-semibold text-[#3b82f6] hover:underline">
                 Pełna lista
@@ -808,18 +964,54 @@ export default function RepairDetailPage() {
             </div>
 
             <div className="mt-4 space-y-3">
+              {messagesQuery.isLoading ? (
+                <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-4 py-5 text-sm text-[#9ca3af]">
+                  Ładowanie wątku…
+                </div>
+              ) : threadMessages.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-4 py-5 text-sm text-[#9ca3af]">
+                  Brak wiadomości w wątku (panel + e-mail wychodzący).
+                </div>
+              ) : (
+                <div className="max-h-[360px] space-y-2 overflow-y-auto rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                  {threadMessages.map((m) =>
+                    m.kind === "note" ? (
+                      <div key={`n-${m.id}`} className="rounded-xl border border-white/10 bg-[#0c0d12] p-3">
+                        <div className="text-xs text-[#9ca3af]">
+                          {(m.thread_origin === "client" || m.thread_origin === "email_inbound" ? "Klient" : m.author_name) || "—"} ·{" "}
+                          {m.created_at
+                            ? new Date(m.created_at).toLocaleString("pl-PL", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })
+                            : ""}
+                        </div>
+                        <div className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.note}</div>
+                      </div>
+                    ) : (
+                      <div key={`e-${m.id}`} className="rounded-xl border border-dashed border-white/15 bg-[#0c0d12] p-3">
+                        <div className="text-[11px] font-semibold uppercase text-[#8b93a8]">E-mail wychodzący</div>
+                        <div className="mt-1 text-sm font-semibold text-white">{m.subject}</div>
+                        <div className="mt-2 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.body_snapshot}</div>
+                        <div className="mt-2 text-xs text-[#9ca3af]">
+                          {m.sent_by_name || "—"} ·{" "}
+                          {m.sent_at
+                            ? new Date(m.sent_at).toLocaleString("pl-PL", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })
+                            : ""}
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
+              )}
+
               <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
-                    Kompozycja wiadomości
-                  </div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Odpowiedź</div>
                   <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1 text-xs">
                     <button
                       type="button"
-                      onClick={() => setCommChannel("sms")}
-                      className={`rounded-lg px-3 py-1 font-semibold ${commChannel === "sms" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}
+                      onClick={() => setCommChannel("panel")}
+                      className={`rounded-lg px-3 py-1 font-semibold ${commChannel === "panel" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}
                     >
-                      SMS
+                      Panel klienta
                     </button>
                     <button
                       type="button"
@@ -830,58 +1022,42 @@ export default function RepairDetailPage() {
                     </button>
                   </div>
                 </div>
+                {commChannel === "email" ? (
+                  <input
+                    type="text"
+                    value={commEmailSubject}
+                    onChange={(e) => setCommEmailSubject(e.target.value)}
+                    placeholder="Temat e-maila…"
+                    className="mb-3 mt-3 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+                  />
+                ) : null}
                 <textarea
                   ref={commTextareaRef}
                   value={commDraft}
                   onChange={(e) => setCommDraft(e.target.value)}
-                  className="mt-3 w-full resize-y rounded-2xl border border-white/10 bg-[#111318] px-4 py-3 text-sm text-white outline-none focus:border-[#3b82f6]"
+                  className="mt-1 w-full resize-y rounded-2xl border border-white/10 bg-[#111318] px-4 py-3 text-sm text-white outline-none focus:border-[#3b82f6]"
                   rows={4}
-                  placeholder="Napisz wiadomość do klienta…"
+                  placeholder={
+                    commChannel === "email"
+                      ? "Treść e-maila (klient widzi w skrzynce i w historii w panelu)…"
+                      : "Wiadomość widoczna w panelu klienta…"
+                  }
                 />
-                {commChannel === "sms" ? (
-                  <div
-                    className="mt-2 text-xs font-semibold"
-                    style={{
-                      color:
-                        smsMeta.tone === "red"
-                          ? "#f87171"
-                          : smsMeta.tone === "amber"
-                            ? "#fbbf24"
-                            : "#86efac",
-                    }}
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    disabled={
+                      commSendMutation.isPending ||
+                      !commDraft.trim() ||
+                      (commChannel === "email" && !commEmailSubject.trim())
+                    }
+                    onClick={() => commSendMutation.mutate()}
+                    className="rounded-xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60"
                   >
-                    {smsMeta.chunks === 1
-                      ? `${smsMeta.len} / 160 znaków`
-                      : `${smsMeta.chunks} SMS (${smsMeta.len} / ${smsMeta.cap})`}
-                  </div>
-                ) : null}
-              </div>
-
-              {commTimeline.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-4 py-5 text-sm text-[#9ca3af]">
-                  Brak wiadomości do wyświetlenia.
+                    {commSendMutation.isPending ? "Wysyłanie…" : commChannel === "panel" ? "Wyślij do panelu" : "Wyślij e-mail"}
+                  </button>
                 </div>
-              ) : (
-                commTimeline.map((ev) => (
-                  <div key={ev.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#3b82f6]/15 border border-[#3b82f6]/30 text-sm font-bold text-[#bcd6ff]">
-                          {(ev.recipient ?? "?").slice(0, 2).toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-semibold text-white">{ev.subject ?? "Wiadomość"}</div>
-                          <div className="mt-0.5 text-xs text-[#9ca3af]">{ev.channel_display}</div>
-                        </div>
-                      </div>
-                      <div className="text-xs text-[#9ca3af]">
-                        {ev.sent_at ? new Date(ev.sent_at).toLocaleString("pl-PL", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" }) : ""}
-                      </div>
-                    </div>
-                    <div className="mt-3 text-sm text-[#e5e7eb] whitespace-pre-wrap">{ev.body_preview}</div>
-                  </div>
-                ))
-              )}
+              </div>
             </div>
           </section>
         ) : null}

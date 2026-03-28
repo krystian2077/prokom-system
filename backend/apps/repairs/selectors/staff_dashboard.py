@@ -185,6 +185,68 @@ def staff_recent_activity(user_id, limit=15):
     )
 
 
+FINISHED_STATUSES = [
+    RepairStatus.PICKED_UP,
+    RepairStatus.SHIPPED,
+    RepairStatus.DELIVERED,
+]
+
+# Zgodne z widokiem „Moje naprawy” (frontend: nonArchivedStatus) — wykluczone z licznika „aktywnych”.
+TERMINAL_OR_ARCHIVED_FOR_ACTIVE_COUNT = [
+    RepairStatus.PICKED_UP,
+    RepairStatus.SHIPPED,
+    RepairStatus.DELIVERED,
+    RepairStatus.CANCELLED,
+    RepairStatus.UNREPAIRABLE,
+    RepairStatus.ABANDONED,
+]
+
+
+def staff_my_active_repairs_count(user_id: int) -> int:
+    """
+    Jedna naprawa = jedna pozycja: przypisane do pracownika, status nie jest końcowy/zarchiwizowany.
+    Nie sumuje kubełków (które nakładają się i zawyżają wynik).
+    """
+    return (
+        RepairRequest.objects.filter(assigned_to_id=user_id)
+        .exclude(status__in=TERMINAL_OR_ARCHIVED_FOR_ACTIVE_COUNT)
+        .count()
+    )
+
+
+def staff_completed_pickups_count(user_id, dashboard_scope: str = "today") -> int:
+    """
+    Liczba napraw przypisanych do pracownika zakończonych wydaniem/transportem,
+    w oknie czasowym zgodnym z zakresem dashboardu (kalendarz lokalny).
+    """
+    scope = (dashboard_scope or "today").lower()
+    today = timezone.now().date()
+
+    qs = RepairRequest.objects.filter(
+        assigned_to_id=user_id,
+        status__in=FINISHED_STATUSES,
+        picked_up_at__isnull=False,
+    )
+
+    if scope == "tomorrow":
+        d = today + timedelta(days=1)
+        return qs.filter(picked_up_at__date=d).count()
+    if scope == "week":
+        monday = today - timedelta(days=today.weekday())
+        sunday = monday + timedelta(days=6)
+        return qs.filter(picked_up_at__date__gte=monday, picked_up_at__date__lte=sunday).count()
+    if scope == "month":
+        first = today.replace(day=1)
+        if today.month == 12:
+            next_month_first = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month_first = today.replace(month=today.month + 1, day=1)
+        last = next_month_first - timedelta(days=1)
+        return qs.filter(picked_up_at__date__gte=first, picked_up_at__date__lte=last).count()
+    # "today" i nieznany zakres — bieżący dzień
+    return qs.filter(picked_up_at__date=today).count()
+
+
 def staff_dashboard_data(user_id, *, days_without_update=3, recent_activity_limit=10):
     """
     Zbiorczy słownik dla dashboardu: listy querysetów i opcjonalnie count.

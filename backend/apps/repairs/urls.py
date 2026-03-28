@@ -2,6 +2,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import RepairRequestViewSet, PublicRepairSubmitView
+from .views.staff_views import DashboardCommsPreviewView
 from .views.track_views import (
     TrackRepairView,
     ClaimRepairByTokenView,
@@ -13,6 +14,7 @@ router = DefaultRouter()
 router.register(r"", RepairRequestViewSet, basename="repair")
 
 urlpatterns = [
+    path("dashboard-comms-preview/", DashboardCommsPreviewView.as_view(), name="dashboard-comms-preview"),
     path("submit/", PublicRepairSubmitView.as_view(), name="repair-submit"),
     path("track/", TrackRepairView.as_view(), name="repair-track"),
     path("claim/", ClaimRepairByTokenView.as_view(), name="repair-claim"),

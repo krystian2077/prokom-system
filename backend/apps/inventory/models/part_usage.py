@@ -1,7 +1,8 @@
 """Użycie części w naprawie (powiązanie naprawa–część + cena + hurtownia + status)."""
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.db import models
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
 from apps.common.models import TimestampedModel
 from .part import Part
@@ -38,6 +39,16 @@ class PartUsage(TimestampedModel):
         on_delete=models.PROTECT,
         related_name="usages",
         verbose_name=_("część"),
+        null=True,
+        blank=True,
+        help_text=_("Pozycja z katalogu — albo puste, gdy używana jest wyłącznie nazwa własna."),
+    )
+    custom_part_name = models.CharField(
+        _("nazwa własna (bez katalogu)"),
+        max_length=200,
+        blank=True,
+        default="",
+        help_text=_("Gdy brak pozycji w katalogu: dowolna nazwa wpisana w naprawie."),
     )
     supplier = models.ForeignKey(
         Supplier,
@@ -97,6 +108,12 @@ class PartUsage(TimestampedModel):
         related_name="ordered_parts",
         verbose_name=_("zamawiający"),
     )
+    expected_arrival_date = models.DateField(
+        _("planowana data dostawy"),
+        null=True,
+        blank=True,
+        help_text=_("Kiedy część ma dotrzeć do serwisu (orientacyjnie)"),
+    )
     purchase_order = models.ForeignKey(
         PurchaseOrder,
         on_delete=models.SET_NULL,
@@ -114,10 +131,20 @@ class PartUsage(TimestampedModel):
     class Meta:
         verbose_name = _("użycie części")
         verbose_name_plural = _("użycia części")
-        ordering = ["repair", "part"]
+        ordering = ["repair", "id"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    Q(part__isnull=False) & Q(custom_part_name="")
+                )
+                | (Q(part__isnull=True) & ~Q(custom_part_name="")),
+                name="inventory_partusage_part_xor_custom_name",
+            ),
+        ]
 
     def __str__(self):
-        return f"{self.repair.repair_number}: {self.part.name} x {self.quantity}"
+        label = self.part.name if self.part_id else (self.custom_part_name or "?")
+        return f"{self.repair.repair_number}: {label} x {self.quantity}"
 
     @property
     def total(self):

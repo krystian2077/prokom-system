@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Users,
@@ -31,24 +30,9 @@ export function WorkerSidebar() {
     enabled: Boolean(token && panelUser),
     queryFn: async () => {
       if (!token) return null;
-      // Staff dashboard buckets — zgodnie z dokumentacją (§8.1) i implementacją /panel/dashboard
-      const dashboardRes = await api.get<any>(`/staff/dashboard/?days_without_update=3&recent_limit=10`, token);
+      const dashboardRes = await api.get<any>(`/staff/dashboard/?days_without_update=3&recent_limit=1`, token);
       return {
-        my_new: dashboardRes?.my_new ?? [],
-        my_urgent: dashboardRes?.my_urgent ?? [],
-        today_to_contact: dashboardRes?.today_to_contact ?? [],
-        my_in_progress: dashboardRes?.my_in_progress ?? [],
-        my_overdue: dashboardRes?.my_overdue ?? [],
-        ready_for_pickup: dashboardRes?.ready_for_pickup ?? [],
-        without_update: dashboardRes?.without_update ?? [],
-      } as {
-        my_new: RepairRequestListItem[];
-        my_urgent: RepairRequestListItem[];
-        today_to_contact: RepairRequestListItem[];
-        my_in_progress: RepairRequestListItem[];
-        my_overdue: RepairRequestListItem[];
-        ready_for_pickup: RepairRequestListItem[];
-        without_update: RepairRequestListItem[];
+        my_active_count: Number(dashboardRes?.my_active_count ?? 0),
       };
     },
     staleTime: 15_000,
@@ -81,12 +65,7 @@ export function WorkerSidebar() {
     staleTime: 15_000,
   });
 
-  const myActiveCount = useMemo(() => {
-    const d = dashboardCountsQuery.data;
-    if (!d) return null;
-    const active = (d.my_new?.length ?? 0) + (d.my_urgent?.length ?? 0) + (d.today_to_contact?.length ?? 0) + (d.my_in_progress?.length ?? 0) + (d.my_overdue?.length ?? 0) + (d.without_update?.length ?? 0);
-    return active;
-  }, [dashboardCountsQuery.data]);
+  const myActiveCount = dashboardCountsQuery.data?.my_active_count ?? null;
 
   const requiresActionCount = (requiresActionCountQuery.data ?? 0) as number;
   const unassignedCount = unassignedCountQuery.data ?? null;

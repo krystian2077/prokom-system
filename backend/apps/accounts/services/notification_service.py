@@ -161,17 +161,31 @@ def notify_quote_rejected(repair):
 
 def notify_client_message(repair):
     """Klient napisał wiadomość (panel / e-mail od klienta)."""
-    if not repair.assigned_to_id:
+    title = f"Nowa wiadomość od klienta: {repair.repair_number}"
+    link = f"/staff/repairs/{repair.id}/"
+    if repair.assigned_to_id:
+        create_staff_notification(
+            user_id=repair.assigned_to_id,
+            notification_type=TYPE_CLIENT_MESSAGE,
+            title=title,
+            description="",
+            repair_id=repair.id,
+            priority="important",
+            link=link,
+        )
         return
-    create_staff_notification(
-        user_id=repair.assigned_to_id,
-        notification_type=TYPE_CLIENT_MESSAGE,
-        title=f"Nowa wiadomość od klienta: {repair.repair_number}",
-        description="",
-        repair_id=repair.id,
-        priority="important",
-        link=f"/staff/repairs/{repair.id}/",
-    )
+    from apps.accounts.models import User, UserRole
+
+    for admin in User.objects.filter(role=UserRole.ADMIN, is_active=True):
+        create_staff_notification(
+            user_id=admin.id,
+            notification_type=TYPE_CLIENT_MESSAGE,
+            title=title,
+            description="",
+            repair_id=repair.id,
+            priority="important",
+            link=link,
+        )
 
 
 def notify_complaint_warranty_assigned(repair, assigned_to_id):

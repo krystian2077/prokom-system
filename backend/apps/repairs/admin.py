@@ -52,7 +52,7 @@ class RepairNoteInline(admin.TabularInline):
     model = RepairNote
     extra = 1
     readonly_fields = ["created_at", "author"]
-    fields = ["note", "is_internal", "is_important", "author", "created_at"]
+    fields = ["note", "is_internal", "is_important", "thread_origin", "author", "created_at"]
 
 
 # Upsell: oferty akcesoriów i Hammer Glass przy naprawie

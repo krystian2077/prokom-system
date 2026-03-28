@@ -5,6 +5,7 @@ Katalog części: autocomplete, kolejka, statystyki karty części.
 from django.db.models import Q, Count, Avg, Min, Max
 
 from apps.inventory.models import Part, PartUsage, Supplier
+from apps.inventory.models.part_usage import PartOrderStatus, PartUsageStatus
 
 
 def part_autocomplete(q, *, repair_id=None, device_category=None, brand=None, limit=20):
@@ -28,6 +29,55 @@ def part_autocomplete(q, *, repair_id=None, device_category=None, brand=None, li
     if brand:
         qs = qs.filter(brand__icontains=brand)
     return qs.select_related("supplier").order_by("name")[:limit]
+
+
+DASHBOARD_PARTS_PREVIEW_LIMIT = 8
+
+
+def _part_usage_dashboard_select_related():
+    return PartUsage.objects.select_related(
+        "repair",
+        "part",
+        "supplier",
+        "repair__client",
+        "repair__device",
+        "repair__device__brand",
+        "repair__assigned_to",
+        "added_by",
+    )
+
+
+def parts_status_dashboard(*, user_id, scope_all_repairs: bool):
+    """
+    Trzy kubełki części dla dashboardu: do zamówienia / w drodze / dotarły.
+    scope_all_repairs=True (admin): wszystkie aktywne naprawy w serwisie.
+    False (staff): tylko naprawy przypisane do user_id.
+    Zwraca słownik z querysetami (nie listami) dla każdego kubełka + pełne zliczenia.
+    """
+    from apps.repairs.selectors.staff_dashboard import ACTIVE_STATUSES
+
+    qs = _part_usage_dashboard_select_related().filter(repair__status__in=ACTIVE_STATUSES)
+    if not scope_all_repairs:
+        qs = qs.filter(repair__assigned_to_id=user_id)
+
+    to_order = qs.filter(
+        usage_status=PartUsageStatus.ORDERED,
+        order_status=PartOrderStatus.TO_ORDER,
+    ).order_by("-created_at")
+
+    in_transit = qs.filter(
+        usage_status=PartUsageStatus.ORDERED,
+        order_status__in=[PartOrderStatus.ORDERED, PartOrderStatus.DELAYED],
+    ).order_by("-created_at")
+
+    arrived = qs.filter(usage_status=PartUsageStatus.ARRIVED).order_by("-created_at")
+
+    return {
+        "to_order": to_order,
+        "in_transit": in_transit,
+        "arrived": arrived,
+        "preview_limit": DASHBOARD_PARTS_PREVIEW_LIMIT,
+    }
 
 
 def parts_queue(*, status=None, assigned_to=None):
