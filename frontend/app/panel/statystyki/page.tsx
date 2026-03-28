@@ -63,10 +63,10 @@ function StatCard({
   accentClass: string;
 }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-      <div className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">{label}</div>
-      <div className="mt-2 text-3xl font-semibold text-white">{value}</div>
-      <div className="mt-3 inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">
+    <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+      <div className="text-xs uppercase tracking-[0.18em] text-[var(--ink2)]">{label}</div>
+      <div className="mt-2 text-3xl font-semibold text-[var(--white)]">{value}</div>
+      <div className="mt-3 inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
         <span className={accentClass}>→</span> teraz
       </div>
     </div>
@@ -135,9 +135,9 @@ export default function StatsAdminPage() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Statystyki i health score</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--ink2)]">Panel Admina</p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Statystyki i health score</h1>
+        <p className="mt-1 text-sm text-[var(--ink2)]">
           KPI na żywo, health (żółte/czerwone) oraz ranking pracowników.
         </p>
       </header>
@@ -151,14 +151,14 @@ export default function StatsAdminPage() {
             <StatCardSkeleton />
           </section>
           <section className="mb-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <StackedRowSkeleton rows={5} />
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <StackedRowSkeleton rows={5} />
             </div>
           </section>
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <StackedRowSkeleton rows={6} />
           </div>
         </>
@@ -188,11 +188,11 @@ export default function StatsAdminPage() {
           </section>
 
           <section className="mb-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Health score</p>
-                  <h2 className="mt-2 text-lg font-semibold text-white">Wymaga uwagi</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Health score</p>
+                  <h2 className="mt-2 text-lg font-semibold text-[var(--white)]">Wymaga uwagi</h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold ${badgeStyleByKey("amber")}`}>
@@ -206,14 +206,14 @@ export default function StatsAdminPage() {
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Żółte</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Żółte</p>
                   <div className="mt-3 space-y-2">
                     {healthYellow.slice(0, maxHealthList).map((it) => (
-                      <div key={it.repair.id} className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                        <Link href={`/panel/repairs/${it.repair.id}`} className="block truncate text-sm font-semibold text-white hover:underline">
+                      <div key={it.repair.id} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
+                        <Link href={`/panel/repairs/${it.repair.id}`} className="block truncate text-sm font-semibold text-[var(--white)] hover:underline">
                           {it.repair.repair_number}
                         </Link>
-                        <p className="mt-1 text-xs text-[#9ca3af]">{it.repair.device_name} · {it.repair.client_name}</p>
+                        <p className="mt-1 text-xs text-[var(--ink2)]">{it.repair.device_name} · {it.repair.client_name}</p>
                         {it.issues?.length ? (
                           <div className="mt-2 text-xs text-[#ffe3b0]">
                             {it.issues.slice(0, 3).join(", ")}
@@ -221,19 +221,19 @@ export default function StatsAdminPage() {
                         ) : null}
                       </div>
                     ))}
-                    {healthYellow.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
+                    {healthYellow.length === 0 ? <p className="text-sm text-[var(--muted)]">Brak.</p> : null}
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Czerwone</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Czerwone</p>
                   <div className="mt-3 space-y-2">
                     {healthRed.slice(0, maxHealthList).map((it) => (
-                      <div key={it.repair.id} className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                        <Link href={`/panel/repairs/${it.repair.id}`} className="block truncate text-sm font-semibold text-white hover:underline">
+                      <div key={it.repair.id} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
+                        <Link href={`/panel/repairs/${it.repair.id}`} className="block truncate text-sm font-semibold text-[var(--white)] hover:underline">
                           {it.repair.repair_number}
                         </Link>
-                        <p className="mt-1 text-xs text-[#9ca3af]">{it.repair.device_name} · {it.repair.client_name}</p>
+                        <p className="mt-1 text-xs text-[var(--ink2)]">{it.repair.device_name} · {it.repair.client_name}</p>
                         {it.issues?.length ? (
                           <div className="mt-2 text-xs text-[#ffb4b4]">
                             {it.issues.slice(0, 3).join(", ")}
@@ -241,28 +241,28 @@ export default function StatsAdminPage() {
                         ) : null}
                       </div>
                     ))}
-                    {healthRed.length === 0 ? <p className="text-sm text-[#6b7280]">Brak.</p> : null}
+                    {healthRed.length === 0 ? <p className="text-sm text-[var(--muted)]">Brak.</p> : null}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Ranking</p>
-                  <h2 className="mt-2 text-lg font-semibold text-white">Najlepsi pracownicy</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Ranking</p>
+                  <h2 className="mt-2 text-lg font-semibold text-[var(--white)]">Najlepsi pracownicy</h2>
                 </div>
 
                 <div className="flex items-end gap-3">
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                       Zakres
                     </label>
                     <select
                       value={rankingDays}
                       onChange={(e) => setRankingDays(Number(e.target.value))}
-                      className="w-[170px] rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                      className="w-[170px] rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                     >
                       <option value={7}>7 dni</option>
                       <option value={30}>30 dni</option>
@@ -273,36 +273,36 @@ export default function StatsAdminPage() {
                   <button
                     type="button"
                     onClick={() => void loadAll()}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   >
                     Odśwież
                   </button>
                 </div>
               </div>
 
-              <div className="mt-3 text-xs text-[#9ca3af]">
+              <div className="mt-3 text-xs text-[var(--ink2)]">
                 Wyświetlanych pracowników: {rankingTop.length} / {rankingInfo.total}
               </div>
 
-              <div className="mt-3 divide-y divide-white/10 rounded-2xl border border-white/10 bg-[#0c0d12]">
+              <div className="mt-3 divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--s1)]">
                 {rankingTop.map((it, idx) => (
                   <div key={it.user_id} className="flex items-start justify-between gap-3 p-3">
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">#{idx + 1}</p>
-                      <p className="mt-1 truncate text-sm font-semibold text-white">{it.full_name}</p>
-                      <p className="mt-1 truncate text-xs text-[#9ca3af]">{it.email}</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">#{idx + 1}</p>
+                      <p className="mt-1 truncate text-sm font-semibold text-[var(--white)]">{it.full_name}</p>
+                      <p className="mt-1 truncate text-xs text-[var(--ink2)]">{it.email}</p>
                     </div>
 
                     <div className="text-right">
-                      <p className="text-xs text-[#9ca3af]">Zakończone</p>
-                      <p className="text-sm font-semibold text-white">{it.completed_repairs}</p>
-                      <p className="mt-2 text-xs text-[#9ca3af]">Przychód</p>
-                      <p className="text-sm font-semibold text-white">{fmtPln(it.revenue)}</p>
+                      <p className="text-xs text-[var(--ink2)]">Zakończone</p>
+                      <p className="text-sm font-semibold text-[var(--white)]">{it.completed_repairs}</p>
+                      <p className="mt-2 text-xs text-[var(--ink2)]">Przychód</p>
+                      <p className="text-sm font-semibold text-[var(--white)]">{fmtPln(it.revenue)}</p>
                     </div>
                   </div>
                 ))}
 
-                {rankingTop.length === 0 ? <div className="p-4 text-sm text-[#6b7280]">Brak danych.</div> : null}
+                {rankingTop.length === 0 ? <div className="p-4 text-sm text-[var(--muted)]">Brak danych.</div> : null}
               </div>
             </div>
           </section>

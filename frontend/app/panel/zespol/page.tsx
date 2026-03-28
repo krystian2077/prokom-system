@@ -15,7 +15,7 @@ function badgeForHealth(level: StaffHealthLevel | undefined) {
   if (level === "red") return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
   if (level === "yellow") return "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]";
   if (level === "green") return "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]";
-  return "border-white/10 bg-white/5 text-[#9ca3af]";
+  return "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]";
 }
 
 function healthLabel(level: StaffHealthLevel | undefined) {
@@ -333,30 +333,30 @@ export default function TeamAdminPage() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Zespół i pracownicy</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Lista pracowników, edycja profilu, reset hasła i blokada kont.</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel Admina</p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Zespół i pracownicy</h1>
+        <p className="mt-1 text-sm text-[var(--ink2)]">Lista pracowników, edycja profilu, reset hasła i blokada kont.</p>
       </header>
 
-      <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+      <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="w-full md:w-[420px]">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Szukaj</label>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Szukaj</label>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Imię, nazwisko, e-mail, specjalizacja…"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
             />
           </div>
 
           <div className="flex flex-wrap items-end gap-3">
             <div className="w-[220px]">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Rola</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Rola</label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleInUrl(e.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
               >
                 <option value="">Wszystkie</option>
                 <option value="admin">Administrator</option>
@@ -365,11 +365,11 @@ export default function TeamAdminPage() {
             </div>
 
             <div className="w-[180px]">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Aktywne</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Aktywne</label>
               <select
                 value={isActiveFilter}
                 onChange={(e) => setActiveInUrl(e.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
               >
                 <option value="">Wszystkie</option>
                 <option value="true">Tak</option>
@@ -378,7 +378,7 @@ export default function TeamAdminPage() {
             </div>
 
             <div className="w-[220px]">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Specjalizacja</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Specjalizacja</label>
               <input
                 value={specInput}
                 onChange={(e) => {
@@ -386,7 +386,7 @@ export default function TeamAdminPage() {
                   queueSpecInUrl(e.target.value);
                 }}
                 placeholder="np. serwis drukarek…"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
+                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
               />
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function TeamAdminPage() {
           <button
             type="button"
             onClick={() => void load()}
-            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
           >
             Odśwież
           </button>
@@ -420,19 +420,19 @@ export default function TeamAdminPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => (
-            <div key={s.id} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div key={s.id} className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{s.full_name}</p>
-                  <p className="mt-1 text-sm text-[#9ca3af] truncate">{s.email}</p>
-                  <p className="mt-2 text-sm text-[#9ca3af]">
-                    Rola: <span className="text-white font-semibold">{(s as unknown as { role_display?: string }).role_display ?? s.role}</span>
+                  <p className="text-sm font-semibold text-[var(--white)] truncate">{s.full_name}</p>
+                  <p className="mt-1 text-sm text-[var(--ink2)] truncate">{s.email}</p>
+                  <p className="mt-2 text-sm text-[var(--ink2)]">
+                    Rola: <span className="text-[var(--white)] font-semibold">{(s as unknown as { role_display?: string }).role_display ?? s.role}</span>
                   </p>
-                  <p className="mt-1 text-sm text-[#9ca3af]">
-                    Spec: <span className="text-white font-semibold">{s.staff_profile?.specialization_display ?? "—"}</span>
+                  <p className="mt-1 text-sm text-[var(--ink2)]">
+                    Spec: <span className="text-[var(--white)] font-semibold">{s.staff_profile?.specialization_display ?? "—"}</span>
                   </p>
-                  <p className="mt-1 text-sm text-[#9ca3af]">
-                    Dostępny: <span className="text-white font-semibold">{s.is_active ? "Tak" : "Nie"}</span>
+                  <p className="mt-1 text-sm text-[var(--ink2)]">
+                    Dostępny: <span className="text-[var(--white)] font-semibold">{s.is_active ? "Tak" : "Nie"}</span>
                   </p>
                 </div>
                 <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${badgeForHealth(s.health_score_level)}`}>
@@ -441,19 +441,19 @@ export default function TeamAdminPage() {
               </div>
 
               <div className="mt-4 space-y-2">
-                <p className="text-xs uppercase tracking-[0.12em] text-[#9ca3af]">Akcje</p>
+                <p className="text-xs uppercase tracking-[0.12em] text-[var(--ink2)]">Akcje</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => openEdit(s)}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   >
                     Edytuj
                   </button>
                   <button
                     type="button"
                     onClick={() => openReset(s.id)}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   >
                     Reset hasła
                   </button>
@@ -469,7 +469,7 @@ export default function TeamAdminPage() {
                     <button
                       type="button"
                       onClick={() => void toggleActive(s.id, true)}
-                      className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                      className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                     >
                       Aktywuj
                     </button>
@@ -477,31 +477,31 @@ export default function TeamAdminPage() {
                 </div>
               </div>
 
-              <div className="mt-4 text-xs text-[#9ca3af]">
+              <div className="mt-4 text-xs text-[var(--ink2)]">
                 {s.last_login ? `Ostatnio: ${formatDateTime(s.last_login)}` : "Ostatnio: —"}
               </div>
             </div>
           ))}
           {filtered.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Brak wyników.</p>
+            <p className="text-sm text-[var(--muted)]">Brak wyników.</p>
           ) : null}
         </div>
       )}
 
       {modalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-[#0c0d12] shadow-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4">
+          <div className="w-full max-w-2xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] p-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">{modalMode === "create" ? "Dodaj" : "Edytuj"}</p>
-                <p className="mt-1 text-lg font-semibold text-white">
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">{modalMode === "create" ? "Dodaj" : "Edytuj"}</p>
+                <p className="mt-1 text-lg font-semibold text-[var(--white)]">
                   {modalMode === "create" ? "Nowego pracownika" : "Profil pracownika"}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
               >
                 Zamknij
               </button>
@@ -512,47 +512,47 @@ export default function TeamAdminPage() {
 
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Imię</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Imię</label>
                   <input
                     value={form.first_name}
                     onChange={(e) => setForm((p) => ({ ...p, first_name: e.target.value }))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Nazwisko</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Nazwisko</label>
                   <input
                     value={form.last_name}
                     onChange={(e) => setForm((p) => ({ ...p, last_name: e.target.value }))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                     required
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">E-mail</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">E-mail</label>
                   <input
                     value={form.email}
                     onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                     required
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Telefon (opcjonalnie)</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Telefon (opcjonalnie)</label>
                   <input
                     value={form.phone ?? ""}
                     onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Rola</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Rola</label>
                   <select
                     value={form.role}
                     onChange={(e) => setForm((p) => ({ ...p, role: e.target.value as UserRole }))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                   >
                     <option value="staff">Pracownik</option>
                     <option value="admin">Administrator</option>
@@ -560,22 +560,22 @@ export default function TeamAdminPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Aktywne</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Aktywne</label>
                   <select
                     value={String(form.is_active)}
                     onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.value === "true" }))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                   >
                     <option value="true">Tak</option>
                     <option value="false">Nie</option>
                   </select>
                 </div>
 
-                <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Profil pracownika (staff_profile)</p>
+                <div className="md:col-span-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Profil pracownika (staff_profile)</p>
                   <div className="mt-3 grid gap-3 md:grid-cols-2">
                     <div className="md:col-span-2">
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Specjalizacja</label>
+                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Specjalizacja</label>
                       <input
                         value={form.staff_profile.specialization ?? ""}
                         onChange={(e) =>
@@ -584,11 +584,11 @@ export default function TeamAdminPage() {
                             staff_profile: { ...p.staff_profile, specialization: e.target.value },
                           }))
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Kolor</label>
+                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Kolor</label>
                       <input
                         value={form.staff_profile.calendar_color ?? ""}
                         onChange={(e) =>
@@ -597,11 +597,11 @@ export default function TeamAdminPage() {
                             staff_profile: { ...p.staff_profile, calendar_color: e.target.value },
                           }))
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Nazwa w UI (opcjonalnie)</label>
+                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Nazwa w UI (opcjonalnie)</label>
                       <input
                         value={form.staff_profile.display_name ?? ""}
                         onChange={(e) =>
@@ -610,7 +610,7 @@ export default function TeamAdminPage() {
                             staff_profile: { ...p.staff_profile, display_name: e.target.value },
                           }))
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                       />
                     </div>
                     <div>
@@ -666,13 +666,13 @@ export default function TeamAdminPage() {
 
                 {modalMode === "create" && form.role === "admin" ? (
                   <div className="md:col-span-2">
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                       Hasło (dla administratora)
                     </label>
                     <input
                       value={form.password ?? ""}
                       onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                      className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                       type="password"
                       required
                     />
@@ -684,7 +684,7 @@ export default function TeamAdminPage() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 >
                   Anuluj
                 </button>
@@ -703,29 +703,29 @@ export default function TeamAdminPage() {
 
       {resetModalOpen && resetTargetId && (
         <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-[#0c0d12] shadow-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4">
+          <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] p-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Reset hasła</p>
-                <p className="mt-1 text-lg font-semibold text-white">Dla wybranego pracownika</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Reset hasła</p>
+                <p className="mt-1 text-lg font-semibold text-[var(--white)]">Dla wybranego pracownika</p>
               </div>
               <button
                 type="button"
                 onClick={() => setResetModalOpen(false)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
               >
                 Zamknij
               </button>
             </div>
 
             <form onSubmit={submitReset} className="p-4 space-y-4">
-              {resetResult ? <p className="text-sm text-white whitespace-pre-wrap">{resetResult}</p> : null}
+              {resetResult ? <p className="text-sm text-[var(--white)] whitespace-pre-wrap">{resetResult}</p> : null}
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Akcja</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Akcja</label>
                 <select
                   value={resetAction}
                   onChange={(e) => setResetAction(e.target.value as "generate" | "send_link")}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                 >
                   <option value="generate">Wygeneruj tymczasowe hasło</option>
                   <option value="send_link">Wyślij link do resetu</option>
@@ -734,13 +734,13 @@ export default function TeamAdminPage() {
 
               {resetAction === "generate" ? (
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                     Nowe hasło (opcjonalnie)
                   </label>
                   <input
                     value={resetCustomPassword}
                     onChange={(e) => setResetCustomPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
                     type="password"
                     placeholder="Jeśli puste, system wygeneruje"
                   />
@@ -751,7 +751,7 @@ export default function TeamAdminPage() {
                 <button
                   type="button"
                   onClick={() => setResetModalOpen(false)}
-                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 >
                   Anuluj
                 </button>

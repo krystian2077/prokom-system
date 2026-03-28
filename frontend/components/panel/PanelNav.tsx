@@ -109,7 +109,7 @@ export function PanelNav({ user }: PanelNavProps) {
               {user.firstName}
             </span>
             <span
-              className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-bold text-[var(--white)]"
               style={{
                 background: "linear-gradient(135deg, var(--red), var(--red-h))",
               }}

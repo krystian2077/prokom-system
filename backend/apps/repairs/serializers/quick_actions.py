@@ -43,7 +43,9 @@ class AssignRepairSerializer(serializers.Serializer):
 class QuickAcceptSerializer(serializers.Serializer):
     """
     Szybkie przyjęcie (prokom.md): minimalne dane.
-    Albo client_id + device_id, albo first_name, last_name, phone, email + device_category (+ opcjonalnie device_model_name).
+    - client_id + device_id — istniejący klient i urządzenie
+    - client_id + device_category (bez device_id) — istniejący klient, nowe urządzenie
+    - first_name, last_name, phone, device_category — nowy klient (+ opcjonalnie email; jeśli brak, backend ustawi placeholder)
     """
     problem_description = serializers.CharField(required=True, trim_whitespace=True, max_length=2000)
     client_id = serializers.UUIDField(required=False, allow_null=True)
@@ -55,19 +57,152 @@ class QuickAcceptSerializer(serializers.Serializer):
     device_category = serializers.ChoiceField(choices=DeviceCategory.choices, required=False, allow_null=True)
     device_model_name = serializers.CharField(required=False, allow_blank=True, max_length=200, default="Do uzupełnienia")
 
+    manual_brand = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    device_color = serializers.CharField(required=False, allow_blank=True, max_length=64)
+    visual_condition = serializers.CharField(required=False, allow_blank=True, max_length=2000)
+    device_password = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    accessory_etui = serializers.BooleanField(required=False, default=False)
+    accessory_sim = serializers.BooleanField(required=False, default=False)
+    accessory_charger = serializers.BooleanField(required=False, default=False)
+    accessory_cable = serializers.BooleanField(required=False, default=False)
+    accessory_box = serializers.BooleanField(required=False, default=False)
+    internal_notes = serializers.CharField(required=False, allow_blank=True, max_length=5000)
+    estimated_cost = serializers.DecimalField(
+        required=False, allow_null=True, max_digits=10, decimal_places=2
+    )
+    estimated_completion_date = serializers.DateField(required=False, allow_null=True)
+    assigned_to_id = serializers.UUIDField(required=False, allow_null=True)
+    unassigned_explicit = serializers.BooleanField(required=False, default=False)
+    send_confirmation_email = serializers.BooleanField(required=False, default=False)
+    hammer_glass_interest = serializers.ChoiceField(
+        choices=["yes", "no"],
+        required=False,
+        allow_null=True,
+    )
+
     def validate(self, attrs):
-        has_existing = attrs.get("client_id") and attrs.get("device_id")
-        has_new = all([
-            attrs.get("first_name"),
-            attrs.get("last_name"),
-            attrs.get("phone"),
-            attrs.get("email"),
-            attrs.get("device_category"),
-        ])
-        if not has_existing and not has_new:
+        cid = attrs.get("client_id")
+        did = attrs.get("device_id")
+        cat = attrs.get("device_category")
+        fn = (attrs.get("first_name") or "").strip()
+        ln = (attrs.get("last_name") or "").strip()
+        ph = (attrs.get("phone") or "").strip()
+
+        has_existing_device = bool(cid and did)
+        has_new_device_for_client = bool(cid and not did and cat)
+        has_new_client = bool(fn and ln and ph and cat)
+
+        if not (has_existing_device or has_new_device_for_client or has_new_client):
             raise serializers.ValidationError(
-                "Podaj albo client_id i device_id (istniejące), albo first_name, last_name, phone, email i device_category."
+                "Podaj: (client_id i device_id) albo (client_id i device_category bez device_id) "
+                "albo (imię, nazwisko, telefon i device_category dla nowego klienta)."
             )
+
+        effective_cat = cat
+        if has_existing_device and not effective_cat:
+            from apps.devices.models import Device
+
+            dev = Device.objects.filter(id=did, client_id=cid).first()
+            if dev:
+                effective_cat = dev.category
+
+        hg = attrs.get("hammer_glass_interest")
+        if effective_cat in ("phone", "tablet", "smartwatch"):
+            if hg not in ("yes", "no"):
+                raise serializers.ValidationError(
+                    {
+                        "hammer_glass_interest": (
+                            "Dla telefonu, tableta lub smartwatcha wybierz zainteresowanie "
+                            "folią Hammer Glass lub szkłem hartowanym (Tak / Nie)."
+                        )
+                    }
+                )
+        else:
+            attrs["hammer_glass_interest"] = None
+
+        return attrs
+
+
+class QuickComplaintWarrantySerializer(serializers.Serializer):
+    """
+    Przyjęcie reklamacji / gwarancji (stacjonarne).
+    - Reklamacja: wymagana naprawa nadrzędna (parent_repair_id lub parent_repair_number).
+    - Gwarancja: opcjonalna naprawa nadrzędna; bez niej — imię, nazwisko, telefon, device_category (nowy klient).
+    """
+
+    repair_type = serializers.ChoiceField(choices=["complaint", "warranty"])
+    problem_description = serializers.CharField(required=True, trim_whitespace=True, max_length=2000)
+    parent_repair_id = serializers.UUIDField(required=False, allow_null=True)
+    parent_repair_number = serializers.CharField(required=False, allow_blank=True, max_length=40)
+
+    first_name = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    last_name = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    phone = serializers.CharField(required=False, allow_blank=True, max_length=20)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    device_category = serializers.ChoiceField(choices=DeviceCategory.choices, required=False, allow_null=True)
+    device_model_name = serializers.CharField(required=False, allow_blank=True, max_length=200, default="Do uzupełnienia")
+    manual_brand = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    device_color = serializers.CharField(required=False, allow_blank=True, max_length=64)
+    visual_condition = serializers.CharField(required=False, allow_blank=True, max_length=2000)
+    device_password = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    accessory_etui = serializers.BooleanField(required=False, default=False)
+    accessory_sim = serializers.BooleanField(required=False, default=False)
+    accessory_charger = serializers.BooleanField(required=False, default=False)
+    accessory_cable = serializers.BooleanField(required=False, default=False)
+    accessory_box = serializers.BooleanField(required=False, default=False)
+    internal_notes = serializers.CharField(required=False, allow_blank=True, max_length=5000)
+    estimated_cost = serializers.DecimalField(
+        required=False, allow_null=True, max_digits=10, decimal_places=2
+    )
+    estimated_completion_date = serializers.DateField(required=False, allow_null=True)
+    assigned_to_id = serializers.UUIDField(required=False, allow_null=True)
+    unassigned_explicit = serializers.BooleanField(required=False, default=False)
+    send_confirmation_email = serializers.BooleanField(required=False, default=False)
+    hammer_glass_interest = serializers.ChoiceField(
+        choices=["yes", "no"],
+        required=False,
+        allow_null=True,
+    )
+
+    def validate(self, attrs):
+        rt = attrs.get("repair_type")
+        pid = attrs.get("parent_repair_id")
+        pnum = (attrs.get("parent_repair_number") or "").strip()
+        has_parent = bool(pid or pnum)
+
+        fn = (attrs.get("first_name") or "").strip()
+        ln = (attrs.get("last_name") or "").strip()
+        ph = (attrs.get("phone") or "").strip()
+        cat = attrs.get("device_category")
+
+        if rt == "complaint" and not has_parent:
+            raise serializers.ValidationError(
+                "Reklamacja wymaga naprawy nadrzędnej: podaj parent_repair_id lub parent_repair_number."
+            )
+
+        if rt == "warranty" and not has_parent:
+            if not (fn and ln and ph and cat):
+                raise serializers.ValidationError(
+                    "Gwarancja bez naprawy w systemie: podaj imię, nazwisko, telefon i kategorię urządzenia."
+                )
+
+        effective_cat = cat
+        if rt == "complaint" or (rt == "warranty" and has_parent):
+            attrs["hammer_glass_interest"] = None
+        elif rt == "warranty" and not has_parent and effective_cat in ("phone", "tablet", "smartwatch"):
+            hg = attrs.get("hammer_glass_interest")
+            if hg not in ("yes", "no"):
+                raise serializers.ValidationError(
+                    {
+                        "hammer_glass_interest": (
+                            "Dla telefonu, tableta lub smartwatcha wybierz zainteresowanie "
+                            "folią Hammer Glass lub szkłem hartowanym (Tak / Nie)."
+                        )
+                    }
+                )
+        else:
+            attrs["hammer_glass_interest"] = None
+
         return attrs
 
 

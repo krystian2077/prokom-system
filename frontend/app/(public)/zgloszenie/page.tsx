@@ -153,6 +153,7 @@ export default function ZgloszeniePage() {
   const [phone, setPhone] = useState("");
   const [pref, setPref] = useState<"email" | "telefon" | "sms">("email");
   const [street, setStreet] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
   const [city, setCity] = useState("");
   const [zip, setZip] = useState("");
 
@@ -312,7 +313,7 @@ export default function ZgloszeniePage() {
         email: email.trim(),
         phone: phone.trim(),
         preferred_contact: preferredContact,
-        street: street.trim(),
+        street: [street, houseNumber].filter(Boolean).join(" ").trim(),
         city: city.trim(),
         postal_code: zip.trim(),
         country: "Polska",
@@ -329,6 +330,7 @@ export default function ZgloszeniePage() {
       delivery_method: deliveryMethod,
       return_method: returnMethod,
       delivery_street: (delivery === "kurier" || pickup === "kurier") ? street.trim() : "",
+      delivery_house_number: (delivery === "kurier" || pickup === "kurier") ? houseNumber.trim() : "",
       delivery_city: (delivery === "kurier" || pickup === "kurier") ? city.trim() : "",
       delivery_postal_code: (delivery === "kurier" || pickup === "kurier") ? zip.trim() : "",
       delivery_country: "Polska",
@@ -742,9 +744,15 @@ export default function ZgloszeniePage() {
                         </div>
                         <div>
                           <label className="flabel text-[var(--muted)] italic normal-case">
-                            Ulica i numer <span className="italic">(opcjonalnie)</span>
+                            Ulica <span className="italic">(opcjonalnie)</span>
                           </label>
-                          <input type="text" className="fi mt-1.5" placeholder="Ulica i numer" value={street} onChange={(e) => setStreet(e.target.value)} />
+                          <input type="text" className="fi mt-1.5" placeholder="np. Mickiewicza" value={street} onChange={(e) => setStreet(e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="flabel text-[var(--muted)] italic normal-case">
+                            Numer domu / lokalu <span className="italic">(opcjonalnie)</span>
+                          </label>
+                          <input type="text" className="fi mt-1.5" placeholder="np. 26, 12/5" value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} />
                         </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" style={{ gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                           <div>
@@ -955,8 +963,12 @@ export default function ZgloszeniePage() {
                             <p className="mt-1.5 text-[11.5px]" style={{ color: "var(--ink2)" }}>Dane z kroku „Kontakt”. Możesz je tutaj poprawić.</p>
                             <div className="mt-3 space-y-3">
                               <div>
-                                <label className="flabel text-[var(--muted)] italic normal-case">Ulica i numer</label>
-                                <input type="text" className="fi mt-1" placeholder="Ulica i numer" value={street} onChange={(e) => setStreet(e.target.value)} />
+                                <label className="flabel text-[var(--muted)] italic normal-case">Ulica</label>
+                                <input type="text" className="fi mt-1" placeholder="Ulica" value={street} onChange={(e) => setStreet(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="flabel text-[var(--muted)] italic normal-case">Numer domu / lokalu</label>
+                                <input type="text" className="fi mt-1" placeholder="np. 26, 12/5" value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} />
                               </div>
                               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div>

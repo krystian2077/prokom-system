@@ -8,6 +8,7 @@ import type { RepairRequestListItem } from "@/types/repairs";
 import Link from "next/link";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { ARCHIVED_FINAL_STATUSES } from "@/lib/repairListDisplay";
 
 type PaginatedResponse<T> = {
   count: number;
@@ -18,31 +19,6 @@ type PaginatedResponse<T> = {
 
 const PAGE_SIZE = 20;
 const KPI_DAYS = 30;
-
-const ARCHIVE_STATUSES: string[] = [
-  // Backend: brak osobnego pola "archiwum" w naprawach.
-  // W praktyce "historia/archiwum" traktujemy jako wszystkie sprawy od momentu,
-  // kiedy nie są już w statusie "new" (lista końcowa + wcześniejsze etapy).
-  "accepted",
-  "in_diagnostics",
-  "diagnostics_done",
-  "quote_pending",
-  "quote_sent",
-  "quote_accepted",
-  "waiting_for_parts",
-  "in_repair",
-  "repair_done",
-  "in_testing",
-  "testing_failed",
-  "testing_passed",
-  "ready_for_pickup",
-  "picked_up",
-  "shipped",
-  "delivered",
-  "cancelled",
-  "unrepairable",
-  "abandoned",
-];
 
 type HistoryVariant = "standard" | "complaint" | "unclaimed" | "warranty" | "vip_returning";
 
@@ -61,15 +37,28 @@ function variantCardClass(v: HistoryVariant): string {
   if (v === "unclaimed") return "border-[#ef4444]/35 bg-[#ef4444]/10";
   if (v === "warranty") return "border-[#8b5cf6]/35 bg-[#8b5cf6]/10";
   if (v === "vip_returning") return "border-[#06b6d4]/35 bg-[#06b6d4]/10";
-  return "border-white/10 bg-white/[0.03]";
+  return "border-[var(--border)] bg-white/[0.03]";
 }
 
-function variantBadge(v: HistoryVariant, waitingDays: number | null | undefined): string {
-  if (v === "complaint") return "Reklamacja";
-  if (v === "unclaimed") return `Nieodebrana ${waitingDays ?? 0}d!`;
-  if (v === "warranty") return "Gwarancja 90d";
-  if (v === "vip_returning") return "VIP powracający";
-  return "Odebrana ✓";
+/** Dodatkowy kontekst (reklamacja, gwarancja…) — tylko gdy wariant nie jest „zwykłym” zamknięciem. */
+function secondaryHistoryChip(
+  item: RepairRequestListItem,
+  v: HistoryVariant
+): { label: string; className: string } | null {
+  const s = (item.status ?? "").toLowerCase();
+  if (["cancelled", "unrepairable", "abandoned"].includes(s)) return null;
+  if (v === "complaint")
+    return { label: "Reklamacja", className: "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd89b]" };
+  if (v === "unclaimed")
+    return {
+      label: `Nieodebrana ${item.waiting_for_client_days ?? 0} d`,
+      className: "border-[#ef4444]/40 bg-[#ef4444]/15 text-[#fecaca]",
+    };
+  if (v === "warranty")
+    return { label: "Gwarancja 90 d", className: "border-[#8b5cf6]/40 bg-[#8b5cf6]/15 text-[#ddd6fe]" };
+  if (v === "vip_returning")
+    return { label: "Klient powracający", className: "border-[#06b6d4]/40 bg-[#06b6d4]/15 text-[#bae6fd]" };
+  return null;
 }
 
 function statusPillStyle(status: string) {
@@ -79,14 +68,7 @@ function statusPillStyle(status: string) {
   if (["delivered", "picked_up"].includes(s)) return `${base} border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]`;
   if (["shipped"].includes(s)) return `${base} border-[#3b82f6]/35 bg-[#3b82f6]/15 text-[#bcd6ff]`;
   if (["ready_for_pickup", "repair_done"].includes(s)) return `${base} border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]`;
-  return `${base} border-white/10 bg-white/5 text-[#9ca3af]`;
-}
-
-function formatZl(value: string | number | null | undefined) {
-  if (value == null) return "—";
-  const num = typeof value === "string" ? Number(value) : value;
-  if (!Number.isFinite(num)) return "—";
-  return `${Math.round(num).toLocaleString("pl-PL")} zł`;
+  return `${base} border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]`;
 }
 
 function SummaryCard({
@@ -95,17 +77,19 @@ function SummaryCard({
   accent,
   loading,
   valueSuffix,
+  hint,
 }: {
   label: string;
   value: number | null;
   accent: string;
   loading: boolean;
   valueSuffix?: string;
+  hint?: string;
 }) {
   const v = value ?? 0;
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12] p-4"
+      className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4"
       style={{
         boxShadow: "inset 0 1px 0 rgba(255,255,255,.05)",
       }}
@@ -120,14 +104,17 @@ function SummaryCard({
       />
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">{label}</div>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">{label}</div>
           {loading ? (
-            <div className="mt-2 h-8 w-[90px] rounded bg-white/5 animate-pulse" />
+            <div className="mt-2 h-8 w-[90px] rounded bg-[var(--row-hover)] animate-pulse" />
           ) : (
-            <div className="mt-2 text-2xl font-semibold text-white">
-              {value == null ? "…" : v}
-              {valueSuffix ?? ""}
-            </div>
+            <>
+              <div className="mt-2 text-2xl font-semibold text-[var(--white)]">
+                {value == null ? "…" : v}
+                {valueSuffix ?? ""}
+              </div>
+              {hint ? <p className="mt-1.5 text-[11px] leading-snug text-[var(--muted)]">{hint}</p> : null}
+            </>
           )}
         </div>
         <div
@@ -166,8 +153,7 @@ export default function ArchivePage() {
   const [error, setError] = useState<string | null>(null);
 
   const statusInQuery = useMemo(() => {
-    // Django/DRF: status_in is list-like => repeating query params
-    return ARCHIVE_STATUSES.map((s) => `status_in=${encodeURIComponent(s)}`).join("&");
+    return ARCHIVED_FINAL_STATUSES.map((s) => `status_in=${encodeURIComponent(s)}`).join("&");
   }, []);
 
   const load = async () => {
@@ -205,9 +191,6 @@ export default function ArchivePage() {
   const [kpiLoading, setKpiLoading] = useState(true);
   const [kpiError, setKpiError] = useState<string | null>(null);
   const [kpi, setKpi] = useState<{
-    repairs_total: number;
-    revenue_total: string;
-    overdue_count: number;
     completed_in_period: number;
     average_completion_days: number | null;
   } | null>(null);
@@ -267,18 +250,17 @@ export default function ArchivePage() {
   }, [search, isAdmin, user?.id]);
 
   const pageCount = Math.max(1, Math.ceil(count / PAGE_SIZE));
-  const overduePercent =
-    kpi && Number.isFinite(kpi.repairs_total) && kpi.repairs_total > 0 ? (kpi.overdue_count / kpi.repairs_total) * 100 : null;
 
   return (
     <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
       <div className="flex flex-col gap-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Historia napraw</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">Historia zakończonych napraw</h1>
-            <p className="mt-1 text-sm text-[#9ca3af]">
-              Widok końcowych napraw z wariantami: standard, reklamacja, nieodebrana, gwarancja i klient powracający.
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Historia napraw</p>
+            <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Historia zakończonych napraw</h1>
+            <p className="mt-1 text-sm text-[var(--ink2)]">
+              Wyłącznie zamknięte zlecenia: wydane, wysłane, dostarczone lub zakończone negatywnie (anulowane, porzucone,
+              nie do naprawy). Dodatkowe oznaczenia pokazują reklamacje, gwarancję lub klienta powracającego.
             </p>
           </div>
 
@@ -287,96 +269,46 @@ export default function ArchivePage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Szukaj: numer naprawy, klient, urządzenie…"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-[#6b7280] outline-none focus:border-[#dc1e1e]"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm text-[var(--white)] placeholder:text-[var(--muted)] outline-none focus:border-[#dc1e1e]"
             />
           </div>
         </header>
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <SummaryCard label="Naprawy" value={kpi && !kpiLoading ? kpi.repairs_total : null} accent="#3b82f6" loading={kpiLoading} />
-          <div
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12] p-4"
-            style={{
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,.05)",
-            }}
-          >
-            <div className="absolute left-0 top-0 h-full w-[2px]" style={{ background: "#dc1e1e", boxShadow: "0 0 18px #dc1e1e", opacity: kpiLoading ? 0.6 : 0.95 }} />
-            <div className="relative flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Przychód</div>
-                {kpiLoading ? (
-                  <div className="mt-2 h-8 w-[120px] rounded bg-white/5 animate-pulse" />
-                ) : (
-                  <div className="mt-2 text-2xl font-semibold text-white">{kpi ? formatZl(kpi.revenue_total) : "…"}</div>
-                )}
-              </div>
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}
-                aria-hidden="true"
-              >
-                <span className="text-sm font-bold" style={{ color: "#dc1e1e" }}>
-                  {kpiLoading ? "…" : "→"}
-                </span>
-              </div>
-            </div>
-          </div>
-
+        <section className="grid max-w-3xl gap-4 md:grid-cols-2">
           <SummaryCard
-            label="Średni czas"
+            label={`Zakończone (${KPI_DAYS} dni)`}
+            value={kpi && !kpiLoading ? kpi.completed_in_period : null}
+            accent="#3b82f6"
+            loading={kpiLoading}
+            hint="Liczba napraw zamkniętych w okresie (cały serwis, jak w statystykach)."
+          />
+          <SummaryCard
+            label="Średni czas realizacji"
             value={kpi && !kpiLoading && kpi.average_completion_days != null ? Math.round(kpi.average_completion_days) : null}
             valueSuffix={kpiLoading ? "" : " dni"}
             accent="#22c55e"
             loading={kpiLoading}
+            hint="Od przyjęcia do zamknięcia — naprawy wydane/wysłane/dostarczone w okresie (cały serwis)."
           />
-
-          <div
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12] p-4"
-            style={{
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,.05)",
-            }}
-          >
-            <div className="absolute left-0 top-0 h-full w-[2px]" style={{ background: "#f59e0b", boxShadow: "0 0 18px #f59e0b", opacity: kpiLoading ? 0.6 : 0.95 }} />
-            <div className="relative flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Opóźnienia</div>
-                {kpiLoading ? (
-                  <div className="mt-2 h-8 w-[90px] rounded bg-white/5 animate-pulse" />
-                ) : (
-                  <div className="mt-2 text-2xl font-semibold text-white">
-                    {overduePercent == null ? "…" : `${overduePercent.toFixed(1)}%`}
-                  </div>
-                )}
-              </div>
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}
-                aria-hidden="true"
-              >
-                <span className="text-sm font-bold" style={{ color: "#f59e0b" }}>
-                  {kpiLoading ? "…" : "→"}
-                </span>
-              </div>
-            </div>
-          </div>
         </section>
 
         {kpiError && !kpiLoading && <p className="text-sm text-[#fca5a5]">{kpiError}</p>}
 
-        <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
+        <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full" style={{ background: "#dc1e1e", boxShadow: "0 0 20px #dc1e1e" }} />
-                <h2 className="text-base font-semibold text-white">Zakończone naprawy</h2>
+                <h2 className="text-base font-semibold text-[var(--white)]">Zakończone naprawy</h2>
               </div>
-              <p className="mt-1 text-sm text-[#9ca3af]">
-                Lista dla statusów końcowych/anulowanych (paginacja i wyszukiwanie).
+              <p className="mt-1 text-sm text-[var(--ink2)]">
+                Tylko statusy końcowe. Wyszukiwanie po numerze, kliencie i urządzeniu — z przypisaniem do Ciebie (jeśli nie
+                jesteś administratorem).
               </p>
             </div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">
               {loading ? (
-                <span className="inline-block h-3 w-28 animate-pulse rounded bg-white/10" aria-hidden />
+                <span className="inline-block h-3 w-28 animate-pulse rounded bg-[var(--row-active)]" aria-hidden />
               ) : (
                 `${items.length} z ${count} pozycji`
               )}
@@ -390,18 +322,18 @@ export default function ArchivePage() {
                   <div
                     // eslint-disable-next-line react/no-array-index-key
                     key={i}
-                    className="flex items-center justify-between gap-3 border-t border-white/10 px-2 py-4 animate-pulse"
+                    className="flex items-center justify-between gap-3 border-t border-[var(--border)] px-2 py-4 animate-pulse"
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <div className="h-8 w-8 rounded-xl bg-white/5" />
+                      <div className="h-8 w-8 rounded-xl bg-[var(--row-hover)]" />
                       <div className="min-w-0">
-                        <div className="h-4 w-40 rounded bg-white/5" />
-                        <div className="mt-2 h-3 w-56 rounded bg-white/5" />
+                        <div className="h-4 w-40 rounded bg-[var(--row-hover)]" />
+                        <div className="mt-2 h-3 w-56 rounded bg-[var(--row-hover)]" />
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="h-8 w-28 rounded-full bg-white/5" />
-                      <div className="h-3 w-16 rounded bg-white/5" />
+                      <div className="h-8 w-28 rounded-full bg-[var(--row-hover)]" />
+                      <div className="h-3 w-16 rounded bg-[var(--row-hover)]" />
                     </div>
                   </div>
                 ))}
@@ -415,7 +347,7 @@ export default function ArchivePage() {
             ) : null}
 
             {!loading && !error && items.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-5 py-8">
+              <div className="rounded-2xl border border-dashed border-[var(--border)] bg-black/10 px-5 py-8">
                 <EmptyState
                   icon={EMPTY_STATES.archive.icon}
                   title={EMPTY_STATES.archive.title}
@@ -425,107 +357,102 @@ export default function ArchivePage() {
             )}
 
             {!loading && !error && items.length > 0 && (
-              <div className="divide-y divide-white/10">
-                {items.map((r, idx) => (
-                  (() => {
-                    const v = getHistoryVariant(r);
-                    const isUnclaimed = v === "unclaimed";
-                    const isComplaint = v === "complaint";
-                    const isWarranty = v === "warranty";
-                    const isVip = v === "vip_returning";
-                    const badge = variantBadge(v, r.waiting_for_client_days);
-                    return (
-                  <Link
-                    key={r.id}
-                    href={`/panel/naprawy/${r.id}`}
-                    className={`group flex items-start justify-between gap-4 rounded-2xl border px-3 py-4 transition hover:bg-white/5 ${variantCardClass(v)}`}
-                    style={{ borderTop: idx === 0 ? "none" : undefined }}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-sm font-semibold text-white group-hover:text-[#dc1e1e]">
-                          {r.repair_number}
-                        </span>
-                        <span className={statusPillStyle(r.status)}>{r.status_display}</span>
-                        <span
-                          className={`rounded-full border px-3 py-1 text-[11px] font-semibold ${
-                            isComplaint
-                              ? "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd89b]"
-                              : isUnclaimed
-                                ? "border-[#ef4444]/40 bg-[#ef4444]/15 text-[#fecaca]"
-                                : isWarranty
-                                  ? "border-[#8b5cf6]/40 bg-[#8b5cf6]/15 text-[#ddd6fe]"
-                                  : isVip
-                                    ? "border-[#06b6d4]/40 bg-[#06b6d4]/15 text-[#bae6fd]"
-                                    : "border-[#22c55e]/40 bg-[#22c55e]/15 text-[#bbf7d0]"
-                          }`}
-                        >
-                          {badge}
-                        </span>
+              <div className="divide-y divide-[var(--border)]">
+                {items.map((r, idx) => {
+                  const v = getHistoryVariant(r);
+                  const isUnclaimed = v === "unclaimed";
+                  const isComplaint = v === "complaint";
+                  const isWarranty = v === "warranty";
+                  const isVip = v === "vip_returning";
+                  const extraChip = secondaryHistoryChip(r, v);
+                  return (
+                    <Link
+                      key={r.id}
+                      href={`/panel/naprawy/${r.id}`}
+                      className={`group flex flex-col gap-3 rounded-2xl border px-4 py-4 transition hover:bg-white/[0.04] sm:flex-row sm:items-center sm:justify-between sm:gap-6 ${variantCardClass(v)}`}
+                      style={{ borderTop: idx === 0 ? "none" : undefined }}
+                    >
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                          <span className="font-mono text-[13px] font-semibold tracking-tight text-[var(--white)] group-hover:text-[#dc1e1e]">
+                            {r.repair_number}
+                          </span>
+                          <span className={statusPillStyle(r.status)}>{r.status_display}</span>
+                          {extraChip ? (
+                            <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${extraChip.className}`}>
+                              {extraChip.label}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="text-sm leading-snug text-[#d1d5db]">
+                          <span className="font-medium text-[var(--white)]/95">{r.device_name}</span>
+                          <span className="text-[var(--muted)]"> · </span>
+                          <span>{r.client_name}</span>
+                        </p>
+                        {isComplaint ? (
+                          <p className="text-xs text-[#fbbf24]/95">
+                            Reklamacja — sprawdź historię zlecenia i notatki serwisowe.
+                          </p>
+                        ) : null}
+                        {isWarranty ? (
+                          <p className="text-xs text-[#c4b5fd]/95">Gwarancja: 90 dni od daty odbioru.</p>
+                        ) : null}
+                        {isVip ? (
+                          <p className="text-xs text-[#67e8f9]/90">Klient powracający — kontekst wcześniejszych napraw.</p>
+                        ) : null}
                       </div>
-                      <p className="mt-1 text-sm text-[#b4b8c4]">
-                        {r.device_name} · {r.client_name}
-                      </p>
-                      {isComplaint ? (
-                        <p className="mt-1 text-xs text-[#fbbf24]">
-                          Uwaga: reklamacja po poprzedniej naprawie. Sprawdź historię i notatki serwisowe.
-                        </p>
-                      ) : null}
-                      {isWarranty ? (
-                        <p className="mt-1 text-xs text-[#c4b5fd]">
-                          Ważność gwarancji: 90 dni od daty odbioru.
-                        </p>
-                      ) : null}
-                      {isVip ? (
-                        <p className="mt-1 text-xs text-[#67e8f9]">
-                          Klient powracający — priorytet obsługi i kontekst poprzednich napraw.
-                        </p>
-                      ) : null}
-                    </div>
 
-                    <div className="flex shrink-0 items-center gap-3 text-right">
-                      {isUnclaimed ? (
-                        <button
-                          type="button"
-                          onClick={(e) => e.preventDefault()}
-                          className="rounded-full border border-[#ef4444]/40 bg-[#ef4444]/15 px-2.5 py-1 text-[11px] font-semibold text-[#fecaca]"
-                        >
-                          Zadzwoń
-                        </button>
-                      ) : null}
-                      <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">
-                        {r.priority_display}
-                      </span>
-                      <span className="text-xs text-[#6b7280]">
-                        {new Date(r.created_at).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" })}
-                      </span>
-                      <span className="text-[#9ca3af] group-hover:text-white">→</span>
-                    </div>
-                  </Link>
-                    );
-                  })()
-                ))}
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 sm:flex-col sm:items-end sm:gap-2">
+                        {isUnclaimed ? (
+                          <button
+                            type="button"
+                            onClick={(e) => e.preventDefault()}
+                            className="rounded-full border border-[#ef4444]/40 bg-[#ef4444]/15 px-2.5 py-1 text-[11px] font-semibold text-[#fecaca]"
+                          >
+                            Zadzwoń
+                          </button>
+                        ) : null}
+                        <span className="rounded-full border border-[var(--border)] bg-white/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
+                          {r.priority_display}
+                        </span>
+                        <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
+                          <span className="hidden sm:inline">Przyjęto</span>
+                          <span className="font-medium tabular-nums text-[var(--ink2)]">
+                            {new Date(r.created_at).toLocaleDateString("pl-PL", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            })}
+                          </span>
+                          <span className="text-[var(--ink2)] transition group-hover:text-[var(--white)]" aria-hidden>
+                            →
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-white/10 bg-[#0c0d12] px-4 py-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3">
             <button
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={!previous || page <= 1 || loading}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+              className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
             >
               ← Poprzednia
             </button>
-            <p className="text-sm text-[#9ca3af]">
-              Strona <span className="font-semibold text-white">{page}</span> / {pageCount}
+            <p className="text-sm text-[var(--ink2)]">
+              Strona <span className="font-semibold text-[var(--white)]">{page}</span> / {pageCount}
             </p>
             <button
               type="button"
               onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
               disabled={!next || page >= pageCount || loading}
-              className="rounded-xl bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+              className="rounded-xl bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
             >
               Następna →
             </button>

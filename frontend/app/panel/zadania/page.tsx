@@ -84,7 +84,7 @@ function priorityPillClass(priorityRaw: string | undefined): string {
   const p = (priorityRaw ?? "").toLowerCase();
   if (p === "urgent") return "border-[#dc1e1e]/40 bg-[#dc1e1e]/15 text-[#ffb4b4]";
   if (p === "high" || p === "important") return "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd9a6]";
-  return "border-white/10 bg-white/5 text-[#9ca3af]";
+  return "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]";
 }
 
 export default function TasksPage() {
@@ -283,8 +283,8 @@ export default function TasksPage() {
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel pracownika</p>
-          <h1 className="mt-2 text-2xl font-semibold text-white">Moje zadania</h1>
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel pracownika</p>
+          <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Moje zadania</h1>
           {relatedRepairFilter ? (
             <p className="mt-2 text-sm text-[#93c5fd]">
               Widok ograniczony do zadań powiązanych z wybraną naprawą.{" "}
@@ -295,7 +295,7 @@ export default function TasksPage() {
                   p.delete("related_repair");
                   router.push(`/panel/zadania?${p.toString()}`);
                 }}
-                className="font-semibold text-white underline decoration-[#3b82f6] underline-offset-2 hover:text-[#bfdbfe]"
+                className="font-semibold text-[var(--white)] underline decoration-[#3b82f6] underline-offset-2 hover:text-[#bfdbfe]"
               >
                 Pokaż wszystkie
               </button>
@@ -308,13 +308,13 @@ export default function TasksPage() {
             setShowAddForm((v) => !v);
             setAddError(null);
           }}
-          className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+          className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb]"
         >
           + Dodaj zadanie
         </button>
       </header>
 
-      <section className="mb-4 rounded-2xl border border-white/10 bg-[#0c0d12] p-3">
+      <section className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
         <div className="flex flex-wrap gap-2">
           {([
             ["all", "Wszystkie"],
@@ -328,8 +328,8 @@ export default function TasksPage() {
               onClick={() => setScopeInUrl(v)}
               className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${
                 scope === v
-                  ? "border-[#3b82f6]/45 bg-[#3b82f6]/15 text-white"
-                  : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                  ? "border-[#3b82f6]/45 bg-[#3b82f6]/15 text-[var(--white)]"
+                  : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
               }`}
             >
               {lbl}
@@ -341,19 +341,19 @@ export default function TasksPage() {
       {showAddForm ? (
         <form
           onSubmit={handleAddTask}
-          className="mb-4 animate-[slideDown_.25s_ease] rounded-2xl border border-white/10 bg-[#0c0d12] p-4"
+          className="mb-4 animate-[slideDown_.25s_ease] rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4"
         >
           <div className="grid gap-3 md:grid-cols-[1fr_180px_190px_auto]">
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Tytuł zadania..."
-              className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
             />
             <select
               value={newPriority}
               onChange={(e) => setNewPriority(e.target.value as TaskPriorityValue)}
-              className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
             >
               <option value="standard">Normalny</option>
               <option value="important">Wysoki</option>
@@ -364,7 +364,7 @@ export default function TasksPage() {
               type="datetime-local"
               value={newDueDate}
               onChange={(e) => setNewDueDate(e.target.value)}
-              className="rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
             />
             <button
               type="submit"
@@ -385,9 +385,9 @@ export default function TasksPage() {
 
       {!tasksError ? (
         <div className="grid gap-4 lg:grid-cols-2">
-          <section className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+          <section className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white">Otwarte · {scopeLabel}</h2>
+              <h2 className="text-sm font-semibold text-[var(--white)]">Otwarte · {scopeLabel}</h2>
               <span className="rounded-full border border-[#f59e0b]/35 bg-[#f59e0b]/15 px-2 py-0.5 text-xs font-semibold text-[#ffd9a6]">
                 {openTasks.length}
               </span>
@@ -405,7 +405,7 @@ export default function TasksPage() {
                 {openTasks.map((t) => (
                   <div
                     key={t.id}
-                    className="flex flex-wrap items-stretch gap-2 rounded-xl border border-white/10 bg-[#0f1117] p-2 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
+                    className="flex flex-wrap items-stretch gap-2 rounded-xl border border-[var(--border)] bg-[var(--s1)] p-2 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
                   >
                     <div
                       role="button"
@@ -417,19 +417,19 @@ export default function TasksPage() {
                           void openDetail(t.id);
                         }
                       }}
-                      className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-lg px-1 py-1 text-left outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                      className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-lg px-1 py-1 text-left outline-none transition hover:bg-[var(--row-hover)] focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
                     >
-                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[#6b7280]" aria-hidden />
+                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[var(--muted)]" aria-hidden />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-semibold text-white">{t.title}</span>
+                          <span className="text-sm font-semibold text-[var(--white)]">{t.title}</span>
                           <span
                             className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}
                           >
                             {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
                           </span>
                         </div>
-                        <div className="mt-1 text-xs text-[#9ca3af]">
+                        <div className="mt-1 text-xs text-[var(--ink2)]">
                           {t.related_repair_number ? (
                             <Link
                               href={`/panel/naprawy/${t.related_repair ?? ""}`}
@@ -459,9 +459,9 @@ export default function TasksPage() {
             )}
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+          <section className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white">Zakończone dziś</h2>
+              <h2 className="text-sm font-semibold text-[var(--white)]">Zakończone dziś</h2>
               <span className="rounded-full border border-[#22c55e]/35 bg-[#22c55e]/15 px-2 py-0.5 text-xs font-semibold text-[#bbf7d0]">
                 {doneToday.length}
               </span>
@@ -479,7 +479,7 @@ export default function TasksPage() {
                 {doneTasks.map((t) => (
                   <div
                     key={t.id}
-                    className="flex flex-wrap items-stretch gap-2 rounded-xl border border-white/10 bg-[#0f1117] p-2 opacity-90 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
+                    className="flex flex-wrap items-stretch gap-2 rounded-xl border border-[var(--border)] bg-[var(--s1)] p-2 opacity-90 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
                   >
                     <div
                       role="button"
@@ -491,19 +491,19 @@ export default function TasksPage() {
                           void openDetail(t.id);
                         }
                       }}
-                      className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-lg px-1 py-1 text-left outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                      className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-lg px-1 py-1 text-left outline-none transition hover:bg-[var(--row-hover)] focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
                     >
-                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[#6b7280]" aria-hidden />
+                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[var(--muted)]" aria-hidden />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-semibold text-[#9ca3af] line-through">{t.title}</span>
+                          <span className="text-sm font-semibold text-[var(--ink2)] line-through">{t.title}</span>
                           <span
                             className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${priorityPillClass(t.priority)}`}
                           >
                             {t.priority_display || PRIORITY_LABEL[(t.priority ?? "normal").toLowerCase()] || "Normalny"}
                           </span>
                         </div>
-                        <div className="mt-1 text-xs text-[#6b7280]">
+                        <div className="mt-1 text-xs text-[var(--muted)]">
                           Ukończono: {t.completed_at ? new Date(t.completed_at).toLocaleString("pl-PL") : "—"}
                         </div>
                       </div>
@@ -512,7 +512,7 @@ export default function TasksPage() {
                       type="button"
                       disabled={updatingTaskId === t.id}
                       onClick={() => void handleToggleDone(t, false)}
-                      className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-semibold text-[#e5e7eb] transition hover:bg-white/10 disabled:opacity-60 sm:self-center"
+                      className="shrink-0 rounded-xl border border-white/15 bg-[var(--row-hover)] px-4 py-2.5 text-xs font-semibold text-[#e5e7eb] transition hover:bg-[var(--row-active)] disabled:opacity-60 sm:self-center"
                     >
                       {updatingTaskId === t.id ? "…" : "Przywróć"}
                     </button>
@@ -534,17 +534,17 @@ export default function TasksPage() {
             role="dialog"
             aria-modal
             aria-labelledby="task-detail-title"
-            className="max-h-[min(90vh,720px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-[#0f1117] shadow-2xl"
+            className="max-h-[min(90vh,720px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--s1)] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-white/10 bg-[#0f1117]/95 px-5 py-4 backdrop-blur">
-              <h2 id="task-detail-title" className="pr-8 text-lg font-semibold text-white">
+            <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--s1)]/95 px-5 py-4 backdrop-blur">
+              <h2 id="task-detail-title" className="pr-8 text-lg font-semibold text-[var(--white)]">
                 {detailLoading ? "Ładowanie…" : detailTask?.title ?? "Zadanie"}
               </h2>
               <button
                 type="button"
                 onClick={closeDetail}
-                className="rounded-xl p-2 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                className="rounded-xl p-2 text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 aria-label="Zamknij"
               >
                 <X className="h-5 w-5" />
@@ -565,7 +565,7 @@ export default function TasksPage() {
                         PRIORITY_LABEL[(detailTask.priority ?? "normal").toLowerCase()] ||
                         "Priorytet"}
                     </span>
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                    <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-[11px] font-semibold text-[var(--ink2)]">
                       {detailTask.status_display ?? detailTask.status}
                     </span>
                     {detailTask.is_overdue ? (
@@ -575,39 +575,39 @@ export default function TasksPage() {
                     ) : null}
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Opis</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Opis</p>
                     <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-[#d1d5db]">
                       {(detailTask.description ?? "").trim() || "Brak opisu."}
                     </p>
                   </div>
                   <dl className="grid gap-2 text-sm">
-                    <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
-                      <dt className="text-[#9ca3af]">Przypisane do</dt>
-                      <dd className="text-right font-medium text-white">{detailTask.assigned_to_name ?? "—"}</dd>
+                    <div className="flex justify-between gap-4 border-b border-[var(--border)] py-1.5">
+                      <dt className="text-[var(--ink2)]">Przypisane do</dt>
+                      <dd className="text-right font-medium text-[var(--white)]">{detailTask.assigned_to_name ?? "—"}</dd>
                     </div>
-                    <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
-                      <dt className="text-[#9ca3af]">Utworzył</dt>
-                      <dd className="text-right font-medium text-white">{detailTask.created_by_name ?? "—"}</dd>
+                    <div className="flex justify-between gap-4 border-b border-[var(--border)] py-1.5">
+                      <dt className="text-[var(--ink2)]">Utworzył</dt>
+                      <dd className="text-right font-medium text-[var(--white)]">{detailTask.created_by_name ?? "—"}</dd>
                     </div>
                     {detailTask.due_date ? (
-                      <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
-                        <dt className="text-[#9ca3af]">Termin</dt>
-                        <dd className="text-right font-medium text-white">
+                      <div className="flex justify-between gap-4 border-b border-[var(--border)] py-1.5">
+                        <dt className="text-[var(--ink2)]">Termin</dt>
+                        <dd className="text-right font-medium text-[var(--white)]">
                           {new Date(detailTask.due_date).toLocaleString("pl-PL")}
                         </dd>
                       </div>
                     ) : null}
                     {detailTask.completed_at ? (
-                      <div className="flex justify-between gap-4 border-b border-white/5 py-1.5">
-                        <dt className="text-[#9ca3af]">Ukończono</dt>
-                        <dd className="text-right font-medium text-white">
+                      <div className="flex justify-between gap-4 border-b border-[var(--border)] py-1.5">
+                        <dt className="text-[var(--ink2)]">Ukończono</dt>
+                        <dd className="text-right font-medium text-[var(--white)]">
                           {new Date(detailTask.completed_at).toLocaleString("pl-PL")}
                         </dd>
                       </div>
                     ) : null}
                     {detailTask.related_repair ? (
                       <div className="flex justify-between gap-4 py-1.5">
-                        <dt className="text-[#9ca3af]">Naprawa</dt>
+                        <dt className="text-[var(--ink2)]">Naprawa</dt>
                         <dd className="text-right">
                           <Link
                             href={`/panel/naprawy/${detailTask.related_repair}`}
@@ -622,11 +622,11 @@ export default function TasksPage() {
                   </dl>
                   {detailTask.comments && detailTask.comments.length > 0 ? (
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Komentarze</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Komentarze</p>
                       <ul className="mt-2 space-y-2">
                         {detailTask.comments.map((c) => (
-                          <li key={c.id} className="rounded-xl border border-white/10 bg-[#0c0d12] px-3 py-2 text-sm">
-                            <div className="flex justify-between gap-2 text-[11px] text-[#6b7280]">
+                          <li key={c.id} className="rounded-xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2 text-sm">
+                            <div className="flex justify-between gap-2 text-[11px] text-[var(--muted)]">
                               <span>{c.author_name ?? "—"}</span>
                               <span>{new Date(c.created_at).toLocaleString("pl-PL")}</span>
                             </div>
@@ -636,7 +636,7 @@ export default function TasksPage() {
                       </ul>
                     </div>
                   ) : null}
-                  <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-4">
+                  <div className="flex flex-wrap justify-end gap-2 border-t border-[var(--border)] pt-4">
                     {!statusIsDone(detailTask.status) ? (
                       <button
                         type="button"
@@ -651,7 +651,7 @@ export default function TasksPage() {
                         type="button"
                         disabled={updatingTaskId === detailTask.id}
                         onClick={() => void handleToggleDone(detailTask, false)}
-                        className="rounded-xl border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+                        className="rounded-xl border border-white/15 bg-[var(--row-hover)] px-5 py-2.5 text-sm font-semibold text-[var(--white)] transition hover:bg-[var(--row-active)] disabled:opacity-60"
                       >
                         {updatingTaskId === detailTask.id ? "Zapisywanie…" : "Przywróć do toku"}
                       </button>

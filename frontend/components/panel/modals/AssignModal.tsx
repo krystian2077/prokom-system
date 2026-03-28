@@ -56,19 +56,19 @@ export function AssignModal({
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4 py-8">
-      <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+      <div className="w-full max-w-lg rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Szybka akcja</div>
-            <h3 className="mt-1 text-xl font-semibold text-white">Przypisz naprawę</h3>
-            <p className="mt-1 text-sm text-[#9ca3af]">
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Szybka akcja</div>
+            <h3 className="mt-1 text-xl font-semibold text-[var(--white)]">Przypisz naprawę</h3>
+            <p className="mt-1 text-sm text-[var(--ink2)]">
               {isAdmin ? "Admin wybiera pracownika po UUID." : "Przypisanie do Ciebie (staff)."}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#9ca3af] hover:bg-white/10"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--ink2)] hover:bg-[var(--row-active)]"
           >
             Zamknij
           </button>
@@ -77,22 +77,22 @@ export function AssignModal({
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           {isAdmin && (
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">assigned_to_id (UUID)</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">assigned_to_id (UUID)</label>
               <input
                 value={assignedToId}
                 onChange={(e) => setAssignedToId(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
                 placeholder="np. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Powód / notatka (opcjonalnie)</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Powód / notatka (opcjonalnie)</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="mt-1 w-full resize-none rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full resize-none rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               rows={3}
               placeholder="np. wymagane kompetencje, pilne, zmiana planu…"
             />

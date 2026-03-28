@@ -12,22 +12,12 @@ import { StatusChangeModal, type RepairStatusValue } from "@/components/panel/mo
 import { RepairPartsSection } from "@/components/panel/RepairPartsSection";
 import { RepairDetailLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
-
-const DELIVERY_LABELS: Record<string, string> = {
-  in_person: "Osobiście w serwisie",
-  courier: "Kurier",
-  parcel_locker: "Paczkomat",
-};
-const RETURN_LABELS: Record<string, string> = {
-  in_person: "Odbiór osobisty",
-  courier: "Kurier do klienta",
-  parcel_locker: "Paczkomat",
-};
+import { deliveryMethodLabel, returnMethodLabel } from "@/lib/repairMethodLabels";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-4 py-2 text-sm">
-      <dt className="shrink-0 text-[#9ca3af]">{label}</dt>
+      <dt className="shrink-0 text-[var(--ink2)]">{label}</dt>
       <dd className="text-right text-[#e5e7eb]">{value ?? "–"}</dd>
     </div>
   );
@@ -43,8 +33,8 @@ function Section({
   className?: string;
 }) {
   return (
-    <section className={`rounded-2xl border border-white/10 bg-[#0c0d12] p-5 ${className}`}>
-      <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">{title}</h2>
+    <section className={`rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-5 ${className}`}>
+      <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -212,7 +202,7 @@ export default function PanelRepairDetailPage() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="mt-4 text-sm text-[#9ca3af] hover:text-white"
+          className="mt-4 text-sm text-[var(--ink2)] hover:text-[var(--white)]"
         >
           ← Wróć do listy
         </button>
@@ -222,42 +212,42 @@ export default function PanelRepairDetailPage() {
 
   const client = data.client ?? { full_name: data.client_name, email: "", phone: "" };
   const device = data.device ?? { device_name: data.device_name, brand_name: "", category: "" };
-  const deliveryLabel = DELIVERY_LABELS[data.delivery_method] ?? data.delivery_method;
-  const returnLabel = RETURN_LABELS[data.return_method] ?? data.return_method;
+  const deliveryLabel = deliveryMethodLabel(data.delivery_method);
+  const returnLabel = returnMethodLabel(data.return_method);
 
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-4 py-8">
       <button
         type="button"
         onClick={() => router.back()}
-        className="mb-6 text-sm text-[#9ca3af] transition hover:text-white"
+        className="mb-6 text-sm text-[var(--ink2)] transition hover:text-[var(--white)]"
       >
         ← Wróć do listy zgłoszeń
       </button>
 
       {/* Nagłówek */}
-      <header className="mb-8 flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-white/10 bg-[#0c0d12] p-6">
+      <header className="mb-8 flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-6">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9ca3af]">Naprawa</p>
-          <h1 className="mt-1 text-xl font-semibold text-white md:text-2xl">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--ink2)]">Naprawa</p>
+          <h1 className="mt-1 text-xl font-semibold text-[var(--white)] md:text-2xl">
             {data.repair_number}
           </h1>
           <p className="mt-2 text-sm text-[#b4b8c4]">
             {device.device_name} · {client.full_name}
           </p>
         </div>
-        <div className="rounded-xl bg-white/5 px-4 py-3 text-right">
+        <div className="rounded-xl bg-[var(--row-hover)] px-4 py-3 text-right">
           <span className="text-xs font-semibold uppercase tracking-wide text-amber-400">
             {data.status_display}
           </span>
           {data.estimated_completion_date && (
-            <p className="mt-1 text-[11px] text-[#9ca3af]">
+            <p className="mt-1 text-[11px] text-[var(--ink2)]">
               Termin: {new Date(data.estimated_completion_date).toLocaleDateString("pl-PL")}
               {data.estimated_duration_display && ` · ${data.estimated_duration_display}`}
             </p>
           )}
           {data.assigned_to && (
-            <p className="mt-1 text-[11px] text-[#9ca3af]">
+            <p className="mt-1 text-[11px] text-[var(--ink2)]">
               Przypisany: {data.assigned_to.first_name} {data.assigned_to.last_name}
             </p>
           )}
@@ -268,7 +258,7 @@ export default function PanelRepairDetailPage() {
         <button
           type="button"
           onClick={() => setStatusModalOpen(true)}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+          className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
         >
           Zmień status
         </button>
@@ -276,7 +266,7 @@ export default function PanelRepairDetailPage() {
         <button
           type="button"
           onClick={() => setAssignModalOpen(true)}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+          className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
         >
           {isAdmin ? "Przypisz (admin)" : "Przypisz mnie"}
         </button>
@@ -284,7 +274,7 @@ export default function PanelRepairDetailPage() {
         <button
           type="button"
           onClick={() => setNoteModalOpen(true)}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+          className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
         >
           Dodaj notatkę
         </button>
@@ -294,7 +284,7 @@ export default function PanelRepairDetailPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-6">
           <Section title="Dane klienta (z formularza)">
-            <dl className="divide-y divide-white/5">
+            <dl className="divide-y divide-[var(--border)]">
               <InfoRow label="Imię i nazwisko" value={client.full_name} />
               <InfoRow label="E-mail" value={client.email} />
               <InfoRow label="Telefon" value={client.phone} />
@@ -302,7 +292,7 @@ export default function PanelRepairDetailPage() {
           </Section>
 
           <Section title="Urządzenie (z formularza)">
-            <dl className="divide-y divide-white/5">
+            <dl className="divide-y divide-[var(--border)]">
               <InfoRow label="Urządzenie" value={device.device_name} />
               <InfoRow label="Marka" value={device.brand_name} />
               <InfoRow label="Kategoria" value={device.category} />
@@ -317,7 +307,7 @@ export default function PanelRepairDetailPage() {
           </Section>
 
           <Section title="Dostawa i zwrot">
-            <dl className="divide-y divide-white/5">
+            <dl className="divide-y divide-[var(--border)]">
               <InfoRow label="Sposób dostarczenia" value={deliveryLabel} />
               <InfoRow label="Sposób zwrotu" value={returnLabel} />
               {data.client_tracking_number && (
@@ -327,9 +317,9 @@ export default function PanelRepairDetailPage() {
           </Section>
 
           <Section title="Uwagi i stan urządzenia">
-            <dl className="divide-y divide-white/5">
+            <dl className="divide-y divide-[var(--border)]">
               {data.client_notes != null && data.client_notes !== "" && (
-                <InfoRow label="Uwagi klienta" value={data.client_notes} />
+                <InfoRow label="Opis wizualny" value={data.client_notes} />
               )}
               {data.device_turns_on != null && (
                 <InfoRow
@@ -341,13 +331,13 @@ export default function PanelRepairDetailPage() {
                 <InfoRow label="Stan wizualny" value={data.visual_condition_description} />
               )}
               {!data.client_notes && data.device_turns_on == null && !data.visual_condition_description && (
-                <p className="py-2 text-sm text-[#6b7280]">Brak dodatkowych uwag.</p>
+                <p className="py-2 text-sm text-[var(--muted)]">Brak dodatkowych uwag.</p>
               )}
             </dl>
           </Section>
 
           <Section title="Opcje zgłoszenia">
-            <dl className="divide-y divide-white/5">
+            <dl className="divide-y divide-[var(--border)]">
               <InfoRow label="Pilna" value={data.is_urgent ? "Tak" : "Nie"} />
               <InfoRow label="Tego samego dnia" value={data.is_same_day ? "Tak" : "Nie"} />
               <InfoRow label="Gwarancja" value={data.is_warranty ? "Tak" : "Nie"} />
@@ -358,7 +348,7 @@ export default function PanelRepairDetailPage() {
 
         <div className="space-y-6">
           <Section title="Status i wewnętrzne">
-            <dl className="divide-y divide-white/5">
+            <dl className="divide-y divide-[var(--border)]">
               <InfoRow label="Status wewnętrzny" value={data.internal_status} />
               <InfoRow label="Priorytet" value={data.priority_display} />
               <InfoRow label="Typ naprawy" value={data.repair_type} />
@@ -368,7 +358,7 @@ export default function PanelRepairDetailPage() {
           </Section>
 
           <Section title="Notatki wewnętrzne">
-            <p className="whitespace-pre-wrap text-sm text-[#9ca3af]">
+            <p className="whitespace-pre-wrap text-sm text-[var(--ink2)]">
               {data.internal_notes || "Brak notatek wewnętrznych."}
             </p>
           </Section>
@@ -376,7 +366,7 @@ export default function PanelRepairDetailPage() {
           <Section title="Oś czasu (statusy)">
             <div className="space-y-4">
               {timeline.filter((ev) => ev.type === "status_change").length === 0 && (
-                <p className="text-sm text-[#6b7280]">Brak zmian statusu w historii.</p>
+                <p className="text-sm text-[var(--muted)]">Brak zmian statusu w historii.</p>
               )}
               {timeline
                 .filter((ev) => ev.type === "status_change")
@@ -386,11 +376,11 @@ export default function PanelRepairDetailPage() {
                     <div key={`${ev.type}-${ev.id}`} className="flex gap-3">
                       <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#dc1e1e]" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-[11px] text-[#9ca3af]">
+                        <p className="text-[11px] text-[var(--ink2)]">
                           {date} · Zmiana statusu{ev.changed_by_name ? ` · ${ev.changed_by_name}` : ""}
                         </p>
                         <p className="mt-0.5 text-sm text-[#e5e7eb]">
-                          {ev.old_status_display || "–"} → {ev.new_status_display || "–"}
+                          {ev.new_status_display || ev.new_status || "–"}
                         </p>
                       </div>
                     </div>
@@ -411,8 +401,8 @@ export default function PanelRepairDetailPage() {
                   onClick={() => setCommTab("messages")}
                   className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                     commTab === "messages"
-                      ? "border-white/20 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                      ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                      : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   }`}
                 >
                   Wiadomości
@@ -422,8 +412,8 @@ export default function PanelRepairDetailPage() {
                   onClick={() => setCommTab("notes")}
                   className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                     commTab === "notes"
-                      ? "border-white/20 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                      ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                      : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   }`}
                 >
                   Notatki (publiczne)
@@ -433,8 +423,8 @@ export default function PanelRepairDetailPage() {
                   onClick={() => setCommTab("team_notes")}
                   className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                     commTab === "team_notes"
-                      ? "border-white/20 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                      ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                      : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   }`}
                 >
                   Komunikacja zespołowa
@@ -445,9 +435,9 @@ export default function PanelRepairDetailPage() {
                 <p className="text-sm text-[#fca5a5]">{templatesError}</p>
               )}
 
-              <div className="rounded-2xl border border-white/10 bg-[#0b0c10] p-4">
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
                 {commTimelineEvents.length === 0 ? (
-                  <p className="text-sm text-[#6b7280]">Brak wpisów w tej kategorii.</p>
+                  <p className="text-sm text-[var(--muted)]">Brak wpisów w tej kategorii.</p>
                 ) : (
                   <div className="space-y-4">
                     {commTimelineEvents.map((ev) => {
@@ -457,7 +447,7 @@ export default function PanelRepairDetailPage() {
                             <div key={`${ev.type}-${ev.id}`} className="flex gap-3">
                               <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#dc1e1e]" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-[11px] text-[#9ca3af]">
+                                <p className="text-[11px] text-[var(--ink2)]">
                                   {date} · {ev.channel_display}
                                   {ev.sent_by_name ? ` · ${ev.sent_by_name}` : ""}
                                 </p>
@@ -474,7 +464,7 @@ export default function PanelRepairDetailPage() {
                           <div key={`${ev.type}-${ev.id}`} className="flex gap-3">
                             <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#dc1e1e]" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-[11px] text-[#9ca3af]">
+                              <p className="text-[11px] text-[var(--ink2)]">
                                 {date} · Notatka{ev.author_name ? ` · ${ev.author_name}` : ""}
                                 {ev.is_important ? " · ważna" : ""}
                               </p>
@@ -491,7 +481,7 @@ export default function PanelRepairDetailPage() {
                 <button
                   type="button"
                   onClick={() => setNoteModalOpen(true)}
-                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 >
                   Dodaj notatkę
                 </button>
@@ -529,7 +519,7 @@ export default function PanelRepairDetailPage() {
                       value={selectedTemplateId ?? ""}
                       onChange={(e) => setSelectedTemplateId(e.target.value ? Number(e.target.value) : null)}
                       disabled={templatesLoading || eligibleEmailTemplates.length === 0}
-                      className="min-w-[260px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white disabled:opacity-60"
+                      className="min-w-[260px] rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] disabled:opacity-60"
                     >
                       {eligibleEmailTemplates.length === 0 ? (
                         <option value="">Brak szablonów</option>
@@ -552,11 +542,11 @@ export default function PanelRepairDetailPage() {
                 )}
 
                 {commTab === "messages" ? (
-                  <div className="mt-4 rounded-2xl border border-white/10 bg-[#0b0c10] p-4">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">
+                  <div className="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">
                       Robocza treść SMS
                     </div>
-                    <p className="mt-1 text-xs text-[#6b7280]">
+                    <p className="mt-1 text-xs text-[var(--muted)]">
                       Szkic zapisywany lokalnie w tej przeglądarce — przygotuj SMS przed wysyłką z modułu komunikacji.
                     </p>
                     <textarea
@@ -564,7 +554,7 @@ export default function PanelRepairDetailPage() {
                       onChange={(e) => setSmsDraft(e.target.value)}
                       rows={3}
                       placeholder="Treść SMS do klienta…"
-                      className="mt-3 w-full resize-y rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#3b82f6]"
+                      className="mt-3 w-full resize-y rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
                     />
                     <div
                       className="mt-2 text-xs font-semibold"

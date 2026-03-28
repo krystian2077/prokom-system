@@ -210,13 +210,13 @@ export function WorkerStatusChangeModal({
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4 py-8" role="dialog" aria-modal>
-      <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+      <div className="w-full max-w-lg rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Zmień status</div>
-            <h3 className="mt-1 text-xl font-semibold text-white">Szybka akcja</h3>
-            <p className="mt-1 text-sm text-[#9ca3af]">
-              Obecny status: <span className="font-semibold text-white">{currentStatus ?? "—"}</span>
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Zmień status</div>
+            <h3 className="mt-1 text-xl font-semibold text-[var(--white)]">Szybka akcja</h3>
+            <p className="mt-1 text-sm text-[var(--ink2)]">
+              Obecny status: <span className="font-semibold text-[var(--white)]">{currentStatus ?? "—"}</span>
             </p>
             {savedBanner ? (
               <div className="mt-3 rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 px-4 py-3 text-sm font-semibold" style={{ color: "#86efac" }}>
@@ -227,7 +227,7 @@ export function WorkerStatusChangeModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#9ca3af] hover:bg-white/10"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--ink2)] hover:bg-[var(--row-active)]"
           >
             Zamknij
           </button>
@@ -235,22 +235,22 @@ export function WorkerStatusChangeModal({
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">1. Bloker sprawy (opcjonalnie)</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">1. Bloker sprawy (opcjonalnie)</label>
             <input
               type="text"
               value={blocker}
               onChange={(e) => setBlocker(e.target.value)}
-              className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
               placeholder="np. czeka na część, decyzja klienta…"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">2. Status wewnętrzny</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">2. Status wewnętrzny</label>
             <select
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value as RepairStatusValue)}
-              className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -261,11 +261,11 @@ export function WorkerStatusChangeModal({
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">3. Status publiczny</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">3. Status publiczny</label>
             <select
               value={publicStatus}
               onChange={(e) => setPublicStatus(e.target.value as RepairStatusValue)}
-              className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={`pub-${s.value}`} value={s.value}>
@@ -276,11 +276,11 @@ export function WorkerStatusChangeModal({
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">4. Notatka wewnętrzna (opcjonalnie)</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">4. Notatka wewnętrzna (opcjonalnie)</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="mt-1 w-full resize-none rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+              className="mt-1 w-full resize-none rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
               rows={4}
               placeholder="np. szczegóły dla zespołu, komentarz po zmianie…"
             />
@@ -335,11 +335,11 @@ export function WorkerStatusChangeModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             >
               Pomiń komunikat
             </button>
-            <button type="submit" className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]">
+            <button type="submit" className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb]">
               Zapisz status
             </button>
           </div>

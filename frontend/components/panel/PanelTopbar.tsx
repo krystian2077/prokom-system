@@ -7,10 +7,12 @@ import { Search, LogOut, Play, CheckCircle2, Bell, MessageSquareText, ChevronLef
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
+import { filterDevicesWhenRepairsPresent, mergeStaffAndGlobalRepairs } from "@/lib/panelSearchMerge";
 import type { RepairRequestListItem } from "@/types/repairs";
-import type { GlobalSearchClient, GlobalSearchDevice, GlobalSearchResponse } from "@/types/search";
-import { getTheme, toggleTheme } from "@/lib/theme";
+import type { GlobalSearchClient, GlobalSearchDevice, GlobalSearchRepair, GlobalSearchResponse } from "@/types/search";
+import { useWorkerPanelTheme } from "@/contexts/WorkerPanelThemeContext";
 import { useWorkerStore } from "@/stores/workerStore";
+import { deadlineLabelForDate } from "@/lib/repair-deadline";
 
 const RECENT_SEARCH_KEY = "prokom-panel-search-recent";
 
@@ -42,11 +44,11 @@ export function PanelTopbar() {
   const router = useRouter();
   const isAdmin = user?.role === "admin";
   const pathname = usePathname();
-  const accent = isAdmin ? "#dc1e1e" : "#3b82f6";
+  const accent = isAdmin ? "var(--red)" : "var(--blue)";
+  const { theme: panelTheme, toggleTheme } = useWorkerPanelTheme();
   const showToast = useWorkerStore((s) => s.addToast);
 
   const [now, setNow] = useState(() => new Date());
-  const [panelTheme, setPanelTheme] = useState<"dark" | "light">("dark");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -64,7 +66,8 @@ export function PanelTopbar() {
     if (repairsList) return "Naprawy";
     if (pathname === "/panel/unassigned" || pathname === "/panel/nieprzypisane") return "Nieprzypisane";
     if (pathname === "/panel/all-repairs" || pathname === "/panel/wszystkie") return "Wszystkie naprawy";
-    if (pathname.startsWith("/panel/intake")) return "Przyjęcie";
+    if (pathname.startsWith("/panel/intake") || pathname.startsWith("/admin-panel/intake"))
+      return "Przyjęcie Stacjonarne";
     if (pathname.startsWith("/panel/comm")) return "Komunikacja";
     if (pathname.startsWith("/panel/powiadomienia")) return "Powiadomienia";
     if (pathname.startsWith("/panel/calendar") || pathname.startsWith("/panel/kalendarz")) return "Kalendarz";
@@ -75,6 +78,7 @@ export function PanelTopbar() {
     if (pathname.startsWith("/panel/clients") || pathname.startsWith("/panel/klienci")) return "Klienci";
     if (pathname.startsWith("/panel/search") || pathname.startsWith("/panel/wyszukiwanie")) return "Wyszukiwanie";
     if (pathname.startsWith("/panel/pickups") || pathname.startsWith("/panel/odbior") || pathname.startsWith("/panel/odbiory")) return "Odbiory";
+    if (pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie")) return "Przyjęcie rekl./gwar.";
     if (
       pathname.startsWith("/panel/claims") ||
       pathname.startsWith("/panel/reklamacje-gwarancje") ||
@@ -87,15 +91,13 @@ export function PanelTopbar() {
 
   const showBack = pathname.startsWith("/panel/") && !pathname.includes("/panel/login") && pathname !== "/panel/dashboard";
 
-  const notifRequiresActionCountQuery = useQuery({
-    queryKey: ["topbar", "notif", "requires-action"],
+  const notifUnreadCountQuery = useQuery({
+    queryKey: ["topbar", "notif", "unread-count"],
     enabled: Boolean(token && user),
     queryFn: async () => {
       if (!token) return 0;
-      const res = await api.get<any>(`/accounts/notifications/requires-action/`, token);
-      if (typeof res?.count === "number") return res.count as number;
-      if (Array.isArray(res?.items)) return res.items.length as number;
-      return 0;
+      const res = await api.get<{ count?: number }>(`/accounts/notifications/unread-count/`, token);
+      return typeof res?.count === "number" ? res.count : 0;
     },
     staleTime: 20_000,
   });
@@ -105,6 +107,7 @@ export function PanelTopbar() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<RepairRequestListItem[]>([]);
+  const [globalRepairs, setGlobalRepairs] = useState<GlobalSearchRepair[]>([]);
   const [globalClients, setGlobalClients] = useState<GlobalSearchClient[]>([]);
   const [globalDevices, setGlobalDevices] = useState<GlobalSearchDevice[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -135,11 +138,24 @@ export function PanelTopbar() {
     [],
   );
 
-  const myRepairs = useMemo(() => results.filter((r) => !archiveStatuses.has(r.status)), [results, archiveStatuses]);
-  const archive = useMemo(() => results.filter((r) => archiveStatuses.has(r.status)), [results, archiveStatuses]);
+  const mergedRepairs = useMemo(() => mergeStaffAndGlobalRepairs(results, globalRepairs), [results, globalRepairs]);
+
+  const myRepairs = useMemo(
+    () => mergedRepairs.filter((r) => !archiveStatuses.has(r.status)),
+    [mergedRepairs, archiveStatuses],
+  );
+  const archive = useMemo(
+    () => mergedRepairs.filter((r) => archiveStatuses.has(r.status)),
+    [mergedRepairs, archiveStatuses],
+  );
+
+  const devicesFiltered = useMemo(
+    () => filterDevicesWhenRepairsPresent(globalDevices, mergedRepairs, globalRepairs),
+    [globalDevices, mergedRepairs, globalRepairs],
+  );
 
   const clientSlice = useMemo(() => globalClients.slice(0, 3), [globalClients]);
-  const deviceSlice = useMemo(() => globalDevices.slice(0, 3), [globalDevices]);
+  const deviceSlice = useMemo(() => devicesFiltered.slice(0, 3), [devicesFiltered]);
 
   // Kolejność nawigacji musi odpowiadać kolejności sekcji w dropdownie.
   const navItems = useMemo<NavItem[]>(
@@ -158,24 +174,6 @@ export function PanelTopbar() {
   );
   const selectedItem = navItems[selectedIndex] ?? null;
 
-  const formatSla = (estimated: string | null | undefined) => {
-    if (!estimated) return null;
-    const d = new Date(estimated);
-    if (!Number.isFinite(d.getTime())) return null;
-
-    const today = new Date();
-    const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-    const dayMs = 24 * 60 * 60 * 1000;
-    const diffDays = Math.round((d.getTime() - t0) / dayMs);
-
-    if (diffDays === 0) return "SLA Dziś";
-    if (diffDays === 1) return "SLA Jutro";
-    if (diffDays === -1) return "SLA Wczoraj";
-    if (diffDays > 1 && diffDays <= 7) return `SLA +${diffDays} dni`;
-
-    return `SLA ${d.toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit" })}`;
-  };
-
   const load = async (q: string) => {
     if (!token || !user) return;
     setLoading(true);
@@ -193,12 +191,14 @@ export function PanelTopbar() {
       ]);
 
       setResults(repairsRes ?? []);
+      setGlobalRepairs(globalRes?.repairs ?? []);
       setGlobalClients(globalRes?.clients ?? []);
       setGlobalDevices(globalRes?.devices ?? []);
       setSelectedIndex(0);
       setOpen(true);
       const hits =
         (repairsRes?.length ?? 0) +
+        (globalRes?.repairs?.length ?? 0) +
         (globalRes?.clients?.length ?? 0) +
         (globalRes?.devices?.length ?? 0);
       if (hits > 0) {
@@ -209,6 +209,7 @@ export function PanelTopbar() {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać wyników.";
       setError(msg);
       setResults([]);
+      setGlobalRepairs([]);
       setGlobalClients([]);
       setGlobalDevices([]);
       setOpen(true);
@@ -223,6 +224,7 @@ export function PanelTopbar() {
     const q = query.trim();
     if (q.length < 2) {
       setResults([]);
+      setGlobalRepairs([]);
       setGlobalClients([]);
       setGlobalDevices([]);
       setOpen(false);
@@ -321,24 +323,20 @@ export function PanelTopbar() {
     return () => window.clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    setPanelTheme(getTheme());
-  }, []);
-
   const handleLogout = async () => {
     await logout();
     router.push("/panel/login");
   };
 
   return (
-    <header className="sticky top-0 z-[110] border-b border-white/5 bg-[#0b0c10]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-[110] border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--s1)_85%,transparent)] backdrop-blur-xl">
       <div className="mx-auto flex min-h-[72px] max-w-[1500px] items-center justify-between gap-4 px-5 py-3 md:min-h-[76px] md:py-3.5">
         <div className="flex items-center gap-3 min-w-0">
           {showBack ? (
             <button
               type="button"
               onClick={() => router.back()}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
               aria-label="Wstecz"
             >
               <ChevronLeft size={18} />
@@ -346,18 +344,18 @@ export function PanelTopbar() {
           ) : null}
 
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
               {user?.role === "admin" ? "Panel Admina" : "Panel pracownika"}
             </div>
-            <div className="truncate text-sm font-semibold text-white">{breadcrumb}</div>
+            <div className="truncate text-sm font-semibold text-[var(--white)]">{breadcrumb}</div>
           </div>
         </div>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center px-4 md:flex lg:px-8">
           <div ref={wrapperRef} className="relative w-full max-w-[min(680px,100%)]">
             <div
-              className="flex min-h-[44px] w-full items-center gap-2.5 rounded-2xl border border-white/10 bg-[#11131a]/70 px-4 py-2.5 focus-within:border-[rgba(59,130,246,.65)]"
-              style={{ color: "#9ca3af", borderColor: "rgba(255,255,255,.10)" }}
+              className="flex min-h-[44px] w-full items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--s2)_88%,transparent)] px-4 py-2.5 focus-within:border-[var(--bb)]"
+              style={{ color: "var(--ink2)" }}
             >
               <Search size={18} className="shrink-0 opacity-90" />
               <input
@@ -384,17 +382,17 @@ export function PanelTopbar() {
                     setOpen(false);
                   }
                 }}
-                className="w-full min-w-0 bg-transparent text-sm leading-snug outline-none placeholder:text-[#6b7280]"
+                className="w-full min-w-0 bg-transparent text-sm leading-snug text-[var(--ink)] outline-none placeholder:text-[var(--muted)]"
                 autoComplete="off"
               />
-              <span className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] font-semibold text-[#9ca3af]">
+              <span className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1.5 text-[11px] font-semibold text-[var(--ink2)]">
                 ⌘K
               </span>
             </div>
 
             {recentSearches.length > 0 ? (
               <div className="mt-2 flex flex-wrap items-center gap-1.5 px-0.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6b7280]">Ostatnie</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Ostatnie</span>
                 {recentSearches.map((t) => (
                   <button
                     key={t}
@@ -404,7 +402,7 @@ export function PanelTopbar() {
                       setQuery(t);
                       void load(t);
                     }}
-                    className="max-w-[200px] truncate rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-[#d0d4de] transition hover:border-[rgba(59,130,246,.4)] hover:bg-[rgba(59,130,246,.12)] hover:text-white"
+                    className="max-w-[200px] truncate rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-[11px] font-semibold text-[var(--ink)] transition hover:border-[var(--bb)] hover:bg-[var(--bl)] hover:text-[var(--white)]"
                   >
                     {t}
                   </button>
@@ -413,24 +411,24 @@ export function PanelTopbar() {
             ) : null}
 
             {open && (
-              <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-[300] max-h-[440px] overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12]">
+              <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-[300] max-h-[440px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] shadow-[0_16px_48px_rgba(0,0,0,.2)]">
                 {loading && (
-                  <div className="flex items-center gap-3 px-4 py-6 text-[#9ca3af]">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#dc1e1e] border-t-transparent" />
+                  <div className="flex items-center gap-3 px-4 py-6 text-[var(--ink2)]">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--red)] border-t-transparent" />
                     Szukam…
                   </div>
                 )}
 
-                {!loading && error && <div className="px-4 py-6 text-[#fca5a5]">{error}</div>}
+                {!loading && error && <div className="px-4 py-6 text-red-400">{error}</div>}
 
-                {!loading && !error && results.length === 0 && globalClients.length === 0 && globalDevices.length === 0 && (
-                  <div className="px-4 py-10 text-center text-[#6b7280]">Brak wyników.</div>
+                {!loading && !error && mergedRepairs.length === 0 && globalClients.length === 0 && devicesFiltered.length === 0 && (
+                  <div className="px-4 py-10 text-center text-[var(--muted)]">Brak wyników.</div>
                 )}
 
-                {!loading && !error && (results.length > 0 || globalClients.length > 0 || globalDevices.length > 0) && (
+                {!loading && !error && (mergedRepairs.length > 0 || globalClients.length > 0 || devicesFiltered.length > 0) && (
                   <div className="flex flex-col">
                     {myRepairs.length > 0 && (
-                      <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">
+                      <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                         {isAdmin ? "AKTYWNE WYNIKI" : "MOJE NAPRAWY"}
                       </div>
                     )}
@@ -441,6 +439,7 @@ export function PanelTopbar() {
                       const urgent = Boolean(r.auto_tags?.includes("pilne"));
                       const waitingForParts =
                         Boolean(r.auto_tags?.includes("czeka_na_czesc")) || r.status === "waiting_for_parts";
+                      const deadlineHint = deadlineLabelForDate(r.estimated_completion_date);
 
                       return (
                         <div
@@ -456,27 +455,25 @@ export function PanelTopbar() {
                           }}
                           className={[
                             "flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition",
-                            "hover:bg-white/5",
-                            isSelected ? "bg-white/10" : "",
+                            "hover:bg-[var(--row-hover)]",
+                            isSelected ? "bg-[var(--row-active)]" : "",
                           ].join(" ")}
                         >
                           <div className="flex min-w-0 flex-1 items-center gap-3">
                             <div
                               className={[
                                 "h-9 w-9 shrink-0 rounded-xl border",
-                                urgent ? "border-red-500/30 bg-red-500/10" : "border-white/10 bg-white/5",
+                                urgent ? "border-red-500/30 bg-red-500/10" : "border-[var(--border)] bg-[var(--row-hover)]",
                                 waitingForParts ? "border-emerald-500/30 bg-emerald-500/10" : "",
                               ].join(" ")}
                             />
                             <div className="min-w-0">
-                              <p className="truncate font-mono text-sm font-semibold text-white">
+                              <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">
                                 {r.repair_number} · {r.device_name}
                               </p>
-                              <p className="mt-0.5 truncate text-sm text-[#9ca3af]">
+                              <p className="mt-0.5 truncate text-sm text-[var(--ink2)]">
                                 {r.client_name}
-                                {formatSla(r.estimated_completion_date)
-                                  ? ` · ${formatSla(r.estimated_completion_date)}`
-                                  : ""}
+                                {deadlineHint ? ` · Termin: ${deadlineHint}` : ""}
                               </p>
                             </div>
                           </div>
@@ -492,7 +489,7 @@ export function PanelTopbar() {
                               Montaż
                             </span>
                           ) : (
-                            <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">
+                            <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
                               {r.status_display}
                             </span>
                           )}
@@ -501,7 +498,7 @@ export function PanelTopbar() {
                     })}
 
                     {archive.length > 0 && (
-                      <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">
+                      <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                         ARCHIWUM
                       </div>
                     )}
@@ -534,29 +531,29 @@ export function PanelTopbar() {
                           }}
                           className={[
                             "flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition",
-                            "hover:bg-white/5",
-                            isSelected ? "bg-white/10" : "",
+                            "hover:bg-[var(--row-hover)]",
+                            isSelected ? "bg-[var(--row-active)]" : "",
                           ].join(" ")}
                         >
                           <div className="flex min-w-0 flex-1 items-center gap-3">
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                              <CheckCircle2 size={18} className="text-[#94a3b8]" />
+                            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--row-hover)]">
+                              <CheckCircle2 size={18} className="text-[var(--ink2)]" />
                             </span>
                             <div className="min-w-0">
-                              <p className="truncate font-mono text-sm font-semibold text-white">
+                              <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">
                                 {r.repair_number} · {r.device_name}
                               </p>
-                              <p className="mt-0.5 truncate text-sm text-[#9ca3af]">{r.client_name}</p>
+                              <p className="mt-0.5 truncate text-sm text-[var(--ink2)]">{r.client_name}</p>
                             </div>
                           </div>
-                          <span className="shrink-0 text-xs text-[#6b7280]">{dateText}</span>
+                          <span className="shrink-0 text-xs text-[var(--muted)]">{dateText}</span>
                         </div>
                       );
                     })}
 
                     {clientSlice.length > 0 && (
                       <div className="mt-3 px-4 pb-3">
-                        <div className="mb-2 px-0 py-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">
+                        <div className="mb-2 px-0 py-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                           KLIENCI
                         </div>
                         <div className="space-y-2">
@@ -580,17 +577,17 @@ export function PanelTopbar() {
                                   if (idx >= 0) handleNavigate(idx);
                                 }}
                                 className={[
-                                  "cursor-pointer rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10",
-                                  isSelected ? "bg-white/10" : "",
+                                  "cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 transition hover:bg-[var(--row-active)]",
+                                  isSelected ? "bg-[var(--row-active)]" : "",
                                 ].join(" ")}
                               >
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="min-w-0">
-                                    <p className="truncate font-mono text-xs font-semibold text-white">{c.full_name}</p>
-                                    <p className="mt-0.5 truncate text-[11px] text-[#9ca3af]">{c.email}</p>
+                                    <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{c.full_name}</p>
+                                    <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{c.email}</p>
                                   </div>
                                   {last?.repair_number ? (
-                                    <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-semibold text-[#9ca3af]">
+                                    <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[10px] font-semibold text-[var(--ink2)]">
                                       {last.repair_number}
                                     </span>
                                   ) : null}
@@ -603,7 +600,7 @@ export function PanelTopbar() {
                                       </span>
                                     ) : null}
                                     {badgeCompany ? (
-                                      <span className="rounded-full border border-[#3b82f6]/30 bg-[#3b82f6]/10 px-2 py-1 text-[10px] font-semibold text-[#3b82f6]">
+                                      <span className="rounded-full border border-[var(--bb)] bg-[var(--bl)] px-2 py-1 text-[10px] font-semibold text-[var(--blue)]">
                                         FIRMA
                                       </span>
                                     ) : null}
@@ -618,7 +615,7 @@ export function PanelTopbar() {
 
                     {deviceSlice.length > 0 && (
                       <div className="mt-2 px-4 pb-3">
-                        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">
+                        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                           URZADZENIA
                         </div>
                         <div className="space-y-2">
@@ -635,13 +632,13 @@ export function PanelTopbar() {
                                   if (idx >= 0) handleNavigate(idx);
                                 }}
                                 className={[
-                                  "rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10",
-                                  isSelected ? "bg-white/10" : "",
+                                  "rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 transition hover:bg-[var(--row-active)]",
+                                  isSelected ? "bg-[var(--row-active)]" : "",
                                 ].join(" ")}
                               >
-                                <p className="truncate font-mono text-xs font-semibold text-white">{d.device_name}</p>
-                                <p className="mt-0.5 truncate text-[11px] text-[#9ca3af]">{d.client_name ?? "—"}</p>
-                                <p className="mt-2 text-[10px] text-[#9ca3af]">
+                                <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{d.device_name}</p>
+                                <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{d.client_name ?? "—"}</p>
+                                <p className="mt-2 text-[10px] text-[var(--ink2)]">
                                   {d.category ?? "—"} · Napraw: {d.repair_count ?? 0}
                                 </p>
                               </div>
@@ -651,17 +648,17 @@ export function PanelTopbar() {
                       </div>
                     )}
 
-                    <div className="mt-auto flex items-center justify-between gap-4 border-t border-white/10 px-4 py-3 text-[11px] text-[#6b7280]">
+                    <div className="mt-auto flex items-center justify-between gap-4 border-t border-[var(--border)] px-4 py-3 text-[11px] text-[var(--muted)]">
                       <div className="flex items-center gap-2">
-                        <span className="rounded border border-white/10 bg-white/5 px-2 py-1 text-[#9ca3af]">Enter</span>
+                        <span className="rounded border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[var(--ink2)]">Enter</span>
                         wybierz
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="rounded border border-white/10 bg-white/5 px-2 py-1 text-[#9ca3af]">↑/↓</span>
+                        <span className="rounded border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[var(--ink2)]">↑/↓</span>
                         nawiguj
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="rounded border border-white/10 bg-white/5 px-2 py-1 text-[#9ca3af]">Esc</span>
+                        <span className="rounded border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[var(--ink2)]">Esc</span>
                         zamknij
                       </div>
                     </div>
@@ -676,12 +673,11 @@ export function PanelTopbar() {
           <button
             type="button"
             onClick={() => {
+              const label = panelTheme === "dark" ? "Tryb jasny" : "Tryb ciemny";
               toggleTheme();
-              const t = getTheme();
-              setPanelTheme(t);
-              showToast(t === "dark" ? "Tryb ciemny" : "Tryb jasny", "success");
+              showToast(label, "success");
             }}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             aria-label={panelTheme === "dark" ? "Przełącz na jasny motyw" : "Przełącz na ciemny motyw"}
             style={{ color: accent }}
           >
@@ -690,20 +686,20 @@ export function PanelTopbar() {
 
           <Link
             href="/panel/powiadomienia"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             aria-label="Powiadomienia"
           >
             <Bell size={18} />
-            {notifRequiresActionCountQuery.data && (notifRequiresActionCountQuery.data as number) > 0 ? (
-              <span className="absolute -right-1 -top-1 rounded-full bg-[#3b82f6] px-1.5 py-0.5 text-[10px] font-bold text-white">
-                {notifRequiresActionCountQuery.data as number}
+            {notifUnreadCountQuery.data && (notifUnreadCountQuery.data as number) > 0 ? (
+              <span className="absolute -right-1 -top-1 rounded-full bg-[var(--blue)] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {notifUnreadCountQuery.data as number}
               </span>
             ) : null}
           </Link>
 
           <Link
             href="/panel/comm"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             aria-label="Wiadomości"
           >
             <MessageSquareText size={18} />
@@ -711,7 +707,7 @@ export function PanelTopbar() {
 
           <Link
             href="/panel/profil"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-bold text-white transition hover:bg-white/10"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-sm font-bold text-[var(--white)] transition hover:bg-[var(--row-active)]"
             aria-label="Mój profil"
             style={{ boxShadow: `0 0 26px rgba(59,130,246,.10)` }}
           >
@@ -722,7 +718,7 @@ export function PanelTopbar() {
             <button
               type="button"
               onClick={handleLogout}
-              className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#9ca3af] transition hover:bg-white/10 md:inline-flex"
+              className="hidden items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--ink2)] transition hover:bg-[var(--row-active)] md:inline-flex"
             >
               <LogOut size={16} />
               Wyloguj

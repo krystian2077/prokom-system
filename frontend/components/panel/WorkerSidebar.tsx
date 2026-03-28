@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Users,
@@ -12,14 +11,31 @@ import {
   ChevronRight,
   LogOut,
   CircleUserRound,
+  ClipboardList,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import type { RepairRequestListItem } from "@/types/repairs";
 
+const navLinkMotion =
+  "group relative flex touch-manipulation items-center justify-between gap-3 rounded-xl border-l-[3px] px-3 py-2.5 outline-none transition-all duration-200 ease-[cubic-bezier(0.33,1,0.68,1)] motion-safe:active:scale-[0.98] motion-safe:active:duration-75 focus-visible:ring-2 focus-visible:ring-[var(--bb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--s1)]";
+
+function navRowClass(active: boolean) {
+  return active
+    ? `${navLinkMotion} border-[var(--blue)] bg-[var(--bl)] text-[var(--white)] shadow-[inset_0_1px_0_0_rgba(255,255,255,.07),0_0_24px_-12px_rgba(59,130,246,.4)] hover:brightness-[1.03]`
+    : `${navLinkMotion} border-transparent bg-transparent text-[var(--ink)] hover:border-[var(--border)] hover:bg-[var(--row-hover)] hover:text-[var(--white)] hover:shadow-[inset_0_0_0_1px_var(--border)] active:bg-[var(--row-hover)]`;
+}
+
+function navIconShell(active: boolean) {
+  const shell =
+    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-200 ease-out [&_svg]:transition-transform [&_svg]:duration-200 [&_svg]:ease-out";
+  return active
+    ? `${shell} border border-[var(--bb)] bg-[color-mix(in_srgb,var(--blue)_22%,transparent)] text-[var(--white)] shadow-[0_0_18px_rgba(59,130,246,.22)] group-hover:shadow-[0_0_24px_rgba(59,130,246,.35)] group-hover:[&_svg]:scale-[1.05]`
+    : `${shell} border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] group-hover:border-[var(--bb)] group-hover:bg-[var(--bl)] group-hover:text-[var(--white)] group-hover:shadow-[0_0_20px_rgba(59,130,246,.15)] group-hover:[&_svg]:scale-110 group-active:[&_svg]:scale-95`;
+}
+
 export function WorkerSidebar() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { user, token, logout } = useAuth();
 
   const panelUser = user && ["staff", "admin"].includes(user.role) ? user : null;
@@ -34,19 +50,6 @@ export function WorkerSidebar() {
       return {
         my_active_count: Number(dashboardRes?.my_active_count ?? 0),
       };
-    },
-    staleTime: 15_000,
-  });
-
-  const requiresActionCountQuery = useQuery({
-    queryKey: ["sidebar", "requires-action", user?.id, user?.role],
-    enabled: Boolean(token && panelUser?.id),
-    queryFn: async () => {
-      if (!token || !panelUser?.id) return 0;
-      const res = await api.get<any>(`/accounts/notifications/requires-action/`, token);
-      if (typeof res?.count === "number") return res.count as number;
-      if (Array.isArray(res?.items)) return res.items.length as number;
-      return 0;
     },
     staleTime: 15_000,
   });
@@ -67,23 +70,15 @@ export function WorkerSidebar() {
 
   const myActiveCount = dashboardCountsQuery.data?.my_active_count ?? null;
 
-  const requiresActionCount = (requiresActionCountQuery.data ?? 0) as number;
   const unassignedCount = unassignedCountQuery.data ?? null;
-  const requiresActionNavActive = pathname === "/panel/dashboard" && searchParams.get("focus") === "requires-action";
 
   const notifBadgeCountQuery = useQuery({
-    queryKey: ["sidebar", "notif-count"],
+    queryKey: ["sidebar", "notif-unread-count"],
     enabled: Boolean(token && panelUser),
     queryFn: async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/accounts/notifications/requires-action/`,
-        { headers: token ? { Authorization: `Token ${token}` } : {} },
-      );
-      if (!res.ok) return 0;
-      const data = await res.json();
-      if (typeof data?.count === "number") return data.count;
-      if (Array.isArray(data?.items)) return data.items.length;
-      return 0;
+      if (!token) return 0;
+      const data = await api.get<{ count?: number }>(`/accounts/notifications/unread-count/`, token);
+      return typeof data?.count === "number" ? data.count : 0;
     },
     staleTime: 15_000,
   });
@@ -98,317 +93,153 @@ export function WorkerSidebar() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <aside
-      className="relative z-[120] hidden w-[248px] flex-col border-r border-white/5 bg-[#0f1117] md:flex"
-    >
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-[#3b82f6]/70" />
+    <aside className="relative z-[120] hidden w-[352px] flex-col border-r border-[var(--border)] bg-gradient-to-b from-[var(--s3)] via-[var(--s1)] to-[var(--page)] md:flex">
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#60a5fa] via-[#3b82f6] to-[#1d4ed8] opacity-90 shadow-[0_0_12px_rgba(59,130,246,.45)]" />
 
-      <div className="px-5 pt-5">
+      <div className="px-6 pt-5">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[13px] font-bold tracking-[0.2em] text-[#9ca3af]">PRO-KOM</div>
+            <div className="text-[15px] font-bold tracking-[0.2em] text-[var(--ink2)]">PRO-KOM</div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold"
-                style={{
-                  background: "rgba(59,130,246,.14)",
-                  borderColor: "rgba(59,130,246,.35)",
-                  color: "#bfdbfe",
-                }}
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--bb)] bg-[var(--bl)] px-3 py-1.5 text-[13px] font-bold text-[var(--blue)] transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
               >
                 <span
-                  className="h-2 w-2 rounded-full bg-[#3b82f6]"
+                  className="h-2 w-2 rounded-full bg-[var(--blue)]"
                   style={{ boxShadow: "0 0 14px rgba(59,130,246,.55)", animation: "statusPulse 1.6s ease infinite" }}
                 />
                 Panel Pracownika
               </span>
             </div>
           </div>
-          <span
-            className="h-9 w-9 shrink-0 rounded-full"
-            style={{
-              background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
-              display: "inline-block",
-              boxShadow: "0 0 22px rgba(59,130,246,.35)",
-            }}
-          />
+          <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[var(--blue)] to-[var(--blue)] shadow-[0_0_22px_rgba(59,130,246,.35)] ring-1 ring-[var(--border)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_28px_rgba(59,130,246,.5)] hover:ring-[var(--bb)] active:scale-95">
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[var(--white)]/25 to-transparent opacity-60" />
+          </span>
         </div>
       </div>
 
-      <nav className="mt-6 flex-1 overflow-auto px-3 pb-6">
+      <nav className="mt-6 flex-1 overflow-auto px-4 pb-6">
         <div className="space-y-5">
           <div>
-            <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">Skróty</div>
+            <div className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Skróty</div>
 
             <div className="space-y-1">
-              <Link
-                href="/panel/dashboard"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background: isActive("/panel/dashboard") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: isActive("/panel/dashboard") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: isActive("/panel/dashboard") ? "3px solid #3b82f6" : "3px solid transparent",
-                }}
-              >
+              <Link href="/panel/dashboard" className={navRowClass(isActive("/panel/dashboard"))}>
                 <div className="flex items-center gap-3">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background: isActive("/panel/dashboard") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
-                      border: isActive("/panel/dashboard") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
-                    }}
-                  >
-                    <History size={18} />
+                  <span className={navIconShell(isActive("/panel/dashboard"))}>
+                    <History size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Dashboard</span>
+                  <span className="text-base font-semibold">Dashboard</span>
                 </div>
-                <span className={isActive("/panel/dashboard") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"} />
+                <span
+                  className={
+                    isActive("/panel/dashboard")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
+                  }
+                />
               </Link>
 
               <Link
                 href="/panel/naprawy"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/repairs") ||
+                className={navRowClass(
+                  pathname.startsWith("/panel/repairs") ||
                     pathname.startsWith("/panel/naprawy") ||
-                    pathname.startsWith("/panel/zgloszenia")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/repairs") ||
-                    pathname.startsWith("/panel/naprawy") ||
-                    pathname.startsWith("/panel/zgloszenia")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/repairs") ||
-                    pathname.startsWith("/panel/naprawy") ||
-                    pathname.startsWith("/panel/zgloszenia")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                    pathname.startsWith("/panel/zgloszenia"),
+                )}
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/repairs") ||
+                    className={navIconShell(
+                      pathname.startsWith("/panel/repairs") ||
                         pathname.startsWith("/panel/naprawy") ||
-                        pathname.startsWith("/panel/zgloszenia")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/repairs") ||
-                        pathname.startsWith("/panel/naprawy") ||
-                        pathname.startsWith("/panel/zgloszenia")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                        pathname.startsWith("/panel/zgloszenia"),
+                    )}
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={20} />
                   </span>
-                  <span className="truncate text-sm font-semibold">Moje naprawy</span>
+                  <span className="text-base font-semibold">Moje naprawy</span>
                 </div>
-                <span
-                  className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]"
-                  style={{
-                    color: "white",
-                    borderColor: "rgba(59,130,246,.35)",
-                    background: "rgba(59,130,246,.14)",
-                  }}
-                >
+                <span className="shrink-0 rounded-full border border-[var(--bb)] bg-[var(--bl)] px-2 py-0.5 text-[12px] font-semibold text-[var(--white)] shadow-[0_0_12px_-4px_rgba(59,130,246,.35)] transition-all duration-200 group-hover:brightness-110 group-active:scale-95">
                   {myActiveCount ?? "…"}
                 </span>
               </Link>
 
               <Link
                 href="/panel/nieprzypisane"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned"),
+                )}
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/nieprzypisane") || pathname.startsWith("/panel/unassigned"),
+                    )}
                   >
-                    <Users size={18} />
+                    <Users size={20} />
                   </span>
-                  <span className="truncate text-sm font-semibold">Nieprzypisane</span>
+                  <span className="text-base font-semibold">Nieprzypisane</span>
                 </div>
-                <span
-                  className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]"
-                  style={{
-                    color: "white",
-                    borderColor: "rgba(59,130,246,.35)",
-                    background: "rgba(59,130,246,.14)",
-                  }}
-                >
+                <span className="shrink-0 rounded-full border border-[var(--bb)] bg-[var(--bl)] px-2 py-0.5 text-[12px] font-semibold text-[var(--white)] shadow-[0_0_12px_-4px_rgba(59,130,246,.35)] transition-all duration-200 group-hover:brightness-110 group-active:scale-95">
                   {unassignedCount ?? "…"}
                 </span>
               </Link>
 
               <Link
                 href="/panel/wszystkie"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie"),
+                )}
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/all-repairs") || pathname.startsWith("/panel/wszystkie"),
+                    )}
                   >
-                    <History size={18} />
+                    <History size={20} />
                   </span>
-                  <span className="truncate text-sm font-semibold">Wszystkie naprawy</span>
+                  <span className="text-base font-semibold">Wszystkie naprawy</span>
                 </div>
-                <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]">—</span>
-              </Link>
-
-              <Link
-                href="/panel/historia"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
-                  >
-                    <History size={18} />
-                  </span>
-                  <span className="truncate text-sm font-semibold">Historia napraw</span>
-                </div>
-                <span
-                  className={
-                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
-                  }
-                />
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">Kolejka</div>
-
-            <div className="space-y-1">
-              <Link
-                href="/panel/dashboard?focus=requires-action"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background: requiresActionNavActive ? "rgba(59,130,246,.12)" : "transparent",
-                  color: requiresActionNavActive ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: requiresActionNavActive ? "3px solid #3b82f6" : "3px solid transparent",
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background: requiresActionNavActive ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
-                      border: requiresActionNavActive ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
-                    }}
-                  >
-                    <Bell size={18} />
-                  </span>
-                  <span className="text-sm font-semibold">Wymaga reakcji</span>
-                </div>
-                <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold" style={{ borderColor: "rgba(59,130,246,.35)", background: "rgba(59,130,246,.14)", color: "#fff" }}>
-                  {requiresActionCount ?? "…"}
+                <span className="shrink-0 rounded-full border border-[var(--border2)] bg-[var(--row-hover)] px-2 py-0.5 text-[12px] font-semibold text-[var(--ink2)] transition-all duration-200 group-hover:border-[var(--border2)] group-hover:bg-[var(--row-active)] group-hover:text-[var(--white)] group-active:scale-95">
+                  —
                 </span>
               </Link>
 
               <Link
-                href="/panel/powiadomienia"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background: pathname.startsWith("/panel/powiadomienia") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/powiadomienia") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/powiadomienia") ? "3px solid #3b82f6" : "3px solid transparent",
-                }}
+                href="/panel/historia"
+                className={navRowClass(
+                  pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive"),
+                )}
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background: pathname.startsWith("/panel/powiadomienia") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
-                      border: pathname.startsWith("/panel/powiadomienia") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive"),
+                    )}
                   >
-                    <Bell size={18} />
+                    <History size={20} />
                   </span>
-                  <span className="truncate text-sm font-semibold">Powiadomienia</span>
+                  <span className="text-base font-semibold">Historia napraw</span>
                 </div>
-                <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold" style={{ borderColor: "rgba(59,130,246,.35)", background: "rgba(59,130,246,.14)", color: "#fff" }}>
+                <span
+                  className={
+                    pathname.startsWith("/panel/historia") || pathname.startsWith("/panel/archive")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
+                  }
+                />
+              </Link>
+
+              <Link href="/panel/powiadomienia" className={navRowClass(pathname.startsWith("/panel/powiadomienia"))}>
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className={navIconShell(pathname.startsWith("/panel/powiadomienia"))}>
+                    <Bell size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Powiadomienia</span>
+                </div>
+                <span className="shrink-0 rounded-full border border-[var(--bb)] bg-[var(--bl)] px-2 py-0.5 text-[12px] font-semibold text-[var(--white)] shadow-[0_0_12px_-4px_rgba(59,130,246,.35)] transition-all duration-200 group-hover:brightness-110 group-active:scale-95">
                   {notifBadgeCount ?? "…"}
                 </span>
               </Link>
@@ -416,350 +247,230 @@ export function WorkerSidebar() {
           </div>
 
           <div>
-            <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b93a8]">Panel</div>
+            <div className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Panel</div>
             <div className="space-y-1">
-              <Link
-                href="/panel/intake"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background: pathname.startsWith("/panel/intake") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/intake") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/intake") ? "3px solid #3b82f6" : "3px solid transparent",
-                }}
-              >
+              <Link href="/panel/intake" className={navRowClass(pathname.startsWith("/panel/intake"))}>
                 <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: pathname.startsWith("/panel/intake") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)", border: pathname.startsWith("/panel/intake") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)" }}>
-                    <CircleUserRound size={18} />
+                  <span className={navIconShell(pathname.startsWith("/panel/intake"))}>
+                    <CircleUserRound size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Przyjęcie</span>
+                  <span className="text-base font-semibold">Przyjęcie Stacjonarne</span>
                 </div>
-                <span className={pathname.startsWith("/panel/intake") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"} />
+                <span
+                  className={
+                    pathname.startsWith("/panel/intake")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
+                  }
+                />
               </Link>
 
-              <Link
-                href="/panel/comm"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background: pathname.startsWith("/panel/comm") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/comm") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/comm") ? "3px solid #3b82f6" : "3px solid transparent",
-                }}
-              >
+              <Link href="/panel/comm" className={navRowClass(pathname.startsWith("/panel/comm"))}>
                 <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: pathname.startsWith("/panel/comm") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)", border: pathname.startsWith("/panel/comm") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)" }}>
-                    <MessageSquareText size={18} />
+                  <span className={navIconShell(pathname.startsWith("/panel/comm"))}>
+                    <MessageSquareText size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Komunikacja</span>
+                  <span className="text-base font-semibold">Komunikacja</span>
                 </div>
-                <span className={pathname.startsWith("/panel/comm") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"} />
+                <span
+                  className={
+                    pathname.startsWith("/panel/comm")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
+                  }
+                />
               </Link>
 
               <Link
                 href="/panel/zadania"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks"),
+                )}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks"),
+                    )}
                   >
-                    <Users size={18} />
+                    <Users size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Zadania</span>
+                  <span className="text-base font-semibold">Zadania</span>
                 </div>
                 <span
                   className={
                     pathname.startsWith("/panel/zadania") || pathname.startsWith("/panel/tasks")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
 
               <Link
                 href="/panel/wyszukiwanie"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search"),
+                )}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search"),
+                    )}
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Wyszukiwanie</span>
+                  <span className="text-base font-semibold">Wyszukiwanie</span>
                 </div>
                 <span
                   className={
                     pathname.startsWith("/panel/wyszukiwanie") || pathname.startsWith("/panel/search")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
 
               <Link
                 href="/panel/reklamacje"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/reklamacje") ||
+                className={navRowClass(
+                  (pathname.startsWith("/panel/reklamacje") ||
                     pathname.startsWith("/panel/reklamacje-gwarancje") ||
-                    pathname.startsWith("/panel/claims")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/reklamacje") ||
-                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
-                    pathname.startsWith("/panel/claims")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/reklamacje") ||
-                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
-                    pathname.startsWith("/panel/claims")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                    pathname.startsWith("/panel/claims")) &&
+                    !pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie"),
+                )}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/reklamacje") ||
+                    className={navIconShell(
+                      (pathname.startsWith("/panel/reklamacje") ||
                         pathname.startsWith("/panel/reklamacje-gwarancje") ||
-                        pathname.startsWith("/panel/claims")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/reklamacje") ||
-                        pathname.startsWith("/panel/reklamacje-gwarancje") ||
-                        pathname.startsWith("/panel/claims")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                        pathname.startsWith("/panel/claims")) &&
+                        !pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie"),
+                    )}
                   >
-                    <Bell size={18} />
+                    <Bell size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Reklamacje</span>
+                  <span className="text-base font-semibold">Reklamacje</span>
                 </div>
                 <span
                   className={
-                    pathname.startsWith("/panel/reklamacje") ||
-                    pathname.startsWith("/panel/reklamacje-gwarancje") ||
-                    pathname.startsWith("/panel/claims")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
+                    (pathname.startsWith("/panel/reklamacje") ||
+                      pathname.startsWith("/panel/reklamacje-gwarancje") ||
+                      pathname.startsWith("/panel/claims")) &&
+                    !pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
+                  }
+                />
+              </Link>
+
+              <Link
+                href="/panel/reklamacje-gwarancje/przyjecie"
+                className={navRowClass(pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie"))}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie"))}>
+                    <ClipboardList size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Przyjęcie rekl./gwar.</span>
+                </div>
+                <span
+                  className={
+                    pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
 
               <Link
                 href="/panel/czesci-hurtownie"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts"),
+                )}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts"),
+                    )}
                   >
-                    <Users size={18} />
+                    <Users size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Części</span>
+                  <span className="text-base font-semibold">Części</span>
                 </div>
                 <span
                   className={
                     pathname.startsWith("/panel/czesci-hurtownie") || pathname.startsWith("/panel/parts")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
 
               <Link
                 href="/panel/kalendarz"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar"),
+                )}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar"),
+                    )}
                   >
-                    <History size={18} />
+                    <History size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Kalendarz</span>
+                  <span className="text-base font-semibold">Kalendarz</span>
                 </div>
                 <span
                   className={
                     pathname.startsWith("/panel/kalendarz") || pathname.startsWith("/panel/calendar")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
 
-              <Link
-                href="/panel/klienci"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background: pathname.startsWith("/panel/klienci") ? "rgba(59,130,246,.12)" : "transparent",
-                  color: pathname.startsWith("/panel/klienci") ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: pathname.startsWith("/panel/klienci") ? "3px solid #3b82f6" : "3px solid transparent",
-                }}
-              >
+              <Link href="/panel/klienci" className={navRowClass(pathname.startsWith("/panel/klienci"))}>
                 <div className="flex items-center gap-3">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background: pathname.startsWith("/panel/klienci") ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
-                      border: pathname.startsWith("/panel/klienci") ? "1px solid rgba(59,130,246,.35)" : "1px solid rgba(255,255,255,.06)",
-                    }}
-                  >
-                    <Users size={18} />
+                  <span className={navIconShell(pathname.startsWith("/panel/klienci"))}>
+                    <Users size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Klienci</span>
+                  <span className="text-base font-semibold">Klienci</span>
                 </div>
                 <span
                   className={
-                    pathname.startsWith("/panel/klienci") ? "h-2 w-2 rounded-full bg-[#3b82f6]" : "h-2 w-2 rounded-full bg-white/10"
+                    pathname.startsWith("/panel/klienci")
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
 
               <Link
                 href="/panel/odbiory"
-                className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
-                style={{
-                  background:
-                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
-                      ? "rgba(59,130,246,.12)"
-                      : "transparent",
-                  color:
-                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
-                      ? "#fff"
-                      : "rgba(208,212,222,.9)",
-                  borderLeft:
-                    pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
-                      ? "3px solid #3b82f6"
-                      : "3px solid transparent",
-                }}
+                className={navRowClass(
+                  pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior"),
+                )}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-xl"
-                    style={{
-                      background:
-                        pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
-                          ? "rgba(59,130,246,.18)"
-                          : "rgba(255,255,255,.03)",
-                      border:
-                        pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
-                          ? "1px solid rgba(59,130,246,.35)"
-                          : "1px solid rgba(255,255,255,.06)",
-                    }}
+                    className={navIconShell(
+                      pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior"),
+                    )}
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={20} />
                   </span>
-                  <span className="text-sm font-semibold">Odbiory</span>
+                  <span className="text-base font-semibold">Odbiory</span>
                 </div>
                 <span
                   className={
                     pathname.startsWith("/panel/odbiory") || pathname.startsWith("/panel/odbior")
-                      ? "h-2 w-2 rounded-full bg-[#3b82f6]"
-                      : "h-2 w-2 rounded-full bg-white/10"
+                      ? "h-2 w-2 shrink-0 rounded-full bg-[var(--blue)] shadow-[0_0_10px_rgba(59,130,246,.7)] transition-shadow group-hover:shadow-[0_0_14px_rgba(59,130,246,.85)]"
+                      : "h-2 w-2 shrink-0 rounded-full bg-[var(--border)] transition-colors group-hover:bg-[var(--blue)]/50"
                   }
                 />
               </Link>
@@ -768,26 +479,30 @@ export function WorkerSidebar() {
         </div>
       </nav>
 
-      <div className="border-t border-white/5 p-4 pb-5">
-        <Link href="/panel/profil" className="flex items-center gap-3 rounded-2xl transition hover:bg-white/5">
-          <span
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-bold text-white"
-            style={{ boxShadow: "0 0 26px rgba(59,130,246,.12)" }}
-          >
+      <div className="border-t border-[var(--border)] p-5 pb-6">
+        <Link
+          href="/panel/profil"
+          className="group/prof flex touch-manipulation items-center gap-3 rounded-2xl px-2 py-2 transition-all duration-200 hover:bg-[var(--row-hover)] hover:shadow-[inset_0_0_0_1px_var(--border)] active:scale-[0.99] active:bg-[var(--row-active)]"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-base font-bold text-[var(--white)] shadow-[0_0_26px_rgba(59,130,246,.12)] transition-all duration-200 group-hover/prof:border-[var(--bb)] group-hover/prof:bg-[var(--bl)] group-hover/prof:shadow-[0_0_28px_rgba(59,130,246,.22)] group-active/prof:scale-95">
             {(user?.full_name ?? user?.email ?? "?")[0]?.toUpperCase() ?? "?"}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold text-white">{user?.full_name || user?.email || "—"}</div>
-            <div className="truncate text-xs text-[#9ca3af]">{user?.role === "admin" ? "Admin" : "Pracownik"} · Profil</div>
+            <div className="truncate text-base font-semibold text-[var(--white)] transition-opacity group-hover/prof:opacity-90">
+              {user?.full_name || user?.email || "—"}
+            </div>
+            <div className="truncate text-sm text-[var(--ink2)] transition-colors group-hover/prof:text-[var(--muted)]">
+              {user?.role === "admin" ? "Admin" : "Pracownik"} · Profil
+            </div>
           </div>
         </Link>
 
         <button
           type="button"
           onClick={() => void handleLogout()}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+          className="group/btn mt-3 inline-flex w-full touch-manipulation items-center justify-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2.5 text-base font-semibold text-[var(--ink2)] transition-all duration-200 hover:border-[var(--border2)] hover:bg-[var(--row-active)] hover:text-[var(--white)] active:scale-[0.98]"
         >
-          <LogOut size={16} />
+          <LogOut size={18} className="transition-transform duration-200 group-hover/btn:-translate-x-0.5" />
           Wyloguj
         </button>
       </div>

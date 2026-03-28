@@ -64,7 +64,7 @@ type BackupLogItem = {
 type TabKey = "docs" | "gdpr" | "backups";
 
 const statusBadgeClass: Record<string, string> = {
-  pending: "border-white/10 bg-white/5 text-[#9ca3af]",
+  pending: "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]",
   in_progress: "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]",
   completed: "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]",
   rejected: "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]",
@@ -297,14 +297,14 @@ function ConfigAdminPageInner() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Konfiguracja i RODO</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--ink2)]">Panel Admina</p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Konfiguracja i RODO</h1>
+        <p className="mt-1 text-sm text-[var(--ink2)]">
           Dokumenty (regulamin/polityka), obsługa wniosków RODO i logi backupów.
         </p>
       </header>
 
-      <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+      <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {(
@@ -320,8 +320,8 @@ function ConfigAdminPageInner() {
                 onClick={() => setTab(k)}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                   tab === k
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                    ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                    : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 }`}
               >
                 {label}
@@ -335,7 +335,7 @@ function ConfigAdminPageInner() {
                 type="button"
                 onClick={() => void loadDocs()}
                 disabled={docsLoading}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
               >
                 Odśwież
               </button>
@@ -345,7 +345,7 @@ function ConfigAdminPageInner() {
                 type="button"
                 onClick={() => void loadGdpr()}
                 disabled={gdprLoading}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
               >
                 Odśwież
               </button>
@@ -355,7 +355,7 @@ function ConfigAdminPageInner() {
                 type="button"
                 onClick={() => void loadBackups()}
                 disabled={backupsLoading}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
               >
                 Odśwież
               </button>
@@ -370,7 +370,7 @@ function ConfigAdminPageInner() {
           {docsLoading ? (
             <div className="grid gap-4 md:grid-cols-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="space-y-3 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+                <div key={i} className="space-y-3 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
                   <Skeleton className="h-3 w-24" />
                   <Skeleton className="h-6 w-48" />
                   <Skeleton className="h-3 w-full max-w-xs" />
@@ -380,21 +380,21 @@ function ConfigAdminPageInner() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {docs.map((d) => (
-                <div key={d.id} className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+                <div key={d.id} className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Dokument</p>
-                      <p className="mt-1 truncate text-lg font-semibold text-white">
+                      <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Dokument</p>
+                      <p className="mt-1 truncate text-lg font-semibold text-[var(--white)]">
                         {d.code} v{d.version}
                       </p>
-                      <p className="mt-1 text-sm text-[#9ca3af]">{d.document_type_display}</p>
-                      <p className="mt-2 text-xs text-[#9ca3af]">Opublikowano: {fmtDate(d.published_at)}</p>
+                      <p className="mt-1 text-sm text-[var(--ink2)]">{d.document_type_display}</p>
+                      <p className="mt-2 text-xs text-[var(--ink2)]">Opublikowano: {fmtDate(d.published_at)}</p>
                     </div>
                     <span
                       className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold ${
                         d.is_active
                           ? "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]"
-                          : "border-white/10 bg-white/5 text-[#9ca3af]"
+                          : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]"
                       }`}
                     >
                       {d.is_active ? "Aktywny" : "Nieaktywny"}
@@ -408,8 +408,8 @@ function ConfigAdminPageInner() {
                       disabled={d.is_active || settingActiveId === d.id}
                       className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
                         d.is_active
-                          ? "border border-white/10 bg-white/5 text-[#9ca3af] opacity-70 cursor-not-allowed"
-                          : "border border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white disabled:opacity-60"
+                          ? "border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] opacity-70 cursor-not-allowed"
+                          : "border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                       }`}
                     >
                       {d.is_active
@@ -423,7 +423,7 @@ function ConfigAdminPageInner() {
               ))}
 
               {docs.length === 0 ? (
-                <div className="col-span-full rounded-3xl border border-white/10 bg-[#0c0d12] p-6 text-sm text-[#9ca3af]">
+                <div className="col-span-full rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6 text-sm text-[var(--ink2)]">
                   Brak dokumentów.
                 </div>
               ) : null}
@@ -436,29 +436,29 @@ function ConfigAdminPageInner() {
         <>
           {gdprError ? <p className="mb-4 text-sm text-[#fca5a5]">{gdprError}</p> : null}
 
-          <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="w-full md:w-[340px]">
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                   Szukaj
                 </label>
                 <input
                   value={gdprSearch}
                   onChange={(e) => setGdprSearch(e.target.value)}
                   placeholder="Imię, nazwisko, email…"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
+                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
                 />
               </div>
 
               <div className="flex flex-wrap items-end gap-3">
                 <div className="w-[220px]">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                     Typ
                   </label>
                   <select
                     value={gdprRequestType}
                     onChange={(e) => setGdprRequestType(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                   >
                     <option value="">Wszystkie</option>
                     <option value="export">Eksport danych</option>
@@ -467,13 +467,13 @@ function ConfigAdminPageInner() {
                 </div>
 
                 <div className="w-[220px]">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                     Status
                   </label>
                   <select
                     value={gdprStatus}
                     onChange={(e) => setGdprStatus(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                   >
                     <option value="">Wszystkie</option>
                     <option value="pending">Oczekuje</option>
@@ -487,15 +487,15 @@ function ConfigAdminPageInner() {
           </div>
 
           {gdprLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <StackedRowSkeleton rows={8} />
             </div>
           ) : (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-[#9ca3af]">
-                  Wyniki: <span className="text-white font-semibold">{gdprItems.length}</span> z{" "}
-                  <span className="text-white font-semibold">{gdprCount}</span>
+                <p className="text-sm text-[var(--ink2)]">
+                  Wyniki: <span className="text-[var(--white)] font-semibold">{gdprItems.length}</span> z{" "}
+                  <span className="text-[var(--white)] font-semibold">{gdprCount}</span>
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -503,32 +503,32 @@ function ConfigAdminPageInner() {
                     type="button"
                     onClick={() => setGdprPage((p) => Math.max(1, p - 1))}
                     disabled={gdprPage <= 1}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                   >
                     ← Poprzednie
                   </button>
-                  <span className="text-sm text-[#9ca3af]">
-                    Strona <span className="text-white font-semibold">{gdprPage}</span> / {gdprPageCount}
+                  <span className="text-sm text-[var(--ink2)]">
+                    Strona <span className="text-[var(--white)] font-semibold">{gdprPage}</span> / {gdprPageCount}
                   </span>
                   <button
                     type="button"
                     onClick={() => setGdprPage((p) => Math.min(gdprPageCount, p + 1))}
                     disabled={gdprPage >= gdprPageCount}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                   >
                     Następne →
                   </button>
                 </div>
               </div>
 
-              <div className="divide-y divide-white/10 rounded-3xl border border-white/10 bg-[#0c0d12]">
+              <div className="divide-y divide-[var(--border)] rounded-3xl border border-[var(--border)] bg-[var(--s1)]">
                 {gdprItems.map((it) => (
                   <div key={it.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Wniosek</p>
-                      <p className="mt-1 truncate text-lg font-semibold text-white">{it.client_full_name}</p>
-                      <p className="mt-1 text-sm text-[#9ca3af]">{it.client_email}</p>
-                      <p className="mt-2 text-xs text-[#9ca3af]">
+                      <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Wniosek</p>
+                      <p className="mt-1 truncate text-lg font-semibold text-[var(--white)]">{it.client_full_name}</p>
+                      <p className="mt-1 text-sm text-[var(--ink2)]">{it.client_email}</p>
+                      <p className="mt-2 text-xs text-[var(--ink2)]">
                         Utworzono: {fmtDate(it.requested_at)}
                         {it.resolved_at ? ` · Rozstrzygnięto: ${fmtDate(it.resolved_at)}` : ""}
                       </p>
@@ -542,12 +542,12 @@ function ConfigAdminPageInner() {
                       <div className="flex items-center gap-2">
                         <span
                           className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold ${
-                            statusBadgeClass[it.status] ?? "border-white/10 bg-white/5 text-[#9ca3af]"
+                            statusBadgeClass[it.status] ?? "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]"
                           }`}
                         >
                           {it.status_display}
                         </span>
-                        <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                        <span className="inline-flex rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold text-[var(--ink2)]">
                           {it.request_type_display}
                         </span>
                       </div>
@@ -557,7 +557,7 @@ function ConfigAdminPageInner() {
                           type="button"
                           onClick={() => openDecisionModal(it.id, "completed")}
                           disabled={it.status === "completed" || it.status === "rejected"}
-                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                          className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                         >
                           Zakończ
                         </button>
@@ -574,7 +574,7 @@ function ConfigAdminPageInner() {
                   </div>
                 ))}
 
-                {gdprItems.length === 0 ? <div className="p-6 text-sm text-[#9ca3af]">Brak wniosków.</div> : null}
+                {gdprItems.length === 0 ? <div className="p-6 text-sm text-[var(--ink2)]">Brak wniosków.</div> : null}
               </div>
             </>
           )}
@@ -585,17 +585,17 @@ function ConfigAdminPageInner() {
         <>
           {backupsError ? <p className="mb-4 text-sm text-[#fca5a5]">{backupsError}</p> : null}
 
-          <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="flex flex-wrap items-end gap-3">
                 <div className="w-[220px]">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                     Typ backupu
                   </label>
                   <select
                     value={backupType}
                     onChange={(e) => setBackupType(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                   >
                     <option value="">Wszystkie</option>
                     <option value="database">Baza danych</option>
@@ -605,13 +605,13 @@ function ConfigAdminPageInner() {
                 </div>
 
                 <div className="w-[220px]">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                     Status
                   </label>
                   <select
                     value={backupStatus}
                     onChange={(e) => setBackupStatus(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                   >
                     <option value="">Wszystkie</option>
                     <option value="started">Rozpoczęto</option>
@@ -624,15 +624,15 @@ function ConfigAdminPageInner() {
           </div>
 
           {backupsLoading ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
               <StackedRowSkeleton rows={8} />
             </div>
           ) : (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-[#9ca3af]">
-                  Wyniki: <span className="text-white font-semibold">{backupsItems.length}</span> z{" "}
-                  <span className="text-white font-semibold">{backupsCount}</span>
+                <p className="text-sm text-[var(--ink2)]">
+                  Wyniki: <span className="text-[var(--white)] font-semibold">{backupsItems.length}</span> z{" "}
+                  <span className="text-[var(--white)] font-semibold">{backupsCount}</span>
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -640,54 +640,54 @@ function ConfigAdminPageInner() {
                     type="button"
                     onClick={() => setBackupsPage((p) => Math.max(1, p - 1))}
                     disabled={backupsPage <= 1}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                   >
                     ← Poprzednie
                   </button>
-                  <span className="text-sm text-[#9ca3af]">
-                    Strona <span className="text-white font-semibold">{backupsPage}</span> / {backupsPageCount}
+                  <span className="text-sm text-[var(--ink2)]">
+                    Strona <span className="text-[var(--white)] font-semibold">{backupsPage}</span> / {backupsPageCount}
                   </span>
                   <button
                     type="button"
                     onClick={() => setBackupsPage((p) => Math.min(backupsPageCount, p + 1))}
                     disabled={backupsPage >= backupsPageCount}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                   >
                     Następne →
                   </button>
                 </div>
               </div>
 
-              <div className="divide-y divide-white/10 rounded-3xl border border-white/10 bg-[#0c0d12]">
+              <div className="divide-y divide-[var(--border)] rounded-3xl border border-[var(--border)] bg-[var(--s1)]">
                 {backupsItems.map((it) => (
                   <div key={it.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Backup</p>
-                      <p className="mt-1 text-lg font-semibold text-white">{it.backup_type_display}</p>
-                      <p className="mt-2 text-xs text-[#9ca3af]">
+                      <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Backup</p>
+                      <p className="mt-1 text-lg font-semibold text-[var(--white)]">{it.backup_type_display}</p>
+                      <p className="mt-2 text-xs text-[var(--ink2)]">
                         Start: {fmtDate(it.started_at)}
                         {it.finished_at ? ` · Koniec: ${fmtDate(it.finished_at)}` : ""}
                       </p>
-                      {it.triggered_by_name ? <p className="mt-1 text-xs text-[#9ca3af]">Wywołał: {it.triggered_by_name}</p> : null}
+                      {it.triggered_by_name ? <p className="mt-1 text-xs text-[var(--ink2)]">Wywołał: {it.triggered_by_name}</p> : null}
                       {it.error_message ? <p className="mt-2 whitespace-pre-wrap text-sm text-[#ffb4b4]">Błąd: {it.error_message}</p> : null}
                     </div>
 
                     <div className="flex flex-col items-end gap-2 md:w-[240px]">
                       <span
                         className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold ${
-                          statusBadgeClass[it.status] ?? "border-white/10 bg-white/5 text-[#9ca3af]"
+                          statusBadgeClass[it.status] ?? "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]"
                         }`}
                       >
                         {it.status_display}
                       </span>
                       {it.storage_path ? (
-                        <p className="break-all text-right text-xs text-[#9ca3af]">{it.storage_path}</p>
+                        <p className="break-all text-right text-xs text-[var(--ink2)]">{it.storage_path}</p>
                       ) : null}
                     </div>
                   </div>
                 ))}
 
-                {backupsItems.length === 0 ? <div className="p-6 text-sm text-[#9ca3af]">Brak logów backupów.</div> : null}
+                {backupsItems.length === 0 ? <div className="p-6 text-sm text-[var(--ink2)]">Brak logów backupów.</div> : null}
               </div>
             </>
           )}
@@ -700,18 +700,18 @@ function ConfigAdminPageInner() {
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-[#0c0d12] shadow-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4">
+          <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] p-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">RODO</p>
-                <p className="mt-1 text-lg font-semibold text-white">
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">RODO</p>
+                <p className="mt-1 text-lg font-semibold text-[var(--white)]">
                   {modalMode === "completed" ? "Zakończ wniosek" : "Odrzuć wniosek"}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
               >
                 Zamknij
               </button>
@@ -720,13 +720,13 @@ function ConfigAdminPageInner() {
             <form onSubmit={submitDecision} className="space-y-4 p-4">
               {modalError ? <p className="whitespace-pre-wrap text-sm text-[#fca5a5]">{modalError}</p> : null}
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                   Notatka (resolution note)
                 </label>
                 <textarea
                   value={modalNote}
                   onChange={(e) => setModalNote(e.target.value)}
-                  className="min-h-[120px] w-full resize-y rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-[#6b7280]"
+                  className="min-h-[120px] w-full resize-y rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
                   placeholder="Opis rozstrzygnięcia, uwagi wewnętrzne, decyzja…"
                 />
               </div>
@@ -735,7 +735,7 @@ function ConfigAdminPageInner() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 >
                   Anuluj
                 </button>
@@ -765,10 +765,10 @@ export default function ConfigAdminPage() {
       fallback={
         <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
           <Skeleton className="mb-6 h-9 w-80" />
-          <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <Skeleton className="h-10 w-64" />
           </div>
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <StackedRowSkeleton rows={8} />
           </div>
         </main>

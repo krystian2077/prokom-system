@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,8 +52,8 @@ function iconMeta(notificationType: string): { emoji: string; className: string 
   if (t === "sla_warning" || t === "sla_exceeded") return { emoji: "⏰", className: "bg-[#dc1e1e]/15 text-[#ffb4b4] border border-[#dc1e1e]/30" };
   if (t === "repair_assigned") return { emoji: "👤", className: "bg-[#3b82f6]/15 text-[#bcd6ff] border border-[#3b82f6]/30" };
   if (t === "unassigned_queue_note") return { emoji: "⏳", className: "bg-[#f59e0b]/15 text-[#ffe3b0] border border-[#f59e0b]/30" };
-  if (t === "status_changed") return { emoji: "🔄", className: "bg-white/10 text-[#d1d5db] border border-white/20" };
-  return { emoji: "🔔", className: "bg-white/10 text-[#d1d5db] border border-white/20" };
+  if (t === "status_changed") return { emoji: "🔄", className: "bg-[var(--row-active)] text-[#d1d5db] border border-white/20" };
+  return { emoji: "🔔", className: "bg-[var(--row-active)] text-[#d1d5db] border border-white/20" };
 }
 
 function relativeTime(createdAt: string): string {
@@ -83,6 +84,7 @@ function dayBucket(createdAt: string): "today" | "yesterday" | "older" {
 
 export default function NotificationsPage() {
   const { token, user } = useAuth();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -150,6 +152,11 @@ export default function NotificationsPage() {
     return g;
   }, [filteredItems]);
 
+  const invalidateNotifUnreadBadges = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ["sidebar", "notif-unread-count"] });
+    void queryClient.invalidateQueries({ queryKey: ["topbar", "notif", "unread-count"] });
+  }, [queryClient]);
+
   const patchStatus = async (id: string, next: "read" | "archived"): Promise<boolean> => {
     if (!token) return false;
     try {
@@ -174,6 +181,7 @@ export default function NotificationsPage() {
         setItems(snapshot);
         return;
       }
+      invalidateNotifUnreadBadges();
     }
 
     if (notification.repair_id) {
@@ -190,6 +198,7 @@ export default function NotificationsPage() {
     setItems((prev) => prev.map((n) => ({ ...n, status: "read" })));
     try {
       await api.post(`/accounts/notifications/mark-all-read/`, undefined, token);
+      invalidateNotifUnreadBadges();
       showToast("Wszystkie oznaczone jako przeczytane.", "success");
     } catch (e) {
       setItems(snapshot);
@@ -204,11 +213,11 @@ export default function NotificationsPage() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <h1 className="mt-2 text-2xl font-semibold text-white">Powiadomienia</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Centrum powiadomień pracownika</p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Powiadomienia</h1>
+        <p className="mt-1 text-sm text-[var(--ink2)]">Centrum powiadomień pracownika</p>
       </header>
 
-      <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+      <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             {FILTERS.map((f) => (
@@ -217,7 +226,7 @@ export default function NotificationsPage() {
                 type="button"
                 onClick={() => setFilterParam(f.key)}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                  filter === f.key ? "border-white/20 bg-white/10 text-white" : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                  filter === f.key ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]" : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 }`}
               >
                 {f.label}
@@ -227,7 +236,7 @@ export default function NotificationsPage() {
           <button
             type="button"
             onClick={() => void handleMarkAllRead()}
-            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
           >
             Oznacz wszystkie
           </button>
@@ -243,7 +252,7 @@ export default function NotificationsPage() {
       {loading ? <NotificationFeedSkeleton rows={7} /> : null}
 
       {!loading && !error && filteredItems.length === 0 ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] py-6">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] py-6">
           <EmptyState
             icon={EMPTY_STATES.notifications.icon}
             title={filter === "all" ? EMPTY_STATES.notifications.title : "Brak powiadomień w tym filtrze"}
@@ -265,7 +274,7 @@ export default function NotificationsPage() {
           ] as const).map(([bucket, label]) =>
             grouped[bucket].length > 0 ? (
               <section key={bucket}>
-                <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#9ca3af]">{label}</h2>
+                <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink2)]">{label}</h2>
                 <div className="space-y-2">
                   {grouped[bucket].map((n) => {
                     const isUnread = (n.status ?? "").toLowerCase() === "unread";
@@ -275,17 +284,17 @@ export default function NotificationsPage() {
                         key={n.id}
                         type="button"
                         onClick={() => void handleOpen(n)}
-                        className="relative flex w-full items-start justify-between gap-3 rounded-2xl border border-white/10 bg-[#0c0d12] p-4 text-left transition hover:border-white/20 hover:bg-[#101118]"
+                        className="relative flex w-full items-start justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4 text-left transition hover:border-white/20 hover:bg-[#101118]"
                       >
                         {isUnread ? <span className="absolute left-2 top-1/2 h-[5px] w-[5px] -translate-y-1/2 rounded-full bg-[#dc1e1e]" aria-hidden /> : null}
                         <div className="flex min-w-0 items-start gap-3 pl-2">
                           <span className={`flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-lg text-sm ${icon.className}`}>{icon.emoji}</span>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-white">{n.title}</p>
-                            {n.description ? <p className="mt-0.5 line-clamp-2 text-xs text-[#9ca3af]">{n.description}</p> : null}
+                            <p className="truncate text-sm font-semibold text-[var(--white)]">{n.title}</p>
+                            {n.description ? <p className="mt-0.5 line-clamp-2 text-xs text-[var(--ink2)]">{n.description}</p> : null}
                           </div>
                         </div>
-                        <div className="shrink-0 text-xs text-[#9ca3af]">{relativeTime(n.created_at)}</div>
+                        <div className="shrink-0 text-xs text-[var(--ink2)]">{relativeTime(n.created_at)}</div>
                       </button>
                     );
                   })}

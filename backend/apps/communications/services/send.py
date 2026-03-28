@@ -74,11 +74,34 @@ def send_email_html(to_email, subject, body_plain, html_content, fail_silently=T
     return msg.send(fail_silently=fail_silently)
 
 
-def send_repair_submission_confirmation(repair, fail_silently=True):
+def _format_money_pl_email(value):
+    if value is None:
+        return ""
+    try:
+        from decimal import Decimal
+
+        d = value if isinstance(value, Decimal) else Decimal(str(value))
+    except Exception:
+        return str(value)
+    integral, frac = f"{d:.2f}".split(".")
+    try:
+        integral_fmt = f"{int(integral):,}".replace(",", " ")
+    except ValueError:
+        integral_fmt = integral
+    return f"{integral_fmt},{frac} zł"
+
+
+def _phone_last4_email(phone: str) -> str:
+    if not phone:
+        return ""
+    digits = "".join(c for c in phone if c.isdigit())
+    return digits[-4:] if len(digits) >= 4 else ""
+
+
+def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_stationary=False):
     """
     Wysyła e-mail potwierdzenia przyjęcia zlecenia na podany adres klienta (dla każdego zgłoszenia).
-    Zawiera: przyjęcie zlecenia, numer naprawy, prośbę o zapisanie numeru, podsumowanie (urządzenie, problem, dostawa, zwrot).
-    Dla gości: opcjonalnie link do przypisania naprawy do konta. Bez linku do śledzenia bez logowania.
+    intake_stationary=True — treść i layout pod przyjęcie w serwisie (pełne linki, instrukcja konta, śledzenie).
     """
     to_email = (getattr(repair.client, "email", None) or "").strip()
     if not to_email:
@@ -95,9 +118,11 @@ def send_repair_submission_confirmation(repair, fail_silently=True):
     if getattr(repair, "hammer_glass_interest", None):
         hg = repair.hammer_glass_interest
         if hg == "yes":
-            hammer_glass_display = "Tak, proszę o ofertę"
+            hammer_glass_display = (
+                "Tak — klient zainteresowany folią Hammer Glass / szkłem hartowanym (wycena przy naprawie)"
+            )
         elif hg == "no":
-            hammer_glass_display = "Nie"
+            hammer_glass_display = "Nie — brak zainteresowania w tej chwili"
         elif hg == "ask_later":
             hammer_glass_display = "Zapytam później"
         elif hg == "free_with_quote":
@@ -119,14 +144,30 @@ def send_repair_submission_confirmation(repair, fail_silently=True):
     device_turns_on = getattr(repair, "device_turns_on", None)
     visual_condition_description = (getattr(repair, "visual_condition_description", None) or "").strip()[:1000]
     delivery_by_courier = (getattr(repair, "delivery_method", None) or "") in ("courier", "parcel_locker")
+    addr_full = getattr(settings, "SERWIS_PRINT_ADDRESS", "") or "ul. Orkana 16B, 34-700 Rabka-Zdrój"
     service_address = {
-        "name": "PRO-KOM Tadeusz Wójciak",
-        "street": "ul. Orkana 16B",
-        "city": "34-700 Rabka-Zdrój",
-        "hours": "pon.–pt. 9:00–17:00, sob. 9:00–14:00",
-        "phone": "883 200 151",
-        "email": "serwisprokomrabka@gmail.com",
+        "name": getattr(settings, "SERWIS_PRINT_COMPANY_NAME", "PRO-KOM Serwis"),
+        "street": addr_full,
+        "city": "",
+        "hours": getattr(settings, "SERWIS_PRINT_HOURS", "Pn–Pt 9:00–17:00"),
+        "phone": getattr(settings, "SERWIS_PRINT_PHONE", "883 200 151"),
+        "email": getattr(settings, "SERWIS_PRINT_EMAIL", "sklep@pro-kom.eu"),
+        "website": getattr(settings, "SERWIS_PRINT_WEBSITE", "www.pro-kom.eu"),
     }
+    client_phone = (getattr(repair.client, "phone", None) or "").strip()
+    phone_last4 = _phone_last4_email(client_phone)
+    track_url = f"{base}/track"
+    track_url_with_ref = f"{base}/track?ref={repair.repair_number}"
+    register_url = f"{base}/client/rejestracja"
+    login_url = f"{base}/client/login"
+    est_cost = _format_money_pl_email(getattr(repair, "estimated_cost", None))
+    est_date = (
+        repair.estimated_completion_date.strftime("%d.%m.%Y")
+        if getattr(repair, "estimated_completion_date", None)
+        else ""
+    )
+    priority_display = repair.get_priority_display() if hasattr(repair, "get_priority_display") else ""
+
     context = {
         "client_name": client_name,
         "repair_number": repair.repair_number,
@@ -142,47 +183,100 @@ def send_repair_submission_confirmation(repair, fail_silently=True):
         "visual_condition_description": visual_condition_description,
         "delivery_by_courier": delivery_by_courier,
         "service_address": service_address,
+        "intake_stationary": intake_stationary,
+        "track_url": track_url,
+        "track_url_with_ref": track_url_with_ref,
+        "register_url": register_url,
+        "login_url": login_url,
+        "client_phone": client_phone,
+        "client_email": to_email,
+        "phone_last4": phone_last4,
+        "estimated_cost_display": est_cost,
+        "estimated_completion_display": est_date,
+        "priority_display": priority_display,
+        "estimated_duration_display": repair.get_estimated_duration_display() if hasattr(repair, "get_estimated_duration_display") else "",
     }
-    subject = f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Serwis"
-    body_plain = (
-        f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
-        "Przyjęliśmy Twoje zlecenie naprawy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, "
-        "by potwierdzić przyjęcie zlecenia i ustalić szczegóły.\n\n"
-        f"Numer naprawy: {repair.repair_number}\n"
-        "Zapisz ten numer — jest ważny. Użyj go w kontakcie z serwisem.\n\n"
-        "Podsumowanie zgłoszenia:\n"
-        f"- Urządzenie: {device_name}\n"
-        f"- Opis problemu: {repair.problem_description or ''}\n"
-        f"- Dostawa: {delivery_display}\n"
-        f"- Zwrot: {return_display}\n"
+    subject = (
+        f"Potwierdzenie przyjęcia w serwisie — {repair.repair_number} | PRO-KOM Serwis"
+        if intake_stationary
+        else f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Serwis"
     )
-    if hammer_glass_display:
-        body_plain += f"- Hammer Glass: {hammer_glass_display}\n"
-    if accessories_summary:
-        body_plain += f"- Dobierz Akcesoria: {accessories_summary}\n"
-    if client_notes:
-        body_plain += f"- Dodatkowe uwagi: {client_notes}\n"
-    if device_turns_on is not None:
-        body_plain += f"- Czy urządzenie się włącza: {'Tak' if device_turns_on else 'Nie'}\n"
-    if visual_condition_description:
-        body_plain += f"- Stan wizualny: {visual_condition_description}\n"
-    body_plain += "\n"
-    if delivery_by_courier:
-        body_plain += (
-            "Wysyłka kurierem — nasz adres do nadania paczki:\n"
-            f"{service_address['name']}\n"
-            f"{service_address['street']}, {service_address['city']}\n"
-            f"Godziny: {service_address['hours']}\n"
-            f"Tel. {service_address['phone']}\n"
-            f"E-mail: {service_address['email']}\n\n"
-            "Wysyłkę paczki do nas opłacasz we własnym zakresie. Po naprawie odsyłamy Ci sprzęt za darmo — zwrot do domu jest po naszej stronie.\n\n"
-            "Prosimy o staranne zabezpieczenie urządzenia przed wysyłką (np. oryginalne opakowanie, wypełniacz, folia bąbelkowa). "
-            "Dzięki temu sprzęt dotrze do nas bez uszkodzeń.\n"
-            "Po nadaniu paczki możesz dodać numer listu przewozowego w panelu klienta — ułatwi to nam śledzenie przesyłki.\n\n"
+    if intake_stationary:
+        body_plain = (
+            f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
+            "Dziękujemy za wizytę w serwisie PRO-KOM. Poniżej masz potwierdzenie przyjęcia sprzętu oraz najważniejsze informacje.\n\n"
+            f"NUMER ZGŁOSZENIA: {repair.repair_number}\n"
+            "Zapisz go — przyda się przy kontakcie z nami i przy śledzeniu statusu.\n\n"
+            f"Urządzenie: {device_name}\n"
+            f"Opis / zakres: {repair.problem_description or '—'}\n"
         )
-    if claim_url:
-        body_plain += f"Chcesz przypisać tę naprawę do konta? Link (ważny 7 dni): {claim_url}\n\n"
-    body_plain += "Z poważaniem,\nZespół PRO-KOM Serwis"
+        if est_cost:
+            body_plain += f"Wstępna wycena: {est_cost}\n"
+        if est_date:
+            body_plain += f"Szacowana data zakończenia: {est_date}\n"
+        if priority_display:
+            body_plain += f"Priorytet: {priority_display}\n"
+        body_plain += f"Dostawa: {delivery_display}\nZwrot: {return_display}\n"
+        if hammer_glass_display:
+            body_plain += f"Folia Hammer Glass / szkło hartowane: {hammer_glass_display}\n"
+        body_plain += (
+            f"\nPANEL KLIENTA — rejestracja: {register_url}\n"
+            f"Zaloguj się: {login_url}\n"
+            "Użyj tego samego adresu e-mail co przy przyjęciu, aby naprawa była widoczna na koncie.\n\n"
+            f"ŚLEDZENIE (bez logowania): {track_url_with_ref}\n"
+            f"Potrzebujesz numeru zgłoszenia oraz ostatnich 4 cyfr telefonu ({phone_last4 or '****'}).\n\n"
+        )
+        if claim_url:
+            body_plain += f"Przypisanie naprawy do konta (link 7 dni): {claim_url}\n\n"
+        body_plain += (
+            f"Kontakt: tel. {service_address['phone']}, {service_address['email']}\n"
+            f"{addr_full}\n\n"
+            "Z poważaniem,\nZespół PRO-KOM Serwis"
+        )
+    else:
+        body_plain = (
+            f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
+            "Przyjęliśmy Twoje zlecenie naprawy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, "
+            "by potwierdzić przyjęcie zlecenia i ustalić szczegóły.\n\n"
+            f"Numer naprawy: {repair.repair_number}\n"
+            "Zapisz ten numer — jest ważny. Użyj go w kontakcie z serwisem.\n\n"
+            "Podsumowanie zgłoszenia:\n"
+            f"- Urządzenie: {device_name}\n"
+            f"- Opis problemu: {repair.problem_description or ''}\n"
+            f"- Dostawa: {delivery_display}\n"
+            f"- Zwrot: {return_display}\n"
+        )
+        if hammer_glass_display:
+            body_plain += f"- Folia Hammer Glass / szkło: {hammer_glass_display}\n"
+        if accessories_summary:
+            body_plain += f"- Dobierz Akcesoria: {accessories_summary}\n"
+        if client_notes:
+            body_plain += f"- Dodatkowe uwagi: {client_notes}\n"
+        if device_turns_on is not None:
+            body_plain += f"- Czy urządzenie się włącza: {'Tak' if device_turns_on else 'Nie'}\n"
+        if visual_condition_description:
+            body_plain += f"- Stan wizualny: {visual_condition_description}\n"
+        body_plain += "\n"
+        if delivery_by_courier:
+            body_plain += (
+                "Wysyłka kurierem — nasz adres do nadania paczki:\n"
+                f"{service_address['name']}\n"
+                f"{service_address['street']}\n"
+                f"Godziny: {service_address['hours']}\n"
+                f"Tel. {service_address['phone']}\n"
+                f"E-mail: {service_address['email']}\n\n"
+                "Wysyłkę paczki do nas opłacasz we własnym zakresie. Po naprawie odsyłamy Ci sprzęt za darmo — zwrot do domu jest po naszej stronie.\n\n"
+                "Prosimy o staranne zabezpieczenie urządzenia przed wysyłką (np. oryginalne opakowanie, wypełniacz, folia bąbelkowa). "
+                "Dzięki temu sprzęt dotrze do nas bez uszkodzeń.\n"
+                "Po nadaniu paczki możesz dodać numer listu przewozowego w panelu klienta — ułatwi to nam śledzenie przesyłki.\n\n"
+            )
+        body_plain += (
+            f"Panel klienta — rejestracja: {register_url}\n"
+            f"Śledzenie: {track_url_with_ref}\n\n"
+        )
+        if claim_url:
+            body_plain += f"Chcesz przypisać tę naprawę do konta? Link (ważny 7 dni): {claim_url}\n\n"
+        body_plain += "Z poważaniem,\nZespół PRO-KOM Serwis"
     try:
         html_content = render_to_string("emails/repair_submission_confirmation.html", context)
         return send_email_html(to_email, subject, body_plain, html_content, fail_silently=fail_silently)

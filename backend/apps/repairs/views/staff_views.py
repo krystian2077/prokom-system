@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from apps.accounts.models import UserRole
 from apps.common.permissions import IsStaffOrAdmin
 from apps.repairs.selectors import (
     repair_list,
@@ -11,6 +12,7 @@ from apps.repairs.selectors import (
     staff_dashboard_data,
     staff_dashboard_quality_metrics,
     staff_health_score,
+    staff_in_repair_kpi_count,
     staff_my_active_repairs_count,
 )
 from apps.repairs.serializers import RepairRequestListSerializer, RepairRequestSerializer
@@ -82,7 +84,13 @@ class StaffRepairDetailView(APIView):
                     "delivery_address",
                     "return_address",
                 )
-                .prefetch_related("status_history", "notes", "images")
+                .prefetch_related(
+                    "status_history",
+                    "notes",
+                    "images",
+                    "accessory_interests",
+                    "accessory_interests__product",
+                )
                 .get(pk=pk)
             )
         except RepairRequest.DoesNotExist:
@@ -114,6 +122,8 @@ class StaffDashboardView(APIView):
         quality["health_score"] = {"level": health["level"], "factors": health["factors"]}
         completed_pickups_count = staff_completed_pickups_count(user_id, dashboard_scope)
         my_active_count = staff_my_active_repairs_count(user_id)
+        is_admin = getattr(request.user, "role", None) == UserRole.ADMIN
+        in_repair_kpi_count = staff_in_repair_kpi_count(user_id, is_admin=is_admin)
 
         list_serializer = RepairRequestListSerializer
         return Response(
@@ -128,6 +138,7 @@ class StaffDashboardView(APIView):
                 "recent_activity": RecentActivityEntrySerializer(data["recent_activity"], many=True).data,
                 "completed_pickups_count": completed_pickups_count,
                 "my_active_count": my_active_count,
+                "in_repair_kpi_count": in_repair_kpi_count,
                 "quality": quality,
             }
         )

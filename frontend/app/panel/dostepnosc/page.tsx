@@ -211,16 +211,16 @@ function AvailabilityPageInner() {
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">
+        <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">
           {isAdmin ? "Panel Admina" : "Panel pracownika"} · Moduł
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Dostępność zespołu</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Widok na dziś/jutro/tydzień + dodawanie wpisów.</p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Dostępność zespołu</h1>
+        <p className="mt-1 text-sm text-[var(--ink2)]">Widok na dziś/jutro/tydzień + dodawanie wpisów.</p>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="lg:col-span-2 space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <div className="flex flex-wrap items-center gap-2">
               {(
                 [
@@ -235,8 +235,8 @@ function AvailabilityPageInner() {
                   onClick={() => setScope(val)}
                   className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                     scope === val
-                      ? "border-white/20 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                      ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                      : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   }`}
                 >
                   {label}
@@ -245,12 +245,12 @@ function AvailabilityPageInner() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-white">
+              <h2 className="text-sm font-semibold text-[var(--white)]">
                 {scope === "today" ? "Dziś" : scope === "tomorrow" ? "Jutro" : "Tydzień"}
               </h2>
-              {entriesLoading ? <span className="inline-block h-3 w-20 animate-pulse rounded bg-white/10" aria-hidden /> : null}
+              {entriesLoading ? <span className="inline-block h-3 w-20 animate-pulse rounded bg-[var(--row-active)]" aria-hidden /> : null}
             </div>
 
             {entriesError ? (
@@ -259,7 +259,7 @@ function AvailabilityPageInner() {
               </div>
             ) : null}
             {!entriesError && !entriesLoading && entries.length === 0 && (
-              <p className="mt-3 text-sm text-[#6b7280]">Brak wpisów dostępności.</p>
+              <p className="mt-3 text-sm text-[var(--muted)]">Brak wpisów dostępności.</p>
             )}
 
             {entriesLoading ? (
@@ -271,17 +271,17 @@ function AvailabilityPageInner() {
             {!entriesError && !entriesLoading && entries.length > 0 && (
               <div className="mt-4 space-y-4">
                 {grouped.map((g) => (
-                  <div key={g.employeeName} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-sm font-semibold text-white">{g.employeeName}</p>
+                  <div key={g.employeeName} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-4">
+                    <p className="text-sm font-semibold text-[var(--white)]">{g.employeeName}</p>
                     <div className="mt-3 space-y-2">
                       {g.items.map((e) => {
                         const times = e.is_all_day
                           ? "Cały dzień"
                           : `${e.start_time ?? ""}-${e.end_time ?? ""}`.replace(/^-|-$/g, "");
                         return (
-                          <div key={e.id} className="rounded-xl border border-white/10 bg-[#0b0c10] p-3">
-                            <p className="text-sm font-semibold text-white">{e.availability_type_display}</p>
-                            <p className="mt-1 text-sm text-[#9ca3af]">
+                          <div key={e.id} className="rounded-xl border border-[var(--border)] bg-[var(--s1)] p-3">
+                            <p className="text-sm font-semibold text-[var(--white)]">{e.availability_type_display}</p>
+                            <p className="mt-1 text-sm text-[var(--ink2)]">
                               {e.date} · {times}
                             </p>
                             {e.note ? <p className="mt-2 whitespace-pre-wrap text-sm text-[#e5e7eb]">{e.note}</p> : null}
@@ -297,9 +297,9 @@ function AvailabilityPageInner() {
         </section>
 
         <aside className="space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-            <h2 className="text-sm font-semibold text-white">Dodaj wpis</h2>
-            <p className="mt-1 text-sm text-[#9ca3af]">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+            <h2 className="text-sm font-semibold text-[var(--white)]">Dodaj wpis</h2>
+            <p className="mt-1 text-sm text-[var(--ink2)]">
               {isAdmin ? "Administrator wybiera pracownika." : "Pracownik dodaje tylko własną dostępność."}
             </p>
 
@@ -308,14 +308,14 @@ function AvailabilityPageInner() {
             <form onSubmit={submit} className="mt-4 space-y-4">
               {isAdmin && (
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                     Pracownik
                   </label>
                   <select
                     value={employeeId}
                     onChange={(e) => setEmployeeId(e.target.value)}
                     disabled={staffLoading}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white disabled:opacity-60"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] disabled:opacity-60"
                   >
                     {adminStaff.length === 0 ? <option value="">Brak danych</option> : null}
                     {adminStaff.map((s) => (
@@ -328,13 +328,13 @@ function AvailabilityPageInner() {
               )}
 
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                   Typ dostępności
                 </label>
                 <select
                   value={availabilityType}
                   onChange={(e) => setAvailabilityType(e.target.value as AvailabilityTypeValue)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                 >
                   {AVAILABILITY_TYPE_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
@@ -345,20 +345,20 @@ function AvailabilityPageInner() {
               </div>
 
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                   Data
                 </label>
                 <input
                   type="date"
                   value={dateStr}
                   onChange={(e) => setDateStr(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                 />
               </div>
 
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Cały dzień</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Cały dzień</p>
                 </div>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-[#e5e7eb]">
                   <input
@@ -374,39 +374,39 @@ function AvailabilityPageInner() {
               {!isAllDay && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                       Start
                     </label>
                     <input
                       type="time"
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                       Koniec
                     </label>
                     <input
                       type="time"
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
                     />
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
                   Notatka (opcjonalnie)
                 </label>
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Np. gdzie jesteś / jaka sprawa / uwagi…"
-                  className="min-h-[90px] w-full resize-y rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]"
+                  className="min-h-[90px] w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
                 />
               </div>
 
@@ -430,7 +430,7 @@ export default function AvailabilityPage() {
     <Suspense
       fallback={
         <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
-          <div className="h-8 w-64 animate-pulse rounded-lg bg-white/10" />
+          <div className="h-8 w-64 animate-pulse rounded-lg bg-[var(--row-active)]" />
           <StackedRowSkeleton rows={6} />
         </main>
       }

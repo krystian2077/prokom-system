@@ -28,49 +28,8 @@ interface StaffDashboardBuckets {
   completed_pickups_count: number;
   /** Unikalna liczba aktywnych napraw przypisanych do mnie (zgodna z /panel/naprawy). */
   my_active_count: number;
-}
-
-const STATUS_OPTIONS: Array<{ value: string; color: "gray" | "amber" | "blue" | "purple" | "green" | "red" }> = [
-  { value: "new", color: "gray" },
-  { value: "accepted", color: "blue" },
-  { value: "in_diagnostics", color: "blue" },
-  { value: "diagnostics_done", color: "blue" },
-  { value: "quote_pending", color: "amber" },
-  { value: "quote_sent", color: "purple" },
-  { value: "quote_accepted", color: "amber" },
-  { value: "quote_rejected", color: "red" },
-  { value: "waiting_for_parts", color: "blue" },
-  { value: "in_repair", color: "amber" },
-  { value: "repair_done", color: "amber" },
-  { value: "in_testing", color: "amber" },
-  { value: "testing_passed", color: "green" },
-  { value: "testing_failed", color: "red" },
-  { value: "ready_for_pickup", color: "green" },
-  { value: "picked_up", color: "gray" },
-  { value: "shipped", color: "gray" },
-  { value: "delivered", color: "gray" },
-  { value: "cancelled", color: "red" },
-  { value: "unrepairable", color: "red" },
-  { value: "abandoned", color: "red" },
-];
-
-function statusPillColor(status: string): { bg: string; border: string; text: string } {
-  const opt = STATUS_OPTIONS.find((s) => s.value === status);
-  const color = opt?.color ?? "gray";
-  switch (color) {
-    case "green":
-      return { bg: "rgba(34,197,94,.14)", border: "rgba(34,197,94,.28)", text: "#22c55e" };
-    case "amber":
-      return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b" };
-    case "blue":
-      return { bg: "rgba(59,130,246,.14)", border: "rgba(59,130,246,.28)", text: "#3b82f6" };
-    case "purple":
-      return { bg: "rgba(139,92,246,.14)", border: "rgba(139,92,246,.28)", text: "#8b5cf6" };
-    case "red":
-      return { bg: "rgba(220,30,30,.14)", border: "rgba(220,30,30,.28)", text: "#dc1e1e" };
-    default:
-      return { bg: "rgba(255,255,255,.05)", border: "rgba(255,255,255,.12)", text: "#9ba3b0" };
-  }
+  /** „W trakcie naprawy” — staff: moje; admin: cały warsztat (jak lista wszystkich napraw). */
+  in_repair_kpi_count: number;
 }
 
 function priorityRank(priority: string | null | undefined) {
@@ -110,7 +69,7 @@ function taskPriorityPillClass(priorityRaw: string | undefined): string {
   const p = (priorityRaw ?? "").toLowerCase();
   if (p === "urgent") return "border-[#dc1e1e]/40 bg-[#dc1e1e]/15 text-[#ffb4b4]";
   if (p === "important") return "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd9a6]";
-  return "border-white/10 bg-white/5 text-[#9ca3af]";
+  return "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]";
 }
 
 const TASK_PRIORITY_LABEL: Record<string, string> = {
@@ -297,10 +256,12 @@ function StaffDashboardSummaryCard({
   label,
   value,
   accent,
+  href,
 }: {
   label: string;
   value: number | null;
   accent: string;
+  href?: string;
 }) {
   const isLoading = value == null;
   const v = value ?? 0;
@@ -328,9 +289,9 @@ function StaffDashboardSummaryCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v, isLoading]);
 
-  return (
+  const card = (
     <div
-      className="relative min-h-[86px] overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12] p-4"
+      className="relative min-h-[86px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4"
       style={{
         boxShadow: `inset 0 1px 0 rgba(255,255,255,.06), 0 0 24px rgba(0,0,0,.25)`,
       }}
@@ -346,8 +307,8 @@ function StaffDashboardSummaryCard({
 
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">{label}</div>
-          <div className="mt-2 text-xl font-semibold text-white">{isLoading ? "…" : displayValue}</div>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">{label}</div>
+          <div className="mt-2 text-xl font-semibold text-[var(--white)]">{isLoading ? "…" : displayValue}</div>
         </div>
 
         <div
@@ -366,6 +327,20 @@ function StaffDashboardSummaryCard({
       </div>
     </div>
   );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="block rounded-2xl outline-none ring-offset-2 ring-offset-[#0f1117] transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#3b82f6]/55"
+        aria-label={`${label} — otwórz`}
+      >
+        {card}
+      </Link>
+    );
+  }
+
+  return card;
 }
 
 function StaffDashboardPage() {
@@ -419,6 +394,7 @@ function StaffDashboardPage() {
         without_update: dashboardRes.without_update ?? [],
         completed_pickups_count: Number(dashboardRes.completed_pickups_count ?? 0),
         my_active_count: Number(dashboardRes.my_active_count ?? 0),
+        in_repair_kpi_count: Number(dashboardRes.in_repair_kpi_count ?? 0),
       } as StaffDashboardBuckets;
     },
   });
@@ -564,22 +540,22 @@ function StaffDashboardPage() {
       <div className="flex flex-col gap-6">
         <header className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.22em] text-[#9ca3af]">
+            <p className="text-xs uppercase tracking-[0.22em] text-[var(--ink2)]">
               Pracownik · {userFirstName}{" "}
               <span
                 className="ml-2 inline-block h-2 w-2 rounded-full bg-[#22c55e]"
                 style={{ boxShadow: "0 0 18px rgba(34,197,94,.45)", animation: "pulse 1.6s ease-in-out infinite" }}
               />
             </p>
-            <h1 className="mt-2 text-[28px] font-semibold text-white" style={{ fontFamily: "var(--font-unbounded)" }}>
+            <h1 className="mt-2 text-[28px] font-semibold text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>
               Dzień dobry, {userFirstName}.
             </h1>
-            <p className="mt-1 text-sm text-[#9ca3af]">{subtitleByScope}</p>
+            <p className="mt-1 text-sm text-[var(--ink2)]">{subtitleByScope}</p>
           </div>
 
           <div className="flex flex-col items-end gap-3">
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-2.5 text-sm">
+              <div className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-2.5 text-sm">
                 <span className="inline-flex items-center justify-center">
                   {isRefreshing ? (
                     <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3b82f6] border-t-transparent" />
@@ -587,15 +563,15 @@ function StaffDashboardPage() {
                     <Clock4 size={16} className="text-[#3b82f6]" />
                   )}
                 </span>
-                <span className="text-[#9ca3af]">Auto-refresh za</span>
-                <span className="font-semibold text-white">{countdown}s</span>
+                <span className="text-[var(--ink2)]">Auto-refresh za</span>
+                <span className="font-semibold text-[var(--white)]">{countdown}s</span>
                 <span className="ml-2 inline-flex h-2 w-2 rounded-full bg-[#22c55e]" style={{ boxShadow: "0 0 18px rgba(34,197,94,.45)" }} />
               </div>
 
               <button
                 type="button"
                 onClick={manualRefresh}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+                className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
                 disabled={loading}
               >
                 <span className="inline-flex items-center gap-2">
@@ -615,48 +591,62 @@ function StaffDashboardPage() {
 
         <ScopeBar value={scope} onChange={setScope} />
 
-        <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-3">
+        <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             {[
               {
+                id: "active",
                 label: "Aktywnych",
+                href: "/panel/naprawy?status=all",
                 value: data && !loading ? data.my_active_count : null,
                 accent: "#f59e0b",
                 delay: "0ms",
               },
               {
-                label: "Pilna / SLA",
-                value: data && !loading ? data.my_urgent.length : null,
+                id: "in_repair",
+                label: "W trakcie Naprawy",
+                href: "/panel/naprawy?status=in_progress",
+                value: data && !loading ? data.in_repair_kpi_count : null,
                 accent: "#dc1e1e",
                 delay: "80ms",
               },
               {
-                label: "Gotowe",
+                id: "ready",
+                label: "Gotowe do Odbioru",
+                href: "/panel/naprawy?status=ready",
                 value: !loading ? (data?.ready_for_pickup?.length ?? 0) : null,
                 accent: "#22c55e",
                 delay: "160ms",
               },
               {
+                id: "messages",
                 label: "Wiadomości",
+                href: "/panel/comm",
                 value: data && !loading ? (data.today_to_contact?.length ?? 0) : null,
                 accent: "#3b82f6",
                 delay: "240ms",
               },
               {
+                id: "completed",
                 label: "Zakończonych",
+                href: "/panel/historia",
                 value: !loading ? (data?.completed_pickups_count ?? 0) : null,
                 accent: "#86efac",
                 delay: "320ms",
               },
             ].map((s) => (
               <motion.div
-                key={s.label}
+                key={s.id}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="cursor-default transition-transform hover:-translate-y-0.5"
               >
-                <StaffDashboardSummaryCard label={s.label} value={s.value as number | null} accent={s.accent} />
+                <StaffDashboardSummaryCard
+                  label={s.label}
+                  value={s.value as number | null}
+                  accent={s.accent}
+                  href={s.href}
+                />
               </motion.div>
             ))}
           </div>
@@ -665,7 +655,7 @@ function StaffDashboardPage() {
         <section
           ref={requiresActionSectionRef}
           id="requires-action"
-          className="scroll-mt-24 rounded-3xl border border-white/10 bg-[#0f1117] p-5"
+          className="scroll-mt-24 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5"
         >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
@@ -674,7 +664,7 @@ function StaffDashboardPage() {
               </div>
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3b82f6]">Następne działania</div>
-                <h2 className="mt-1 text-lg font-semibold text-white">Co teraz robić?</h2>
+                <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Co teraz robić?</h2>
               </div>
             </div>
             <Link href="/panel/naprawy" className="text-sm font-semibold text-[#3b82f6] hover:underline">
@@ -697,7 +687,7 @@ function StaffDashboardPage() {
                 <Link
                   key={r.id}
                   href={`/panel/naprawy/${r.id}`}
-                  className="group relative rounded-2xl border border-white/10 bg-[#0c0d12] p-4 transition hover:translate-x-0.5 hover:bg-white/5 hover:border-white/20"
+                  className="group relative rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4 transition hover:translate-x-0.5 hover:bg-[var(--row-hover)] hover:border-[var(--border2)]"
                 >
                   <div className="absolute right-3 top-3 h-2 w-2 rounded-full" style={{ background: tone === "urgent" ? "#dc1e1e" : tone === "warn" ? "#f59e0b" : "#9ca3af" }} />
                   <div className="flex flex-wrap items-center gap-2">
@@ -712,15 +702,15 @@ function StaffDashboardPage() {
                       #{i + 1}
                     </span>
                     <span
-                      className="font-mono text-xs font-semibold text-[#9ca3af]"
+                      className="font-mono text-xs font-semibold text-[var(--ink2)]"
                       style={{ minWidth: 72 }}
                     >
                       {r.repair_number}
                     </span>
                   </div>
 
-                  <div className="mt-2 text-sm font-semibold text-white">{r.device_name}</div>
-                  <div className="mt-1 text-xs text-[#9ca3af]">{r.status_display}</div>
+                  <div className="mt-2 text-sm font-semibold text-[var(--white)]">{r.device_name}</div>
+                  <div className="mt-1 text-xs text-[var(--ink2)]">{r.status_display}</div>
 
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <span
@@ -736,7 +726,7 @@ function StaffDashboardPage() {
                     ) : null}
                   </div>
 
-                  <div className="mt-3 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#9ca3af] group-hover:text-white">
+                  <div className="mt-3 inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] group-hover:text-[var(--white)]">
                     {action.text}
                   </div>
                 </Link>
@@ -744,7 +734,7 @@ function StaffDashboardPage() {
             })}
           </div>
           {!requiresActionQuery.isLoading && (requiresAction?.length ?? 0) === 0 ? (
-            <p className="mt-4 text-sm text-[#9ca3af]">
+            <p className="mt-4 text-sm text-[var(--ink2)]">
               Brak aktywnych napraw do wyświetlenia. Sprawdź{" "}
               <Link href="/panel/naprawy" className="font-semibold text-[#3b82f6] hover:underline">
                 Moje naprawy
@@ -756,11 +746,11 @@ function StaffDashboardPage() {
 
         <div className="flex flex-col gap-4">
           <div className="grid gap-4 lg:grid-cols-2">
-            <section className="worker-card-shimmer rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+            <section className="worker-card-shimmer rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Moje naprawy</div>
-                  <h2 className="mt-1 text-lg font-semibold text-white">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Moje naprawy</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">
                     {scope === "today" ? "Dziś" : scope === "tomorrow" ? "Jutro" : scope === "week" ? "Ten tydzień" : "Ten miesiąc"}
                   </h2>
                 </div>
@@ -769,34 +759,34 @@ function StaffDashboardPage() {
                 </Link>
               </div>
 
-              <div className="mt-4 divide-y divide-white/10 rounded-2xl border border-white/10 bg-[#0c0d12]">
+              <div className="mt-4 divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--s1)]">
                 {(loading ? Array.from({ length: 4 }) : myRepairsPreviewRows).map((r: any, idx: number) =>
                   loading ? (
                     <div key={idx} className="h-[62px] animate-pulse px-4 py-3">
-                      <div className="h-3 w-24 rounded bg-white/10" />
-                      <div className="mt-2 h-3 w-48 rounded bg-white/10" />
+                      <div className="h-3 w-24 rounded bg-[var(--row-active)]" />
+                      <div className="mt-2 h-3 w-48 rounded bg-[var(--row-active)]" />
                     </div>
                   ) : (
                     <Link
                       key={r.id}
                       href={`/panel/naprawy/${r.id}`}
-                      className="group flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-white/5"
+                      className="group flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-[var(--row-hover)]"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-semibold text-[#9ca3af]">{r.repair_number}</span>
-                          <span className="h-7 w-7 rounded-xl bg-[#191d28] border border-white/10" />
-                          <span className="min-w-0 truncate text-sm font-semibold text-white">{r.device_name}</span>
+                          <span className="font-mono text-xs font-semibold text-[var(--ink2)]">{r.repair_number}</span>
+                          <span className="h-7 w-7 rounded-xl bg-[#191d28] border border-[var(--border)]" />
+                          <span className="min-w-0 truncate text-sm font-semibold text-[var(--white)]">{r.device_name}</span>
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#9ca3af]">
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--ink2)]">
                           <span>{r.client_name}</span>
-                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-semibold uppercase tracking-wide text-[10px] text-[#9ca3af]">
+                          <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-0.5 font-semibold uppercase tracking-wide text-[10px] text-[var(--ink2)]">
                             {nextAction(r).text.replace("▶ ", "")}
                           </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">
+                        <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
                           {statusBadge(r).label}
                         </span>
                       </div>
@@ -805,7 +795,7 @@ function StaffDashboardPage() {
                 )}
               </div>
               {!loading && myRepairsPreviewRows.length === 0 ? (
-                <p className="mt-4 text-sm text-[#6b7280]">
+                <p className="mt-4 text-sm text-[var(--muted)]">
                   Brak napraw pasujących do tego widoku (termin SLA / data utworzenia). Otwórz{" "}
                   <Link href="/panel/naprawy" className="font-semibold text-[#3b82f6] hover:underline">
                     Moje naprawy
@@ -814,18 +804,18 @@ function StaffDashboardPage() {
                 </p>
               ) : null}
               {!loading && myRepairsPreviewScopeFallback ? (
-                <p className="mt-3 text-xs text-[#6b7280]">
+                <p className="mt-3 text-xs text-[var(--muted)]">
                   Brak pozycji z terminem SLA / datą utworzenia w tym oknie — pokazano wszystkie aktywne naprawy.
                 </p>
               ) : null}
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Moje zadania</div>
-                  <h2 className="mt-1 text-lg font-semibold text-white">Dziś</h2>
-                  <p className="mt-1 max-w-[280px] text-xs leading-snug text-[#6b7280]">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Moje zadania</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Dziś</h2>
+                  <p className="mt-1 max-w-[280px] text-xs leading-snug text-[var(--muted)]">
                     Termin na dziś oraz otwarte zadania powiązane z naprawą (np. z szybkich zadań przy zgłoszeniu).
                   </p>
                 </div>
@@ -836,12 +826,12 @@ function StaffDashboardPage() {
               <div className="mt-4 space-y-2">
                 {tasksQuery.isLoading ? (
                   Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={idx} className="h-[72px] animate-pulse rounded-2xl border border-white/10 bg-[#0c0d12]" />
+                    <div key={idx} className="h-[72px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--s1)]" />
                   ))
                 ) : tasksQuery.error ? (
                   <p className="text-sm text-[#fca5a5]">Nie udało się pobrać zadań.</p>
                 ) : (tasksQuery.data ?? []).length === 0 ? (
-                  <p className="text-sm text-[#6b7280]">Brak zadań w tym widoku.</p>
+                  <p className="text-sm text-[var(--muted)]">Brak zadań w tym widoku.</p>
                 ) : (
                   (tasksQuery.data ?? []).slice(0, 5).map((t) => {
                     const zadaniaHref = t.related_repair
@@ -855,12 +845,12 @@ function StaffDashboardPage() {
                     return (
                       <div
                         key={t.id}
-                        className="flex flex-wrap items-stretch gap-2 rounded-2xl border border-white/10 bg-[#0c0d12] p-2 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
+                        className="flex flex-wrap items-stretch gap-2 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-2 sm:flex-nowrap sm:items-center sm:gap-3 sm:p-3"
                       >
                         <div className="flex min-w-0 flex-1 items-start gap-2 px-0.5 py-0.5">
                           <Link
                             href={zadaniaHref}
-                            className="mt-0.5 shrink-0 text-[#6b7280] transition hover:text-[#3b82f6]"
+                            className="mt-0.5 shrink-0 text-[var(--muted)] transition hover:text-[#3b82f6]"
                             aria-label="Otwórz listę zadań"
                           >
                             <ChevronRight className="h-4 w-4" aria-hidden />
@@ -868,7 +858,7 @@ function StaffDashboardPage() {
                           <div className="min-w-0 flex-1">
                             <Link
                               href={zadaniaHref}
-                              className="text-sm font-semibold text-white transition hover:text-[#93c5fd]"
+                              className="text-sm font-semibold text-[var(--white)] transition hover:text-[#93c5fd]"
                             >
                               {t.title}
                             </Link>
@@ -879,7 +869,7 @@ function StaffDashboardPage() {
                                 {priLabel}
                               </span>
                             </div>
-                            <div className="mt-1 text-xs text-[#9ca3af]">
+                            <div className="mt-1 text-xs text-[var(--ink2)]">
                               {t.related_repair && t.related_repair_number ? (
                                 <Link
                                   href={`/panel/naprawy/${t.related_repair}`}
@@ -913,12 +903,12 @@ function StaffDashboardPage() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Wiadomości</div>
-                  <h2 className="mt-1 text-lg font-semibold text-white">Najnowsze</h2>
-                  <p className="mt-1 max-w-[280px] text-xs leading-snug text-[#6b7280]">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Wiadomości</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Najnowsze</h2>
+                  <p className="mt-1 max-w-[280px] text-xs leading-snug text-[var(--muted)]">
                     Ostatnie wpisy: wiadomości od klienta (panel lub e-mail) oraz wychodzące wiadomości z logu — zakres jak w komunikacji przy naprawach.
                   </p>
                 </div>
@@ -929,15 +919,15 @@ function StaffDashboardPage() {
               <div className="mt-4 space-y-2">
                 {commPreviewQuery.isLoading ? (
                   Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={idx} className="h-[76px] animate-pulse rounded-2xl border border-white/10 bg-[#0c0d12]" />
+                    <div key={idx} className="h-[76px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--s1)]" />
                   ))
                 ) : commPreviewQuery.error ? (
                   <p className="text-sm text-[#fca5a5]">Nie udało się pobrać wiadomości.</p>
                 ) : (commPreviewQuery.data ?? []).length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-[#0c0d12]/80 px-4 py-6 text-center">
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-[var(--s1)]/80 px-4 py-6 text-center">
                     <MessageSquareText className="mx-auto h-8 w-8 text-[#4b5563]" aria-hidden />
-                    <p className="mt-2 text-sm text-[#9ca3af]">Brak ostatniej komunikacji w wątkach.</p>
-                    <p className="mt-1 text-xs text-[#6b7280]">
+                    <p className="mt-2 text-sm text-[var(--ink2)]">Brak ostatniej komunikacji w wątkach.</p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">
                       Gdy klient napisze w panelu lub wyślesz wiadomość z naprawy, pojawi się tu skrót.
                     </p>
                     <Link
@@ -954,7 +944,7 @@ function StaffDashboardPage() {
                         <Link
                           key={row.id}
                           href={`/panel/naprawy/${row.repair_id}?tab=comms`}
-                          className="group block rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-3 transition hover:bg-white/5"
+                          className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3 transition hover:bg-[var(--row-hover)]"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex min-w-0 flex-1 items-start gap-3">
@@ -966,13 +956,13 @@ function StaffDashboardPage() {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-200/90">{row.label}</div>
-                                <div className="mt-0.5 truncate text-sm font-semibold text-white">{row.preview}</div>
-                                <div className="mt-1 text-xs text-[#9ca3af]">
+                                <div className="mt-0.5 truncate text-sm font-semibold text-[var(--white)]">{row.preview}</div>
+                                <div className="mt-1 text-xs text-[var(--ink2)]">
                                   <span className="font-mono font-semibold">{row.repair_number}</span>
                                 </div>
                               </div>
                             </div>
-                            <div className="shrink-0 text-right text-[11px] text-[#9ca3af]">
+                            <div className="shrink-0 text-right text-[11px] text-[var(--ink2)]">
                               {row.at
                                 ? new Date(row.at).toLocaleString("pl-PL", {
                                     day: "2-digit",
@@ -994,7 +984,7 @@ function StaffDashboardPage() {
                       <Link
                         key={l.id}
                         href={l.repair ? `/panel/naprawy/${l.repair}?tab=comms` : "/panel/comm"}
-                        className="group block rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-3 transition hover:bg-white/5"
+                        className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3 transition hover:bg-[var(--row-hover)]"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex min-w-0 flex-1 items-start gap-3">
@@ -1009,13 +999,13 @@ function StaffDashboardPage() {
                               {isSms ? <Smartphone className="h-4 w-4" strokeWidth={2.25} /> : <Mail className="h-4 w-4" strokeWidth={2.25} />}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]">Wysłane do klienta</div>
+                              <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Wysłane do klienta</div>
                               <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                                <span className="truncate text-sm font-semibold text-white">{preview}</span>
+                                <span className="truncate text-sm font-semibold text-[var(--white)]">{preview}</span>
                               </div>
-                              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[#9ca3af]">
+                              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--ink2)]">
                                 {l.repair_number ? (
-                                  <span className="font-mono font-semibold text-[#9ca3af]">{l.repair_number}</span>
+                                  <span className="font-mono font-semibold text-[var(--ink2)]">{l.repair_number}</span>
                                 ) : null}
                                 {l.recipient ? (
                                   <span className="truncate" title={l.recipient}>
@@ -1025,7 +1015,7 @@ function StaffDashboardPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="shrink-0 text-right text-[11px] text-[#9ca3af]">
+                          <div className="shrink-0 text-right text-[11px] text-[var(--ink2)]">
                             {l.sent_at
                               ? new Date(l.sent_at).toLocaleString("pl-PL", {
                                   day: "2-digit",
@@ -1043,11 +1033,11 @@ function StaffDashboardPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Status</div>
-                  <h2 className="mt-1 text-lg font-semibold text-white">Status części</h2>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Status</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Status części</h2>
                 </div>
                 <Link href="/panel/czesci-hurtownie" className="text-sm font-semibold text-[#3b82f6] hover:underline">
                   Szczegóły
@@ -1057,7 +1047,7 @@ function StaffDashboardPage() {
               <div className="mt-4 space-y-3">
                 {partsStatusQuery.isLoading ? (
                   Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className="h-[72px] animate-pulse rounded-2xl border border-white/10 bg-[#0c0d12]" />
+                    <div key={idx} className="h-[72px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--s1)]" />
                   ))
                 ) : (
                   (["to_order", "in_transit", "arrived"] as const).map((bucketKey) => {
@@ -1073,11 +1063,11 @@ function StaffDashboardPage() {
                     return (
                       <div
                         key={bucketKey}
-                        className="rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-3"
+                        className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-semibold text-white">{labels[bucketKey]}</span>
-                          <span className="shrink-0 rounded-lg bg-white/5 px-2 py-0.5 text-xs font-mono font-semibold text-[#9ca3af]">
+                          <span className="text-sm font-semibold text-[var(--white)]">{labels[bucketKey]}</span>
+                          <span className="shrink-0 rounded-lg bg-[var(--row-hover)] px-2 py-0.5 text-xs font-mono font-semibold text-[var(--ink2)]">
                             {count}
                           </span>
                         </div>
@@ -1087,14 +1077,14 @@ function StaffDashboardPage() {
                               key={item.id}
                               type="button"
                               onClick={() => setPartsModalUsage(item)}
-                              className="flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-transparent px-2 py-1.5 text-left text-sm text-[#e5e7eb] transition hover:border-white/10 hover:bg-white/5"
+                              className="flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-transparent px-2 py-1.5 text-left text-sm text-[#e5e7eb] transition hover:border-[var(--border)] hover:bg-[var(--row-hover)]"
                             >
                               <span className="min-w-0 truncate">
-                                <span className="font-mono text-[#9ca3af]">{item.repair_number ?? "—"}</span>
-                                <span className="text-[#6b7280]"> · </span>
+                                <span className="font-mono text-[var(--ink2)]">{item.repair_number ?? "—"}</span>
+                                <span className="text-[var(--muted)]"> · </span>
                                 <span>{partUsageDisplayName(item)}</span>
                                 {item.expected_arrival_date ? (
-                                  <span className="text-[11px] text-[#6b7280]">
+                                  <span className="text-[11px] text-[var(--muted)]">
                                     {" "}
                                     · dostawa {String(item.expected_arrival_date).slice(0, 10)}
                                   </span>
@@ -1103,10 +1093,10 @@ function StaffDashboardPage() {
                             </button>
                           ))}
                           {items.length === 0 ? (
-                            <p className="px-2 text-xs text-[#6b7280]">Brak pozycji.</p>
+                            <p className="px-2 text-xs text-[var(--muted)]">Brak pozycji.</p>
                           ) : null}
                           {extra > 0 ? (
-                            <p className="px-2 text-xs text-[#6b7280]">
+                            <p className="px-2 text-xs text-[var(--muted)]">
                               + {extra} więcej — zobacz{" "}
                               <Link href="/panel/czesci-hurtownie" className="font-semibold text-[#3b82f6] hover:underline">
                                 kolejkę części
@@ -1138,8 +1128,8 @@ export default function StaffDashboardPageWithSuspense() {
     <Suspense
       fallback={
         <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-          <div className="h-10 w-48 animate-pulse rounded-xl bg-white/10" />
-          <div className="mt-6 h-40 animate-pulse rounded-3xl border border-white/10 bg-[#0f1117]" />
+          <div className="h-10 w-48 animate-pulse rounded-xl bg-[var(--row-active)]" />
+          <div className="mt-6 h-40 animate-pulse rounded-3xl border border-[var(--border)] bg-[var(--s1)]" />
         </main>
       }
     >

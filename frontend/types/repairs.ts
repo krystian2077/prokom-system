@@ -2,6 +2,10 @@ export interface RepairRequestListItem {
   id: string;
   repair_number: string;
   client_name: string;
+  /** Telefon klienta (główny lub firmowy zapasowy). */
+  client_phone?: string | null;
+  /** UUID urządzenia (lista staff zwraca FK). */
+  device?: string | { id: string } | null;
   device_name: string;
   assigned_to?:
     | string
@@ -31,7 +35,12 @@ export interface RepairRequestListItem {
   staff_planned_work_date?: string | null;
   estimated_duration_days_min?: number | null;
   estimated_duration_days_max?: number | null;
+  /** Kwoty z API (Decimal jako string). */
+  estimated_cost?: string | number | null;
+  final_cost?: string | number | null;
   created_at: string;
+  /** Data fizycznego przyjęcia urządzenia (null u starszych zapisów). */
+  accepted_at?: string | null;
 }
 
 /** Dane klienta z API (zagnieżdżone w szczegółach naprawy). */
@@ -41,6 +50,20 @@ export interface RepairClient {
   email: string;
   phone: string;
   client_number?: string;
+}
+
+/** Adres klienta (nested z API — GET /repairs/:id/). */
+export interface ClientAddress {
+  id: string;
+  label?: string | null;
+  street?: string;
+  house_number?: string | null;
+  city?: string;
+  postal_code?: string;
+  country?: string;
+  phone?: string | null;
+  additional_info?: string | null;
+  is_default?: boolean;
 }
 
 /** Dane urządzenia z API (zagnieżdżone w szczegółach naprawy). */
@@ -65,17 +88,27 @@ export interface RepairDetail extends RepairRequestListItem {
   public_status: string | null;
   delivery_method: string;
   return_method: string;
-  delivery_address?: string | null;
-  return_address?: string | null;
+  /** Obiekt adresu (API) lub legacy: sam identyfikator. */
+  delivery_address?: ClientAddress | string | null;
+  return_address?: ClientAddress | string | null;
   client_notes?: string | null;
   device_turns_on?: boolean | null;
   visual_condition_description?: string | null;
+  hammer_glass_interest?: string | null;
+  accessory_choose_for_me?: boolean;
+  accessory_wishlist?: string | null;
+  /** Złączone zainteresowania akcesoriami z formularza (produkty + „dobierz za mnie”). */
+  accessory_selection_summary?: string | null;
+  /** Tekst z pola urządzenia „dołączone akcesoria”. */
+  device_accessories_included?: string | null;
   client_tracking_number?: string | null;
   is_urgent: boolean;
   is_same_day: boolean;
   is_warranty: boolean;
   requires_data_backup: boolean;
   source?: string;
+  /** Etykieta źródła zgłoszenia (np. „Przyjęcie stacjonarne”) — z API. */
+  source_display?: string | null;
   assigned_to?: { id: string; email: string; first_name?: string; last_name?: string } | null;
   created_at: string;
   updated_at: string;

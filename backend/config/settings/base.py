@@ -148,6 +148,21 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =============================================================================
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
 
+# Dane na wydruku PDF (potwierdzenie przyjęcia) — uzupełnij w .env produkcyjnym
+SERWIS_PRINT_COMPANY_NAME = env(
+    "SERWIS_PRINT_COMPANY_NAME",
+    default="PRO-KOM Tadeusz Wójciak",
+)
+SERWIS_PRINT_TAGLINE = env("SERWIS_PRINT_TAGLINE", default="Serwis elektroniki użytkowej")
+SERWIS_PRINT_PHONE = env("SERWIS_PRINT_PHONE", default="883-200-151")
+SERWIS_PRINT_EMAIL = env("SERWIS_PRINT_EMAIL", default="serwisprokom@gmail.com")
+SERWIS_PRINT_ADDRESS = env(
+    "SERWIS_PRINT_ADDRESS",
+    default="34-700 Rabka-Zdrój, ul. Orkana 16B",
+)
+SERWIS_PRINT_HOURS = env("SERWIS_PRINT_HOURS", default="Pn–Pt 9:00–17:00 · Sob 9:00–13:00")
+SERWIS_PRINT_WEBSITE = env("SERWIS_PRINT_WEBSITE", default="www.pro-kom.eu")
+
 # Webhook skrzynki przychodzącej (e-mail → wątek naprawy); pusty = endpoint zwraca 503
 EMAIL_INBOUND_WEBHOOK_SECRET = env("EMAIL_INBOUND_WEBHOOK_SECRET", default="")
 

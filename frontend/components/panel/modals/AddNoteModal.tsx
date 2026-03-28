@@ -70,32 +70,32 @@ export function AddNoteModal({
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4 py-8">
-      <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-[#0f1117] p-5">
+      <div className="w-full max-w-lg rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Szybka akcja</div>
-            <h3 className="mt-1 text-xl font-semibold text-white">Dodaj notatkę</h3>
-            <p className="mt-1 text-sm text-[#9ca3af]">Notatki wewnętrzne nie są widoczne dla klienta.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Szybka akcja</div>
+            <h3 className="mt-1 text-xl font-semibold text-[var(--white)]">Dodaj notatkę</h3>
+            <p className="mt-1 text-sm text-[var(--ink2)]">Notatki wewnętrzne nie są widoczne dla klienta.</p>
           </div>
-          <button type="button" onClick={onClose} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#9ca3af] hover:bg-white/10">
+          <button type="button" onClick={onClose} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--ink2)] hover:bg-[var(--row-active)]">
             Zamknij
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Treść notatki</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Treść notatki</label>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="mt-1 w-full resize-none rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full resize-none rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               rows={5}
               placeholder="Wpisz notatkę dla zespołu…"
             />
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
+            <label className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm">
               <input
                 type="checkbox"
                 checked={isInternal}
@@ -104,7 +104,7 @@ export function AddNoteModal({
               Notatka wewnętrzna
             </label>
 
-            <label className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
+            <label className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm">
               <input type="checkbox" checked={isImportant} onChange={(e) => setIsImportant(e.target.checked)} />
               Ważna
             </label>
@@ -112,11 +112,11 @@ export function AddNoteModal({
 
           <div className="grid gap-3 md:grid-cols-2">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Typ notatki</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Typ notatki</div>
               <select
                 value={noteType}
                 onChange={(e) => setNoteType(e.target.value as RepairNoteTypeValue)}
-                className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               >
                 <option value="internal">wewnętrzna</option>
                 <option value="system">systemowa</option>
@@ -124,7 +124,7 @@ export function AddNoteModal({
               </select>
             </div>
 
-            <label className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
+            <label className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm">
               <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
               Przypięta
             </label>

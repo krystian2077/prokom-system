@@ -55,6 +55,7 @@ class PublicRepairSubmitView(APIView):
                 delivery_method=data.get("delivery_method", "in_person"),
                 return_method=data.get("return_method", "in_person"),
                 delivery_street=data.get("delivery_street", ""),
+                delivery_house_number=data.get("delivery_house_number", ""),
                 delivery_city=data.get("delivery_city", ""),
                 delivery_postal_code=data.get("delivery_postal_code", ""),
                 delivery_country=data.get("delivery_country", "Polska"),

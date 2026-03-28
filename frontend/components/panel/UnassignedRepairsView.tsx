@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,7 +8,7 @@ import { api, authApi, ApiError, getErrorMessageFromBody } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
 import { useWorkerStore } from "@/stores/workerStore";
-import { Info, RotateCcw } from "lucide-react";
+import { ChevronDown, Info, RotateCcw } from "lucide-react";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { RepairTableSkeleton } from "@/components/ui/Skeleton";
@@ -87,6 +87,18 @@ function suggestedTeamLabel(bucket: DeviceBucket): string {
   }
 }
 
+/** Wyświetlane w kolumnie „Sugerowany” — dopasowanie do kategorii urządzenia. */
+function suggestedTechnicianName(bucket: DeviceBucket): string {
+  switch (bucket) {
+    case "phone_tablet":
+      return "Kuba";
+    case "laptop_printer":
+      return "Rafał";
+    default:
+      return "—";
+  }
+}
+
 type WaitLevel = 0 | 1 | 2 | 3;
 
 function waitingMeta(createdAt: string): { level: WaitLevel; label: string; suffix: string } {
@@ -117,6 +129,113 @@ function matchesSpecialization(specialization: string | null | undefined, bucket
   return false;
 }
 
+/** Kolejność imion w menu „Przypisz do kogoś innego” (zgodnie z ustaleniem w serwisie). */
+const ASSIGN_PICKER_ORDER = ["Rafał", "Krystian", "Paweł"];
+
+type AssignableStaff = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  picker_label: string;
+};
+
+function sortAssignableForPicker(rows: AssignableStaff[]): AssignableStaff[] {
+  const rank = (label: string): number => {
+    const word = label.trim().split(/\s+/)[0] ?? "";
+    const i = ASSIGN_PICKER_ORDER.indexOf(word);
+    if (i >= 0) return i;
+    return 100;
+  };
+  return [...rows].sort((a, b) => {
+    const ra = rank(a.picker_label);
+    const rb = rank(b.picker_label);
+    if (ra !== rb) return ra - rb;
+    return a.picker_label.localeCompare(b.picker_label, "pl");
+  });
+}
+
+function AssignRepairActions({
+  busy,
+  assignableSorted,
+  assignableLoading,
+  onAssignMe,
+  onAssignUser,
+  size = "compact",
+  children,
+}: {
+  busy: boolean;
+  assignableSorted: AssignableStaff[];
+  assignableLoading: boolean;
+  onAssignMe: () => void;
+  onAssignUser: (a: AssignableStaff) => void;
+  size?: "compact" | "comfortable";
+  children?: ReactNode;
+}) {
+  const hasOthers = assignableSorted.length > 0;
+  const primaryClass =
+    size === "comfortable"
+      ? "rounded-xl px-4 py-2.5 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb] disabled:opacity-60"
+      : "rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--white)] transition hover:bg-[#2563eb] disabled:opacity-60";
+  const secondaryClass =
+    size === "comfortable"
+      ? "flex cursor-pointer list-none items-center gap-1 rounded-xl border border-white/15 bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[#e5e7eb] transition hover:bg-[var(--row-active)] [&::-webkit-details-marker]:hidden"
+      : "flex cursor-pointer list-none items-center gap-1 rounded-lg border border-white/15 bg-[var(--row-hover)] px-3 py-1.5 text-xs font-semibold text-[#e5e7eb] transition hover:bg-[var(--row-active)] [&::-webkit-details-marker]:hidden";
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onAssignMe();
+        }}
+        className={`bg-[#3b82f6] ${primaryClass}`}
+      >
+        {busy ? (size === "comfortable" ? "Przypisywanie…" : "…") : "Przypisz do mnie"}
+      </button>
+      {hasOthers ? (
+        <details className="group relative">
+          <summary className={secondaryClass} onClick={(e) => e.stopPropagation()}>
+            Przypisz do kogoś innego
+            <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70 transition group-open:rotate-180" aria-hidden />
+          </summary>
+          <ul
+            className="absolute right-0 top-full z-50 mt-1 min-w-[12rem] rounded-lg border border-[var(--border)] bg-[#1a1d26] py-1 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {assignableLoading ? (
+              <li className="px-3 py-2 text-xs text-[var(--ink2)]">Ładowanie…</li>
+            ) : (
+              assignableSorted.map((u) => (
+                <li key={u.id}>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="w-full px-3 py-2 text-left text-xs font-medium text-[#e5e7eb] transition hover:bg-[var(--row-active)] disabled:opacity-50"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onAssignUser(u);
+                      const det = e.currentTarget.closest("details") as HTMLDetailsElement | null;
+                      if (det) det.open = false;
+                    }}
+                  >
+                    {u.picker_label}
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </details>
+      ) : null}
+      {children}
+    </div>
+  );
+}
+
 export function UnassignedRepairsView({ basePath }: { basePath: string }) {
   const { token, user } = useAuth();
   const router = useRouter();
@@ -127,6 +246,7 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
   const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
   const [refreshTick, setRefreshTick] = useState(0);
   const [postingFor, setPostingFor] = useState<string | null>(null);
+  const [assigningFor, setAssigningFor] = useState<string | null>(null);
 
   const spec = user?.staff_profile?.specialization ?? null;
   const specDisplay = user?.staff_profile?.specialization_display ?? null;
@@ -143,6 +263,18 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
     },
     staleTime: 10_000,
   });
+
+  const assignableQuery = useQuery({
+    queryKey: ["staff", "assignable-for-repairs"],
+    enabled: Boolean(token),
+    queryFn: async () => {
+      if (!token) throw new Error("Missing auth/token");
+      return api.get<AssignableStaff[]>("/accounts/staff/assignable-for-repairs/", token);
+    },
+    staleTime: 60_000,
+  });
+
+  const assignableSorted = sortAssignableForPicker(assignableQuery.data ?? []);
 
   const list = repairsQuery.data ?? [];
   const oldest = list[0] ?? null;
@@ -184,6 +316,44 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
     );
   }
 
+  async function assignToMe(repairId: string) {
+    if (!token) return;
+    setAssigningFor(repairId);
+    try {
+      await api.post(`/repairs/${repairId}/assign/`, {}, token);
+      addToast("✓ Naprawa przypisana do Ciebie", "success");
+      await queryClient.invalidateQueries({ queryKey: ["repairs", "unassigned-new"] });
+      await queryClient.invalidateQueries({ queryKey: ["sidebar", "unassigned-count"] });
+    } catch (e) {
+      const msg =
+        e instanceof ApiError
+          ? getErrorMessageFromBody(e.body ?? "", "Nie udało się przypisać naprawy.")
+          : "Nie udało się przypisać naprawy.";
+      addToast(msg, "error");
+    } finally {
+      setAssigningFor(null);
+    }
+  }
+
+  async function assignToUser(repairId: string, assignee: AssignableStaff) {
+    if (!token) return;
+    setAssigningFor(repairId);
+    try {
+      await api.post(`/repairs/${repairId}/assign/`, { assigned_to_id: assignee.id }, token);
+      addToast(`✓ Naprawa przypisana do ${assignee.picker_label}`, "success");
+      await queryClient.invalidateQueries({ queryKey: ["repairs", "unassigned-new"] });
+      await queryClient.invalidateQueries({ queryKey: ["sidebar", "unassigned-count"] });
+    } catch (e) {
+      const msg =
+        e instanceof ApiError
+          ? getErrorMessageFromBody(e.body ?? "", "Nie udało się przypisać naprawy.")
+          : "Nie udało się przypisać naprawy.";
+      addToast(msg, "error");
+    } finally {
+      setAssigningFor(null);
+    }
+  }
+
   function onSuggest(r: RepairRequestListItem, bucket: DeviceBucket) {
     const team = suggestedTeamLabel(bucket);
     const line =
@@ -198,15 +368,15 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
       <div className="flex flex-col gap-4">
         <header className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Pracownik</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">Nieprzypisane</h1>
-            <p className="mt-1 text-sm text-[#9ca3af]">Kolejka zgłoszeń ze statusem „nowe”, bez przypisanego pracownika</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Pracownik</p>
+            <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Nieprzypisane</h1>
+            <p className="mt-1 text-sm text-[var(--ink2)]">Kolejka zgłoszeń ze statusem „nowe”, bez przypisanego pracownika</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={() => setRefreshTick((t) => t + 1)}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             >
               <span className="inline-flex items-center gap-2">
                 <RotateCcw size={16} />
@@ -215,7 +385,7 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
             </button>
             <Link
               href="/panel/intake"
-              className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+              className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb]"
             >
               Nowe przyjęcie
             </Link>
@@ -232,10 +402,10 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
         >
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-[#60a5fa]" aria-hidden />
           <div>
-            <p className="font-semibold text-white">Tryb tylko do odczytu</p>
+            <p className="font-semibold text-[var(--white)]">Przypisywanie z kolejki</p>
             <p className="mt-1 text-[#cbd5e1]">
-              Nie możesz samodzielnie przypisać naprawy — kolejkę obsługuje administrator. Możesz wysłać notatkę wewnętrzną do
-              admina (pilne przypisanie lub sugestia wg specjalizacji).
+              „Przypisz do mnie” albo „Przypisz do kogoś innego” (lista pracowników). Opcjonalnie wyślij notatkę do administratora
+              („Pilnie → Admin” lub „Sugestia”), gdy potrzebna jest eskalacja lub informacja wg specjalizacji.
             </p>
           </div>
         </div>
@@ -250,23 +420,33 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
           >
             <div>
               <p className="text-sm font-semibold text-[#fecaca]">Najdłużej w kolejce</p>
-              <p className="mt-1 font-mono text-lg text-white">{oldest.repair_number}</p>
+              <p className="mt-1 font-mono text-lg text-[var(--white)]">{oldest.repair_number}</p>
               <p className="mt-0.5 text-sm text-[#fca5a5]">
                 {oldest.device_name} · od {new Date(oldest.created_at).toLocaleString("pl-PL")}
               </p>
             </div>
-            <button
-              type="button"
-              disabled={postingFor === oldest.id}
-              onClick={onUrgent}
-              className="shrink-0 rounded-xl bg-[#dc2626] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b91c1c] disabled:opacity-60"
-            >
-              {postingFor === oldest.id ? "Wysyłanie…" : "Pilnie → Admin"}
-            </button>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <AssignRepairActions
+                busy={Boolean(assigningFor === oldest.id || postingFor === oldest.id)}
+                assignableSorted={assignableSorted}
+                assignableLoading={assignableQuery.isLoading}
+                onAssignMe={() => void assignToMe(oldest.id)}
+                onAssignUser={(u) => void assignToUser(oldest.id, u)}
+                size="comfortable"
+              />
+              <button
+                type="button"
+                disabled={postingFor === oldest.id || assigningFor === oldest.id}
+                onClick={onUrgent}
+                className="rounded-xl bg-[#dc2626] px-4 py-2.5 text-sm font-semibold text-[var(--white)] transition hover:bg-[#b91c1c] disabled:opacity-60"
+              >
+                {postingFor === oldest.id ? "Wysyłanie…" : "Pilnie → Admin"}
+              </button>
+            </div>
           </div>
         ) : null}
 
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0f1117]">
+        <div className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)]">
           {repairsQuery.isLoading ? (
             <div className="p-4">
               <RepairTableSkeleton rows={8} />
@@ -291,14 +471,14 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-[#9ca3af]">
+                  <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--ink2)]">
                     <th className="px-4 py-3 font-semibold">Nr ref</th>
                     <th className="px-4 py-3 font-semibold">Urządzenie</th>
                     <th className="px-4 py-3 font-semibold">Klient</th>
                     <th className="px-4 py-3 font-semibold">Kategoria</th>
                     <th className="px-4 py-3 font-semibold">Oczekiwanie</th>
                     <th className="px-4 py-3 font-semibold">Sugerowany</th>
-                    <th className="px-4 py-3 font-semibold text-right">Akcja</th>
+                    <th className="px-4 py-3 font-semibold text-right">Akcje</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -314,7 +494,7 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
                             {r.repair_number}
                           </Link>
                         </td>
-                        <td className="px-4 py-3 align-middle text-white">{r.device_name}</td>
+                        <td className="px-4 py-3 align-middle text-[var(--white)]">{r.device_name}</td>
                         <td className="px-4 py-3 align-middle text-[#e5e7eb]">{r.client_name}</td>
                         <td className="px-4 py-3 align-middle text-[#cbd5e1]">{categoryLabel(bucket)}</td>
                         <td className="px-4 py-3 align-middle">
@@ -326,24 +506,30 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
                             {wait.suffix}
                           </span>
                         </td>
-                        <td className="px-4 py-3 align-middle text-[#9ca3af]">{suggestedTeamLabel(bucket)}</td>
+                        <td className="px-4 py-3 align-middle text-[#e5e7eb]">{suggestedTechnicianName(bucket)}</td>
                         <td className="px-4 py-3 align-middle text-right">
-                          {showSuggest ? (
-                            <button
-                              type="button"
-                              disabled={postingFor === r.id}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                onSuggest(r, bucket);
-                              }}
-                              className="rounded-lg border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-1.5 text-xs font-semibold text-[#93c5fd] transition hover:bg-[#3b82f6]/25 disabled:opacity-60"
-                            >
-                              {postingFor === r.id ? "…" : "Sugestia"}
-                            </button>
-                          ) : (
-                            <span className="text-xs text-[#6b7280]">—</span>
-                          )}
+                          <AssignRepairActions
+                            busy={Boolean(assigningFor === r.id || postingFor === r.id)}
+                            assignableSorted={assignableSorted}
+                            assignableLoading={assignableQuery.isLoading}
+                            onAssignMe={() => void assignToMe(r.id)}
+                            onAssignUser={(u) => void assignToUser(r.id, u)}
+                          >
+                            {showSuggest ? (
+                              <button
+                                type="button"
+                                disabled={postingFor === r.id || assigningFor === r.id}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  onSuggest(r, bucket);
+                                }}
+                                className="rounded-lg border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-1.5 text-xs font-semibold text-[#93c5fd] transition hover:bg-[#3b82f6]/25 disabled:opacity-60"
+                              >
+                                {postingFor === r.id ? "…" : "Sugestia"}
+                              </button>
+                            ) : null}
+                          </AssignRepairActions>
                         </td>
                       </tr>
                     );
@@ -354,16 +540,16 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
           )}
 
           {!repairsQuery.isLoading && slice.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-3">
-              <p className="text-sm text-[#9ca3af]">
-                Strona <span className="font-semibold text-white">{safePage}</span> / {pageCount}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] px-4 py-3">
+              <p className="text-sm text-[var(--ink2)]">
+                Strona <span className="font-semibold text-[var(--white)]">{safePage}</span> / {pageCount}
               </p>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPage(Math.max(1, safePage - 1))}
                   disabled={safePage <= 1}
-                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white disabled:opacity-50"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-50"
                 >
                   Wstecz
                 </button>
@@ -371,7 +557,7 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
                   type="button"
                   onClick={() => setPage(Math.min(pageCount, safePage + 1))}
                   disabled={safePage >= pageCount}
-                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white disabled:opacity-50"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-50"
                 >
                   Dalej
                 </button>
@@ -380,16 +566,20 @@ export function UnassignedRepairsView({ basePath }: { basePath: string }) {
           ) : null}
         </div>
 
-        <footer className="rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-4 text-sm text-[#9ca3af]">
-          <p className="font-semibold text-white">Twoja specjalizacja</p>
+        <footer className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-4 text-sm text-[var(--ink2)]">
+          <p className="font-semibold text-[var(--white)]">Twoja specjalizacja</p>
           <p className="mt-2">
             {specDisplay ? (
               <>
-                W profilu serwisowym: <span className="text-[#e5e7eb]">{specDisplay}</span>. Przycisk „Sugestia” pojawia się przy
-                zgłoszeniach zgodnych z tym zakresem (oraz przy „ogólnych”, jeśli masz specjalizację ogólną).
+                W profilu serwisowym: <span className="text-[#e5e7eb]">{specDisplay}</span>. Przypisanie do siebie lub do innego
+                pracownika jest dostępne dla każdej pozycji w kolejce. Przycisk „Sugestia” (notatka do admina) pojawia się dodatkowo przy zgłoszeniach zgodnych z tym
+                zakresem (oraz przy „ogólnych”, jeśli masz specjalizację ogólną).
               </>
             ) : (
-              <>Brak ustawionej specjalizacji w profilu — skontaktuj się z administratorem, aby móc wysyłać dopasowane sugestie.</>
+              <>
+                Brak ustawionej specjalizacji w profilu — nadal możesz przypisywać naprawy do siebie lub do innego pracownika.
+                Ustaw specjalizację u administratora, aby mieć dodatkowy przycisk „Sugestia” przy pasujących zgłoszeniach.
+              </>
             )}
           </p>
         </footer>

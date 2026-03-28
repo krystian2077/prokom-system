@@ -147,37 +147,37 @@ export default function AdvancedSearchPanel() {
   const devices = results?.devices ?? [];
 
   return (
-    <section className="mx-auto mt-6 w-full max-w-[900px] rounded-3xl border border-white/10 bg-[#0b0c10]/40 p-5 text-sm">
+    <section className="mx-auto mt-6 w-full max-w-[900px] rounded-3xl border border-[var(--border)] bg-[var(--s1)]/40 p-5 text-sm">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Advanced Search</p>
-          <h2 className="mt-2 text-lg font-semibold text-white">Zaawansowane wyszukiwanie</h2>
-          <p className="mt-1 text-sm text-[#9ca3af]">Klienci, naprawy i urządzenia z filtrami statusu/typu.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Advanced Search</p>
+          <h2 className="mt-2 text-lg font-semibold text-[var(--white)]">Zaawansowane wyszukiwanie</h2>
+          <p className="mt-1 text-sm text-[var(--ink2)]">Klienci, naprawy i urządzenia z filtrami statusu/typu.</p>
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+      <div className="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="grid gap-3 md:grid-cols-2">
           <div className="md:col-span-2">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Fraza
             </label>
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="np. numer naprawy, IMEI, e-mail, model…"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none placeholder:text-[#6b7280]"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm text-[var(--white)] outline-none placeholder:text-[var(--muted)]"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Typ wyników
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
             >
               {TYPE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -188,14 +188,14 @@ export default function AdvancedSearchPanel() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Status (opcjonalnie)
             </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as RepairStatusValue | "")}
               disabled={!(type === "repairs" || type === "complaints" || type === "warranties")}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] disabled:opacity-50"
             >
               <option value="">Wszystkie</option>
               {REPAIR_STATUS_OPTIONS.map((o) => (
@@ -207,14 +207,14 @@ export default function AdvancedSearchPanel() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Typ sprawy (opcjonalnie)
             </label>
             <select
               value={repairType}
               onChange={(e) => setRepairType(e.target.value)}
               disabled={type !== "repairs"}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] disabled:opacity-50"
             >
               <option value="">Wszystkie</option>
               {REPAIR_TYPE_OPTIONS.map((o) => (
@@ -226,14 +226,14 @@ export default function AdvancedSearchPanel() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Typ klienta (opcjonalnie)
             </label>
             <select
               value={clientType}
               onChange={(e) => setClientType(e.target.value)}
               disabled={type !== "clients"}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] disabled:opacity-50"
             >
               <option value="">Wszyscy</option>
               <option value="individual">Osoba prywatna</option>
@@ -242,27 +242,27 @@ export default function AdvancedSearchPanel() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Data od
             </label>
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
               disabled={!(type === "repairs" || type === "complaints" || type === "warranties" || type === "all" || type === "devices" || type === "clients")}
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Data do
             </label>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]"
+              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
               disabled={!(type === "repairs" || type === "complaints" || type === "warranties" || type === "all" || type === "devices" || type === "clients")}
             />
           </div>
@@ -284,8 +284,8 @@ export default function AdvancedSearchPanel() {
       {results ? (
         <div className="mt-4 space-y-4">
           {clients.length > 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                 KLIENCI ({clients.length})
               </p>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -296,12 +296,12 @@ export default function AdvancedSearchPanel() {
                     onClick={(ev) => {
                       if (!c.last_repair_summary?.id) ev.preventDefault();
                     }}
-                    className={`rounded-2xl border border-white/10 bg-white/5 px-3 py-3 transition hover:bg-white/10 ${
+                    className={`rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-3 transition hover:bg-[var(--row-active)] ${
                       c.last_repair_summary?.id ? "" : "pointer-events-none opacity-70"
                     }`}
                   >
-                    <p className="truncate font-mono text-sm font-semibold text-white">{c.full_name}</p>
-                    <p className="mt-1 truncate text-xs text-[#9ca3af]">{c.email}</p>
+                    <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">{c.full_name}</p>
+                    <p className="mt-1 truncate text-xs text-[var(--ink2)]">{c.email}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       {clientBadgeReturns(c) ? (
                         <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-semibold text-emerald-400">
@@ -314,11 +314,11 @@ export default function AdvancedSearchPanel() {
                         </span>
                       ) : null}
                       {c.last_repair_summary?.repair_number ? (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                        <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[11px] font-semibold text-[var(--ink2)]">
                           Ostatnia: {c.last_repair_summary.repair_number}
                         </span>
                       ) : (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-[#6b7280]">
+                        <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[11px] font-semibold text-[var(--muted)]">
                           Brak ostatniej naprawy
                         </span>
                       )}
@@ -330,8 +330,8 @@ export default function AdvancedSearchPanel() {
           ) : null}
 
           {repairs.length > 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                 NAPRAWY ({repairs.length})
               </p>
               <div className="mt-3 space-y-3">
@@ -339,16 +339,16 @@ export default function AdvancedSearchPanel() {
                   <Link
                     key={r.id}
                     href={`/panel/repairs/${r.id}`}
-                    className="block rounded-2xl border border-white/10 bg-white/5 px-3 py-3 transition hover:bg-white/10"
+                    className="block rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-3 transition hover:bg-[var(--row-active)]"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate font-mono text-sm font-semibold text-white">{r.repair_number}</p>
-                        <p className="mt-1 text-xs text-[#9ca3af] truncate">
+                        <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">{r.repair_number}</p>
+                        <p className="mt-1 text-xs text-[var(--ink2)] truncate">
                           {r.client_name ?? "—"} · {r.device_name ?? "—"}
                         </p>
                       </div>
-                      <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                      <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold text-[var(--ink2)]">
                         {r.status_display}
                       </span>
                     </div>
@@ -359,20 +359,20 @@ export default function AdvancedSearchPanel() {
           ) : null}
 
           {devices.length > 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
                 URZĄDZENIA ({devices.length})
               </p>
               <div className="mt-3 space-y-3">
                 {devices.map((d: GlobalSearchDevice) => (
-                  <div key={d.id} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
-                    <p className="truncate font-mono text-sm font-semibold text-white">{d.device_name}</p>
-                    <p className="mt-1 text-xs text-[#9ca3af] truncate">{d.client_name ?? "—"}</p>
-                    <p className="mt-2 text-[11px] text-[#9ca3af]">
+                  <div key={d.id} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-3">
+                    <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">{d.device_name}</p>
+                    <p className="mt-1 text-xs text-[var(--ink2)] truncate">{d.client_name ?? "—"}</p>
+                    <p className="mt-2 text-[11px] text-[var(--ink2)]">
                       Kategoria: {d.category ?? "—"} · Napraw: {d.repair_count ?? 0}
                     </p>
                     {/* Akcje dla urządzeń w kolejnym kroku (docelowe actions) */}
-                    <p className="mt-2 text-[11px] text-[#6b7280]">Brak docelowej akcji dla urządzeń w tym trybie.</p>
+                    <p className="mt-2 text-[11px] text-[var(--muted)]">Brak docelowej akcji dla urządzeń w tym trybie.</p>
                   </div>
                 ))}
               </div>

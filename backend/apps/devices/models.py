@@ -207,6 +207,13 @@ class Device(BaseModel):
         help_text=_("Jeśli model nie jest w bazie")
     )
 
+    color = models.CharField(
+        _("kolor"),
+        max_length=64,
+        blank=True,
+        default="",
+    )
+
     # „Inne urządzenie” (kategoria other) — pola ręczne przy przyjęciu stacjonarnym
     manual_device_name = models.CharField(
         _("nazwa urządzenia (inne)"),

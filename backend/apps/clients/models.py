@@ -312,7 +312,13 @@ class ClientAddress(BaseModel):
     )
 
     # Adres
-    street = models.CharField(_("ulica i numer"), max_length=200)
+    street = models.CharField(_("ulica"), max_length=200)
+    house_number = models.CharField(
+        _("numer domu / lokalu"),
+        max_length=50,
+        blank=True,
+        default="",
+    )
     city = models.CharField(_("miasto"), max_length=100)
     postal_code = models.CharField(_("kod pocztowy"), max_length=10)
     country = models.CharField(_("kraj"), max_length=100, default="Polska")
@@ -341,5 +347,6 @@ class ClientAddress(BaseModel):
         ordering = ["-is_default", "-created_at"]
 
     def __str__(self):
-        return f"{self.label}: {self.street}, {self.city}"
+        line = f"{self.street} {self.house_number}".strip() if self.house_number else self.street
+        return f"{self.label}: {line}, {self.city}"
 

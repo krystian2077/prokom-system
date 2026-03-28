@@ -37,7 +37,7 @@ const adminItems: SidebarItem[] = [
   },
   {
     href: "/admin-panel/intake",
-    label: "Przyjęcie",
+    label: "Przyjęcie Stacjonarne",
     icon: <PlusCircle size={18} />,
     isActive: (p) => p.startsWith("/admin-panel/intake"),
   },
@@ -150,21 +150,19 @@ export function AdminSidebar() {
 
   return (
     <aside
-      className="z-[120] hidden w-[270px] flex-col border-r border-white/5 bg-[#0f1117] md:flex"
-      style={{ boxShadow: "inset -1px 0 0 rgba(220,30,30,.10)" }}
+      className="z-[120] hidden w-[270px] flex-col border-r border-[var(--border)] bg-[var(--s1)] md:flex"
+      style={{ boxShadow: "inset -1px 0 0 var(--rb)" }}
     >
       <div className="px-5 pt-5">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-[13px] font-bold tracking-[0.2em] text-[#9ca3af]">PRO-KOM</div>
-            <div className="mt-1 text-sm font-semibold" style={{ color: "#d0d4de" }}>
-              Panel admina
-            </div>
+            <div className="text-[13px] font-bold tracking-[0.2em] text-[var(--ink2)]">PRO-KOM</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--ink)]">Panel admina</div>
           </div>
           <span
             className="h-9 w-9 rounded-full"
             style={{
-              background: "linear-gradient(135deg, #dc1e1e, #b81818)",
+              background: "linear-gradient(135deg, var(--red), var(--red-h))",
               display: "inline-block",
             }}
           />
@@ -181,24 +179,28 @@ export function AdminSidebar() {
                 href={item.href}
                 className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition"
                 style={{
-                  background: active ? "rgba(220,30,30,.12)" : "transparent",
-                  color: active ? "#fff" : "rgba(208,212,222,.9)",
-                  borderLeft: active ? "3px solid #dc1e1e" : "3px solid transparent",
+                  background: active ? "var(--rl)" : "transparent",
+                  color: active ? "var(--white)" : "var(--ink)",
+                  borderLeft: active ? "3px solid var(--red)" : "3px solid transparent",
                 }}
               >
                 <div className="flex items-center gap-3">
                   <span
                     className="flex h-8 w-8 items-center justify-center rounded-xl"
                     style={{
-                      background: active ? "rgba(220,30,30,.18)" : "rgba(255,255,255,.03)",
-                      border: active ? "1px solid rgba(220,30,30,.35)" : "1px solid rgba(255,255,255,.06)",
+                      background: active ? "color-mix(in srgb, var(--red) 22%, transparent)" : "var(--row-hover)",
+                      border: active ? "1px solid var(--rb)" : "1px solid var(--border)",
                     }}
                   >
                     {item.icon}
                   </span>
                   <span className="text-sm font-semibold">{item.label}</span>
                 </div>
-                {active ? <span className="h-2 w-2 rounded-full bg-[#dc1e1e]" /> : <span className="h-2 w-2 rounded-full bg-white/10" />}
+                {active ? (
+                  <span className="h-2 w-2 rounded-full bg-[var(--red)]" />
+                ) : (
+                  <span className="h-2 w-2 rounded-full bg-[var(--border)]" />
+                )}
               </Link>
             );
           })}

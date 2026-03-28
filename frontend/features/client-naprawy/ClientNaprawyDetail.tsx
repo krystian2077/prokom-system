@@ -219,8 +219,12 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               <DetailItem label="Odbiór urządzenia" value={pickupLabel} />
               {repair.hammerGlass != null && (
                 <DetailItem
-                  label="Hammer Glass"
-                  value={repair.hammerGlass === "tak" ? "Tak – interesuje mnie folia" : "Nie, dziękuję"}
+                  label="Folia Hammer Glass / szkło hartowane"
+                  value={
+                    repair.hammerGlass === "tak"
+                      ? "Tak — proszę o ofertę przy naprawie"
+                      : "Nie — na razie nie"
+                  }
                   tag
                 />
               )}

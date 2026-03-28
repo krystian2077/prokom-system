@@ -171,8 +171,8 @@ export default function CommPage() {
   return (
     <main className="mx-auto min-h-screen max-w-[1450px] px-4 py-8">
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold text-white">Komunikacja</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Wątki napraw z wiadomościami od klienta i szybka odpowiedź.</p>
+        <h1 className="text-2xl font-semibold text-[var(--white)]">Komunikacja</h1>
+        <p className="mt-1 text-sm text-[var(--ink2)]">Wątki napraw z wiadomościami od klienta i szybka odpowiedź.</p>
       </div>
 
       <div className="mb-4">
@@ -180,7 +180,7 @@ export default function CommPage() {
           value={searchDraft}
           onChange={(e) => setSearchDraft(e.target.value)}
           placeholder="Szukaj po numerze, kliencie, urządzeniu..."
-          className="w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+          className="w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
         />
       </div>
 
@@ -191,8 +191,8 @@ export default function CommPage() {
       ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[360px_1fr]">
-        <aside className="rounded-3xl border border-white/10 bg-[#0c0d12] p-3">
-          <div className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wątki</div>
+        <aside className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3">
+          <div className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Wątki</div>
           {loading ? (
             <CommThreadListSkeleton rows={6} />
           ) : filteredThreads.length === 0 ? (
@@ -219,10 +219,10 @@ export default function CommPage() {
                       background: active ? "rgba(59,130,246,.10)" : "rgba(255,255,255,.02)",
                     }}
                   >
-                    <div className="font-mono text-xs font-semibold text-white">{t.repair.repair_number}</div>
+                    <div className="font-mono text-xs font-semibold text-[var(--white)]">{t.repair.repair_number}</div>
                     <div className="mt-0.5 truncate text-sm text-[#e5e7eb]">{t.repair.client_name} · {t.repair.device_name}</div>
-                    <div className="mt-1 truncate text-xs text-[#9ca3af]">{meta.preview || "Brak wiadomości"}</div>
-                    <div className="mt-1 text-[11px] text-[#6b7280]">{meta.at ? dateLabel(meta.at) : "—"}</div>
+                    <div className="mt-1 truncate text-xs text-[var(--ink2)]">{meta.preview || "Brak wiadomości"}</div>
+                    <div className="mt-1 text-[11px] text-[var(--muted)]">{meta.at ? dateLabel(meta.at) : "—"}</div>
                   </button>
                 );
               })}
@@ -230,22 +230,22 @@ export default function CommPage() {
           )}
         </aside>
 
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
           {!activeThread ? (
-            <div className="text-sm text-[#6b7280]">Wybierz wątek z lewej listy.</div>
+            <div className="text-sm text-[var(--muted)]">Wybierz wątek z lewej listy.</div>
           ) : (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+              <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
                 <div>
                   <Link href={`/panel/naprawy/${activeThread.repair.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
                     {activeThread.repair.repair_number}
                   </Link>
-                  <div className="mt-1 text-sm text-white">{activeThread.repair.client_name} · {activeThread.repair.device_name}</div>
-                  <div className="mt-1 text-xs text-[#9ca3af]">Status: {activeThread.repair.status_display}</div>
+                  <div className="mt-1 text-sm text-[var(--white)]">{activeThread.repair.client_name} · {activeThread.repair.device_name}</div>
+                  <div className="mt-1 text-xs text-[var(--ink2)]">Status: {activeThread.repair.status_display}</div>
                 </div>
-                <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1 text-xs">
-                  <button type="button" onClick={() => setChannel("panel")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "panel" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>Panel</button>
-                  <button type="button" onClick={() => setChannel("email")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "email" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[#9ca3af]"}`}>E-mail</button>
+                <div className="inline-flex rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-1 text-xs">
+                  <button type="button" onClick={() => setChannel("panel")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "panel" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[var(--ink2)]"}`}>Panel</button>
+                  <button type="button" onClick={() => setChannel("email")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "email" ? "bg-[#3b82f6]/20 text-[#bfdbfe]" : "text-[var(--ink2)]"}`}>E-mail</button>
                 </div>
               </div>
 
@@ -263,24 +263,24 @@ export default function CommPage() {
                 </div>
               ) : null}
 
-              <div className="max-h-[340px] space-y-2 overflow-auto rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+              <div className="max-h-[340px] space-y-2 overflow-auto rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
                 {activeThread.messages.length === 0 ? (
-                  <div className="text-sm text-[#6b7280]">Brak wiadomości.</div>
+                  <div className="text-sm text-[var(--muted)]">Brak wiadomości.</div>
                 ) : (
                   activeThread.messages.map((m) =>
                     m.kind === "note" ? (
-                      <div key={`n-${m.id}`} className="rounded-xl border border-white/10 bg-[#0c0d12] p-3">
-                        <div className="text-xs text-[#9ca3af]">
+                      <div key={`n-${m.id}`} className="rounded-xl border border-[var(--border)] bg-[var(--s1)] p-3">
+                        <div className="text-xs text-[var(--ink2)]">
                           {(m.thread_origin === "client" || m.thread_origin === "email_inbound" ? "Klient" : m.author_name) || "—"} · {dateLabel(m.created_at)}
                         </div>
                         <div className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.note}</div>
                       </div>
                     ) : (
-                      <div key={`e-${m.id}`} className="rounded-xl border border-dashed border-white/15 bg-[#0c0d12] p-3">
-                        <div className="text-[11px] font-semibold uppercase text-[#8b93a8]">E-mail</div>
-                        <div className="mt-1 text-sm font-semibold text-white">{m.subject}</div>
+                      <div key={`e-${m.id}`} className="rounded-xl border border-dashed border-white/15 bg-[var(--s1)] p-3">
+                        <div className="text-[11px] font-semibold uppercase text-[var(--ink2)]">E-mail</div>
+                        <div className="mt-1 text-sm font-semibold text-[var(--white)]">{m.subject}</div>
                         <div className="mt-2 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.body_snapshot}</div>
-                        <div className="mt-2 text-xs text-[#9ca3af]">
+                        <div className="mt-2 text-xs text-[var(--ink2)]">
                           {m.sent_by_name || "—"} · {dateLabel(m.sent_at)}
                         </div>
                       </div>
@@ -289,14 +289,14 @@ export default function CommPage() {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
                 {channel === "email" ? (
                   <input
                     type="text"
                     value={emailSubject}
                     onChange={(e) => setEmailSubject(e.target.value)}
                     placeholder="Temat e-maila…"
-                    className="mb-3 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#3b82f6]"
+                    className="mb-3 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
                   />
                 ) : null}
                 <textarea
@@ -304,7 +304,7 @@ export default function CommPage() {
                   onChange={(e) => setDraft(e.target.value)}
                   rows={4}
                   placeholder={channel === "email" ? "Treść e-maila (klient widzi ją w skrzynce i w historii)…" : "Napisz odpowiedź w panelu (widoczna dla klienta w jego koncie)…"}
-                  className="w-full resize-y rounded-2xl border border-white/10 bg-[#111318] px-4 py-3 text-sm text-white outline-none focus:border-[#3b82f6]"
+                  className="w-full resize-y rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-3 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
                 />
                 <div className="mt-3 flex items-center justify-end gap-2">
                   <button
@@ -313,7 +313,7 @@ export default function CommPage() {
                       setDraft("");
                       setEmailSubject("");
                     }}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   >
                     Wyczyść
                   </button>
@@ -321,7 +321,7 @@ export default function CommPage() {
                     type="button"
                     disabled={sending || !draft.trim() || (channel === "email" && !emailSubject.trim())}
                     onClick={() => void sendMessage()}
-                    className="rounded-xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60"
+                    className="rounded-xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-[var(--white)] hover:bg-[#2563eb] disabled:opacity-60"
                   >
                     {sending ? "Wysyłanie…" : channel === "panel" ? "Wyślij do panelu klienta" : "Wyślij e-mail"}
                   </button>

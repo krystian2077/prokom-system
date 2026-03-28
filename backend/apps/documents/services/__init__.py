@@ -1,5 +1,14 @@
 """PRO-KOM Serwis — Documents services."""
-from .pdf import build_acceptance_protocol_pdf, build_acceptance_protocol_short_pdf
+from .pdf import (
+    build_acceptance_protocol_pdf,
+    build_acceptance_protocol_short_pdf,
+    build_complaint_warranty_intake_pdf,
+)
 from .qr import build_repair_qr_image
 
-__all__ = ["build_acceptance_protocol_pdf", "build_acceptance_protocol_short_pdf", "build_repair_qr_image"]
+__all__ = [
+    "build_acceptance_protocol_pdf",
+    "build_acceptance_protocol_short_pdf",
+    "build_complaint_warranty_intake_pdf",
+    "build_repair_qr_image",
+]

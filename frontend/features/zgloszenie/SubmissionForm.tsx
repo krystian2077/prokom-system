@@ -137,6 +137,7 @@ export function SubmissionForm() {
   const [deliveryMethod, setDeliveryMethod] = useState("in_person");
   const [returnMethod, setReturnMethod] = useState("in_person");
   const [deliveryStreet, setDeliveryStreet] = useState("");
+  const [deliveryHouseNumber, setDeliveryHouseNumber] = useState("");
   const [deliveryCity, setDeliveryCity] = useState("");
   const [deliveryPostalCode, setDeliveryPostalCode] = useState("");
   const [hammerGlassInterest, setHammerGlassInterest] = useState<string | null>(null);
@@ -181,7 +182,7 @@ export function SubmissionForm() {
   const validateStep3 = (): boolean => {
     if (deliveryMethod !== "in_person") {
       const err: Record<string, string> = {};
-      if (!deliveryStreet.trim()) err.delivery_street = "Podaj ulicę i numer.";
+      if (!deliveryStreet.trim()) err.delivery_street = "Podaj ulicę.";
       if (!deliveryCity.trim()) err.delivery_city = "Podaj miasto.";
       setFieldErrors(err);
       return Object.keys(err).length === 0;
@@ -221,6 +222,7 @@ export function SubmissionForm() {
       delivery_method: deliveryMethod as PublicSubmitPayload["delivery_method"],
       return_method: returnMethod as PublicSubmitPayload["return_method"],
       delivery_street: deliveryStreet || "",
+      delivery_house_number: deliveryHouseNumber || "",
       delivery_city: deliveryCity || "",
       delivery_postal_code: deliveryPostalCode || "",
       delivery_country: "Polska",
@@ -454,10 +456,16 @@ export function SubmissionForm() {
               {deliveryMethod !== "in_person" && (
                 <>
                   <Input
-                    label="Ulica i numer (adres wysyłki)"
+                    label="Ulica (adres wysyłki)"
                     value={deliveryStreet}
                     onChange={(e) => setDeliveryStreet(e.target.value)}
                     error={fieldErrors.delivery_street}
+                  />
+                  <Input
+                    label="Numer domu / lokalu"
+                    value={deliveryHouseNumber}
+                    onChange={(e) => setDeliveryHouseNumber(e.target.value)}
+                    placeholder="np. 26, 12/5"
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <Input

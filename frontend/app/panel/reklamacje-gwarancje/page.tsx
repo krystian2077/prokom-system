@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Smartphone } from "lucide-react";
+import { ClipboardList, Smartphone } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
@@ -36,8 +36,8 @@ function complaintUiBucket(status: string | null | undefined): "in_progress" | "
 function complaintStatusBadgeClass(bucket: ReturnType<typeof complaintUiBucket>) {
   if (bucket === "in_progress") return "border-[#f59e0b]/40 bg-[#f59e0b]/12 text-[#ffe3b0]";
   if (bucket === "awaiting") return "border-[#3b82f6]/40 bg-[#3b82f6]/12 text-[#bcd6ff]";
-  if (bucket === "closed") return "border-white/20 bg-white/10 text-[#d1d5db]";
-  return "border-white/10 bg-white/5 text-[#9ca3af]";
+  if (bucket === "closed") return "border-white/20 bg-[var(--row-active)] text-[#d1d5db]";
+  return "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]";
 }
 
 function complaintStatusBadgeLabel(
@@ -144,12 +144,21 @@ export default function ComplaintsWarrantyPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-white">Reklamacje i gwarancje</h1>
-        <p className="mt-1 text-sm text-[#9ca3af]">Sprawy reklamacyjne i gwarancyjne — bez tworzenia z tego widoku.</p>
+      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-[var(--white)]">Reklamacje i gwarancje</h1>
+          <p className="mt-1 text-sm text-[var(--ink2)]">Sprawy reklamacyjne i gwarancyjne — bez tworzenia z tego widoku.</p>
+        </div>
+        <Link
+          href="/panel/reklamacje-gwarancje/przyjecie"
+          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-2xl border border-[#f59e0b]/35 bg-[#f59e0b]/12 px-4 py-2.5 text-sm font-semibold text-[#fde68a] transition hover:bg-[#f59e0b]/20"
+        >
+          <ClipboardList size={18} />
+          Nowe przyjęcie
+        </Link>
       </header>
 
-      <div className="mb-6 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+      <div className="mb-6 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
           <div className="flex flex-wrap items-center gap-2">
             {(
@@ -166,8 +175,8 @@ export default function ComplaintsWarrantyPage() {
                 onClick={() => pushFilters({ phase: key })}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                   phase === key
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                    ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                    : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 }`}
               >
                 {label}
@@ -175,7 +184,7 @@ export default function ComplaintsWarrantyPage() {
             ))}
           </div>
 
-          <div className="hidden h-8 w-px bg-white/10 lg:block" aria-hidden />
+          <div className="hidden h-8 w-px bg-[var(--row-active)] lg:block" aria-hidden />
 
           <div className="flex flex-wrap items-center gap-2">
             {(
@@ -191,8 +200,8 @@ export default function ComplaintsWarrantyPage() {
                 onClick={() => pushFilters({ kind: key })}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                   kind === key
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                    ? "border-white/20 bg-[var(--row-active)] text-[var(--white)]"
+                    : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 }`}
               >
                 {label}
@@ -205,7 +214,7 @@ export default function ComplaintsWarrantyPage() {
               type="button"
               onClick={() => void load()}
               disabled={!token || loading}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+              className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
             >
               Odśwież
             </button>
@@ -220,11 +229,11 @@ export default function ComplaintsWarrantyPage() {
       ) : null}
 
       {loading ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
           <StackedRowSkeleton rows={8} />
         </div>
       ) : !error && items.length === 0 ? (
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] py-6">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] py-6">
           <EmptyState
             icon="⚠️"
             title="Brak spraw w tym widoku"
@@ -233,8 +242,8 @@ export default function ComplaintsWarrantyPage() {
         </div>
       ) : !error ? (
         <>
-          <p className="mb-4 text-sm text-[#9ca3af]">
-            Wyniki: <span className="font-semibold text-white">{items.length}</span>
+          <p className="mb-4 text-sm text-[var(--ink2)]">
+            Wyniki: <span className="font-semibold text-[var(--white)]">{items.length}</span>
           </p>
           <ul className="space-y-3">
             {items.map((r) => {
@@ -246,7 +255,7 @@ export default function ComplaintsWarrantyPage() {
                 <li key={r.id}>
                   <Link
                     href={`/panel/naprawy/${r.id}`}
-                    className="block rounded-2xl border border-white/10 bg-[#0b0c10] p-4 transition hover:border-white/20 hover:bg-[#0c0d14]"
+                    className="block rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4 transition hover:border-white/20 hover:bg-[#0c0d14]"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="flex min-w-0 flex-1 items-start gap-3">
@@ -258,13 +267,13 @@ export default function ComplaintsWarrantyPage() {
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span className="font-mono text-sm font-bold text-white">{rekLabel(r.id)}</span>
-                            <span className="text-[#6b7280]">·</span>
-                            <span className="font-mono text-sm font-semibold text-[#9ca3af]">{r.repair_number}</span>
+                            <span className="font-mono text-sm font-bold text-[var(--white)]">{rekLabel(r.id)}</span>
+                            <span className="text-[var(--muted)]">·</span>
+                            <span className="font-mono text-sm font-semibold text-[var(--ink2)]">{r.repair_number}</span>
                             {r.parent_repair_number ? (
                               <>
-                                <span className="text-[#6b7280]">·</span>
-                                <span className="text-xs text-[#9ca3af]">
+                                <span className="text-[var(--muted)]">·</span>
+                                <span className="text-xs text-[var(--ink2)]">
                                   Naprawa źródłowa:{" "}
                                   <span className="font-mono font-semibold text-[#e5e7eb]">{r.parent_repair_number}</span>
                                 </span>
@@ -272,7 +281,7 @@ export default function ComplaintsWarrantyPage() {
                             ) : null}
                           </div>
                           <p className="mt-2 line-clamp-2 text-sm text-[#e5e7eb]">{problem}</p>
-                          <p className="mt-2 text-xs text-[#9ca3af]">
+                          <p className="mt-2 text-xs text-[var(--ink2)]">
                             {r.client_name}
                             {" · "}
                             Zgłosił: <span className="text-[#e5e7eb]">{r.created_by_label ?? "—"}</span>

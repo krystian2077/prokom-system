@@ -67,6 +67,7 @@ export interface PublicSubmitPayload {
   delivery_method?: string;
   return_method?: string;
   delivery_street?: string;
+  delivery_house_number?: string;
   delivery_city?: string;
   delivery_postal_code?: string;
   delivery_country?: string;

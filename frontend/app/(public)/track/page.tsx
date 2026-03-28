@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { api, API_V1 } from "@/lib/api";
 
@@ -35,11 +36,17 @@ function formatDate(iso: string | null): string {
 }
 
 export default function TrackPage() {
+  const searchParams = useSearchParams();
   const [ref, setRef] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TrackResult | null>(null);
+
+  useEffect(() => {
+    const q = searchParams.get("ref")?.trim();
+    if (q) setRef(q);
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,10 +82,18 @@ export default function TrackPage() {
           Śledzenie naprawy
         </p>
         <h1 className="mt-3 font-black tracking-tight text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(24px, 4vw, 32px)" }}>
-          Sprawdź status <span style={{ color: "var(--red, #dc1e1e)" }}>bez logowania</span>
+          Podgląd statusu zgłoszenia
         </h1>
-        <p className="mt-2 text-sm" style={{ color: "var(--ink2)" }}>
-          Wpisz numer zgłoszenia oraz ostatnie 4 cyfry numeru telefonu podanego w zgłoszeniu.
+        <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
+          Tu sprawdzisz podstawowy status po numerze referencyjnym i telefonie. Pełne śledzenie, historia i wiadomości
+          są dostępne w panelu klienta po{" "}
+          <Link href="/client/rejestracja" className="font-medium text-white underline decoration-[var(--red)] underline-offset-2 hover:no-underline">
+            założeniu konta
+          </Link>{" "}
+          i zalogowaniu — na stronie głównej panelu użyj sekcji „Szukaj mojej naprawy”, jeśli naprawa nie pojawi się sama na liście.
+        </p>
+        <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
+          Wpisz numer zgłoszenia oraz ostatnie 4 cyfry numeru telefonu z przyjęcia.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
@@ -160,11 +175,15 @@ export default function TrackPage() {
 
         <p className="mt-10 text-center text-sm" style={{ color: "var(--muted)" }}>
           <Link href="/" className="underline hover:text-white">
-            ← Wróć na stronę główną
+            ← Strona główna
           </Link>
           {" · "}
           <Link href="/client/login" className="underline hover:text-white">
-            Panel klienta
+            Logowanie do panelu
+          </Link>
+          {" · "}
+          <Link href="/client/login?returnUrl=%2Fclient%2Fdashboard%23szukaj-naprawy" className="underline hover:text-white">
+            Panel — Szukaj mojej naprawy
           </Link>
         </p>
       </div>

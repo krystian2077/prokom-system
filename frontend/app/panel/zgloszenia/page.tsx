@@ -121,7 +121,7 @@ function statusPillColor(status: string): { bg: string; border: string; text: st
 
 function KanbanBoardSkeleton() {
   return (
-    <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+    <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1">
         <Skeleton className="h-4 w-40" />
         <Skeleton className="h-3 w-20" />
@@ -131,7 +131,7 @@ function KanbanBoardSkeleton() {
           <div
             // eslint-disable-next-line react/no-array-index-key
             key={col}
-            className="min-w-[280px] flex-1 rounded-3xl border border-white/10 bg-[#0b0c10] p-3"
+            className="min-w-[280px] flex-1 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3"
           >
             <Skeleton className="h-5 w-24" />
             <div className="mt-3 space-y-3">
@@ -267,21 +267,21 @@ export default function PanelZgloszeniaPage() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9ca3af]">{panelLabel}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--ink2)]">{panelLabel}</p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white">{scopeLabel}</h1>
-            <p className="mt-1 text-sm text-[#9ca3af]">
+            <h1 className="text-2xl font-semibold tracking-tight text-[var(--white)]">{scopeLabel}</h1>
+            <p className="mt-1 text-sm text-[var(--ink2)]">
               Kanban z naprawami przypisanymi do Ciebie — kliknij kartę, aby przejść do szczegółów.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Porządek</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Porządek</div>
               <select
                 value={ordering}
                 onChange={(e) => setOrdering(e.target.value)}
-                className="rounded-2xl border border-white/10 bg-[#111318] px-3 py-1.5 text-xs font-semibold text-white outline-none focus:border-[#dc1e1e]"
+                className="rounded-2xl border border-[var(--border)] bg-[#111318] px-3 py-1.5 text-xs font-semibold text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               >
                 <option value="-created_at">Najnowsze</option>
                 <option value="created_at">Najstarsze</option>
@@ -298,25 +298,25 @@ export default function PanelZgloszeniaPage() {
         </div>
       </header>
 
-      <section className="hidden mb-6 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+      <section className="hidden mb-6 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-1 flex-col gap-1">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Wyszukiwanie</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Wyszukiwanie</div>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="np. numer naprawy, klient, telefon, IMEI, serial, opis…"
-              className="rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
             />
           </div>
 
           <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-3 lg:max-w-[620px] lg:flex-1 lg:items-end">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Status</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Status</div>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               >
                 <option value="">Wszystkie</option>
                 {STATUS_OPTIONS.map((s) => (
@@ -328,11 +328,11 @@ export default function PanelZgloszeniaPage() {
             </div>
 
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Priorytet</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Priorytet</div>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               >
                 <option value="">Wszystkie</option>
                 {PRIORITY_OPTIONS.map((p) => (
@@ -344,11 +344,11 @@ export default function PanelZgloszeniaPage() {
             </div>
 
             <div className="hidden md:block">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Typ sprawy</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Typ sprawy</div>
               <select
                 value={repairType}
                 onChange={(e) => setRepairType(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               >
                 <option value="">Wszystkie</option>
                 {REPAIR_TYPE_OPTIONS.map((p) => (
@@ -369,7 +369,7 @@ export default function PanelZgloszeniaPage() {
                 key={t.value}
                 type="button"
                 onClick={() => toggleTag(t.value)}
-                className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition"
+                className="rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition"
                 style={{
                   color: on ? "#fff" : "#8b93a8",
                   background: on ? "rgba(220,30,30,.18)" : "transparent",
@@ -385,12 +385,12 @@ export default function PanelZgloszeniaPage() {
         {isAdmin && (
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Przypisanie (uuid)</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Przypisanie (uuid)</div>
               <input
                 value={assignedToUuid}
                 onChange={(e) => setAssignedToUuid(e.target.value)}
                 placeholder="opcjonalnie: assigned_to=<uuid> (puste = wszyscy)"
-                className="mt-1 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 py-2.5 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
             <div className="flex items-end justify-end">
@@ -405,7 +405,7 @@ export default function PanelZgloszeniaPage() {
                   setTags([]);
                   setOrdering("-created_at");
                 }}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10"
+                className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)]"
               >
                 Wyczyść filtry
               </button>
@@ -425,7 +425,7 @@ export default function PanelZgloszeniaPage() {
                 setTags([]);
                 setOrdering("-created_at");
               }}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)]"
             >
               Wyczyść filtry
             </button>
@@ -435,13 +435,13 @@ export default function PanelZgloszeniaPage() {
 
       {loading ? <KanbanBoardSkeleton /> : null}
       {error && !loading ? (
-        <div className="rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-8">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-8">
           <ErrorState error={new Error(error)} onRetry={() => setReloadNonce((n) => n + 1)} title="Błąd listy zgłoszeń" />
         </div>
       ) : null}
 
       {!loading && !error && items.length === 0 && (
-        <div className="rounded-2xl border border-white/10 bg-[#0c0d12] px-4 py-8">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-8">
           <EmptyState
             icon={EMPTY_STATES.myRepairs.icon}
             title={EMPTY_STATES.myRepairs.title}
@@ -451,12 +451,12 @@ export default function PanelZgloszeniaPage() {
       )}
 
       {!loading && !error && items.length > 0 && (
-        <section className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+        <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1">
-            <p className="text-sm text-[#9ca3af]">
-              Wyniki: <span className="font-semibold text-white">{count}</span>
+            <p className="text-sm text-[var(--ink2)]">
+              Wyniki: <span className="font-semibold text-[var(--white)]">{count}</span>
             </p>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Kanban</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Kanban</p>
           </div>
 
           <div className="flex gap-4 overflow-x-auto pb-2">
@@ -465,11 +465,11 @@ export default function PanelZgloszeniaPage() {
               return (
                 <div
                   key={col.key}
-                  className="min-w-[280px] flex-1 rounded-3xl border border-white/10 bg-[#0b0c10] p-3"
+                  className="min-w-[280px] flex-1 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3"
                 >
                   <div className="flex items-center justify-between gap-3 px-2 py-1">
-                    <div className="text-sm font-semibold text-white">{col.title}</div>
-                    <div className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-[#9ca3af]">
+                    <div className="text-sm font-semibold text-[var(--white)]">{col.title}</div>
+                    <div className="rounded-full bg-[var(--row-hover)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ink2)]">
                       {colItems.length}
                     </div>
                   </div>
@@ -489,12 +489,12 @@ export default function PanelZgloszeniaPage() {
                         <Link
                           key={r.id}
                           href={`/panel/repairs/${r.id}`}
-                          className="group block rounded-2xl border border-white/10 bg-[#0c0d12] p-3 transition hover:border-white/20 hover:bg-[#111318]"
+                          className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3 transition hover:border-white/20 hover:bg-[#111318]"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-mono text-sm font-semibold text-white group-hover:text-[#dc1e1e]">
+                                <span className="font-mono text-sm font-semibold text-[var(--white)] group-hover:text-[#dc1e1e]">
                                   {r.repair_number}
                                 </span>
                                 <span
@@ -524,17 +524,17 @@ export default function PanelZgloszeniaPage() {
 
                             <div className="flex shrink-0 flex-col items-end gap-2">
                               <span
-                                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]"
+                                className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]"
                                 title="Priorytet"
                               >
                                 {r.priority_display}
                               </span>
-                              <span className="text-xs text-[#6b7280]">{createdAt}</span>
+                              <span className="text-xs text-[var(--muted)]">{createdAt}</span>
                             </div>
                           </div>
 
                           <div className="mt-2 flex items-center justify-end">
-                            <span className="text-[#9ca3af] transition group-hover:text-white">→</span>
+                            <span className="text-[var(--ink2)] transition group-hover:text-[var(--white)]">→</span>
                           </div>
                         </Link>
                       );

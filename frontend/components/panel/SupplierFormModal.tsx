@@ -120,16 +120,16 @@ export function SupplierFormModal({ open, mode, initial, token, onClose, onSaved
 
   return (
     <div className="fixed inset-0 z-[450] flex items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm" role="dialog" aria-modal>
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[18px] border border-white/15 bg-[#0f1117] p-5 shadow-[0_20px_60px_rgba(0,0,0,.55)]">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[18px] border border-white/15 bg-[var(--s1)] p-5 shadow-[0_20px_60px_rgba(0,0,0,.55)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8b93a8]">Dostawca</div>
-            <h2 className="mt-1 text-xl font-semibold text-white">{mode === "create" ? "Nowa hurtownia" : "Edycja hurtowni"}</h2>
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Dostawca</div>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--white)]">{mode === "create" ? "Nowa hurtownia" : "Edycja hurtowni"}</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#9ca3af] hover:bg-white/10"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--ink2)] hover:bg-[var(--row-active)]"
           >
             Zamknij
           </button>
@@ -137,104 +137,104 @@ export function SupplierFormModal({ open, mode, initial, token, onClose, onSaved
 
         <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-3">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Nazwa *</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Nazwa *</label>
             <input
               value={String(form.name ?? "")}
               onChange={(e) => set("name", e.target.value)}
-              className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               required
             />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Telefon</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Telefon</label>
               <input
                 value={String(form.phone ?? "")}
                 onChange={(e) => set("phone", e.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">E-mail</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">E-mail</label>
               <input
                 type="email"
                 value={String(form.email ?? "")}
                 onChange={(e) => set("email", e.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Strona WWW</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Strona WWW</label>
             <input
               value={String(form.website_url ?? "")}
               onChange={(e) => set("website_url", e.target.value)}
               placeholder="https://…"
-              className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
             />
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Śr. czas dostawy (dni)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Śr. czas dostawy (dni)</label>
             <input
               type="number"
               min={0}
               max={365}
               value={form.average_delivery_days === "" ? "" : String(form.average_delivery_days)}
               onChange={(e) => set("average_delivery_days", e.target.value === "" ? "" : Number(e.target.value))}
-              className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
             />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">NIP</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">NIP</label>
               <input
                 value={String(form.nip ?? "")}
                 onChange={(e) => set("nip", e.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Kraj</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Kraj</label>
               <input
                 value={String(form.country ?? "")}
                 onChange={(e) => set("country", e.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Ulica</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Ulica</label>
             <input
               value={String(form.street ?? "")}
               onChange={(e) => set("street", e.target.value)}
-              className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
             />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Kod pocztowy</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Kod pocztowy</label>
               <input
                 value={String(form.postal_code ?? "")}
                 onChange={(e) => set("postal_code", e.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Miasto</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Miasto</label>
               <input
                 value={String(form.city ?? "")}
                 onChange={(e) => set("city", e.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
               />
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b93a8]">Notatka wewnętrzna</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Notatka wewnętrzna</label>
             <textarea
               value={String(form.notes ?? "")}
               onChange={(e) => set("notes", e.target.value)}
               rows={3}
-              className="mt-1 w-full resize-none rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#dc1e1e]"
+              className="mt-1 w-full resize-none rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-[#e5e7eb]">
@@ -249,7 +249,7 @@ export function SupplierFormModal({ open, mode, initial, token, onClose, onSaved
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 disabled:opacity-50"
+              className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] hover:bg-[var(--row-active)] disabled:opacity-50"
             >
               Anuluj
             </button>

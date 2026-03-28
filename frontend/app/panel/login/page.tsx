@@ -60,8 +60,8 @@ export default function StaffLoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050509] px-4">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#0b0c10] p-8 shadow-xl shadow-black/40">
-        <div className="mb-6 text-xs uppercase tracking-[0.22em] text-[#9ca3af]">
+      <div className="w-full max-w-md rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-8 shadow-xl shadow-black/40">
+        <div className="mb-6 text-xs uppercase tracking-[0.22em] text-[var(--ink2)]">
           <span
             className="mr-2 inline-block h-1.5 w-1.5 rounded-full"
             style={{
@@ -74,8 +74,8 @@ export default function StaffLoginPage() {
           />
           {loginMode === "admin" ? "Panel administratora" : "Panel pracownika"}
         </div>
-        <h1 className="text-2xl font-semibold text-white">Logowanie do systemu</h1>
-        <p className="mt-2 text-sm text-[#9ca3af]">
+        <h1 className="text-2xl font-semibold text-[var(--white)]">Logowanie do systemu</h1>
+        <p className="mt-2 text-sm text-[var(--ink2)]">
           Podaj służbowy adres e-mail i hasło. Konta zakładane są przez administratora systemu.
         </p>
 
@@ -85,7 +85,7 @@ export default function StaffLoginPage() {
             <input
               type="email"
               autoComplete="username"
-              className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-0 focus:border-[#dc1e1e]"
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-black/40 px-3 py-2 text-sm text-[var(--white)] outline-none ring-0 focus:border-[#dc1e1e]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -95,7 +95,7 @@ export default function StaffLoginPage() {
             <input
               type="password"
               autoComplete="current-password"
-              className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-0 focus:border-[#dc1e1e]"
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-black/40 px-3 py-2 text-sm text-[var(--white)] outline-none ring-0 focus:border-[#dc1e1e]"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -106,7 +106,7 @@ export default function StaffLoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-md transition disabled:opacity-60"
+            className="mt-2 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-[var(--white)] shadow-md transition disabled:opacity-60"
             style={{
               background: loginMode === "admin" ? "#dc1e1e" : "#3b82f6",
               boxShadow:
@@ -119,7 +119,7 @@ export default function StaffLoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 border-t border-white/10 pt-4 text-xs text-[#6b7280]">
+        <div className="mt-6 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
           Klienci logują się przez{" "}
           <Link href="/client/login" className="font-medium text-[#dc1e1e] hover:underline">
             panel klienta

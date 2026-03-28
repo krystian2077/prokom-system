@@ -100,6 +100,50 @@ class StaffListView(APIView):
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
+class StaffAssignableForRepairView(APIView):
+    """
+    GET /api/v1/accounts/staff/assignable-for-repairs/
+    Aktywni pracownicy i administratorzy (do przypisania naprawy), domyślnie bez bieżącego użytkownika.
+    Query: include_self=1 — uwzględnij zalogowanego (np. przyjęcie stacjonarne).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        role = getattr(request.user, "role", None)
+        if role not in (UserRole.STAFF, UserRole.ADMIN):
+            return Response({"detail": "Brak uprawnień."}, status=403)
+        include_self = request.query_params.get("include_self", "").lower() in ("1", "true", "yes")
+        qs = User.objects.filter(role__in=[UserRole.STAFF, UserRole.ADMIN], is_active=True).select_related(
+            "staff_profile"
+        )
+        if not include_self:
+            qs = qs.exclude(pk=request.user.id)
+        qs = qs.order_by("first_name", "last_name", "email")
+        user_ids = list(qs.values_list("id", flat=True))
+        stats = _get_staff_stats(user_ids) if user_ids else {}
+        data = []
+        for u in qs:
+            try:
+                profile = u.staff_profile
+            except StaffProfile.DoesNotExist:
+                profile = None
+            display = (profile.display_name.strip() if profile and profile.display_name else "") or ""
+            picker_label = display or (u.first_name.strip() if u.first_name else "") or (u.get_full_name() or u.email)
+            st = stats.get(str(u.id), {})
+            data.append(
+                {
+                    "id": str(u.id),
+                    "first_name": u.first_name or "",
+                    "last_name": u.last_name or "",
+                    "full_name": u.get_full_name() or u.email,
+                    "picker_label": picker_label,
+                    "active_repairs_count": st.get("active_repairs_count", 0),
+                    "specialization": getattr(profile, "specialization", None) if profile else None,
+                }
+            )
+        return Response(data, status=200)
+
+
 class StaffDetailView(APIView):
     """GET /api/v1/accounts/staff/<uuid>/ — szczegóły pracownika. Tylko admin."""
     permission_classes = [IsAuthenticated]

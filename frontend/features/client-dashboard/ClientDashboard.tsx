@@ -18,6 +18,7 @@ import { getDeviceEmoji } from "@/types/panel";
 import { truncate } from "@/lib/format";
 import type { DashboardStats } from "@/types/panel";
 import type { Repair } from "@/types/panel";
+import { FindMyRepairCard } from "./FindMyRepairCard";
 
 export function ClientDashboard() {
   const { token, user } = useAuth();
@@ -185,6 +186,8 @@ export function ClientDashboard() {
               </div>
             ))}
           </div>
+
+          <FindMyRepairCard />
 
           {/* Ostatnie naprawy */}
           <div className="panel-card mt-8">

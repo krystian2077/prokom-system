@@ -16,10 +16,12 @@ from .views.notification_views import (
     StaffNotificationListView,
     StaffNotificationDetailView,
     StaffNotificationMarkAllReadView,
+    StaffNotificationUnreadCountView,
     StaffNotificationRequiresActionView,
 )
 from .views.staff_management_views import (
     StaffListView,
+    StaffAssignableForRepairView,
     StaffDetailView,
     StaffUpdateView,
     StaffResetPasswordView,
@@ -44,7 +46,10 @@ urlpatterns = [
     path("notifications/", StaffNotificationListView.as_view(), name="notifications-list"),
     path("notifications/requires-action/", StaffNotificationRequiresActionView.as_view(), name="notifications-requires-action"),
     path("notifications/mark-all-read/", StaffNotificationMarkAllReadView.as_view(), name="notifications-mark-all-read"),
+    path("notifications/unread-count/", StaffNotificationUnreadCountView.as_view(), name="notifications-unread-count"),
     path("notifications/<int:pk>/", StaffNotificationDetailView.as_view(), name="notifications-detail"),
+    # Lista do przypisywania napraw (staff/admin, bez siebie)
+    path("staff/assignable-for-repairs/", StaffAssignableForRepairView.as_view(), name="staff-assignable-for-repairs"),
     # Zarządzanie pracownikami (tylko admin)
     path("staff/", StaffListView.as_view(), name="staff-list"),
     path("staff/<uuid:pk>/", StaffDetailView.as_view(), name="staff-detail"),

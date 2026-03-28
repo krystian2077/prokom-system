@@ -70,6 +70,7 @@ class PublicRepairSubmitSerializer(serializers.Serializer):
         required=False,
     )
     delivery_street = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
+    delivery_house_number = serializers.CharField(max_length=50, required=False, allow_blank=True, default="")
     delivery_city = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     delivery_postal_code = serializers.CharField(max_length=10, required=False, allow_blank=True, default="")
     delivery_country = serializers.CharField(max_length=100, required=False, default="Polska")

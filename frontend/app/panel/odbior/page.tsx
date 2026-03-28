@@ -110,13 +110,13 @@ export default function PickupPage() {
     <main className="mx-auto min-h-screen max-w-[1450px] px-4 py-8">
       <div className="mb-5 flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Odbiory</h1>
-          <p className="mt-1 text-sm text-[#9ca3af]">Gotowe do odbioru oraz wydane dziś (widok pracownika).</p>
+          <h1 className="text-2xl font-semibold text-[var(--white)]">Odbiory</h1>
+          <p className="mt-1 text-sm text-[var(--ink2)]">Gotowe do odbioru oraz wydane dziś (widok pracownika).</p>
         </div>
         <button
           type="button"
           onClick={() => void load()}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] hover:bg-white/10 hover:text-white"
+          className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
         >
           Odśwież
         </button>
@@ -129,10 +129,10 @@ export default function PickupPage() {
       ) : null}
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Gotowe do odbioru</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{readyList.length}</span>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Gotowe do odbioru</h2>
+            <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-xs font-semibold text-[var(--white)]">{readyList.length}</span>
           </div>
 
           {loading ? (
@@ -146,14 +146,14 @@ export default function PickupPage() {
           ) : (
             <div className="space-y-2">
               {readyList.map((r) => (
-                <div key={r.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                <div key={r.id} className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Link href={`/panel/naprawy/${r.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
                         {r.repair_number}
                       </Link>
-                      <div className="mt-1 truncate text-sm text-white">{r.device_name}</div>
-                      <div className="mt-1 text-xs text-[#9ca3af]">
+                      <div className="mt-1 truncate text-sm text-[var(--white)]">{r.device_name}</div>
+                      <div className="mt-1 text-xs text-[var(--ink2)]">
                         {r.client_name} · Czeka: {waitingText(r.created_at)} · Pracownik: {assigneeLabel(r)}
                       </div>
                     </div>
@@ -172,27 +172,27 @@ export default function PickupPage() {
           )}
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wydane dziś</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{issuedList.length}</span>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Wydane dziś</h2>
+            <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-xs font-semibold text-[var(--white)]">{issuedList.length}</span>
           </div>
 
           {loading ? (
             <PickupColumnSkeleton rows={3} />
           ) : issuedList.length === 0 ? (
-            <div className="py-6 text-center text-sm text-[#6b7280]">Brak wydanych dziś.</div>
+            <div className="py-6 text-center text-sm text-[var(--muted)]">Brak wydanych dziś.</div>
           ) : (
             <div className="space-y-2">
               {issuedList.map((r) => (
-                <div key={r.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0f1117] px-3 py-2">
+                <div key={r.id} className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2">
                   <div className="min-w-0">
-                    <div className="font-mono text-xs font-semibold text-white">{r.repair_number}</div>
-                    <div className="truncate text-xs text-[#9ca3af]">{r.device_name}</div>
+                    <div className="font-mono text-xs font-semibold text-[var(--white)]">{r.repair_number}</div>
+                    <div className="truncate text-xs text-[var(--ink2)]">{r.device_name}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-[#86efac]">✓ {new Date(r.created_at).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}</div>
-                    <div className="text-[11px] text-[#9ca3af]">{r.status_display}</div>
+                    <div className="text-[11px] text-[var(--ink2)]">{r.status_display}</div>
                   </div>
                 </div>
               ))}

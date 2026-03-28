@@ -68,6 +68,20 @@ class StaffNotificationMarkAllReadView(APIView):
         return Response({"marked": updated})
 
 
+class StaffNotificationUnreadCountView(APIView):
+    """
+    GET /api/v1/accounts/notifications/unread-count/
+    Liczba nieprzeczytanych powiadomień (StaffNotification) dla zalogowanego pracownika.
+    """
+    permission_classes = [IsAuthenticated, IsStaffOrAdmin]
+
+    def get(self, request):
+        if request.user.role not in ("staff", "admin"):
+            return Response({"detail": "Brak uprawnień."}, status=403)
+        count = StaffNotification.objects.filter(user=request.user, status=StaffNotification.UNREAD).count()
+        return Response({"count": count})
+
+
 class StaffNotificationRequiresActionView(APIView):
     """
     GET /api/v1/accounts/notifications/requires-action/

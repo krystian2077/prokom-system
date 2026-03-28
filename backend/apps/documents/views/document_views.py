@@ -4,11 +4,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
 
 from apps.repairs.models import RepairRequest, RepairVisitSchedule
 from apps.documents.services import (
     build_acceptance_protocol_pdf,
     build_acceptance_protocol_short_pdf,
+    build_complaint_warranty_intake_pdf,
     build_repair_qr_image,
 )
 
@@ -20,6 +22,9 @@ class AcceptanceProtocolPDFView(APIView):
     Dostęp: staff/admin lub klient będący właścicielem naprawy.
     """
     permission_classes = [IsAuthenticated]
+    # Negocjacja DRF: samo Accept: application/pdf nie ma renderera → 406.
+    # Widok zwraca HttpResponse z PDF; klient powinien wysłać Accept */* lub application/json.
+    renderer_classes = [JSONRenderer]
 
     def get(self, request, repair_id):
         try:
@@ -42,6 +47,7 @@ class AcceptanceProtocolShortPDFView(APIView):
     Zwraca 404, jeśli naprawa nie ma visit_schedule.
     """
     permission_classes = [IsAuthenticated]
+    renderer_classes = [JSONRenderer]
 
     def get(self, request, repair_id):
         try:
@@ -67,6 +73,38 @@ class AcceptanceProtocolShortPDFView(APIView):
         return response
 
 
+class ComplaintWarrantyIntakePDFView(APIView):
+    """
+    GET /api/v1/documents/repair/<repair_id>/complaint-warranty-intake/
+    PDF potwierdzenia przyjęcia reklamacji lub gwarancji.
+    """
+
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [JSONRenderer]
+
+    def get(self, request, repair_id):
+        try:
+            repair = RepairRequest.objects.select_related("client", "device", "parent_repair").get(pk=repair_id)
+        except RepairRequest.DoesNotExist:
+            return Response({"detail": "Nie znaleziono naprawy."}, status=status.HTTP_404_NOT_FOUND)
+        if request.user.role not in ("staff", "admin"):
+            if not getattr(repair.client, "user_id", None) or repair.client.user_id != request.user.id:
+                return Response({"detail": "Brak uprawnień."}, status=status.HTTP_403_FORBIDDEN)
+        if repair.repair_type not in ("complaint", "warranty"):
+            return Response(
+                {"detail": "Ten dokument dotyczy tylko zgłoszeń typu reklamacja lub gwarancja."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        try:
+            pdf_bytes = build_complaint_warranty_intake_pdf(repair, request=request)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        kind = "reklamacja" if repair.repair_type == "complaint" else "gwarancja"
+        response["Content-Disposition"] = f'inline; filename="potwierdzenie-{kind}-{repair.repair_number}.pdf"'
+        return response
+
+
 class RepairQRView(APIView):
     """
     GET /api/v1/documents/repair/<repair_id>/qr/?url=<encoded_url>
@@ -74,6 +112,7 @@ class RepairQRView(APIView):
     Opcjonalny query: url=... (jeśli brak, generuje placeholder tekst).
     """
     permission_classes = [IsAuthenticated]
+    renderer_classes = [JSONRenderer]
 
     def get(self, request, repair_id):
         try:

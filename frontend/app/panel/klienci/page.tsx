@@ -147,6 +147,19 @@ function buildPageButtons(currentPage: number, totalPages: number): number[] {
   return Array.from(pages).sort((a, b) => a - b);
 }
 
+function formatDateShort(iso: string | undefined | null): string {
+  if (!iso) return "—";
+  try {
+    return new Date(iso).toLocaleDateString("pl-PL", { day: "numeric", month: "short", year: "numeric" });
+  } catch {
+    return "—";
+  }
+}
+
+function clientDisplayName(c: ClientListItem): string {
+  return c.client_type === "business" ? c.company_name || c.full_name : c.full_name || c.client_number;
+}
+
 export default function ClientsPage() {
   const { token } = useAuth();
   const router = useRouter();
@@ -319,17 +332,17 @@ export default function ClientsPage() {
   return (
     <main className="mx-auto max-w-[1500px] px-4 py-8">
       <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1">
             <div className="relative">
               <input
                 value={searchDraft}
                 onChange={(e) => setSearchDraft(e.target.value)}
-                className="h-11 w-full rounded-2xl border border-white/10 bg-[#111318] px-4 pr-12 text-sm text-white outline-none placeholder:opacity-60 focus:border-[#3b82f6]"
+                className="h-11 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 pr-12 text-sm text-[var(--white)] outline-none placeholder:opacity-60 focus:border-[#3b82f6]"
                 placeholder="Szukaj po nazwie, telefonie, e-mailu…"
               />
-              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8b93a8]" aria-hidden>
+              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--ink2)]" aria-hidden>
                 ⌕
               </div>
             </div>
@@ -338,7 +351,7 @@ export default function ClientsPage() {
           <div className="flex items-center justify-between gap-3 lg:justify-end">
             <Link
               href="/panel/intake"
-              className="rounded-2xl bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+              className="rounded-2xl bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb]"
             >
               + Nowe przyjęcie
             </Link>
@@ -391,17 +404,16 @@ export default function ClientsPage() {
               <div
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
-                className="h-[92px] animate-pulse rounded-2xl border border-white/10 bg-white/5"
+                className="h-[92px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--row-hover)]"
               />
             ))
           ) : visibleClients.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-4 py-7 text-sm text-[#9ca3af]">
+            <div className="rounded-2xl border border-dashed border-[var(--border)] bg-black/20 px-4 py-7 text-sm text-[var(--ink2)]">
               Brak klientów do wyświetlenia.
             </div>
           ) : (
             visibleClients.map((c) => {
-              const displayName =
-                c.client_type === "business" ? c.company_name || c.full_name : c.full_name || c.client_number;
+              const displayName = clientDisplayName(c);
               const badge = segmentBadge(c);
               const avatarInitials = computeAvatarInitials(c);
               const blacklisted = Boolean(c.is_blacklisted);
@@ -416,7 +428,7 @@ export default function ClientsPage() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") setSelectedClientId(c.id);
                   }}
-                  className="rounded-2xl border border-white/10 bg-[#0b0c10] px-4 py-4 transition hover:border-white/20"
+                  className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-4 transition hover:border-white/20"
                   style={{
                     borderColor: selectedClientId === c.id ? "rgba(59,130,246,.35)" : undefined,
                     background: selectedClientId === c.id ? "rgba(59,130,246,.08)" : undefined,
@@ -425,7 +437,7 @@ export default function ClientsPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 items-start gap-3">
                       <div
-                        className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                        className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-[var(--white)]"
                         style={{
                           background: vip
                             ? "linear-gradient(135deg, rgba(139,92,246,1), rgba(220,30,30,.9))"
@@ -439,7 +451,7 @@ export default function ClientsPage() {
 
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="truncate text-sm font-semibold text-white">{displayName}</span>
+                          <span className="truncate text-sm font-semibold text-[var(--white)]">{displayName}</span>
                           {vip && (
                             <span
                               className="rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
@@ -474,7 +486,7 @@ export default function ClientsPage() {
                           )}
                         </div>
 
-                        <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[#8b93a8]">
+                        <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[var(--ink2)]">
                           <span className="truncate">📞 {c.phone || "—"}</span>
                           <span className="truncate">✉️ {c.email || "—"}</span>
                           {c.client_type === "business" && (c.nip || c.contact_person) && (
@@ -488,21 +500,17 @@ export default function ClientsPage() {
 
                     <div className="flex shrink-0 items-center gap-4">
                       <div className="text-right">
-                        <div className="text-base font-semibold text-white">{c.total_repairs ?? 0}</div>
-                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[#8b93a8]">Naprawy</div>
+                        <div className="text-base font-semibold text-[var(--white)]">{c.total_repairs ?? 0}</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">Naprawy</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-base font-semibold text-white">{c.visit_count ?? 0}</div>
-                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[#8b93a8]">Wizyty</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-base font-semibold text-white">{blacklisted ? 1 : 0}</div>
-                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[#8b93a8]">Ryzyko</div>
+                        <div className="text-base font-semibold text-[var(--white)]">{c.visit_count ?? 0}</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">Wizyty</div>
                       </div>
 
                       <button
                         type="button"
-                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af] transition hover:border-white/20 hover:text-white"
+                        className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)] transition hover:border-white/20 hover:text-[var(--white)]"
                         style={{
                           borderColor: c.total_repairs > 0 ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.08)",
                         }}
@@ -517,10 +525,10 @@ export default function ClientsPage() {
           )}
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-2 text-xs text-[#9ca3af]">
+        <div className="mt-6 flex items-center justify-end gap-2 text-xs text-[var(--ink2)]">
           <button
             type="button"
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:border-white/20 disabled:opacity-50 disabled:hover:border-white/10"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 transition hover:border-white/20 disabled:opacity-50 disabled:hover:border-[var(--border)]"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
@@ -548,20 +556,20 @@ export default function ClientsPage() {
 
           <button
             type="button"
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition hover:border-white/20 disabled:opacity-50 disabled:hover:border-white/10"
+            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 transition hover:border-white/20 disabled:opacity-50 disabled:hover:border-[var(--border)]"
             disabled={page >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           >
             →
           </button>
         </div>
-        <div className="mt-4 text-sm text-[#9ca3af]">Wyświetlono {shownCount} z {data?.count ?? 0} klientów</div>
+        <div className="mt-4 text-sm text-[var(--ink2)]">Wyświetlono {shownCount} z {data?.count ?? 0} klientów</div>
       </div>
 
-      <aside className="rounded-3xl border border-white/10 bg-[#0c0d12] p-5">
-        <div className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Podgląd klienta</div>
+      <aside className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+        <div className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">Podgląd klienta</div>
         {!selectedClientId ? (
-          <div className="mt-3 text-sm text-[#6b7280]">Kliknij klienta na liście, aby pobrać szczegóły.</div>
+          <div className="mt-3 text-sm text-[var(--muted)]">Kliknij klienta na liście, aby pobrać szczegóły.</div>
         ) : selectedLoading ? (
           <div className="mt-3 space-y-3">
             <Skeleton className="h-5 w-48" />
@@ -571,23 +579,215 @@ export default function ClientsPage() {
         ) : selectedError ? (
           <div className="mt-3 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-[#fca5a5]">{selectedError}</div>
         ) : selectedClient ? (
-          <div className="mt-3 space-y-3">
-            <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
-              <div className="text-sm font-semibold text-white">{selectedClient.full_name}</div>
-              <div className="mt-1 text-xs text-[#9ca3af]">{selectedClient.email || "—"} · {selectedClient.phone || "—"}</div>
-              <div className="mt-1 text-xs text-[#9ca3af]">{selectedClient.street || ""} {selectedClient.city || ""} {selectedClient.postal_code || ""}</div>
+          <div className="mt-4 space-y-4">
+            {/* Profil */}
+            <div
+              className="overflow-hidden rounded-2xl border border-[var(--border)]"
+              style={{
+                background:
+                  "linear-gradient(145deg, rgba(59,130,246,.08) 0%, rgba(15,17,23,.95) 42%, #0f1117 100%)",
+                boxShadow: "0 0 0 1px rgba(59,130,246,.06) inset",
+              }}
+            >
+              <div className="p-4">
+                <div className="flex gap-3">
+                  <div
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-bold text-[var(--white)]"
+                    style={{
+                      background: selectedClient.is_vip
+                        ? "linear-gradient(135deg, rgba(139,92,246,1), rgba(220,30,30,.85))"
+                        : "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+                      boxShadow: selectedClient.is_vip
+                        ? "0 0 0 1px rgba(139,92,246,.35) inset, 0 8px 24px rgba(59,130,246,.15)"
+                        : "0 0 0 1px rgba(59,130,246,.35) inset, 0 8px 24px rgba(59,130,246,.12)",
+                    }}
+                    aria-hidden
+                  >
+                    {computeAvatarInitials(selectedClient)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5 gap-y-1">
+                      <h2 className="text-[15px] font-semibold leading-tight text-[var(--white)]">{clientDisplayName(selectedClient)}</h2>
+                      {selectedClient.is_vip && (
+                        <span
+                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                          style={{
+                            background: "rgba(245,158,11,.14)",
+                            border: "1px solid rgba(245,158,11,.30)",
+                            color: "#f59e0b",
+                          }}
+                        >
+                          VIP
+                        </span>
+                      )}
+                      {(() => {
+                        const b = segmentBadge(selectedClient);
+                        if (!b || selectedClient.is_vip) return null;
+                        return (
+                          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={b.styles}>
+                            {b.label}
+                          </span>
+                        );
+                      })()}
+                      {selectedClient.is_blacklisted && (
+                        <span
+                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                          style={{
+                            background: "rgba(220,38,38,.14)",
+                            border: "1px solid rgba(220,38,38,.28)",
+                            color: "#f87171",
+                          }}
+                        >
+                          Blacklist
+                        </span>
+                      )}
+                    </div>
+                    {selectedClient.client_type === "business" && selectedClient.full_name && selectedClient.company_name && (
+                      <p className="mt-1 truncate text-xs text-[var(--ink2)]">{selectedClient.full_name}</p>
+                    )}
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-black/25 px-2.5 py-1 font-mono text-[11px] text-[#c7d2eb]">
+                      {selectedClient.client_number}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Naprawy", value: selectedClient.total_repairs ?? 0 },
+                    { label: "Wizyty", value: selectedClient.visit_count ?? 0 },
+                  ].map((cell) => (
+                    <div
+                      key={cell.label}
+                      className="rounded-xl border border-white/8 bg-[var(--s1)]/80 px-2 py-2.5 text-center"
+                      style={{ borderColor: "rgba(255,255,255,.06)" }}
+                    >
+                      <div className="text-lg font-semibold tabular-nums text-[var(--white)]">{cell.value}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{cell.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 space-y-0.5 border-t border-white/8 pt-4 text-[11px] text-[var(--muted)]">
+                  <p>
+                    Klient od <span className="text-[var(--ink2)]">{formatDateShort(selectedClient.created_at)}</span>
+                  </p>
+                  {selectedClient.last_visit_at ? (
+                    <p>
+                      Ostatnia wizyta: <span className="text-[var(--ink2)]">{formatDateShort(selectedClient.last_visit_at)}</span>
+                    </p>
+                  ) : null}
+                </div>
+              </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
-              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Naprawy klienta</div>
-              <div className="mt-2 space-y-2">
+
+            {/* Kontakt */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Kontakt</div>
+              <ul className="mt-3 space-y-3">
+                <li className="flex gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#111318] text-sm" aria-hidden>
+                    📞
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">Telefon</div>
+                    {selectedClient.phone ? (
+                      <a href={`tel:${selectedClient.phone.replace(/\s/g, "")}`} className="mt-0.5 block text-sm text-[#93c5fd] hover:underline">
+                        {selectedClient.phone}
+                      </a>
+                    ) : (
+                      <span className="mt-0.5 block text-sm text-[var(--muted)]">—</span>
+                    )}
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#111318] text-sm" aria-hidden>
+                    ✉️
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">E-mail</div>
+                    {selectedClient.email ? (
+                      <a href={`mailto:${selectedClient.email}`} className="mt-0.5 block truncate text-sm text-[#93c5fd] hover:underline">
+                        {selectedClient.email}
+                      </a>
+                    ) : (
+                      <span className="mt-0.5 block text-sm text-[var(--muted)]">—</span>
+                    )}
+                  </div>
+                </li>
+                {selectedClient.preferred_contact ? (
+                  <li className="flex gap-3">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#111318] text-sm" aria-hidden>
+                      💬
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">Preferowany kontakt</div>
+                      <p className="mt-0.5 text-sm text-[var(--white)]">{selectedClient.preferred_contact}</p>
+                    </div>
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+
+            {/* Adres i firma */}
+            {(selectedClient.street || selectedClient.city || selectedClient.postal_code || selectedClient.nip || selectedClient.contact_person) ? (
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+                {(selectedClient.street || selectedClient.city || selectedClient.postal_code) ? (
+                  <>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Adres</div>
+                    <p className="mt-2 text-sm leading-relaxed text-[#d1d5db]">
+                      {[selectedClient.street, [selectedClient.postal_code, selectedClient.city].filter(Boolean).join(" ")].filter(Boolean).join(", ") ||
+                        "—"}
+                    </p>
+                  </>
+                ) : null}
+                {selectedClient.client_type === "business" && (selectedClient.nip || selectedClient.contact_person) ? (
+                  <div className={selectedClient.street || selectedClient.city ? "mt-4 border-t border-white/8 pt-4" : ""}>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Firma</div>
+                    <dl className="mt-2 space-y-2 text-sm">
+                      {selectedClient.nip ? (
+                        <div className="flex justify-between gap-3">
+                          <dt className="text-[var(--muted)]">NIP</dt>
+                          <dd className="font-mono text-[var(--white)]">{selectedClient.nip}</dd>
+                        </div>
+                      ) : null}
+                      {selectedClient.contact_person ? (
+                        <div className="flex justify-between gap-3">
+                          <dt className="text-[var(--muted)]">Osoba</dt>
+                          <dd className="text-right text-[var(--white)]">{selectedClient.contact_person}</dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Naprawy klienta</div>
+                {selectedRepairs.length > 6 ? (
+                  <span className="text-[10px] text-[var(--muted)]">+{selectedRepairs.length - 6} więcej</span>
+                ) : null}
+              </div>
+              <div className="mt-3 space-y-2">
                 {selectedRepairs.slice(0, 6).map((r) => (
-                  <Link key={r.id} href={`/panel/naprawy/${r.id}`} className="block rounded-xl border border-white/10 bg-[#0c0d12] px-3 py-2 hover:border-white/20">
-                    <div className="font-mono text-xs font-semibold text-white">{r.repair_number}</div>
-                    <div className="mt-0.5 text-xs text-[#9ca3af]">{r.device_name}</div>
-                    <div className="mt-0.5 text-[11px] text-[#93c5fd]">{r.status_display}</div>
+                  <Link
+                    key={r.id}
+                    href={`/panel/naprawy/${r.id}`}
+                    className="group block rounded-xl border border-[var(--border)] bg-gradient-to-br from-[#0c0d12] to-[#0a0b0f] px-3 py-2.5 transition hover:border-[#3b82f6]/35 hover:shadow-[0_0_0_1px_rgba(59,130,246,.12)]"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-mono text-xs font-semibold text-[var(--white)]">{r.repair_number}</span>
+                      <span className="shrink-0 rounded-md bg-[#1e293b]/80 px-1.5 py-0.5 text-[10px] text-[#93c5fd]">{r.status_display}</span>
+                    </div>
+                    <div className="mt-1 text-xs text-[var(--ink2)] group-hover:text-[#cbd5e1]">{r.device_name}</div>
                   </Link>
                 ))}
-                {selectedRepairs.length === 0 ? <div className="text-xs text-[#6b7280]">Brak napraw klienta.</div> : null}
+                {selectedRepairs.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-[var(--border)] bg-black/20 px-3 py-6 text-center text-xs text-[var(--muted)]">
+                    Brak napraw tego klienta w systemie.
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

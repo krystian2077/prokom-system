@@ -49,6 +49,54 @@ html::-webkit-scrollbar-corner {
   background: transparent;
 }
 
+/* Panel pracownika — ciemny tor, niebieski kciuk jak --blue (#3b82f6) w UI */
+html.worker-panel {
+  scrollbar-color: #3b82f6 #0f1117;
+}
+html.worker-panel::-webkit-scrollbar {
+  width: 17px;
+  height: 17px;
+}
+html.worker-panel::-webkit-scrollbar-track {
+  background: #0f1117;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+html.worker-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html.worker-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 45%, #3b82f6 100%);
+  background-clip: content-box;
+}
+html.worker-panel::-webkit-scrollbar-corner {
+  background: #0f1117;
+}
+
+html.worker-panel.worker-panel--light {
+  scrollbar-color: #2563eb #e8ecf4;
+}
+html.worker-panel.worker-panel--light::-webkit-scrollbar-track {
+  background: #e8ecf4;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+html.worker-panel.worker-panel--light::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html.worker-panel.worker-panel--light::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 45%, #3b82f6 100%);
+  background-clip: content-box;
+}
+html.worker-panel.worker-panel--light::-webkit-scrollbar-corner {
+  background: #e8ecf4;
+}
+
 body {
   @apply bg-white text-dark antialiased;
   /* overflow-x na body psuje sticky — patrz ConditionalPublicLayout overflow-x-hidden */
@@ -110,6 +158,27 @@ b {
 .akcesoria-categories-scroll::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,.2);
   border-radius: 4px;
+}
+
+/* Oś czasu (naprawa) — cienki pasek, bez „grubego” niebieskiego tracka */
+.repair-timeline-scroll {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.35) rgba(255, 255, 255, 0.04);
+}
+.repair-timeline-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.repair-timeline-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+}
+.repair-timeline-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.35));
+  border-radius: 6px;
+}
+.repair-timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.65), rgba(37, 99, 235, 0.5));
 }
 
 /* Zgłoszenie — dark theme: design tokens + tło, noise, ambient glow */
@@ -1286,7 +1355,90 @@ b {
   --cyan: #06b6d4;
   --cl: rgba(6, 182, 212, 0.1);
   --cb: rgba(6, 182, 212, 0.25);
-  --nav: 248px;
+  --nav: 352px;
+}
+
+/* Panel staff — zmienne tylko w `.worker-shell` (motyw z WorkerPanelThemeContext) */
+.worker-shell[data-worker-theme="dark"] {
+  --page: #07080c;
+  --s1: #0f1117;
+  --s2: #141720;
+  --s3: #191d28;
+  --s4: #1c2030;
+  --s5: #212538;
+  --faint: #2c3145;
+  --white: #fff;
+  --ink: #d0d4de;
+  --ink2: #8b93a8;
+  --muted: #525b6e;
+  --border: rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.13);
+  --red: #dc1e1e;
+  --red-h: #b81818;
+  --rl: rgba(220, 30, 30, 0.08);
+  --rb: rgba(220, 30, 30, 0.22);
+  --green: #22c55e;
+  --gl: rgba(34, 197, 94, 0.1);
+  --gb: rgba(34, 197, 94, 0.25);
+  --amber: #f59e0b;
+  --al: rgba(245, 158, 11, 0.1);
+  --ab: rgba(245, 158, 11, 0.25);
+  --blue: #3b82f6;
+  --bl: rgba(59, 130, 246, 0.1);
+  --bb: rgba(59, 130, 246, 0.25);
+  --purple: #8b5cf6;
+  --pl: rgba(139, 92, 246, 0.1);
+  --pb: rgba(139, 92, 246, 0.25);
+  --orange: #f97316;
+  --ol: rgba(249, 115, 22, 0.1);
+  --ob: rgba(249, 115, 22, 0.25);
+  --cyan: #06b6d4;
+  --cl: rgba(6, 182, 212, 0.1);
+  --cb: rgba(6, 182, 212, 0.25);
+  --nav: 352px;
+  --row-hover: rgba(255, 255, 255, 0.06);
+  --row-active: rgba(255, 255, 255, 0.1);
+}
+
+.worker-shell[data-worker-theme="light"] {
+  --page: #eef1f8;
+  --s1: #ffffff;
+  --s2: #f4f6fc;
+  --s3: #eaecf4;
+  --s4: #e0e3ef;
+  --s5: #d5d9e8;
+  --faint: #c5c9d8;
+  --white: #111827;
+  --ink: #1f2334;
+  --ink2: #4b5268;
+  --muted: #7c859e;
+  --border: rgba(0, 0, 0, 0.08);
+  --border2: rgba(0, 0, 0, 0.14);
+  --red: #c81919;
+  --red-h: #a31414;
+  --rl: rgba(200, 25, 25, 0.07);
+  --rb: rgba(200, 25, 25, 0.18);
+  --green: #15803d;
+  --gl: rgba(21, 128, 61, 0.09);
+  --gb: rgba(21, 128, 61, 0.22);
+  --amber: #b45309;
+  --al: rgba(180, 83, 9, 0.09);
+  --ab: rgba(180, 83, 9, 0.22);
+  --blue: #1d4ed8;
+  --bl: rgba(29, 78, 216, 0.09);
+  --bb: rgba(29, 78, 216, 0.22);
+  --purple: #6d28d9;
+  --pl: rgba(109, 40, 217, 0.09);
+  --pb: rgba(109, 40, 217, 0.22);
+  --orange: #c2410c;
+  --ol: rgba(194, 65, 12, 0.09);
+  --ob: rgba(194, 65, 12, 0.22);
+  --cyan: #0369a1;
+  --cl: rgba(3, 105, 161, 0.09);
+  --cb: rgba(3, 105, 161, 0.22);
+  --nav: 352px;
+  --row-hover: rgba(15, 23, 42, 0.06);
+  --row-active: rgba(15, 23, 42, 0.09);
 }
 
 [data-theme="light"] {

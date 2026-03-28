@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ExternalLink } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { api, fetchAllPages } from "@/lib/api";
 import type { InventorySupplier } from "@/types/inventory";
 import { PanelDatePicker } from "@/components/panel/PanelDatePicker";
@@ -57,6 +58,13 @@ function formatMoney(v: string | number | null | undefined): string {
   return n.toLocaleString("pl-PL", { maximumFractionDigits: 2 });
 }
 
+function supplierWebsiteHref(url: string | null | undefined): string | null {
+  const t = (url ?? "").trim();
+  if (!t) return null;
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://${t}`;
+}
+
 export function RepairPartsSection({
   repairId,
   token,
@@ -74,7 +82,6 @@ export function RepairPartsSection({
 
   // Form state
   const [quantity, setQuantity] = useState<string>("1");
-  const [unitPriceUsed, setUnitPriceUsed] = useState<string>("");
   const [purchaseCost, setPurchaseCost] = useState<string>("");
   const [formPipeline, setFormPipeline] = useState<FormPipelineKey>("to_order");
   const [notes, setNotes] = useState<string>("");
@@ -117,7 +124,6 @@ export function RepairPartsSection({
 
   const resetForm = () => {
     setQuantity("1");
-    setUnitPriceUsed("");
     setPurchaseCost("");
     setFormPipeline("to_order");
     setExpectedArrivalDate("");
@@ -151,6 +157,13 @@ export function RepairPartsSection({
     };
   }, [token]);
 
+  const selectedSupplier = useMemo(
+    () =>
+      supplierId ? suppliers.find((s) => String(s.id) === String(supplierId)) ?? null : null,
+    [suppliers, supplierId],
+  );
+  const supplierLinkHref = selectedSupplier ? supplierWebsiteHref(selectedSupplier.website_url) : null;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
@@ -163,15 +176,14 @@ export function RepairPartsSection({
     }
 
     const q = Number(quantity);
-    const unit = Number(unitPriceUsed.trim());
-    const cost = purchaseCost.trim() === "" ? null : Number(purchaseCost);
+    const unit = Number(purchaseCost.trim());
 
     if (!Number.isFinite(q) || q <= 0) {
       setFormError("Ilość musi być liczbą większą od 0.");
       return;
     }
     if (!Number.isFinite(unit) || unit <= 0) {
-      setFormError("Cena jednostkowa musi być liczbą większą od 0.");
+      setFormError("Cena zakupu (jedn.) musi być liczbą większą od 0.");
       return;
     }
 
@@ -182,7 +194,7 @@ export function RepairPartsSection({
         custom_part_name: name,
         supplier: supplierId,
         quantity: q,
-        purchase_cost: cost,
+        purchase_cost: unit,
         unit_price_used: unit,
         usage_status,
         order_status,
@@ -207,54 +219,39 @@ export function RepairPartsSection({
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h3 className="text-sm font-semibold text-white">Części w naprawie</h3>
-          <p className="mt-1 text-sm text-[#9ca3af]">
-            Zamawianie części, lista pozycji i rozliczenie (zakup i cena dla klienta).
-          </p>
-        </div>
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={() => resetForm()}
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+          className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
         >
           Wyczyść formularz
         </button>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-[#0b0c10] p-4">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Zamawianie części</h4>
-            <p className="mt-1 text-xs text-[#6b7280]">
-              Statusy zgodne z kartą „Status części” na dashboardzie (do zamówienia / w drodze / dotarła).
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="md:col-span-2">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Nazwa części
             </label>
             <input
               value={partName}
               onChange={(ev) => setPartName(ev.target.value)}
               placeholder="Np. LCD A56 ORG"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
               autoComplete="off"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Hurtownia
             </label>
             <select
               value={supplierId ?? ""}
               onChange={(e) => setSupplierId(e.target.value || null)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
             >
               <option value="">— wybierz hurtownię —</option>
               {suppliers.map((s) => (
@@ -263,59 +260,61 @@ export function RepairPartsSection({
                 </option>
               ))}
             </select>
+            {supplierLinkHref ? (
+              <a
+                href={supplierLinkHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-[#3b82f6] transition hover:text-[#60a5fa] hover:underline"
+              >
+                Strona hurtowni
+                <ExternalLink size={14} className="opacity-90" aria-hidden />
+              </a>
+            ) : selectedSupplier ? (
+              <p className="mt-2 text-xs text-[var(--muted)]">
+                Brak zapisanego linku do strony — uzupełnij pole „link do hurtowni” przy edycji dostawcy.
+              </p>
+            ) : null}
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Ilość</label>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Ilość</label>
             <input
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               inputMode="decimal"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
-              Cena zakupu (części)
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
+              Cena zakupu (jedn.)
             </label>
             <input
               value={purchaseCost}
               onChange={(e) => setPurchaseCost(e.target.value)}
               inputMode="decimal"
-              placeholder="Opcjonalnie"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
-              Cena jedn. dla klienta
-            </label>
-            <input
-              value={unitPriceUsed}
-              onChange={(e) => setUnitPriceUsed(e.target.value)}
-              inputMode="decimal"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Kiedy ma dotrzeć (plan)
             </label>
             <PanelDatePicker value={expectedArrivalDate} onChange={setExpectedArrivalDate} />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Status części
             </label>
             <select
               value={formPipeline}
               onChange={(e) => setFormPipeline(e.target.value as FormPipelineKey)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
             >
               <option value="to_order">Do zamówienia</option>
               <option value="in_transit">W drodze</option>
@@ -324,12 +323,12 @@ export function RepairPartsSection({
           </div>
 
           <div className="md:col-span-2">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">Notatka</label>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Notatka</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Np. doprecyzowanie zamówienia…"
-              className="min-h-[72px] w-full resize-y rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]"
+              className="min-h-[72px] w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
             />
           </div>
 
@@ -351,32 +350,32 @@ export function RepairPartsSection({
         </form>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-[#0b0c10] p-4">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex items-center justify-between gap-3">
-          <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Użycia części</h4>
-          {loadingUsages && <span className="text-xs text-[#9ca3af]">Ładowanie…</span>}
+          <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">Użycia części</h4>
+          {loadingUsages && <span className="text-xs text-[var(--ink2)]">Ładowanie…</span>}
         </div>
 
         {usagesError && <p className="mt-3 text-sm text-[#fca5a5]">{usagesError}</p>}
         {!usagesError && !loadingUsages && usages.length === 0 && (
-          <p className="mt-3 text-sm text-[#6b7280]">Brak użyć części w tej naprawie.</p>
+          <p className="mt-3 text-sm text-[var(--muted)]">Brak użyć części w tej naprawie.</p>
         )}
 
         <div className="mt-4 space-y-3">
           {usages.map((u) => (
-            <div key={u.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
+            <div key={u.id} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-[220px]">
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-[var(--white)]">
                     {partUsageDisplayName(u)}{" "}
-                    {u.part?.code ? <span className="text-[#9ca3af]">({u.part.code})</span> : null}
+                    {u.part?.code ? <span className="text-[var(--ink2)]">({u.part.code})</span> : null}
                   </p>
-                  <p className="mt-1 text-sm text-[#9ca3af]">Ilość: {u.quantity}</p>
+                  <p className="mt-1 text-sm text-[var(--ink2)]">Ilość: {u.quantity}</p>
                   {u.supplier_detail?.name ? (
-                    <p className="mt-1 text-xs text-[#9ca3af]">Hurtownia: {u.supplier_detail.name}</p>
+                    <p className="mt-1 text-xs text-[var(--ink2)]">Hurtownia: {u.supplier_detail.name}</p>
                   ) : null}
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] text-[#6b7280]">Planowana dostawa</span>
+                    <span className="text-[11px] text-[var(--muted)]">Planowana dostawa</span>
                     <PanelDatePicker
                       compact
                       value={u.expected_arrival_date?.slice(0, 10) ?? ""}
@@ -388,10 +387,10 @@ export function RepairPartsSection({
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Status</p>
-                  <p className="mt-1 text-sm font-semibold text-white">{u.usage_status_display}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink2)]">Status</p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--white)]">{u.usage_status_display}</p>
                   {u.order_status_display ? (
-                    <p className="mt-0.5 text-xs text-[#9ca3af]">Zamówienie: {u.order_status_display}</p>
+                    <p className="mt-0.5 text-xs text-[var(--ink2)]">Zamówienie: {u.order_status_display}</p>
                   ) : null}
                 </div>
               </div>
@@ -416,8 +415,8 @@ export function RepairPartsSection({
                         }}
                         className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition ${
                           active
-                            ? "border-[#3b82f6]/50 bg-[#3b82f6]/20 text-white"
-                            : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                            ? "border-[#3b82f6]/50 bg-[#3b82f6]/20 text-[var(--white)]"
+                            : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                         } disabled:opacity-50`}
                       >
                         {step.label}
@@ -429,7 +428,7 @@ export function RepairPartsSection({
 
               {(u.usage_status === "arrived" || u.usage_status === "used" || u.usage_status === "unused") && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="mr-1 self-center text-[11px] text-[#6b7280]">Po dostawie:</span>
+                  <span className="mr-1 self-center text-[11px] text-[var(--muted)]">Po dostawie:</span>
                   {(
                     [
                       { label: "Użyta", v: "used" as const },
@@ -447,7 +446,7 @@ export function RepairPartsSection({
                       className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition ${
                         u.usage_status === v
                           ? "border-emerald-500/40 bg-emerald-500/15 text-[#a7f3d0]"
-                          : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                          : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                       } disabled:opacity-50`}
                     >
                       {label}
@@ -458,18 +457,18 @@ export function RepairPartsSection({
 
               <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
                 <div>
-                  <p className="text-xs text-[#9ca3af]">Cena zastosowana</p>
-                  <p className="text-sm text-white">
+                  <p className="text-xs text-[var(--ink2)]">Cena zastosowana</p>
+                  <p className="text-sm text-[var(--white)]">
                     {formatMoney(u.unit_price_used)} {u.part?.unit ?? ""}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#9ca3af]">Koszt zakupu (opcjonalnie)</p>
-                  <p className="text-sm text-white">{u.purchase_cost ? formatMoney(u.purchase_cost) : "–"}</p>
+                  <p className="text-xs text-[var(--ink2)]">Koszt zakupu (opcjonalnie)</p>
+                  <p className="text-sm text-[var(--white)]">{u.purchase_cost ? formatMoney(u.purchase_cost) : "–"}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#9ca3af]">Suma</p>
-                  <p className="text-sm font-semibold text-white">{formatMoney(u.total)}</p>
+                  <p className="text-xs text-[var(--ink2)]">Suma</p>
+                  <p className="text-sm font-semibold text-[var(--white)]">{formatMoney(u.total)}</p>
                 </div>
               </div>
 

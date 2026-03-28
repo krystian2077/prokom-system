@@ -55,8 +55,8 @@ export function PanelDatePicker({ value, onChange, disabled, compact }: PanelDat
   const endMonth = new Date(now.getFullYear() + 6, 11, 31);
 
   const btnClass = compact
-    ? "flex min-w-[9.5rem] items-center justify-between gap-2 rounded-lg border border-white/10 bg-[#0c0d12] px-2 py-1 text-left text-xs text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
-    : "flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50";
+    ? "flex min-w-[9.5rem] items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-[var(--s1)] px-2 py-1 text-left text-xs text-[var(--white)] transition hover:bg-[var(--row-active)] disabled:cursor-not-allowed disabled:opacity-50"
+    : "flex w-full items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-left text-sm text-[var(--white)] transition hover:bg-[var(--row-active)] disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
     <div className="relative" ref={rootRef}>
@@ -68,13 +68,13 @@ export function PanelDatePicker({ value, onChange, disabled, compact }: PanelDat
         aria-haspopup="dialog"
         className={btnClass}
       >
-        <span className={selected ? "truncate text-white" : "truncate text-[#6b7280]"}>{label}</span>
-        <CalendarDays className="h-4 w-4 shrink-0 text-[#9ca3af]" aria-hidden />
+        <span className={selected ? "truncate text-[var(--white)]" : "truncate text-[var(--muted)]"}>{label}</span>
+        <CalendarDays className="h-4 w-4 shrink-0 text-[var(--ink2)]" aria-hidden />
       </button>
 
       {open ? (
         <div
-          className="panel-date-picker-popover absolute left-0 top-full z-[80] mt-2 min-w-[min(100vw-2rem,20rem)] rounded-2xl border border-white/10 bg-[#0f1117] p-3 shadow-2xl shadow-black/60"
+          className="panel-date-picker-popover absolute left-0 top-full z-[80] mt-2 min-w-[min(100vw-2rem,20rem)] rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3 shadow-2xl shadow-black/60"
           role="dialog"
           aria-label="Kalendarz — wybór daty"
         >
@@ -93,10 +93,10 @@ export function PanelDatePicker({ value, onChange, disabled, compact }: PanelDat
             defaultMonth={selected ?? now}
           />
           {selected ? (
-            <div className="mt-2 flex justify-end border-t border-white/10 pt-2">
+            <div className="mt-2 flex justify-end border-t border-[var(--border)] pt-2">
               <button
                 type="button"
-                className="text-xs font-semibold text-[#9ca3af] transition hover:text-white"
+                className="text-xs font-semibold text-[var(--ink2)] transition hover:text-[var(--white)]"
                 onClick={() => {
                   onChange("");
                   setOpen(false);

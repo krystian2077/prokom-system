@@ -3,8 +3,11 @@
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { WorkerPanelThemeProvider } from "@/contexts/WorkerPanelThemeContext";
 import { AdminSidebar } from "@/components/panel/AdminSidebar";
 import { PanelTopbar } from "@/components/panel/PanelTopbar";
+import { StaffPanelShell } from "@/components/panel/StaffPanelShell";
+import { StaffLoginChrome } from "@/components/panel/StaffLoginChrome";
 import { WorkerStatusModalRoot } from "@/components/panel/WorkerStatusModalRoot";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { ToastContainer } from "@/components/ui/Toast";
@@ -31,25 +34,26 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
   }, [user, loading, router, pathname, isLoginPage]);
 
   return (
-    <div className="min-h-screen bg-[#07080c] text-white">
+    <WorkerPanelThemeProvider>
       {isLoginPage ? (
-        children
+        <StaffLoginChrome>{children}</StaffLoginChrome>
       ) : (
-        <ConfirmProvider>
-          <ToastContainer />
-          <div className="flex min-h-screen">
-            <AdminSidebar />
-            <div className="flex min-w-0 flex-1 flex-col">
-              <PanelTopbar />
-              <div className="min-w-0 flex-1">
-                <WorkerStatusModalRoot />
-                {children}
+        <StaffPanelShell>
+          <ConfirmProvider>
+            <ToastContainer />
+            <div className="flex min-h-screen">
+              <AdminSidebar />
+              <div className="flex min-w-0 flex-1 flex-col">
+                <PanelTopbar />
+                <div className="min-w-0 flex-1">
+                  <WorkerStatusModalRoot />
+                  {children}
+                </div>
               </div>
             </div>
-          </div>
-        </ConfirmProvider>
+          </ConfirmProvider>
+        </StaffPanelShell>
       )}
-    </div>
+    </WorkerPanelThemeProvider>
   );
 }
-

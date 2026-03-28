@@ -1,10 +1,23 @@
 """Serializery dla RepairRequest."""
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from apps.common.enums import RepairStatus
 from apps.common.utils import get_public_repair_status
 from ..models import RepairRequest, RepairImage
 from apps.clients.serializers import ClientListSerializer
+from apps.clients.serializers.address import ClientAddressSerializer
 from apps.devices.serializers import DeviceListSerializer
+
+User = get_user_model()
+
+
+class AssignedStaffMiniSerializer(serializers.ModelSerializer):
+    """Przypisany pracownik w liście napraw (imię / „JA” po stronie frontu)."""
+
+    class Meta:
+        model = User
+        fields = ("id", "email", "first_name", "last_name")
+        read_only_fields = fields
 
 
 class RelatedComplaintWarrantySerializer(serializers.ModelSerializer):
@@ -39,6 +52,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
     complaint_warranty_status_display = serializers.SerializerMethodField()
     parent_repair_number = serializers.SerializerMethodField()
     created_by_label = serializers.SerializerMethodField()
+    client_phone = serializers.SerializerMethodField()
+    assigned_to = AssignedStaffMiniSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = RepairRequest
@@ -73,10 +88,24 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "parent_repair_number",
             "created_by_label",
             "created_at",
+            "accepted_at",
+            "estimated_cost",
+            "final_cost",
+            "client_phone",
         ]
 
     def get_client_name(self, obj):
         return obj.client.get_full_name()
+
+    def get_client_phone(self, obj):
+        c = obj.client
+        if not c:
+            return None
+        primary = (getattr(c, "phone", None) or "").strip()
+        if primary:
+            return primary
+        company = (getattr(c, "company_phone", None) or "").strip()
+        return company or None
 
     def get_device_name(self, obj):
         return obj.device.get_device_name()
@@ -189,11 +218,14 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     """Pełny serializer zgłoszenia naprawy (szczegóły)."""
     client = ClientListSerializer(read_only=True)
     device = DeviceListSerializer(read_only=True)
+    delivery_address = ClientAddressSerializer(read_only=True, allow_null=True)
+    return_address = ClientAddressSerializer(read_only=True, allow_null=True)
     client_name = serializers.SerializerMethodField()
     device_name = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     priority_display = serializers.CharField(source="get_priority_display", read_only=True)
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
+    source_display = serializers.CharField(source="get_source_display", read_only=True)
     public_status = serializers.SerializerMethodField()
     estimated_duration_display = serializers.SerializerMethodField()
     is_overdue = serializers.BooleanField(read_only=True)
@@ -207,6 +239,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     hammer_glass_offers = serializers.SerializerMethodField()
     accessory_choose_for_me = serializers.SerializerMethodField()
     accessory_wishlist = serializers.SerializerMethodField()
+    accessory_selection_summary = serializers.SerializerMethodField()
+    device_accessories_included = serializers.SerializerMethodField()
     related_complaints_warranties = serializers.SerializerMethodField()
     auto_tags = serializers.SerializerMethodField()
     waiting_for_client_days = serializers.SerializerMethodField()
@@ -252,6 +286,7 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "final_cost",
             "internal_notes",
             "source",
+            "source_display",
             "is_incomplete",
             "parent_repair",
             "repair_type",
@@ -285,6 +320,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "hammer_glass_interest",
             "accessory_choose_for_me",
             "accessory_wishlist",
+            "accessory_selection_summary",
+            "device_accessories_included",
             "client_notes",
             "device_turns_on",
             "visual_condition_description",
@@ -361,6 +398,33 @@ class RepairRequestSerializer(serializers.ModelSerializer):
         if interest and getattr(interest, "note", None) and interest.note.strip():
             return interest.note.strip()
         return None
+
+    def get_accessory_selection_summary(self, obj):
+        """Skrót z formularza: wybrane produkty + „dobierz za mnie”."""
+        if not obj.id or not getattr(obj, "accessory_interests", None):
+            return None
+        parts = []
+        for i in (
+            obj.accessory_interests.filter(source="client")
+            .select_related("product")
+            .order_by("created_at")
+        ):
+            if i.choose_for_me and i.product_id is None:
+                if (i.note or "").strip():
+                    parts.append(f"Dobierz za mnie: {i.note.strip()}")
+                else:
+                    parts.append("Dobierz za mnie")
+            elif i.product_id and i.product:
+                parts.append(i.product.name)
+        return " · ".join(parts) if parts else None
+
+    def get_device_accessories_included(self, obj):
+        """Tekst „dołączone akcesoria” z karty urządzenia (przyjęcie / formularz)."""
+        dev = getattr(obj, "device", None)
+        if not dev:
+            return None
+        text = (getattr(dev, "accessories_included", None) or "").strip()
+        return text or None
 
     def get_related_complaints_warranties(self, obj):
         """Powiązane reklamacje i gwarancje (dla naprawy źródłowej)."""

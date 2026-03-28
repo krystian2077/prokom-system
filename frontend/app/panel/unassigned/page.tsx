@@ -10,7 +10,7 @@ export default function UnassignedPage() {
     <Suspense
       fallback={
         <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-          <div className="rounded-3xl border border-white/10 bg-[#0f1117] p-4">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
             <RepairTableSkeleton rows={8} />
           </div>
         </main>

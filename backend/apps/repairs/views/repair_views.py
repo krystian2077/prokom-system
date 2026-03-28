@@ -39,6 +39,7 @@ from apps.repairs.serializers.quick_actions import (
     AssignRepairSerializer,
     QuoteRespondSerializer,
     QuickAcceptSerializer,
+    QuickComplaintWarrantySerializer,
     MarkPackageReceivedSerializer,
     ClientRepairMessageCreateSerializer,
     SendClientEmailSerializer,
@@ -60,7 +61,7 @@ from apps.repairs.services import (
     change_repair_status,
     assign_repair,
 )
-from apps.repairs.services.repair_creation import quick_accept_repair
+from apps.repairs.services.repair_creation import quick_accept_repair, quick_complaint_warranty_intake
 from apps.repairs.services.assignment_suggest import suggest_assignment
 from apps.repairs.services.messaging import (
     merge_repair_thread_items,
@@ -185,7 +186,9 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         """
         POST /api/v1/repairs/quick-accept/
         Szybkie przyjęcie (prokom.md): minimalne dane, is_incomplete=True, source=in_person.
-        Body: problem_description + (client_id i device_id) LUB (first_name, last_name, phone, email, device_category [, device_model_name]).
+        Body: problem_description +
+          (client_id + device_id) LUB (client_id + device_category — nowe urządzenie) LUB
+          (first_name, last_name, phone, device_category [, email, device_model_name]).
         """
         ser = QuickAcceptSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -202,6 +205,68 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
                 email=data.get("email") or None,
                 device_category=data.get("device_category"),
                 device_model_name=data.get("device_model_name") or None,
+                manual_brand=data.get("manual_brand") or None,
+                device_color=data.get("device_color") or None,
+                visual_condition=data.get("visual_condition") or None,
+                device_password=data.get("device_password") or None,
+                accessory_etui=data.get("accessory_etui") or False,
+                accessory_sim=data.get("accessory_sim") or False,
+                accessory_charger=data.get("accessory_charger") or False,
+                accessory_cable=data.get("accessory_cable") or False,
+                accessory_box=data.get("accessory_box") or False,
+                internal_notes=data.get("internal_notes") or None,
+                estimated_cost=data.get("estimated_cost"),
+                estimated_completion_date=data.get("estimated_completion_date"),
+                assigned_to_id=data.get("assigned_to_id"),
+                unassigned_explicit=data.get("unassigned_explicit") or False,
+                send_confirmation_email=data.get("send_confirmation_email") or False,
+                hammer_glass_interest=data.get("hammer_glass_interest"),
+            )
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            RepairRequestSerializer(repair).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    @action(detail=False, methods=["post"], url_path="quick-complaint-warranty", permission_classes=[IsStaffOrAdmin])
+    def quick_complaint_warranty(self, request):
+        """
+        POST /api/v1/repairs/quick-complaint-warranty/
+        Przyjęcie reklamacji lub gwarancji (stacjonarne).
+        """
+        ser = QuickComplaintWarrantySerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.validated_data
+        try:
+            repair = quick_complaint_warranty_intake(
+                created_by_id=request.user.id,
+                repair_type=data["repair_type"],
+                problem_description=data["problem_description"],
+                parent_repair_id=data.get("parent_repair_id"),
+                parent_repair_number=data.get("parent_repair_number") or None,
+                first_name=data.get("first_name") or None,
+                last_name=data.get("last_name") or None,
+                phone=data.get("phone") or None,
+                email=data.get("email") or None,
+                device_category=data.get("device_category"),
+                device_model_name=data.get("device_model_name") or None,
+                manual_brand=data.get("manual_brand") or None,
+                device_color=data.get("device_color") or None,
+                visual_condition=data.get("visual_condition") or None,
+                device_password=data.get("device_password") or None,
+                accessory_etui=data.get("accessory_etui") or False,
+                accessory_sim=data.get("accessory_sim") or False,
+                accessory_charger=data.get("accessory_charger") or False,
+                accessory_cable=data.get("accessory_cable") or False,
+                accessory_box=data.get("accessory_box") or False,
+                internal_notes=data.get("internal_notes") or None,
+                estimated_cost=data.get("estimated_cost"),
+                estimated_completion_date=data.get("estimated_completion_date"),
+                assigned_to_id=data.get("assigned_to_id"),
+                unassigned_explicit=data.get("unassigned_explicit") or False,
+                send_confirmation_email=data.get("send_confirmation_email") or False,
+                hammer_glass_interest=data.get("hammer_glass_interest"),
             )
         except ValueError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -479,24 +544,44 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         """
         POST /api/v1/repairs/<id>/assign/
         Admin: może przypisać do dowolnego pracownika (assigned_to_id w body).
-        Staff: może tylko przypisać do siebie (body ignorowane).
+        Staff: bez body — do siebie; z assigned_to_id — do innego aktywnego pracownika lub administratora.
         """
         from django.contrib.auth import get_user_model
         repair = self.get_object()
         ser = AssignRepairSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         notes = ser.validated_data.get("notes", "")
+        User = get_user_model()
+
+        def _resolve_assignee(assigned_to_id):
+            assignee = User.objects.filter(pk=assigned_to_id).first()
+            if not assignee or getattr(assignee, "role", None) not in ("staff", "admin"):
+                return None, Response(
+                    {"detail": "Przypisanie tylko do pracownika lub administratora."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not assignee.is_active:
+                return None, Response(
+                    {"detail": "Wybrany użytkownik jest nieaktywny."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            return assignee, None
+
         if getattr(request.user, "role", None) == "admin":
             assigned_to_id = ser.validated_data.get("assigned_to_id") or request.user.id
             if assigned_to_id:
-                assignee = get_user_model().objects.filter(pk=assigned_to_id).first()
-                if not assignee or getattr(assignee, "role", None) not in ("staff", "admin"):
-                    return Response(
-                        {"detail": "Przypisanie tylko do pracownika lub administratora."},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+                assignee, err = _resolve_assignee(assigned_to_id)
+                if err:
+                    return err
         else:
-            assigned_to_id = request.user.id
+            assigned_to_param = ser.validated_data.get("assigned_to_id")
+            if assigned_to_param:
+                assignee, err = _resolve_assignee(assigned_to_param)
+                if err:
+                    return err
+                assigned_to_id = assignee.id
+            else:
+                assigned_to_id = request.user.id
         assign_repair(repair, assigned_to_id=assigned_to_id, assigned_by_id=request.user.id, notes=notes)
         from apps.accounts.services.notification_service import notify_repair_assigned
         notify_repair_assigned(repair, assigned_to_id)

@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ExternalLink, Package, Phone, RefreshCw } from "lucide-react";
+import { ExternalLink, Package, Pencil, Phone, Plus, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchAllPages } from "@/lib/api";
-import type { InventorySupplier, PartUsageQueueItem } from "@/types/inventory";
+import { api, fetchAllPages } from "@/lib/api";
+import type { InventorySupplier, InventorySupplierDetail, PartUsageQueueItem } from "@/types/inventory";
+import { SupplierFormModal } from "@/components/panel/SupplierFormModal";
+import { useStore } from "@/store";
 import { partUsageDisplayName } from "@/types/repairs";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -34,21 +36,6 @@ const FILTER_TABS: Array<{ key: PartsFilter; label: string }> = [
   { key: "unused", label: "Niewykorzystane" },
 ];
 
-type SupplierCardRow = {
-  id: string;
-  name: string;
-  website_url: string;
-  phone: string | null;
-  email: string | null;
-  leadDays: number | null;
-};
-
-const SUPPLIER_FALLBACK: SupplierCardRow[] = [
-  { id: "a", name: "Dostawca A - GSM Parts PL", website_url: "https://gsm-parts.pl", phone: null, email: null, leadDays: 1 },
-  { id: "b", name: "Dostawca B - MobileHub", website_url: "https://mobilehub.example", phone: null, email: null, leadDays: 2 },
-  { id: "c", name: "Dostawca C - iTech Supply", website_url: "https://itech-supply.example", phone: null, email: null, leadDays: 3 },
-];
-
 function mapQueueItemToRow(q: PartUsageQueueItem): PartRow {
   const status = (q.usage_status ?? "").toLowerCase();
   return {
@@ -68,9 +55,9 @@ function statusBadgeClass(status: string): string {
   const s = (status ?? "").toLowerCase();
   if (s === "arrived") return "border-[var(--gb)] bg-[var(--gl)] text-[var(--green)] animate-glow-g";
   if (s === "ordered") return "border-[#f59e0b]/40 bg-[#f59e0b]/10 text-[#ffe3b0]";
-  if (s === "used") return "border-white/20 bg-white/10 text-[#d1d5db]";
-  if (s === "unused") return "border-white/20 bg-white/10 text-[#9ca3af]";
-  return "border-white/20 bg-white/10 text-[#d1d5db]";
+  if (s === "used") return "border-white/20 bg-[var(--row-active)] text-[#d1d5db]";
+  if (s === "unused") return "border-white/20 bg-[var(--row-active)] text-[var(--ink2)]";
+  return "border-white/20 bg-[var(--row-active)] text-[#d1d5db]";
 }
 
 function statusLabel(status: string, display?: string | null): string {
@@ -91,6 +78,7 @@ function formatWebsite(url: string | null | undefined): string {
 
 export default function PartsSuppliersPage() {
   const { token, user } = useAuth();
+  const { addToast } = useStore();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -98,6 +86,9 @@ export default function PartsSuppliersPage() {
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<PartRow[]>([]);
   const [suppliers, setSuppliers] = useState<InventorySupplier[]>([]);
+  const [supplierModalOpen, setSupplierModalOpen] = useState(false);
+  const [supplierModalMode, setSupplierModalMode] = useState<"create" | "edit">("create");
+  const [editingSupplier, setEditingSupplier] = useState<InventorySupplierDetail | null>(null);
 
   const statusFilter = useMemo<PartsFilter>(() => {
     const raw = searchParams.get("status");
@@ -144,22 +135,28 @@ export default function PartsSuppliersPage() {
     return rows.filter((row) => row.status === statusFilter);
   }, [rows, statusFilter]);
 
-  const supplierCards = useMemo((): SupplierCardRow[] => {
-    if (suppliers.length > 0) {
-      return suppliers.map((s) => ({
-        id: s.id,
-        name: s.name,
-        website_url: s.website_url ?? "",
-        phone: s.phone ?? null,
-        email: s.email ?? null,
-        leadDays:
-          Number.isFinite(Number(s.average_delivery_days)) && Number(s.average_delivery_days) > 0
-            ? Number(s.average_delivery_days)
-            : null,
-      }));
+  const openCreateSupplier = () => {
+    setSupplierModalMode("create");
+    setEditingSupplier(null);
+    setSupplierModalOpen(true);
+  };
+
+  const openEditSupplier = async (s: InventorySupplier) => {
+    if (!token) return;
+    try {
+      const detail = await api.get<InventorySupplierDetail>(`/inventory/suppliers/${s.id}/`, token);
+      setSupplierModalMode("edit");
+      setEditingSupplier(detail);
+      setSupplierModalOpen(true);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : "Nie udało się wczytać hurtowni.", "error");
     }
-    return SUPPLIER_FALLBACK;
-  }, [suppliers]);
+  };
+
+  const supplierLeadDays = (s: InventorySupplier) =>
+    Number.isFinite(Number(s.average_delivery_days)) && Number(s.average_delivery_days) > 0
+      ? Number(s.average_delivery_days)
+      : null;
 
   const formatDate = (value: string) => {
     if (!value) return "—";
@@ -172,9 +169,9 @@ export default function PartsSuppliersPage() {
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Magazyn</p>
-          <h1 className="mt-2 text-2xl font-semibold text-white">Moje części</h1>
-          <p className="mt-1 text-sm text-[#6b7280]">
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Magazyn</p>
+          <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Moje części</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Kolejka z magazynu napraw (GET /inventory/parts-queue/?assigned_to=…) — wszystkie strony paginacji.
           </p>
         </div>
@@ -182,7 +179,7 @@ export default function PartsSuppliersPage() {
           type="button"
           onClick={() => void load()}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-50"
         >
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           Odśwież
@@ -196,10 +193,10 @@ export default function PartsSuppliersPage() {
       ) : null}
 
       <section className="grid gap-5 lg:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Aktywne części</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Aktywne części</h2>
+            <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-xs font-semibold text-[var(--white)]">
               {loading ? "…" : filteredRows.length}
             </span>
           </div>
@@ -213,7 +210,7 @@ export default function PartsSuppliersPage() {
                 className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                   statusFilter === t.key
                     ? "border-[#dc1e1e]/50 bg-[#dc1e1e]/15 text-white"
-                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                    : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                 }`}
               >
                 {t.label}
@@ -244,15 +241,15 @@ export default function PartsSuppliersPage() {
               {filteredRows.map((row) => {
                 const st = row.status;
                 return (
-                  <div key={row.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                  <div key={row.id} className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <Package size={16} className="shrink-0 text-[#6b7280]" />
-                          <p className="truncate text-sm font-semibold text-white">{row.partName}</p>
+                          <Package size={16} className="shrink-0 text-[var(--muted)]" />
+                          <p className="truncate text-sm font-semibold text-[var(--white)]">{row.partName}</p>
                         </div>
                         <p className="mt-1 font-mono text-xs text-[#93c5fd]">{row.repairNumber}</p>
-                        <p className="mt-1 text-xs text-[#9ca3af]">
+                        <p className="mt-1 text-xs text-[var(--ink2)]">
                           {row.deviceName} · {row.supplierName} · {formatDate(row.createdAt)}
                         </p>
                       </div>
@@ -262,7 +259,7 @@ export default function PartsSuppliersPage() {
                         </span>
                         <Link
                           href={`/panel/naprawy/${row.repairId}`}
-                          className="text-xs font-semibold text-[#9ca3af] hover:text-white"
+                          className="text-xs font-semibold text-[var(--ink2)] hover:text-[var(--white)]"
                         >
                           Otwórz naprawę
                         </Link>
@@ -275,41 +272,67 @@ export default function PartsSuppliersPage() {
           ) : null}
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Hurtownie</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
-              {loading ? "…" : supplierCards.length}
-            </span>
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Hurtownie</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-xs font-semibold text-[var(--white)]">
+                {loading ? "…" : suppliers.length}
+              </span>
+              <button
+                type="button"
+                onClick={openCreateSupplier}
+                disabled={!token}
+                className="inline-flex items-center gap-1.5 rounded-2xl border border-[var(--border)] bg-[#dc1e1e]/90 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b81818] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Plus size={14} />
+                Dodaj hurtownię
+              </button>
+            </div>
           </div>
-          <p className="mb-3 text-xs text-[#6b7280]">
-            Źródło: <span className="font-mono text-[#9ca3af]">GET /inventory/suppliers/</span>
+          <p className="mb-3 text-xs text-[var(--muted)]">
+            Lista aktywnych dostawców z magazynu — dodawanie i edycja przez pracownika (POST/PATCH).
           </p>
 
           {loading ? (
             <div className="space-y-2 py-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 animate-pulse rounded-2xl bg-white/5" />
+                <div key={i} className="h-24 animate-pulse rounded-2xl bg-[var(--row-hover)]" />
               ))}
             </div>
           ) : null}
 
           {!loading && !error && suppliers.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Brak aktywnych dostawców w bazie (lub błąd wczytywania).</p>
+            <p className="text-sm text-[var(--muted)]">
+              Brak aktywnych hurtowni. Użyj „Dodaj hurtownię”, aby zapisać nazwę, link i kontakt.
+            </p>
           ) : null}
 
-          {!loading && supplierCards.length > 0 ? (
+          {!loading && suppliers.length > 0 ? (
             <div className="space-y-2">
-              {supplierCards.map((s) => {
-                const href = s.website_url?.trim()
-                  ? s.website_url.startsWith("http")
-                    ? s.website_url
-                    : `https://${s.website_url}`
+              {suppliers.map((s) => {
+                const web = (s.website_url ?? "").trim();
+                const href = web
+                  ? web.startsWith("http")
+                    ? web
+                    : `https://${web}`
                   : null;
+                const lead = supplierLeadDays(s);
                 return (
-                  <article key={s.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
-                    <p className="text-sm font-semibold text-white">{s.name}</p>
-                    <div className="mt-2 flex flex-col gap-1.5 text-xs text-[#9ca3af]">
+                  <article key={s.id} className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="min-w-0 flex-1 text-sm font-semibold text-[var(--white)]">{s.name}</p>
+                      <button
+                        type="button"
+                        onClick={() => void openEditSupplier(s)}
+                        className="shrink-0 rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-2 text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                        title="Edytuj hurtownię"
+                        aria-label="Edytuj hurtownię"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                    </div>
+                    <div className="mt-2 flex flex-col gap-1.5 text-xs text-[var(--ink2)]">
                       {href ? (
                         <a
                           href={href}
@@ -326,19 +349,22 @@ export default function PartsSuppliersPage() {
                       {s.phone ? (
                         <a
                           href={`tel:${String(s.phone).replace(/\s/g, "")}`}
-                          className="inline-flex items-center gap-1 text-[#d1d5db] hover:text-white"
+                          className="inline-flex items-center gap-1 text-[#d1d5db] hover:text-[var(--white)]"
                         >
                           <Phone size={12} />
                           {s.phone}
                         </a>
                       ) : null}
                       {s.email ? (
-                        <a href={`mailto:${s.email}`} className="text-[#d1d5db] hover:text-white">
+                        <a href={`mailto:${s.email}`} className="text-[#d1d5db] hover:text-[var(--white)]">
                           {s.email}
                         </a>
                       ) : null}
+                      {!s.phone && !s.email ? (
+                        <span className="text-[var(--muted)]">Kontakt: —</span>
+                      ) : null}
                       <p className="mt-1 text-[11px] font-semibold text-[#d1d5db]">
-                        Czas dostawy: {s.leadDays != null ? `${s.leadDays} dni` : "—"}
+                        Czas dostawy: {lead != null ? `${lead} dni` : "—"}
                       </p>
                     </div>
                   </article>
@@ -348,6 +374,15 @@ export default function PartsSuppliersPage() {
           ) : null}
         </div>
       </section>
+
+      <SupplierFormModal
+        open={supplierModalOpen}
+        mode={supplierModalMode}
+        initial={editingSupplier}
+        token={token}
+        onClose={() => setSupplierModalOpen(false)}
+        onSaved={() => void load()}
+      />
     </main>
   );
 }

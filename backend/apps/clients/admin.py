@@ -188,6 +188,7 @@ class ClientAddressAdmin(admin.ModelAdmin):
 
     def full_address(self, obj):
         """Pełny adres."""
-        return f"{obj.street}, {obj.postal_code} {obj.city}"
+        line = f"{obj.street} {obj.house_number}".strip() if obj.house_number else obj.street
+        return f"{line}, {obj.postal_code} {obj.city}"
     full_address.short_description = "Adres"
 

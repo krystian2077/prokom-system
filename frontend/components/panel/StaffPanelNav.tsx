@@ -58,12 +58,12 @@ export function StaffPanelNav() {
         <div className="flex items-center gap-2">
           <Link
             href="/panel/dashboard"
-            className="text-lg font-bold text-white"
+            className="text-lg font-bold text-[var(--white)]"
             style={{ fontFamily: "var(--font-unbounded, inherit)" }}
           >
             PRO-KOM
           </Link>
-          <span className="text-xs uppercase tracking-[0.15em] text-[#9ca3af]">
+          <span className="text-xs uppercase tracking-[0.15em] text-[var(--ink2)]">
             {panelLabel}
           </span>
         </div>
@@ -105,7 +105,7 @@ export function StaffPanelNav() {
               {user.first_name || user.email}
             </span>
             <span
-              className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-bold text-[var(--white)]"
               style={{
                 background: "linear-gradient(135deg, var(--red, #dc1e1e), var(--red-h, #b81818))",
               }}
@@ -122,7 +122,7 @@ export function StaffPanelNav() {
             </button>
           </>
         ) : (
-          <div className="h-5 w-20 rounded bg-white/10" />
+          <div className="h-5 w-20 rounded bg-[var(--row-active)]" />
         )}
       </div>
     </nav>

@@ -76,25 +76,42 @@ def staff_repairs_today_to_contact(user_id):
     )
 
 
+# Jak frontend/lib/repairListDisplay.ts — IN_REPAIR_PILL_STATUSES + etap testów po naprawie.
+IN_REPAIR_KPI_STATUSES = [
+    RepairStatus.ACCEPTED,
+    RepairStatus.IN_DIAGNOSTICS,
+    RepairStatus.DIAGNOSTICS_DONE,
+    RepairStatus.QUOTE_PENDING,
+    RepairStatus.QUOTE_SENT,
+    RepairStatus.QUOTE_ACCEPTED,
+    RepairStatus.QUOTE_REJECTED,
+    RepairStatus.WAITING_FOR_PARTS,
+    RepairStatus.IN_REPAIR,
+    RepairStatus.REPAIR_DONE,
+    RepairStatus.IN_TESTING,
+    RepairStatus.TESTING_FAILED,
+    RepairStatus.TESTING_PASSED,
+]
+
+
 def staff_repairs_my_in_progress(user_id):
-    """Moje w toku (bez new, accepted, quote_sent, ready, finished)."""
-    in_progress_statuses = [
-        RepairStatus.IN_DIAGNOSTICS,
-        RepairStatus.DIAGNOSTICS_DONE,
-        RepairStatus.QUOTE_PENDING,
-        RepairStatus.QUOTE_ACCEPTED,
-        RepairStatus.WAITING_FOR_PARTS,
-        RepairStatus.IN_REPAIR,
-        RepairStatus.REPAIR_DONE,
-        RepairStatus.IN_TESTING,
-        RepairStatus.TESTING_FAILED,
-        RepairStatus.TESTING_PASSED,
-    ]
+    """Moje w fazie roboczej (jak pigułka „W naprawie” na liście + testy końcowe)."""
     return (
         _base_qs()
-        .filter(assigned_to_id=user_id, status__in=in_progress_statuses)
+        .filter(assigned_to_id=user_id, status__in=IN_REPAIR_KPI_STATUSES)
         .order_by("-updated_at")
     )
+
+
+def staff_in_repair_kpi_count(user_id: int, *, is_admin: bool = False) -> int:
+    """
+    Liczba napraw „w trakcie” na KPI dashboardu.
+    Staff: tylko przypisane do użytkownika. Admin: cały warsztat (jak /staff/repairs/ bez filtra).
+    """
+    qs = _base_qs().filter(status__in=IN_REPAIR_KPI_STATUSES)
+    if not is_admin:
+        qs = qs.filter(assigned_to_id=user_id)
+    return qs.count()
 
 
 def staff_repairs_my_overdue(user_id):

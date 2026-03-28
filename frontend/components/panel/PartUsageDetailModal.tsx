@@ -86,74 +86,74 @@ export function PartUsageDetailModal({
         aria-label="Zamknij"
         onClick={onClose}
       />
-      <div className="relative z-10 m-4 max-h-[min(92vh,880px)] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#0f1117] p-5 shadow-xl sm:max-w-2xl">
+      <div className="relative z-10 m-4 max-h-[min(92vh,880px)] w-full max-w-lg overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5 shadow-xl sm:max-w-2xl">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9ca3af]">Pozycja w naprawie</p>
-            <h3 className="mt-1 text-lg font-semibold text-white">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Pozycja w naprawie</p>
+            <h3 className="mt-1 text-lg font-semibold text-[var(--white)]">
               {partUsageDisplayName(usageRow)}{" "}
-              {usageRow.part?.code ? <span className="text-[#9ca3af]">({usageRow.part.code})</span> : null}
+              {usageRow.part?.code ? <span className="text-[var(--ink2)]">({usageRow.part.code})</span> : null}
             </h3>
             {usageRow.repair_number ? (
-              <p className="mt-1 font-mono text-sm text-[#9ca3af]">{usageRow.repair_number}</p>
+              <p className="mt-1 font-mono text-sm text-[var(--ink2)]">{usageRow.repair_number}</p>
             ) : null}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/10 p-2 text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
+            className="rounded-xl border border-[var(--border)] p-2 text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             aria-label="Zamknij"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="mt-4 space-y-3 rounded-2xl border border-white/10 bg-[#0c0d12] p-4 text-sm">
+        <div className="mt-4 space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4 text-sm">
           <div className="grid gap-2 sm:grid-cols-2">
             <div>
-              <p className="text-xs text-[#9ca3af]">Urządzenie</p>
-              <p className="text-white">{usageRow.repair_device_name ?? "—"}</p>
+              <p className="text-xs text-[var(--ink2)]">Urządzenie</p>
+              <p className="text-[var(--white)]">{usageRow.repair_device_name ?? "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Przypisany</p>
-              <p className="text-white">{usageRow.assigned_to_name ?? "—"}</p>
+              <p className="text-xs text-[var(--ink2)]">Przypisany</p>
+              <p className="text-[var(--white)]">{usageRow.assigned_to_name ?? "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Status części</p>
-              <p className="text-white">{usageRow.usage_status_display}</p>
+              <p className="text-xs text-[var(--ink2)]">Status części</p>
+              <p className="text-[var(--white)]">{usageRow.usage_status_display}</p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Status zamówienia</p>
-              <p className="text-white">{usageRow.order_status_display ?? usageRow.order_status ?? "—"}</p>
+              <p className="text-xs text-[var(--ink2)]">Status zamówienia</p>
+              <p className="text-[var(--white)]">{usageRow.order_status_display ?? usageRow.order_status ?? "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Ilość</p>
-              <p className="text-white">{usageRow.quantity}</p>
+              <p className="text-xs text-[var(--ink2)]">Ilość</p>
+              <p className="text-[var(--white)]">{usageRow.quantity}</p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Cena jedn. / suma</p>
-              <p className="text-white">
+              <p className="text-xs text-[var(--ink2)]">Cena jedn. / suma</p>
+              <p className="text-[var(--white)]">
                 {formatMoney(usageRow.unit_price_used)} · {formatMoney(usageRow.total)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Cena zakupu (części)</p>
-              <p className="text-white">{usageRow.purchase_cost != null ? formatMoney(usageRow.purchase_cost) : "—"}</p>
+              <p className="text-xs text-[var(--ink2)]">Cena zakupu (części)</p>
+              <p className="text-[var(--white)]">{usageRow.purchase_cost != null ? formatMoney(usageRow.purchase_cost) : "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-[#9ca3af]">Planowana dostawa</p>
-              <p className="text-white">{formatPlDate(usageRow.expected_arrival_date)}</p>
+              <p className="text-xs text-[var(--ink2)]">Planowana dostawa</p>
+              <p className="text-[var(--white)]">{formatPlDate(usageRow.expected_arrival_date)}</p>
             </div>
           </div>
           {usageRow.supplier_detail?.name ? (
             <div>
-              <p className="text-xs text-[#9ca3af]">Hurtownia</p>
-              <p className="text-white">{usageRow.supplier_detail.name}</p>
+              <p className="text-xs text-[var(--ink2)]">Hurtownia</p>
+              <p className="text-[var(--white)]">{usageRow.supplier_detail.name}</p>
             </div>
           ) : null}
           {usageRow.notes ? (
             <div>
-              <p className="text-xs text-[#9ca3af]">Notatka</p>
+              <p className="text-xs text-[var(--ink2)]">Notatka</p>
               <p className="whitespace-pre-wrap text-[#e5e7eb]">{usageRow.notes}</p>
             </div>
           ) : null}
@@ -170,37 +170,37 @@ export function PartUsageDetailModal({
           </div>
         ) : null}
 
-        <div className="mt-6 border-t border-white/10 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#9ca3af]">Katalog części</p>
+        <div className="mt-6 border-t border-[var(--border)] pt-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">Katalog części</p>
           {!partId ? (
-            <p className="mt-2 text-sm text-[#9ca3af]">Pozycja bez powiązania z katalogiem — brak statystyk z magazynu.</p>
+            <p className="mt-2 text-sm text-[var(--ink2)]">Pozycja bez powiązania z katalogiem — brak statystyk z magazynu.</p>
           ) : null}
-          {partId && cardLoading ? <p className="mt-2 text-sm text-[#9ca3af]">Wczytywanie karty części…</p> : null}
+          {partId && cardLoading ? <p className="mt-2 text-sm text-[var(--ink2)]">Wczytywanie karty części…</p> : null}
           {partId && cardError ? <p className="mt-2 text-sm text-[#fca5a5]">{cardError}</p> : null}
           {partId && card && !cardLoading ? (
             <div className="mt-3 space-y-2 text-sm text-[#e5e7eb]">
               <p>
-                Użyć w serwisie: <span className="font-semibold text-white">{card.usage_count}</span>
+                Użyć w serwisie: <span className="font-semibold text-[var(--white)]">{card.usage_count}</span>
               </p>
               {card.avg_purchase_cost ? (
                 <p>
                   Śr. koszt zakupu:{" "}
-                  <span className="font-mono text-white">{formatMoney(card.avg_purchase_cost)}</span>
+                  <span className="font-mono text-[var(--white)]">{formatMoney(card.avg_purchase_cost)}</span>
                 </p>
               ) : null}
               {card.last_supplier?.name ? (
                 <p>
-                  Ostatnia hurtownia: <span className="text-white">{card.last_supplier.name}</span>
+                  Ostatnia hurtownia: <span className="text-[var(--white)]">{card.last_supplier.name}</span>
                 </p>
               ) : null}
               {card.recent_repairs?.length ? (
                 <div className="mt-2">
-                  <p className="text-xs text-[#9ca3af]">Ostatnie naprawy z tą częścią</p>
+                  <p className="text-xs text-[var(--ink2)]">Ostatnie naprawy z tą częścią</p>
                   <ul className="mt-1 space-y-1">
                     {card.recent_repairs.slice(0, 5).map((r) => (
                       <li key={r.usage_id} className="flex flex-wrap gap-2 text-xs">
-                        <span className="font-mono text-[#9ca3af]">{r.repair_number ?? r.repair_id}</span>
-                        <span className="text-[#6b7280]">{r.usage_status}</span>
+                        <span className="font-mono text-[var(--ink2)]">{r.repair_number ?? r.repair_id}</span>
+                        <span className="text-[var(--muted)]">{r.usage_status}</span>
                       </li>
                     ))}
                   </ul>

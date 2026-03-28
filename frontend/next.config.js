@@ -4,6 +4,11 @@ const nextConfig = {
   async redirects() {
     return [
       { source: "/serwis-telefonow", destination: "/uslugi", permanent: true },
+      {
+        source: "/panel/podglad/:path*",
+        destination: "/panel/naprawy/:path*",
+        permanent: false,
+      },
     ];
   },
   images: {

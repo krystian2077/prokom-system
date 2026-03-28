@@ -72,13 +72,23 @@ def repair_list(
     if priority:
         qs = qs.filter(priority=priority)
     if search:
+        # Spójnie z global_search: także marka/model urządzenia (ręczny wpis i katalog).
         qs = qs.filter(
             Q(repair_number__icontains=search)
             | Q(client__first_name__icontains=search)
             | Q(client__last_name__icontains=search)
             | Q(client__email__icontains=search)
+            | Q(client__phone__icontains=search)
+            | Q(client__company_name__icontains=search)
+            | Q(client__nip__icontains=search)
             | Q(device__serial_number__icontains=search)
             | Q(device__imei__icontains=search)
+            | Q(device__model_name__icontains=search)
+            | Q(device__manual_device_name__icontains=search)
+            | Q(device__manual_brand__icontains=search)
+            | Q(device__manual_model__icontains=search)
+            | Q(device__device_model__name__icontains=search)
+            | Q(device__brand__name__icontains=search)
             | Q(problem_description__icontains=search)
         )
     tag_list = list(tags or []) if tags else ([tag] if tag else [])

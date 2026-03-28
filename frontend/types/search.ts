@@ -44,6 +44,8 @@ export type GlobalSearchRepair = {
   status: string;
   status_display: string;
   repair_type?: string | null;
+  client?: string | null;
+  device?: string | null;
   client_name?: string | null;
   device_name?: string | null;
   problem_description?: string | null;

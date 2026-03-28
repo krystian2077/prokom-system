@@ -100,6 +100,7 @@ const ERROR_FIELD_LABELS: Record<string, string> = {
   delivery_method: "Sposób dostawy",
   return_method: "Sposób zwrotu",
   delivery_street: "Ulica (dostawa)",
+  delivery_house_number: "Numer domu / lokalu (dostawa)",
   delivery_city: "Miasto (dostawa)",
   delivery_postal_code: "Kod pocztowy (dostawa)",
   delivery_country: "Kraj (dostawa)",

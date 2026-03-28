@@ -12,6 +12,7 @@ class ClientAddressSerializer(serializers.ModelSerializer):
             "id",
             "label",
             "street",
+            "house_number",
             "city",
             "postal_code",
             "country",
