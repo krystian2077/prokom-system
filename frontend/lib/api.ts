@@ -148,8 +148,11 @@ export function getErrorMessageFromBody(errBody: string, fallback = "Wystąpił 
   return fallback;
 }
 
+/** Domyślny limit czasu HTTP — zapobiega „wiszącemu” przyciskowi przy zawieszonej odpowiedzi. */
+const DEFAULT_REQUEST_TIMEOUT_MS = 90_000;
+
 async function request<T = unknown>(path: string, options: ApiOptions = {}): Promise<T> {
-  const { method = "GET", token, headers: customHeaders, ...rest } = options;
+  const { method = "GET", token, headers: customHeaders, signal: _callerSignal, ...rest } = options;
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...customHeaders,
@@ -159,7 +162,23 @@ async function request<T = unknown>(path: string, options: ApiOptions = {}): Pro
   }
 
   const url = path.startsWith("http") ? path : `${API_V1}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, { method, headers, ...rest });
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), DEFAULT_REQUEST_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(url, { method, headers, signal: controller.signal, ...rest });
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new ApiError(
+        "Przekroczono czas oczekiwania na odpowiedź serwera. Sprawdź połączenie lub odśwież stronę.",
+        0,
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!res.ok) {
     const errBody = await res.text();

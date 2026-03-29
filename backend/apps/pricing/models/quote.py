@@ -42,6 +42,12 @@ class Quote(BaseModel):
         help_text=_("Suma pozycji (aktualizowana przy zapisie)"),
     )
     sent_at = models.DateTimeField(_("wysłana"), null=True, blank=True)
+    last_client_email_sent_at = models.DateTimeField(
+        _("ostatnia kopia wyceny na e-mail klienta"),
+        null=True,
+        blank=True,
+        help_text=_("Ustawiane przy udanej wysyłce e-maila z podsumowaniem wyceny."),
+    )
     valid_until = models.DateField(_("ważna do"), null=True, blank=True)
     notes = models.TextField(_("notatki do wyceny"), blank=True)
     created_by = models.ForeignKey(
@@ -75,6 +81,12 @@ class QuoteItemType(models.TextChoices):
     PART = "part", _("Część")
     LABOUR = "labour", _("Robocizna")
     OTHER = "other", _("Inne")
+
+
+class PartOrigin(models.TextChoices):
+    """Oryginał vs zamiennik (dla pozycji z częścią)."""
+    ORIGINAL = "original", _("Oryginalna (OEM)")
+    AFTERMARKET = "aftermarket", _("Zamiennik")
 
 
 class QuoteItem(TimestampedModel):
@@ -113,8 +125,32 @@ class QuoteItem(TimestampedModel):
         blank=True,
         help_text=_("Nazwa pozycji (np. z part/labour lub dowolny tekst)"),
     )
+    part_origin = models.CharField(
+        _("część oryginalna / zamiennik"),
+        max_length=20,
+        choices=PartOrigin.choices,
+        default=PartOrigin.AFTERMARKET,
+        db_index=True,
+    )
     quantity = models.DecimalField(_("ilość"), max_digits=10, decimal_places=2, default=Decimal("1"))
-    unit_price = models.DecimalField(_("cena jedn."), max_digits=10, decimal_places=2)
+    parts_price = models.DecimalField(
+        _("cena części (jedn.)"),
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0"),
+    )
+    labour_price = models.DecimalField(
+        _("cena robocizny (jedn.)"),
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0"),
+    )
+    unit_price = models.DecimalField(
+        _("cena jedn. (suma)"),
+        max_digits=10,
+        decimal_places=2,
+        help_text=_("Części + robocizna na jednostkę; używane razem z ilością do kwoty pozycji."),
+    )
     total = models.DecimalField(_("razem"), max_digits=10, decimal_places=2, editable=False)
 
     class Meta:
@@ -126,6 +162,9 @@ class QuoteItem(TimestampedModel):
         return f"{self.get_item_type_display()}: {self.description or (self.part.name if self.part else self.labour_type.name)} — {self.total} zł"
 
     def save(self, *args, **kwargs):
+        p = self.parts_price if self.parts_price is not None else Decimal("0")
+        l = self.labour_price if self.labour_price is not None else Decimal("0")
+        self.unit_price = p + l
         self.total = self.quantity * self.unit_price
         super().save(*args, **kwargs)
         self.quote.recalculate_total()

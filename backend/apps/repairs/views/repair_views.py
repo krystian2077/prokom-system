@@ -291,6 +291,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
                 new_status=ser.validated_data["new_status"],
                 changed_by_id=request.user.id if request.user.is_authenticated else None,
                 notes=ser.validated_data.get("notes", ""),
+                skip_transition_check=True,
             )
         except ValueError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -628,6 +629,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
                     new_status=new_status,
                     changed_by_id=request.user.id,
                     notes="Odebrano paczkę z urządzeniem.",
+                    skip_transition_check=True,
                 )
             except ValueError:
                 pass

@@ -244,6 +244,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     related_complaints_warranties = serializers.SerializerMethodField()
     auto_tags = serializers.SerializerMethodField()
     waiting_for_client_days = serializers.SerializerMethodField()
+    assigned_to = AssignedStaffMiniSerializer(read_only=True, allow_null=True)
+    client_visible_quote = serializers.SerializerMethodField()
 
     class Meta:
         model = RepairRequest
@@ -326,6 +328,7 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "device_turns_on",
             "visual_condition_description",
             "client_tracking_number",
+            "client_visible_quote",
         ]
         read_only_fields = [
             "id", "repair_number", "created_at", "updated_at",
@@ -438,6 +441,31 @@ class RepairRequestSerializer(serializers.ModelSerializer):
 
     def get_waiting_for_client_days(self, obj):
         return getattr(obj, "waiting_for_client_days", None)
+
+    def get_client_visible_quote(self, obj):
+        """Ostatnia wycena „dla klienta” (wysłana lub późniejszy etap) — pozycje i suma."""
+        request = self.context.get("request")
+        if not request or getattr(request.user, "role", None) != "client":
+            return None
+        from apps.pricing.models import QuoteStatus
+        from apps.pricing.serializers.quote import ClientVisibleQuoteSerializer
+
+        q = (
+            obj.quotes.filter(
+                status__in=[
+                    QuoteStatus.SENT,
+                    QuoteStatus.ACCEPTED,
+                    QuoteStatus.REJECTED,
+                    QuoteStatus.EXPIRED,
+                ]
+            )
+            .prefetch_related("items")
+            .order_by("-sent_at", "-version", "-created_at")
+            .first()
+        )
+        if not q:
+            return None
+        return ClientVisibleQuoteSerializer(q, context=self.context).data
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

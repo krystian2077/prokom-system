@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/store";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
@@ -29,6 +30,7 @@ function dateLabel(iso: string) {
 
 export default function CommPage() {
   const { token } = useAuth();
+  const p = usePanelBasePath();
   const addToast = useStore((s) => s.addToast);
 
   const [searchDraft, setSearchDraft] = useState("");
@@ -237,7 +239,7 @@ export default function CommPage() {
             <div className="space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3">
                 <div>
-                  <Link href={`/panel/naprawy/${activeThread.repair.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
+                  <Link href={p.repairDetailPath(activeThread.repair.id)} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
                     {activeThread.repair.repair_number}
                   </Link>
                   <div className="mt-1 text-sm text-[var(--white)]">{activeThread.repair.client_name} · {activeThread.repair.device_name}</div>

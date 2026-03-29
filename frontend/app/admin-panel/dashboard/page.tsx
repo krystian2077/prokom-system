@@ -184,25 +184,25 @@ export default function AdminDashboardPage() {
 
   if (!isAdmin) {
     return (
-      <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+      <main className="mx-auto min-h-screen max-w-[1500px] px-5 py-8">
         <p className="text-sm text-[#fca5a5]">Tylko administrator.</p>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8">
+    <main className="mx-auto flex min-h-screen max-w-[1500px] flex-col gap-6 px-5 py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
-          <h1 className="mt-2 text-2xl font-semibold text-white">Dashboard</h1>
-          <p className="mt-1 text-sm text-[#9ca3af]">KPI zarządcze oraz alerty wymagające reakcji zespołu.</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel administratora</p>
+          <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Dashboard</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">KPI zarządcze oraz alerty wymagające reakcji zespołu.</p>
         </div>
         <button
           type="button"
           onClick={() => void load()}
           disabled={loading || !token}
-          className="h-[40px] rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+          className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
         >
           Odśwież
         </button>
@@ -217,10 +217,10 @@ export default function AdminDashboardPage() {
             <StatCardSkeleton />
           </section>
           <section className="grid gap-4 lg:grid-cols-[1.2fr,.8fr]">
-            <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <StackedRowSkeleton rows={4} />
             </div>
-            <div className="space-y-3 rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="space-y-3 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <Skeleton className="h-5 w-48" />
               <Skeleton className="h-4 w-full max-w-sm" />
               <Skeleton className="h-4 w-3/4 max-w-xs" />
@@ -235,19 +235,22 @@ export default function AdminDashboardPage() {
         <>
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {kpiCards.map((card) => (
-              <article key={card.label} className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
-                <div className="absolute left-0 top-0 h-full w-[2px]" style={{ background: card.accent }} />
-                <p className="text-xs uppercase tracking-[0.18em] text-[#9ca3af]">{card.label}</p>
-                <p className="mt-2 text-3xl font-semibold text-white">{card.value}</p>
+              <article
+                key={card.label}
+                className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,.04)]"
+              >
+                <div className="absolute left-0 top-0 h-full w-[3px]" style={{ background: card.accent }} />
+                <p className="text-xs uppercase tracking-[0.18em] text-[var(--ink2)]">{card.label}</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--white)]">{card.value}</p>
               </article>
             ))}
           </section>
 
           <section className="grid gap-4 lg:grid-cols-[1.2fr,.8fr]">
-            <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold text-white">Alerty zarządcze</h2>
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-[#9ca3af]">
+                <h2 className="text-lg font-semibold text-[var(--white)]">Alerty zarządcze</h2>
+                <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold text-[var(--ink2)]">
                   Aktywne: {alerts.length}
                 </span>
               </div>
@@ -274,17 +277,19 @@ export default function AdminDashboardPage() {
               )}
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
-              <h2 className="text-lg font-semibold text-white">Kondycja operacyjna</h2>
-              <p className="mt-1 text-sm text-[#9ca3af]">Podstawowe wskaźniki finansowe i czasowe z dashboardu admina.</p>
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+              <h2 className="text-lg font-semibold text-[var(--white)]">Kondycja operacyjna</h2>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                Podstawowe wskaźniki finansowe i czasowe z dashboardu admina.
+              </p>
               <dl className="mt-4 space-y-3">
                 <div className="flex items-center justify-between gap-3 text-sm">
-                  <dt className="text-[#9ca3af]">Przychód</dt>
-                  <dd className="font-semibold text-white">{fmtMoney(kpi.revenueTotal)}</dd>
+                  <dt className="text-[var(--ink2)]">Przychód</dt>
+                  <dd className="font-semibold text-[var(--white)]">{fmtMoney(kpi.revenueTotal)}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3 text-sm">
-                  <dt className="text-[#9ca3af]">Śr. czas naprawy</dt>
-                  <dd className="font-semibold text-white">
+                  <dt className="text-[var(--ink2)]">Śr. czas naprawy</dt>
+                  <dd className="font-semibold text-[var(--white)]">
                     {kpi.avgCompletionDays === null ? "Brak danych" : `${kpi.avgCompletionDays.toFixed(1)} dnia`}
                   </dd>
                 </div>

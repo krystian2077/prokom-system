@@ -1,55 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useWorkerStore } from "@/stores/workerStore";
-
-export type RepairStatusValue =
-  | "new"
-  | "accepted"
-  | "in_diagnostics"
-  | "diagnostics_done"
-  | "quote_pending"
-  | "quote_sent"
-  | "quote_accepted"
-  | "quote_rejected"
-  | "waiting_for_parts"
-  | "in_repair"
-  | "repair_done"
-  | "in_testing"
-  | "testing_passed"
-  | "testing_failed"
-  | "ready_for_pickup"
-  | "picked_up"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "unrepairable"
-  | "abandoned";
-
-const STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
-  { value: "new", label: "Nowe zgłoszenie" },
-  { value: "accepted", label: "Przyjęte do serwisu" },
-  { value: "in_diagnostics", label: "W diagnostyce" },
-  { value: "diagnostics_done", label: "Diagnoza zakończona" },
-  { value: "quote_pending", label: "Przygotowanie wyceny" },
-  { value: "quote_sent", label: "Wycena wysłana" },
-  { value: "quote_accepted", label: "Wycena zaakceptowana" },
-  { value: "quote_rejected", label: "Wycena odrzucona" },
-  { value: "waiting_for_parts", label: "Oczekiwanie na części" },
-  { value: "in_repair", label: "W trakcie naprawy" },
-  { value: "repair_done", label: "Naprawa zakończona" },
-  { value: "in_testing", label: "Testowanie" },
-  { value: "testing_passed", label: "Testy przeszły" },
-  { value: "testing_failed", label: "Testy nie przeszły" },
-  { value: "ready_for_pickup", label: "Gotowe do odbioru" },
-  { value: "picked_up", label: "Odebrane" },
-  { value: "shipped", label: "Wysłane" },
-  { value: "delivered", label: "Dostarczone" },
-  { value: "cancelled", label: "Anulowane" },
-  { value: "unrepairable", label: "Nie do naprawy" },
-  { value: "abandoned", label: "Porzucone przez klienta" },
-];
+import {
+  QUICK_CHANGE_STATUS_OPTIONS,
+  normalizeStatusToQuickChangeValue,
+  type RepairStatusValue,
+} from "@/lib/repairStatusOptions";
+import { repairStatusPublicLabel } from "@/lib/repairStatusPublic";
 
 const DESTRUCTIVE_CONFIRM: Partial<
   Record<
@@ -57,12 +16,6 @@ const DESTRUCTIVE_CONFIRM: Partial<
     { title: string; description: string; confirmLabel: string; variant: "danger" | "warning" }
   >
 > = {
-  delivered: {
-    title: "Oznaczyć jako dostarczone?",
-    description: "Status „dostarczone” zamyka ścieżkę wydania. Upewnij się, że klient odebrał urządzenie.",
-    confirmLabel: "Tak, dostarczone",
-    variant: "danger",
-  },
   cancelled: {
     title: "Anulować naprawę?",
     description: "Anulowanie jest poważną decyzją operacyjną. Sprawdź, czy klient został poinformowany.",
@@ -70,15 +23,9 @@ const DESTRUCTIVE_CONFIRM: Partial<
     variant: "danger",
   },
   unrepairable: {
-    title: "Oznaczyć jako nie do naprawy?",
-    description: "To komunikuje klientowi brak możliwości naprawy. Upewnij się, że diagnoza jest ostateczna.",
-    confirmLabel: "Tak, nie do naprawy",
-    variant: "warning",
-  },
-  abandoned: {
-    title: "Oznaczyć jako porzucone?",
-    description: "Sprawa zostanie zamknięta jako porzucona przez klienta.",
-    confirmLabel: "Tak, porzucone",
+    title: "Oznaczyć naprawę jako nieopłacalną?",
+    description: "To komunikuje klientowi, że naprawa jest nieopłacalna. Upewnij się, że diagnoza jest ostateczna.",
+    confirmLabel: "Tak, nieopłacalna",
     variant: "warning",
   },
 };
@@ -101,18 +48,11 @@ export function StatusChangeModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selected = useMemo(() => {
-    if (!currentStatus) return null;
-    return STATUS_OPTIONS.find((s) => s.value === currentStatus) ? currentStatus : null;
-  }, [currentStatus]);
-
   useEffect(() => {
     if (!open) return;
-    if (!selected) return;
-    setNewStatus(selected as RepairStatusValue);
-    // Reset pola notatki przy otwarciu
+    setNewStatus(normalizeStatusToQuickChangeValue(currentStatus));
     setNotes("");
-  }, [open, selected]);
+  }, [open, currentStatus]);
 
   if (!open) return null;
 
@@ -152,7 +92,8 @@ export function StatusChangeModal({
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Szybka akcja</div>
             <h3 className="mt-1 text-xl font-semibold text-[var(--white)]">Zmień status naprawy</h3>
             <p className="mt-1 text-sm text-[var(--ink2)]">
-              Obecny status: <span className="font-semibold text-[var(--white)]">{currentStatus ?? "—"}</span>
+              Obecny status:{" "}
+              <span className="font-semibold text-[var(--white)]">{repairStatusPublicLabel(currentStatus)}</span>
             </p>
           </div>
           <button type="button" onClick={onClose} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--ink2)] hover:bg-[var(--row-active)]">
@@ -168,7 +109,7 @@ export function StatusChangeModal({
               onChange={(e) => setNewStatus(e.target.value as RepairStatusValue)}
               className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
             >
-              {STATUS_OPTIONS.map((s) => (
+              {QUICK_CHANGE_STATUS_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>
                   {s.label}
                 </option>

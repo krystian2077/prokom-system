@@ -51,6 +51,32 @@ export interface RepairItem {
   price: number | null;
 }
 
+/** Wycena wysłana do klienta (z API client_visible_quote). */
+export interface ClientVisibleQuoteItem {
+  id: number | string;
+  description: string;
+  item_type: string;
+  item_type_display: string;
+  part_origin?: string;
+  part_origin_display?: string;
+  quantity: string | number;
+  parts_price: string | number;
+  labour_price: string | number;
+  unit_price: string | number;
+  total: string | number;
+}
+
+export interface ClientVisibleQuote {
+  id: string;
+  version: number;
+  status: string;
+  status_display: string;
+  total_amount: string | number;
+  sent_at: string | null;
+  valid_until: string | null;
+  items: ClientVisibleQuoteItem[];
+}
+
 export interface ServiceInfo {
   technicianName: string | null;
   estimatedTime: string | null;
@@ -79,12 +105,16 @@ export interface Repair {
   /** Numer listu przewozowego (wysyłka do serwisu) — klient może dodać w panelu. */
   clientTrackingNumber: string | null;
   status: RepairStatus;
+  /** Etykieta z API (status_display / public_status) — ta sama co w panelu pracownika. */
+  statusDisplay?: string | null;
   statusUpdatedAt: string;
   createdAt: string;
   priceItems: RepairItem[];
   totalPrice: number | null;
   serviceInfo: ServiceInfo;
   timeline: TimelineStep[];
+  /** Ostatnia wycena widoczna dla klienta (po wysłaniu z serwisu). */
+  clientVisibleQuote: ClientVisibleQuote | null;
 }
 
 export interface TimelineStep {
@@ -138,17 +168,17 @@ export function getStatusBadgeProps(status: RepairStatus): {
 } {
   switch (status) {
     case "new":
-      return { label: "Nowe zgłoszenie", className: "new" };
+      return { label: "Zgłoszenie przyjęte", className: "new" };
     case "diagnosed":
-      return { label: "Po diagnostyce", className: "wait" };
+      return { label: "W Diagnostyce", className: "wait" };
     case "wait_decision":
-      return { label: "Oczekuje na decyzję", className: "wait" };
+      return { label: "Wycena Wysłana", className: "wait" };
     case "in_progress":
       return { label: "W naprawie", className: "progress" };
     case "ready":
-      return { label: "Gotowe do odbioru", className: "ready" };
+      return { label: "Gotowe Do Odbioru", className: "ready" };
     case "done":
-      return { label: "Zakończone", className: "done" };
+      return { label: "Odebrane", className: "done" };
     case "cancelled":
       return { label: "Anulowane", className: "new" };
   }

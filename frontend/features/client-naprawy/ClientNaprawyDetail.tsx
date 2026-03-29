@@ -7,9 +7,23 @@ import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/panel/StatusBadge";
 import { apiRepairDetailToPanel, type ApiRepairDetail } from "@/lib/panel-api";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { formatQuoteNumberLabel } from "@/lib/quoteLabels";
+import { repairStatusPublicLabel } from "@/lib/repairStatusPublic";
 import { formatPrice, formatTotalPrice, getDeviceEmoji } from "@/types/panel";
 import type { Repair } from "@/types/panel";
-import type { RepairThreadItem } from "@/types/repairs";
+import type { RepairThreadItem, RepairTimelineEvent } from "@/types/repairs";
+
+type StatusChangeEvent = Extract<RepairTimelineEvent, { type: "status_change" }>;
+
+function labelForStatusChange(ev: StatusChangeEvent): string {
+  return (ev.new_status_display ?? "").trim() || repairStatusPublicLabel(ev.new_status);
+}
+
+function sortedStatusChanges(events: RepairTimelineEvent[]): StatusChangeEvent[] {
+  const rows = events.filter((e): e is StatusChangeEvent => e.type === "status_change");
+  rows.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  return rows;
+}
 
 function DetailItem({
   label,
@@ -73,6 +87,11 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
   const [msgDraft, setMsgDraft] = useState("");
   const [msgSending, setMsgSending] = useState(false);
   const [msgFeedback, setMsgFeedback] = useState<"ok" | "err" | null>(null);
+  const [quoteRespondBusy, setQuoteRespondBusy] = useState(false);
+  const [quoteRespondError, setQuoteRespondError] = useState<string | null>(null);
+  const [statusTimeline, setStatusTimeline] = useState<StatusChangeEvent[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+  const [timelineError, setTimelineError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -113,6 +132,30 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
       cancelled = true;
     };
   }, [token, repairId]);
+
+  useEffect(() => {
+    if (!token || !repairId || !repair) return;
+    let cancelled = false;
+    setTimelineLoading(true);
+    setTimelineError(null);
+    api
+      .get<RepairTimelineEvent[]>(`/repairs/${repairId}/timeline/`, token)
+      .then((data) => {
+        if (!cancelled) setStatusTimeline(sortedStatusChanges(Array.isArray(data) ? data : []));
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setStatusTimeline([]);
+          setTimelineError(e instanceof Error ? e.message : "Nie udało się załadować historii statusów.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setTimelineLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token, repairId, repair?.statusUpdatedAt]);
 
   if (loading) {
     return (
@@ -180,17 +223,26 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
             >
               {getDeviceEmoji(repair.deviceCategory)}
             </div>
-            <div>
-              <p className="cp-heading font-mono text-lg font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
-                {repair.repairNumber}
-              </p>
-              <p className="text-sm" style={{ color: "var(--ink2)" }}>
-                {repair.deviceModel} – {repair.problemDescription ? `${repair.problemDescription.slice(0, 40)}…` : "Naprawa"} – Przyjęto {formatDate(repair.createdAt)}
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 md:gap-x-5">
+                <p
+                  className="cp-heading shrink-0 font-mono text-lg font-bold"
+                  style={{ fontFamily: "'Courier New', monospace" }}
+                >
+                  {repair.repairNumber}
+                </p>
+                <p className="min-w-0 text-lg font-semibold leading-snug tracking-tight" style={{ color: "var(--ink)" }}>
+                  {repair.deviceModel}
+                </p>
+              </div>
+              <p className="mt-1 text-sm" style={{ color: "var(--ink2)" }}>
+                {repair.problemDescription ? `${repair.problemDescription.slice(0, 40)}…` : "Naprawa"} — Przyjęto{" "}
+                {formatDate(repair.createdAt)}
               </p>
             </div>
           </div>
         </div>
-        <StatusBadge status={repair.status} large />
+        <StatusBadge status={repair.status} labelOverride={repair.statusDisplay} large />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -282,6 +334,159 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
             </div>
           </div>
 
+          {repair.clientVisibleQuote ? (
+            <div className="panel-card" style={{ borderColor: "rgba(34, 197, 94, 0.35)", boxShadow: "0 0 0 1px rgba(34, 197, 94, 0.12)" }}>
+              <div className="panel-card-header flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--green-l)", border: "1px solid var(--green-b)" }}>
+                  📋
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
+                    Twoja wycena
+                  </h2>
+                  <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
+                    {formatQuoteNumberLabel(repair.clientVisibleQuote.version)} · {repair.clientVisibleQuote.status_display}
+                    {repair.clientVisibleQuote.sent_at
+                      ? ` · wysłano ${formatDateTime(repair.clientVisibleQuote.sent_at)}`
+                      : ""}
+                  </p>
+                  {repair.clientVisibleQuote.valid_until ? (
+                    <p className="mt-1 text-xs" style={{ color: "var(--ink2)" }}>
+                      Ważna do: {formatDate(repair.clientVisibleQuote.valid_until)}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <div className="space-y-3 p-5">
+                <div
+                  className="overflow-x-auto rounded-xl border"
+                  style={{
+                    borderColor: "var(--border2)",
+                    background: "var(--island3)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                  }}
+                >
+                  <table className="w-full min-w-[520px] text-left text-sm">
+                    <thead>
+                      <tr className="border-b text-[11px] uppercase tracking-[0.06em]" style={{ borderColor: "var(--border2)", color: "var(--ink)" }}>
+                        <th className="px-3 py-2.5 font-semibold">Pozycja</th>
+                        <th className="px-3 py-2.5 font-semibold">Część</th>
+                        <th className="px-3 py-2.5 font-semibold">Ilość</th>
+                        <th className="px-3 py-2.5 font-semibold">Części</th>
+                        <th className="px-3 py-2.5 font-semibold">Robocizna</th>
+                        <th className="px-3 py-2.5 text-right font-semibold">Razem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {repair.clientVisibleQuote.items.map((line) => (
+                        <tr key={String(line.id)} className="border-t" style={{ borderColor: "var(--border)" }}>
+                          <td className="px-3 py-3 text-[13px] leading-snug" style={{ color: "var(--heading)" }}>
+                            {line.description || line.item_type_display || "—"}
+                          </td>
+                          <td className="px-3 py-3 text-xs leading-snug" style={{ color: "var(--ink2)" }}>
+                            {line.part_origin_display ?? "—"}
+                          </td>
+                          <td
+                            className="px-3 py-3 font-mono text-[13px] tabular-nums"
+                            style={{ color: "var(--ink)" }}
+                          >
+                            {String(line.quantity)}
+                          </td>
+                          <td
+                            className="px-3 py-3 text-right font-mono text-[13px] tabular-nums font-semibold"
+                            style={{ color: "var(--heading)" }}
+                          >
+                            {formatPrice(typeof line.parts_price === "number" ? line.parts_price : parseFloat(String(line.parts_price ?? 0)))}
+                          </td>
+                          <td
+                            className="px-3 py-3 text-right font-mono text-[13px] tabular-nums font-semibold"
+                            style={{ color: "var(--heading)" }}
+                          >
+                            {formatPrice(typeof line.labour_price === "number" ? line.labour_price : parseFloat(String(line.labour_price ?? 0)))}
+                          </td>
+                          <td
+                            className="px-3 py-3 text-right font-mono text-[15px] tabular-nums font-bold"
+                            style={{ color: "var(--heading)" }}
+                          >
+                            {formatPrice(typeof line.total === "number" ? line.total : parseFloat(String(line.total ?? 0)))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex flex-wrap items-end justify-between gap-3 border-t pt-3" style={{ borderColor: "var(--border)" }}>
+                  <p className="text-sm" style={{ color: "var(--ink2)" }}>
+                    Suma wyceny:{" "}
+                    <span className="text-lg font-bold tabular-nums" style={{ color: "var(--heading)" }}>
+                      {formatPrice(
+                        typeof repair.clientVisibleQuote.total_amount === "number"
+                          ? repair.clientVisibleQuote.total_amount
+                          : parseFloat(String(repair.clientVisibleQuote.total_amount ?? 0)),
+                      )}{" "}
+                      <span className="text-sm font-semibold">brutto</span>
+                    </span>
+                  </p>
+                </div>
+                {repair.status === "wait_decision" ? (
+                  <div className="rounded-xl border p-4" style={{ borderColor: "var(--amber-b)", background: "var(--amber-l)" }}>
+                    <p className="text-sm font-medium" style={{ color: "var(--ink)" }}>
+                      Prosimy o decyzję: zaakceptuj wycenę, aby rozpocząć naprawę, lub odrzuć, jeśli się nie zgadzasz.
+                    </p>
+                    {quoteRespondError ? (
+                      <p className="mt-2 text-xs font-medium" style={{ color: "var(--red)" }}>{quoteRespondError}</p>
+                    ) : null}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={quoteRespondBusy}
+                        onClick={async () => {
+                          if (!token) return;
+                          setQuoteRespondError(null);
+                          setQuoteRespondBusy(true);
+                          try {
+                            const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/quote-respond/`, { action: "accept" }, token);
+                            setRepair(apiRepairDetailToPanel(data));
+                          } catch (e) {
+                            setQuoteRespondError(e instanceof Error ? e.message : "Nie udało się zapisać decyzji.");
+                          } finally {
+                            setQuoteRespondBusy(false);
+                          }
+                        }}
+                        className="rounded-lg border-0 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+                        style={{ background: "var(--green)" }}
+                      >
+                        {quoteRespondBusy ? "Zapisywanie…" : "Akceptuję wycenę"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={quoteRespondBusy}
+                        onClick={async () => {
+                          if (!token) return;
+                          if (!window.confirm("Odrzucić tę wycenę? Serwis skontaktuje się z Tobą w razie pytań.")) return;
+                          setQuoteRespondError(null);
+                          setQuoteRespondBusy(true);
+                          try {
+                            const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/quote-respond/`, { action: "reject" }, token);
+                            setRepair(apiRepairDetailToPanel(data));
+                          } catch (e) {
+                            setQuoteRespondError(e instanceof Error ? e.message : "Nie udało się zapisać decyzji.");
+                          } finally {
+                            setQuoteRespondBusy(false);
+                          }
+                        }}
+                        className="rounded-lg border px-4 py-2 text-sm font-bold disabled:opacity-60"
+                        style={{ borderColor: "var(--border)", color: "var(--ink)", background: "var(--island)" }}
+                      >
+                        Odrzucam
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+
           {/* Postęp naprawy */}
           <div className="panel-card">
             <div className="panel-card-header flex items-start gap-3">
@@ -296,32 +501,49 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               </div>
             </div>
             <div className="p-5">
-              {(repair.timeline?.length ? repair.timeline : []).map((step, i) => (
-                <div
-                  key={step.key}
-                  className={`tl-step relative flex gap-4 pb-6 last:pb-0 ${step.status}`}
-                  style={{
-                    borderLeft: i < (repair.timeline?.length ?? 0) - 1 ? "2px solid var(--border)" : "none",
-                    marginLeft: 7,
-                    paddingLeft: 20,
-                  }}
-                >
-                  <div
-                    className={`tl-node absolute left-0 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                      step.status === "done" ? "bg-[var(--green)] text-white" : step.status === "active" ? "bg-[var(--amber)] text-white ring-4 ring-[var(--amber)]/30" : "bg-[var(--island4)]"
-                    }`}
-                    style={step.status === "active" ? { animation: "ringPulseAmber 1.5s ease infinite" } : undefined}
-                  >
-                    {step.status === "done" ? "✓" : step.status === "active" ? "●" : ""}
-                  </div>
-                  <div className="tl-body min-w-0 flex-1">
-                    <p className="cp-heading font-medium">{step.label}</p>
-                    <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
-                      {step.date ? formatDateTime(step.date) : "Oczekuje"}
-                    </p>
-                  </div>
-                </div>
-              ))}
+              {timelineLoading && statusTimeline.length === 0 ? (
+                <p className="py-2 text-sm" style={{ color: "var(--muted)" }}>Ładowanie historii statusów…</p>
+              ) : timelineError ? (
+                <p className="py-2 text-sm" style={{ color: "var(--red)" }}>{timelineError}</p>
+              ) : statusTimeline.length === 0 ? (
+                <p className="py-2 text-sm" style={{ color: "var(--ink2)" }}>Brak zapisanych zmian statusu.</p>
+              ) : (
+                statusTimeline.map((ev, i) => {
+                  const isLast = i === statusTimeline.length - 1;
+                  const stepStatus = isLast ? "active" : "done";
+                  return (
+                    <div
+                      key={`st-${ev.id}`}
+                      className={`tl-step relative flex gap-4 pb-6 last:pb-0 ${stepStatus}`}
+                      style={{
+                        borderLeft: i < statusTimeline.length - 1 ? "2px solid var(--border)" : "none",
+                        marginLeft: 7,
+                        paddingLeft: 20,
+                      }}
+                    >
+                      <div
+                        className={`tl-node absolute left-0 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
+                          stepStatus === "done" ? "bg-[var(--green)] text-white" : "bg-[var(--amber)] text-white ring-4 ring-[var(--amber)]/30"
+                        }`}
+                        style={stepStatus === "active" ? { animation: "ringPulseAmber 1.5s ease infinite" } : undefined}
+                      >
+                        {stepStatus === "done" ? "✓" : "●"}
+                      </div>
+                      <div className="tl-body min-w-0 flex-1">
+                        <p className="cp-heading font-medium">{labelForStatusChange(ev)}</p>
+                        <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+                          <time dateTime={ev.created_at}>{formatDateTime(ev.created_at)}</time>
+                        </p>
+                        {(ev.notes ?? "").trim() ? (
+                          <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed" style={{ color: "var(--ink2)" }}>
+                            {ev.notes}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -502,8 +724,15 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
             </div>
             <div className="p-5">
               <InfoRow label="Numer zlecenia" value={repair.repairNumber} mono />
-              <InfoRow label="Przyjął" value={typeof repair.serviceInfo.technicianName === "string" ? repair.serviceInfo.technicianName : "Do przypisania"} />
-              <InfoRow label="Szacowany czas" value={repair.serviceInfo.estimatedTime ?? "Do ustalenia"} color="amber" />
+              <InfoRow
+                label="Przypisany Serwisant"
+                value={typeof repair.serviceInfo.technicianName === "string" ? repair.serviceInfo.technicianName : "Do przypisania"}
+              />
+              <InfoRow
+                label="Szacowany czas naprawy"
+                value={repair.serviceInfo.estimatedTime ?? "Do ustalenia"}
+                color="amber"
+              />
               <InfoRow label="Gwarancja" value={`${repair.serviceInfo.warrantyMonths} miesięcy`} color="green" />
               {repair.serviceInfo.notes && (
                 <div className="mt-3 rounded-lg bg-[var(--island3)] p-3 text-xs" style={{ color: "var(--ink2)" }}>

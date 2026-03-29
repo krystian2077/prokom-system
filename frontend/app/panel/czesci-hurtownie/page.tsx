@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, Package, Pencil, Phone, Plus, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, fetchAllPages } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import type { InventorySupplier, InventorySupplierDetail, PartUsageQueueItem } from "@/types/inventory";
 import { SupplierFormModal } from "@/components/panel/SupplierFormModal";
 import { useStore } from "@/store";
@@ -77,6 +78,7 @@ function formatWebsite(url: string | null | undefined): string {
 }
 
 export default function PartsSuppliersPage() {
+  const panelPaths = usePanelBasePath();
   const { token, user } = useAuth();
   const { addToast } = useStore();
   const pathname = usePathname();
@@ -258,7 +260,7 @@ export default function PartsSuppliersPage() {
                           {statusLabel(st, row.statusDisplay)}
                         </span>
                         <Link
-                          href={`/panel/naprawy/${row.repairId}`}
+                          href={panelPaths.repairDetailPath(row.repairId)}
                           className="text-xs font-semibold text-[var(--ink2)] hover:text-[var(--white)]"
                         >
                           Otwórz naprawę

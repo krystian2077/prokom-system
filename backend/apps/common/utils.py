@@ -82,35 +82,14 @@ def create_slug_from_name(name, max_length=100):
 
 def get_public_repair_status(internal_status):
     """
-    Mapuje wewnętrzny status naprawy na przyjazny status publiczny dla klienta.
+    Status widoczny dla klienta — ten sam co etykieta pola ``status`` (RepairStatus).
     """
     from apps.common.enums import RepairStatus
 
-    status_mapping = {
-        RepairStatus.NEW: "Przyjęte do realizacji",
-        RepairStatus.ACCEPTED: "Przyjęte do realizacji",
-        RepairStatus.IN_DIAGNOSTICS: "Trwa diagnoza",
-        RepairStatus.DIAGNOSTICS_DONE: "Diagnoza zakończona",
-        RepairStatus.QUOTE_PENDING: "Przygotowywanie wyceny",
-        RepairStatus.QUOTE_SENT: "Oczekiwanie na Twoją decyzję",
-        RepairStatus.QUOTE_ACCEPTED: "Rozpoczynamy naprawę",
-        RepairStatus.QUOTE_REJECTED: "Wycena odrzucona",
-        RepairStatus.WAITING_FOR_PARTS: "Oczekiwanie na części",
-        RepairStatus.IN_REPAIR: "W trakcie naprawy",
-        RepairStatus.REPAIR_DONE: "Naprawa zakończona",
-        RepairStatus.IN_TESTING: "Testowanie urządzenia",
-        RepairStatus.TESTING_PASSED: "Testy zakończone pomyślnie",
-        RepairStatus.TESTING_FAILED: "Wymaga dodatkowej naprawy",
-        RepairStatus.READY_FOR_PICKUP: "Gotowe do odbioru",
-        RepairStatus.PICKED_UP: "Odebrane",
-        RepairStatus.SHIPPED: "Wysłane",
-        RepairStatus.DELIVERED: "Dostarczone",
-        RepairStatus.CANCELLED: "Anulowane",
-        RepairStatus.UNREPAIRABLE: "Nie do naprawy",
-        RepairStatus.ABANDONED: "Nieodebrane",
-    }
-
-    return status_mapping.get(internal_status, "Status nieznany")
+    try:
+        return str(RepairStatus(internal_status).label)
+    except ValueError:
+        return _("Status nieznany")
 
 
 def get_status_badge_color(status):

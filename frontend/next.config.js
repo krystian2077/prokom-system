@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  /** Domyślnie Next 14 przerywa build/dev przy useSearchParams() bez Suspense (często 500). */
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
+  /** Zapobiega błędom typu „Cannot find module './vendor-chunks/framer-motion.js'” przy bundlowaniu. */
+  transpilePackages: ["framer-motion"],
   async redirects() {
     return [
       { source: "/serwis-telefonow", destination: "/uslugi", permanent: true },

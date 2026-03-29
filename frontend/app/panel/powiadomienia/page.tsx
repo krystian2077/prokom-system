@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
@@ -84,6 +85,7 @@ function dayBucket(createdAt: string): "today" | "yesterday" | "older" {
 
 export default function NotificationsPage() {
   const { token, user } = useAuth();
+  const panelPaths = usePanelBasePath();
   const queryClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
@@ -185,10 +187,7 @@ export default function NotificationsPage() {
     }
 
     if (notification.repair_id) {
-      const rid = encodeURIComponent(notification.repair_id);
-      const href =
-        user?.role === "admin" ? `/admin-panel/repairs/${rid}` : `/panel/naprawy/${rid}`;
-      router.push(href);
+      router.push(panelPaths.repairDetailPath(notification.repair_id));
     }
   };
 

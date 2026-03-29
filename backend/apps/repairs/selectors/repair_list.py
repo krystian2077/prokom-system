@@ -116,7 +116,13 @@ def repair_by_id(repair_id):
             "client", "device", "assigned_to", "created_by",
             "delivery_address", "return_address",
         )
-        .prefetch_related("status_history", "assignments", "notes", "images")
+        .prefetch_related(
+            "status_history",
+            "assignments",
+            "notes",
+            "images",
+            "quotes__items",
+        )
         .filter(id=repair_id)
         .first()
     )
@@ -129,7 +135,13 @@ def repair_by_number(repair_number):
             "client", "device", "assigned_to", "created_by",
             "delivery_address", "return_address",
         )
-        .prefetch_related("status_history", "assignments", "notes", "images")
+        .prefetch_related(
+            "status_history",
+            "assignments",
+            "notes",
+            "images",
+            "quotes__items",
+        )
         .filter(repair_number=repair_number)
         .first()
     )

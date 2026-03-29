@@ -14,7 +14,9 @@ interface AppStore {
   setScope: (s: Scope) => void;
 
   statusModalRepairId: string | null;
-  openStatusModal: (id: string | number) => void;
+  /** Wartość z listy szybkiej zmiany — ustawiana przy „Zastosuj sugestię” z paska nad zakładkami. */
+  statusModalPrefillNewStatus: string | null;
+  openStatusModal: (id: string | number, prefillNewStatus?: string | null) => void;
   closeStatusModal: () => void;
 
   assignModalRepairId: string | null;
@@ -41,8 +43,13 @@ export const useStore = create<AppStore>((set) => ({
   setScope: (s) => set({ scope: s }),
 
   statusModalRepairId: null,
-  openStatusModal: (id) => set({ statusModalRepairId: String(id) }),
-  closeStatusModal: () => set({ statusModalRepairId: null }),
+  statusModalPrefillNewStatus: null,
+  openStatusModal: (id, prefillNewStatus) =>
+    set({
+      statusModalRepairId: String(id),
+      statusModalPrefillNewStatus: prefillNewStatus === undefined ? null : prefillNewStatus,
+    }),
+  closeStatusModal: () => set({ statusModalRepairId: null, statusModalPrefillNewStatus: null }),
 
   assignModalRepairId: null,
   openAssignModal: (id) => set({ assignModalRepairId: String(id) }),

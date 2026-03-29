@@ -22,42 +22,41 @@ class DeviceCategory(models.TextChoices):
 
 class RepairStatus(models.TextChoices):
     """
-    Statusy naprawy — publiczne i wewnętrzne.
-    Klient widzi uproszczoną wersję.
+    Statusy naprawy — etykiety zgodne z komunikacją dla klienta (postęp naprawy).
     """
     # Przyjęcie
-    NEW = "new", _("Nowe zgłoszenie")
-    ACCEPTED = "accepted", _("Przyjęte do serwisu")
+    NEW = "new", _("Zgłoszenie przyjęte")
+    ACCEPTED = "accepted", _("Zgłoszenie przyjęte")
 
     # Diagnoza
-    IN_DIAGNOSTICS = "in_diagnostics", _("W diagnostyce")
-    DIAGNOSTICS_DONE = "diagnostics_done", _("Diagnoza zakończona")
+    IN_DIAGNOSTICS = "in_diagnostics", _("W Diagnostyce")
+    DIAGNOSTICS_DONE = "diagnostics_done", _("Diagnoza Ukończona")
 
     # Wycena
-    QUOTE_PENDING = "quote_pending", _("Przygotowanie wyceny")
-    QUOTE_SENT = "quote_sent", _("Wycena wysłana")
-    QUOTE_ACCEPTED = "quote_accepted", _("Wycena zaakceptowana")
-    QUOTE_REJECTED = "quote_rejected", _("Wycena odrzucona")
+    QUOTE_PENDING = "quote_pending", _("Diagnoza Ukończona")
+    QUOTE_SENT = "quote_sent", _("Wycena Wysłana")
+    QUOTE_ACCEPTED = "quote_accepted", _("W naprawie")
+    QUOTE_REJECTED = "quote_rejected", _("Anulowane")
 
     # Naprawa
-    WAITING_FOR_PARTS = "waiting_for_parts", _("Oczekiwanie na części")
-    IN_REPAIR = "in_repair", _("W trakcie naprawy")
-    REPAIR_DONE = "repair_done", _("Naprawa zakończona")
+    WAITING_FOR_PARTS = "waiting_for_parts", _("Oczekiwanie na Części")
+    IN_REPAIR = "in_repair", _("W naprawie")
+    REPAIR_DONE = "repair_done", _("Naprawa Zakończona")
 
     # Testowanie
-    IN_TESTING = "in_testing", _("Testowanie")
-    TESTING_PASSED = "testing_passed", _("Testy przeszły")
-    TESTING_FAILED = "testing_failed", _("Testy nie przeszły")
+    IN_TESTING = "in_testing", _("W naprawie")
+    TESTING_PASSED = "testing_passed", _("Naprawa Zakończona")
+    TESTING_FAILED = "testing_failed", _("W naprawie")
 
     # Zakończenie
-    READY_FOR_PICKUP = "ready_for_pickup", _("Gotowe do odbioru")
+    READY_FOR_PICKUP = "ready_for_pickup", _("Gotowe Do Odbioru")
     PICKED_UP = "picked_up", _("Odebrane")
     SHIPPED = "shipped", _("Wysłane")
-    DELIVERED = "delivered", _("Dostarczone")
+    DELIVERED = "delivered", _("Odebrane")
 
     # Anulowanie / problemy
     CANCELLED = "cancelled", _("Anulowane")
-    UNREPAIRABLE = "unrepairable", _("Nie do naprawy")
+    UNREPAIRABLE = "unrepairable", _("Naprawa Nieopłacalna")
     ABANDONED = "abandoned", _("Porzucone przez klienta")
 
 

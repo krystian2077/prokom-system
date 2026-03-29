@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import type { RepairRequestListItem } from "@/types/repairs";
 import Link from "next/link";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { STATUS_OPTIONS as REPAIR_STATUS_OPTIONS_BASE } from "@/components/panel/WorkerStatusChangeModal";
 
 type PaginatedResponse<T> = {
   count: number;
@@ -46,29 +48,36 @@ const KANBAN_COLUMNS = [
 ] as const;
 type KanbanColumnKey = (typeof KANBAN_COLUMNS)[number]["key"];
 
-const STATUS_OPTIONS: Array<{ value: string; label: string; color: "gray" | "amber" | "blue" | "purple" | "green" | "red" }> = [
-  { value: "new", label: "Nowe zgłoszenie", color: "gray" },
-  { value: "accepted", label: "Przyjęte do serwisu", color: "blue" },
-  { value: "in_diagnostics", label: "W diagnostyce", color: "blue" },
-  { value: "diagnostics_done", label: "Diagnoza zakończona", color: "blue" },
-  { value: "quote_pending", label: "Przygotowanie wyceny", color: "amber" },
-  { value: "quote_sent", label: "Wycena wysłana", color: "purple" },
-  { value: "quote_accepted", label: "Wycena zaakceptowana", color: "amber" },
-  { value: "quote_rejected", label: "Wycena odrzucona", color: "red" },
-  { value: "waiting_for_parts", label: "Oczekiwanie na części", color: "blue" },
-  { value: "in_repair", label: "W trakcie naprawy", color: "amber" },
-  { value: "repair_done", label: "Naprawa zakończona", color: "amber" },
-  { value: "in_testing", label: "Testowanie", color: "amber" },
-  { value: "testing_passed", label: "Testy przeszły", color: "green" },
-  { value: "testing_failed", label: "Testy nie przeszły", color: "red" },
-  { value: "ready_for_pickup", label: "Gotowe do odbioru", color: "green" },
-  { value: "picked_up", label: "Odebrane", color: "gray" },
-  { value: "shipped", label: "Wysłane", color: "gray" },
-  { value: "delivered", label: "Dostarczone", color: "gray" },
-  { value: "cancelled", label: "Anulowane", color: "red" },
-  { value: "unrepairable", label: "Nie do naprawy", color: "red" },
-  { value: "abandoned", label: "Porzucone przez klienta", color: "red" },
-];
+const STATUS_OPTION_COLORS: Record<string, "gray" | "amber" | "blue" | "purple" | "green" | "red"> = {
+  new: "gray",
+  accepted: "blue",
+  in_diagnostics: "blue",
+  diagnostics_done: "blue",
+  quote_pending: "amber",
+  quote_sent: "purple",
+  quote_accepted: "amber",
+  quote_rejected: "red",
+  waiting_for_parts: "blue",
+  in_repair: "amber",
+  repair_done: "amber",
+  in_testing: "amber",
+  testing_passed: "green",
+  testing_failed: "red",
+  ready_for_pickup: "green",
+  picked_up: "gray",
+  shipped: "gray",
+  delivered: "gray",
+  cancelled: "red",
+  unrepairable: "red",
+  abandoned: "red",
+};
+
+const STATUS_OPTIONS: Array<{ value: string; label: string; color: "gray" | "amber" | "blue" | "purple" | "green" | "red" }> =
+  REPAIR_STATUS_OPTIONS_BASE.map((s) => ({
+    value: s.value,
+    label: s.label,
+    color: STATUS_OPTION_COLORS[s.value] ?? "gray",
+  }));
 
 const PRIORITY_OPTIONS: Array<{ value: string; label: string; color: "gray" | "amber" | "red" | "blue" }> = [
   { value: "low", label: "Niski", color: "gray" },
@@ -149,6 +158,7 @@ function KanbanBoardSkeleton() {
 
 export default function PanelZgloszeniaPage() {
   const { token, user } = useAuth();
+  const panelPaths = usePanelBasePath();
   const [items, setItems] = useState<RepairRequestListItem[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -289,7 +299,7 @@ export default function PanelZgloszeniaPage() {
               </select>
             </div>
             <Link
-              href="/panel/intake"
+              href={panelPaths.intakePath}
               className="rounded-2xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
             >
               + Nowe zgłoszenie
@@ -488,7 +498,7 @@ export default function PanelZgloszeniaPage() {
                       return (
                         <Link
                           key={r.id}
-                          href={`/panel/repairs/${r.id}`}
+                          href={panelPaths.zgloszenieDetailPath(r.id)}
                           className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3 transition hover:border-white/20 hover:bg-[#111318]"
                         >
                           <div className="flex items-start justify-between gap-3">

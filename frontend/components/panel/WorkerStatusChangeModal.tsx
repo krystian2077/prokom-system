@@ -5,6 +5,13 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useWorkerStore } from "@/stores/workerStore";
+import { repairStatusPublicLabel } from "@/lib/repairStatusPublic";
+import {
+  QUICK_CHANGE_STATUS_OPTIONS,
+  STATUS_OPTIONS,
+  normalizeStatusToQuickChangeValue,
+  type RepairStatusValue,
+} from "@/lib/repairStatusOptions";
 
 /**
  * UWAGA:
@@ -13,53 +20,7 @@ import { useWorkerStore } from "@/stores/workerStore";
  * - nie mamy (jeszcze) pól/sugestii sms/email, więc modal trzyma się "bez zamykania" po zapisie.
  */
 
-export type RepairStatusValue =
-  | "new"
-  | "accepted"
-  | "in_diagnostics"
-  | "diagnostics_done"
-  | "quote_pending"
-  | "quote_sent"
-  | "quote_accepted"
-  | "quote_rejected"
-  | "waiting_for_parts"
-  | "in_repair"
-  | "repair_done"
-  | "in_testing"
-  | "testing_passed"
-  | "testing_failed"
-  | "ready_for_pickup"
-  | "picked_up"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "unrepairable"
-  | "abandoned";
-
-/** Eksportowane dla zbiorczej zmiany statusu (lista admin). */
-export const STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
-  { value: "new", label: "Nowe zgłoszenie" },
-  { value: "accepted", label: "Przyjęte do serwisu" },
-  { value: "in_diagnostics", label: "W diagnostyce" },
-  { value: "diagnostics_done", label: "Diagnoza zakończona" },
-  { value: "quote_pending", label: "Przygotowanie wyceny" },
-  { value: "quote_sent", label: "Wycena wysłana" },
-  { value: "quote_accepted", label: "Wycena zaakceptowana" },
-  { value: "quote_rejected", label: "Wycena odrzucona" },
-  { value: "waiting_for_parts", label: "Oczekiwanie na części" },
-  { value: "in_repair", label: "W trakcie naprawy" },
-  { value: "repair_done", label: "Naprawa zakończona" },
-  { value: "in_testing", label: "Testowanie" },
-  { value: "testing_passed", label: "Testy przeszły" },
-  { value: "testing_failed", label: "Testy nie przeszły" },
-  { value: "ready_for_pickup", label: "Gotowe do odbioru" },
-  { value: "picked_up", label: "Odebrane" },
-  { value: "shipped", label: "Wysłane" },
-  { value: "delivered", label: "Dostarczone" },
-  { value: "cancelled", label: "Anulowane" },
-  { value: "unrepairable", label: "Nie do naprawy" },
-  { value: "abandoned", label: "Porzucone przez klienta" },
-];
+export { STATUS_OPTIONS, type RepairStatusValue };
 
 export function WorkerStatusChangeModal({
   open,
@@ -81,7 +42,6 @@ export function WorkerStatusChangeModal({
   const addToast = useWorkerStore((s) => s.addToast);
 
   const [savedBanner, setSavedBanner] = useState<string | null>(null);
-  const [blocker, setBlocker] = useState("");
   const [newStatus, setNewStatus] = useState<RepairStatusValue>("in_repair");
   const [publicStatus, setPublicStatus] = useState<RepairStatusValue>("in_repair");
   const [notes, setNotes] = useState("");
@@ -91,13 +51,16 @@ export function WorkerStatusChangeModal({
   useEffect(() => {
     if (!open) return;
     setSavedBanner(null);
-    setBlocker("");
     setNotes("");
     setSuggestedMessage("");
-    const maybe = STATUS_OPTIONS.find((s) => s.value === currentStatus) ? (currentStatus as RepairStatusValue) : null;
-    if (maybe) {
-      setNewStatus(maybe);
-      setPublicStatus(maybe);
+    const prefill = useWorkerStore.getState().statusModalPrefillNewStatus;
+    const v = prefill
+      ? (prefill as RepairStatusValue)
+      : normalizeStatusToQuickChangeValue(currentStatus);
+    setNewStatus(v);
+    setPublicStatus(v);
+    if (prefill) {
+      useWorkerStore.setState({ statusModalPrefillNewStatus: null });
     }
   }, [open, currentStatus]);
 
@@ -130,16 +93,6 @@ export function WorkerStatusChangeModal({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!token) return;
-    if (newStatus === "delivered") {
-      const ok = await confirm({
-        title: "Oznaczyć urządzenie jako wydane?",
-        description:
-          `Ta akcja oznaczy urządzenie ${repairNumber || repairId} jako wydane klientowi. Nie można cofnąć.`,
-        confirmLabel: "Tak, wydano",
-        variant: "danger",
-      });
-      if (!ok) return;
-    }
     if (newStatus === "cancelled") {
       const ok = await confirm({
         title: "Anulować naprawę?",
@@ -151,28 +104,18 @@ export function WorkerStatusChangeModal({
     }
     if (newStatus === "unrepairable") {
       const ok = await confirm({
-        title: "Oznaczyć jako nie do naprawy?",
-        description: "To komunikuje klientowi brak możliwości naprawy po diagnozie.",
-        confirmLabel: "Tak, nie do naprawy",
-        variant: "warning",
-      });
-      if (!ok) return;
-    }
-    if (newStatus === "abandoned") {
-      const ok = await confirm({
-        title: "Oznaczyć jako porzucone przez klienta?",
-        description: "Sprawa zostanie zamknięta jako porzucona.",
-        confirmLabel: "Tak, porzucone",
+        title: "Oznaczyć naprawę jako nieopłacalną?",
+        description: "To komunikuje klientowi, że naprawa jest nieopłacalna po diagnozie.",
+        confirmLabel: "Tak, nieopłacalna",
         variant: "warning",
       });
       if (!ok) return;
     }
     setSavedBanner(null);
-    const combined = [blocker.trim(), notes.trim()].filter(Boolean).join("\n\n");
     try {
       const response = await api.post<any>(
         `/repairs/${repairId}/change-status/`,
-        { new_status: newStatus, notes: combined },
+        { new_status: newStatus, notes: notes.trim() },
         token,
       );
       const backendSuggested = typeof response?.suggested_sms === "string" ? response.suggested_sms.trim() : "";
@@ -216,7 +159,8 @@ export function WorkerStatusChangeModal({
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Zmień status</div>
             <h3 className="mt-1 text-xl font-semibold text-[var(--white)]">Szybka akcja</h3>
             <p className="mt-1 text-sm text-[var(--ink2)]">
-              Obecny status: <span className="font-semibold text-[var(--white)]">{currentStatus ?? "—"}</span>
+              Obecny status:{" "}
+              <span className="font-semibold text-[var(--white)]">{repairStatusPublicLabel(currentStatus)}</span>
             </p>
             {savedBanner ? (
               <div className="mt-3 rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 px-4 py-3 text-sm font-semibold" style={{ color: "#86efac" }}>
@@ -235,24 +179,19 @@ export function WorkerStatusChangeModal({
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">1. Bloker sprawy (opcjonalnie)</label>
-            <input
-              type="text"
-              value={blocker}
-              onChange={(e) => setBlocker(e.target.value)}
-              className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
-              placeholder="np. czeka na część, decyzja klienta…"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">2. Status wewnętrzny</label>
+            <label className="block text-[11px] font-semibold tracking-wide text-[var(--ink2)]">
+              1. Status
+            </label>
             <select
               value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value as RepairStatusValue)}
+              onChange={(e) => {
+                const v = e.target.value as RepairStatusValue;
+                setNewStatus(v);
+                setPublicStatus(v);
+              }}
               className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
             >
-              {STATUS_OPTIONS.map((s) => (
+              {QUICK_CHANGE_STATUS_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>
                   {s.label}
                 </option>
@@ -261,22 +200,7 @@ export function WorkerStatusChangeModal({
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">3. Status publiczny</label>
-            <select
-              value={publicStatus}
-              onChange={(e) => setPublicStatus(e.target.value as RepairStatusValue)}
-              className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
-            >
-              {STATUS_OPTIONS.map((s) => (
-                <option key={`pub-${s.value}`} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">4. Notatka wewnętrzna (opcjonalnie)</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">2. Notatka wewnętrzna (opcjonalnie)</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -289,7 +213,7 @@ export function WorkerStatusChangeModal({
           {canShowMessageBox ? (
             <div className="rounded-2xl border border-[#3b82f6]/30 bg-[#3b82f6]/10 p-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#93c5fd]">
-                5. Sugerowana wiadomość
+                3. Sugerowana wiadomość
               </div>
               <div className="mt-2 text-sm text-[#e5e7eb] whitespace-pre-wrap">
                 {loadingSuggested ? "Pobieram sugestię..." : suggestedMessage || "Brak gotowej sugestii dla tego statusu."}

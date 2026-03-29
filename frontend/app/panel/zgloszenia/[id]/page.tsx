@@ -5,14 +5,17 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/store";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import type { RepairDetail, RepairTimelineEvent } from "@/types/repairs";
 import { AddNoteModal } from "@/components/panel/modals/AddNoteModal";
 import { AssignModal } from "@/components/panel/modals/AssignModal";
-import { StatusChangeModal, type RepairStatusValue } from "@/components/panel/modals/StatusChangeModal";
+import { StatusChangeModal } from "@/components/panel/modals/StatusChangeModal";
+import type { RepairStatusValue } from "@/lib/repairStatusOptions";
 import { RepairPartsSection } from "@/components/panel/RepairPartsSection";
 import { RepairDetailLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { deliveryMethodLabel, returnMethodLabel } from "@/lib/repairMethodLabels";
+import { repairStatusPublicLabel } from "@/lib/repairStatusPublic";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -42,6 +45,7 @@ function Section({
 
 export default function PanelRepairDetailPage() {
   const { token, user } = useAuth();
+  const panelPaths = usePanelBasePath();
   const addToast = useStore((s) => s.addToast);
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -188,7 +192,9 @@ export default function PanelRepairDetailPage() {
   }, [eligibleEmailTemplates]);
 
   if (loading) {
-    return <RepairDetailLoadingSkeleton listHref="/panel/zgloszenia" backLabel="Wróć do zgłoszeń" />;
+    return (
+      <RepairDetailLoadingSkeleton listHref={panelPaths.zgloszeniaPath} backLabel="Wróć do zgłoszeń" />
+    );
   }
 
   if (error || !data) {
@@ -238,7 +244,7 @@ export default function PanelRepairDetailPage() {
         </div>
         <div className="rounded-xl bg-[var(--row-hover)] px-4 py-3 text-right">
           <span className="text-xs font-semibold uppercase tracking-wide text-amber-400">
-            {data.status_display}
+            {data.public_status ?? data.status_display}
           </span>
           {data.estimated_completion_date && (
             <p className="mt-1 text-[11px] text-[var(--ink2)]">
@@ -380,7 +386,7 @@ export default function PanelRepairDetailPage() {
                           {date} · Zmiana statusu{ev.changed_by_name ? ` · ${ev.changed_by_name}` : ""}
                         </p>
                         <p className="mt-0.5 text-sm text-[#e5e7eb]">
-                          {ev.new_status_display || ev.new_status || "–"}
+                          {ev.new_status_display?.trim() || repairStatusPublicLabel(ev.new_status)}
                         </p>
                       </div>
                     </div>

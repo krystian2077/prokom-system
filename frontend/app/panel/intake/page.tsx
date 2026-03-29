@@ -22,6 +22,7 @@ import {
 
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { AcceptanceProtocolPreviewModal } from "@/components/panel/AcceptanceProtocolPreviewModal";
 import { downloadAcceptanceProtocolPdf, openRepairQrLabel } from "@/lib/acceptance-pdf";
 import { IntakePreviewPanel } from "@/components/panel/intake/IntakePreviewPanel";
@@ -63,6 +64,7 @@ function clientDisplayName(c: IntakeSearchClient): string {
 
 export default function IntakePage() {
   const { token, user } = useAuth();
+  const p = usePanelBasePath();
   const modelRef = useRef<HTMLInputElement | null>(null);
   const searchWrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -970,7 +972,7 @@ export default function IntakePage() {
                 Drukuj etykietę
               </button>
               <Link
-                href={`/panel/naprawy/${success.id}`}
+                href={p.repairDetailPath(success.id)}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#3b82f6]/40 bg-[#3b82f6]/12 px-4 py-3 text-sm font-semibold text-[#bfdbfe] transition hover:bg-[#3b82f6]/22"
               >
                 <Pencil size={18} />

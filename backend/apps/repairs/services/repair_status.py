@@ -31,10 +31,20 @@ ALLOWED_TRANSITIONS = {
 }
 
 
-def change_repair_status(repair, new_status, changed_by_id=None, notes=""):
+def change_repair_status(
+    repair,
+    new_status,
+    changed_by_id=None,
+    notes="",
+    *,
+    skip_transition_check=False,
+):
     """
     Zmienia status naprawy i zapisuje wpis w RepairStatusHistory.
     Ustawia daty (accepted_at, completed_at, ready_for_pickup_at, picked_up_at) w zależności od statusu.
+
+    ``skip_transition_check=True`` — staff może ustawić dowolny status (pominięcie kolejności w workflow).
+    Dla akcji klienta / automatycznych zostaw ``False`` (walidacja ALLOWED_TRANSITIONS).
 
     Zwraca zaktualizowany obiekt RepairRequest.
     """
@@ -42,12 +52,13 @@ def change_repair_status(repair, new_status, changed_by_id=None, notes=""):
     if old_status == new_status:
         return repair
 
-    allowed = ALLOWED_TRANSITIONS.get(old_status, [])
-    if new_status not in allowed:
-        raise ValueError(
-            f"Nieprawidłowe przejście statusu: {old_status} → {new_status}. "
-            f"Dozwolone: {allowed}"
-        )
+    if not skip_transition_check:
+        allowed = ALLOWED_TRANSITIONS.get(old_status, [])
+        if new_status not in allowed:
+            raise ValueError(
+                f"Nieprawidłowe przejście statusu: {old_status} → {new_status}. "
+                f"Dozwolone: {allowed}"
+            )
 
     now = timezone.now()
 

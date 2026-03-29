@@ -220,7 +220,7 @@ export function ClientNaprawyList() {
                         {formatDate(repair.createdAt)}
                       </td>
                       <td className="p-4">
-                        <StatusBadge status={repair.status} />
+                        <StatusBadge status={repair.status} labelOverride={repair.statusDisplay} />
                       </td>
                       <td className="cp-heading p-4 text-sm font-medium">
                         {formatPrice(repair.totalPrice)}

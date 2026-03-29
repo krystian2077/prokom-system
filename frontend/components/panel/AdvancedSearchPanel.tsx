@@ -5,29 +5,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import type { AdvancedSearchResponse, GlobalSearchClient, GlobalSearchDevice, GlobalSearchRepair } from "@/types/search";
-
-type RepairStatusValue =
-  | "new"
-  | "accepted"
-  | "in_diagnostics"
-  | "diagnostics_done"
-  | "quote_pending"
-  | "quote_sent"
-  | "quote_accepted"
-  | "quote_rejected"
-  | "waiting_for_parts"
-  | "in_repair"
-  | "repair_done"
-  | "in_testing"
-  | "testing_passed"
-  | "testing_failed"
-  | "ready_for_pickup"
-  | "picked_up"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "unrepairable"
-  | "abandoned";
+import { STATUS_OPTIONS as REPAIR_STATUS_OPTIONS, type RepairStatusValue } from "@/components/panel/WorkerStatusChangeModal";
 
 const TYPE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "repairs", label: "Naprawy" },
@@ -42,30 +20,6 @@ const REPAIR_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "warranty", label: "Gwarancyjna" },
   { value: "complaint", label: "Reklamacja" },
   { value: "scheduled", label: "Z umówionym terminem" },
-];
-
-const REPAIR_STATUS_OPTIONS: Array<{ value: RepairStatusValue; label: string }> = [
-  { value: "new", label: "Nowe zgłoszenie" },
-  { value: "accepted", label: "Przyjęte do serwisu" },
-  { value: "in_diagnostics", label: "W diagnostyce" },
-  { value: "diagnostics_done", label: "Diagnoza zakończona" },
-  { value: "quote_pending", label: "Przygotowanie wyceny" },
-  { value: "quote_sent", label: "Wycena wysłana" },
-  { value: "quote_accepted", label: "Wycena zaakceptowana" },
-  { value: "quote_rejected", label: "Wycena odrzucona" },
-  { value: "waiting_for_parts", label: "Oczekiwanie na części" },
-  { value: "in_repair", label: "W trakcie naprawy" },
-  { value: "repair_done", label: "Naprawa zakończona" },
-  { value: "in_testing", label: "Testowanie" },
-  { value: "testing_passed", label: "Testy przeszły" },
-  { value: "testing_failed", label: "Testy nie przeszły" },
-  { value: "ready_for_pickup", label: "Gotowe do odbioru" },
-  { value: "picked_up", label: "Odebrane" },
-  { value: "shipped", label: "Wysłane" },
-  { value: "delivered", label: "Dostarczone" },
-  { value: "cancelled", label: "Anulowane" },
-  { value: "unrepairable", label: "Nie do naprawy" },
-  { value: "abandoned", label: "Porzucone przez klienta" },
 ];
 
 function clientBadgeReturns(c: GlobalSearchClient) {

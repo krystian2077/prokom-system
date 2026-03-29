@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton, StackedRowSkeleton, StatCardSkeleton } from "@/components/ui/Skeleton";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { useAuth } from "@/contexts/AuthContext";
 import type {
   CustomerOrder,
@@ -447,8 +448,9 @@ function StatusBreakdown({
 }
 
 function OrderCardCustomer({ order, compact }: { order: CustomerOrder; compact?: boolean }) {
+  const panelPaths = usePanelBasePath();
   const marginPercent = order.margin_percent;
-  const linkHref = order.related_repair ? `/panel/repairs/${order.related_repair}` : null;
+  const linkHref = order.related_repair ? panelPaths.repairDetailPath(order.related_repair) : null;
 
   return (
     <div className={`rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-3 ${compact ? "p-3" : "p-4"}`}>

@@ -5,8 +5,21 @@ from .models import LabourType, Quote, QuoteItem, QuoteVersion, QuoteDecision, D
 
 class QuoteItemInline(admin.TabularInline):
     model = QuoteItem
-    extra = 1
+    extra = 0
     autocomplete_fields = ["part", "labour_type"]
+    fields = [
+        "item_type",
+        "part",
+        "labour_type",
+        "description",
+        "part_origin",
+        "quantity",
+        "parts_price",
+        "labour_price",
+        "unit_price",
+        "total",
+    ]
+    readonly_fields = ["unit_price", "total"]
 
 
 @admin.register(LabourType)

@@ -148,6 +148,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =============================================================================
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
 
+# SMTP — limit czasu połączenia/wysyłki (sek.); zapobiega nieskończonemu „Wysyłanie…” przy zawieszonym hoście
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=25)
+
 # Dane na wydruku PDF (potwierdzenie przyjęcia) — uzupełnij w .env produkcyjnym
 SERWIS_PRINT_COMPANY_NAME = env(
     "SERWIS_PRINT_COMPANY_NAME",

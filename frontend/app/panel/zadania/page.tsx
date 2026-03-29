@@ -7,6 +7,7 @@ import { ChevronRight, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { TaskListSkeleton } from "@/components/ui/Skeleton";
@@ -89,6 +90,7 @@ function priorityPillClass(priorityRaw: string | undefined): string {
 
 export default function TasksPage() {
   const { token, user } = useAuth();
+  const panelPaths = usePanelBasePath();
   const showToast = useWorkerStore((s) => s.addToast);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -151,7 +153,7 @@ export default function TasksPage() {
     const params = new URLSearchParams(searchParams.toString());
     if (next === "all") params.delete("scope");
     else params.set("scope", next);
-    router.push(`/panel/zadania?${params.toString()}`);
+    router.push(`${panelPaths.zadaniaPath}?${params.toString()}`);
   };
 
   const loadTasks = async () => {
@@ -291,9 +293,9 @@ export default function TasksPage() {
               <button
                 type="button"
                 onClick={() => {
-                  const p = new URLSearchParams(searchParams.toString());
-                  p.delete("related_repair");
-                  router.push(`/panel/zadania?${p.toString()}`);
+                  const qs = new URLSearchParams(searchParams.toString());
+                  qs.delete("related_repair");
+                  router.push(`${panelPaths.zadaniaPath}?${qs.toString()}`);
                 }}
                 className="font-semibold text-[var(--white)] underline decoration-[#3b82f6] underline-offset-2 hover:text-[#bfdbfe]"
               >
@@ -432,7 +434,7 @@ export default function TasksPage() {
                         <div className="mt-1 text-xs text-[var(--ink2)]">
                           {t.related_repair_number ? (
                             <Link
-                              href={`/panel/naprawy/${t.related_repair ?? ""}`}
+                              href={panelPaths.repairDetailPath(t.related_repair ?? "")}
                               className="text-[#3b82f6] hover:underline"
                               onClick={(e) => e.stopPropagation()}
                             >
@@ -610,7 +612,7 @@ export default function TasksPage() {
                         <dt className="text-[var(--ink2)]">Naprawa</dt>
                         <dd className="text-right">
                           <Link
-                            href={`/panel/naprawy/${detailTask.related_repair}`}
+                            href={panelPaths.repairDetailPath(detailTask.related_repair)}
                             className="font-semibold text-[#3b82f6] hover:underline"
                             onClick={closeDetail}
                           >

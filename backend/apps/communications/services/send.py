@@ -431,6 +431,124 @@ def send_template_to_repair(template, repair, sent_by=None):
         return log, True
 
 
+def client_email_is_deliverable(email: str | None) -> bool:
+    """Czy na adres można wysłać prawdziwy e-mail (nie placeholder techniczny)."""
+    e = (email or "").strip().lower()
+    if not e or e.endswith("@prokom.local"):
+        return False
+    return True
+
+
+def send_quote_summary_email_to_client(repair, quote, sent_by, *, fail_silently=False, is_resend=False):
+    """
+    Wysyła zestawienie wyceny na e-mail klienta (HTML + plain text, log CommunicationLog).
+    Zwraca (success: bool, detail: str | None) — detail np. 'no_email' lub 'send_failed'.
+    """
+    client = repair.client
+    if not client_email_is_deliverable(getattr(client, "email", None) or ""):
+        return False, "no_email"
+
+    base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3000").rstrip("/")
+    panel_repairs_url = f"{base}/client/naprawy"
+    panel_detail_url = f"{base}/client/naprawy/{repair.id}"
+    track_url = f"{base}/track?ref={repair.repair_number}"
+
+    device_label = repair.device.get_device_name() if getattr(repair, "device", None) else "Urządzenie"
+    client_name = client.get_full_name() if client else ""
+
+    quote_rows = []
+    lines_plain = []
+    for it in quote.items.all().order_by("id"):
+        desc = (it.description or "Pozycja").strip()
+        try:
+            origin_lbl = it.get_part_origin_display()
+        except Exception:
+            origin_lbl = ""
+        quote_rows.append(
+            {
+                "description": desc,
+                "quantity": str(it.quantity),
+                "parts": _format_money_pl_email(it.parts_price),
+                "labour": _format_money_pl_email(it.labour_price),
+                "line_total": _format_money_pl_email(it.total),
+                "origin": origin_lbl or "—",
+            }
+        )
+        origin_line = f"  |  {origin_lbl}" if origin_lbl else ""
+        lines_plain.append(
+            f"• {desc}\n"
+            f"  Ilość: {it.quantity}  |  Części: {_format_money_pl_email(it.parts_price)}  |  "
+            f"Robocizna: {_format_money_pl_email(it.labour_price)}  |  Razem: {_format_money_pl_email(it.total)}"
+            f"{origin_line}"
+        )
+
+    total_str = _format_money_pl_email(quote.total_amount)
+    intro = (
+        "Przesyłamy zaktualizowane zestawienie kosztów — kwoty w panelu klienta są zgodne z poniższą tabelą."
+        if is_resend
+        else "Przesyłamy zestawienie kosztów naprawy — szczegóły znajdziesz także w panelu klienta."
+    )
+    body_plain = (
+        f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
+        f"{intro}\n\n"
+        f"Numer zgłoszenia: {repair.repair_number}\n"
+        f"Wycena nr: {quote.version}\n"
+        f"Urządzenie: {device_label}\n\n"
+        "Pozycje:\n"
+        + "\n".join(lines_plain)
+        + f"\n\nSUMA: {total_str}\n"
+    )
+    if quote.valid_until:
+        vu = quote.valid_until.strftime("%d.%m.%Y") if hasattr(quote.valid_until, "strftime") else str(quote.valid_until)
+        body_plain += f"Ważność wyceny do: {vu}\n"
+    if quote.sent_at:
+        try:
+            st = timezone.localtime(quote.sent_at).strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            st = str(quote.sent_at)
+        body_plain += f"Data wysłania / aktualizacji: {st}\n"
+    body_plain += (
+        f"\nPanel klienta (szczegóły i akceptacja): {panel_detail_url}\n"
+        f"Śledzenie bez logowania: {track_url}\n"
+    )
+
+    ctx = {
+        "client_name": client_name,
+        "repair_number": repair.repair_number,
+        "device_name": device_label,
+        "quote_version": quote.version,
+        "total_amount_display": total_str,
+        "intro_text": intro,
+        "quote_rows": quote_rows,
+        "valid_until_display": "",
+        "sent_at_display": "",
+        "is_resend": is_resend,
+        "panel_repairs_url": panel_repairs_url,
+        "panel_detail_url": panel_detail_url,
+        "track_url": track_url,
+    }
+    if quote.valid_until:
+        ctx["valid_until_display"] = (
+            quote.valid_until.strftime("%d.%m.%Y") if hasattr(quote.valid_until, "strftime") else str(quote.valid_until)
+        )
+    if quote.sent_at:
+        try:
+            ctx["sent_at_display"] = timezone.localtime(quote.sent_at).strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            ctx["sent_at_display"] = str(quote.sent_at)
+
+    html_content = render_to_string("emails/quote_summary.html", ctx)
+    subject = (
+        f"Zaktualizowana wycena — {repair.repair_number} | PRO-KOM Serwis"
+        if is_resend
+        else f"Wycena naprawy {repair.repair_number} | PRO-KOM Serwis"
+    )
+    _log, ok = send_freeform_email_to_repair_client(
+        repair, subject, body_plain, sent_by, fail_silently=fail_silently, html_content=html_content
+    )
+    return (True, None) if ok else (False, "send_failed")
+
+
 def _outbound_client_email_footer(repair):
     """Stopka ułatwiająca dopasowanie odpowiedzi klienta (numer w temacie wątku)."""
     rn = repair.repair_number
@@ -441,10 +559,22 @@ def _outbound_client_email_footer(repair):
     )
 
 
-def send_freeform_email_to_repair_client(repair, subject, body_plain, sent_by, *, fail_silently=True):
+def _outbound_client_email_footer_html(repair):
+    rn = repair.repair_number
+    return (
+        f'<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:28px;'
+        f'border-top:1px solid #e5e5e5;padding-top:18px;"><tr><td style="font-size:12px;line-height:1.55;color:#737373;">'
+        f"Odpowiadając na tę wiadomość, zachowaj w temacie numer zgłoszenia: "
+        f'<strong style="color:#404040;">{rn}</strong> — wtedy odpowiedź trafi do wątku tej naprawy w serwisie.'
+        f"</td></tr></table>"
+    )
+
+
+def send_freeform_email_to_repair_client(repair, subject, body_plain, sent_by, *, fail_silently=True, html_content=None):
     """
     Dowolny e-mail do klienta naprawy; zapisuje CommunicationLog (bez szablonu).
     Treść wysłana = body_plain + krótka stopka z numerem zgłoszenia (pod odbiór odpowiedzi przez webhook).
+    Gdy podasz html_content — wysyłka multipart/alternative (HTML + plain).
     Zwraca (log, success).
     """
     from apps.communications.models import CommunicationLog
@@ -467,7 +597,11 @@ def send_freeform_email_to_repair_client(repair, subject, body_plain, sent_by, *
         )
         return log, False
     try:
-        send_email(recipient, full_subject, body_with_footer, fail_silently=fail_silently)
+        if html_content:
+            html_full = (html_content or "").rstrip() + _outbound_client_email_footer_html(repair)
+            send_email_html(recipient, full_subject, body_with_footer, html_full, fail_silently=fail_silently)
+        else:
+            send_email(recipient, full_subject, body_with_footer, fail_silently=fail_silently)
         log = CommunicationLog.objects.create(
             repair=repair,
             template=None,

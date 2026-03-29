@@ -169,8 +169,12 @@ export interface QuoteItem {
   id: number;
   description: string;
   quantity: number;
-  unit_price: number;
-  total_price: number;
+  parts_price: string | number;
+  labour_price: string | number;
+  unit_price: string | number;
+  total: string | number;
+  part_origin?: "original" | "aftermarket";
+  part_origin_display?: string;
 }
 
 export interface CostSummary {

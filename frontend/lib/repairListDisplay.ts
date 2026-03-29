@@ -167,21 +167,15 @@ export function priorityRank(priority: string | null | undefined): number {
 }
 
 export function statusBadge(item: RepairRequestListItem) {
+  const display = (item.public_status ?? item.status_display ?? "").trim();
   const s = (item.status ?? "").toLowerCase();
   if (["ready_for_pickup"].includes(s))
-    return { bg: "rgba(34,197,94,.14)", border: "rgba(34,197,94,.30)", text: "#22c55e", label: "Gotowe" };
+    return { bg: "rgba(34,197,94,.14)", border: "rgba(34,197,94,.30)", text: "#22c55e", label: display || "Gotowe Do Odbioru" };
   if (["waiting_for_parts"].includes(s) || (item.auto_tags ?? []).includes("czeka_na_czesc"))
-    return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b", label: "Czeka na część" };
+    return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b", label: display || "Oczekiwanie na Części" };
   if (["testing_failed"].includes(s) || (item.auto_tags ?? []).includes("pilne"))
-    return { bg: "rgba(220,30,30,.14)", border: "rgba(220,30,30,.28)", text: "#dc1e1e", label: item.status_display || "Pilne" };
-  return { bg: "rgba(59,130,246,.14)", border: "rgba(59,130,246,.28)", text: "#3b82f6", label: item.status_display || "W naprawie" };
-}
-
-export function blockerText(item: RepairRequestListItem): string {
-  const s = (item.status ?? "").toLowerCase();
-  if (s === "waiting_for_parts" || (item.auto_tags ?? []).includes("czeka_na_czesc")) return "Blokada: część w drodze";
-  if (item.requires_attention) return "Blokada: wymaga reakcji";
-  return "";
+    return { bg: "rgba(220,30,30,.14)", border: "rgba(220,30,30,.28)", text: "#dc1e1e", label: display || "Pilne" };
+  return { bg: "rgba(59,130,246,.14)", border: "rgba(59,130,246,.28)", text: "#3b82f6", label: display || "W naprawie" };
 }
 
 export function nextAction(item: RepairRequestListItem) {

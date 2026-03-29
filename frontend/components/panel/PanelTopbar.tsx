@@ -44,7 +44,8 @@ export function PanelTopbar() {
   const router = useRouter();
   const isAdmin = user?.role === "admin";
   const pathname = usePathname();
-  const accent = isAdmin ? "var(--red)" : "var(--blue)";
+  const accent = "var(--blue)";
+  const isAdminPanel = pathname.startsWith("/admin-panel");
   const { theme: panelTheme, toggleTheme } = useWorkerPanelTheme();
   const showToast = useWorkerStore((s) => s.addToast);
 
@@ -53,6 +54,35 @@ export function PanelTopbar() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const breadcrumb = useMemo(() => {
+    if (pathname.startsWith("/admin-panel")) {
+      if (pathname === "/admin-panel/dashboard" || pathname.startsWith("/admin-panel/dashboard/")) return "Dashboard";
+      if (pathname.startsWith("/admin-panel/repairs/")) return "Szczegóły naprawy";
+      if (pathname === "/admin-panel/repairs") return "Naprawy";
+      if (pathname.startsWith("/admin-panel/zgloszenia/")) return "Szczegóły naprawy";
+      if (pathname === "/admin-panel/zgloszenia") return "Zgłoszenia";
+      if (pathname.startsWith("/admin-panel/unassigned")) return "Nieprzypisane";
+      if (pathname.startsWith("/admin-panel/workload")) return "Obciążenie";
+      if (pathname.startsWith("/admin-panel/intake")) return "Przyjęcie Stacjonarne";
+      if (pathname.startsWith("/admin-panel/comm")) return "Komunikacja";
+      if (pathname.startsWith("/admin-panel/notif")) return "Powiadomienia";
+      if (pathname.startsWith("/admin-panel/calendar")) return "Kalendarz";
+      if (pathname.startsWith("/admin-panel/availability")) return "Dostępność";
+      if (pathname.startsWith("/admin-panel/parts")) return "Części";
+      if (pathname.startsWith("/admin-panel/tasks")) return "Zadania";
+      if (pathname.startsWith("/admin-panel/archive")) return "Historia napraw";
+      if (pathname.startsWith("/admin-panel/clients")) return "Klienci";
+      if (pathname.startsWith("/admin-panel/search")) return "Wyszukiwanie";
+      if (pathname.startsWith("/admin-panel/pickups")) return "Odbiory";
+      if (pathname.startsWith("/admin-panel/claims")) return "Reklamacje";
+      if (pathname.startsWith("/admin-panel/profil")) return "Mój profil";
+      if (pathname.startsWith("/admin-panel/stats")) return "Statystyki";
+      if (pathname.startsWith("/admin-panel/team")) return "Zespół";
+      if (pathname.startsWith("/admin-panel/orders")) return "Zamówienia";
+      if (pathname.startsWith("/admin-panel/config")) return "Konfiguracja";
+      if (pathname.startsWith("/admin-panel/hurtownie")) return "Hurtownie";
+      return "Panel";
+    }
+
     if (pathname === "/panel/dashboard" || pathname.startsWith("/panel/dashboard/")) return "Dashboard";
     const repairsDetail =
       pathname.startsWith("/panel/repairs/") ||
@@ -66,8 +96,7 @@ export function PanelTopbar() {
     if (repairsList) return "Naprawy";
     if (pathname === "/panel/unassigned" || pathname === "/panel/nieprzypisane") return "Nieprzypisane";
     if (pathname === "/panel/all-repairs" || pathname === "/panel/wszystkie") return "Wszystkie naprawy";
-    if (pathname.startsWith("/panel/intake") || pathname.startsWith("/admin-panel/intake"))
-      return "Przyjęcie Stacjonarne";
+    if (pathname.startsWith("/panel/intake")) return "Przyjęcie Stacjonarne";
     if (pathname.startsWith("/panel/comm")) return "Komunikacja";
     if (pathname.startsWith("/panel/powiadomienia")) return "Powiadomienia";
     if (pathname.startsWith("/panel/calendar") || pathname.startsWith("/panel/kalendarz")) return "Kalendarz";
@@ -89,7 +118,11 @@ export function PanelTopbar() {
     return "Panel";
   }, [pathname]);
 
-  const showBack = pathname.startsWith("/panel/") && !pathname.includes("/panel/login") && pathname !== "/panel/dashboard";
+  const showBack =
+    (pathname.startsWith("/panel/") || pathname.startsWith("/admin-panel/")) &&
+    !pathname.includes("/panel/login") &&
+    pathname !== "/panel/dashboard" &&
+    pathname !== "/admin-panel/dashboard";
 
   const notifUnreadCountQuery = useQuery({
     queryKey: ["topbar", "notif", "unread-count"],
@@ -345,7 +378,7 @@ export function PanelTopbar() {
 
           <div className="min-w-0">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
-              {user?.role === "admin" ? "Panel Admina" : "Panel pracownika"}
+              {user?.role === "admin" ? "Panel administratora" : "Panel pracownika"}
             </div>
             <div className="truncate text-sm font-semibold text-[var(--white)]">{breadcrumb}</div>
           </div>
@@ -414,7 +447,7 @@ export function PanelTopbar() {
               <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-[300] max-h-[440px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] shadow-[0_16px_48px_rgba(0,0,0,.2)]">
                 {loading && (
                   <div className="flex items-center gap-3 px-4 py-6 text-[var(--ink2)]">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--red)] border-t-transparent" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--blue)] border-t-transparent" />
                     Szukam…
                   </div>
                 )}
@@ -685,7 +718,7 @@ export function PanelTopbar() {
           </button>
 
           <Link
-            href="/panel/powiadomienia"
+            href={isAdminPanel ? "/admin-panel/notif" : "/panel/powiadomienia"}
             className="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             aria-label="Powiadomienia"
           >
@@ -698,7 +731,7 @@ export function PanelTopbar() {
           </Link>
 
           <Link
-            href="/panel/comm"
+            href={isAdminPanel ? "/admin-panel/comm" : "/panel/comm"}
             className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
             aria-label="Wiadomości"
           >
@@ -706,7 +739,7 @@ export function PanelTopbar() {
           </Link>
 
           <Link
-            href="/panel/profil"
+            href={isAdminPanel ? "/admin-panel/profil" : "/panel/profil"}
             className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-sm font-bold text-[var(--white)] transition hover:bg-[var(--row-active)]"
             aria-label="Mój profil"
             style={{ boxShadow: `0 0 26px rgba(59,130,246,.10)` }}

@@ -14,6 +14,7 @@ import { ChevronRight, Clock4, Mail, MessageSquareText, RotateCcw, Smartphone, Z
 import { motion } from "framer-motion";
 import { ScopeBar } from "@/components/layout/ScopeBar";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { usePanelBasePath } from "@/lib/panelPaths";
 
 type Scope = DashboardScope;
 
@@ -43,26 +44,20 @@ function priorityRank(priority: string | null | undefined) {
 }
 
 function statusBadge(item: RepairRequestListItem) {
+  const display = (item.public_status ?? item.status_display ?? "").trim();
   const s = (item.status ?? "").toLowerCase();
   const tags = item.auto_tags ?? [];
 
-  if (["ready_for_pickup"].includes(s)) return { bg: "rgba(34,197,94,.14)", border: "rgba(34,197,94,.30)", text: "#22c55e", label: "Gotowe" };
+  if (["ready_for_pickup"].includes(s))
+    return { bg: "rgba(34,197,94,.14)", border: "rgba(34,197,94,.30)", text: "#22c55e", label: display || "Gotowe Do Odbioru" };
   if (["waiting_for_parts"].includes(s) || tags.includes("czeka_na_czesc"))
-    return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b", label: "Czeka na część" };
+    return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b", label: display || "Oczekiwanie na Części" };
   if (["testing_failed"].includes(s) || tags.includes("pilne"))
-    return { bg: "rgba(220,30,30,.14)", border: "rgba(220,30,30,.28)", text: "#dc1e1e", label: item.status_display || "Pilne" };
+    return { bg: "rgba(220,30,30,.14)", border: "rgba(220,30,30,.28)", text: "#dc1e1e", label: display || "Pilne" };
 
-  if (["in_testing"].includes(s)) return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b", label: "Testy" };
-  return { bg: "rgba(59,130,246,.14)", border: "rgba(59,130,246,.28)", text: "#3b82f6", label: item.status_display || "W naprawie" };
-}
-
-function blockerText(item: RepairRequestListItem) {
-  const s = (item.status ?? "").toLowerCase();
-  const tags = item.auto_tags ?? [];
-
-  if (s === "waiting_for_parts" || tags.includes("czeka_na_czesc")) return "Blokada: część w drodze";
-  if (item.requires_attention) return "Blokada: wymaga reakcji";
-  return "";
+  if (["in_testing"].includes(s))
+    return { bg: "rgba(245,158,11,.16)", border: "rgba(245,158,11,.30)", text: "#f59e0b", label: display || "W naprawie" };
+  return { bg: "rgba(59,130,246,.14)", border: "rgba(59,130,246,.28)", text: "#3b82f6", label: display || "W naprawie" };
 }
 
 function taskPriorityPillClass(priorityRaw: string | undefined): string {
@@ -347,6 +342,7 @@ function StaffDashboardPage() {
   const { token, user } = useAuth();
   const searchParams = useSearchParams();
   const requiresActionSectionRef = useRef<HTMLElement | null>(null);
+  const p = usePanelBasePath();
 
   const scope = useWorkerStore((s) => s.scope);
   const setScope = useWorkerStore((s) => s.setScope);
@@ -354,7 +350,7 @@ function StaffDashboardPage() {
   const queryClient = useQueryClient();
   const [partsModalUsage, setPartsModalUsage] = useState<PartUsage | null>(null);
 
-  const panelLabel = user?.role === "admin" ? "Panel Admina" : "Panel pracownika";
+  const panelLabel = user?.role === "admin" ? "Panel administratora" : "Panel pracownika";
 
   const scopeDaysWithoutUpdate = useMemo(() => {
     switch (scope) {
@@ -580,7 +576,7 @@ function StaffDashboardPage() {
                 </span>
               </button>
 
-              <Link href="/panel/intake" className="rounded-2xl bg-[#dc1e1e] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b81818]">
+              <Link href={p.intakePath} className="rounded-2xl bg-[#dc1e1e] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b81818]">
                 Nowe przyjęcie
               </Link>
             </div>
@@ -597,7 +593,7 @@ function StaffDashboardPage() {
               {
                 id: "active",
                 label: "Aktywnych",
-                href: "/panel/naprawy?status=all",
+                href: `${p.repairsListPath}?status=all`,
                 value: data && !loading ? data.my_active_count : null,
                 accent: "#f59e0b",
                 delay: "0ms",
@@ -605,7 +601,7 @@ function StaffDashboardPage() {
               {
                 id: "in_repair",
                 label: "W trakcie Naprawy",
-                href: "/panel/naprawy?status=in_progress",
+                href: `${p.repairsListPath}?status=in_progress`,
                 value: data && !loading ? data.in_repair_kpi_count : null,
                 accent: "#dc1e1e",
                 delay: "80ms",
@@ -613,7 +609,7 @@ function StaffDashboardPage() {
               {
                 id: "ready",
                 label: "Gotowe do Odbioru",
-                href: "/panel/naprawy?status=ready",
+                href: `${p.repairsListPath}?status=ready`,
                 value: !loading ? (data?.ready_for_pickup?.length ?? 0) : null,
                 accent: "#22c55e",
                 delay: "160ms",
@@ -621,7 +617,7 @@ function StaffDashboardPage() {
               {
                 id: "messages",
                 label: "Wiadomości",
-                href: "/panel/comm",
+                href: p.commPath,
                 value: data && !loading ? (data.today_to_contact?.length ?? 0) : null,
                 accent: "#3b82f6",
                 delay: "240ms",
@@ -629,7 +625,7 @@ function StaffDashboardPage() {
               {
                 id: "completed",
                 label: "Zakończonych",
-                href: "/panel/historia",
+                href: p.historiaPath,
                 value: !loading ? (data?.completed_pickups_count ?? 0) : null,
                 accent: "#86efac",
                 delay: "320ms",
@@ -667,7 +663,7 @@ function StaffDashboardPage() {
                 <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Co teraz robić?</h2>
               </div>
             </div>
-            <Link href="/panel/naprawy" className="text-sm font-semibold text-[#3b82f6] hover:underline">
+            <Link href={p.repairsListPath} className="text-sm font-semibold text-[#3b82f6] hover:underline">
               Wszystkie
             </Link>
           </div>
@@ -681,12 +677,11 @@ function StaffDashboardPage() {
               })();
 
               const action = nextAction(r);
-              const blocker = blockerText(r);
               const sb = statusBadge(r);
               return (
                 <Link
                   key={r.id}
-                  href={`/panel/naprawy/${r.id}`}
+                  href={p.repairDetailPath(r.id)}
                   className="group relative rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4 transition hover:translate-x-0.5 hover:bg-[var(--row-hover)] hover:border-[var(--border2)]"
                 >
                   <div className="absolute right-3 top-3 h-2 w-2 rounded-full" style={{ background: tone === "urgent" ? "#dc1e1e" : tone === "warn" ? "#f59e0b" : "#9ca3af" }} />
@@ -719,11 +714,6 @@ function StaffDashboardPage() {
                     >
                       {sb.label}
                     </span>
-                    {blocker ? (
-                      <span className="rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#f59e0b]">
-                        {blocker}
-                      </span>
-                    ) : null}
                   </div>
 
                   <div className="mt-3 inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] group-hover:text-[var(--white)]">
@@ -736,7 +726,7 @@ function StaffDashboardPage() {
           {!requiresActionQuery.isLoading && (requiresAction?.length ?? 0) === 0 ? (
             <p className="mt-4 text-sm text-[var(--ink2)]">
               Brak aktywnych napraw do wyświetlenia. Sprawdź{" "}
-              <Link href="/panel/naprawy" className="font-semibold text-[#3b82f6] hover:underline">
+              <Link href={p.repairsListPath} className="font-semibold text-[#3b82f6] hover:underline">
                 Moje naprawy
               </Link>
               .
@@ -754,7 +744,7 @@ function StaffDashboardPage() {
                     {scope === "today" ? "Dziś" : scope === "tomorrow" ? "Jutro" : scope === "week" ? "Ten tydzień" : "Ten miesiąc"}
                   </h2>
                 </div>
-                <Link href="/panel/naprawy" className="text-sm font-semibold text-[#3b82f6] hover:underline">
+                <Link href={p.repairsListPath} className="text-sm font-semibold text-[#3b82f6] hover:underline">
                   Wszystkie
                 </Link>
               </div>
@@ -769,7 +759,7 @@ function StaffDashboardPage() {
                   ) : (
                     <Link
                       key={r.id}
-                      href={`/panel/naprawy/${r.id}`}
+                      href={p.repairDetailPath(r.id)}
                       className="group flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-[var(--row-hover)]"
                     >
                       <div className="min-w-0">
@@ -797,7 +787,7 @@ function StaffDashboardPage() {
               {!loading && myRepairsPreviewRows.length === 0 ? (
                 <p className="mt-4 text-sm text-[var(--muted)]">
                   Brak napraw pasujących do tego widoku (termin SLA / data utworzenia). Otwórz{" "}
-                  <Link href="/panel/naprawy" className="font-semibold text-[#3b82f6] hover:underline">
+                  <Link href={p.repairsListPath} className="font-semibold text-[#3b82f6] hover:underline">
                     Moje naprawy
                   </Link>
                   , aby zobaczyć pełną listę.
@@ -819,7 +809,7 @@ function StaffDashboardPage() {
                     Termin na dziś oraz otwarte zadania powiązane z naprawą (np. z szybkich zadań przy zgłoszeniu).
                   </p>
                 </div>
-                <Link href="/panel/zadania" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
+                <Link href={p.zadaniaPath} className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
                   Wszystkie
                 </Link>
               </div>
@@ -835,8 +825,8 @@ function StaffDashboardPage() {
                 ) : (
                   (tasksQuery.data ?? []).slice(0, 5).map((t) => {
                     const zadaniaHref = t.related_repair
-                      ? `/panel/zadania?${new URLSearchParams({ related_repair: t.related_repair }).toString()}`
-                      : "/panel/zadania";
+                      ? `${p.zadaniaPath}?${new URLSearchParams({ related_repair: t.related_repair }).toString()}`
+                      : p.zadaniaPath;
                     const pri = (t.priority ?? "standard").toLowerCase();
                     const priLabel =
                       t.priority_display ?? TASK_PRIORITY_LABEL[pri] ?? TASK_PRIORITY_LABEL.standard;
@@ -872,7 +862,7 @@ function StaffDashboardPage() {
                             <div className="mt-1 text-xs text-[var(--ink2)]">
                               {t.related_repair && t.related_repair_number ? (
                                 <Link
-                                  href={`/panel/naprawy/${t.related_repair}`}
+                                  href={p.repairDetailPath(t.related_repair)}
                                   className="font-semibold text-[#3b82f6] hover:underline"
                                 >
                                   {t.related_repair_number}
@@ -912,7 +902,7 @@ function StaffDashboardPage() {
                     Ostatnie wpisy: wiadomości od klienta (panel lub e-mail) oraz wychodzące wiadomości z logu — zakres jak w komunikacji przy naprawach.
                   </p>
                 </div>
-                <Link href="/panel/comm" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
+                <Link href={p.commPath} className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
                   Wszystkie
                 </Link>
               </div>
@@ -931,7 +921,7 @@ function StaffDashboardPage() {
                       Gdy klient napisze w panelu lub wyślesz wiadomość z naprawy, pojawi się tu skrót.
                     </p>
                     <Link
-                      href="/panel/naprawy"
+                      href={p.repairsListPath}
                       className="mt-3 inline-block text-sm font-semibold text-[#3b82f6] hover:underline"
                     >
                       Przejdź do napraw
@@ -943,7 +933,7 @@ function StaffDashboardPage() {
                       return (
                         <Link
                           key={row.id}
-                          href={`/panel/naprawy/${row.repair_id}?tab=comms`}
+                          href={`${p.repairDetailPath(row.repair_id)}?tab=comms`}
                           className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3 transition hover:bg-[var(--row-hover)]"
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -983,7 +973,7 @@ function StaffDashboardPage() {
                     return (
                       <Link
                         key={l.id}
-                        href={l.repair ? `/panel/naprawy/${l.repair}?tab=comms` : "/panel/comm"}
+                        href={l.repair ? `${p.repairDetailPath(l.repair)}?tab=comms` : p.commPath}
                         className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3 transition hover:bg-[var(--row-hover)]"
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -1039,7 +1029,7 @@ function StaffDashboardPage() {
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Status</div>
                   <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Status części</h2>
                 </div>
-                <Link href="/panel/czesci-hurtownie" className="text-sm font-semibold text-[#3b82f6] hover:underline">
+                <Link href={p.czesciPath} className="text-sm font-semibold text-[#3b82f6] hover:underline">
                   Szczegóły
                 </Link>
               </div>
@@ -1098,7 +1088,7 @@ function StaffDashboardPage() {
                           {extra > 0 ? (
                             <p className="px-2 text-xs text-[var(--muted)]">
                               + {extra} więcej — zobacz{" "}
-                              <Link href="/panel/czesci-hurtownie" className="font-semibold text-[#3b82f6] hover:underline">
+                              <Link href={p.czesciPath} className="font-semibold text-[#3b82f6] hover:underline">
                                 kolejkę części
                               </Link>
                             </p>

@@ -5,11 +5,14 @@ import type { RepairStatus } from "@/types/panel";
 
 interface StatusBadgeProps {
   status: RepairStatus;
+  /** Nadpisuje tekst (np. status_display / public_status z API). */
+  labelOverride?: string | null;
   large?: boolean;
 }
 
-export function StatusBadge({ status, large }: StatusBadgeProps) {
-  const { label, className } = getStatusBadgeProps(status);
+export function StatusBadge({ status, labelOverride, large }: StatusBadgeProps) {
+  const { label: defaultLabel, className } = getStatusBadgeProps(status);
+  const label = (labelOverride ?? "").trim() || defaultLabel;
   const showDot = className === "progress" || className === "ready";
 
   return (

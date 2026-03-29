@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RepairRequestListItem } from "@/types/repairs";
 import Link from "next/link";
@@ -138,6 +139,7 @@ export default function ArchivePage() {
   const { user, token } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const p = usePanelBasePath();
   const isAdmin = user?.role === "admin";
 
   const page = Number(searchParams.get("page") ?? "1") || 1;
@@ -146,7 +148,7 @@ export default function ArchivePage() {
     const nextPage = typeof next === "function" ? next(page) : next;
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(nextPage));
-    router.push(`/panel/historia?${params.toString()}`);
+    router.push(`${p.historiaPath}?${params.toString()}`);
   };
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -368,7 +370,7 @@ export default function ArchivePage() {
                   return (
                     <Link
                       key={r.id}
-                      href={`/panel/naprawy/${r.id}`}
+                      href={p.repairDetailPath(r.id)}
                       className={`group flex flex-col gap-3 rounded-2xl border px-4 py-4 transition hover:bg-white/[0.04] sm:flex-row sm:items-center sm:justify-between sm:gap-6 ${variantCardClass(v)}`}
                       style={{ borderTop: idx === 0 ? "none" : undefined }}
                     >

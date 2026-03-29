@@ -18,6 +18,8 @@ export interface RepairRequestListItem {
     | null;
   status: string;
   status_display: string;
+  /** Jak `status_display` — etykieta publiczna (klient + serwis). */
+  public_status?: string | null;
   priority: string;
   priority_display: string;
   repair_type?: string | null;
