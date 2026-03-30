@@ -4,8 +4,9 @@ PRO-KOM Serwis — Selectory dashboardu staff
 Kubełki widoczne na dashboardzie: moje nowe, pilne, do kontaktu, w toku, zaległe, gotowe do odbioru, bez aktualizacji, ostatnia aktywność.
 Blok jakościowy: wiadomości do klientów, niezamknięte sprawy, średni czas odpowiedzi, reklamacje/gwarancje, wskaźnik reklamacyjności.
 """
-from django.db.models import Q, Avg, F
+from django.db.models import Q, Avg, F, DateTimeField
 from django.db.models import DurationField, ExpressionWrapper
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from datetime import timedelta
 
@@ -173,13 +174,13 @@ def pickup_panel_data(*, assigned_to_id=None):
     to_prepare_shipment = base.exclude(return_method=ReturnMethod.IN_PERSON).order_by("-ready_for_pickup_at")
 
     issued_today = (
-        RepairRequest.objects.filter(
-            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
-            picked_up_at__gte=today_start,
-            picked_up_at__lt=today_end,
+        RepairRequest.objects.filter(status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED])
+        .annotate(
+            closure_at=Coalesce("picked_up_at", "completed_at", output_field=DateTimeField()),
         )
+        .filter(closure_at__gte=today_start, closure_at__lt=today_end)
         .select_related("client", "device", "assigned_to")
-        .order_by("-picked_up_at")
+        .order_by("-closure_at")
     )
     if assigned_to_id:
         issued_today = issued_today.filter(assigned_to_id=assigned_to_id)
@@ -233,25 +234,30 @@ def staff_my_active_repairs_count(user_id: int) -> int:
 
 def staff_completed_pickups_count(user_id, dashboard_scope: str = "today") -> int:
     """
-    Liczba napraw przypisanych do pracownika zakończonych wydaniem/transportem,
-    w oknie czasowym zgodnym z zakresem dashboardu (kalendarz lokalny).
+    Liczba napraw przypisanych do pracownika zakończonych wydaniem / wysyłką / dostawą,
+    w oknie zgodnym z zakresem dashboardu (kalendarz lokalny).
+
+    Za datę zamknięcia używamy picked_up_at (odbiór, wysyłka, dostawa — ustawiane przy zmianie statusu)
+    lub — gdy brak — completed_at (np. starsze rekordy WYSŁANE sprzed uzupełniania picked_up_at).
     """
     scope = (dashboard_scope or "today").lower()
     today = timezone.now().date()
 
-    qs = RepairRequest.objects.filter(
-        assigned_to_id=user_id,
-        status__in=FINISHED_STATUSES,
-        picked_up_at__isnull=False,
+    qs = (
+        RepairRequest.objects.filter(assigned_to_id=user_id, status__in=FINISHED_STATUSES)
+        .annotate(
+            closure_at=Coalesce("picked_up_at", "completed_at", output_field=DateTimeField()),
+        )
+        .filter(closure_at__isnull=False)
     )
 
     if scope == "tomorrow":
         d = today + timedelta(days=1)
-        return qs.filter(picked_up_at__date=d).count()
+        return qs.filter(closure_at__date=d).count()
     if scope == "week":
         monday = today - timedelta(days=today.weekday())
         sunday = monday + timedelta(days=6)
-        return qs.filter(picked_up_at__date__gte=monday, picked_up_at__date__lte=sunday).count()
+        return qs.filter(closure_at__date__gte=monday, closure_at__date__lte=sunday).count()
     if scope == "month":
         first = today.replace(day=1)
         if today.month == 12:
@@ -259,9 +265,9 @@ def staff_completed_pickups_count(user_id, dashboard_scope: str = "today") -> in
         else:
             next_month_first = today.replace(month=today.month + 1, day=1)
         last = next_month_first - timedelta(days=1)
-        return qs.filter(picked_up_at__date__gte=first, picked_up_at__date__lte=last).count()
+        return qs.filter(closure_at__date__gte=first, closure_at__date__lte=last).count()
     # "today" i nieznany zakres — bieżący dzień
-    return qs.filter(picked_up_at__date=today).count()
+    return qs.filter(closure_at__date=today).count()
 
 
 def staff_dashboard_data(user_id, *, days_without_update=3, recent_activity_limit=10):

@@ -73,6 +73,8 @@ def change_repair_status(
             repair.ready_for_pickup_at = now
         elif new_status == RepairStatus.PICKED_UP and not repair.picked_up_at:
             repair.picked_up_at = now
+        elif new_status == RepairStatus.SHIPPED and not repair.picked_up_at:
+            repair.picked_up_at = now  # moment zamknięcia zlecenia wysyłkowego (KPI / panel odbiorów)
         elif new_status == RepairStatus.DELIVERED and not repair.picked_up_at:
             repair.picked_up_at = now  # traktujemy dostawę jako „odbior”
         elif new_status == RepairStatus.QUOTE_SENT and not repair.quote_sent_at:

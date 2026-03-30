@@ -454,7 +454,7 @@ function StaffDashboardPage() {
     enabled: Boolean(token),
     queryFn: async () => {
       if (!token) throw new Error("Missing token");
-      const res = await api.get<{ items?: DashboardCommPreviewItem[] }>(`/repairs/dashboard-comms-preview/?limit=8`, token);
+      const res = await api.get<{ items?: DashboardCommPreviewItem[] }>(`/repairs/dashboard-comms-preview/?limit=20`, token);
       return (res?.items ?? []) as DashboardCommPreviewItem[];
     },
     staleTime: 30_000,
@@ -906,7 +906,7 @@ function StaffDashboardPage() {
                   Wszystkie
                 </Link>
               </div>
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 max-h-[408px] overflow-y-auto space-y-2 pr-0.5">
                 {commPreviewQuery.isLoading ? (
                   Array.from({ length: 4 }).map((_, idx) => (
                     <div key={idx} className="h-[76px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--s1)]" />

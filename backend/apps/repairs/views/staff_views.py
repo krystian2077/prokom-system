@@ -106,7 +106,7 @@ class StaffDashboardView(APIView):
 
     Dashboard pracownika/admina — te same kubełki co GET /api/v1/repairs/dashboard/.
     Query: days_without_update (int, domyślnie 3, min. 1), recent_limit (int, domyślnie 10),
-    dashboard_scope (today|tomorrow|week|month) — okno KPI „zakończonych” (picked_up_at).
+    dashboard_scope (today|tomorrow|week|month) — okno KPI „zakończonych” (data zamknięcia: picked_up_at lub completed_at).
     """
 
     permission_classes = [IsAuthenticated, IsStaffOrAdmin]

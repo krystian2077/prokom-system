@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -12,6 +12,22 @@ import {
   normalizeStatusToQuickChangeValue,
   type RepairStatusValue,
 } from "@/lib/repairStatusOptions";
+import { AlertTriangle, Check, ChevronDown } from "lucide-react";
+
+const STATUS_META: Partial<Record<RepairStatusValue, { color: string }>> = {
+  accepted:          { color: "#3b82f6" },
+  in_diagnostics:    { color: "#a78bfa" },
+  diagnostics_done:  { color: "#818cf8" },
+  quote_sent:        { color: "#22d3ee" },
+  waiting_for_parts: { color: "#f59e0b" },
+  in_repair:         { color: "#60a5fa" },
+  repair_done:       { color: "#34d399" },
+  ready_for_pickup:  { color: "#22c55e" },
+  shipped:           { color: "#10b981" },
+  picked_up:         { color: "#4ade80" },
+  cancelled:         { color: "#ef4444" },
+  unrepairable:      { color: "#f97316" },
+};
 
 /**
  * UWAGA:
@@ -47,6 +63,19 @@ export function WorkerStatusChangeModal({
   const [notes, setNotes] = useState("");
   const [suggestedMessage, setSuggestedMessage] = useState("");
   const [loadingSuggested, setLoadingSuggested] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [dropdownOpen]);
 
   useEffect(() => {
     if (!open) return;
@@ -182,21 +211,77 @@ export function WorkerStatusChangeModal({
             <label className="block text-[11px] font-semibold tracking-wide text-[var(--ink2)]">
               1. Status
             </label>
-            <select
-              value={newStatus}
-              onChange={(e) => {
-                const v = e.target.value as RepairStatusValue;
-                setNewStatus(v);
-                setPublicStatus(v);
-              }}
-              className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
-            >
-              {QUICK_CHANGE_STATUS_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+            <div ref={dropdownRef} className="relative mt-1">
+              <button
+                type="button"
+                onClick={() => setDropdownOpen((v) => !v)}
+                className="flex w-full items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-3 text-left transition hover:border-white/20 focus:outline-none"
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: STATUS_META[newStatus]?.color ?? "#6b7280" }}
+                  />
+                  <span className="text-base font-semibold text-[var(--white)]">
+                    {QUICK_CHANGE_STATUS_OPTIONS.find((o) => o.value === newStatus)?.label ?? newStatus}
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 text-[var(--ink2)] transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-[var(--border)] bg-[#0e1015] shadow-2xl">
+                  <div className="max-h-[320px] overflow-y-auto py-1">
+                    {QUICK_CHANGE_STATUS_OPTIONS.map((opt) => {
+                      const isSelected = opt.value === newStatus;
+                      const isDestructive = opt.value === "cancelled";
+                      const isWarning = opt.value === "unrepairable";
+                      const meta = STATUS_META[opt.value];
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setNewStatus(opt.value);
+                            setPublicStatus(opt.value);
+                            setDropdownOpen(false);
+                          }}
+                          className={`group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
+                            isSelected ? "bg-white/8" : "hover:bg-white/5"
+                          }`}
+                        >
+                          <span
+                            className="h-2.5 w-2.5 shrink-0 rounded-full transition-transform group-hover:scale-110"
+                            style={{ backgroundColor: meta?.color ?? "#6b7280" }}
+                          />
+                          <span
+                            className={`flex-1 text-base font-medium transition-colors ${
+                              isDestructive
+                                ? "text-[#fca5a5] group-hover:text-[#ef4444]"
+                                : isWarning
+                                ? "text-[#fdba74] group-hover:text-[#f97316]"
+                                : isSelected
+                                ? "text-[var(--white)]"
+                                : "text-[var(--ink2)] group-hover:text-[var(--white)]"
+                            }`}
+                          >
+                            {opt.label}
+                          </span>
+                          {(isDestructive || isWarning) && (
+                            <AlertTriangle className={`h-4 w-4 shrink-0 ${isDestructive ? "text-[#ef4444]/70" : "text-[#f97316]/70"}`} />
+                          )}
+                          {isSelected && !isDestructive && !isWarning && (
+                            <Check className="h-4 w-4 shrink-0 text-[var(--ink2)]" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
