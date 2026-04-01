@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
+  Archive,
   Boxes,
   CalendarDays,
   ClipboardList,
@@ -225,17 +226,27 @@ export function AdminSidebar() {
                 {dotActive(isUnder("/admin-panel/tasks"))}
               </Link>
 
-              <Link href="/admin-panel/search" className={navRowClass(isUnder("/admin-panel/search"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/search"))}>
-                    <Search size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Wyszukiwanie</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/search"))}
-              </Link>
+               <Link href="/admin-panel/search" className={navRowClass(isUnder("/admin-panel/search"))}>
+                 <div className="flex items-center gap-3">
+                   <span className={navIconShell(isUnder("/admin-panel/search"))}>
+                     <Search size={20} />
+                   </span>
+                   <span className="text-base font-semibold">Wyszukiwanie</span>
+                 </div>
+                 {dotActive(isUnder("/admin-panel/search"))}
+               </Link>
 
-              <Link href="/admin-panel/claims" className={navRowClass(isUnder("/admin-panel/claims"))}>
+               <Link href="/admin-panel/archive" className={navRowClass(isUnder("/admin-panel/archive"))}>
+                 <div className="flex items-center gap-3">
+                   <span className={navIconShell(isUnder("/admin-panel/archive"))}>
+                     <Archive size={20} />
+                   </span>
+                   <span className="text-base font-semibold">Historia napraw</span>
+                 </div>
+                 {dotActive(isUnder("/admin-panel/archive"))}
+               </Link>
+
+               <Link href="/admin-panel/claims" className={navRowClass(isUnder("/admin-panel/claims"))}>
                 <div className="flex items-center gap-3">
                   <span className={navIconShell(isUnder("/admin-panel/claims"))}>
                     <ClipboardList size={20} />

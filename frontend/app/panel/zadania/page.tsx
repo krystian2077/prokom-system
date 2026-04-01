@@ -11,6 +11,7 @@ import { usePanelBasePath } from "@/lib/panelPaths";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { TaskListSkeleton } from "@/components/ui/Skeleton";
+import { PanelDateTimePicker } from "@/components/panel/PanelDateTimePicker";
 
 type TaskStatusValue = "new" | "in_progress" | "waiting" | "done" | "completed" | "cancelled";
 type TaskPriorityValue = "low" | "normal" | "standard" | "high" | "important" | "urgent";
@@ -362,12 +363,7 @@ export default function TasksPage() {
               <option value="urgent">Pilny</option>
               <option value="low">Niski</option>
             </select>
-            <input
-              type="datetime-local"
-              value={newDueDate}
-              onChange={(e) => setNewDueDate(e.target.value)}
-              className="rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
-            />
+            <PanelDateTimePicker value={newDueDate} onChange={setNewDueDate} placeholder="Wybierz datę i godzinę" />
             <button
               type="submit"
               disabled={addingTask}

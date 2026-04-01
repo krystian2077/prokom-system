@@ -1,8 +1,8 @@
 "use client";
 
-import TasksPage from "@/app/panel/zadania/page";
+import { AdminTasksWorkspace } from "@/components/panel/tasks/AdminTasksWorkspace";
 
 export default function AdminTasksPage() {
-  return <TasksPage />;
+  return <AdminTasksWorkspace />;
 }
 

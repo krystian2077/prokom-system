@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Task, TaskComment
+from .models import Task
 from .enums import TaskStatus, TaskPriority
 from .serializers import (
     TaskListSerializer,
@@ -61,9 +61,13 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = serializer.save()
         if task.assigned_to_id != old_assigned:
             self._notify_task_assigned(task)
-        if task.status != old_status and task.status == TaskStatus.COMPLETED:
-            task.completed_at = timezone.now()
-            task.save(update_fields=["completed_at"])
+        if task.status != old_status:
+            if task.status == TaskStatus.COMPLETED:
+                task.completed_at = timezone.now()
+                task.save(update_fields=["completed_at"])
+            elif old_status == TaskStatus.COMPLETED and task.completed_at is not None:
+                task.completed_at = None
+                task.save(update_fields=["completed_at"])
         if task.due_date != old_due:
             self._notify_due_changed(task)
 

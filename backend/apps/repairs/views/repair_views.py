@@ -544,7 +544,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
     def assign(self, request, pk=None):
         """
         POST /api/v1/repairs/<id>/assign/
-        Admin: może przypisać do dowolnego pracownika (assigned_to_id w body).
+        Admin: przypisuje wyłącznie do serwisanta (assigned_to_id w body, bez self-assign).
         Staff: bez body — do siebie; z assigned_to_id — do innego aktywnego pracownika lub administratora.
         """
         from django.contrib.auth import get_user_model
@@ -554,9 +554,9 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         notes = ser.validated_data.get("notes", "")
         User = get_user_model()
 
-        def _resolve_assignee(assigned_to_id):
+        def _resolve_assignee(assigned_to_id, allowed_roles=("staff", "admin")):
             assignee = User.objects.filter(pk=assigned_to_id).first()
-            if not assignee or getattr(assignee, "role", None) not in ("staff", "admin"):
+            if not assignee or getattr(assignee, "role", None) not in allowed_roles:
                 return None, Response(
                     {"detail": "Przypisanie tylko do pracownika lub administratora."},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -569,11 +569,23 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             return assignee, None
 
         if getattr(request.user, "role", None) == "admin":
-            assigned_to_id = ser.validated_data.get("assigned_to_id") or request.user.id
-            if assigned_to_id:
-                assignee, err = _resolve_assignee(assigned_to_id)
-                if err:
-                    return err
+            assigned_to_id = ser.validated_data.get("assigned_to_id")
+            if not assigned_to_id:
+                return Response(
+                    {"detail": "Administrator musi wskazać serwisanta do przypisania."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if str(assigned_to_id) == str(request.user.id):
+                return Response(
+                    {"detail": "Administrator nie może przypisać naprawy do siebie."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            assignee, err = _resolve_assignee(assigned_to_id, allowed_roles=("staff",))
+            if err:
+                return Response(
+                    {"detail": "Administrator może przypisywać naprawy wyłącznie do serwisantów."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             assigned_to_param = ser.validated_data.get("assigned_to_id")
             if assigned_to_param:

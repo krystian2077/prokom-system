@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { StatCardSkeleton, StackedRowSkeleton } from "@/components/ui/Skeleton";
 import type { RepairRequestListItem } from "@/types/repairs";
+import type { StaffNotificationItem } from "@/types/notifications";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -156,6 +157,31 @@ function alertClass(severity: AlertSeverity): string {
   return "border-[var(--bb)] bg-[var(--bl)] text-[#bcd6ff]";
 }
 
+function notifPriorityColor(priority: string): string {
+  if (priority === "urgent") return "#ef4444";
+  if (priority === "important") return "#f59e0b";
+  if (priority === "low") return "#525b6e";
+  return "#3b82f6";
+}
+
+function notifTypeLabel(type: string): string {
+  const map: Record<string, string> = {
+    repair_assigned: "Przypisano",
+    client_message: "Wiadomość",
+    new_message: "Wiadomość",
+    new_unassigned: "Nieprzypisane",
+    sla_exceeded: "SLA",
+    sla_warning: "SLA",
+    quote_accepted: "Wycena",
+    quote_rejected: "Wycena",
+    status_changed: "Status",
+    part_arrived: "Części",
+    mentioned: "Wzmianka",
+    complaint: "Reklamacja",
+  };
+  return map[type] ?? "Info";
+}
+
 // ─── WorkloadChart ────────────────────────────────────────────────────────────
 
 function WorkloadChart({ repairs }: { repairs: RepairRequestListItem[] }) {
@@ -300,6 +326,7 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<SubmissionTabKey>("new");
   const [alerts, setAlerts] = useState<DashboardAlert[]>([]);
   const [hoveredStage, setHoveredStage] = useState<number | null>(null);
+  const [notifications, setNotifications] = useState<StaffNotificationItem[]>([]);
 
   const load = async () => {
     if (!token) return;
@@ -311,7 +338,7 @@ export default function AdminDashboardPage() {
       const IN_REPAIR_PARAMS  = si("in_diagnostics","diagnostics_done","quote_pending","quote_sent","quote_accepted","waiting_for_parts","in_repair","repair_done","in_testing","testing_failed","testing_passed");
       const READY_PARAMS       = si("ready_for_pickup","shipped");
       const ALL_ACTIVE_PARAMS  = si("new","accepted","in_diagnostics","diagnostics_done","quote_pending","quote_sent","quote_accepted","waiting_for_parts","in_repair","repair_done","in_testing","testing_failed","testing_passed");
-      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes, unassignedRes] = await Promise.all([
+      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes, unassignedRes, notifRes] = await Promise.all([
         api.get<AdminDashboardResponse>("/analytics/admin-dashboard/?days=30", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=20&ordering=-updated_at", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=new&ordering=-created_at&page_size=20", token),
@@ -319,6 +346,7 @@ export default function AdminDashboardPage() {
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=waiting_for_parts&ordering=-updated_at&page_size=20", token),
         api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${READY_PARAMS}&ordering=-updated_at&page_size=20`, token),
         api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${ALL_ACTIVE_PARAMS}&ordering=-updated_at&page_size=20`, token),
+        api.get<{ results?: StaffNotificationItem[] } | StaffNotificationItem[]>("/accounts/notifications/?ordering=-created_at&page_size=3", token),
       ]);
       const newItems        = newRes?.results        ?? [];
       const repairItems     = repairRes?.results     ?? [];
@@ -330,6 +358,7 @@ export default function AdminDashboardPage() {
       setRecentRepairs(repairsRes?.results ?? []);
       setAllActiveRepairs(allActive);
       setTabRepairs({ new: newItems, repair: repairItems, waiting: waitingItems, ready: readyItems, unassigned: unassignedItems });
+      setNotifications(Array.isArray(notifRes) ? notifRes : (notifRes as { results?: StaffNotificationItem[] })?.results ?? []);
 
       const built: DashboardAlert[] = [];
       const unassignedCount = (repairsRes?.results ?? []).filter((r) => !r.assigned_to).length;
@@ -352,6 +381,7 @@ export default function AdminDashboardPage() {
       setAllActiveRepairs([]);
       setTabRepairs({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
       setAlerts([]);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -582,53 +612,156 @@ export default function AdminDashboardPage() {
             </div>
           </section>
 
-          {/* ── Row 3: Alerts + Team workload ── */}
+          {/* ── Row 3: Centrum uwagi + Last activity ── */}
           <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
 
-            {/* Alerts */}
-            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
-              <div className="mb-4 flex items-center justify-between gap-3">
+            {/* Centrum uwagi */}
+            <div className="flex flex-col gap-0 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+              {/* Header */}
+              <div className="mb-5 flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zarządzanie</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Alerty zarządcze</h2>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Operacje</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Centrum uwagi</h2>
                 </div>
-                <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold text-[var(--ink2)]">
-                  Aktywne: {alerts.length}
-                </span>
+                {alerts.length > 0 && (
+                  <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/10 px-3 py-1 text-[11px] font-bold text-[#ef4444]">
+                    {alerts.length} alertów
+                  </span>
+                )}
               </div>
-              {alerts.length === 0 ? (
-                <p className="rounded-xl border border-[var(--gb)] bg-[var(--gl)] px-3 py-3 text-sm text-[#bbf7d0]">
-                  ✓&nbsp; Brak aktywnych alertów. Warsztat działa sprawnie.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {alerts.map((alert) => (
+
+              {/* Sub-section 1: Alerts */}
+              <div className="space-y-1.5">
+                {alerts.length === 0 ? (
+                  <div className="flex items-center gap-2.5 rounded-xl border border-[var(--gb)] bg-[var(--gl)] px-3.5 py-2.5">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#22c55e]/40 bg-[#22c55e]/15 text-[10px] font-bold text-[#22c55e]">✓</div>
+                    <p className="text-sm text-[#bbf7d0]">Brak aktywnych alertów. Warsztat działa sprawnie.</p>
+                  </div>
+                ) : (
+                  alerts.map((alert) => (
                     <button
                       key={alert.type}
                       type="button"
                       onClick={() => router.push(alert.href)}
-                      className={`group w-full rounded-xl border px-4 py-3 text-left transition hover:brightness-110 ${alertClass(alert.severity)}`}
+                      className={`group w-full rounded-xl border px-3.5 py-2.5 text-left transition hover:brightness-110 ${alertClass(alert.severity)}`}
                     >
                       <div className="flex items-center gap-2">
                         <span className="flex-1 text-sm font-semibold">{alert.title}</span>
-                        <span className="text-xs opacity-50 transition group-hover:opacity-100">→</span>
+                        <span className="text-xs opacity-40 transition group-hover:opacity-100">→</span>
                       </div>
                     </button>
-                  ))}
+                  ))
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="my-4 border-t border-white/[0.06]" />
+
+              {/* Sub-section 2: Nieprzypisane naprawy */}
+              <div>
+                <div className="mb-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#ef4444]" />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ink2)]">Nieprzypisane</span>
+                    {tabRepairs.unassigned.length > 0 && (
+                      <span className="rounded-full border border-[#ef4444]/25 bg-[#ef4444]/10 px-1.5 text-[10px] font-bold text-[#ef4444]">
+                        {tabRepairs.unassigned.length}
+                      </span>
+                    )}
+                  </div>
+                  <Link href="/admin-panel/unassigned" className="text-[11px] font-semibold text-[#3b82f6] hover:underline">
+                    Wszystkie →
+                  </Link>
                 </div>
-              )}
+                {tabRepairs.unassigned.length === 0 ? (
+                  <p className="text-xs text-[var(--muted)]">Wszystkie naprawy mają przypisanego technika.</p>
+                ) : (
+                  <div className="space-y-1">
+                    {tabRepairs.unassigned.slice(0, 3).map((r) => (
+                      <Link
+                        key={r.id}
+                        href={`/admin-panel/repairs/${r.id}`}
+                        className="flex items-center gap-3 rounded-xl border border-[#ef4444]/12 bg-[#ef4444]/[0.04] px-3 py-2.5 transition hover:border-[#ef4444]/25 hover:bg-[#ef4444]/[0.08]"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[11px] font-bold text-[var(--white)]">{r.repair_number}</span>
+                            {r.priority && r.priority !== "normal" && (
+                              <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/12 px-1.5 text-[9px] font-bold text-[#ef4444]">
+                                {r.priority_display}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{r.client_name} · {r.device_name}</p>
+                        </div>
+                        <span className="shrink-0 text-[10px] text-[var(--muted)]">{relativeTime(r.created_at)}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="my-4 border-t border-white/[0.06]" />
+
+              {/* Sub-section 3: Ostatnie powiadomienia */}
+              <div>
+                <div className="mb-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#3b82f6]" />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ink2)]">Powiadomienia</span>
+                  </div>
+                  <Link href="/admin-panel/notifications" className="text-[11px] font-semibold text-[#3b82f6] hover:underline">
+                    Wszystkie →
+                  </Link>
+                </div>
+                {notifications.length === 0 ? (
+                  <p className="text-xs text-[var(--muted)]">Brak nowych powiadomień.</p>
+                ) : (
+                  <div className="space-y-1">
+                    {notifications.map((n) => {
+                      const dot = notifPriorityColor(n.priority);
+                      const label = notifTypeLabel(n.notification_type);
+                      return (
+                        <div
+                          key={n.id}
+                          className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 transition hover:bg-white/[0.04]"
+                        >
+                          {/* Priority dot */}
+                          <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: dot }} />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span
+                                className="rounded border px-1.5 py-px text-[9px] font-bold uppercase tracking-wide"
+                                style={{ background: dot + "15", borderColor: dot + "30", color: dot }}
+                              >
+                                {label}
+                              </span>
+                              {n.repair_number && (
+                                <span className="font-mono text-[10px] font-semibold text-[var(--ink2)]">{n.repair_number}</span>
+                              )}
+                            </div>
+                            <p className="mt-0.5 truncate text-[12px] font-medium text-[var(--white)]">{n.title}</p>
+                          </div>
+                          <span className="mt-0.5 shrink-0 text-[10px] text-[var(--muted)]">{relativeTime(n.created_at)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Team workload */}
+            {/* Top staff performance */}
             <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zespół</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Obciążenie zespołu</h2>
-                  <p className="mt-1 text-xs text-[var(--muted)]">Top techników — ostatnie 30 dni</p>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Wyniki techników</h2>
+                  <p className="mt-1 text-xs text-[var(--muted)]">Ukończone naprawy — ostatnie 30 dni</p>
                 </div>
                 <Link href="/admin-panel/workload" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
-                  Workload
+                  Workload →
                 </Link>
               </div>
               <div className="mt-4 space-y-0.5">

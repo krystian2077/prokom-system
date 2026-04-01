@@ -94,10 +94,12 @@ class TaskSerializer(serializers.ModelSerializer):
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     """Tworzenie: staff może przypisać tylko do siebie (lub pusto → backend ustawi siebie). Edycja: tylko admin zmienia osobę."""
 
+    id = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = Task
         fields = [
-            "title", "description", "assigned_to", "status", "priority",
+            "id", "title", "description", "assigned_to", "status", "priority",
             "due_date", "related_repair", "related_client", "related_customer_order", "related_store_order",
             "is_archived",
         ]

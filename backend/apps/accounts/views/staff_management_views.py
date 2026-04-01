@@ -133,6 +133,7 @@ class StaffAssignableForRepairView(APIView):
             data.append(
                 {
                     "id": str(u.id),
+                    "role": u.role,
                     "first_name": u.first_name or "",
                     "last_name": u.last_name or "",
                     "full_name": u.get_full_name() or u.email,

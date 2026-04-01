@@ -4,6 +4,10 @@ export type StaffNotificationPriorityValue = "low" | "standard" | "important" | 
 
 export type StaffNotificationItem = {
   id: string;
+  user_id?: string;
+  user_name?: string;
+  user_email?: string;
+  user_role?: string;
   notification_type: string;
   priority: StaffNotificationPriorityValue | string;
   repair: string | null;

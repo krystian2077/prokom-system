@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { usePanelBasePath } from "@/lib/panelPaths";
@@ -18,8 +19,6 @@ type PaginatedResponse<T> = {
   previous: string | null;
   results: T[];
 };
-
-type ScopeTag = string;
 
 const KANBAN_NEW_STATUSES = new Set(["new", "accepted"]);
 const KANBAN_IN_PROGRESS_STATUSES = new Set([
@@ -47,6 +46,17 @@ const KANBAN_COLUMNS = [
 type KanbanColumnKey = (typeof KANBAN_COLUMNS)[number]["key"];
 
 type DatePreset = "today" | "week" | "month" | "last_7" | "last_14" | "last_30" | "custom";
+
+type AssignableStaffRow = {
+  id: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  picker_label?: string;
+  role?: "staff" | "admin" | string;
+};
+
+const STAFF_FILTER_NAMES = ["Kuba", "Rafał", "Paweł"] as const;
 
 const STATUS_OPTION_COLORS: Record<string, "gray" | "amber" | "blue" | "purple" | "green" | "red"> = {
   new: "gray",
@@ -79,35 +89,6 @@ const STATUS_OPTIONS: Array<{ value: string; label: string; color: "gray" | "amb
     color: STATUS_OPTION_COLORS[s.value] ?? "gray",
   }));
 
-const PRIORITY_OPTIONS: Array<{ value: string; label: string; color: "gray" | "amber" | "red" | "blue" }> = [
-  { value: "low", label: "Niski", color: "gray" },
-  { value: "normal", label: "Normalny", color: "blue" },
-  { value: "high", label: "Wysoki", color: "amber" },
-  { value: "urgent", label: "Pilny", color: "red" },
-  { value: "same_day", label: "Same Day", color: "red" },
-];
-
-const REPAIR_TYPE_OPTIONS: Array<{ value: string; label: string; color: "gray" | "amber" | "red" | "blue" }> = [
-  { value: "standard", label: "Standardowa", color: "gray" },
-  { value: "warranty", label: "Gwarancyjna", color: "blue" },
-  { value: "complaint", label: "Reklamacja", color: "amber" },
-  { value: "scheduled", label: "Z umówionym terminem", color: "gray" },
-];
-
-const TAG_OPTIONS: Array<{ value: ScopeTag; label: string }> = [
-  { value: "pilne", label: "Pilne" },
-  { value: "same_day", label: "Same Day" },
-  { value: "wysyłkowe", label: "Wysyłkowe" },
-  { value: "reklamacja", label: "Reklamacja" },
-  { value: "gwarancja", label: "Gwarancja" },
-  { value: "niekompletne", label: "Niekompletne" },
-  { value: "czeka_na_czesc", label: "Czeka na część" },
-  { value: "klient_wraca", label: "Klient wraca" },
-  { value: "firma", label: "Firma" },
-  { value: "odzyskiwanie_danych", label: "Odzyskiwanie danych" },
-  { value: "apple", label: "Apple" },
-  { value: "samsung", label: "Samsung" },
-];
 
 function statusPillColor(status: string): { bg: string; border: string; text: string } {
   const opt = STATUS_OPTIONS.find((s) => s.value === status);
@@ -126,6 +107,13 @@ function statusPillColor(status: string): { bg: string; border: string; text: st
     default:
       return { bg: "rgba(255,255,255,.05)", border: "rgba(255,255,255,.12)", text: "#9ba3b0" };
   }
+}
+
+function getAssigneeName(item: RepairRequestListItem): string {
+  if (!item.assigned_to) return "Nieprzypisane";
+  if (typeof item.assigned_to === "string") return "Przypisany";
+  const full = `${item.assigned_to.first_name ?? ""} ${item.assigned_to.last_name ?? ""}`.trim();
+  return full || item.assigned_to.email || "Przypisany";
 }
 
 function KanbanBoardSkeleton() {
@@ -167,7 +155,10 @@ function dayStart(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
-function rangeByPreset(preset: Exclude<DatePreset, "custom">, ref: Date): { from: string; to: string } {
+function rangeByPreset(
+  preset: "today" | "week" | "month" | "last_7" | "last_14" | "last_30",
+  ref: Date,
+): { from: string; to: string } {
   const now = dayStart(ref);
   if (preset === "today") return { from: ymd(now), to: ymd(now) };
   if (preset === "last_7" || preset === "last_14" || preset === "last_30") {
@@ -218,35 +209,39 @@ export default function PanelZgloszeniaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadNonce, setReloadNonce] = useState(0);
-
-  const [page, setPage] = useState(1);
-
-  // Filtry (startujemy od tych, które backend obsługuje „na pewno”)
-  const [status, setStatus] = useState<string>("");
-  const [priority, setPriority] = useState<string>("");
-  const [repairType, setRepairType] = useState<string>("");
   const [assignedToUuid, setAssignedToUuid] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [ordering, setOrdering] = useState<string>("-created_at");
-  const [datePreset, setDatePreset] = useState<DatePreset>("month");
-  const [dateFrom, setDateFrom] = useState<string>(() => rangeByPreset("month", new Date()).from);
-  const [dateTo, setDateTo] = useState<string>(() => rangeByPreset("month", new Date()).to);
+  const [datePreset, setDatePreset] = useState<DatePreset>("last_7");
+  const [dateFrom, setDateFrom] = useState<string>(() => rangeByPreset("last_7", new Date()).from);
+  const [dateTo, setDateTo] = useState<string>(() => rangeByPreset("last_7", new Date()).to);
 
+  const page = 1;
   const isAdmin = user?.role === "admin";
-
   const canRequest = Boolean(token && user);
 
-  const activeTagSet = useMemo(() => new Set(tags), [tags]);
+  const staffQuery = useQuery({
+    queryKey: ["accounts", "staff", "assignable-for-repairs"],
+    enabled: Boolean(token && isAdmin),
+    queryFn: async () => {
+      if (!token) throw new Error("Missing auth/token");
+      return api.get<AssignableStaffRow[]>("/accounts/staff/assignable-for-repairs/?include_self=1", token);
+    },
+    staleTime: 60_000,
+  });
 
-  const toggleTag = (t: string) => {
-    setTags((prev) => {
-      const set = new Set(prev);
-      if (set.has(t)) set.delete(t);
-      else set.add(t);
-      return Array.from(set);
+  const staffFilters = useMemo(() => {
+    const rows = (staffQuery.data ?? []).filter((row) => row.role === "staff");
+    return STAFF_FILTER_NAMES.map((name) => {
+      const match = rows.find((row) => (row.first_name ?? "").trim() === name);
+      return { name, id: match?.id ?? null, available: Boolean(match) };
     });
-  };
+  }, [staffQuery.data]);
+
+  useEffect(() => {
+    if (datePreset === "custom") return;
+    const range = rangeByPreset(datePreset, new Date());
+    setDateFrom(range.from);
+    setDateTo(range.to);
+  }, [datePreset]);
 
   useEffect(() => {
     if (!canRequest) {
@@ -263,20 +258,10 @@ export default function PanelZgloszeniaPage() {
         params.set("page", String(page));
         params.set("page_size", "500");
 
-        // staff: zawsze „assigned_to=me”
         if (user?.role === "staff") params.set("assigned_to", String(user.id));
-        // admin: opcjonalnie wpisany uuid
         if (isAdmin && assignedToUuid.trim()) params.set("assigned_to", assignedToUuid.trim());
 
-        if (status) params.set("status", status);
-        if (priority) params.set("priority", priority);
-        if (repairType) params.set("repair_type", repairType);
-        if (ordering) params.set("ordering", ordering);
-        if (search.trim()) params.set("search", search.trim());
-        tags.forEach((t) => params.append("tags", t));
-
         const url = `/repairs/?${params.toString()}`;
-
         const data = await api.get<PaginatedResponse<RepairRequestListItem>>(url, token);
         setItems(data?.results ?? []);
         setCount(data?.count ?? 0);
@@ -287,36 +272,9 @@ export default function PanelZgloszeniaPage() {
         setLoading(false);
       }
     };
-    load();
-  }, [
-    canRequest,
-    token,
-    user?.role,
-    user?.id,
-    page,
-    status,
-    priority,
-    repairType,
-    assignedToUuid,
-    search,
-    tags,
-    ordering,
-    isAdmin,
-    reloadNonce,
-  ]);
 
-  useEffect(() => {
-    // Gdy zmieniamy filtry, wracamy do pierwszej strony.
-    setPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, priority, repairType, assignedToUuid, search, tags, ordering]);
-
-  useEffect(() => {
-    if (datePreset === "custom") return;
-    const range = rangeByPreset(datePreset, new Date());
-    setDateFrom(range.from);
-    setDateTo(range.to);
-  }, [datePreset]);
+    void load();
+  }, [canRequest, token, user?.role, user?.id, page, assignedToUuid, isAdmin, reloadNonce]);
 
   const panelLabel = user?.role === "admin" ? "Panel Admina" : "Panel pracownika";
   const scopeLabel = user?.role === "admin" ? "Wszystkie naprawy" : "Moje naprawy";
@@ -324,13 +282,7 @@ export default function PanelZgloszeniaPage() {
   const scopedItems = useMemo(() => items.filter((r) => inDateScope(r, dateFrom, dateTo)), [items, dateFrom, dateTo]);
 
   const kanbanByColumn = useMemo(() => {
-    const map: Record<KanbanColumnKey, RepairRequestListItem[]> = {
-      new: [],
-      in_progress: [],
-      ready: [],
-      done: [],
-    };
-
+    const map: Record<KanbanColumnKey, RepairRequestListItem[]> = { new: [], in_progress: [], ready: [], done: [] };
     for (const r of scopedItems) {
       if (KANBAN_NEW_STATUSES.has(r.status)) map.new.push(r);
       else if (KANBAN_IN_PROGRESS_STATUSES.has(r.status)) map.in_progress.push(r);
@@ -338,7 +290,6 @@ export default function PanelZgloszeniaPage() {
       else if (KANBAN_DONE_STATUSES.has(r.status)) map.done.push(r);
       else map.in_progress.push(r);
     }
-
     return map;
   }, [scopedItems]);
 
@@ -349,28 +300,14 @@ export default function PanelZgloszeniaPage() {
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-[var(--white)]">{scopeLabel}</h1>
-            <p className="mt-1 text-sm text-[var(--ink2)]">Premium kanban serwisowy — kliknij kartę, aby przejść do szczegółów naprawy.</p>
+            <p className="mt-1 text-sm text-[var(--ink2)]">Premium kanban serwisowy — daty, kalendarz i pracownicy.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Porządek</div>
-              <select
-                value={ordering}
-                onChange={(e) => setOrdering(e.target.value)}
-                className="rounded-2xl border border-[var(--border)] bg-[#111318] px-3 py-1.5 text-xs font-semibold text-[var(--white)] outline-none focus:border-[#dc1e1e]"
-              >
-                <option value="-created_at">Najnowsze</option>
-                <option value="created_at">Najstarsze</option>
-                <option value="estimated_completion_date">ETA (rosnąco)</option>
-              </select>
-            </div>
-            <Link
-              href={panelPaths.intakePath}
-              className="rounded-2xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              + Nowe zgłoszenie
-            </Link>
-          </div>
+          <Link
+            href={panelPaths.intakePath}
+            className="rounded-2xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            + Nowe zgłoszenie
+          </Link>
         </div>
       </header>
 
@@ -416,8 +353,8 @@ export default function PanelZgloszeniaPage() {
             <button
               type="button"
               onClick={() => {
-                const range = rangeByPreset("month", new Date());
-                setDatePreset("month");
+                const range = rangeByPreset("last_7", new Date());
+                setDatePreset("last_7");
                 setDateFrom(range.from);
                 setDateTo(range.to);
               }}
@@ -427,139 +364,42 @@ export default function PanelZgloszeniaPage() {
             </button>
           </div>
         </div>
-      </section>
-
-      <section className="hidden mb-6 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex flex-1 flex-col gap-1">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Wyszukiwanie</div>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="np. numer naprawy, klient, telefon, IMEI, serial, opis…"
-              className="rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
-            />
-          </div>
-
-          <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-3 lg:max-w-[620px] lg:flex-1 lg:items-end">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Status</div>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
-              >
-                <option value="">Wszystkie</option>
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Priorytet</div>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
-              >
-                <option value="">Wszystkie</option>
-                {PRIORITY_OPTIONS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="hidden md:block">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Typ sprawy</div>
-              <select
-                value={repairType}
-                onChange={(e) => setRepairType(e.target.value)}
-                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
-              >
-                <option value="">Wszystkie</option>
-                {REPAIR_TYPE_OPTIONS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {TAG_OPTIONS.map((t) => {
-            const on = activeTagSet.has(t.value);
-            return (
-              <button
-                key={t.value}
-                type="button"
-                onClick={() => toggleTag(t.value)}
-                className="rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition"
-                style={{
-                  color: on ? "#fff" : "#8b93a8",
-                  background: on ? "rgba(220,30,30,.18)" : "transparent",
-                  borderColor: on ? "rgba(220,30,30,.35)" : "rgba(255,255,255,.10)",
-                }}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
 
         {isAdmin && (
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Przypisanie (uuid)</div>
-              <input
-                value={assignedToUuid}
-                onChange={(e) => setAssignedToUuid(e.target.value)}
-                placeholder="opcjonalnie: assigned_to=<uuid> (puste = wszyscy)"
-                className="mt-1 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#dc1e1e]"
-              />
-            </div>
-            <div className="flex items-end justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setAssignedToUuid("");
-                  setStatus("");
-                  setPriority("");
-                  setRepairType("");
-                  setSearch("");
-                  setTags([]);
-                  setOrdering("-created_at");
-                }}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)]"
-              >
-                Wyczyść filtry
-              </button>
-            </div>
-          </div>
-        )}
-
-        {!isAdmin && (
-          <div className="mt-3 flex justify-end">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                setStatus("");
-                setPriority("");
-                setRepairType("");
-                setSearch("");
-                setTags([]);
-                setOrdering("-created_at");
+              onClick={() => setAssignedToUuid("")}
+              className="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition"
+              style={{
+                borderColor: assignedToUuid ? "rgba(255,255,255,.12)" : "rgba(59,130,246,.45)",
+                background: assignedToUuid ? "rgba(255,255,255,.03)" : "rgba(59,130,246,.18)",
+                color: assignedToUuid ? "#9ca3af" : "#dbeafe",
               }}
-              className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)]"
             >
-              Wyczyść filtry
+              Wszyscy
             </button>
+            {staffFilters.map((worker) => {
+              const active = worker.id != null && assignedToUuid === worker.id;
+              return (
+                <button
+                  key={worker.name}
+                  type="button"
+                  onClick={() => {
+                    if (worker.id) setAssignedToUuid(worker.id);
+                  }}
+                  disabled={!worker.available}
+                  className="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition disabled:cursor-not-allowed disabled:opacity-45"
+                  style={{
+                    borderColor: active ? "rgba(59,130,246,.5)" : "rgba(255,255,255,.12)",
+                    background: active ? "rgba(59,130,246,.18)" : "rgba(255,255,255,.03)",
+                    color: active ? "#dbeafe" : "#9ca3af",
+                  }}
+                >
+                  {worker.name}
+                </button>
+              );
+            })}
           </div>
         )}
       </section>
@@ -576,7 +416,7 @@ export default function PanelZgloszeniaPage() {
           <EmptyState
             icon={EMPTY_STATES.myRepairs.icon}
             title={EMPTY_STATES.myRepairs.title}
-            description={EMPTY_STATES.myRepairs.description}
+            description="Brak zgłoszeń z ostatnich 7 dni."
           />
         </div>
       )}
@@ -585,8 +425,8 @@ export default function PanelZgloszeniaPage() {
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-8">
           <EmptyState
             icon={EMPTY_STATES.search.icon}
-            title="Brak zgłoszeń w wybranym zakresie"
-            description="Zmień preset czasu lub wskaż inny zakres dat w kalendarzu."
+            title="Brak zgłoszeń z ostatnich 7 dni"
+            description="W tym zakresie nie ma jeszcze żadnych napraw."
           />
         </div>
       )}
@@ -624,8 +464,7 @@ export default function PanelZgloszeniaPage() {
                     ) : null}
                     {colItems.map((r) => {
                       const pill = statusPillColor(r.status);
-                      const waitingDays =
-                        typeof r.waiting_for_client_days === "number" ? r.waiting_for_client_days : null;
+                      const waitingDays = typeof r.waiting_for_client_days === "number" ? r.waiting_for_client_days : null;
                       const createdAt = new Date(r.created_at).toLocaleDateString("pl-PL", {
                         day: "2-digit",
                         month: "2-digit",
@@ -635,7 +474,7 @@ export default function PanelZgloszeniaPage() {
                       return (
                         <Link
                           key={r.id}
-                          href={panelPaths.zgloszenieDetailPath(r.id)}
+                          href={panelPaths.repairDetailPath(r.id)}
                           className="group block rounded-2xl border border-[#27334a] bg-[#0d1428] p-3 transition hover:-translate-y-0.5 hover:border-[#4f69a3] hover:bg-[#111a32] hover:shadow-[0_12px_28px_rgba(0,0,0,.35)]"
                         >
                           <div className="flex items-start justify-between gap-3">
@@ -666,6 +505,11 @@ export default function PanelZgloszeniaPage() {
 
                               <p className="mt-1 text-sm text-[#c8d2e9] line-clamp-2">
                                 {r.client_name} · {r.device_name}
+                              </p>
+
+                              <p className="mt-2 text-xs text-[#8da0c5]">
+                                <span className="font-semibold uppercase tracking-wide text-[#b7c3db]">Serwisant:</span>{" "}
+                                {getAssigneeName(r)}
                               </p>
                             </div>
 
