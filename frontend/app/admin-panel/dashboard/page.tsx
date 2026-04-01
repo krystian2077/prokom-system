@@ -81,7 +81,7 @@ const SUBMISSION_TABS = [
   { key: "new",      label: "Nowe",              sub: "Ostatnio przyjęte — czekają na przetworzenie", href: "/admin-panel/repairs?status=new",              accent: "#3b82f6" },
   { key: "repair",   label: "W naprawie",         sub: "Aktywne naprawy w toku",                       href: "/admin-panel/repairs?status=in_repair",        accent: "#f59e0b" },
   { key: "waiting",  label: "Czeka na części",    sub: "Naprawy oczekujące na dostawę",                href: "/admin-panel/repairs?status=waiting_for_parts", accent: "#a78bfa" },
-  { key: "ready",    label: "Gotowe do odbioru",  sub: "Urządzenia gotowe dla klientów",              href: "/admin-panel/repairs?status=ready_for_pickup",  accent: "#22c55e" },
+  { key: "ready",    label: "Gotowe do odbioru",  sub: "Gotowe do odbioru oraz wysłane kurierem",     href: "/admin-panel/repairs?status=ready_for_pickup",  accent: "#22c55e" },
   { key: "unassigned", label: "Nieprzypisane",    sub: "Naprawy bez przypisanego technika",           href: "/admin-panel/unassigned",                       accent: "#ef4444" },
 ] as const;
 
@@ -279,24 +279,26 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      // in_progress_statuses mirrors backend kpi_views.py exactly
-      const IN_PROGRESS = "accepted,in_diagnostics,diagnostics_done,quote_pending,quote_sent,quote_accepted,waiting_for_parts,in_repair,repair_done,in_testing,testing_failed,testing_passed";
-      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes] = await Promise.all([
+      // W naprawie: aktywny workflow (bez "accepted" i "new") — statusy z diagnostyki przez naprawę do testów
+      const IN_REPAIR = "in_diagnostics,diagnostics_done,quote_pending,quote_sent,quote_accepted,waiting_for_parts,in_repair,repair_done,in_testing,testing_failed,testing_passed";
+      // Gotowe do odbioru: ready_for_pickup + shipped (wysłane kurierem)
+      const READY = "ready_for_pickup,shipped";
+      // Nieprzypisane bazuje na new + accepted + in_repair — wszystkie aktywne bez technika
+      const ALL_ACTIVE = `new,accepted,${IN_REPAIR}`;
+      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes, unassignedRes] = await Promise.all([
         api.get<AdminDashboardResponse>("/analytics/admin-dashboard/?days=30", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=20&ordering=-updated_at", token),
-        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status=new&ordering=-created_at&page_size=20`, token),
-        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${IN_PROGRESS}&ordering=-updated_at&page_size=20`, token),
+        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=new&ordering=-created_at&page_size=20", token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${IN_REPAIR}&ordering=-updated_at&page_size=20`, token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=waiting_for_parts&ordering=-updated_at&page_size=20", token),
-        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=ready_for_pickup&ordering=-updated_at&page_size=20", token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${READY}&ordering=-updated_at&page_size=20`, token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${ALL_ACTIVE}&ordering=-updated_at&page_size=20`, token),
       ]);
-      const newItems    = newRes?.results    ?? [];
-      const repairItems = repairRes?.results ?? [];
-      const waitingItems = waitingRes?.results ?? [];
-      const readyItems  = readyRes?.results  ?? [];
-      // deduplicate by id — waiting_for_parts is a subset of repairItems
-      const allActive = new Map<string, RepairRequestListItem>();
-      for (const r of [...newItems, ...repairItems]) allActive.set(r.id, r);
-      const unassignedItems = Array.from(allActive.values()).filter((r) => !r.assigned_to);
+      const newItems        = newRes?.results        ?? [];
+      const repairItems     = repairRes?.results     ?? [];
+      const waitingItems    = waitingRes?.results    ?? [];
+      const readyItems      = readyRes?.results      ?? [];
+      const unassignedItems = (unassignedRes?.results ?? []).filter((r) => !r.assigned_to);
       setDashData(dash ?? null);
       setRecentRepairs(repairsRes?.results ?? []);
       setTabRepairs({ new: newItems, repair: repairItems, waiting: waitingItems, ready: readyItems, unassigned: unassignedItems });
