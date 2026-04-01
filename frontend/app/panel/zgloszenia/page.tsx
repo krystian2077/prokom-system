@@ -46,7 +46,7 @@ const KANBAN_COLUMNS = [
 ] as const;
 type KanbanColumnKey = (typeof KANBAN_COLUMNS)[number]["key"];
 
-type DatePreset = "today" | "week" | "month" | "custom";
+type DatePreset = "today" | "week" | "month" | "last_7" | "last_14" | "last_30" | "custom";
 
 const STATUS_OPTION_COLORS: Record<string, "gray" | "amber" | "blue" | "purple" | "green" | "red"> = {
   new: "gray",
@@ -170,6 +170,12 @@ function dayStart(date: Date): Date {
 function rangeByPreset(preset: Exclude<DatePreset, "custom">, ref: Date): { from: string; to: string } {
   const now = dayStart(ref);
   if (preset === "today") return { from: ymd(now), to: ymd(now) };
+  if (preset === "last_7" || preset === "last_14" || preset === "last_30") {
+    const days = preset === "last_7" ? 7 : preset === "last_14" ? 14 : 30;
+    const from = new Date(now);
+    from.setDate(now.getDate() - (days - 1));
+    return { from: ymd(from), to: ymd(now) };
+  }
   if (preset === "week") {
     const day = now.getDay();
     const diff = day === 0 ? -6 : 1 - day;
@@ -373,6 +379,9 @@ export default function PanelZgloszeniaPage() {
           <div className="flex flex-wrap items-center gap-2">
             {([
               { key: "today", label: "Dzisiaj" },
+              { key: "last_7", label: "Ostatnie 7 dni" },
+              { key: "last_14", label: "Ostatnie 14 dni" },
+              { key: "last_30", label: "Ostatnie 30 dni" },
               { key: "week", label: "Ten tydzień" },
               { key: "month", label: "Ten miesiąc" },
             ] as const).map((p) => {

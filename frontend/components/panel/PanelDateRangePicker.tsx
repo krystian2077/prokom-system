@@ -14,6 +14,24 @@ function parseIsoDate(v: string): Date | undefined {
   return isValid(d) ? d : undefined;
 }
 
+function ymd(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function lastDaysRange(days: number): RangeValue {
+  const to = startOfDay(new Date());
+  const from = new Date(to);
+  from.setDate(to.getDate() - (days - 1));
+  return { from: ymd(from), to: ymd(to) };
+}
+
 type RangeValue = { from: string; to: string };
 
 export type PanelDateRangePickerProps = {
@@ -24,7 +42,13 @@ export type PanelDateRangePickerProps = {
 
 export function PanelDateRangePicker({ value, onChange, disabled }: PanelDateRangePickerProps) {
   const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<RangeValue>(value);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setDraft(value);
+  }, [open, value]);
 
   useEffect(() => {
     if (!open) return;
@@ -45,11 +69,13 @@ export function PanelDateRangePicker({ value, onChange, disabled }: PanelDateRan
   }, [open]);
 
   const selected = useMemo<DateRange | undefined>(() => {
-    const from = parseIsoDate(value.from);
-    const to = parseIsoDate(value.to);
+    const from = parseIsoDate(draft.from);
+    const to = parseIsoDate(draft.to);
     if (!from && !to) return undefined;
     return { from, to };
-  }, [value.from, value.to]);
+  }, [draft.from, draft.to]);
+
+  const canApply = Boolean((draft.from && draft.to) || (!draft.from && !draft.to));
 
   const label = useMemo(() => {
     const from = parseIsoDate(value.from);
@@ -82,13 +108,40 @@ export function PanelDateRangePicker({ value, onChange, disabled }: PanelDateRan
           role="dialog"
           aria-label="Kalendarz - wybór zakresu dat"
         >
+          <div className="mb-2 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+            <div className="text-xs text-[#9fb1d3]">
+              <span className="font-semibold text-[#dbeafe]">Od:</span> {draft.from || "-"}
+            </div>
+            <div className="text-xs text-[#9fb1d3]">
+              <span className="font-semibold text-[#dbeafe]">Do:</span> {draft.to || "-"}
+            </div>
+          </div>
+
+          <div className="mb-2 flex flex-wrap gap-2">
+            {[
+              { key: "7", label: "7 dni", range: lastDaysRange(7) },
+              { key: "14", label: "14 dni", range: lastDaysRange(14) },
+              { key: "30", label: "30 dni", range: lastDaysRange(30) },
+              { key: "today", label: "Dzisiaj", range: lastDaysRange(1) },
+            ].map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-[#bcd0ef] transition hover:border-[#3b82f6]/50 hover:bg-[#3b82f6]/18"
+                onClick={() => setDraft(p.range)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
           <DayPicker
             mode="range"
             selected={selected}
             onSelect={(r) => {
               const from = r?.from ? format(r.from, "yyyy-MM-dd") : "";
               const to = r?.to ? format(r.to, "yyyy-MM-dd") : "";
-              onChange({ from, to });
+              setDraft({ from, to });
             }}
             locale={pl}
             weekStartsOn={1}
@@ -103,19 +156,34 @@ export function PanelDateRangePicker({ value, onChange, disabled }: PanelDateRan
               type="button"
               className="text-xs font-semibold text-[var(--ink2)] transition hover:text-[var(--white)]"
               onClick={() => {
-                onChange({ from: "", to: "" });
+                setDraft({ from: "", to: "" });
+              }}
+            >
+              Wyczyść
+            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="rounded-lg border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-xs font-semibold text-[var(--white)] hover:bg-[var(--row-active)]"
+                onClick={() => {
+                  setDraft(value);
                 setOpen(false);
               }}
             >
-              Wyczyść zakres
-            </button>
-            <button
-              type="button"
-              className="rounded-lg border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-xs font-semibold text-[var(--white)] hover:bg-[var(--row-active)]"
-              onClick={() => setOpen(false)}
-            >
-              Zamknij
-            </button>
+                Anuluj
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-[#3b82f6]/40 bg-[#3b82f6]/20 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-[#3b82f6]/30 disabled:opacity-50"
+                onClick={() => {
+                  onChange(draft);
+                  setOpen(false);
+                }}
+                disabled={!canApply}
+              >
+                Zastosuj
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
