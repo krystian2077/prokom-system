@@ -270,7 +270,7 @@ export default function AdminDashboardPage() {
     try {
       const [dash, repairsRes, newRes] = await Promise.all([
         api.get<AdminDashboardResponse>("/analytics/admin-dashboard/?days=30", token),
-        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=10&ordering=-updated_at", token),
+        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=20&ordering=-updated_at", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status__in=new,accepted&ordering=-created_at&page_size=8", token),
       ]);
       setDashData(dash ?? null);
@@ -674,7 +674,7 @@ export default function AdminDashboardPage() {
                 <p className="text-sm text-[var(--ink2)]">Brak niedawnej aktywności.</p>
               </div>
             ) : (
-              <div className="space-y-1">
+              <div className="max-h-[448px] space-y-1 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
                 {recentRepairs.map((r) => {
                   const badge = statusBadge(r);
                   const pAccent = priorityAccent(r.priority);
