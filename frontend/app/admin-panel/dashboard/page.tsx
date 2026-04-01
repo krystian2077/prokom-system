@@ -279,20 +279,19 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      // W naprawie: aktywny workflow (bez "accepted" i "new") — statusy z diagnostyki przez naprawę do testów
-      const IN_REPAIR = "in_diagnostics,diagnostics_done,quote_pending,quote_sent,quote_accepted,waiting_for_parts,in_repair,repair_done,in_testing,testing_failed,testing_passed";
-      // Gotowe do odbioru: ready_for_pickup + shipped (wysłane kurierem)
-      const READY = "ready_for_pickup,shipped";
-      // Nieprzypisane bazuje na new + accepted + in_repair — wszystkie aktywne bez technika
-      const ALL_ACTIVE = `new,accepted,${IN_REPAIR}`;
+      // API uses repeated status_in params: ?status_in=X&status_in=Y (not status__in=X,Y)
+      const si = (...ss: string[]) => ss.map((s) => `status_in=${s}`).join("&");
+      const IN_REPAIR_PARAMS  = si("in_diagnostics","diagnostics_done","quote_pending","quote_sent","quote_accepted","waiting_for_parts","in_repair","repair_done","in_testing","testing_failed","testing_passed");
+      const READY_PARAMS       = si("ready_for_pickup","shipped");
+      const ALL_ACTIVE_PARAMS  = si("new","accepted","in_diagnostics","diagnostics_done","quote_pending","quote_sent","quote_accepted","waiting_for_parts","in_repair","repair_done","in_testing","testing_failed","testing_passed");
       const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes, unassignedRes] = await Promise.all([
         api.get<AdminDashboardResponse>("/analytics/admin-dashboard/?days=30", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=20&ordering=-updated_at", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=new&ordering=-created_at&page_size=20", token),
-        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${IN_REPAIR}&ordering=-updated_at&page_size=20`, token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${IN_REPAIR_PARAMS}&ordering=-updated_at&page_size=20`, token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=waiting_for_parts&ordering=-updated_at&page_size=20", token),
-        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${READY}&ordering=-updated_at&page_size=20`, token),
-        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?status__in=${ALL_ACTIVE}&ordering=-updated_at&page_size=20`, token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${READY_PARAMS}&ordering=-updated_at&page_size=20`, token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${ALL_ACTIVE_PARAMS}&ordering=-updated_at&page_size=20`, token),
       ]);
       const newItems        = newRes?.results        ?? [];
       const repairItems     = repairRes?.results     ?? [];
