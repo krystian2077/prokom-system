@@ -77,6 +77,16 @@ const PIPELINE_STAGES = [
 
 const PIPELINE_CLOSED = ["cancelled", "unrepairable", "abandoned"];
 
+const SUBMISSION_TABS = [
+  { key: "new",      label: "Nowe",              sub: "Ostatnio przyjęte — czekają na przetworzenie", href: "/admin-panel/repairs?status=new",              accent: "#3b82f6" },
+  { key: "repair",   label: "W naprawie",         sub: "Aktywne naprawy w toku",                       href: "/admin-panel/repairs?status=in_repair",        accent: "#f59e0b" },
+  { key: "waiting",  label: "Czeka na części",    sub: "Naprawy oczekujące na dostawę",                href: "/admin-panel/repairs?status=waiting_for_parts", accent: "#a78bfa" },
+  { key: "ready",    label: "Gotowe do odbioru",  sub: "Urządzenia gotowe dla klientów",              href: "/admin-panel/repairs?status=ready_for_pickup",  accent: "#22c55e" },
+  { key: "unassigned", label: "Nieprzypisane",    sub: "Naprawy bez przypisanego technika",           href: "/admin-panel/unassigned",                       accent: "#ef4444" },
+] as const;
+
+type SubmissionTabKey = typeof SUBMISSION_TABS[number]["key"];
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function fmtPln(v: string | number | null | undefined): string {
@@ -260,7 +270,8 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<Error | null>(null);
   const [dashData, setDashData] = useState<AdminDashboardResponse | null>(null);
   const [recentRepairs, setRecentRepairs] = useState<RepairRequestListItem[]>([]);
-  const [newSubmissions, setNewSubmissions] = useState<RepairRequestListItem[]>([]);
+  const [tabRepairs, setTabRepairs] = useState<Record<SubmissionTabKey, RepairRequestListItem[]>>({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
+  const [activeTab, setActiveTab] = useState<SubmissionTabKey>("new");
   const [alerts, setAlerts] = useState<DashboardAlert[]>([]);
 
   const load = async () => {
@@ -268,14 +279,22 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const [dash, repairsRes, newRes] = await Promise.all([
+      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes] = await Promise.all([
         api.get<AdminDashboardResponse>("/analytics/admin-dashboard/?days=30", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=20&ordering=-updated_at", token),
-        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status__in=new,accepted&ordering=-created_at&page_size=8", token),
+        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status__in=new,accepted&ordering=-created_at&page_size=20", token),
+        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status__in=in_repair,in_diagnostics,diagnostics_done,in_testing,repair_done&ordering=-updated_at&page_size=20", token),
+        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=waiting_for_parts&ordering=-updated_at&page_size=20", token),
+        api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=ready_for_pickup&ordering=-updated_at&page_size=20", token),
       ]);
+      const newItems       = newRes?.results     ?? [];
+      const repairItems    = repairRes?.results   ?? [];
+      const waitingItems   = waitingRes?.results  ?? [];
+      const readyItems     = readyRes?.results    ?? [];
+      const unassignedItems = [...newItems, ...repairItems, ...waitingItems, ...readyItems].filter((r) => !r.assigned_to);
       setDashData(dash ?? null);
       setRecentRepairs(repairsRes?.results ?? []);
-      setNewSubmissions(newRes?.results ?? []);
+      setTabRepairs({ new: newItems, repair: repairItems, waiting: waitingItems, ready: readyItems, unassigned: unassignedItems });
 
       const built: DashboardAlert[] = [];
       const unassignedCount = (repairsRes?.results ?? []).filter((r) => !r.assigned_to).length;
@@ -295,7 +314,7 @@ export default function AdminDashboardPage() {
       setError(e instanceof Error ? e : new Error("Nie udało się pobrać danych dashboardu."));
       setDashData(null);
       setRecentRepairs([]);
-      setNewSubmissions([]);
+      setTabRepairs({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
       setAlerts([]);
     } finally {
       setLoading(false);
@@ -570,79 +589,114 @@ export default function AdminDashboardPage() {
             </div>
           </section>
 
-          {/* ── Row 4: New submissions ── */}
-          <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
-            <div className="mb-4 flex items-end justify-between gap-3">
-              <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zgłoszenia</div>
-                <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Nowe zgłoszenia</h2>
-                <p className="mt-1 text-xs text-[var(--muted)]">Ostatnio przyjęte — czekają na przetworzenie</p>
-              </div>
-              <div className="flex items-center gap-3">
-                {toNum(dashData.kpi.new_count) > 0 && (
-                  <span className="rounded-full border border-[#3b82f6]/30 bg-[#3b82f6]/12 px-2.5 py-1 text-[11px] font-bold text-[#60a5fa]">
-                    {dashData.kpi.new_count} oczekuje
-                  </span>
-                )}
-                <Link href="/admin-panel/repairs?status=new" className="text-sm font-semibold text-[#3b82f6] hover:underline">
-                  Wszystkie →
-                </Link>
-              </div>
-            </div>
+          {/* ── Row 4: Submissions with tabs ── */}
+          {(() => {
+            const tab = SUBMISSION_TABS.find((t) => t.key === activeTab)!;
+            const items = tabRepairs[activeTab];
+            return (
+              <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+                {/* Header */}
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zgłoszenia</div>
+                    <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">{tab.label}</h2>
+                    <p className="mt-1 text-xs text-[var(--muted)]">{tab.sub}</p>
+                  </div>
+                  <Link href={tab.href} className="text-sm font-semibold text-[#3b82f6] hover:underline">
+                    Wszystkie →
+                  </Link>
+                </div>
 
-            {newSubmissions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center">
-                <p className="text-sm text-[var(--ink2)]">Brak nowych zgłoszeń.</p>
-                <p className="mt-1 text-xs text-[var(--muted)]">Wszystkie zgłoszenia zostały przetworzone.</p>
-              </div>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-                {newSubmissions.map((r) => {
-                  const pAccent = priorityAccent(r.priority);
-                  const badge = statusBadge(r);
-                  const assigned = assignedInfo(r.assigned_to);
-                  return (
-                    <Link
-                      key={r.id}
-                      href={`/admin-panel/repairs/${r.id}`}
-                      className="group flex flex-col gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--s2)] p-4 transition hover:border-white/15 hover:bg-[var(--row-hover)]"
-                      style={{ borderTopColor: pAccent, borderTopWidth: "2px" }}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="font-mono text-xs font-bold text-[var(--white)]">{r.repair_number}</span>
-                        <span className="shrink-0 text-[10px] text-[var(--muted)]">{relativeTime(r.created_at)}</span>
-                      </div>
-                      <div>
-                        <p className="truncate text-sm font-semibold text-[var(--white)]">{r.client_name}</p>
-                        <p className="mt-0.5 truncate text-xs text-[var(--muted)]">{r.device_name}</p>
-                      </div>
-                      <div className="mt-auto flex flex-wrap items-center gap-1.5">
-                        <span
-                          className="rounded-full border px-2 py-px text-[10px] font-semibold"
-                          style={{ background: badge.bg, borderColor: badge.border, color: badge.text }}
-                        >
-                          {badge.label}
-                        </span>
-                        {!assigned && (
-                          <span className="rounded-full border border-[var(--rb)] bg-[var(--rl)] px-2 py-px text-[10px] font-semibold text-[#ffb4b4]">
-                            Nieprzypisane
-                          </span>
-                        )}
-                        {r.priority && r.priority !== "normal" && (
+                {/* Tabs */}
+                <div className="mb-4 flex flex-wrap gap-1.5">
+                  {SUBMISSION_TABS.map((t) => {
+                    const count = tabRepairs[t.key].length;
+                    const isActive = activeTab === t.key;
+                    return (
+                      <button
+                        key={t.key}
+                        type="button"
+                        onClick={() => setActiveTab(t.key)}
+                        className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
+                        style={
+                          isActive
+                            ? { borderColor: t.accent + "55", background: t.accent + "18", color: t.accent }
+                            : { borderColor: "var(--border)", background: "var(--row-hover)", color: "var(--ink2)" }
+                        }
+                      >
+                        {t.label}
+                        {count > 0 && (
                           <span
-                            className="rounded-full border px-2 py-px text-[10px] font-semibold"
-                            style={{ background: pAccent + "1a", borderColor: pAccent + "44", color: pAccent }}
+                            className="rounded-full px-1.5 text-[10px] font-bold"
+                            style={
+                              isActive
+                                ? { background: t.accent + "30", color: t.accent }
+                                : { background: "rgba(255,255,255,.08)", color: "var(--muted)" }
+                            }
                           >
-                            {r.priority_display}
+                            {count}
                           </span>
                         )}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Cards */}
+                {items.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center">
+                    <p className="text-sm text-[var(--ink2)]">Brak zgłoszeń w tej kategorii.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                    {items.map((r) => {
+                      const pAccent = priorityAccent(r.priority);
+                      const badge = statusBadge(r);
+                      const assigned = assignedInfo(r.assigned_to);
+                      return (
+                        <Link
+                          key={r.id}
+                          href={`/admin-panel/repairs/${r.id}`}
+                          className="group flex flex-col gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--s2)] p-4 transition hover:border-white/15 hover:bg-[var(--row-hover)]"
+                          style={{ borderTopColor: tab.accent, borderTopWidth: "2px" }}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-mono text-xs font-bold text-[var(--white)]">{r.repair_number}</span>
+                            <span className="shrink-0 text-[10px] text-[var(--muted)]">{relativeTime(r.created_at)}</span>
+                          </div>
+                          <div>
+                            <p className="truncate text-sm font-semibold text-[var(--white)]">{r.client_name}</p>
+                            <p className="mt-0.5 truncate text-xs text-[var(--muted)]">{r.device_name}</p>
+                          </div>
+                          <div className="mt-auto flex flex-wrap items-center gap-1.5">
+                            <span
+                              className="rounded-full border px-2 py-px text-[10px] font-semibold"
+                              style={{ background: badge.bg, borderColor: badge.border, color: badge.text }}
+                            >
+                              {badge.label}
+                            </span>
+                            {!assigned && (
+                              <span className="rounded-full border border-[var(--rb)] bg-[var(--rl)] px-2 py-px text-[10px] font-semibold text-[#ffb4b4]">
+                                Nieprzypisane
+                              </span>
+                            )}
+                            {r.priority && r.priority !== "normal" && (
+                              <span
+                                className="rounded-full border px-2 py-px text-[10px] font-semibold"
+                                style={{ background: pAccent + "1a", borderColor: pAccent + "44", color: pAccent }}
+                              >
+                                {r.priority_display}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            );
+          })()}
 
           {/* ── Row 5: Enhanced last activity ── */}
           <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
