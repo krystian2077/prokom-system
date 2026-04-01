@@ -319,17 +319,17 @@ export default function AdminRepairsPage() {
 
   if (!isAdmin) {
     return (
-      <main className="mx-auto min-h-screen max-w-[2100px] px-5 py-8">
+      <main className="mx-auto min-h-screen max-w-[2260px] px-5 py-8">
         <p className="text-sm text-[#fca5a5]">Tylko administrator.</p>
       </main>
     );
   }
 
   const tableGridClass =
-    "grid min-w-[2060px] grid-cols-[44px_minmax(168px,1fr)_minmax(240px,1.35fr)_minmax(148px,1fr)_minmax(132px,1fr)_minmax(190px,1.1fr)_minmax(170px,1fr)_minmax(180px,1fr)_minmax(220px,1.25fr)] gap-x-3 gap-y-2";
+    "grid min-w-[2100px] grid-cols-[44px_minmax(172px,1fr)_minmax(280px,1.45fr)_minmax(172px,1fr)_minmax(150px,.95fr)_minmax(210px,1.1fr)_minmax(190px,1fr)_minmax(180px,1fr)_minmax(240px,1.15fr)] gap-x-4 gap-y-2";
 
   return (
-    <main className="mx-auto min-h-screen max-w-[2100px] px-4 py-8">
+    <main className="mx-auto min-h-screen max-w-[2260px] px-4 py-8">
       <div className="flex flex-col gap-4">
         <header className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -546,7 +546,7 @@ export default function AdminRepairsPage() {
             <div
               className={
                 tableGridClass +
-                " items-stretch border-b border-[#2d3548] bg-gradient-to-b from-[#151821] to-[#0d0f14] px-4 py-4 text-[11px] font-bold uppercase leading-tight tracking-[0.18em] text-[#8b9cbb] sm:text-xs"
+                " items-stretch border-b border-[#2d3548] bg-gradient-to-b from-[#151821] to-[#0d0f14] px-5 py-4 text-[11px] font-bold uppercase leading-tight tracking-[0.16em] text-[#9fb3d9] sm:text-xs"
               }
             >
               <div className="flex justify-center">
@@ -609,22 +609,7 @@ export default function AdminRepairsPage() {
 
               <div className="flex items-end justify-center pb-1 text-[#c7d2eb]">Status</div>
               <div className="flex items-end justify-center pb-1 text-[#c7d2eb]">Koszt naprawy</div>
-              <div className="hidden items-end justify-center pb-1 text-[#c7d2eb] lg:flex">
-                <label className="mr-2" htmlFor="admin-staff-filter-desktop">Przypisany</label>
-                <select
-                  id="admin-staff-filter-desktop"
-                  value={staffFilter}
-                  onChange={(e) => setQuery({ staff: e.target.value, page: 1 })}
-                  className="rounded-lg border border-white/10 bg-[#0f1422] px-2 py-1 text-[11px] font-semibold normal-case tracking-normal text-white"
-                >
-                  <option value="all">Wszyscy</option>
-                  {staffAssignOptions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div className="hidden items-end justify-center pb-1 text-[#c7d2eb] lg:flex">Przypisany</div>
               <div className="flex items-end justify-center pb-1 text-[#c7d2eb]">Akcja</div>
             </div>
 
@@ -815,26 +800,28 @@ export default function AdminRepairsPage() {
                         </div>
 
                         <div className="text-center">
-                          <span className="inline-block max-w-full truncate text-[14px] font-medium tracking-tight text-[#c5d4f0]" title={assignee}>
+                          <span className="inline-block max-w-full truncate text-[14px] font-semibold tracking-tight text-[#d7e3f8]" title={assignee}>
                             {assignee}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center">
+                          <div className="inline-flex items-center justify-center gap-2">
                           <button
                             type="button"
                             onClick={() => {
                               setAssignTargetIds([id]);
                               setAssignOpen(true);
                             }}
-                            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#cbd5e1] hover:bg-white/10 hover:text-white"
+                            className="inline-flex h-10 min-w-[118px] items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-4 text-[13px] font-semibold text-[#dbe7ff] transition hover:border-[#7dd3fc]/60 hover:bg-[#1d4ed8]/25 hover:text-white"
                           >
                             <ArrowRightLeft size={12} />
                             Przypisz
                           </button>
-                          <Link href={`/admin-panel/repairs/${r.id}`} className="rounded-full border border-[#3b82f6]/40 bg-[#3b82f6]/10 px-3 py-1.5 text-xs font-semibold text-[#bfdbfe] hover:bg-[#3b82f6]/20">
+                          <Link href={`/admin-panel/repairs/${r.id}`} className="inline-flex h-10 min-w-[100px] items-center justify-center rounded-full border border-[#3b82f6]/60 bg-[#3b82f6]/18 px-4 text-[13px] font-semibold text-[#dbeafe] transition hover:border-[#60a5fa]/75 hover:bg-[#2563eb]/35 hover:text-white">
                             Otwórz
                           </Link>
+                          </div>
                         </div>
                       </div>
                     </div>

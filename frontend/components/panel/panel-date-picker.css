@@ -1,5 +1,6 @@
 /* react-day-picker — dopasowanie do ciemnego panelu (obok importu style.css) */
-.panel-date-picker-popover .rdp-root {
+.panel-date-picker-popover .rdp-root,
+.panel-date-range-picker-popover .rdp-root {
   --rdp-accent-color: #ef4444;
   --rdp-accent-background-color: rgba(239, 68, 68, 0.18);
   --rdp-today-color: #fbbf24;
@@ -9,19 +10,23 @@
   margin: 0;
 }
 
-.panel-date-picker-popover .rdp-month_caption {
+.panel-date-picker-popover .rdp-month_caption,
+.panel-date-range-picker-popover .rdp-month_caption {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.25rem 0 0.5rem;
 }
 
-.panel-date-picker-popover .rdp-dropdowns {
+.panel-date-picker-popover .rdp-dropdowns,
+.panel-date-range-picker-popover .rdp-dropdowns {
   gap: 0.5rem;
 }
 
 .panel-date-picker-popover .rdp-dropdown_root select,
-.panel-date-picker-popover select.rdp-dropdown {
+.panel-date-picker-popover select.rdp-dropdown,
+.panel-date-range-picker-popover .rdp-dropdown_root select,
+.panel-date-range-picker-popover select.rdp-dropdown {
   appearance: auto;
   background-color: rgb(17 18 22);
   color: #e5e7eb;
@@ -32,18 +37,23 @@
 }
 
 .panel-date-picker-popover .rdp-button_previous,
-.panel-date-picker-popover .rdp-button_next {
+.panel-date-picker-popover .rdp-button_next,
+.panel-date-range-picker-popover .rdp-button_previous,
+.panel-date-range-picker-popover .rdp-button_next {
   color: #e5e7eb;
   opacity: 0.9;
 }
 
 .panel-date-picker-popover .rdp-button_previous:hover,
-.panel-date-picker-popover .rdp-button_next:hover {
+.panel-date-picker-popover .rdp-button_next:hover,
+.panel-date-range-picker-popover .rdp-button_previous:hover,
+.panel-date-range-picker-popover .rdp-button_next:hover {
   background-color: rgba(255, 255, 255, 0.08);
   border-radius: 0.5rem;
 }
 
-.panel-date-picker-popover .rdp-weekday {
+.panel-date-picker-popover .rdp-weekday,
+.panel-date-range-picker-popover .rdp-weekday {
   color: #9ca3af;
   font-size: 0.7rem;
   font-weight: 600;
@@ -51,20 +61,24 @@
   letter-spacing: 0.04em;
 }
 
-.panel-date-picker-popover .rdp-day_button {
+.panel-date-picker-popover .rdp-day_button,
+.panel-date-range-picker-popover .rdp-day_button {
   color: #e5e7eb;
 }
 
-.panel-date-picker-popover .rdp-day_button:hover:not([disabled]) {
+.panel-date-picker-popover .rdp-day_button:hover:not([disabled]),
+.panel-date-range-picker-popover .rdp-day_button:hover:not([disabled]) {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Dzisiejsza data — wyraźny pierścień + tło (łatwo zauważyć „gdzie jesteśmy w kalendarzu”) */
-.panel-date-picker-popover .rdp-today:not(.rdp-outside) {
+.panel-date-picker-popover .rdp-today:not(.rdp-outside),
+.panel-date-range-picker-popover .rdp-today:not(.rdp-outside) {
   color: inherit;
 }
 
-.panel-date-picker-popover .rdp-today:not(.rdp-outside) .rdp-day_button {
+.panel-date-picker-popover .rdp-today:not(.rdp-outside) .rdp-day_button,
+.panel-date-range-picker-popover .rdp-today:not(.rdp-outside) .rdp-day_button {
   color: #fef9c3;
   font-weight: 700;
   border-radius: 9999px;
@@ -72,12 +86,14 @@
   box-shadow: inset 0 0 0 2px rgba(251, 191, 36, 0.95);
 }
 
-.panel-date-picker-popover .rdp-today:not(.rdp-outside) .rdp-day_button:hover:not([disabled]) {
+.panel-date-picker-popover .rdp-today:not(.rdp-outside) .rdp-day_button:hover:not([disabled]),
+.panel-date-range-picker-popover .rdp-today:not(.rdp-outside) .rdp-day_button:hover:not([disabled]) {
   background-color: rgba(251, 191, 36, 0.26);
 }
 
 /* Gdy „dzisiaj” jest jednocześnie wybranym dniem — zachowaj złoty pierścień + czerwone wypełnienie wyboru */
-.panel-date-picker-popover .rdp-today.rdp-selected:not(.rdp-outside) .rdp-day_button {
+.panel-date-picker-popover .rdp-today.rdp-selected:not(.rdp-outside) .rdp-day_button,
+.panel-date-range-picker-popover .rdp-today.rdp-selected:not(.rdp-outside) .rdp-day_button {
   color: #fff;
   background-color: rgba(239, 68, 68, 0.45);
   box-shadow:
@@ -85,3 +101,16 @@
     0 0 0 1px rgba(239, 68, 68, 0.6);
   border: 2px solid rgba(239, 68, 68, 0.85);
 }
+
+.panel-date-range-picker-popover .rdp-range_middle .rdp-day_button {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #dbeafe;
+}
+
+.panel-date-range-picker-popover .rdp-range_start .rdp-day_button,
+.panel-date-range-picker-popover .rdp-range_end .rdp-day_button {
+  background-color: rgba(59, 130, 246, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.55);
+  color: #ffffff;
+}
+
