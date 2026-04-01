@@ -58,7 +58,7 @@ type DashboardAlert = {
   href: string;
 };
 
-type DonutSegment = { label: string; count: number; revenue: string; color: string };
+type WorkloadEntry = { id: string; name: string; inits: string; count: number; color: string; isUnassigned: boolean };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -156,104 +156,129 @@ function alertClass(severity: AlertSeverity): string {
   return "border-[var(--bb)] bg-[var(--bl)] text-[#bcd6ff]";
 }
 
-// ─── DonutChart ───────────────────────────────────────────────────────────────
+// ─── WorkloadChart ────────────────────────────────────────────────────────────
 
-function DonutChart({ segments }: { segments: DonutSegment[] }) {
-  const [hovered, setHovered] = useState<number | null>(null);
+function WorkloadChart({ repairs }: { repairs: RepairRequestListItem[] }) {
+  const [hovered, setHovered] = useState<string | null>(null);
 
-  const total = segments.reduce((s, d) => s + d.count, 0);
-  const GAP = 0.022;
-  const R = 78, R_HOV = 84, INNER = 52, CX = 100, CY = 100;
+  const entries = useMemo<WorkloadEntry[]>(() => {
+    const techMap = new Map<string, { name: string; inits: string; count: number }>();
+    let unassignedCount = 0;
 
-  const arcs = useMemo(() => {
-    if (total === 0) return [];
-    const totalSweep = 2 * Math.PI - GAP * segments.length;
-    let angle = -Math.PI / 2;
+    for (const r of repairs) {
+      if (!r.assigned_to) {
+        unassignedCount++;
+      } else if (typeof r.assigned_to === "object") {
+        const id = r.assigned_to.id;
+        const name =
+          [r.assigned_to.first_name, r.assigned_to.last_name].filter(Boolean).join(" ") ||
+          r.assigned_to.email;
+        const prev = techMap.get(id) ?? { name, inits: initials(name), count: 0 };
+        techMap.set(id, { ...prev, count: prev.count + 1 });
+      }
+    }
 
-    return segments.map((seg) => {
-      const sweep = (seg.count / total) * totalSweep;
-      const end = angle + sweep;
-      const large = sweep > Math.PI ? 1 : 0;
+    const assigned: WorkloadEntry[] = Array.from(techMap.entries())
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([id, d], i) => ({ id, ...d, color: TECH_COLORS[i % TECH_COLORS.length], isUnassigned: false }));
 
-      const makePath = (outerR: number) => {
-        const x1 = CX + outerR * Math.cos(angle), y1 = CY + outerR * Math.sin(angle);
-        const x2 = CX + outerR * Math.cos(end),   y2 = CY + outerR * Math.sin(end);
-        const ix1 = CX + INNER * Math.cos(end),   iy1 = CY + INNER * Math.sin(end);
-        const ix2 = CX + INNER * Math.cos(angle), iy2 = CY + INNER * Math.sin(angle);
-        return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${outerR} ${outerR} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${ix1.toFixed(2)} ${iy1.toFixed(2)} A${INNER} ${INNER} 0 ${large} 0 ${ix2.toFixed(2)} ${iy2.toFixed(2)}Z`;
-      };
+    if (unassignedCount > 0)
+      assigned.push({ id: "__unassigned", name: "Nieprzypisane", inits: "—", count: unassignedCount, color: "#ef4444", isUnassigned: true });
 
-      const result = {
-        ...seg,
-        normal: makePath(R),
-        expanded: makePath(R_HOV),
-        pct: Math.round((seg.count / total) * 100),
-      };
-      angle = end + GAP;
-      return result;
-    });
-  }, [segments, total]);
+    return assigned;
+  }, [repairs]);
+
+  const maxCount = Math.max(...entries.map((e) => e.count), 1);
+  const total = repairs.length;
+  const unassignedEntry = entries.find((e) => e.isUnassigned);
 
   if (total === 0) {
     return (
       <div className="flex h-44 items-center justify-center">
-        <p className="text-sm text-[var(--muted)]">Brak danych — zamknij pierwsze naprawy.</p>
+        <p className="text-sm text-[var(--muted)]">Brak aktywnych napraw.</p>
       </div>
     );
   }
 
-  const active = hovered !== null ? arcs[hovered] : null;
-
   return (
-    <div className="flex items-center gap-4">
-      <svg
-        width="200" height="200" viewBox="0 0 200 200"
-        className="shrink-0"
-        style={{ overflow: "visible" }}
-      >
-        {arcs.map((arc, i) => (
-          <path
-            key={arc.label}
-            d={hovered === i ? arc.expanded : arc.normal}
-            fill={arc.color}
-            style={{
-              opacity: hovered !== null && hovered !== i ? 0.22 : 1,
-              transition: "opacity .15s",
-              cursor: "pointer",
-              filter: hovered === i ? `drop-shadow(0 0 8px ${arc.color}88)` : "none",
-            }}
-            onMouseEnter={() => setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-          />
-        ))}
-        <text x="100" y="89" textAnchor="middle" fontSize="23" fontWeight="700" fill="white">
-          {active ? active.count : total}
-        </text>
-        <text x="100" y="108" textAnchor="middle" fontSize="10" fill="#8b93a8">
-          {active ? active.label.split(" ")[0] : "napraw"}
-        </text>
-        {active && (
-          <text x="100" y="123" textAnchor="middle" fontSize="9" fill="#22c55e">
-            {fmtPln(active.revenue)}
-          </text>
-        )}
-      </svg>
-
-      <div className="flex-1 space-y-0.5">
-        {arcs.map((arc, i) => (
-          <div
-            key={arc.label}
-            className="flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 transition-colors hover:bg-white/5"
-            style={{ opacity: hovered !== null && hovered !== i ? 0.35 : 1, transition: "opacity .15s" }}
-            onMouseEnter={() => setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-          >
-            <div className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: arc.color }} />
-            <span className="min-w-0 flex-1 truncate text-sm text-[var(--ink2)]">{arc.label}</span>
-            <span className="shrink-0 text-[11px] text-[var(--muted)]">{arc.pct}%</span>
-            <span className="w-5 shrink-0 text-right text-sm font-bold text-[var(--white)]">{arc.count}</span>
+    <div>
+      {/* Summary row */}
+      <div className="mb-5 flex items-end gap-3">
+        <div>
+          <p className="text-3xl font-bold tabular-nums text-[var(--white)]">{total}</p>
+          <p className="text-[11px] uppercase tracking-wider text-[var(--muted)]">aktywnych zleceń</p>
+        </div>
+        {unassignedEntry && (
+          <div className="mb-1 rounded-full border border-[#ef4444]/30 bg-[#ef4444]/10 px-2.5 py-1 text-[11px] font-bold text-[#ef4444]">
+            {unassignedEntry.count} bez technika
           </div>
-        ))}
+        )}
+      </div>
+
+      <div className="space-y-1.5">
+        {entries.map((entry) => {
+          const isHov = hovered === entry.id;
+          const isDim = hovered !== null && !isHov;
+          const barPct = Math.round((entry.count / maxCount) * 100);
+
+          return (
+            <div
+              key={entry.id}
+              className="flex cursor-default items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-white/[0.03]"
+              style={{ opacity: isDim ? 0.22 : 1, transition: "opacity .15s" }}
+              onMouseEnter={() => setHovered(entry.id)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              {/* Avatar */}
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+                style={{
+                  background: entry.color + "1a",
+                  border: `1.5px solid ${entry.color}${isHov ? "88" : "33"}`,
+                  color: entry.color,
+                  boxShadow: isHov ? `0 0 14px ${entry.color}44` : "none",
+                  transition: "box-shadow .15s, border-color .15s",
+                }}
+              >
+                {entry.inits}
+              </div>
+
+              {/* Name + bar */}
+              <div className="min-w-0 flex-1">
+                <p
+                  className="truncate text-sm font-semibold transition-colors"
+                  style={{ color: isHov ? "var(--white)" : "var(--ink2)" }}
+                >
+                  {entry.name}
+                </p>
+                <div className="mt-1.5 h-[5px] overflow-hidden rounded-full bg-white/[0.06]">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.max(barPct, entry.count > 0 ? 4 : 0)}%`,
+                      background: `linear-gradient(90deg, ${entry.color}66, ${entry.color})`,
+                      boxShadow: isHov ? `0 0 10px ${entry.color}99` : `0 0 4px ${entry.color}33`,
+                      transition: "width .65s cubic-bezier(.4,0,.2,1), box-shadow .15s",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Count badge */}
+              <div
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-all"
+                style={{
+                  background: isHov ? entry.color + "22" : "transparent",
+                  color: isHov ? entry.color : "var(--white)",
+                  border: isHov ? `1px solid ${entry.color}44` : "1px solid transparent",
+                  transition: "background .15s, color .15s, border-color .15s",
+                }}
+              >
+                {entry.count}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -271,6 +296,7 @@ export default function AdminDashboardPage() {
   const [dashData, setDashData] = useState<AdminDashboardResponse | null>(null);
   const [recentRepairs, setRecentRepairs] = useState<RepairRequestListItem[]>([]);
   const [tabRepairs, setTabRepairs] = useState<Record<SubmissionTabKey, RepairRequestListItem[]>>({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
+  const [allActiveRepairs, setAllActiveRepairs] = useState<RepairRequestListItem[]>([]);
   const [activeTab, setActiveTab] = useState<SubmissionTabKey>("new");
   const [alerts, setAlerts] = useState<DashboardAlert[]>([]);
   const [hoveredStage, setHoveredStage] = useState<number | null>(null);
@@ -298,9 +324,11 @@ export default function AdminDashboardPage() {
       const repairItems     = repairRes?.results     ?? [];
       const waitingItems    = waitingRes?.results    ?? [];
       const readyItems      = readyRes?.results      ?? [];
-      const unassignedItems = (unassignedRes?.results ?? []).filter((r) => !r.assigned_to);
+      const allActive       = unassignedRes?.results ?? [];
+      const unassignedItems = allActive.filter((r) => !r.assigned_to);
       setDashData(dash ?? null);
       setRecentRepairs(repairsRes?.results ?? []);
+      setAllActiveRepairs(allActive);
       setTabRepairs({ new: newItems, repair: repairItems, waiting: waitingItems, ready: readyItems, unassigned: unassignedItems });
 
       const built: DashboardAlert[] = [];
@@ -321,6 +349,7 @@ export default function AdminDashboardPage() {
       setError(e instanceof Error ? e : new Error("Nie udało się pobrać danych dashboardu."));
       setDashData(null);
       setRecentRepairs([]);
+      setAllActiveRepairs([]);
       setTabRepairs({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
       setAlerts([]);
     } finally {
@@ -355,16 +384,6 @@ export default function AdminDashboardPage() {
     return { stages, total, closed };
   }, [dashData]);
 
-  const techSegments = useMemo<DonutSegment[]>(() => {
-    return (dashData?.tables?.top_staff ?? [])
-      .filter((s) => s.completed_repairs > 0)
-      .map((s, i) => ({
-        label: s.full_name,
-        count: s.completed_repairs,
-        revenue: s.revenue,
-        color: TECH_COLORS[i % TECH_COLORS.length],
-      }));
-  }, [dashData]);
 
   if (!isAdmin) {
     return (
@@ -547,19 +566,19 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Donut: repair distribution per technician */}
+            {/* Workload per technician */}
             <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
               <div className="mb-4 flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zespół</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Rozkład napraw</h2>
-                  <p className="mt-1 text-xs text-[var(--muted)]">Ukończone naprawy per technik — 30 dni</p>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Obciążenie techników</h2>
+                  <p className="mt-1 text-xs text-[var(--muted)]">Aktywne zlecenia na teraz</p>
                 </div>
                 <Link href="/admin-panel/workload" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
-                  Workload
+                  Workload →
                 </Link>
               </div>
-              <DonutChart segments={techSegments} />
+              <WorkloadChart repairs={allActiveRepairs} />
             </div>
           </section>
 
