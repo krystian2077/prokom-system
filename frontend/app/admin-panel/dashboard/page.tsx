@@ -273,6 +273,7 @@ export default function AdminDashboardPage() {
   const [tabRepairs, setTabRepairs] = useState<Record<SubmissionTabKey, RepairRequestListItem[]>>({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
   const [activeTab, setActiveTab] = useState<SubmissionTabKey>("new");
   const [alerts, setAlerts] = useState<DashboardAlert[]>([]);
+  const [hoveredStage, setHoveredStage] = useState<number | null>(null);
 
   const load = async () => {
     if (!token) return;
@@ -437,7 +438,132 @@ export default function AdminDashboardPage() {
             ))}
           </section>
 
-          {/* ── Row 2: Alerts + Team workload ── */}
+          {/* ── Row 2: Pipeline + Donut chart ── */}
+          <section className="grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
+
+            {/* Premium Pipeline */}
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Warsztat</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Pipeline statusów</h2>
+                  <p className="mt-1 text-xs text-[var(--muted)]">Rozkład aktywnych napraw według etapów</p>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold tabular-nums text-[var(--white)]">
+                      {pipeline.stages.reduce((a, s) => a + s.count, 0)}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]">aktywnych</p>
+                  </div>
+                  <Link href="/admin-panel/repairs" className="text-sm font-semibold text-[#3b82f6] hover:underline">
+                    Wszystkie →
+                  </Link>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                {pipeline.stages.map((stage, i) => {
+                  const pct = Math.round((stage.count / pipeline.total) * 100);
+                  const isHov = hoveredStage === i;
+                  const isDim = hoveredStage !== null && !isHov;
+                  return (
+                    <Link
+                      key={stage.label}
+                      href={`/admin-panel/repairs?status=${stage.statuses[0]}`}
+                      className="flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-colors hover:bg-white/[0.03]"
+                      style={{ opacity: isDim ? 0.3 : 1, transition: "opacity .15s" }}
+                      onMouseEnter={() => setHoveredStage(i)}
+                      onMouseLeave={() => setHoveredStage(null)}
+                    >
+                      {/* Dot + label */}
+                      <div className="flex w-32 shrink-0 items-center gap-2.5">
+                        <div
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{
+                            background: stage.color,
+                            boxShadow: isHov ? `0 0 10px ${stage.color}` : "none",
+                            transform: isHov ? "scale(1.5)" : "scale(1)",
+                            transition: "transform .15s, box-shadow .15s",
+                          }}
+                        />
+                        <span
+                          className="text-sm font-medium transition-colors"
+                          style={{ color: isHov ? "var(--white)" : "var(--ink2)" }}
+                        >
+                          {stage.label}
+                        </span>
+                      </div>
+
+                      {/* Bar */}
+                      <div
+                        className="relative flex-1 overflow-hidden rounded-full bg-white/[0.05]"
+                        style={{ height: isHov ? "12px" : "8px", transition: "height .2s" }}
+                      >
+                        <div
+                          className="absolute inset-y-0 left-0 rounded-full"
+                          style={{
+                            width: `${Math.max(pct, stage.count > 0 ? 2 : 0)}%`,
+                            background: `linear-gradient(90deg, ${stage.color}88, ${stage.color})`,
+                            boxShadow: isHov ? `0 0 18px ${stage.color}88` : stage.count > 0 ? `0 0 8px ${stage.color}33` : "none",
+                            transition: "width .7s cubic-bezier(.4,0,.2,1), box-shadow .15s",
+                          }}
+                        />
+                      </div>
+
+                      {/* Count */}
+                      <div className="w-16 shrink-0 text-right">
+                        <span
+                          className="text-xl font-bold tabular-nums transition-colors"
+                          style={{ color: isHov ? stage.color : "var(--white)" }}
+                        >
+                          {stage.count}
+                        </span>
+                        {pct > 0 && (
+                          <span className="ml-1 text-[10px] text-[var(--muted)]">{pct}%</span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+
+                {pipeline.closed > 0 && (
+                  <div
+                    className="flex items-center gap-4 rounded-2xl px-3 py-3.5 border-t border-white/5 mt-1 pt-4"
+                    style={{ opacity: hoveredStage !== null ? 0.2 : 0.45 }}
+                  >
+                    <div className="flex w-32 shrink-0 items-center gap-2.5">
+                      <div className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                      <span className="text-sm font-medium text-[var(--muted)]">Anulowane</span>
+                    </div>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/5">
+                      <div className="h-full w-full rounded-full bg-white/10" />
+                    </div>
+                    <div className="w-16 text-right">
+                      <span className="text-xl font-bold tabular-nums text-[var(--muted)]">{pipeline.closed}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Donut: repair distribution per technician */}
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+              <div className="mb-4 flex items-end justify-between gap-3">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zespół</div>
+                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Rozkład napraw</h2>
+                  <p className="mt-1 text-xs text-[var(--muted)]">Ukończone naprawy per technik — 30 dni</p>
+                </div>
+                <Link href="/admin-panel/workload" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
+                  Workload
+                </Link>
+              </div>
+              <DonutChart segments={techSegments} />
+            </div>
+          </section>
+
+          {/* ── Row 3: Alerts + Team workload ── */}
           <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
 
             {/* Alerts */}
@@ -517,81 +643,6 @@ export default function AdminDashboardPage() {
                   ))
                 )}
               </div>
-            </div>
-          </section>
-
-          {/* ── Row 3: Pipeline + Donut chart ── */}
-          <section className="grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
-
-            {/* Pipeline */}
-            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
-              <div className="mb-5 flex items-end justify-between gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Warsztat</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Pipeline statusów</h2>
-                  <p className="mt-1 text-xs text-[var(--muted)]">Rozkład aktywnych napraw według etapów</p>
-                </div>
-                <Link href="/admin-panel/repairs" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
-                  Wszystkie naprawy
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {pipeline.stages.map((stage) => {
-                  const pct = Math.round((stage.count / pipeline.total) * 100);
-                  return (
-                    <div key={stage.label} className="flex items-center gap-4">
-                      <div className="flex w-28 shrink-0 items-center gap-2">
-                        <div className="h-2 w-2 shrink-0 rounded-full" style={{ background: stage.color }} />
-                        <span className="text-sm font-medium text-[var(--ink2)]">{stage.label}</span>
-                      </div>
-                      <div className="h-[6px] flex-1 overflow-hidden rounded-full bg-white/5">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${pct}%`,
-                            background: `linear-gradient(90deg, ${stage.color}bb, ${stage.color})`,
-                            boxShadow: stage.count > 0 ? `0 0 8px ${stage.color}44` : "none",
-                            transition: "width .6s cubic-bezier(.4,0,.2,1)",
-                          }}
-                        />
-                      </div>
-                      <div className="w-14 shrink-0 text-right">
-                        <span className="text-sm font-bold text-[var(--white)]">{stage.count}</span>
-                        <span className="ml-1 text-[10px] text-[var(--muted)]">({pct}%)</span>
-                      </div>
-                    </div>
-                  );
-                })}
-                {pipeline.closed > 0 && (
-                  <div className="flex items-center gap-4 border-t border-white/5 pt-3">
-                    <div className="flex w-28 shrink-0 items-center gap-2">
-                      <div className="h-2 w-2 shrink-0 rounded-full bg-white/20" />
-                      <span className="text-sm font-medium text-[var(--muted)]">Anulowane</span>
-                    </div>
-                    <div className="h-[6px] flex-1 overflow-hidden rounded-full bg-white/5">
-                      <div className="h-full w-full rounded-full bg-white/12" />
-                    </div>
-                    <div className="w-14 shrink-0 text-right">
-                      <span className="text-sm font-bold text-[var(--muted)]">{pipeline.closed}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Donut: repair distribution per technician */}
-            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
-              <div className="mb-4 flex items-end justify-between gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zespół</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Rozkład napraw</h2>
-                  <p className="mt-1 text-xs text-[var(--muted)]">Ukończone naprawy per technik — 30 dni</p>
-                </div>
-                <Link href="/admin-panel/workload" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
-                  Workload
-                </Link>
-              </div>
-              <DonutChart segments={techSegments} />
             </div>
           </section>
 
