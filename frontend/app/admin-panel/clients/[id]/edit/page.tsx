@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, BadgeInfo, Building2, CircleDollarSign, Clock3, MapPin, Save, ShieldAlert, Sparkles, User, Wallet } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { StackedRowSkeleton } from "@/components/ui/Skeleton";
 import { Select } from "@/components/ui/Select";
@@ -114,10 +115,13 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
 }
 
 export default function AdminClientEditPage() {
+  const panelPaths = usePanelBasePath();
   const { token, user } = useAuth();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const clientId = params?.id;
+  const isStaffOrAdmin = user?.role === "staff" || user?.role === "admin";
+  const canEditVipBlacklist = user?.role === "admin";
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -164,10 +168,10 @@ export default function AdminClientEditPage() {
   };
 
   useEffect(() => {
-    if (user?.role !== "admin") return;
+    if (!isStaffOrAdmin) return;
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, clientId, user?.role]);
+  }, [token, clientId, isStaffOrAdmin]);
 
   const displayName = useMemo(() => (client ? getClientDisplayName(client) : "Klient"), [client]);
 
@@ -196,11 +200,15 @@ export default function AdminClientEditPage() {
         preferred_contact: form.preferred_contact,
         accepts_marketing: form.accepts_marketing,
         internal_notes: form.internal_notes.trim(),
-        is_vip: form.is_vip,
-        is_blacklisted: form.is_blacklisted,
+        ...(canEditVipBlacklist
+          ? {
+              is_vip: form.is_vip,
+              is_blacklisted: form.is_blacklisted,
+            }
+          : {}),
       };
       await api.patch(`/clients/${clientId}/`, payload, token);
-      router.replace(`/admin-panel/clients/${clientId}`);
+      router.replace(`${panelPaths.klienciPath}/${clientId}`);
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : "Nie udało się zapisać zmian.");
     } finally {
@@ -208,7 +216,7 @@ export default function AdminClientEditPage() {
     }
   };
 
-  if (user?.role !== "admin") {
+  if (!isStaffOrAdmin) {
     return null;
   }
 
@@ -243,7 +251,7 @@ export default function AdminClientEditPage() {
     <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
-          href={`/admin-panel/clients/${clientId}`}
+          href={`${panelPaths.klienciPath}/${clientId}`}
           className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
         >
           <ArrowLeft size={16} />
@@ -302,30 +310,38 @@ export default function AdminClientEditPage() {
                   options={CLIENT_SEGMENT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
                 />
               </Field>
-              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 md:col-span-2">
-                <input
-                  type="checkbox"
-                  checked={form.is_vip}
-                  onChange={(e) => setForm((p) => ({ ...p, is_vip: e.target.checked }))}
-                  className="h-4 w-4 rounded border-white/20 bg-transparent text-[#3b82f6]"
-                />
-                <span>
-                  <span className="block text-sm font-semibold text-white">VIP / premium</span>
-                  <span className="block text-xs text-[#8b93a8]">Podkreśl klienta priorytetowego w panelu i na listach.</span>
-                </span>
-              </label>
-              <label className="flex items-center gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/10 px-4 py-3 md:col-span-2">
-                <input
-                  type="checkbox"
-                  checked={form.is_blacklisted}
-                  onChange={(e) => setForm((p) => ({ ...p, is_blacklisted: e.target.checked }))}
-                  className="h-4 w-4 rounded border-white/20 bg-transparent text-[#ef4444]"
-                />
-                <span>
-                  <span className="block text-sm font-semibold text-white">Na czarnej liście</span>
-                  <span className="block text-xs text-[#fca5a5]">Włącza ostrzegawczy status klienta.</span>
-                </span>
-              </label>
+              {canEditVipBlacklist ? (
+                <>
+                  <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 md:col-span-2">
+                    <input
+                      type="checkbox"
+                      checked={form.is_vip}
+                      onChange={(e) => setForm((p) => ({ ...p, is_vip: e.target.checked }))}
+                      className="h-4 w-4 rounded border-white/20 bg-transparent text-[#3b82f6]"
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-white">VIP / premium</span>
+                      <span className="block text-xs text-[#8b93a8]">Podkreśl klienta priorytetowego w panelu i na listach.</span>
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/10 px-4 py-3 md:col-span-2">
+                    <input
+                      type="checkbox"
+                      checked={form.is_blacklisted}
+                      onChange={(e) => setForm((p) => ({ ...p, is_blacklisted: e.target.checked }))}
+                      className="h-4 w-4 rounded border-white/20 bg-transparent text-[#ef4444]"
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-white">Na czarnej liście</span>
+                      <span className="block text-xs text-[#fca5a5]">Włącza ostrzegawczy status klienta.</span>
+                    </span>
+                  </label>
+                </>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-[#8b93a8] md:col-span-2">
+                  VIP i blacklist może zmieniać tylko administrator.
+                </div>
+              )}
             </div>
           </section>
 
@@ -415,7 +431,7 @@ export default function AdminClientEditPage() {
             <div className="mt-4 space-y-3 text-sm text-[#cbd5e1]">
               <Tip icon={<Clock3 size={15} />} text="Po zapisaniu wrócisz automatycznie do szczegółów klienta." />
               <Tip icon={<MapPin size={15} />} text="Adres główny i zapisane adresy są podglądowe — edycja odbywa się tutaj." />
-              <Tip icon={<ShieldAlert size={15} />} text="Blacklist i VIP zmieniają wygląd karty klienta w całym panelu." />
+              {canEditVipBlacklist ? <Tip icon={<ShieldAlert size={15} />} text="Blacklist i VIP zmieniają wygląd karty klienta w całym panelu." /> : null}
               <Tip icon={<CircleDollarSign size={15} />} text="Obrót jest tylko do odczytu i pochodzi z backendu." />
             </div>
           </section>

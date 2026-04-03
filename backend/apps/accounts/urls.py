@@ -24,6 +24,7 @@ from .views.notification_views import (
 )
 from .views.staff_management_views import (
     StaffListView,
+    StaffTeamOverviewView,
     StaffAssignableForRepairView,
     StaffDetailView,
     StaffUpdateView,
@@ -58,6 +59,7 @@ urlpatterns = [
     path("staff/assignable-for-repairs/", StaffAssignableForRepairView.as_view(), name="staff-assignable-for-repairs"),
     # Zarządzanie pracownikami (tylko admin)
     path("staff/", StaffListView.as_view(), name="staff-list"),
+    path("staff/team-overview/", StaffTeamOverviewView.as_view(), name="staff-team-overview"),
     path("staff/<uuid:pk>/", StaffDetailView.as_view(), name="staff-detail"),
     path("staff/<uuid:pk>/update/", StaffUpdateView.as_view(), name="staff-update"),
     path("staff/<uuid:pk>/reset-password/", StaffResetPasswordView.as_view(), name="staff-reset-password"),

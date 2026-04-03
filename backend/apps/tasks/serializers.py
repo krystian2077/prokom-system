@@ -92,7 +92,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
-    """Tworzenie: staff może przypisać tylko do siebie (lub pusto → backend ustawi siebie). Edycja: tylko admin zmienia osobę."""
+    """Tworzenie/edycja zadań z walidacją przypisania dla staff/admin."""
 
     id = serializers.UUIDField(read_only=True)
 
@@ -111,16 +111,12 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
         role = getattr(request.user, "role", None)
         if role == "admin":
             return value
-        # Aktualizacja: staff nie przepisuje na kogoś innego
-        if self.instance:
-            current_id = self.instance.assigned_to_id
-            new_id = value.id if value else None
-            if new_id != current_id:
-                raise serializers.ValidationError("Tylko administrator może przepisywać zadanie do innej osoby.")
-            return value
-        # Tworzenie: staff tylko do siebie lub bez przypisania (uzupełni widok)
+
+        # Staff może przypisać zadanie do aktywnego użytkownika panelu (staff/admin) lub zostawić puste.
         if value is None:
             return value
-        if value.id != request.user.id:
-            raise serializers.ValidationError("Możesz przypisać zadanie tylko do siebie.")
+
+        target_role = getattr(value, "role", None)
+        if target_role not in ("staff", "admin") or not getattr(value, "is_active", False):
+            raise serializers.ValidationError("Możesz przypisać zadanie tylko do aktywnego pracownika lub administratora.")
         return value

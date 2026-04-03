@@ -142,7 +142,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class StaffSpecialization(models.TextChoices):
     """Specjalizacja pracownika (do auto-przypisania)."""
-    PHONE_TABLET = "phone_tablet", _("Telefony, tablety, smartwatche, odzyskiwanie danych")
+    PHONE_TABLET = "phone_tablet", _("Telefony, Tablety, Smartwatche")
     LAPTOP_PRINTER = "laptop_printer", _("Laptopy, komputery, konsole, drukarki")
     GENERAL = "general", _("Ogólne / proste naprawy")
 

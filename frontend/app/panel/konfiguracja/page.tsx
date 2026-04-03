@@ -61,7 +61,47 @@ type BackupLogItem = {
   triggered_by_name?: string | null;
 };
 
-type TabKey = "docs" | "gdpr" | "backups";
+type SettingValueType = "string" | "integer" | "float" | "boolean" | "json";
+type SettingDraftValue = string | boolean;
+
+type SystemSettingItem = {
+  id: number;
+  key: string;
+  category: string;
+  label: string;
+  description?: string;
+  value_type: SettingValueType;
+  is_secret: boolean;
+  is_readonly: boolean;
+  value: unknown;
+  updated_at: string;
+  updated_by_name?: string | null;
+};
+
+type FeatureFlagItem = {
+  id: number;
+  key: string;
+  name: string;
+  description?: string;
+  is_enabled: boolean;
+  rollout_percentage: number;
+  updated_at: string;
+  updated_by_name?: string | null;
+};
+
+type ConfigAuditLogItem = {
+  id: number;
+  entity_type: "setting" | "feature_flag";
+  entity_key: string;
+  action: string;
+  old_value: unknown;
+  new_value: unknown;
+  metadata?: { masked?: boolean };
+  changed_by_name?: string | null;
+  created_at: string;
+};
+
+type TabKey = "system" | "docs" | "gdpr" | "backups";
 
 const statusBadgeClass: Record<string, string> = {
   pending: "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]",
@@ -80,6 +120,45 @@ function fmtDate(iso: string | null | undefined) {
   return d.toLocaleString("pl-PL");
 }
 
+function formatUnknown(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "";
+  }
+}
+
+function parseSettingDraft(setting: SystemSettingItem, draft: SettingDraftValue): unknown {
+  if (setting.value_type === "boolean") {
+    if (typeof draft !== "boolean") throw new Error(`Pole ${setting.label} musi być typu Tak/Nie.`);
+    return draft;
+  }
+  if (typeof draft !== "string") throw new Error(`Pole ${setting.label} wymaga wartości tekstowej.`);
+
+  if (setting.value_type === "integer") {
+    const parsed = Number.parseInt(draft, 10);
+    if (!Number.isFinite(parsed)) throw new Error(`Pole ${setting.label} musi być liczbą całkowitą.`);
+    return parsed;
+  }
+  if (setting.value_type === "float") {
+    const parsed = Number.parseFloat(draft);
+    if (!Number.isFinite(parsed)) throw new Error(`Pole ${setting.label} musi być liczbą.`);
+    return parsed;
+  }
+  if (setting.value_type === "json") {
+    if (!draft.trim()) return null;
+    try {
+      return JSON.parse(draft);
+    } catch {
+      throw new Error(`Pole ${setting.label} zawiera niepoprawny JSON.`);
+    }
+  }
+  return draft;
+}
+
 function ConfigAdminPageInner() {
   const { user, token } = useAuth();
   const addToast = useStore((s) => s.addToast);
@@ -90,17 +169,27 @@ function ConfigAdminPageInner() {
 
   const tab = useMemo<TabKey>(() => {
     const t = searchParams.get("tab");
-    if (t === "gdpr" || t === "backups") return t;
-    return "docs";
+    if (t === "docs" || t === "gdpr" || t === "backups") return t;
+    return "system";
   }, [searchParams]);
 
   const setTab = (k: TabKey) => {
     const p = new URLSearchParams(searchParams.toString());
-    if (k === "docs") p.delete("tab");
+    if (k === "system") p.delete("tab");
     else p.set("tab", k);
     const q = p.toString();
     router.replace(q ? `${pathname}?${q}` : pathname);
   };
+
+  // SYSTEM CENTER
+  const [systemLoading, setSystemLoading] = useState(false);
+  const [systemError, setSystemError] = useState<string | null>(null);
+  const [systemSaving, setSystemSaving] = useState(false);
+  const [settings, setSettings] = useState<SystemSettingItem[]>([]);
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlagItem[]>([]);
+  const [auditItems, setAuditItems] = useState<ConfigAuditLogItem[]>([]);
+  const [settingDrafts, setSettingDrafts] = useState<Record<string, SettingDraftValue>>({});
+  const [flagDrafts, setFlagDrafts] = useState<Record<string, { is_enabled: boolean; rollout_percentage: string }>>({});
 
   // DOCUMENTS
   const [docs, setDocs] = useState<TermsVersionItem[]>([]);
@@ -114,8 +203,6 @@ function ConfigAdminPageInner() {
   const [gdprPage, setGdprPage] = useState(1);
   const [gdprCount, setGdprCount] = useState(0);
   const [gdprItems, setGdprItems] = useState<GdprRequestAdminItem[]>([]);
-  const [gdprNext, setGdprNext] = useState<string | null>(null);
-  const [gdprPrev, setGdprPrev] = useState<string | null>(null);
   const [gdprRequestType, setGdprRequestType] = useState<string>("");
   const [gdprStatus, setGdprStatus] = useState<string>("");
   const [gdprSearch, setGdprSearch] = useState<string>("");
@@ -134,13 +221,58 @@ function ConfigAdminPageInner() {
   const [backupsItems, setBackupsItems] = useState<BackupLogItem[]>([]);
   const [backupsCount, setBackupsCount] = useState(0);
   const [backupsPage, setBackupsPage] = useState(1);
-  const [backupsNext, setBackupsNext] = useState<string | null>(null);
-  const [backupsPrev, setBackupsPrev] = useState<string | null>(null);
   const [backupStatus, setBackupStatus] = useState<string>("");
   const [backupType, setBackupType] = useState<string>("");
   const backupsPageSize = 25;
 
   const canRequest = Boolean(token && user && isAdmin);
+
+  const loadSystemCenter = async () => {
+    if (!token) return;
+    setSystemLoading(true);
+    setSystemError(null);
+    try {
+      const [settingsRes, flagsRes, auditRes] = await Promise.all([
+        api.get<{ results: SystemSettingItem[] }>("/compliance/admin/system-settings/", token),
+        api.get<{ results: FeatureFlagItem[] }>("/compliance/admin/feature-flags/", token),
+        api.get<PaginatedResponse<ConfigAuditLogItem>>("/compliance/admin/config-audit-logs/?page_size=10", token),
+      ]);
+
+      const loadedSettings = settingsRes.results ?? [];
+      const loadedFlags = flagsRes.results ?? [];
+      const loadedAudit = auditRes.results ?? [];
+
+      setSettings(loadedSettings);
+      setFeatureFlags(loadedFlags);
+      setAuditItems(loadedAudit);
+
+      setSettingDrafts(
+        Object.fromEntries(
+          loadedSettings.map((s) => {
+            if (s.value_type === "boolean") return [s.key, Boolean(s.value)];
+            return [s.key, formatUnknown(s.value)];
+          }),
+        ),
+      );
+
+      setFlagDrafts(
+        Object.fromEntries(
+          loadedFlags.map((f) => [
+            f.key,
+            {
+              is_enabled: f.is_enabled,
+              rollout_percentage: String(f.rollout_percentage),
+            },
+          ]),
+        ),
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się pobrać centrum konfiguracji.";
+      setSystemError(msg);
+    } finally {
+      setSystemLoading(false);
+    }
+  };
 
   const loadDocs = async () => {
     if (!token) return;
@@ -172,8 +304,6 @@ function ConfigAdminPageInner() {
       const res = await api.get<PaginatedResponse<GdprRequestAdminItem>>(url, token);
       setGdprItems(res.results ?? []);
       setGdprCount(res.count ?? 0);
-      setGdprNext(res.next ?? null);
-      setGdprPrev(res.previous ?? null);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać wniosków RODO.";
       setGdprError(msg);
@@ -196,8 +326,6 @@ function ConfigAdminPageInner() {
       const res = await api.get<PaginatedResponse<BackupLogItem>>(url, token);
       setBackupsItems(res.results ?? []);
       setBackupsCount(res.count ?? 0);
-      setBackupsNext(res.next ?? null);
-      setBackupsPrev(res.previous ?? null);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać logów backupu.";
       setBackupsError(msg);
@@ -211,6 +339,117 @@ function ConfigAdminPageInner() {
     () => Math.max(1, Math.ceil(backupsCount / backupsPageSize)),
     [backupsCount],
   );
+
+  const groupedSettings = useMemo(() => {
+    return settings.reduce<Record<string, SystemSettingItem[]>>((acc, item) => {
+      acc[item.category] = acc[item.category] ?? [];
+      acc[item.category].push(item);
+      return acc;
+    }, {});
+  }, [settings]);
+
+  const dirtySettings = useMemo(() => {
+    return settings.filter((s) => {
+      const draft = settingDrafts[s.key];
+      if (draft === undefined) return false;
+      try {
+        const parsed = parseSettingDraft(s, draft);
+        return JSON.stringify(parsed) !== JSON.stringify(s.value);
+      } catch {
+        return true;
+      }
+    });
+  }, [settings, settingDrafts]);
+
+  const dirtyFlags = useMemo(() => {
+    return featureFlags.filter((f) => {
+      const draft = flagDrafts[f.key];
+      if (!draft) return false;
+      const rollout = Number.parseInt(draft.rollout_percentage, 10);
+      if (!Number.isFinite(rollout)) return true;
+      return f.is_enabled !== draft.is_enabled || f.rollout_percentage !== rollout;
+    });
+  }, [featureFlags, flagDrafts]);
+
+  const saveSettings = async () => {
+    if (!token) return;
+    if (dirtySettings.length === 0) {
+      addToast("Brak zmian do zapisania w ustawieniach.", "info");
+      return;
+    }
+
+    let items: Array<{ key: string; value: unknown; updated_at: string }> = [];
+    try {
+      items = dirtySettings.map((s) => {
+        const draft = settingDrafts[s.key];
+        if (draft === undefined) {
+          throw new Error(`Brak draftu dla ustawienia ${s.label}.`);
+        }
+        return {
+          key: s.key,
+          value: parseSettingDraft(s, draft),
+          updated_at: s.updated_at,
+        };
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nieprawidłowe dane ustawień.";
+      addToast(msg, "error");
+      return;
+    }
+
+    setSystemSaving(true);
+    try {
+      await api.patch("/compliance/admin/system-settings/bulk-update/", { items }, token);
+      addToast("Ustawienia systemowe zapisane.", "success");
+      await loadSystemCenter();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się zapisać ustawień systemowych.";
+      addToast(msg, "error");
+    } finally {
+      setSystemSaving(false);
+    }
+  };
+
+  const saveFeatureFlags = async () => {
+    if (!token) return;
+    if (dirtyFlags.length === 0) {
+      addToast("Brak zmian do zapisania we flagach.", "info");
+      return;
+    }
+
+    let items: Array<{ key: string; is_enabled: boolean; rollout_percentage: number; updated_at: string }> = [];
+    try {
+      items = dirtyFlags.map((f) => {
+        const draft = flagDrafts[f.key];
+        const rollout = Number.parseInt(draft?.rollout_percentage ?? "", 10);
+        if (!Number.isFinite(rollout) || rollout < 0 || rollout > 100) {
+          throw new Error(`Flaga ${f.name}: rollout musi być liczbą 0-100.`);
+        }
+        return {
+          key: f.key,
+          is_enabled: Boolean(draft?.is_enabled),
+          rollout_percentage: rollout,
+          updated_at: f.updated_at,
+        };
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nieprawidłowe dane feature flag.";
+      addToast(msg, "error");
+      return;
+    }
+
+    setSystemSaving(true);
+    try {
+      await api.patch("/compliance/admin/feature-flags/bulk-update/", { items }, token);
+      addToast("Feature flagi zapisane.", "success");
+      await loadSystemCenter();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się zapisać feature flag.";
+      addToast(msg, "error");
+    } finally {
+      setSystemSaving(false);
+    }
+  };
 
   const openDecisionModal = (id: number, mode: "completed" | "rejected") => {
     setModalTargetId(id);
@@ -265,9 +504,10 @@ function ConfigAdminPageInner() {
 
   useEffect(() => {
     if (!canRequest) return;
-    void loadDocs();
+    if (tab === "system") void loadSystemCenter();
+    if (tab === "docs") void loadDocs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canRequest]);
+  }, [canRequest, tab]);
 
   useEffect(() => {
     if (!canRequest) return;
@@ -298,9 +538,9 @@ function ConfigAdminPageInner() {
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-6">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--ink2)]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Konfiguracja i RODO</h1>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Konfiguracja premium</h1>
         <p className="mt-1 text-sm text-[var(--ink2)]">
-          Dokumenty (regulamin/polityka), obsługa wniosków RODO i logi backupów.
+          Centrum ustawień systemowych, feature flagi, dokumenty, RODO i backupy.
         </p>
       </header>
 
@@ -309,6 +549,7 @@ function ConfigAdminPageInner() {
           <div className="flex flex-wrap items-center gap-2">
             {(
               [
+                ["system", "Centrum konfiguracji"],
                 ["docs", "Dokumenty"],
                 ["gdpr", "Wnioski RODO"],
                 ["backups", "Backupy"],
@@ -340,6 +581,16 @@ function ConfigAdminPageInner() {
                 Odśwież
               </button>
             ) : null}
+            {tab === "system" ? (
+              <button
+                type="button"
+                onClick={() => void loadSystemCenter()}
+                disabled={systemLoading}
+                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
+              >
+                Odśwież
+              </button>
+            ) : null}
             {tab === "gdpr" ? (
               <button
                 type="button"
@@ -363,6 +614,196 @@ function ConfigAdminPageInner() {
           </div>
         </div>
       </div>
+
+      {tab === "system" ? (
+        <>
+          {systemError ? <p className="mb-4 text-sm text-[#fca5a5]">{systemError}</p> : null}
+
+          {systemLoading ? (
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+              <StackedRowSkeleton rows={10} />
+            </div>
+          ) : (
+            <div className="grid gap-5">
+              <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Control Center</p>
+                    <h2 className="mt-1 text-xl font-semibold text-[var(--white)]">Ustawienia systemowe</h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void saveSettings()}
+                    disabled={systemSaving || dirtySettings.length === 0}
+                    className="rounded-xl bg-[var(--white)] px-4 py-2 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {systemSaving ? "Zapisuję..." : `Zapisz ustawienia (${dirtySettings.length})`}
+                  </button>
+                </div>
+
+                <div className="grid gap-4">
+                  {Object.entries(groupedSettings).map(([category, rows]) => (
+                    <div key={category} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-4">
+                      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">{category}</p>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {rows.map((s) => {
+                          const draft = settingDrafts[s.key];
+                          return (
+                            <label key={s.key} className="rounded-xl border border-[var(--border)] bg-[var(--s1)] p-3 text-sm">
+                              <div className="mb-1 flex items-center justify-between gap-2">
+                                <span className="font-semibold text-[var(--white)]">{s.label}</span>
+                                {s.is_readonly ? (
+                                  <span className="rounded-full border border-[var(--border)] px-2 py-0.5 text-[10px] text-[var(--ink2)]">
+                                    read-only
+                                  </span>
+                                ) : null}
+                              </div>
+                              {s.description ? <p className="mb-2 text-xs text-[var(--ink2)]">{s.description}</p> : null}
+
+                              {s.value_type === "boolean" ? (
+                                <input
+                                  type="checkbox"
+                                  checked={Boolean(draft)}
+                                  disabled={s.is_readonly}
+                                  onChange={(e) =>
+                                    setSettingDrafts((prev) => ({
+                                      ...prev,
+                                      [s.key]: e.target.checked,
+                                    }))
+                                  }
+                                  className="h-4 w-4 accent-[var(--white)]"
+                                />
+                              ) : s.value_type === "json" ? (
+                                <textarea
+                                  value={typeof draft === "string" ? draft : formatUnknown(draft)}
+                                  disabled={s.is_readonly}
+                                  onChange={(e) => setSettingDrafts((prev) => ({ ...prev, [s.key]: e.target.value }))}
+                                  className="min-h-[120px] w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
+                                />
+                              ) : (
+                                <input
+                                  type={s.is_secret ? "password" : "text"}
+                                  value={typeof draft === "string" ? draft : formatUnknown(draft)}
+                                  disabled={s.is_readonly}
+                                  onChange={(e) => setSettingDrafts((prev) => ({ ...prev, [s.key]: e.target.value }))}
+                                  placeholder={s.is_secret ? "••••••••" : ""}
+                                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
+                                />
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Rollout</p>
+                    <h2 className="mt-1 text-xl font-semibold text-[var(--white)]">Feature flagi</h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void saveFeatureFlags()}
+                    disabled={systemSaving || dirtyFlags.length === 0}
+                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--white)] transition hover:bg-[var(--row-active)] disabled:opacity-60"
+                  >
+                    {systemSaving ? "Zapisuję..." : `Zapisz flagi (${dirtyFlags.length})`}
+                  </button>
+                </div>
+
+                <div className="grid gap-3">
+                  {featureFlags.map((flag) => {
+                    const draft = flagDrafts[flag.key] ?? {
+                      is_enabled: flag.is_enabled,
+                      rollout_percentage: String(flag.rollout_percentage),
+                    };
+
+                    return (
+                      <div key={flag.key} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[var(--white)]">{flag.name}</p>
+                            <p className="mt-1 text-xs text-[var(--ink2)]">{flag.key}</p>
+                            {flag.description ? <p className="mt-2 text-sm text-[var(--ink2)]">{flag.description}</p> : null}
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <label className="flex items-center gap-2 text-sm text-[var(--white)]">
+                              <input
+                                type="checkbox"
+                                checked={draft.is_enabled}
+                                onChange={(e) =>
+                                  setFlagDrafts((prev) => ({
+                                    ...prev,
+                                    [flag.key]: {
+                                      ...(prev[flag.key] ?? draft),
+                                      is_enabled: e.target.checked,
+                                    },
+                                  }))
+                                }
+                                className="h-4 w-4 accent-[var(--white)]"
+                              />
+                              Aktywna
+                            </label>
+
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              value={draft.rollout_percentage}
+                              onChange={(e) =>
+                                setFlagDrafts((prev) => ({
+                                  ...prev,
+                                  [flag.key]: {
+                                    ...(prev[flag.key] ?? draft),
+                                    rollout_percentage: e.target.value,
+                                  },
+                                }))
+                              }
+                              className="w-24 rounded-xl border border-[var(--border)] bg-[var(--s1)] px-2 py-1 text-sm text-[var(--white)]"
+                            />
+                            <span className="text-xs text-[var(--ink2)]">%</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Compliance</p>
+                <h2 className="mt-1 text-xl font-semibold text-[var(--white)]">Audyt zmian konfiguracji</h2>
+                <div className="mt-4 divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--row-hover)]">
+                  {auditItems.map((log) => (
+                    <div key={log.id} className="p-3 text-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-semibold text-[var(--white)]">
+                          {log.entity_type === "setting" ? "Ustawienie" : "Feature flag"}: {log.entity_key}
+                        </span>
+                        <span className="text-xs text-[var(--ink2)]">{fmtDate(log.created_at)}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-[var(--ink2)]">
+                        {log.changed_by_name || "System"} · akcja: {log.action}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap text-xs text-[var(--ink2)]">
+                        {log.metadata?.masked
+                          ? "Wartość oznaczona jako sekret (ukryta w audycie)."
+                          : `Przed: ${formatUnknown(log.old_value) || "-"} -> Po: ${formatUnknown(log.new_value) || "-"}`}
+                      </p>
+                    </div>
+                  ))}
+                  {auditItems.length === 0 ? <div className="p-5 text-sm text-[var(--ink2)]">Brak logów audytu.</div> : null}
+                </div>
+              </section>
+            </div>
+          )}
+        </>
+      ) : null}
 
       {tab === "docs" ? (
         <>

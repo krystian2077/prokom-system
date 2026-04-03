@@ -9,6 +9,11 @@ export type CalendarEventDTO = {
   title: string;
   subtitle?: string;
   repair_id?: string;
+  employee_id?: string;
+  employee_name?: string;
+  employee_color?: string;
+  source_type?: string;
+  priority?: "low" | "medium" | "high" | string;
 };
 
 export type DailySummary = {
@@ -24,6 +29,25 @@ export type DailySummary = {
 export type CalendarMonthResponse = {
   events: CalendarEventDTO[];
   daily_summaries: Record<string, DailySummary>;
+  summary?: {
+    total_events: number;
+    days_with_events: number;
+    today_events: number;
+    tomorrow_events: number;
+    by_category: Partial<Record<CalendarCategoryKey, number>>;
+  };
+  workload_by_employee?: Array<{
+    employee_id: string;
+    employee_name: string;
+    employee_color?: string;
+    total_events: number;
+    accepted: number;
+    completed: number;
+    picked_up: number;
+    parts_incoming: number;
+    planned_work: number;
+    ready_for_pickup: number;
+  }>;
 };
 
 export const EMPTY_DAILY_SUMMARY: DailySummary = {

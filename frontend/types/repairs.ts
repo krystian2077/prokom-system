@@ -40,9 +40,13 @@ export interface RepairRequestListItem {
   /** Kwoty z API (Decimal jako string). */
   estimated_cost?: string | number | null;
   final_cost?: string | number | null;
+  delivery_method?: string | null;
+  return_method?: string | null;
   created_at: string;
   /** Data fizycznego przyjęcia urządzenia (null u starszych zapisów). */
   accepted_at?: string | null;
+  ready_for_pickup_at?: string | null;
+  picked_up_at?: string | null;
 }
 
 /** Dane klienta z API (zagnieżdżone w szczegółach naprawy). */

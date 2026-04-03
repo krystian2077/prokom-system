@@ -12,6 +12,24 @@ import { WorkerStatusModalRoot } from "@/components/panel/WorkerStatusModalRoot"
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { ToastContainer } from "@/components/ui/Toast";
 
+// Dodaj globalne style animacji
+const pageAnimationStyles = `
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .page-transition {
+    animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+`;
+
 export default function AdminPanelLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -35,6 +53,7 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
 
   return (
     <WorkerPanelThemeProvider>
+      <style>{pageAnimationStyles}</style>
       {isLoginPage ? (
         <StaffLoginChrome>{children}</StaffLoginChrome>
       ) : (
@@ -53,7 +72,9 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
                 <PanelTopbar />
                 <div className="min-w-0 flex-1">
                   <WorkerStatusModalRoot />
-                  {children}
+                  <div key={pathname} className="page-transition">
+                    {children}
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,7 +1,10 @@
-"use client";
+import { ProfileSettingsPage } from "@/components/panel/ProfileSettingsPage";
 
-import StaffProfilePage from "@/app/panel/profil/page";
+export const metadata = {
+  title: "Mój profil | Panel administratora | PRO-KOM Serwis",
+  description: "Zarządzaj danymi administratora i ustawieniami bezpieczeństwa.",
+};
 
 export default function AdminProfilePage() {
-  return <StaffProfilePage />;
+  return <ProfileSettingsPage panelRole="admin" />;
 }

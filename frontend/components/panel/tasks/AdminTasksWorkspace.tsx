@@ -66,6 +66,8 @@ type TaskFormState = {
 
 type ViewFilter = "all" | "mine" | "team" | "open" | "completed" | "cancelled" | "urgent" | "unassigned";
 
+type WorkspaceMode = "admin" | "staff";
+
 const PRIORITY_OPTIONS = [
   { value: "low", label: "Niski" },
   { value: "standard", label: "Standardowy" },
@@ -197,11 +199,14 @@ function taskSearchText(task: TaskListItem, assigneeName?: string | null): strin
     .toLowerCase();
 }
 
-export function AdminTasksWorkspace() {
+export function AdminTasksWorkspace({ mode = "admin" }: { mode?: WorkspaceMode }) {
   const { token, user } = useAuth();
   const addToast = useStore((s) => s.addToast);
 
+  const isStaffMode = mode === "staff";
   const isAdmin = user?.role === "admin";
+  const isStaff = user?.role === "staff";
+  const isAllowed = isAdmin || (isStaffMode && isStaff);
   const [tasks, setTasks] = useState<TaskListItem[]>([]);
   const [staff, setStaff] = useState<StaffOption[]>([]);
   const [detail, setDetail] = useState<TaskDetail | null>(null);
@@ -233,7 +238,7 @@ export function AdminTasksWorkspace() {
   }, [user?.id]);
 
   const loadTasks = async () => {
-    if (!token || !isAdmin) return;
+    if (!token || !isAllowed) return;
     setLoading(true);
     setError(null);
     try {
@@ -247,7 +252,7 @@ export function AdminTasksWorkspace() {
   };
 
   const loadStaff = async () => {
-    if (!token || !isAdmin) return;
+    if (!token || !isAllowed) return;
     try {
       const res = await api.get<StaffOption[] | { results?: StaffOption[] }>("/accounts/staff/assignable-for-repairs/?include_self=1", token);
       setStaff(Array.isArray(res) ? res : res?.results ?? []);
@@ -276,11 +281,11 @@ export function AdminTasksWorkspace() {
   };
 
   useEffect(() => {
-    if (!token || !isAdmin) return;
+    if (!token || !isAllowed) return;
     void loadTasks();
     void loadStaff();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, isAdmin]);
+  }, [token, isAllowed]);
 
   useEffect(() => {
     if (!selectedTaskId) {
@@ -473,10 +478,10 @@ export function AdminTasksWorkspace() {
   };
 
   const selectedTaskDateLabel = selectedTask?.due_date ? fullDateLabel(selectedTask.due_date) : "Brak terminu";
-  if (!isAdmin) {
+  if (!isAllowed) {
     return (
       <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-        <p className="text-sm text-[#fca5a5]">Tylko administrator ma dostęp do globalnych zadań.</p>
+        <p className="text-sm text-[#fca5a5]">Brak dostępu do modułu zadań.</p>
       </main>
     );
   }
@@ -484,11 +489,12 @@ export function AdminTasksWorkspace() {
   return (
     <main className="mx-auto min-h-screen max-w-[1600px] px-4 py-8">
       <header className="mb-6 rounded-[2rem] border border-[#2a3246] bg-gradient-to-r from-[#0e1423] via-[#121b31] to-[#0d1629] p-5 shadow-[0_18px_50px_rgba(0,0,0,.35)]">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9db0d4]">Panel Admina</p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Zadania zespołu</h1>
+        <p className="text-xs uppercase tracking-[0.2em] text-[#9db0d4]">{isStaffMode ? "Panel Pracownika" : "Panel Admina"}</p>
+        <h1 className="mt-2 text-3xl font-semibold text-white">{isStaffMode ? "Zadania" : "Zadania zespołu"}</h1>
         <p className="mt-1 max-w-4xl text-sm text-[#a9b8d6]">
-          Zarządzaj zadaniami dla siebie i pracowników w jednym, czytelnym widoku. Dodawaj zadania z terminem,
-          godziną, priorytetem i przypisaniem, a następnie edytuj je, przekazuj dalej, anuluj lub kończ jednym kliknięciem.
+          {isStaffMode
+            ? "Zarządzaj zadaniami przypisanymi do Ciebie oraz utworzonymi przez Ciebie. Możesz tworzyć, edytować i usuwać zadania w swoim zakresie uprawnień."
+            : "Zarządzaj zadaniami dla siebie i pracowników w jednym, czytelnym widoku. Dodawaj zadania z terminem, godziną, priorytetem i przypisaniem, a następnie edytuj je, przekazuj dalej, anuluj lub kończ jednym kliknięciem."}
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <SummaryCard label="Wszystkie" value={tasks.length} tone="text-white" />
@@ -773,7 +779,7 @@ export function AdminTasksWorkspace() {
                       >
                         Cofnij zmiany
                       </button>
-                      <button
+                          <button
                         type="button"
                         disabled={saving}
                         onClick={() => void quickReassign(user?.id ? String(user.id) : "")}
@@ -781,6 +787,26 @@ export function AdminTasksWorkspace() {
                       >
                         Przypisz do mnie
                       </button>
+                              <button
+                                type="button"
+                                disabled={saving}
+                                onClick={async () => {
+                                  if (!token || !selectedTaskId) return;
+                                  try {
+                                    await api.delete(`/tasks/${selectedTaskId}/`, token);
+                                    setSelectedTaskId(null);
+                                    setDetail(null);
+                                    setDetailForm(null);
+                                    await loadTasks();
+                                    addToast("Zadanie usunięte.", "success");
+                                  } catch (e) {
+                                    addToast(e instanceof Error ? e.message : "Nie udało się usunąć zadania.", "error");
+                                  }
+                                }}
+                                className="rounded-xl border border-[#dc1e1e]/35 bg-[#dc1e1e]/15 px-4 py-2 text-sm font-semibold text-[#fecaca] transition hover:bg-[#dc1e1e]/25 disabled:opacity-60"
+                              >
+                                Usuń zadanie
+                              </button>
                     </div>
                   </div>
                 ) : null}
@@ -910,7 +936,7 @@ export function AdminTasksWorkspace() {
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9fb1d3]">
               <ArchiveRestore className="h-4 w-4 text-[#93c5fd]" aria-hidden />
-              Skróty administracyjne
+              {isStaffMode ? "Skróty zadaniowe" : "Skróty administracyjne"}
             </div>
             <div className="mt-3 grid gap-2 text-sm text-[#d1d5db]">
               <div className="rounded-2xl border border-white/10 bg-[#0f172a]/60 p-3">

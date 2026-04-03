@@ -4,7 +4,7 @@ KPI i rankingi: dashboard dla admina, statystyki napraw, ranking pracowników, r
 from datetime import timedelta
 from decimal import Decimal
 
-from django.db.models import Count, Sum, Q, Avg
+from django.db.models import Count, Sum, Avg
 from django.utils import timezone
 from django.db.models.functions import TruncDate
 from rest_framework.views import APIView
@@ -266,16 +266,18 @@ def _is_admin(request):
 class AdminDashboardView(APIView):
     """
     GET /api/v1/analytics/admin-dashboard/?days=30&assigned_to=<uuid>
-    Rozbudowany dashboard admina (N5): KPI, tabele dynamiczne, wykresy.
-    Dostęp: tylko admin.
+    Rozbudowany dashboard: KPI, tabele dynamiczne, wykresy.
+    Dostęp: admin oraz staff (staff widzi tylko własny zakres danych).
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if not _is_admin(request):
+        is_admin = _is_admin(request)
+        is_staff = getattr(request.user, "role", None) == UserRole.STAFF
+        if not (is_admin or is_staff):
             return Response({"detail": "Tylko administrator."}, status=403)
         days = int(request.query_params.get("days", 30))
-        assigned_to = request.query_params.get("assigned_to")  # opcjonalny filtr
+        assigned_to = request.query_params.get("assigned_to") if is_admin else str(request.user.id)
         since = timezone.now() - timedelta(days=days)
         today = timezone.now().date()
 
@@ -369,7 +371,18 @@ class AdminDashboardView(APIView):
             .order_by("created_at")[:20]
         )
         if assigned_to:
-            no_quote_repairs = no_quote_repairs.filter(assigned_to_id=assigned_to)
+            no_quote_repairs = (
+                RepairRequest.objects.filter(
+                    status__in=[
+                        RepairStatus.ACCEPTED, RepairStatus.IN_DIAGNOSTICS,
+                        RepairStatus.DIAGNOSTICS_DONE, RepairStatus.QUOTE_PENDING,
+                    ],
+                    repair_type="standard",
+                    assigned_to_id=assigned_to,
+                )
+                .select_related("client", "device", "assigned_to")
+                .order_by("created_at")[:20]
+            )
         unclaimed_repairs = (
             unclaimed_qs.select_related("client", "device", "assigned_to")
             .order_by("ready_for_pickup_at")[:20]
@@ -402,7 +415,7 @@ class AdminDashboardView(APIView):
         }
 
         # Top pracownicy (w okresie)
-        staff_ids = list(User.objects.filter(role=UserRole.STAFF).values_list("id", flat=True))
+        staff_ids = [request.user.id] if is_staff and not is_admin else list(User.objects.filter(role=UserRole.STAFF).values_list("id", flat=True))
         completed = (
             RepairRequest.objects.filter(
                 assigned_to_id__in=staff_ids,
@@ -429,6 +442,23 @@ class AdminDashboardView(APIView):
         top_staff.sort(key=lambda x: (x["completed_repairs"], float(x["revenue"])), reverse=True)
         tables["top_staff"] = top_staff[:15]
 
+        # Dodatkowe KPI: zakończone w okresie i średni czas realizacji
+        completed_in_period = base_qs.filter(
+            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+        ).count()
+        finished_qs = base_qs.filter(
+            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+            completed_at__isnull=False,
+            accepted_at__isnull=False,
+        )
+        from django.db.models import F, ExpressionWrapper, DurationField
+        avg_duration = finished_qs.annotate(
+            dur=ExpressionWrapper(F("completed_at") - F("accepted_at"), output_field=DurationField())
+        ).aggregate(avg=Avg("dur"))["avg"]
+        avg_completion_days = round(avg_duration.total_seconds() / 86400, 1) if avg_duration else None
+        kpi["completed_count"] = completed_in_period
+        kpi["avg_completion_days"] = avg_completion_days
+
         # ---------- Wykresy ----------
         qs_chart = RepairRequest.objects.filter(created_at__gte=since)
         if assigned_to:
@@ -442,12 +472,185 @@ class AdminDashboardView(APIView):
             .annotate(count=Count("id"), revenue=Sum("final_cost"))
             .order_by("period")
         )
+
+        # Źródła zgłoszeń
+        by_source = dict(
+            qs_chart.values_list("source").annotate(c=Count("id")).values_list("source", "c")
+        )
+
+        # Priorytety
+        by_priority = dict(
+            qs_chart.values_list("priority").annotate(c=Count("id")).values_list("priority", "c")
+        )
+
+        # Kategorie urządzeń
+        by_category = dict(
+            qs_chart.values("device__category")
+            .annotate(c=Count("id"))
+            .values_list("device__category", "c")
+        )
+
+        # ── Marki & Modele: CAŁY system (all-time) + licznik okresu ──
+        # qs_all ignoruje filtr daty — pokazuje wszystkie marki w systemie
+        from collections import defaultdict
+
+        qs_all = RepairRequest.objects.all()
+        if assigned_to:
+            qs_all = qs_all.filter(assigned_to_id=assigned_to)
+
+        brand_map: dict = defaultdict(
+            lambda: {"total": 0, "period": 0, "revenue": Decimal("0"), "models": defaultdict(int)}
+        )
+
+        # FK brand — all time
+        for r in qs_all.exclude(device__brand__isnull=True).values(
+            "device__brand__name"
+        ).annotate(count=Count("id"), rev=Sum("final_cost")):
+            k = (r["device__brand__name"] or "").strip()
+            if k:
+                brand_map[k]["total"] += r["count"]
+                brand_map[k]["revenue"] += r["rev"] or Decimal("0")
+
+        # manual_brand — all time
+        for r in qs_all.filter(device__brand__isnull=True).exclude(device__manual_brand="").values(
+            "device__manual_brand"
+        ).annotate(count=Count("id"), rev=Sum("final_cost")):
+            k = (r["device__manual_brand"] or "").strip()
+            if k:
+                brand_map[k]["total"] += r["count"]
+                brand_map[k]["revenue"] += r["rev"] or Decimal("0")
+
+        # FK brand — okres
+        for r in qs_chart.exclude(device__brand__isnull=True).values(
+            "device__brand__name"
+        ).annotate(count=Count("id")):
+            k = (r["device__brand__name"] or "").strip()
+            if k:
+                brand_map[k]["period"] += r["count"]
+
+        # manual_brand — okres
+        for r in qs_chart.filter(device__brand__isnull=True).exclude(device__manual_brand="").values(
+            "device__manual_brand"
+        ).annotate(count=Count("id")):
+            k = (r["device__manual_brand"] or "").strip()
+            if k:
+                brand_map[k]["period"] += r["count"]
+
+        # Modele per marka — FK device_model (all time)
+        for r in qs_all.exclude(device__device_model__isnull=True).values(
+            "device__brand__name", "device__device_model__name"
+        ).annotate(count=Count("id")):
+            b = (r["device__brand__name"] or "Inne").strip()
+            m = (r["device__device_model__name"] or "").strip()
+            if b and m:
+                brand_map[b]["models"][m] += r["count"]
+
+        # Modele per marka — model_name (text)
+        for r in qs_all.filter(device__device_model__isnull=True).exclude(device__model_name="").values(
+            "device__brand__name", "device__model_name"
+        ).annotate(count=Count("id")):
+            b = (r["device__brand__name"] or "Inne").strip()
+            m = (r["device__model_name"] or "").strip()
+            if m:
+                brand_map[b]["models"][m] += r["count"]
+
+        # Modele per marka — manual_model
+        for r in qs_all.filter(device__device_model__isnull=True, device__model_name="").exclude(
+            device__manual_model=""
+        ).values("device__manual_brand", "device__manual_model").annotate(count=Count("id")):
+            b = (r["device__manual_brand"] or "Inne").strip()
+            m = (r["device__manual_model"] or "").strip()
+            if m:
+                brand_map[b]["models"][m] += r["count"]
+
+        top_brands = sorted(
+            [
+                {
+                    "name": k,
+                    "total": v["total"],
+                    "period": v["period"],
+                    "revenue": str(v["revenue"]),
+                    "top_models": sorted(
+                        [{"name": mk, "count": mc} for mk, mc in v["models"].items()],
+                        key=lambda x: x["count"], reverse=True,
+                    )[:5],
+                }
+                for k, v in brand_map.items() if v["total"] > 0
+            ],
+            key=lambda x: x["total"], reverse=True,
+        )[:15]
+
+        # ── Top modele (flat) — all time ──
+        model_map: dict = defaultdict(lambda: {"total": 0, "period": 0, "brand": ""})
+
+        for r in qs_all.exclude(device__device_model__isnull=True).values(
+            "device__device_model__name", "device__brand__name"
+        ).annotate(count=Count("id")):
+            k = (r["device__device_model__name"] or "").strip()
+            if k:
+                model_map[k]["total"] += r["count"]
+                if not model_map[k]["brand"] and r.get("device__brand__name"):
+                    model_map[k]["brand"] = r["device__brand__name"]
+
+        for r in qs_all.filter(device__device_model__isnull=True).exclude(device__model_name="").values(
+            "device__model_name", "device__brand__name"
+        ).annotate(count=Count("id")):
+            k = (r["device__model_name"] or "").strip()
+            if k:
+                model_map[k]["total"] += r["count"]
+                if not model_map[k]["brand"] and r.get("device__brand__name"):
+                    model_map[k]["brand"] = r["device__brand__name"]
+
+        for r in qs_all.filter(device__device_model__isnull=True, device__model_name="").exclude(
+            device__manual_model=""
+        ).values("device__manual_model", "device__manual_brand").annotate(count=Count("id")):
+            k = (r["device__manual_model"] or "").strip()
+            if k:
+                model_map[k]["total"] += r["count"]
+                if not model_map[k]["brand"] and r.get("device__manual_brand"):
+                    model_map[k]["brand"] = r["device__manual_brand"]
+
+        # Licznik okresu dla modeli
+        for r in qs_chart.exclude(device__device_model__isnull=True).values(
+            "device__device_model__name"
+        ).annotate(count=Count("id")):
+            k = (r["device__device_model__name"] or "").strip()
+            if k:
+                model_map[k]["period"] += r["count"]
+
+        for r in qs_chart.filter(device__device_model__isnull=True).exclude(device__model_name="").values(
+            "device__model_name"
+        ).annotate(count=Count("id")):
+            k = (r["device__model_name"] or "").strip()
+            if k:
+                model_map[k]["period"] += r["count"]
+
+        for r in qs_chart.filter(device__device_model__isnull=True, device__model_name="").exclude(
+            device__manual_model=""
+        ).values("device__manual_model").annotate(count=Count("id")):
+            k = (r["device__manual_model"] or "").strip()
+            if k:
+                model_map[k]["period"] += r["count"]
+
+        top_models = sorted(
+            [
+                {"model": k, "brand": v["brand"], "total": v["total"], "period": v["period"]}
+                for k, v in model_map.items() if v["total"] > 0
+            ],
+            key=lambda x: x["total"], reverse=True,
+        )[:20]
+
         charts = {
             "repairs_by_status": by_status,
             "repairs_over_time": [
                 {"period": str(r["period"]), "count": r["count"], "revenue": str(r["revenue"] or "0")}
                 for r in repairs_over_time
             ],
+            "repairs_by_source": by_source,
+            "repairs_by_priority": by_priority,
+            "repairs_by_category": {k: v for k, v in by_category.items() if k},
+            "top_brands": top_brands,
+            "top_models": top_models,
         }
 
         return Response(

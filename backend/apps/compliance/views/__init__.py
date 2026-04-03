@@ -3,8 +3,13 @@
 from .gdpr_views import ExportMyDataView, RequestAccountDeletionView
 from .admin_views import (
     BackupLogsAdminListView,
+    ConfigAuditLogsAdminListView,
+    FeatureFlagsAdminBulkUpdateView,
+    FeatureFlagsAdminListView,
     GdprRequestAdminUpdateView,
     GdprRequestsAdminListView,
+    SystemSettingsAdminBulkUpdateView,
+    SystemSettingsAdminListView,
     TermsVersionsAdminListView,
     TermsVersionsAdminSetActiveView,
 )
@@ -17,4 +22,9 @@ __all__ = [
     "GdprRequestsAdminListView",
     "GdprRequestAdminUpdateView",
     "BackupLogsAdminListView",
+    "SystemSettingsAdminListView",
+    "SystemSettingsAdminBulkUpdateView",
+    "FeatureFlagsAdminListView",
+    "FeatureFlagsAdminBulkUpdateView",
+    "ConfigAuditLogsAdminListView",
 ]

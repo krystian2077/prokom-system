@@ -7,6 +7,20 @@ from django.db.models import Q
 from apps.clients.models import Client
 
 
+def _parse_bool_param(value):
+    """Konwertuje query param bool na True/False/None."""
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return None
+    text = str(value).strip().lower()
+    if text in {"1", "true", "t", "yes", "y", "on"}:
+        return True
+    if text in {"0", "false", "f", "no", "n", "off"}:
+        return False
+    return None
+
+
 def client_list(
     *,
     search=None,
@@ -31,10 +45,12 @@ def client_list(
             | Q(client_number__icontains=search)
             | Q(company_name__icontains=search)
         )
-    if is_vip is not None:
-        qs = qs.filter(is_vip=is_vip)
-    if is_blacklisted is not None:
-        qs = qs.filter(is_blacklisted=is_blacklisted)
+    parsed_is_vip = _parse_bool_param(is_vip)
+    parsed_is_blacklisted = _parse_bool_param(is_blacklisted)
+    if parsed_is_vip is not None:
+        qs = qs.filter(is_vip=parsed_is_vip)
+    if parsed_is_blacklisted is not None:
+        qs = qs.filter(is_blacklisted=parsed_is_blacklisted)
     if client_type:
         qs = qs.filter(client_type=client_type)
     if client_segment:

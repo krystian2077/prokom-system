@@ -1,7 +1,7 @@
 """PRO-KOM Serwis — Admin: Dostępność pracowników."""
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import EmployeeAvailability
+from .models import EmployeeAvailability, EmployeeAbsenceRequest
 
 
 @admin.register(EmployeeAvailability)
@@ -26,3 +26,21 @@ class EmployeeAvailabilityAdmin(admin.ModelAdmin):
         return (obj.note[:40] + "…") if obj.note and len(obj.note) > 40 else (obj.note or "")
 
     note_short.short_description = _("Notatka")
+
+
+@admin.register(EmployeeAbsenceRequest)
+class EmployeeAbsenceRequestAdmin(admin.ModelAdmin):
+    list_display = [
+        "employee", "availability_type", "start_date", "end_date", "status", "reviewed_by", "created_at",
+    ]
+    list_filter = ["status", "availability_type", "start_date", "end_date"]
+    search_fields = ["employee__email", "employee__first_name", "employee__last_name", "note", "review_note"]
+    autocomplete_fields = ["employee", "reviewed_by"]
+    date_hierarchy = "start_date"
+    readonly_fields = ["created_at", "updated_at", "reviewed_at"]
+    fieldsets = (
+        (None, {"fields": ("employee", "availability_type", "start_date", "end_date", "note", "status")}),
+        (_("Decyzja"), {"fields": ("reviewed_by", "reviewed_at", "review_note")}),
+        (_("System"), {"fields": ("created_at", "updated_at")}),
+    )
+

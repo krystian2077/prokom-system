@@ -61,12 +61,45 @@ type DashboardAlert = {
 
 type WorkloadEntry = { id: string; name: string; inits: string; count: number; color: string; isUnassigned: boolean };
 
+type PartUsageSummaryItem = {
+  id: string;
+  repair_number: string | null;
+  repair_device_name: string;
+  custom_part_name: string | null;
+  quantity: number;
+  expected_arrival_date: string | null;
+  order_status_display: string;
+};
+
+type PartsBucket = { count: number; items: PartUsageSummaryItem[] };
+
+type PartsDashboardSummary = {
+  to_order: PartsBucket;
+  in_transit: PartsBucket;
+  arrived: PartsBucket;
+};
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TECH_COLORS = [
   "#3b82f6", "#a78bfa", "#22c55e", "#f59e0b",
   "#f97316", "#ec4899", "#14b8a6", "#e11d48",
 ];
+
+const PARTS_BUCKETS = [
+  { key: "to_order",  label: "Do zamówienia", color: "#f59e0b" },
+  { key: "in_transit", label: "W drodze",     color: "#3b82f6" },
+  { key: "arrived",   label: "Dotarły",       color: "#22c55e" },
+] as const;
+
+type PartsBucketKey = typeof PARTS_BUCKETS[number]["key"];
+
+const STAFF_PERIODS = [
+  { days: 1,  label: "Dziś"  },
+  { days: 7,  label: "7 dni" },
+  { days: 14, label: "14 dni" },
+  { days: 30, label: "30 dni" },
+] as const;
 
 const PIPELINE_STAGES = [
   { label: "Nowe",        statuses: ["new", "accepted"],                                                   color: "#3b82f6" },
@@ -327,6 +360,11 @@ export default function AdminDashboardPage() {
   const [alerts, setAlerts] = useState<DashboardAlert[]>([]);
   const [hoveredStage, setHoveredStage] = useState<number | null>(null);
   const [notifications, setNotifications] = useState<StaffNotificationItem[]>([]);
+  const [staffPeriod, setStaffPeriod] = useState(30);
+  const [staffList, setStaffList] = useState<TopStaffItem[]>([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [partsSummary, setPartsSummary] = useState<PartsDashboardSummary | null>(null);
+  const [activeBucket, setActiveBucket] = useState<PartsBucketKey>("to_order");
 
   const load = async () => {
     if (!token) return;
@@ -338,27 +376,33 @@ export default function AdminDashboardPage() {
       const IN_REPAIR_PARAMS  = si("in_diagnostics","diagnostics_done","quote_pending","quote_sent","quote_accepted","waiting_for_parts","in_repair","repair_done","in_testing","testing_failed","testing_passed");
       const READY_PARAMS       = si("ready_for_pickup","shipped");
       const ALL_ACTIVE_PARAMS  = si("new","accepted","in_diagnostics","diagnostics_done","quote_pending","quote_sent","quote_accepted","waiting_for_parts","in_repair","repair_done","in_testing","testing_failed","testing_passed");
-      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes, unassignedRes, notifRes] = await Promise.all([
+      const [dash, repairsRes, newRes, repairRes, waitingRes, readyRes, unassignedRes, notifRes, partsRes] = await Promise.all([
         api.get<AdminDashboardResponse>("/analytics/admin-dashboard/?days=30", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?page_size=20&ordering=-updated_at", token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=new&ordering=-created_at&page_size=20", token),
         api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${IN_REPAIR_PARAMS}&ordering=-updated_at&page_size=20`, token),
         api.get<{ results?: RepairRequestListItem[] }>("/repairs/?status=waiting_for_parts&ordering=-updated_at&page_size=20", token),
         api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${READY_PARAMS}&ordering=-updated_at&page_size=20`, token),
-        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${ALL_ACTIVE_PARAMS}&ordering=-updated_at&page_size=20`, token),
-        api.get<{ results?: StaffNotificationItem[] } | StaffNotificationItem[]>("/accounts/notifications/?ordering=-created_at&page_size=3", token),
+        api.get<{ results?: RepairRequestListItem[] }>(`/repairs/?${ALL_ACTIVE_PARAMS}&ordering=-updated_at&page_size=50`, token),
+        api.get<{ count: number; results: StaffNotificationItem[] }>("/accounts/notifications/admin/?limit=20", token),
+        api.get<PartsDashboardSummary>("/inventory/parts-dashboard-summary/", token),
       ]);
       const newItems        = newRes?.results        ?? [];
       const repairItems     = repairRes?.results     ?? [];
       const waitingItems    = waitingRes?.results    ?? [];
       const readyItems      = readyRes?.results      ?? [];
       const allActive       = unassignedRes?.results ?? [];
-      const unassignedItems = allActive.filter((r) => !r.assigned_to);
+      const unassignedItems = allActive
+        .filter((r) => !r.assigned_to)
+        .sort((a, b) => new Date(a.created_at ?? 0).getTime() - new Date(b.created_at ?? 0).getTime());
       setDashData(dash ?? null);
       setRecentRepairs(repairsRes?.results ?? []);
       setAllActiveRepairs(allActive);
       setTabRepairs({ new: newItems, repair: repairItems, waiting: waitingItems, ready: readyItems, unassigned: unassignedItems });
-      setNotifications(Array.isArray(notifRes) ? notifRes : (notifRes as { results?: StaffNotificationItem[] })?.results ?? []);
+      setStaffList(dash?.tables?.top_staff ?? []);
+      setStaffPeriod(30);
+      setNotifications(notifRes?.results ?? []);
+      setPartsSummary(partsRes ?? null);
 
       const built: DashboardAlert[] = [];
       const unassignedCount = (repairsRes?.results ?? []).filter((r) => !r.assigned_to).length;
@@ -382,6 +426,8 @@ export default function AdminDashboardPage() {
       setTabRepairs({ new: [], repair: [], waiting: [], ready: [], unassigned: [] });
       setAlerts([]);
       setNotifications([]);
+      setStaffList([]);
+      setPartsSummary(null);
     } finally {
       setLoading(false);
     }
@@ -393,12 +439,27 @@ export default function AdminDashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAdmin]);
 
+  const handleStaffPeriod = async (days: number) => {
+    if (days === staffPeriod) return;
+    setStaffPeriod(days);
+    if (!token) return;
+    setStaffLoading(true);
+    try {
+      const res = await api.get<AdminDashboardResponse>(`/analytics/admin-dashboard/?days=${days}`, token);
+      setStaffList(res?.tables?.top_staff ?? []);
+    } catch {
+      // silent — keep existing list
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
   const kpiCards = useMemo(() => {
     const kpi = dashData?.kpi;
     return [
       { label: "Przychód mies.", value: fmtPln(kpi?.revenue_total ?? "0"), sub: "robocizna + części", accent: "#22c55e", onClick: () => router.push("/admin-panel/stats"), clickable: true },
-      { label: "W naprawie", value: toNum(kpi?.in_progress_count), sub: undefined, accent: "#f59e0b", onClick: undefined, clickable: false },
-      { label: "Nowe zgłoszenia", value: toNum(kpi?.new_count), sub: "czeka na przetworzenie", accent: "#3b82f6", onClick: undefined, clickable: false },
+      { label: "W naprawie", value: toNum(kpi?.in_progress_count), sub: "aktywne zlecenia", accent: "#f59e0b", onClick: () => router.push("/admin-panel/repairs?status=in_progress"), clickable: true },
+      { label: "Nowe zgłoszenia", value: toNum(kpi?.new_count), sub: "czeka na przetworzenie", accent: "#3b82f6", onClick: () => router.push("/admin-panel/repairs?status=new"), clickable: true },
       { label: "Gotowe do odbioru", value: toNum(kpi?.ready_for_pickup_count), sub: "urządzeń do odbioru", accent: "#a78bfa", onClick: () => router.push("/admin-panel/pickups"), clickable: true },
     ];
   }, [dashData, router]);
@@ -616,185 +677,375 @@ export default function AdminDashboardPage() {
           <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
 
             {/* Centrum uwagi */}
-            <div className="flex flex-col gap-0 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
-              {/* Header */}
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Operacje</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Centrum uwagi</h2>
-                </div>
-                {alerts.length > 0 && (
-                  <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/10 px-3 py-1 text-[11px] font-bold text-[#ef4444]">
-                    {alerts.length} alertów
-                  </span>
-                )}
-              </div>
+            <div className="relative flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--s1)]">
+              {/* Subtle top gradient accent */}
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-              {/* Sub-section 1: Alerts */}
-              <div className="space-y-1.5">
-                {alerts.length === 0 ? (
-                  <div className="flex items-center gap-2.5 rounded-xl border border-[var(--gb)] bg-[var(--gl)] px-3.5 py-2.5">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#22c55e]/40 bg-[#22c55e]/15 text-[10px] font-bold text-[#22c55e]">✓</div>
-                    <p className="text-sm text-[#bbf7d0]">Brak aktywnych alertów. Warsztat działa sprawnie.</p>
+              <div className="flex flex-col gap-0 p-6">
+                {/* Header */}
+                <div className="mb-6 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink2)]">Operacje</p>
+                    <h2 className="mt-1.5 text-xl font-semibold text-[var(--white)]">Centrum uwagi</h2>
+                    <p className="mt-1 text-xs text-[var(--muted)]">Alerty, nieprzypisane zlecenia i powiadomienia</p>
                   </div>
-                ) : (
-                  alerts.map((alert) => (
-                    <button
-                      key={alert.type}
-                      type="button"
-                      onClick={() => router.push(alert.href)}
-                      className={`group w-full rounded-xl border px-3.5 py-2.5 text-left transition hover:brightness-110 ${alertClass(alert.severity)}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="flex-1 text-sm font-semibold">{alert.title}</span>
-                        <span className="text-xs opacity-40 transition group-hover:opacity-100">→</span>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-
-              {/* Divider */}
-              <div className="my-4 border-t border-white/[0.06]" />
-
-              {/* Sub-section 2: Nieprzypisane naprawy */}
-              <div>
-                <div className="mb-2.5 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#ef4444]" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ink2)]">Nieprzypisane</span>
-                    {tabRepairs.unassigned.length > 0 && (
-                      <span className="rounded-full border border-[#ef4444]/25 bg-[#ef4444]/10 px-1.5 text-[10px] font-bold text-[#ef4444]">
-                        {tabRepairs.unassigned.length}
+                  <div className="flex shrink-0 items-center gap-2">
+                    {alerts.length > 0 && (
+                      <span className="flex items-center gap-1.5 rounded-full border border-[#ef4444]/35 bg-[#ef4444]/12 px-3 py-1.5 text-[11px] font-bold text-[#ef4444]">
+                        <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#ef4444]" />
+                        {alerts.length}
                       </span>
                     )}
                   </div>
-                  <Link href="/admin-panel/unassigned" className="text-[11px] font-semibold text-[#3b82f6] hover:underline">
-                    Wszystkie →
-                  </Link>
                 </div>
-                {tabRepairs.unassigned.length === 0 ? (
-                  <p className="text-xs text-[var(--muted)]">Wszystkie naprawy mają przypisanego technika.</p>
-                ) : (
-                  <div className="space-y-1">
-                    {tabRepairs.unassigned.slice(0, 3).map((r) => (
-                      <Link
-                        key={r.id}
-                        href={`/admin-panel/repairs/${r.id}`}
-                        className="flex items-center gap-3 rounded-xl border border-[#ef4444]/12 bg-[#ef4444]/[0.04] px-3 py-2.5 transition hover:border-[#ef4444]/25 hover:bg-[#ef4444]/[0.08]"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-[11px] font-bold text-[var(--white)]">{r.repair_number}</span>
-                            {r.priority && r.priority !== "normal" && (
-                              <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/12 px-1.5 text-[9px] font-bold text-[#ef4444]">
-                                {r.priority_display}
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{r.client_name} · {r.device_name}</p>
-                        </div>
-                        <span className="shrink-0 text-[10px] text-[var(--muted)]">{relativeTime(r.created_at)}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
 
-              {/* Divider */}
-              <div className="my-4 border-t border-white/[0.06]" />
-
-              {/* Sub-section 3: Ostatnie powiadomienia */}
-              <div>
-                <div className="mb-2.5 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#3b82f6]" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ink2)]">Powiadomienia</span>
+                {/* ── Section 1: Alerty ── */}
+                <div className="mb-5">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]">Alerty</span>
                   </div>
-                  <Link href="/admin-panel/notifications" className="text-[11px] font-semibold text-[#3b82f6] hover:underline">
-                    Wszystkie →
-                  </Link>
+                  <div className="space-y-1.5">
+                    {alerts.length === 0 ? (
+                      <div className="flex items-center gap-3 rounded-2xl border border-[#22c55e]/20 bg-[#22c55e]/[0.06] px-4 py-3">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#22c55e]/30 bg-[#22c55e]/15 text-[11px] font-bold text-[#22c55e]">✓</div>
+                        <p className="text-sm font-medium text-[#86efac]">Brak alertów — warsztat działa sprawnie.</p>
+                      </div>
+                    ) : (
+                      alerts.map((alert) => {
+                        const accentColor = alert.severity === "red" ? "#ef4444" : alert.severity === "amber" ? "#f59e0b" : "#3b82f6";
+                        return (
+                          <button
+                            key={alert.type}
+                            type="button"
+                            onClick={() => router.push(alert.href)}
+                            className={`group relative w-full overflow-hidden rounded-2xl border px-4 py-3 text-left transition hover:brightness-110 ${alertClass(alert.severity)}`}
+                          >
+                            <div className="absolute inset-y-0 left-0 w-[3px] rounded-l-2xl" style={{ background: accentColor }} />
+                            <div className="flex items-center gap-3 pl-2">
+                              <span className="flex-1 text-[13px] font-semibold leading-snug">{alert.title}</span>
+                              <span className="shrink-0 text-xs font-bold opacity-40 transition group-hover:opacity-90">→</span>
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
-                {notifications.length === 0 ? (
-                  <p className="text-xs text-[var(--muted)]">Brak nowych powiadomień.</p>
-                ) : (
-                  <div className="space-y-1">
-                    {notifications.map((n) => {
-                      const dot = notifPriorityColor(n.priority);
-                      const label = notifTypeLabel(n.notification_type);
-                      return (
-                        <div
-                          key={n.id}
-                          className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 transition hover:bg-white/[0.04]"
+
+                {/* ── Divider ── */}
+                <div className="mb-5 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
+                {/* ── Section 2: Nieprzypisane ── */}
+                <div className="mb-5">
+                  <div className="mb-2.5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]">Nieprzypisane</span>
+                      {tabRepairs.unassigned.length > 0 && (
+                        <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/12 px-2 py-px text-[10px] font-bold text-[#ef4444]">
+                          {tabRepairs.unassigned.length}
+                        </span>
+                      )}
+                    </div>
+                    <Link href="/admin-panel/unassigned" className="text-[11px] font-semibold text-[#60a5fa] transition hover:text-[#93c5fd]">
+                      Wszystkie →
+                    </Link>
+                  </div>
+                  {tabRepairs.unassigned.length === 0 ? (
+                    <p className="text-xs text-[var(--muted)]">Wszystkie naprawy mają przypisanego technika.</p>
+                  ) : (
+                    <div className="max-h-[160px] space-y-1.5 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
+                      {tabRepairs.unassigned.map((r) => (
+                        <Link
+                          key={r.id}
+                          href={`/admin-panel/repairs/${r.id}`}
+                          className="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-[#ef4444]/14 bg-[#ef4444]/[0.04] px-4 py-3 transition hover:border-[#ef4444]/28 hover:bg-[#ef4444]/[0.08]"
                         >
-                          {/* Priority dot */}
-                          <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: dot }} />
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span
-                                className="rounded border px-1.5 py-px text-[9px] font-bold uppercase tracking-wide"
-                                style={{ background: dot + "15", borderColor: dot + "30", color: dot }}
-                              >
-                                {label}
-                              </span>
-                              {n.repair_number && (
-                                <span className="font-mono text-[10px] font-semibold text-[var(--ink2)]">{n.repair_number}</span>
+                          <div className="absolute inset-y-0 left-0 w-[3px] rounded-l-2xl bg-[#ef4444]/60" />
+                          <div className="min-w-0 flex-1 pl-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-[12px] font-bold text-[var(--white)]">{r.repair_number}</span>
+                              {r.priority && r.priority !== "normal" && (
+                                <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/14 px-1.5 py-px text-[9px] font-bold text-[#ef4444]">
+                                  {r.priority_display}
+                                </span>
                               )}
                             </div>
-                            <p className="mt-0.5 truncate text-[12px] font-medium text-[var(--white)]">{n.title}</p>
+                            <p className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{r.client_name} · {r.device_name}</p>
                           </div>
-                          <span className="mt-0.5 shrink-0 text-[10px] text-[var(--muted)]">{relativeTime(n.created_at)}</span>
-                        </div>
-                      );
-                    })}
+                          <span className="shrink-0 text-[10px] tabular-nums text-[var(--muted)]">{relativeTime(r.created_at)}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* ── Divider ── */}
+                <div className="mb-5 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
+                {/* ── Section 3: Powiadomienia ── */}
+                <div>
+                  <div className="mb-2.5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]">Powiadomienia</span>
+                      {notifications.length > 0 && (
+                        <span className="rounded-full border border-[#3b82f6]/30 bg-[#3b82f6]/12 px-2 py-px text-[10px] font-bold text-[#60a5fa]">
+                          {notifications.length}
+                        </span>
+                      )}
+                    </div>
+                    <Link href="/admin-panel/notifications" className="text-[11px] font-semibold text-[#60a5fa] transition hover:text-[#93c5fd]">
+                      Wszystkie →
+                    </Link>
                   </div>
-                )}
+                  {notifications.length === 0 ? (
+                    <p className="text-xs text-[var(--muted)]">Brak nowych powiadomień.</p>
+                  ) : (
+                    <div className="max-h-[260px] space-y-1.5 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
+                      {notifications.map((n) => {
+                        const dot = notifPriorityColor(n.priority);
+                        const label = notifTypeLabel(n.notification_type);
+                        return (
+                          <div
+                            key={n.id}
+                            className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-white/[0.025] px-4 py-3 transition hover:border-white/10 hover:bg-white/[0.04]"
+                          >
+                            {/* Priority indicator */}
+                            <div
+                              className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                              style={{ background: dot + "18", border: `1px solid ${dot}35` }}
+                            >
+                              <div className="h-1.5 w-1.5 rounded-full" style={{ background: dot }} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span
+                                  className="rounded-md border px-1.5 py-px text-[9px] font-bold uppercase tracking-wider"
+                                  style={{ background: dot + "12", borderColor: dot + "28", color: dot }}
+                                >
+                                  {label}
+                                </span>
+                                {n.repair_number && (
+                                  <span className="font-mono text-[10px] font-semibold text-[var(--ink2)]">{n.repair_number}</span>
+                                )}
+                              </div>
+                              <p className="mt-1 truncate text-[12px] font-medium leading-snug text-[var(--white)]">{n.title}</p>
+                            </div>
+                            <span className="mt-[3px] shrink-0 text-[10px] tabular-nums text-[var(--muted)]">{relativeTime(n.created_at)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Top staff performance */}
-            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
-              <div className="flex items-end justify-between gap-3">
+            <div className="flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6">
+              {/* Header + period filter */}
+              <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zespół</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Wyniki techników</h2>
-                  <p className="mt-1 text-xs text-[var(--muted)]">Ukończone naprawy — ostatnie 30 dni</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink2)]">Zespół</p>
+                  <h2 className="mt-1.5 text-lg font-semibold text-[var(--white)]">Wyniki techników</h2>
+                  <p className="mt-1 text-xs text-[var(--muted)]">Przychód i ukończone naprawy</p>
                 </div>
-                <Link href="/admin-panel/workload" className="shrink-0 text-sm font-semibold text-[#3b82f6] hover:underline">
-                  Workload →
-                </Link>
-              </div>
-              <div className="mt-4 space-y-0.5">
-                {dashData.tables.top_staff.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-center">
-                    <p className="text-sm text-[var(--ink2)]">Brak danych o zespole.</p>
-                    <p className="mt-1 text-xs text-[var(--muted)]">Dane pojawią się po zamknięciu pierwszych napraw.</p>
-                  </div>
-                ) : (
-                  dashData.tables.top_staff.slice(0, 6).map((staff, i) => (
-                    <div
-                      key={staff.user_id}
-                      className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-[var(--row-hover)]"
+                {/* Period tabs */}
+                <div className="flex items-center gap-0.5 rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-0.5">
+                  {STAFF_PERIODS.map((p) => (
+                    <button
+                      key={p.days}
+                      type="button"
+                      onClick={() => void handleStaffPeriod(p.days)}
+                      disabled={staffLoading}
+                      className="rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all disabled:opacity-50"
+                      style={
+                        staffPeriod === p.days
+                          ? { background: "var(--s1)", color: "var(--white)", boxShadow: "0 1px 4px rgba(0,0,0,.35)" }
+                          : { color: "var(--muted)" }
+                      }
                     >
-                      <div
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
-                        style={{
-                          background: TECH_COLORS[i % TECH_COLORS.length] + "22",
-                          border: `1.5px solid ${TECH_COLORS[i % TECH_COLORS.length]}44`,
-                          color: TECH_COLORS[i % TECH_COLORS.length],
-                        }}
-                      >
-                        {initials(staff.full_name)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-[var(--white)]">{staff.full_name}</p>
-                        <p className="text-xs text-[var(--muted)]">{staff.completed_repairs} napraw</p>
-                      </div>
-                      <p className="shrink-0 text-sm font-semibold text-[#22c55e]">{fmtPln(staff.revenue)}</p>
-                    </div>
-                  ))
-                )}
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {/* Content */}
+              {staffLoading ? (
+                <div className="flex flex-1 items-center justify-center py-8">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/10 border-t-[#3b82f6]" />
+                </div>
+              ) : staffList.length === 0 ? (
+                <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center">
+                  <p className="text-sm text-[var(--ink2)]">Brak danych w tym okresie.</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">Dane pojawią się po zamknięciu napraw.</p>
+                </div>
+              ) : (() => {
+                const maxRev = Math.max(...staffList.map((s) => toNum(s.revenue)), 1);
+                const totalRev = staffList.reduce((sum, s) => sum + toNum(s.revenue), 0);
+                const rankStyle = ["#f59e0b", "#94a3b8", "#b45309"] as const;
+                return (
+                  <>
+                    <div className="space-y-1">
+                      {staffList.slice(0, 8).map((staff, i) => {
+                        const rev = toNum(staff.revenue);
+                        const barPct = Math.round((rev / maxRev) * 100);
+                        const color = TECH_COLORS[i % TECH_COLORS.length];
+                        return (
+                          <div
+                            key={staff.user_id}
+                            className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-white/[0.03]"
+                          >
+                            {/* Rank */}
+                            <span
+                              className="w-4 shrink-0 text-center text-[11px] font-bold tabular-nums"
+                              style={{ color: i < 3 ? rankStyle[i] : "var(--muted)" }}
+                            >
+                              {i + 1}
+                            </span>
+                            {/* Avatar */}
+                            <div
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+                              style={{
+                                background: color + "20",
+                                border: `1.5px solid ${color}44`,
+                                color,
+                              }}
+                            >
+                              {initials(staff.full_name)}
+                            </div>
+                            {/* Name + bar */}
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-[13px] font-semibold text-[var(--white)]">{staff.full_name}</p>
+                              <div className="mt-1.5 h-[4px] overflow-hidden rounded-full bg-white/[0.06]">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${Math.max(barPct, rev > 0 ? 3 : 0)}%`,
+                                    background: `linear-gradient(90deg, ${color}55, ${color})`,
+                                    transition: "width .7s cubic-bezier(.4,0,.2,1)",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            {/* Revenue + repairs */}
+                            <div className="shrink-0 text-right">
+                              <p className="text-[13px] font-bold text-[#22c55e]">{fmtPln(rev)}</p>
+                              <p className="text-[10px] tabular-nums text-[var(--muted)]">{staff.completed_repairs} napraw</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Total */}
+                    <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
+                      <span className="text-xs text-[var(--muted)]">
+                        Łącznie · {STAFF_PERIODS.find((p) => p.days === staffPeriod)?.label}
+                      </span>
+                      <span className="text-base font-bold text-[#22c55e]">{fmtPln(totalRev)}</span>
+                    </div>
+                  </>
+                );
+              })()}
+
+              {/* ── Części — status ── */}
+              {partsSummary && (() => {
+                const bucket = PARTS_BUCKETS.find((b) => b.key === activeBucket)!;
+                const items = partsSummary[activeBucket].items;
+                const totalParts = PARTS_BUCKETS.reduce((s, b) => s + partsSummary[b.key].count, 0);
+                return (
+                  <div className="mt-5 border-t border-white/[0.06] pt-5">
+                    {/* Sub-header */}
+                    <div className="mb-3 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]">Części</span>
+                        {totalParts > 0 && (
+                          <span className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-px text-[10px] font-bold text-[var(--ink2)]">
+                            {totalParts}
+                          </span>
+                        )}
+                      </div>
+                      <Link href="/admin-panel/parts" className="text-[11px] font-semibold text-[#60a5fa] transition hover:text-[#93c5fd]">
+                        Zarządzaj →
+                      </Link>
+                    </div>
+
+                    {/* Bucket tabs */}
+                    <div className="mb-3 flex gap-1">
+                      {PARTS_BUCKETS.map((b) => {
+                        const cnt = partsSummary[b.key].count;
+                        const isActive = activeBucket === b.key;
+                        return (
+                          <button
+                            key={b.key}
+                            type="button"
+                            onClick={() => setActiveBucket(b.key)}
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-[11px] font-semibold transition-all"
+                            style={
+                              isActive
+                                ? { borderColor: b.color + "40", background: b.color + "14", color: b.color }
+                                : { borderColor: "transparent", background: "rgba(255,255,255,.03)", color: "var(--muted)" }
+                            }
+                          >
+                            <span className="truncate">{b.label}</span>
+                            {cnt > 0 && (
+                              <span
+                                className="shrink-0 rounded-full px-1.5 text-[9px] font-bold"
+                                style={
+                                  isActive
+                                    ? { background: b.color + "25", color: b.color }
+                                    : { background: "rgba(255,255,255,.07)", color: "var(--muted)" }
+                                }
+                              >
+                                {cnt}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Items */}
+                    {items.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-white/[0.07] px-3 py-4 text-center">
+                        <p className="text-xs text-[var(--muted)]">Brak części w tej kategorii.</p>
+                      </div>
+                    ) : (
+                      <div className="max-h-[168px] space-y-1 overflow-y-auto pr-0.5 [scrollbar-color:rgba(255,255,255,.10)_transparent] [scrollbar-width:thin]">
+                        {items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center gap-2.5 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 transition hover:bg-white/[0.04]"
+                          >
+                            <div className="mt-px h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: bucket.color }} />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-[12px] font-semibold text-[var(--white)]">
+                                {item.custom_part_name ?? "—"}
+                              </p>
+                              <div className="mt-0.5 flex items-center gap-1.5">
+                                {item.repair_number && (
+                                  <span className="font-mono text-[10px] text-[var(--ink2)]">{item.repair_number}</span>
+                                )}
+                                {item.repair_device_name && (
+                                  <span className="truncate text-[10px] text-[var(--muted)]">· {item.repair_device_name}</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <span className="text-[11px] font-bold text-[var(--white)]">×{item.quantity}</span>
+                              {item.expected_arrival_date && (
+                                <p className="text-[9px] text-[var(--muted)]">
+                                  {new Date(item.expected_arrival_date).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit" })}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </section>
 

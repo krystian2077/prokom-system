@@ -49,7 +49,6 @@ export function PanelTopbar() {
   const { theme: panelTheme, toggleTheme } = useWorkerPanelTheme();
   const showToast = useWorkerStore((s) => s.addToast);
 
-  const [now, setNow] = useState(() => new Date());
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -86,14 +85,16 @@ export function PanelTopbar() {
     if (pathname === "/panel/dashboard" || pathname.startsWith("/panel/dashboard/")) return "Dashboard";
     const repairsDetail =
       pathname.startsWith("/panel/repairs/") ||
-      pathname.startsWith("/panel/naprawy/") ||
-      pathname.startsWith("/panel/zgloszenia/");
+      pathname.startsWith("/panel/naprawy/");
     const repairsList =
       pathname === "/panel/repairs" ||
-      pathname === "/panel/naprawy" ||
-      pathname === "/panel/zgloszenia";
+      pathname === "/panel/naprawy";
+    const zgloszeniaDetail = pathname.startsWith("/panel/zgloszenia/");
+    const zgloszeniaList = pathname === "/panel/zgloszenia";
     if (repairsDetail) return "Szczegóły naprawy";
     if (repairsList) return "Naprawy";
+    if (zgloszeniaDetail) return "Szczegóły zgłoszenia";
+    if (zgloszeniaList) return "Zgłoszenia";
     if (pathname === "/panel/unassigned" || pathname === "/panel/nieprzypisane") return "Nieprzypisane";
     if (pathname === "/panel/all-repairs" || pathname === "/panel/wszystkie") return "Wszystkie naprawy";
     if (pathname.startsWith("/panel/intake")) return "Przyjęcie Stacjonarne";
@@ -107,6 +108,7 @@ export function PanelTopbar() {
     if (pathname.startsWith("/panel/clients") || pathname.startsWith("/panel/klienci")) return "Klienci";
     if (pathname.startsWith("/panel/search") || pathname.startsWith("/panel/wyszukiwanie")) return "Wyszukiwanie";
     if (pathname.startsWith("/panel/pickups") || pathname.startsWith("/panel/odbior") || pathname.startsWith("/panel/odbiory")) return "Odbiory";
+    if (pathname.startsWith("/panel/statystyki") || pathname.startsWith("/panel/stats")) return "Statystyki";
     if (pathname.startsWith("/panel/reklamacje-gwarancje/przyjecie")) return "Przyjęcie rekl./gwar.";
     if (
       pathname.startsWith("/panel/claims") ||
@@ -115,6 +117,7 @@ export function PanelTopbar() {
     )
       return "Reklamacje";
     if (pathname.startsWith("/panel/profil")) return "Mój profil";
+    if (pathname.startsWith("/panel/hurtownie")) return "Hurtownie";
     return "Panel";
   }, [pathname]);
 
@@ -144,13 +147,7 @@ export function PanelTopbar() {
   const [globalClients, setGlobalClients] = useState<GlobalSearchClient[]>([]);
   const [globalDevices, setGlobalDevices] = useState<GlobalSearchDevice[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-
   const repairsDetailBase = pathname?.startsWith("/admin-panel") ? "/admin-panel/repairs" : "/panel/naprawy";
-
-  useEffect(() => {
-    setRecentSearches(readRecentSearches());
-  }, []);
 
   type NavItem =
     | { kind: "repair"; id: string }
@@ -236,7 +233,6 @@ export function PanelTopbar() {
         (globalRes?.devices?.length ?? 0);
       if (hits > 0) {
         pushRecentSearch(q);
-        setRecentSearches(readRecentSearches());
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać wyników.";
@@ -277,7 +273,7 @@ export function PanelTopbar() {
   // Ctrl+K focuses input
   useEffect(() => {
     const onKeyDown = (ev: KeyboardEvent) => {
-      const key = ev.key.toLowerCase();
+      const key = (ev.key || "").toLowerCase();
       if ((ev.ctrlKey || ev.metaKey) && key === "k") {
         ev.preventDefault();
         inputRef.current?.focus();
@@ -351,10 +347,6 @@ export function PanelTopbar() {
     // URZĄDZENIA: otwórz najnowszą naprawę powiązaną z imei/serial.
     void openLatestRepairForDevice(item.device);
   };
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 30_000);
-    return () => window.clearInterval(id);
-  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -363,8 +355,8 @@ export function PanelTopbar() {
 
   return (
     <header className="sticky top-0 z-[110] border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--s1)_85%,transparent)] backdrop-blur-xl">
-      <div className="mx-auto flex min-h-[72px] max-w-[1500px] items-center justify-between gap-4 px-5 py-3 md:min-h-[76px] md:py-3.5">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="mx-auto flex min-h-[96px] max-w-[1500px] items-center gap-4 pl-2 pr-5 py-6 md:min-h-[100px] md:py-6">
+        <div className="flex flex-1 items-center gap-5 min-w-0">
           {showBack ? (
             <button
               type="button"
@@ -377,18 +369,18 @@ export function PanelTopbar() {
           ) : null}
 
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
+            <div className="mb-1 text-[12px] font-bold uppercase tracking-[0.22em]" style={{ color: "#e8445a" }}>
               {user?.role === "admin" ? "Panel administratora" : "Panel pracownika"}
             </div>
-            <div className="truncate text-sm font-semibold text-[var(--white)]">{breadcrumb}</div>
+            <div className="truncate text-lg font-bold tracking-tight text-[var(--white)]" style={{ letterSpacing: "-0.01em", lineHeight: 1.2 }}>{breadcrumb}</div>
           </div>
         </div>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center px-4 md:flex lg:px-8">
-          <div ref={wrapperRef} className="relative w-full max-w-[min(680px,100%)]">
+          <div ref={wrapperRef} className="relative w-full max-w-[min(1100px,100%)]">
             <div
-              className="flex min-h-[44px] w-full items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--s2)_88%,transparent)] px-4 py-2.5 focus-within:border-[var(--bb)]"
-              style={{ color: "var(--ink2)" }}
+              className="flex min-h-[48px] w-full items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--s2)_88%,transparent)] px-4 py-2.5 transition-all duration-200 focus-within:border-[var(--bb)] focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_2px_16px_rgba(59,130,246,0.1)]"
+              style={{ color: "var(--ink2)", boxShadow: "0 1px 8px rgba(59,130,246,0.07), 0 0 0 1px rgba(59,130,246,0.06)" }}
             >
               <Search size={18} className="shrink-0 opacity-90" />
               <input
@@ -423,25 +415,6 @@ export function PanelTopbar() {
               </span>
             </div>
 
-            {recentSearches.length > 0 ? (
-              <div className="mt-2 flex flex-wrap items-center gap-1.5 px-0.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Ostatnie</span>
-                {recentSearches.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onMouseDown={(ev) => ev.preventDefault()}
-                    onClick={() => {
-                      setQuery(t);
-                      void load(t);
-                    }}
-                    className="max-w-[200px] truncate rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-[11px] font-semibold text-[var(--ink)] transition hover:border-[var(--bb)] hover:bg-[var(--bl)] hover:text-[var(--white)]"
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            ) : null}
 
             {open && (
               <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-[300] max-h-[440px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] shadow-[0_16px_48px_rgba(0,0,0,.2)]">
@@ -702,7 +675,7 @@ export function PanelTopbar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-1 items-center justify-end gap-3">
           <button
             type="button"
             onClick={() => {

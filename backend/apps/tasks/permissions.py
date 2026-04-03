@@ -12,17 +12,35 @@ class IsStaffOrAdmin(BasePermission):
 
 
 def can_edit_task(user, task):
-    """Czy użytkownik może edytować zadanie (zmieniać przypisanie, pełna edycja). Tylko admin."""
-    return getattr(user, "role", None) == "admin"
+    """Czy użytkownik może edytować zadanie.
+
+    Admin: wszystkie.
+    Staff: zadania przypisane do niego lub utworzone przez niego.
+    """
+    if getattr(user, "role", None) == "admin":
+        return True
+    if getattr(user, "role", None) != "staff":
+        return False
+    return task.assigned_to_id == user.id or task.created_by_id == user.id
 
 
 def can_reassign_task(user, task):
-    """Czy użytkownik może przepisać zadanie do innej osoby. Tylko admin."""
-    return getattr(user, "role", None) == "admin"
+    """Czy użytkownik może przepisać zadanie do innej osoby.
+
+    Admin: zawsze.
+    Staff: tylko jeśli ma prawo edycji danego zadania.
+    """
+    return can_edit_task(user, task)
 
 
 def can_see_task(user, task):
-    """Czy użytkownik może zobaczyć zadanie. Admin — wszystko; staff — tylko przypisane do niego."""
+    """Czy użytkownik może zobaczyć zadanie.
+
+    Admin: wszystko.
+    Staff: zadania przypisane do niego lub utworzone przez niego.
+    """
     if getattr(user, "role", None) == "admin":
         return True
-    return task.assigned_to_id == user.id
+    if getattr(user, "role", None) != "staff":
+        return False
+    return task.assigned_to_id == user.id or task.created_by_id == user.id

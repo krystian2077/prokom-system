@@ -2,10 +2,12 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from apps.clients.models import Client
+from apps.common.permissions import IsStaffOrAdmin
 from apps.clients.serializers import (
     ClientSerializer,
     ClientListSerializer,
@@ -20,7 +22,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     Lista, tworzenie, szczegóły i edycja klientów.
     Filtry: search, is_vip, is_blacklisted, client_type, client_segment.
     """
-    queryset = Client.objects.filter(is_deleted=False)
+    permission_classes = [IsStaffOrAdmin]
+    queryset = Client.objects.all()  # type: ignore[attr-defined]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["is_vip", "is_blacklisted", "client_type", "client_segment"]
     search_fields = [
@@ -53,6 +56,13 @@ class ClientViewSet(viewsets.ModelViewSet):
             raise NotFound("Klient nie istnieje lub został usunięty.")
         return obj
 
+    def destroy(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "admin":
+            raise PermissionDenied("Tylko administrator może usuwać klientów.")
+        client = self.get_object()
+        client.soft_delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=["get"], url_path="premium-card")
     def premium_card(self, request, pk=None):
         """
@@ -61,9 +71,6 @@ class ClientViewSet(viewsets.ModelViewSet):
         reklamacje/gwarancje, notatki, badge (klient wraca / stały).
         Dostęp: staff, admin.
         """
-        from apps.common.permissions import IsStaffOrAdmin
-        if not request.user.is_authenticated or request.user.role not in ("staff", "admin"):
-            return Response({"detail": "Brak uprawnień."}, status=403)
         client = self.get_object()
         data = build_premium_card_data(client, request=request)
         return Response(data, status=200)
@@ -75,9 +82,6 @@ class ClientViewSet(viewsets.ModelViewSet):
         Wyszukiwanie klientów po telefonie, nazwisku, e-mailu (do „klient wraca”).
         Zwraca krótką listę dopasowań. Dostęp: staff, admin.
         """
-        from apps.common.permissions import IsStaffOrAdmin
-        if not request.user.is_authenticated or request.user.role not in ("staff", "admin"):
-            return Response({"detail": "Brak uprawnień."}, status=403)
         q = request.query_params.get("q", "").strip()
         limit = min(int(request.query_params.get("limit", 20)), 50)
         clients = client_search(q, limit=limit)

@@ -1,210 +1,260 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { api } from "@/lib/api";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  CalendarCheck,
+  CalendarClock,
+  CalendarOff,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  Plus,
+  RefreshCw,
+  Search,
+  Shield,
+  Trash2,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api";
 import { useStore } from "@/store";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { StaffCardSkeleton } from "@/components/ui/Skeleton";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import type { StaffListItem, StaffHealthLevel, StaffProfile } from "@/types/staff";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { RepairTableSkeleton } from "@/components/ui/Skeleton";
+import { WorkerTeamPage } from "../../../components/panel/WorkerTeamPage";
+import { AdminAbsenceRequestsPanel } from "@/components/panel/AdminAbsenceRequestsPanel";
 import type { UserRole } from "@/types/auth";
-
-function badgeForHealth(level: StaffHealthLevel | undefined) {
-  if (level === "red") return "border-[#dc1e1e]/35 bg-[#dc1e1e]/15 text-[#ffb4b4]";
-  if (level === "yellow") return "border-[#f59e0b]/35 bg-[#f59e0b]/15 text-[#ffe3b0]";
-  if (level === "green") return "border-[#22c55e]/35 bg-[#22c55e]/15 text-[#bbf7d0]";
-  return "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]";
-}
-
-function healthLabel(level: StaffHealthLevel | undefined) {
-  if (level === "red") return "Zły";
-  if (level === "yellow") return "Uwaga";
-  if (level === "green") return "OK";
-  return "—";
-}
+import type { TeamOverviewResponse, TeamOverviewRow, TeamTodayStatus } from "@/types/staff";
 
 type StaffForm = {
   first_name: string;
   last_name: string;
   email: string;
-  phone?: string;
+  phone: string;
   role: UserRole;
   is_active: boolean;
-  staff_profile: StaffProfile;
-  password?: string;
+  specialization: string;
+  calendar_color: string;
+  display_name: string;
+  is_visible_in_rankings: boolean;
+  is_available: boolean;
+  accepts_shipment_repairs: boolean;
+  password: string;
 };
 
-function buildEmptyForm(currentRole: UserRole): StaffForm {
+type StatusFilter = "all" | TeamTodayStatus;
+
+function emptyForm(): StaffForm {
   return {
     first_name: "",
     last_name: "",
     email: "",
-    role: currentRole,
+    phone: "",
+    role: "staff",
     is_active: true,
-    staff_profile: {
-      specialization: "",
-      calendar_color: "#3498db",
-      display_name: "",
-      is_visible_in_rankings: true,
-      is_available: true,
-      accepts_shipment_repairs: true,
-    },
+    specialization: "",
+    calendar_color: "#3498db",
+    display_name: "",
+    is_visible_in_rankings: true,
+    is_available: true,
+    accepts_shipment_repairs: true,
     password: "",
   };
 }
 
-function formatDateTime(iso: string | null | undefined) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return String(iso);
-  return d.toLocaleString("pl-PL");
+function statusPillClass(status: TeamTodayStatus): string {
+  if (status === "working_today") return "border-[#22c55e]/35 bg-[#22c55e]/12 text-[#86efac]";
+  if (status === "off_today") return "border-[#ef4444]/35 bg-[#ef4444]/12 text-[#fca5a5]";
+  if (status === "unknown") return "border-[#64748b]/35 bg-[#64748b]/12 text-[#cbd5e1]";
+  return "border-[#f59e0b]/35 bg-[#f59e0b]/12 text-[#fde68a]";
+}
+
+function statusIcon(status: TeamTodayStatus) {
+  if (status === "working_today") return <CalendarCheck size={12} className="inline-block" />;
+  if (status === "off_today") return <CalendarOff size={12} className="inline-block" />;
+  return <CalendarClock size={12} className="inline-block" />;
+}
+
+function toDate(value: string | null | undefined): string {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function toDateTime(value: string | null | undefined): string {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function absenceRangeLabel(startDate: string, endDate: string): string {
+  if (!startDate) return "-";
+  if (startDate === endDate) return toDate(startDate);
+  return `${toDate(startDate)} - ${toDate(endDate)}`;
+}
+
+function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3.5">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8ea2c8]">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-white">{value}</p>
+      {sub ? <p className="mt-0.5 text-xs text-[#7e8aa5]">{sub}</p> : null}
+    </div>
+  );
 }
 
 export default function TeamAdminPage() {
-  const { user, token } = useAuth();
+  const { token, user } = useAuth();
   const addToast = useStore((s) => s.addToast);
   const { confirm } = useConfirm();
   const isAdmin = user?.role === "admin";
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const searchParamsRef = useRef(searchParams);
-  searchParamsRef.current = searchParams;
+  const isStaff = user?.role === "staff";
 
+  const [rows, setRows] = useState<TeamOverviewRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [items, setItems] = useState<StaffListItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const [search, setSearch] = useState("");
-
-  const roleFilter = searchParams.get("role") ?? "";
-  const isActiveFilter = searchParams.get("active") ?? "";
-  const specializationFilter = searchParams.get("spec") ?? "";
-  const [specInput, setSpecInput] = useState(specializationFilter);
-  const specDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    setSpecInput(specializationFilter);
-  }, [specializationFilter]);
-
-  useEffect(
-    () => () => {
-      if (specDebounceRef.current) clearTimeout(specDebounceRef.current);
-    },
-    [],
-  );
-
-  const replaceQuery = (mutate: (p: URLSearchParams) => void) => {
-    const p = new URLSearchParams(searchParams.toString());
-    mutate(p);
-    const q = p.toString();
-    router.replace(q ? `${pathname}?${q}` : pathname);
-  };
-
-  const setRoleInUrl = (value: string) => {
-    replaceQuery((p) => {
-      if (!value) p.delete("role");
-      else p.set("role", value);
-    });
-  };
-
-  const setActiveInUrl = (value: string) => {
-    replaceQuery((p) => {
-      if (!value) p.delete("active");
-      else p.set("active", value);
-    });
-  };
-
-  const queueSpecInUrl = (raw: string) => {
-    if (specDebounceRef.current) clearTimeout(specDebounceRef.current);
-    specDebounceRef.current = setTimeout(() => {
-      specDebounceRef.current = null;
-      const p = new URLSearchParams(searchParamsRef.current.toString());
-      const v = raw.trim();
-      if (!v) p.delete("spec");
-      else p.set("spec", v);
-      const q = p.toString();
-      router.replace(q ? `${pathname}?${q}` : pathname);
-    }, 400);
-  };
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "staff">("all");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
-  const [activeStaffId, setActiveStaffId] = useState<string | null>(null);
-  const [form, setForm] = useState<StaffForm>(() => buildEmptyForm("staff"));
   const [formError, setFormError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [formBusy, setFormBusy] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<StaffForm>(() => emptyForm());
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const [resetModalOpen, setResetModalOpen] = useState(false);
-  const [resetTargetId, setResetTargetId] = useState<string | null>(null);
-  const [resetAction, setResetAction] = useState<"generate" | "send_link">("generate");
-  const [resetCustomPassword, setResetCustomPassword] = useState<string>("");
+  const [resetPasswordId, setResetPasswordId] = useState<string | null>(null);
+  const [resetPasswordMode, setResetPasswordMode] = useState<"generate" | "send_link">("generate");
+  const [resetCustomPassword, setResetCustomPassword] = useState("");
   const [resetResult, setResetResult] = useState<string | null>(null);
-  const [resetSending, setResetSending] = useState(false);
+  const [resetBusy, setResetBusy] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const qs: string[] = [];
-      if (roleFilter) qs.push(`role=${encodeURIComponent(roleFilter)}`);
-      if (isActiveFilter) qs.push(`is_active=${encodeURIComponent(isActiveFilter)}`);
-      if (specializationFilter) qs.push(`specialization=${encodeURIComponent(specializationFilter)}`);
-      const url = `/accounts/staff/${qs.length ? `?${qs.join("&")}` : ""}`;
-      const res = await api.get<StaffListItem[]>(url, token);
-      setItems(res);
+      const res = await api.get<TeamOverviewResponse>(`/accounts/staff/team-overview/?to=${encodeURIComponent(new Date(Date.now() + 1000 * 60 * 60 * 24 * 45).toISOString().slice(0, 10))}`, token);
+      setRows(Array.isArray(res?.results) ? res.results : []);
+      setLastUpdated(new Date());
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się pobrać listy pracowników.";
+      const msg = e instanceof Error ? e.message : "Nie udało się pobrać danych zespołu.";
       setError(msg);
+      setRows([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (!token || !isAdmin) return;
     void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, isAdmin, roleFilter, isActiveFilter, specializationFilter]);
+  }, [token, isAdmin, load]);
 
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    if (!needle) return items;
-    return items.filter((s) => {
-      const hay = `${s.full_name ?? ""} ${s.email ?? ""} ${s.role_display ?? ""} ${s.staff_profile?.specialization_display ?? ""}`.toLowerCase();
-      return hay.includes(needle);
-    });
-  }, [items, search]);
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows
+      .filter((r) => {
+        if (statusFilter !== "all" && r.today_status !== statusFilter) return false;
+        if (roleFilter !== "all" && r.role !== roleFilter) return false;
+        if (!q) return true;
+        const phone = (r as { phone?: string }).phone ?? "";
+        const text = `${r.full_name ?? ""} ${r.email ?? ""} ${phone} ${r.role_display ?? ""} ${r.staff_profile?.specialization_display ?? ""}`.toLowerCase();
+        return text.includes(q);
+      })
+      .sort((a, b) => {
+        const activeRank = (a.is_active ? 0 : 1) - (b.is_active ? 0 : 1);
+        if (activeRank !== 0) return activeRank;
+        return (a.full_name || "").localeCompare(b.full_name || "", "pl");
+      });
+  }, [rows, query, statusFilter, roleFilter]);
+
+  useEffect(() => {
+    if (filteredRows.length === 0) {
+      setSelectedId(null);
+      return;
+    }
+    const exists = filteredRows.some((r) => r.id === selectedId);
+    if (!exists) setSelectedId(filteredRows[0].id);
+  }, [filteredRows, selectedId]);
+
+  const selected = useMemo(() => filteredRows.find((r) => r.id === selectedId) ?? null, [filteredRows, selectedId]);
+
+  const stats = useMemo(() => {
+    const total = rows.length;
+    const activeAccounts = rows.filter((r) => r.is_active).length;
+    const working = rows.filter((r) => r.today_status === "working_today").length;
+    const offToday = rows.filter((r) => r.today_status === "off_today").length;
+    const planned = rows.filter((r) => r.today_status === "planned_off").length;
+    const unknown = rows.filter((r) => r.today_status === "unknown").length;
+    return { total, activeAccounts, working, offToday, planned, unknown };
+  }, [rows]);
+
+  const setTodayStatus = async (employeeId: string, status: "working_today" | "off_today") => {
+    if (!token) return;
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const existing = await api.get<Array<{ id: string }>>(
+        `/availability/?employee=${encodeURIComponent(employeeId)}&date=${encodeURIComponent(today)}&is_active=true`,
+        token,
+      );
+      if (Array.isArray(existing) && existing.length) {
+        await Promise.allSettled(existing.map((entry) => api.delete(`/availability/${entry.id}/`, token)));
+      }
+      await api.post(
+        "/availability/",
+        {
+          employee: employeeId,
+          date: today,
+          is_all_day: true,
+          availability_type: status === "working_today" ? "available" : "day_off",
+          note: status === "working_today" ? "Oznaczone przez administratora: obecny w pracy" : "Oznaczone przez administratora: dzień wolny",
+        },
+        token,
+      );
+      addToast(status === "working_today" ? "Ustawiono: dziś w pracy." : "Ustawiono: dziś wolne.", "success");
+      await load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować statusu na dziś.";
+      addToast(msg, "error");
+    }
+  };
 
   const openCreate = () => {
     setModalMode("create");
-    setActiveStaffId(null);
-    setForm(buildEmptyForm("staff"));
+    setEditingId(null);
+    setForm(emptyForm());
     setFormError(null);
     setModalOpen(true);
   };
 
-  const openEdit = (s: StaffListItem) => {
+  const openEdit = (row: TeamOverviewRow) => {
     setModalMode("edit");
-    setActiveStaffId(s.id);
+    setEditingId(row.id);
     setForm({
-      first_name: s.first_name ?? "",
-      last_name: s.last_name ?? "",
-      email: s.email ?? "",
-      phone: (s as unknown as { phone?: string }).phone ?? "",
-      role: (s.role as UserRole) ?? "staff",
-      is_active: Boolean(s.is_active),
-      staff_profile: {
-        specialization: s.staff_profile?.specialization ?? "",
-        calendar_color: s.staff_profile?.calendar_color ?? "#3498db",
-        display_name: s.staff_profile?.display_name ?? "",
-        is_visible_in_rankings: Boolean(s.staff_profile?.is_visible_in_rankings),
-        is_available: Boolean(s.staff_profile?.is_available),
-        accepts_shipment_repairs: Boolean(s.staff_profile?.accepts_shipment_repairs),
-      },
+      first_name: row.first_name || "",
+      last_name: row.last_name || "",
+      email: row.email || "",
+      phone: (row as { phone?: string }).phone || "",
+      role: (row.role as UserRole) || "staff",
+      is_active: Boolean(row.is_active),
+      specialization: row.staff_profile?.specialization || "",
+      calendar_color: row.staff_profile?.calendar_color || "#3498db",
+      display_name: row.staff_profile?.display_name || "",
+      is_visible_in_rankings: true,
+      is_available: row.staff_profile?.is_available !== false,
+      accepts_shipment_repairs: true,
       password: "",
     });
     setFormError(null);
@@ -214,113 +264,106 @@ export default function TeamAdminPage() {
   const submitForm = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!token) return;
-    if (!isAdmin) return;
-    if (!modalOpen) return;
 
+    setFormBusy(true);
     setFormError(null);
-    setSubmitting(true);
+
     try {
       const payload: Record<string, unknown> = {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         email: form.email.trim().toLowerCase(),
-        phone: form.phone?.trim() ?? "",
+        phone: form.phone.trim(),
         role: form.role,
         is_active: form.is_active,
+        specialization: form.specialization,
+        calendar_color: form.calendar_color,
+        display_name: form.display_name,
+        is_visible_in_rankings: form.is_visible_in_rankings,
+        is_available: form.is_available,
+        accepts_shipment_repairs: form.accepts_shipment_repairs,
       };
 
-      payload.specialization = form.staff_profile.specialization ?? "";
-      payload.calendar_color = form.staff_profile.calendar_color ?? "#3498db";
-      payload.display_name = form.staff_profile.display_name ?? "";
-      payload.is_visible_in_rankings = form.staff_profile.is_visible_in_rankings ?? true;
-      payload.is_available = form.staff_profile.is_available ?? true;
-      payload.accepts_shipment_repairs = form.staff_profile.accepts_shipment_repairs ?? true;
-
       if (modalMode === "create") {
-        if (form.role === "admin") {
-          const pw = form.password?.trim();
-          if (!pw) throw new Error("Hasło jest wymagane przy tworzeniu administratora.");
-          payload.password = pw;
-        } else if (form.password?.trim()) {
-          payload.password = form.password.trim();
+        if (form.role === "admin" && !form.password.trim()) {
+          throw new Error("Hasło jest wymagane dla nowego administratora.");
         }
-
+        if (form.password.trim()) payload.password = form.password.trim();
         await api.post("/accounts/staff/", payload, token);
+        addToast("Pracownik został dodany.", "success");
       } else {
-        if (!activeStaffId) throw new Error("Brak ID pracownika.");
-        await api.patch(`/accounts/staff/${activeStaffId}/update/`, payload, token);
+        if (!editingId) throw new Error("Brak ID pracownika do edycji.");
+        await api.patch(`/accounts/staff/${editingId}/update/`, payload, token);
+        addToast("Dane pracownika zostały zapisane.", "success");
       }
 
       setModalOpen(false);
-      addToast(modalMode === "create" ? "Pracownik dodany." : "Dane zaktualizowane.", "success");
       await load();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zapisać pracownika.";
       setFormError(msg);
       addToast(msg, "error");
     } finally {
-      setSubmitting(false);
+      setFormBusy(false);
     }
   };
 
-  const openReset = (staffId: string) => {
-    setResetTargetId(staffId);
-    setResetAction("generate");
-    setResetCustomPassword("");
-    setResetResult(null);
-    setResetModalOpen(true);
+  const removeUser = async (row: TeamOverviewRow) => {
+    if (!token) return;
+    const ok = await confirm({
+      title: "Usunąć pracownika?",
+      description: `Konto ${row.full_name} zostanie dezaktywowane (soft delete).`,
+      confirmLabel: "Tak, usuń",
+      variant: "danger",
+    });
+    if (!ok) return;
+
+    setDeletingId(row.id);
+    try {
+      await api.delete(`/accounts/staff/${row.id}/`, token);
+      addToast("Pracownik został usunięty (dezaktywowany).", "success");
+      await load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się usunąć pracownika.";
+      setError(msg);
+      addToast(msg, "error");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
-  const submitReset = async (ev: React.FormEvent) => {
+  const resetPassword = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!token) return;
-    if (!resetTargetId) return;
-    setResetSending(true);
+    if (!token || !resetPasswordId) return;
+    setResetBusy(true);
     setResetResult(null);
     try {
-      const body: Record<string, unknown> = { action: resetAction };
-      if (resetAction === "generate" && resetCustomPassword.trim()) body.new_password = resetCustomPassword.trim();
+      const body: Record<string, unknown> = { action: resetPasswordMode };
+      if (resetPasswordMode === "generate" && resetCustomPassword.trim()) {
+        body.new_password = resetCustomPassword.trim();
+      }
       const res = await api.post<{ message?: string; temporary_password?: string; token_created?: boolean }>(
-        `/accounts/staff/${resetTargetId}/reset-password/`,
+        `/accounts/staff/${resetPasswordId}/reset-password/`,
         body,
         token,
       );
-      if (resetAction === "generate") {
+      if (resetPasswordMode === "generate") {
         const tmp = res.temporary_password;
-        setResetResult(tmp ? `Tymczasowe haslo: ${tmp}` : res.message ?? "Wygenerowano hasło.");
+        setResetResult(tmp ? `Tymczasowe hasło: ${tmp}` : res.message ?? "Hasło zostało wygenerowane i ustawione.");
       } else {
-        setResetResult(res.message ?? "Wysłano link do resetu.");
+        setResetResult(res.message ?? "Link do resetu hasła został wysłany na e-mail pracownika.");
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zresetować hasła.";
       setResetResult(msg);
     } finally {
-      setResetSending(false);
+      setResetBusy(false);
     }
   };
 
-  const toggleActive = async (staffId: string, next: boolean) => {
-    if (!token) return;
-    if (!next) {
-      const ok = await confirm({
-        title: "Zablokować konto?",
-        description: 'Pracownik straci dostęp do systemu. Operację można cofnąć, klikając "Aktywuj".',
-        confirmLabel: "Tak, zablokuj",
-        variant: "danger",
-      });
-      if (!ok) return;
-    }
-    try {
-      if (next) await api.post(`/accounts/staff/${staffId}/activate/`, {}, token);
-      else await api.post(`/accounts/staff/${staffId}/deactivate/`, {}, token);
-      addToast(next ? "Konto aktywowane." : "Konto zablokowane.", "success");
-      await load();
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Nie udało się zmienić statusu konta.";
-      setError(msg);
-      addToast(msg, "error");
-    }
-  };
+  if (isStaff) {
+    return <WorkerTeamPage />;
+  }
 
   if (!isAdmin) {
     return (
@@ -331,418 +374,467 @@ export default function TeamAdminPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      <header className="mb-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Zespół i pracownicy</h1>
-        <p className="mt-1 text-sm text-[var(--ink2)]">Lista pracowników, edycja profilu, reset hasła i blokada kont.</p>
+    <main className="mx-auto min-h-screen max-w-[1450px] space-y-5 px-4 py-8">
+      <header className="rounded-[2rem] border border-[#2b3550] bg-gradient-to-r from-[#0d1526] via-[#121d34] to-[#0d1628] p-5 shadow-[0_16px_50px_rgba(0,0,0,.35)]">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9fb4de]">Panel Admina</p>
+            <h1 className="mt-1.5 text-3xl font-semibold text-white">Zespół</h1>
+            <p className="mt-1 text-sm text-[#98a8c8]">Profesjonalny panel ludzi i dostępności: kto dziś pracuje, kto ma wolne i kiedy planuje nieobecność.</p>
+            <p className="mt-1 text-xs text-[#6f7fa1]">
+              {lastUpdated ? `Ostatnia synchronizacja: ${toDateTime(lastUpdated.toISOString())}` : "Jeszcze nie zsynchronizowano"}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void load()}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+            >
+              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+              Odśwież
+            </button>
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#3b82f6]/50 bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(37,99,235,.35)] transition hover:brightness-110"
+            >
+              <Plus size={16} />
+              Dodaj pracownika
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <StatCard label="Wszyscy pracownicy" value={stats.total} sub="admin + staff" />
+          <StatCard label="Aktywne konta" value={stats.activeAccounts} sub="mają dostęp do systemu" />
+          <StatCard label="Dziś w pracy" value={stats.working} />
+          <StatCard label="Dziś wolne" value={stats.offToday} />
+          <StatCard label="Brak deklaracji" value={stats.unknown} />
+        </div>
       </header>
 
-      <div className="mb-5 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="w-full md:w-[420px]">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Szukaj</label>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Imię, nazwisko, e-mail, specjalizacja…"
-              className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
-            />
+      <AdminAbsenceRequestsPanel />
+
+      {error ? <ErrorState error={new Error(error)} onRetry={() => void load()} title="Błąd panelu zespołu" /> : null}
+
+      <section className="grid gap-4 xl:grid-cols-[1.08fr_.92fr]">
+        <div className="rounded-3xl border border-white/10 bg-[#0c0f18] p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8ea2c8]">Lista pracowników</h2>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{filteredRows.length}</span>
           </div>
 
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="w-[220px]">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Rola</label>
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleInUrl(e.target.value)}
-                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
-              >
-                <option value="">Wszystkie</option>
-                <option value="admin">Administrator</option>
-                <option value="staff">Pracownik</option>
-              </select>
-            </div>
-
-            <div className="w-[180px]">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Aktywne</label>
-              <select
-                value={isActiveFilter}
-                onChange={(e) => setActiveInUrl(e.target.value)}
-                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
-              >
-                <option value="">Wszystkie</option>
-                <option value="true">Tak</option>
-                <option value="false">Nie</option>
-              </select>
-            </div>
-
-            <div className="w-[220px]">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Specjalizacja</label>
+          <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+            <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
+              <Search size={14} className="text-[#7f8ca6]" />
               <input
-                value={specInput}
-                onChange={(e) => {
-                  setSpecInput(e.target.value);
-                  queueSpecInUrl(e.target.value);
-                }}
-                placeholder="np. serwis drukarek…"
-                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)] placeholder:text-[var(--muted)]"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Szukaj po imieniu, e-mailu, roli..."
+                className="w-full bg-transparent text-white outline-none placeholder:text-[#60708f]"
               />
+            </label>
+
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as "all" | "admin" | "staff")}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            >
+              <option value="all">Wszystkie role</option>
+              <option value="admin">Administrator</option>
+              <option value="staff">Pracownik</option>
+            </select>
+
+            <div className="flex gap-1">
+              {([
+                ["all", "Wszyscy"],
+                ["working_today", "W pracy"],
+                ["off_today", "Wolne"],
+                ["planned_off", "Planują"],
+                ["unknown", "Brak deklaracji"],
+              ] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setStatusFilter(key)}
+                  className={`rounded-lg border px-2.5 py-2 text-xs font-semibold transition ${
+                    statusFilter === key
+                      ? "border-[#3b82f6]/40 bg-[#3b82f6]/18 text-[#bfdbfe]"
+                      : "border-white/10 bg-white/5 text-[#9ca3af] hover:text-white"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
+          </div>
+
+          <div className="mt-3 max-h-[72vh] space-y-2 overflow-auto pr-1">
+            {loading ? (
+              <RepairTableSkeleton rows={8} />
+            ) : filteredRows.length === 0 ? (
+              <EmptyState icon="👥" title="Brak wyników" description="Zmień filtry lub dodaj nową osobę do zespołu." />
+            ) : (
+              filteredRows.map((r) => {
+                const selectedRow = selectedId === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setSelectedId(r.id)}
+                    className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
+                      selectedRow ? "border-[#3b82f6]/40 bg-[#3b82f6]/12" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-white">{r.full_name}</p>
+                        <p className="mt-0.5 text-[11px] text-[#8ea2c8]">{r.email}</p>
+                      </div>
+                      <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${statusPillClass(r.today_status)}`}>
+                        {statusIcon(r.today_status)}
+                        {r.today_status_label}
+                      </span>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-1 text-[11px]">
+                      <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[#9ca3af]">
+                        Rola: <span className="font-semibold text-white">{r.role_display || r.role}</span>
+                      </div>
+                      <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[#9ca3af]">
+                        Nieobecność: <span className="font-semibold text-white">{r.next_absence ? toDate(r.next_absence.start_date) : "-"}</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => void load()}
-            className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
-          >
-            Odśwież
-          </button>
-          <button
-            type="button"
-            onClick={openCreate}
-            className="rounded-xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b61717]"
-          >
-            Dodaj pracownika
-          </button>
-        </div>
-      </div>
-
-      {error ? (
-        <div className="mb-4">
-          <ErrorState error={new Error(error)} onRetry={() => void load()} title="Błąd pobierania zespołu" />
-        </div>
-      ) : null}
-      {loading ? (
-        <StaffCardSkeleton count={6} />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((s) => (
-            <div key={s.id} className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-              <div className="flex items-start justify-between gap-3">
+        <div className="rounded-3xl border border-white/10 bg-[#0c0f18] p-4">
+          {!selected ? (
+            <EmptyState icon="🧑‍💼" title="Wybierz pracownika" description="Po lewej stronie wybierz osobę, aby zobaczyć status i zaplanowane nieobecności." />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[var(--white)] truncate">{s.full_name}</p>
-                  <p className="mt-1 text-sm text-[var(--ink2)] truncate">{s.email}</p>
-                  <p className="mt-2 text-sm text-[var(--ink2)]">
-                    Rola: <span className="text-[var(--white)] font-semibold">{(s as unknown as { role_display?: string }).role_display ?? s.role}</span>
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--ink2)]">
-                    Spec: <span className="text-[var(--white)] font-semibold">{s.staff_profile?.specialization_display ?? "—"}</span>
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--ink2)]">
-                    Dostępny: <span className="text-[var(--white)] font-semibold">{s.is_active ? "Tak" : "Nie"}</span>
-                  </p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8ea2c8]">Profil pracownika</p>
+                  <h3 className="mt-1 truncate text-xl font-semibold text-white">{selected.full_name}</h3>
+                  <p className="mt-0.5 text-xs text-[#9ca3af]">{selected.email}</p>
                 </div>
-                <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${badgeForHealth(s.health_score_level)}`}>
-                  {healthLabel(s.health_score_level)}
-                </span>
-              </div>
-
-              <div className="mt-4 space-y-2">
-                <p className="text-xs uppercase tracking-[0.12em] text-[var(--ink2)]">Akcje</p>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => openEdit(s)}
-                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                    onClick={() => openEdit(selected)}
+                    className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#93c5fd] transition hover:bg-white/10"
                   >
+                    <Pencil size={13} />
                     Edytuj
                   </button>
+                   <button
+                     type="button"
+                     onClick={() => {
+                       setResetPasswordId(selected.id);
+                       setResetPasswordMode("generate");
+                       setResetCustomPassword("");
+                       setResetResult(null);
+                       setShowResetPasswordModal(true);
+                     }}
+                     className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#fbbf24] transition hover:bg-white/10"
+                   >
+                     <RefreshCw size={13} />
+                     Resetuj hasło
+                   </button>
                   <button
                     type="button"
-                    onClick={() => openReset(s.id)}
-                    className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                    onClick={() => void removeUser(selected)}
+                    disabled={deletingId === selected.id || Boolean(selected.is_superadmin)}
+                    className="inline-flex items-center gap-1 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/12 px-3 py-1.5 text-xs font-semibold text-[#fecaca] transition hover:bg-[#ef4444]/20 disabled:opacity-50"
                   >
-                    Reset hasła
+                    <Trash2 size={13} />
+                    {deletingId === selected.id ? "Usuwam..." : "Usuń"}
                   </button>
-                  {s.is_active ? (
-                    <button
-                      type="button"
-                      onClick={() => void toggleActive(s.id, false)}
-                      className="rounded-xl border border-[#dc1e1e]/30 bg-[#dc1e1e]/10 px-3 py-2 text-xs font-semibold text-[#ffb4b4] transition hover:bg-[#dc1e1e]/15"
-                    >
-                      Zablokuj
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => void toggleActive(s.id, true)}
-                      className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-xs font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
-                    >
-                      Aktywuj
-                    </button>
-                  )}
                 </div>
               </div>
 
-              <div className="mt-4 text-xs text-[var(--ink2)]">
-                {s.last_login ? `Ostatnio: ${formatDateTime(s.last_login)}` : "Ostatnio: —"}
+              <div className="grid gap-2 sm:grid-cols-2">
+                <InfoLine icon={<UserRound size={13} />} label="Imię i nazwisko" value={selected.full_name || "-"} />
+                <InfoLine icon={<Mail size={13} />} label="E-mail" value={selected.email || "-"} href={selected.email ? `mailto:${selected.email}` : undefined} />
+                <InfoLine
+                  icon={<Phone size={13} />}
+                  label="Telefon"
+                  value={(selected as { phone?: string }).phone || "Brak"}
+                  href={(selected as { phone?: string }).phone ? `tel:${((selected as { phone?: string }).phone || "").replace(/\s/g, "")}` : undefined}
+                />
+                <InfoLine icon={<Shield size={13} />} label="Rola" value={selected.role_display || selected.role} />
+                <InfoLine icon={<Users size={13} />} label="Status konta" value={selected.is_active ? "Aktywne" : "Nieaktywne"} />
+                <InfoLine icon={<MapPin size={13} />} label="Specjalizacja" value={selected.staff_profile?.specialization_display || "Brak"} />
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => void setTodayStatus(selected.id, "working_today")}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#22c55e]/35 bg-[#22c55e]/12 px-3 py-2 text-xs font-semibold text-[#bbf7d0] transition hover:bg-[#22c55e]/20"
+                >
+                  <CalendarCheck size={14} />
+                  Oznacz dziś: W pracy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void setTodayStatus(selected.id, "off_today")}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#ef4444]/35 bg-[#ef4444]/12 px-3 py-2 text-xs font-semibold text-[#fecaca] transition hover:bg-[#ef4444]/20"
+                >
+                  <CalendarOff size={14} />
+                  Oznacz dziś: Wolne
+                </button>
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <MetricBox
+                  label="Status na dziś"
+                  value={selected.today_status_label}
+                  tone={selected.today_status === "working_today" ? "border-[#22c55e]/30 bg-[#22c55e]/10 text-[#bbf7d0]" : selected.today_status === "off_today" ? "border-[#ef4444]/30 bg-[#ef4444]/10 text-[#fecaca]" : "border-[#f59e0b]/30 bg-[#f59e0b]/10 text-[#fde68a]"}
+                />
+                <MetricBox
+                  label="Najbliższa nieobecność"
+                  value={selected.next_absence ? absenceRangeLabel(selected.next_absence.start_date, selected.next_absence.end_date) : "Brak"}
+                  tone="border-[#3b82f6]/30 bg-[#3b82f6]/10 text-[#bfdbfe]"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <h4 className="text-sm font-semibold text-white">Dzisiaj</h4>
+                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${statusPillClass(selected.today_status)}`}>
+                    {statusIcon(selected.today_status)}
+                    {selected.today_status_label}
+                  </span>
+                </div>
+                {selected.today_entries.length === 0 ? (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-[#7e8aa5]">Brak wpisów szczegółowych na dzisiaj.</div>
+                ) : (
+                  <div className="space-y-2">
+                    {selected.today_entries.map((entry) => (
+                      <div key={entry.id} className="rounded-xl border border-white/10 bg-[#0f1320] px-3 py-2">
+                        <p className="text-sm font-semibold text-white">{entry.availability_type_label}</p>
+                        <p className="text-[11px] text-[#8ea2c8]">
+                          {entry.is_all_day ? "Cały dzień" : `${entry.start_time || "-"} - ${entry.end_time || "-"}`}
+                        </p>
+                        {entry.note ? <p className="mt-1 text-[11px] text-[#9ca3af]">{entry.note}</p> : null}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <h4 className="text-sm font-semibold text-white">Planowane nieobecności</h4>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-[#9ca3af]">
+                    {selected.planned_absence_ranges.length}
+                  </span>
+                </div>
+                {selected.planned_absence_ranges.length === 0 ? (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-[#7e8aa5]">Brak zaplanowanych nieobecności.</div>
+                ) : (
+                  <div className="space-y-2">
+                    {selected.planned_absence_ranges.map((r, idx) => (
+                      <div key={`${r.start_date}-${r.end_date}-${idx}`} className="rounded-xl border border-white/10 bg-[#0f1320] px-3 py-2">
+                        <p className="text-sm font-semibold text-white">{r.availability_type_label}</p>
+                        <p className="text-[11px] text-[#8ea2c8]">{absenceRangeLabel(r.start_date, r.end_date)}</p>
+                        {r.note ? <p className="mt-1 text-[11px] text-[#9ca3af]">{r.note}</p> : null}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          ))}
-          {filtered.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">Brak wyników.</p>
-          ) : null}
+          )}
         </div>
-      )}
+      </section>
 
-      {modalOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-2xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] shadow-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] p-4">
+      {modalOpen ? (
+        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/65 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-3xl rounded-3xl border border-[#2b3550] bg-[#0f1629] shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">{modalMode === "create" ? "Dodaj" : "Edytuj"}</p>
-                <p className="mt-1 text-lg font-semibold text-[var(--white)]">
-                  {modalMode === "create" ? "Nowego pracownika" : "Profil pracownika"}
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9fb4de]">{modalMode === "create" ? "Dodaj" : "Edytuj"}</p>
+                <p className="mt-1 text-lg font-semibold text-white">
+                  {modalMode === "create" ? "Nowego pracownika" : "Dane pracownika"}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
               >
                 Zamknij
               </button>
             </div>
 
-            <form onSubmit={submitForm} className="p-4">
-              {formError ? <p className="mb-3 text-sm text-[#fca5a5]">{formError}</p> : null}
+            <form onSubmit={submitForm} className="space-y-4 p-4">
+              {formError ? <p className="text-sm text-[#fca5a5]">{formError}</p> : null}
 
               <div className="grid gap-3 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Imię</label>
-                  <input
-                    value={form.first_name}
-                    onChange={(e) => setForm((p) => ({ ...p, first_name: e.target.value }))}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Nazwisko</label>
-                  <input
-                    value={form.last_name}
-                    onChange={(e) => setForm((p) => ({ ...p, last_name: e.target.value }))}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                    required
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">E-mail</label>
-                  <input
-                    value={form.email}
-                    onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                    required
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Telefon (opcjonalnie)</label>
-                  <input
-                    value={form.phone ?? ""}
-                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Rola</label>
-                  <select
-                    value={form.role}
-                    onChange={(e) => setForm((p) => ({ ...p, role: e.target.value as UserRole }))}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
-                  >
+                <Field label="Imię" required>
+                  <input value={form.first_name} onChange={(e) => setForm((p) => ({ ...p, first_name: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" required />
+                </Field>
+                <Field label="Nazwisko" required>
+                  <input value={form.last_name} onChange={(e) => setForm((p) => ({ ...p, last_name: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" required />
+                </Field>
+                <Field label="E-mail" required className="md:col-span-2">
+                  <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" required />
+                </Field>
+                <Field label="Telefon" className="md:col-span-2">
+                  <input value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" />
+                </Field>
+                <Field label="Rola">
+                  <select value={form.role} onChange={(e) => setForm((p) => ({ ...p, role: e.target.value as UserRole }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none">
                     <option value="staff">Pracownik</option>
                     <option value="admin">Administrator</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Aktywne</label>
-                  <select
-                    value={String(form.is_active)}
-                    onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.value === "true" }))}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
-                  >
+                </Field>
+                <Field label="Aktywne konto">
+                  <select value={String(form.is_active)} onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.value === "true" }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none">
                     <option value="true">Tak</option>
                     <option value="false">Nie</option>
                   </select>
-                </div>
+                </Field>
+                <Field label="Specjalizacja" className="md:col-span-2">
+                  <input value={form.specialization} onChange={(e) => setForm((p) => ({ ...p, specialization: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" />
+                </Field>
+                <Field label="Nazwa w UI">
+                  <input value={form.display_name} onChange={(e) => setForm((p) => ({ ...p, display_name: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" />
+                </Field>
+                <Field label="Kolor kalendarza">
+                  <input value={form.calendar_color} onChange={(e) => setForm((p) => ({ ...p, calendar_color: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none" />
+                </Field>
 
-                <div className="md:col-span-2 rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Profil pracownika (staff_profile)</p>
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    <div className="md:col-span-2">
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Specjalizacja</label>
-                      <input
-                        value={form.staff_profile.specialization ?? ""}
-                        onChange={(e) =>
-                          setForm((p) => ({
-                            ...p,
-                            staff_profile: { ...p.staff_profile, specialization: e.target.value },
-                          }))
-                        }
-                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Kolor</label>
-                      <input
-                        value={form.staff_profile.calendar_color ?? ""}
-                        onChange={(e) =>
-                          setForm((p) => ({
-                            ...p,
-                            staff_profile: { ...p.staff_profile, calendar_color: e.target.value },
-                          }))
-                        }
-                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Nazwa w UI (opcjonalnie)</label>
-                      <input
-                        value={form.staff_profile.display_name ?? ""}
-                        onChange={(e) =>
-                          setForm((p) => ({
-                            ...p,
-                            staff_profile: { ...p.staff_profile, display_name: e.target.value },
-                          }))
-                        }
-                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[#e5e7eb]">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(form.staff_profile.is_visible_in_rankings)}
-                          onChange={(e) =>
-                            setForm((p) => ({
-                              ...p,
-                              staff_profile: { ...p.staff_profile, is_visible_in_rankings: e.target.checked },
-                            }))
-                          }
-                          className="h-4 w-4"
-                        />
-                        Widoczny w rankingach
-                      </label>
-                    </div>
-                    <div>
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[#e5e7eb]">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(form.staff_profile.is_available)}
-                          onChange={(e) =>
-                            setForm((p) => ({
-                              ...p,
-                              staff_profile: { ...p.staff_profile, is_available: e.target.checked },
-                            }))
-                          }
-                          className="h-4 w-4"
-                        />
-                        Dostępny do przypisań
-                      </label>
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[#e5e7eb]">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(form.staff_profile.accepts_shipment_repairs)}
-                          onChange={(e) =>
-                            setForm((p) => ({
-                              ...p,
-                              staff_profile: { ...p.staff_profile, accepts_shipment_repairs: e.target.checked },
-                            }))
-                          }
-                          className="h-4 w-4"
-                        />
-                        Przyjmuje naprawy wysyłkowe
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                {modalMode === "create" && form.role === "admin" ? (
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
-                      Hasło (dla administratora)
-                    </label>
+                {modalMode === "create" ? (
+                  <Field label={form.role === "admin" ? "Hasło (wymagane dla admina)" : "Hasło (opcjonalnie)"} className="md:col-span-2">
                     <input
-                      value={form.password ?? ""}
+                      value={form.password}
                       onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
+                      className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none"
                       type="password"
-                      required
+                      required={form.role === "admin"}
                     />
-                  </div>
-                ) : null}
+                  </Field>
+                ) : (
+                  <Field label="Zmień hasło (opcjonalnie)" className="md:col-span-2">
+                    <div className="flex flex-col gap-2">
+                      <input
+                        value={form.password}
+                        onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none"
+                        type="password"
+                        placeholder="Wpisz nowe hasło (pozostaw puste, aby nie zmienić)"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResetPasswordId(editingId);
+                          setResetPasswordMode("generate");
+                          setResetCustomPassword("");
+                          setResetResult(null);
+                          setShowResetPasswordModal(true);
+                        }}
+                        className="text-left text-xs text-[#7e8aa5] hover:text-[#bfdbfe] transition"
+                      >
+                        Albo użyj opcji &quot;Resetuj hasło&quot; poniżej →
+                      </button>
+                    </div>
+                  </Field>
+                )}
               </div>
 
-              <div className="mt-4 flex items-center justify-end gap-3">
+              <div className="grid gap-2 md:grid-cols-3">
+                <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[#d1d5db]">
+                  <input type="checkbox" checked={form.is_available} onChange={(e) => setForm((p) => ({ ...p, is_available: e.target.checked }))} />
+                  Dostępny do przypisań
+                </label>
+                <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[#d1d5db]">
+                  <input type="checkbox" checked={form.is_visible_in_rankings} onChange={(e) => setForm((p) => ({ ...p, is_visible_in_rankings: e.target.checked }))} />
+                  Widoczny w rankingach
+                </label>
+                <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[#d1d5db]">
+                  <input type="checkbox" checked={form.accepts_shipment_repairs} onChange={(e) => setForm((p) => ({ ...p, accepts_shipment_repairs: e.target.checked }))} />
+                  Przyjmuje wysyłki
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="rounded-xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b61717] disabled:opacity-60"
+                  disabled={formBusy}
+                  className="rounded-xl border border-[#3b82f6]/40 bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
                 >
-                  {submitting ? "Zapisuję…" : "Zapisz"}
+                  {formBusy ? "Zapisuję..." : "Zapisz"}
                 </button>
               </div>
             </form>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {resetModalOpen && resetTargetId && (
-        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] shadow-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] p-4">
+      {showResetPasswordModal && resetPasswordId ? (
+        <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/65 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-xl rounded-3xl border border-[#2b3550] bg-[#0f1629] shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Reset hasła</p>
-                <p className="mt-1 text-lg font-semibold text-[var(--white)]">Dla wybranego pracownika</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9fb4de]">Reset hasła</p>
+                <p className="mt-1 text-lg font-semibold text-white">Dla wybranego pracownika</p>
               </div>
               <button
                 type="button"
-                onClick={() => setResetModalOpen(false)}
-                className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                onClick={() => setShowResetPasswordModal(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
               >
                 Zamknij
               </button>
             </div>
 
-            <form onSubmit={submitReset} className="p-4 space-y-4">
-              {resetResult ? <p className="text-sm text-[var(--white)] whitespace-pre-wrap">{resetResult}</p> : null}
+            <form onSubmit={resetPassword} className="space-y-4 p-4">
+              {resetResult ? (
+                <div className={`rounded-xl border p-3 text-sm ${resetResult.includes("pomyślnie") || resetResult.includes("Tymczasowe") || resetResult.includes("wysłany") ? "border-[#22c55e]/30 bg-[#22c55e]/10 text-[#bbf7d0]" : "border-[#ef4444]/30 bg-[#ef4444]/10 text-[#fecaca]"}`}>
+                  {resetResult}
+                </div>
+              ) : null}
+
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Akcja</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#8ea2c8]">Akcja</label>
                 <select
-                  value={resetAction}
-                  onChange={(e) => setResetAction(e.target.value as "generate" | "send_link")}
-                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
+                  value={resetPasswordMode}
+                  onChange={(e) => setResetPasswordMode(e.target.value as "generate" | "send_link")}
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none"
                 >
                   <option value="generate">Wygeneruj tymczasowe hasło</option>
                   <option value="send_link">Wyślij link do resetu</option>
                 </select>
               </div>
 
-              {resetAction === "generate" ? (
+              {resetPasswordMode === "generate" ? (
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#8ea2c8]">
                     Nowe hasło (opcjonalnie)
                   </label>
                   <input
                     value={resetCustomPassword}
                     onChange={(e) => setResetCustomPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm text-[var(--white)]"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white outline-none"
                     type="password"
-                    placeholder="Jeśli puste, system wygeneruje"
+                    placeholder="Jeśli puste, system wygeneruje losowe"
                   />
                 </div>
               ) : null}
@@ -750,23 +842,89 @@ export default function TeamAdminPage() {
               <div className="flex items-center justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setResetModalOpen(false)}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                  onClick={() => setShowResetPasswordModal(false)}
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
-                  disabled={resetSending}
-                  className="rounded-xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b61717] disabled:opacity-60"
+                  disabled={resetBusy}
+                  className="rounded-xl border border-[#3b82f6]/40 bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
                 >
-                  {resetSending ? "Wykonuję…" : "Wykonaj"}
+                  {resetBusy ? "Wykonuję..." : "Wykonaj"}
                 </button>
               </div>
             </form>
           </div>
         </div>
-      )}
+      ) : null}
     </main>
+  );
+}
+
+function Field({
+  label,
+  required,
+  children,
+  className,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8ea2c8]">
+        {label}
+        {required ? <span className="ml-1 text-[#fca5a5]">*</span> : null}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function MetricBox({ label, value, tone }: { label: string; value: string | number; tone: string }) {
+  return (
+    <div className={`rounded-xl border px-3 py-2 ${tone}`}>
+      <p className="text-[11px] uppercase tracking-[0.12em]">{label}</p>
+      <p className="mt-1 text-sm font-semibold">{value}</p>
+    </div>
+  );
+}
+
+function InfoLine({
+  icon,
+  label,
+  value,
+  href,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+}) {
+  const content = href ? (
+    <a
+      href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+      className="truncate text-[#d1d5db] hover:text-white"
+    >
+      {value}
+    </a>
+  ) : (
+    <span className="truncate text-[#d1d5db]">{value}</span>
+  );
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2.5">
+      <p className="mb-1 flex items-center gap-1 text-[11px] uppercase tracking-[0.12em] text-[#7e8aa5]">
+        {icon}
+        {label}
+      </p>
+      {content}
+    </div>
   );
 }

@@ -18,6 +18,9 @@ TYPE_COMPLAINT_WARRANTY_ASSIGNED = "complaint_warranty_assigned"
 TYPE_COMPLAINT_WARRANTY_AWAITING_DECISION = "complaint_warranty_awaiting_decision"
 TYPE_QUICK_ACCEPT_INCOMPLETE = "quick_accept_incomplete"
 TYPE_UNASSIGNED_QUEUE_NOTE = "unassigned_queue_note"
+TYPE_ABSENCE_REQUEST_CREATED = "absence_request_created"
+TYPE_ABSENCE_REQUEST_APPROVED = "absence_request_approved"
+TYPE_ABSENCE_REQUEST_REJECTED = "absence_request_rejected"
 
 
 def create_staff_notification(
@@ -202,3 +205,38 @@ def notify_complaint_warranty_assigned(repair, assigned_to_id):
         priority="important",
         link=f"/staff/repairs/{repair.id}/",
     )
+
+
+def notify_absence_request_created(request_obj):
+    """Nowe zgłoszenie urlopu/dnia wolnego trafia do adminów."""
+    from apps.accounts.models import User, UserRole
+
+    title = f"Nowe zgłoszenie nieobecności: {request_obj.employee.get_full_name() or request_obj.employee.email}"
+    description = f"{request_obj.get_availability_type_display()} · {request_obj.start_date} — {request_obj.end_date}"
+    for admin in User.objects.filter(role=UserRole.ADMIN, is_active=True):
+        create_staff_notification(
+            user_id=admin.id,
+            notification_type=TYPE_ABSENCE_REQUEST_CREATED,
+            title=title,
+            description=description,
+            priority="important",
+            link="/admin-panel/team",
+        )
+
+
+def notify_absence_request_decision(request_obj, *, approved: bool):
+    """Odpowiedź admina wraca do pracownika jako powiadomienie systemowe."""
+    notification_type = TYPE_ABSENCE_REQUEST_APPROVED if approved else TYPE_ABSENCE_REQUEST_REJECTED
+    title = "Twoje zgłoszenie zostało zaakceptowane" if approved else "Twoje zgłoszenie zostało odrzucone"
+    description = f"{request_obj.get_availability_type_display()} · {request_obj.start_date} — {request_obj.end_date}"
+    if request_obj.review_note:
+        description = f"{description} · {request_obj.review_note}"
+    create_staff_notification(
+        user_id=request_obj.employee_id,
+        notification_type=notification_type,
+        title=title,
+        description=description,
+        priority="important",
+        link="/panel/zespol",
+    )
+

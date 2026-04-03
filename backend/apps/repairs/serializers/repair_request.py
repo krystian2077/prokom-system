@@ -89,6 +89,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "created_by_label",
             "created_at",
             "accepted_at",
+            "ready_for_pickup_at",
+            "picked_up_at",
             "estimated_cost",
             "final_cost",
             "client_phone",

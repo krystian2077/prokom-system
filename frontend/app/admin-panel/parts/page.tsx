@@ -31,6 +31,13 @@ const FILTER_TABS: Array<{ key: UsageFilter; label: string }> = [
   { key: "unused", label: "Niewykorzystane" },
 ];
 
+const PREMIUM_CARD_CLASS =
+  "relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#121625] via-[#0f1320] to-[#0b0e18] p-5 shadow-[0_20px_55px_rgba(0,0,0,.36)]";
+const PREMIUM_CARD_GLOW_CLASS =
+  "pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/10 via-white/0 to-transparent";
+const FORM_CONTROL_CLASS =
+  "w-full rounded-xl border border-[#2a3348] bg-[#0d111b] px-3 py-2.5 text-sm text-white shadow-inner shadow-black/30 outline-none transition placeholder:text-[#60708f] focus:border-[#60a5fa] focus:ring-2 focus:ring-[#60a5fa]/20";
+
 function statusBadgeClass(status: string): string {
   const s = (status ?? "").toLowerCase();
   if (s === "arrived") return "border-[var(--gb)] bg-[var(--gl)] text-[var(--green)] animate-glow-g";
@@ -68,8 +75,6 @@ export default function AdminPartsPage() {
   const [repairs, setRepairs] = useState<RepairOption[]>([]);
   const [savingOrder, setSavingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
-  const [orderSearch, setOrderSearch] = useState("");
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [supplierModalOpen, setSupplierModalOpen] = useState(false);
   const [supplierModalMode, setSupplierModalMode] = useState<"create" | "edit">("create");
   const [editingSupplier, setEditingSupplier] = useState<InventorySupplierDetail | null>(null);
@@ -128,26 +133,6 @@ export default function AdminPartsPage() {
   }, [queueRaw, usageFilter]);
 
   const supplierCards = useMemo(() => suppliers, [suppliers]);
-
-  const filteredOrders = useMemo(() => {
-    const needle = orderSearch.trim().toLowerCase();
-    if (!needle) return orders;
-    return orders.filter((o) => {
-      const text = [
-        o.product_name,
-        o.product_name_manual,
-        o.status_display,
-        o.contact_phone,
-        o.contact_email,
-        o.notes,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return text.includes(needle);
-    });
-  }, [orders, orderSearch]);
-
-  const selectedOrder = useMemo(() => orders.find((o) => o.id === selectedOrderId) ?? null, [orders, selectedOrderId]);
 
   const orderStats = useMemo(() => {
     const waiting = orders.filter((o) => !["picked_up", "cancelled"].includes((o.status ?? "").toLowerCase())).length;
@@ -217,7 +202,7 @@ export default function AdminPartsPage() {
         urgent: newOrder.urgent,
         client_waiting: newOrder.client_waiting,
       };
-      const created = await api.post<CustomerOrder>("/orders/customer-orders/", payload, token);
+      await api.post<CustomerOrder>("/orders/customer-orders/", payload, token);
       addToast("Część dodana do zamówień i powiązana z naprawą.", "success");
       setNewOrder({
         product_name_manual: "",
@@ -233,7 +218,6 @@ export default function AdminPartsPage() {
         client_waiting: true,
       });
       await load();
-      if (created?.id) setSelectedOrderId(created.id);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się dodać zamówienia części.";
       setOrderError(msg);
@@ -272,14 +256,6 @@ export default function AdminPartsPage() {
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
             Odśwież
           </button>
-          <button
-            type="button"
-            onClick={openCreateSupplier}
-            className="inline-flex items-center gap-2 rounded-2xl border border-[#3b82f6]/35 bg-[#3b82f6]/15 px-4 py-2 text-sm font-semibold text-[#bfdbfe] transition hover:bg-[#3b82f6]/25"
-          >
-            <Plus size={16} />
-            Dodaj hurtownię
-          </button>
         </div>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -297,16 +273,18 @@ export default function AdminPartsPage() {
       ) : null}
 
       <section className="mb-5 grid gap-5 xl:grid-cols-3">
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4 xl:col-span-1">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Dodaj część do zamówienia</h2>
-          <p className="mt-1 text-xs text-[#6b7280]">Nowa pozycja musi być przypisana do istniejącej naprawy.</p>
+        <div className={`${PREMIUM_CARD_CLASS} xl:col-span-1`}>
+          <div className={PREMIUM_CARD_GLOW_CLASS} aria-hidden />
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9fb1d3]">Operacje</p>
+          <h2 className="mt-1 text-lg font-semibold text-white">Dodaj część do zamówienia</h2>
+          <p className="mt-1 text-xs text-[#7f8ca6]">Nowa pozycja musi być przypisana do istniejącej naprawy.</p>
 
           <form onSubmit={(e) => void submitOrder(e)} className="mt-4 space-y-3">
             <Field label="Nazwa części *">
               <input
                 value={newOrder.product_name_manual}
                 onChange={(e) => setNewOrder((p) => ({ ...p, product_name_manual: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                className={FORM_CONTROL_CLASS}
                 placeholder="np. Wyświetlacz OLED iPhone 13"
                 required
               />
@@ -319,7 +297,7 @@ export default function AdminPartsPage() {
                   min={1}
                   value={newOrder.quantity}
                   onChange={(e) => setNewOrder((p) => ({ ...p, quantity: Number(e.target.value) || 1 }))}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                  className={FORM_CONTROL_CLASS}
                   required
                 />
               </Field>
@@ -327,7 +305,7 @@ export default function AdminPartsPage() {
                 <select
                   value={newOrder.supplier}
                   onChange={(e) => setNewOrder((p) => ({ ...p, supplier: e.target.value }))}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                  className={FORM_CONTROL_CLASS}
                 >
                   <option value="">Wybierz</option>
                   {supplierCards.filter((s) => s.is_active !== false).map((s) => (
@@ -343,7 +321,7 @@ export default function AdminPartsPage() {
               <select
                 value={newOrder.related_repair}
                 onChange={(e) => setNewOrder((p) => ({ ...p, related_repair: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                className={FORM_CONTROL_CLASS}
                 required
               >
                 <option value="">Wybierz naprawę</option>
@@ -363,7 +341,7 @@ export default function AdminPartsPage() {
                   step="0.01"
                   value={newOrder.purchase_price}
                   onChange={(e) => setNewOrder((p) => ({ ...p, purchase_price: e.target.value }))}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                  className={FORM_CONTROL_CLASS}
                 />
               </Field>
               <Field label="Cena sprzedaży">
@@ -373,7 +351,7 @@ export default function AdminPartsPage() {
                   step="0.01"
                   value={newOrder.sell_price}
                   onChange={(e) => setNewOrder((p) => ({ ...p, sell_price: e.target.value }))}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                  className={FORM_CONTROL_CLASS}
                 />
               </Field>
             </div>
@@ -384,7 +362,7 @@ export default function AdminPartsPage() {
                   type="date"
                   value={newOrder.planned_order_date}
                   onChange={(e) => setNewOrder((p) => ({ ...p, planned_order_date: e.target.value }))}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                  className={FORM_CONTROL_CLASS}
                 />
               </Field>
               <Field label="Przewidywana dostawa">
@@ -392,7 +370,7 @@ export default function AdminPartsPage() {
                   type="date"
                   value={newOrder.expected_delivery_date}
                   onChange={(e) => setNewOrder((p) => ({ ...p, expected_delivery_date: e.target.value }))}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                  className={FORM_CONTROL_CLASS}
                 />
               </Field>
             </div>
@@ -402,17 +380,17 @@ export default function AdminPartsPage() {
                 rows={3}
                 value={newOrder.notes}
                 onChange={(e) => setNewOrder((p) => ({ ...p, notes: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
+                className={FORM_CONTROL_CLASS}
               />
             </Field>
 
-            <div className="flex flex-wrap gap-3 text-sm text-[#cbd5e1]">
-              <label className="inline-flex items-center gap-2">
-                <input type="checkbox" checked={newOrder.urgent} onChange={(e) => setNewOrder((p) => ({ ...p, urgent: e.target.checked }))} />
+            <div className="flex flex-wrap gap-2 text-sm text-[#d1dae9]">
+              <label className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5">
+                <input className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#dc2626]" type="checkbox" checked={newOrder.urgent} onChange={(e) => setNewOrder((p) => ({ ...p, urgent: e.target.checked }))} />
                 Pilne
               </label>
-              <label className="inline-flex items-center gap-2">
-                <input type="checkbox" checked={newOrder.client_waiting} onChange={(e) => setNewOrder((p) => ({ ...p, client_waiting: e.target.checked }))} />
+              <label className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5">
+                <input className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#2563eb]" type="checkbox" checked={newOrder.client_waiting} onChange={(e) => setNewOrder((p) => ({ ...p, client_waiting: e.target.checked }))} />
                 Klient czeka
               </label>
             </div>
@@ -422,7 +400,7 @@ export default function AdminPartsPage() {
             <button
               type="submit"
               disabled={savingOrder || loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#3b82f6]/50 bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(37,99,235,.35)] transition hover:brightness-110 disabled:opacity-60"
             >
               <Plus size={16} />
               {savingOrder ? "Dodaję..." : "Dodaj część do zamówienia"}
@@ -430,80 +408,13 @@ export default function AdminPartsPage() {
           </form>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4 xl:col-span-2">
+        <div className={`${PREMIUM_CARD_CLASS} xl:col-span-2`}>
+          <div className={PREMIUM_CARD_GLOW_CLASS} aria-hidden />
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Wszystkie zamówienia części</h2>
-            <input
-              value={orderSearch}
-              onChange={(e) => setOrderSearch(e.target.value)}
-              placeholder="Szukaj po nazwie, statusie, kontakcie..."
-              className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm text-white outline-none focus:border-[#60a5fa]"
-            />
-          </div>
-
-          {loading ? <RepairTableSkeleton rows={8} /> : null}
-
-          {!loading && filteredOrders.length === 0 ? (
-            <EmptyState icon={EMPTY_STATES.parts.icon} title="Brak zamówień części" description="Dodaj pierwszą część po lewej stronie." />
-          ) : null}
-
-          {!loading && filteredOrders.length > 0 ? (
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div className="space-y-2">
-                {filteredOrders.map((o) => (
-                  <button
-                    key={o.id}
-                    type="button"
-                    onClick={() => setSelectedOrderId(o.id)}
-                    className={`w-full rounded-2xl border p-3 text-left transition ${
-                      selectedOrderId === o.id
-                        ? "border-[#60a5fa]/50 bg-[#1d4ed8]/15"
-                        : "border-white/10 bg-[#0f1117] hover:bg-white/5"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold text-white">{o.product_name}</p>
-                    <p className="mt-1 text-xs text-[#9ca3af]">
-                      Status: {o.status_display} · Ilość: {o.quantity}
-                    </p>
-                    <p className="mt-1 text-xs text-[#93c5fd]">Naprawa: {o.related_repair ?? "brak"}</p>
-                  </button>
-                ))}
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-[#0f1117] p-4">
-                {!selectedOrder ? (
-                  <p className="text-sm text-[#9ca3af]">Wybierz zamówienie, aby zobaczyć szczegóły.</p>
-                ) : (
-                  <div className="space-y-2 text-sm">
-                    <p className="text-lg font-semibold text-white">{selectedOrder.product_name}</p>
-                    <DetailRow label="Status" value={selectedOrder.status_display} />
-                    <DetailRow label="Ilość" value={String(selectedOrder.quantity)} />
-                    <DetailRow label="Cena zakupu" value={selectedOrder.purchase_price || "-"} />
-                    <DetailRow label="Cena sprzedaży" value={selectedOrder.sell_price || "-"} />
-                    <DetailRow label="Marża" value={selectedOrder.margin || "-"} />
-                    <DetailRow label="Telefon" value={selectedOrder.contact_phone || "-"} />
-                    <DetailRow label="Email" value={selectedOrder.contact_email || "-"} />
-                    <DetailRow label="Planowana data" value={selectedOrder.planned_order_date || "-"} />
-                    <DetailRow label="Przewidywana dostawa" value={selectedOrder.expected_delivery_date || "-"} />
-                    <DetailRow label="Powiązana naprawa" value={selectedOrder.related_repair || "-"} />
-                    {selectedOrder.related_repair ? (
-                      <Link href={`/admin-panel/repairs/${selectedOrder.related_repair}`} className="inline-flex text-xs font-semibold text-[#93c5fd] hover:underline">
-                        Otwórz naprawę
-                      </Link>
-                    ) : null}
-                    {selectedOrder.notes ? <p className="mt-2 whitespace-pre-wrap text-[#e5e7eb]">{selectedOrder.notes}</p> : null}
-                  </div>
-                )}
-              </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9fb1d3]">Monitoring</p>
+              <h2 className="text-lg font-semibold text-white">Aktywne części</h2>
             </div>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="grid gap-5 lg:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Aktywne części</h2>
             <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
               {filteredQueue.length}
             </span>
@@ -515,10 +426,10 @@ export default function AdminPartsPage() {
                 key={t.key}
                 type="button"
                 onClick={() => setUsageFilter(t.key)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
                   usageFilter === t.key
-                    ? "border-[#dc1e1e]/50 bg-[#dc1e1e]/15 text-white"
-                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:bg-white/10 hover:text-white"
+                    ? "border-[#dc1e1e]/55 bg-[#dc1e1e]/20 text-white"
+                    : "border-white/10 bg-white/5 text-[#9ca3af] hover:border-white/20 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {t.label}
@@ -549,7 +460,7 @@ export default function AdminPartsPage() {
               {filteredQueue.map((row) => {
                 const st = (row.usage_status ?? "").toLowerCase();
                 return (
-                  <div key={row.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
+                  <div key={row.id} className="rounded-2xl border border-white/10 bg-[#111726] p-3.5 shadow-[0_8px_24px_rgba(0,0,0,.28)] transition hover:border-white/20 hover:bg-[#141c2d]">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -582,15 +493,31 @@ export default function AdminPartsPage() {
             </div>
           ) : null}
         </div>
+      </section>
 
-        <div className="rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">Hurtownie</h2>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
-              {supplierCards.length}
-            </span>
+      <section className="mb-5">
+        <div className={PREMIUM_CARD_CLASS}>
+          <div className={PREMIUM_CARD_GLOW_CLASS} aria-hidden />
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9fb1d3]">Dostawcy</p>
+              <h2 className="text-lg font-semibold text-white">Hurtownie</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">
+                {supplierCards.length}
+              </span>
+              <button
+                type="button"
+                onClick={openCreateSupplier}
+                className="inline-flex items-center gap-2 rounded-2xl border border-[#3b82f6]/45 bg-[#3b82f6]/20 px-3 py-1.5 text-xs font-semibold text-[#dbeafe] shadow-[0_8px_20px_rgba(59,130,246,.22)] transition hover:brightness-110"
+              >
+                <Plus size={14} />
+                Dodaj hurtownię
+              </button>
+            </div>
           </div>
-          <p className="mb-3 text-xs text-[#6b7280]">
+          <p className="mb-3 text-xs text-[#7f8ca6]">
             Źródło: <span className="font-mono text-[#9ca3af]">GET /inventory/suppliers/</span>
           </p>
 
@@ -607,7 +534,7 @@ export default function AdminPartsPage() {
           ) : null}
 
           {!loading && supplierCards.length > 0 ? (
-            <div className="space-y-2">
+            <div className="grid gap-3 md:grid-cols-2">
               {supplierCards.map((s) => {
                 const href = s.website_url?.trim()
                   ? s.website_url.startsWith("http")
@@ -615,15 +542,15 @@ export default function AdminPartsPage() {
                     : `https://${s.website_url}`
                   : null;
                 return (
-                  <article key={s.id} className="rounded-2xl border border-white/10 bg-[#0f1117] p-3">
-                    <p className="text-sm font-semibold text-white">{s.name}</p>
+                  <article key={s.id} className="rounded-2xl border border-white/10 bg-[#111726] p-3.5 shadow-[0_8px_24px_rgba(0,0,0,.28)] transition hover:border-white/20 hover:bg-[#141c2d]">
+                    <p className="text-sm font-semibold tracking-wide text-white">{s.name}</p>
                     <div className="mt-2 flex flex-col gap-1.5 text-xs text-[#9ca3af]">
                       {href ? (
                         <a
                           href={href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 font-semibold text-[#93c5fd] hover:underline"
+                          className="inline-flex items-center gap-1 font-semibold text-[#93c5fd] hover:text-[#bfdbfe]"
                         >
                           {formatWebsite(s.website_url)}
                           <ExternalLink size={12} />
@@ -653,7 +580,7 @@ export default function AdminPartsPage() {
                       <button
                         type="button"
                         onClick={() => void openEditSupplier(s.id)}
-                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#93c5fd] transition hover:bg-white/10"
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#93c5fd] transition hover:border-white/20 hover:bg-white/10"
                       >
                         Edytuj
                       </button>
@@ -699,14 +626,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <p className="text-[#cbd5e1]">
-      <span className="text-[#8da2c5]">{label}: </span>
-      <span className="text-white">{value}</span>
-    </p>
-  );
-}
 
 function LinkIcon() {
   return <span className="text-xs" aria-hidden>#</span>;

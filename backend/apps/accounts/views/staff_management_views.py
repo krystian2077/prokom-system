@@ -2,17 +2,21 @@
 Zarządzanie pracownikami (Staff Management) — tylko admin.
 Lista, dodawanie, edycja, reset hasła, blokada, logi logowania.
 """
-from django.db.models import Q, Count
+from datetime import date, timedelta
+
+from django.db.models import Count
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound
 
-from apps.accounts.models import User, UserRole, StaffProfile, LoginActivity
+from apps.accounts.models import User, UserRole, StaffProfile, StaffSpecialization, LoginActivity
 from apps.repairs.models import RepairRequest
 from apps.common.enums import RepairStatus
+from apps.availability.models import EmployeeAvailability
+from apps.availability.enums import AvailabilityType
 from apps.accounts.serializers.staff_management import (
     StaffListSerializer,
     StaffCreateSerializer,
@@ -62,6 +66,74 @@ def _get_staff_stats(user_ids):
     return by_user
 
 
+ABSENCE_TYPES = {
+    AvailabilityType.DAY_OFF,
+    AvailabilityType.VACATION,
+    AvailabilityType.SICK_LEAVE,
+    AvailabilityType.TEMPORARILY_UNAVAILABLE,
+}
+
+AVAILABILITY_LABELS = dict(AvailabilityType.choices)
+
+
+def _to_iso(d):
+    return d.isoformat() if d else None
+
+
+def _availability_type_label(value):
+    return AVAILABILITY_LABELS.get(value, value)
+
+
+def _group_absence_ranges(entries):
+    """Scala kolejne dni nieobecności w ciągłe zakresy dla czytelnego podglądu w panelu."""
+    rows = sorted(entries, key=lambda e: (e.date, e.availability_type))
+    ranges = []
+    current_type = None
+    current_label = None
+    current_start = None
+    current_end = None
+    current_note = ""
+
+    def _push_current():
+        if not current_type or not current_start or not current_end:
+            return
+        ranges.append(
+            {
+                "availability_type": current_type,
+                "availability_type_label": current_label,
+                "start_date": _to_iso(current_start),
+                "end_date": _to_iso(current_end),
+                "note": current_note,
+            }
+        )
+
+    for entry in rows:
+        if entry.availability_type not in ABSENCE_TYPES:
+            continue
+        if current_type is None:
+            current_type = entry.availability_type
+            current_label = _availability_type_label(entry.availability_type)
+            current_start = entry.date
+            current_end = entry.date
+            current_note = entry.note or ""
+            continue
+        expected_next_day = current_end + timedelta(days=1)
+        if entry.availability_type == current_type and entry.date == expected_next_day:
+            current_end = entry.date
+            if not current_note and entry.note:
+                current_note = entry.note
+            continue
+        _push_current()
+        current_type = entry.availability_type
+        current_label = _availability_type_label(entry.availability_type)
+        current_start = entry.date
+        current_end = entry.date
+        current_note = entry.note or ""
+
+    _push_current()
+    return ranges
+
+
 class StaffListView(APIView):
     """
     GET /api/v1/accounts/staff/ — lista pracowników (admin + staff). Tylko admin.
@@ -98,6 +170,140 @@ class StaffListView(APIView):
         user = ser.save()
         from apps.accounts.serializers import UserSerializer
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+
+class StaffTeamOverviewView(APIView):
+    """
+    GET /api/v1/accounts/staff/team-overview/
+    Zwrot: wszyscy admin/staff + status na dziś + najbliższe zakresy planowanej nieobecności.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        role = getattr(request.user, "role", None)
+        if role not in (UserRole.ADMIN, UserRole.STAFF):
+            return Response({"detail": "Brak uprawnień."}, status=403)
+
+        today = timezone.localdate()
+        to_param = request.query_params.get("to")
+        if to_param:
+            try:
+                end_date = date.fromisoformat(to_param)
+            except ValueError:
+                return Response({"detail": "Nieprawidłowa data parametru 'to' (YYYY-MM-DD)."}, status=400)
+        else:
+            end_date = today + timedelta(days=30)
+
+        if end_date < today:
+            end_date = today
+        max_end_date = today + timedelta(days=90)
+        if end_date > max_end_date:
+            end_date = max_end_date
+
+        user_roles = [UserRole.STAFF] if role == UserRole.STAFF else [UserRole.ADMIN, UserRole.STAFF]
+        users = list(
+            User.objects.filter(role__in=user_roles)
+            .select_related("staff_profile")
+            .order_by("is_active", "role", "last_name", "first_name")
+        )
+        user_ids = [u.id for u in users]
+
+        entries = list(
+            EmployeeAvailability.objects.filter(
+                employee_id__in=user_ids,
+                is_active=True,
+                date__gte=today,
+                date__lte=end_date,
+            )
+            .select_related("employee")
+            .order_by("employee_id", "date", "start_time")
+        )
+
+        entries_by_user = {}
+        for entry in entries:
+            key = str(entry.employee_id)
+            if key not in entries_by_user:
+                entries_by_user[key] = []
+            entries_by_user[key].append(entry)
+
+        data = []
+        for user in users:
+            key = str(user.id)
+            profile = getattr(user, "staff_profile", None)
+            user_entries = entries_by_user.get(key, [])
+            today_entries = [e for e in user_entries if e.date == today]
+            future_absence_entries = [e for e in user_entries if e.date >= today and e.availability_type in ABSENCE_TYPES]
+            absence_ranges = _group_absence_ranges(future_absence_entries)
+            next_absence = absence_ranges[0] if absence_ranges else None
+
+            has_available_today = any(e.availability_type == AvailabilityType.AVAILABLE for e in today_entries)
+            has_absence_today = any(e.availability_type in ABSENCE_TYPES for e in today_entries)
+
+            if not user.is_active:
+                today_status = "off_today"
+                today_status_label = "Wolne"
+            elif has_available_today:
+                today_status = "working_today"
+                today_status_label = "W pracy"
+            elif has_absence_today:
+                today_status = "off_today"
+                today_status_label = "Wolne"
+            elif today_entries:
+                today_status = "working_today"
+                today_status_label = "W pracy"
+            elif next_absence:
+                today_status = "planned_off"
+                today_status_label = "Planuje wolne"
+            else:
+                today_status = "unknown"
+                today_status_label = "Brak deklaracji"
+
+            data.append(
+                {
+                    "id": key,
+                    "email": user.email,
+                    "full_name": user.get_full_name(),
+                    "first_name": user.first_name or "",
+                    "last_name": user.last_name or "",
+                    "phone": user.phone or "",
+                    "role": user.role,
+                    "role_display": user.get_role_display(),
+                    "is_active": user.is_active,
+                    "is_superadmin": user.is_superadmin,
+                    "today_status": today_status,
+                    "today_status_label": today_status_label,
+                    "today_entries": [
+                        {
+                            "id": str(e.id),
+                            "availability_type": e.availability_type,
+                            "availability_type_label": e.get_availability_type_display(),
+                            "date": _to_iso(e.date),
+                            "is_all_day": e.is_all_day,
+                            "start_time": e.start_time.isoformat() if e.start_time else None,
+                            "end_time": e.end_time.isoformat() if e.end_time else None,
+                            "note": e.note or "",
+                            "created_at": e.created_at.isoformat() if e.created_at else None,
+                            "updated_at": e.updated_at.isoformat() if e.updated_at else None,
+                        }
+                        for e in today_entries
+                    ],
+                    "next_absence": next_absence,
+                    "planned_absence_ranges": absence_ranges[:6],
+                    "staff_profile": {
+                        "specialization": getattr(profile, "specialization", None) if profile else None,
+                        "specialization_display": (
+                            dict(StaffSpecialization.choices).get(profile.specialization, profile.specialization)
+                            if profile and profile.specialization
+                            else None
+                        ),
+                        "display_name": getattr(profile, "display_name", None) if profile else None,
+                        "calendar_color": getattr(profile, "calendar_color", None) if profile else None,
+                        "is_available": getattr(profile, "is_available", True) if profile else True,
+                    },
+                }
+            )
+
+        return Response({"date": _to_iso(today), "to": _to_iso(end_date), "results": data}, status=200)
 
 
 class StaffAssignableForRepairView(APIView):
@@ -162,6 +368,18 @@ class StaffDetailView(APIView):
         stats = _get_staff_stats([user.id])
         data = StaffListSerializer(user, context={"staff_stats": stats}).data
         return Response(data)
+
+    def delete(self, request, pk):
+        if not _is_admin(request):
+            return Response({"detail": "Tylko administrator."}, status=403)
+        user = self._get_user(pk)
+        if getattr(user, "is_superadmin", False):
+            return Response({"detail": "Nie można usunąć konta superadministratora."}, status=400)
+        if str(user.id) == str(request.user.id):
+            return Response({"detail": "Nie możesz usunąć własnego konta."}, status=400)
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+        return Response({"message": "Konto pracownika zostało dezaktywowane (soft delete).", "is_active": False}, status=200)
 
 
 class StaffUpdateView(APIView):

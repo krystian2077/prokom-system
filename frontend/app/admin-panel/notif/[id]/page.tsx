@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { notificationPriorityLabel, notificationStatusLabel, notificationTypeLabel } from "@/lib/notificationLabels";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -84,9 +85,9 @@ export default function AdminNotificationDetailsPage() {
     () => [
       { label: "Pracownik", value: item?.user_name || item?.user_email || "-" },
       { label: "E-mail", value: item?.user_email || "-" },
-      { label: "Typ", value: item?.notification_type || "-" },
-      { label: "Priorytet", value: item?.priority || "-" },
-      { label: "Status", value: item?.status || "-" },
+      { label: "Typ", value: notificationTypeLabel(item?.notification_type) },
+      { label: "Priorytet", value: notificationPriorityLabel(item?.priority) },
+      { label: "Status", value: notificationStatusLabel(item?.status) },
       { label: "Data", value: item?.created_at ? formatDate(item.created_at) : "-" },
     ],
     [item],

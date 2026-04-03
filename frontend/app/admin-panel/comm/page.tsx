@@ -8,6 +8,7 @@ import { useStore } from "@/store";
 import { EmptyState, EMPTY_STATES } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { CommThreadListSkeleton } from "@/components/ui/Skeleton";
+import { Select } from "@/components/ui/Select";
 import type { RepairRequestListItem, RepairThreadItem } from "@/types/repairs";
 
 type Channel = "panel" | "email";
@@ -206,56 +207,52 @@ export default function AdminCommPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-      <header className="mb-6 rounded-3xl border border-[#2a3246] bg-gradient-to-r from-[#0e1423] via-[#121b31] to-[#0d1629] p-5 shadow-[0_18px_50px_rgba(0,0,0,.35)]">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#9db0d4]">Panel Admina</p>
+    <main className="mx-auto min-h-screen max-w-[1550px] px-4 py-8">
+      <header className="mb-6 rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,.18),transparent_42%),linear-gradient(135deg,#0d1119,#111a2d_55%,#0a0f1a)] p-6 shadow-[0_24px_70px_rgba(0,0,0,.38)]">
+        <p className="text-xs uppercase tracking-[0.22em] text-[#94a3b8]">Panel Admina · centrum komunikacji</p>
         <h1 className="mt-2 text-3xl font-semibold text-white">Komunikacja z klientami</h1>
-        <p className="mt-1 text-sm text-[#a9b8d6]">
+        <p className="mt-1 max-w-3xl text-sm text-[#9fb0c8]">
           Wszystkie rozmowy klient-pracownik w jednym miejscu. Administrator może przejąć komunikację i wysłać odpowiedź
           przez panel lub e-mail.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+          <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))] px-4 py-4 shadow-[0_12px_28px_rgba(0,0,0,.18)]">
             <p className="text-[11px] uppercase tracking-[0.15em] text-[#9fb1d3]">Wątki</p>
-            <p className="mt-1 text-xl font-semibold text-white">{repairs.length}</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{repairs.length}</p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+          <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))] px-4 py-4 shadow-[0_12px_28px_rgba(0,0,0,.18)]">
             <p className="text-[11px] uppercase tracking-[0.15em] text-[#9fb1d3]">Wymagają reakcji</p>
-            <p className="mt-1 text-xl font-semibold text-[#fca5a5]">{repairs.filter((r) => r.requires_attention).length}</p>
+            <p className="mt-1 text-2xl font-semibold text-[#fca5a5]">{repairs.filter((r) => r.requires_attention).length}</p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+          <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))] px-4 py-4 shadow-[0_12px_28px_rgba(0,0,0,.18)]">
             <p className="text-[11px] uppercase tracking-[0.15em] text-[#9fb1d3]">Aktywny kanał</p>
-            <p className="mt-1 text-xl font-semibold text-[#bfdbfe]">{channel === "panel" ? "Panel" : "E-mail"}</p>
+            <p className="mt-1 text-2xl font-semibold text-[#bfdbfe]">{channel === "panel" ? "Panel" : "E-mail"}</p>
           </div>
         </div>
       </header>
 
-      <section className="mb-4 rounded-3xl border border-[#2b3650] bg-[#0c1322]/88 p-4">
+      <section className="mb-4 rounded-[28px] border border-white/10 bg-[#0d1119] p-4 shadow-[0_18px_50px_rgba(0,0,0,.28)] backdrop-blur">
         <div className="grid gap-3 lg:grid-cols-[1fr_220px_260px]">
           <input
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
             placeholder="Szukaj po numerze naprawy, kliencie, urządzeniu, treści..."
-            className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-[#7f8da8] outline-none transition focus:border-[#4f69a3]"
+            className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-[#7f8da8] outline-none transition hover:border-white/20 focus:border-[#4f69a3] focus:ring-4 focus:ring-[rgba(79,105,163,.16)]"
           />
-          <select
+          <Select
+            className="w-full"
+            label="Pracownik"
             value={selectedStaffId}
+            placeholder="Wszyscy pracownicy"
             onChange={(e) => setSelectedStaffId(e.target.value)}
-            className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition focus:border-[#4f69a3]"
-          >
-            <option value="">Wszyscy pracownicy</option>
-            {staffList.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-          <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1 text-sm">
+            options={staffList.map((s) => ({ value: s.id, label: s.name }))}
+          />
+          <div className="inline-flex rounded-2xl border border-white/10 bg-white/[0.03] p-1 text-sm shadow-[0_10px_24px_rgba(0,0,0,.12)]">
             <button
               type="button"
               onClick={() => setViewMode("all")}
-              className={`flex-1 rounded-lg px-3 py-1.5 font-semibold ${
-                viewMode === "all" ? "bg-[#1a2743] text-[#dbeafe]" : "text-[#9fb1d3]"
+              className={`flex-1 rounded-lg px-3 py-1.5 font-semibold transition ${
+                viewMode === "all" ? "bg-[rgba(59,130,246,.16)] text-[#dbeafe] shadow-[0_10px_22px_rgba(59,130,246,.12)]" : "text-[#9fb1d3] hover:text-white"
               }`}
             >
               Wszystkie
@@ -263,8 +260,8 @@ export default function AdminCommPage() {
             <button
               type="button"
               onClick={() => setViewMode("requires_attention")}
-              className={`flex-1 rounded-lg px-3 py-1.5 font-semibold ${
-                viewMode === "requires_attention" ? "bg-[#3f1f2a] text-[#fecaca]" : "text-[#9fb1d3]"
+              className={`flex-1 rounded-lg px-3 py-1.5 font-semibold transition ${
+                viewMode === "requires_attention" ? "bg-[rgba(220,30,30,.14)] text-[#fecaca] shadow-[0_10px_22px_rgba(220,30,30,.1)]" : "text-[#9fb1d3] hover:text-white"
               }`}
             >
               Wymagają reakcji
@@ -280,8 +277,8 @@ export default function AdminCommPage() {
       ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[390px_1fr]">
-        <aside className="rounded-3xl border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-3 shadow-[0_16px_46px_rgba(0,0,0,.35)]">
-          <div className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9fb1d3]">Rozmowy</div>
+        <aside className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#0d1119,#0b1020)] p-3 shadow-[0_22px_60px_rgba(0,0,0,.36)]">
+          <div className="px-2 pb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#9fb1d3]">Rozmowy</div>
           {loadingRepairs ? (
             <CommThreadListSkeleton rows={7} />
           ) : filteredRepairs.length === 0 ? (
@@ -293,7 +290,7 @@ export default function AdminCommPage() {
               />
             </div>
           ) : (
-            <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
+            <div className="max-h-[660px] space-y-3 overflow-y-auto pr-1">
               {orderedRepairs.map((r) => {
                 const active = activeRepair?.id === r.id;
                 const assignee = r.assigned_to;
@@ -307,21 +304,24 @@ export default function AdminCommPage() {
                     key={r.id}
                     type="button"
                     onClick={() => setActiveRepairId(r.id)}
-                    className="min-h-[102px] w-full rounded-2xl border px-3 py-3 text-left transition"
+                    className="group min-h-[106px] w-full rounded-[24px] border px-3 py-3 text-left transition duration-200 hover:-translate-y-0.5"
                     style={{
-                      borderColor: active ? "rgba(79,105,163,.75)" : "rgba(255,255,255,.10)",
-                      background: active ? "rgba(79,105,163,.16)" : "rgba(255,255,255,.02)",
+                      borderColor: active ? "rgba(59,130,246,.45)" : "rgba(255,255,255,.10)",
+                      background: active
+                        ? "linear-gradient(180deg, rgba(59,130,246,.16), rgba(255,255,255,.02))"
+                        : "linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015))",
+                      boxShadow: active ? "0 18px 40px rgba(59,130,246,.10)" : "0 10px 24px rgba(0,0,0,.16)",
                     }}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-mono text-xs font-semibold text-white">{r.repair_number}</p>
-                      {r.requires_attention ? <span className="rounded-full bg-[#7f1d1d] px-2 py-0.5 text-[10px] font-semibold text-[#fecaca]">Pilne</span> : null}
+                      <p className="font-mono text-xs font-semibold tracking-[0.14em] text-white">{r.repair_number}</p>
+                      {r.requires_attention ? <span className="rounded-full bg-[rgba(220,30,30,.16)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#fecaca]">Pilne</span> : null}
                     </div>
-                    <p className="mt-1 truncate text-sm text-[#e5e7eb]">{r.client_name} - {r.device_name}</p>
-                    <p className="mt-1 truncate text-xs text-[#9fb1d3]">{preview}</p>
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-[#7f8fb0]">
+                    <p className="mt-1 truncate text-[15px] font-semibold tracking-[-0.01em] text-white group-hover:text-[#eaf2ff]">{r.client_name} - {r.device_name}</p>
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#9fb1d3] group-hover:text-[#b9c8e3]">{preview}</p>
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-[#7f8fb0]">
                       <span className="truncate">Opiekun: {staffName}</span>
-                      <span>{relativeTime(r.created_at)}</span>
+                      <span className="rounded-full bg-white/[0.04] px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-[#9fb1d3]">{relativeTime(r.created_at)}</span>
                     </div>
                   </button>
                 );
@@ -330,32 +330,32 @@ export default function AdminCommPage() {
           )}
         </aside>
 
-        <div className="rounded-3xl border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-4 shadow-[0_16px_46px_rgba(0,0,0,.35)]">
+        <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#0d1119,#0b1020)] p-4 shadow-[0_22px_60px_rgba(0,0,0,.36)]">
           {!activeRepair ? (
             <div className="py-8">
               <EmptyState icon={EMPTY_STATES.notifications.icon} title="Wybierz rozmowę" description="Z lewej strony wybierz klienta i naprawę, aby zobaczyć historię." />
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="flex flex-wrap items-start justify-between gap-3 rounded-[24px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_12px_24px_rgba(0,0,0,.12)]">
                 <div>
                   <Link href={`/admin-panel/repairs/${activeRepair.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
                     {activeRepair.repair_number}
                   </Link>
-                  <p className="mt-1 text-sm text-white">{activeRepair.client_name} - {activeRepair.device_name}</p>
+                  <p className="mt-1 text-[15px] font-semibold tracking-[-0.01em] text-white">{activeRepair.client_name} - {activeRepair.device_name}</p>
                   <p className="mt-1 text-xs text-[#9fb1d3]">Status: {activeRepair.status_display}</p>
                 </div>
-                <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1 text-xs">
-                  <button type="button" onClick={() => setChannel("panel")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "panel" ? "bg-[#1a2743] text-[#dbeafe]" : "text-[#9fb1d3]"}`}>
+                <div className="inline-flex rounded-2xl border border-white/10 bg-white/[0.03] p-1 text-xs shadow-[0_10px_24px_rgba(0,0,0,.12)]">
+                  <button type="button" onClick={() => setChannel("panel")} className={`rounded-xl px-3 py-1 font-semibold transition ${channel === "panel" ? "bg-[rgba(59,130,246,.16)] text-[#dbeafe]" : "text-[#9fb1d3] hover:text-white"}`}>
                     Panel klienta
                   </button>
-                  <button type="button" onClick={() => setChannel("email")} className={`rounded-lg px-3 py-1 font-semibold ${channel === "email" ? "bg-[#1a2743] text-[#dbeafe]" : "text-[#9fb1d3]"}`}>
+                  <button type="button" onClick={() => setChannel("email")} className={`rounded-xl px-3 py-1 font-semibold transition ${channel === "email" ? "bg-[rgba(59,130,246,.16)] text-[#dbeafe]" : "text-[#9fb1d3] hover:text-white"}`}>
                     E-mail
                   </button>
                 </div>
               </div>
 
-              <div className="max-h-[360px] space-y-2 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+              <div className="max-h-[360px] space-y-3 overflow-y-auto rounded-[24px] border border-white/10 bg-white/[0.02] p-3">
                 {loadingThread && activeMessages.length === 0 ? (
                   <CommThreadListSkeleton rows={4} />
                 ) : activeMessages.length === 0 ? (
@@ -363,17 +363,17 @@ export default function AdminCommPage() {
                 ) : (
                   visibleMessages.map((m) =>
                     m.kind === "note" ? (
-                      <div key={`n-${m.id}`} className="rounded-xl border border-white/10 bg-[#0f172a]/60 p-3">
-                        <p className="text-xs text-[#9fb1d3]">
+                      <div key={`n-${m.id}`} className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015))] p-3 shadow-[0_10px_22px_rgba(0,0,0,.12)]">
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-[#9fb1d3]">
                           {(m.thread_origin === "client" || m.thread_origin === "email_inbound" ? "Klient" : m.author_name) || "-"} · {dateLabel(m.created_at)}
                         </p>
-                        <p className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.note}</p>
+                        <p className="mt-2 whitespace-pre-wrap text-[15px] leading-7 text-[#e5e7eb]">{m.note}</p>
                       </div>
                     ) : (
-                      <div key={`e-${m.id}`} className="rounded-xl border border-dashed border-white/20 bg-[#0f172a]/50 p-3">
+                      <div key={`e-${m.id}`} className="rounded-[22px] border border-dashed border-white/20 bg-[linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01))] p-3 shadow-[0_10px_22px_rgba(0,0,0,.12)]">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-[#9fb1d3]">E-mail</p>
-                        <p className="mt-1 text-sm font-semibold text-white">{m.subject || "Bez tematu"}</p>
-                        <p className="mt-1 whitespace-pre-wrap text-sm text-[#e5e7eb]">{m.body_snapshot || "-"}</p>
+                        <p className="mt-2 text-[15px] font-semibold tracking-[-0.01em] text-white">{m.subject || "Bez tematu"}</p>
+                        <p className="mt-2 whitespace-pre-wrap text-[15px] leading-7 text-[#e5e7eb]">{m.body_snapshot || "-"}</p>
                         <p className="mt-2 text-xs text-[#9fb1d3]">{m.sent_by_name || "-"} · {dateLabel(m.sent_at)}</p>
                       </div>
                     ),
@@ -381,13 +381,13 @@ export default function AdminCommPage() {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015))] p-3 shadow-[0_10px_22px_rgba(0,0,0,.12)]">
                 {channel === "email" ? (
                   <input
                     value={emailSubject}
                     onChange={(e) => setEmailSubject(e.target.value)}
                     placeholder="Temat wiadomości e-mail"
-                    className="mb-3 w-full rounded-xl border border-white/10 bg-[#0d1527] px-3 py-2 text-sm text-white placeholder:text-[#7f8da8] outline-none focus:border-[#4f69a3]"
+                    className="mb-3 w-full rounded-2xl border border-white/10 bg-[#0d1527] px-4 py-3 text-sm text-white placeholder:text-[#7f8da8] outline-none transition hover:border-white/20 focus:border-[#4f69a3] focus:ring-4 focus:ring-[rgba(79,105,163,.16)]"
                   />
                 ) : null}
                 <textarea
@@ -399,7 +399,7 @@ export default function AdminCommPage() {
                       ? "Napisz odpowiedź, którą klient zobaczy w panelu..."
                       : "Napisz treść e-maila do klienta..."
                   }
-                  className="w-full resize-y rounded-xl border border-white/10 bg-[#0d1527] px-3 py-2 text-sm text-white placeholder:text-[#7f8da8] outline-none focus:border-[#4f69a3]"
+                    className="w-full resize-y rounded-2xl border border-white/10 bg-[#0d1527] px-4 py-3 text-sm text-white placeholder:text-[#7f8da8] outline-none transition hover:border-white/20 focus:border-[#4f69a3] focus:ring-4 focus:ring-[rgba(79,105,163,.16)]"
                 />
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <p className="text-xs text-[#8ea2c7]">Kanał: {channel === "panel" ? "Wiadomość panelowa" : "E-mail"}</p>
@@ -410,7 +410,7 @@ export default function AdminCommPage() {
                         setDraft("");
                         setEmailSubject("");
                       }}
-                      className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-[#b8c7e2] transition hover:bg-white/[0.12] hover:text-white"
+                      className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-semibold text-[#b8c7e2] transition hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white"
                     >
                       Wyczyść
                     </button>
@@ -418,7 +418,7 @@ export default function AdminCommPage() {
                       type="button"
                       disabled={sending || !draft.trim() || (channel === "email" && !emailSubject.trim())}
                       onClick={() => void handleSend()}
-                      className="rounded-xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563eb] disabled:opacity-60"
+                      className="rounded-2xl bg-[linear-gradient(135deg,#3b82f6,#1d4ed8)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(59,130,246,.28)] transition hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-60"
                     >
                       {sending ? "Wysyłanie..." : channel === "panel" ? "Wyślij do panelu" : "Wyślij e-mail"}
                     </button>

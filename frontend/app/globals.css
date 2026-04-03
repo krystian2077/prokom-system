@@ -113,7 +113,6 @@ h4,
 h5,
 h6 {
   margin: 0;
-  font-family: var(--font-dm-sans, inherit);
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.1;
@@ -363,6 +362,146 @@ b {
   background: #141720;
   color: #fff;
 }
+
+/* Natywne selecty w ciemnych panelach — spójne tło list rozwijanych */
+.worker-shell select,
+.client-panel select,
+.login-page select,
+.zgloszenie-page select,
+.uslugi-page select,
+[data-theme="dark"] select {
+  color-scheme: dark;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  min-height: 48px;
+  padding: 0.85rem 2.9rem 0.85rem 1rem;
+  border-radius: 16px;
+  background-color: #141720;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.68) 50%), linear-gradient(135deg, rgba(255, 255, 255, 0.68) 50%, transparent 50%);
+  background-position: calc(100% - 1.15rem) calc(50% - 2px), calc(100% - 0.95rem) calc(50% - 2px);
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 10px 28px rgba(0, 0, 0, 0.22);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.worker-shell select:hover:not(:disabled),
+.client-panel select:hover:not(:disabled),
+.login-page select:hover:not(:disabled),
+.zgloszenie-page select:hover:not(:disabled),
+.uslugi-page select:hover:not(:disabled),
+[data-theme="dark"] select:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18), 0 14px 34px rgba(0, 0, 0, 0.28);
+}
+
+.worker-shell select:focus-visible,
+.client-panel select:focus-visible,
+.login-page select:focus-visible,
+.zgloszenie-page select:focus-visible,
+.uslugi-page select:focus-visible,
+[data-theme="dark"] select:focus-visible {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.85);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22), 0 16px 36px rgba(0, 0, 0, 0.3);
+}
+
+.worker-shell select:disabled,
+.client-panel select:disabled,
+.login-page select:disabled,
+.zgloszenie-page select:disabled,
+.uslugi-page select:disabled,
+[data-theme="dark"] select:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.worker-shell select option,
+.worker-shell select optgroup,
+.client-panel select option,
+.client-panel select optgroup,
+.login-page select option,
+.login-page select optgroup,
+.zgloszenie-page select option,
+.zgloszenie-page select optgroup,
+.uslugi-page select option,
+.uslugi-page select optgroup,
+[data-theme="dark"] select option,
+[data-theme="dark"] select optgroup {
+  background-color: #141720;
+  color: #ffffff;
+  font-size: 0.96rem;
+}
+
+[data-theme="light"] select,
+.worker-shell[data-worker-theme="light"] select,
+.client-panel.client-panel--light select {
+  color-scheme: light;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  min-height: 48px;
+  padding: 0.85rem 2.9rem 0.85rem 1rem;
+  border-radius: 16px;
+  background-color: #ffffff;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(15, 23, 42, 0.5) 50%), linear-gradient(135deg, rgba(15, 23, 42, 0.5) 50%, transparent 50%);
+  background-position: calc(100% - 1.15rem) calc(50% - 2px), calc(100% - 0.95rem) calc(50% - 2px);
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+  color: #1f2937;
+  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 10px 28px rgba(15, 23, 42, 0.08);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+[data-theme="light"] select:hover:not(:disabled),
+.worker-shell[data-worker-theme="light"] select:hover:not(:disabled),
+.client-panel.client-panel--light select:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(15, 23, 42, 0.2);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 14px 34px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] select:focus-visible,
+.worker-shell[data-worker-theme="light"] select:focus-visible,
+.client-panel.client-panel--light select:focus-visible {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.9);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18), 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] select:disabled,
+.worker-shell[data-worker-theme="light"] select:disabled,
+.client-panel.client-panel--light select:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+[data-theme="light"] select option,
+[data-theme="light"] select optgroup,
+.worker-shell[data-worker-theme="light"] select option,
+.worker-shell[data-worker-theme="light"] select optgroup,
+.client-panel.client-panel--light select option,
+.client-panel.client-panel--light select optgroup {
+  background-color: #ffffff;
+  color: #1f2937;
+  font-size: 0.96rem;
+}
+
 .zgloszenie-page .fta {
   resize: vertical;
   min-height: 108px;

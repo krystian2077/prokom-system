@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.compliance.models import GdprRequest, TermsVersion, BackupLog
+from apps.compliance.models import BackupLog, ConfigAuditLog, FeatureFlag, GdprRequest, SystemSetting, TermsVersion
 
 
 class TermsVersionAdminSerializer(serializers.ModelSerializer):
@@ -85,4 +85,103 @@ class BackupLogAdminSerializer(serializers.ModelSerializer):
     def get_triggered_by_name(self, obj):
         u = getattr(obj, "triggered_by", None)
         return u.get_full_name() if u else None
+
+
+class SystemSettingAdminSerializer(serializers.ModelSerializer):
+    updated_by_name = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SystemSetting
+        fields = [
+            "id",
+            "key",
+            "category",
+            "label",
+            "description",
+            "value_type",
+            "is_secret",
+            "is_readonly",
+            "value",
+            "updated_at",
+            "updated_by_name",
+        ]
+        read_only_fields = fields
+
+    def get_updated_by_name(self, obj):
+        u = getattr(obj, "updated_by", None)
+        return u.get_full_name() if u else None
+
+    def get_value(self, obj):
+        # Sekretów nie zwracamy do UI; można je tylko nadpisać nową wartością.
+        if obj.is_secret:
+            return None
+        return obj.value_json
+
+
+class SystemSettingUpdateItemSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=120)
+    value = serializers.JSONField()
+    updated_at = serializers.DateTimeField(required=False)
+
+
+class SystemSettingsBulkUpdateSerializer(serializers.Serializer):
+    items = SystemSettingUpdateItemSerializer(many=True, allow_empty=False)
+
+
+class FeatureFlagAdminSerializer(serializers.ModelSerializer):
+    updated_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FeatureFlag
+        fields = [
+            "id",
+            "key",
+            "name",
+            "description",
+            "is_enabled",
+            "rollout_percentage",
+            "updated_at",
+            "updated_by_name",
+        ]
+        read_only_fields = fields
+
+    def get_updated_by_name(self, obj):
+        u = getattr(obj, "updated_by", None)
+        return u.get_full_name() if u else None
+
+
+class FeatureFlagUpdateItemSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=80)
+    is_enabled = serializers.BooleanField()
+    rollout_percentage = serializers.IntegerField(min_value=0, max_value=100)
+    updated_at = serializers.DateTimeField(required=False)
+
+
+class FeatureFlagsBulkUpdateSerializer(serializers.Serializer):
+    items = FeatureFlagUpdateItemSerializer(many=True, allow_empty=False)
+
+
+class ConfigAuditLogAdminSerializer(serializers.ModelSerializer):
+    changed_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ConfigAuditLog
+        fields = [
+            "id",
+            "entity_type",
+            "entity_key",
+            "action",
+            "old_value",
+            "new_value",
+            "metadata",
+            "changed_by_name",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+    def get_changed_by_name(self, obj):
+        u = getattr(obj, "changed_by", None)
+        return u.get_full_name() if u else None
+
 

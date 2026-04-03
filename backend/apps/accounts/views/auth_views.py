@@ -26,6 +26,8 @@ from apps.accounts.models import (
 from apps.accounts.serializers import UserSerializer, UserSelfUpdateSerializer, LoginSerializer, ClientRegisterSerializer
 from apps.clients.models import Client
 from apps.clients.selectors import client_by_email
+from apps.availability.models import EmployeeAvailability
+from apps.availability.enums import AvailabilityType
 
 
 def _assign_guest_repairs_to_user(user):
@@ -112,6 +114,40 @@ def _log_failed_login_and_maybe_lock(request, email_lower):
             )
 
 
+def _auto_mark_staff_present_on_login(user):
+    """Przy staff-login oznacz pracownika jako obecnego na dziś (idempotentnie)."""
+    if getattr(user, "role", None) != UserRole.STAFF:
+        return
+
+    today = dt.localdate()
+    has_absence_today = EmployeeAvailability.objects.filter(
+        employee=user,
+        date=today,
+        is_active=True,
+        availability_type__in=(
+            AvailabilityType.DAY_OFF,
+            AvailabilityType.VACATION,
+            AvailabilityType.SICK_LEAVE,
+            AvailabilityType.TEMPORARILY_UNAVAILABLE,
+        ),
+    ).exists()
+    if has_absence_today:
+        return
+
+    EmployeeAvailability.objects.get_or_create(
+        employee=user,
+        date=today,
+        is_active=True,
+        availability_type=AvailabilityType.AVAILABLE,
+        defaults={
+            "is_all_day": True,
+            "created_by": user,
+            "updated_by": user,
+            "note": "Automatyczna obecność po logowaniu",
+        },
+    )
+
+
 class LoginView(APIView):
     """
     POST /api/v1/accounts/login/
@@ -194,6 +230,7 @@ class StaffLoginView(APIView):
             raise ValidationError("Nieprawidłowy e-mail lub hasło.")
 
         user = User.objects.select_related("staff_profile").get(pk=user.pk)
+        _auto_mark_staff_present_on_login(user)
         _log_login(request, user, "success")
         token, _ = Token.objects.get_or_create(user=user)
         return Response(

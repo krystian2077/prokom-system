@@ -12,3 +12,11 @@ class AvailabilityType(models.TextChoices):
     DAY_OFF = "day_off", _("Dzień wolny")
     VACATION = "vacation", _("Urlop")
     SICK_LEAVE = "sick_leave", _("Chorobowe")
+
+
+class AbsenceRequestStatus(models.TextChoices):
+    """Status zgłoszenia nieobecności."""
+    PENDING = "pending", _("Oczekuje")
+    APPROVED = "approved", _("Zaakceptowane")
+    REJECTED = "rejected", _("Odrzucone")
+

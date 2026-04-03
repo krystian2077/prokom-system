@@ -73,6 +73,20 @@ export function AdminSidebar() {
     staleTime: 15_000,
   });
 
+  const allRepairsCountQuery = useQuery({
+    queryKey: ["sidebar", "all-repairs-count", "admin"],
+    enabled: Boolean(token && panelUser),
+    queryFn: async () => {
+      if (!token) return 0;
+      const rows = await api.get<RepairRequestListItem[]>(
+        `/staff/repairs/?status=new&ordering=created_at`,
+        token,
+      );
+      return (rows ?? []).length;
+    },
+    staleTime: 15_000,
+  });
+
   const unassignedCountQuery = useQuery({
     queryKey: ["sidebar", "unassigned-count", "admin"],
     enabled: Boolean(token && panelUser),
@@ -99,6 +113,7 @@ export function AdminSidebar() {
   });
 
   const myActiveCount = dashboardCountsQuery.data?.my_active_count ?? null;
+  const allRepairsCount = allRepairsCountQuery.data ?? null;
   const unassignedCount = unassignedCountQuery.data ?? null;
   const notifBadgeCount = (notifBadgeCountQuery.data ?? 0) as number;
 
@@ -117,7 +132,7 @@ export function AdminSidebar() {
       <div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#60a5fa] via-[#3b82f6] to-[#1d4ed8] opacity-90 shadow-[0_0_12px_rgba(59,130,246,.45)]" />
 
       <div className="px-6 pt-5">
-        <div className="flex items-center justify-between gap-3">
+<div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[15px] font-bold tracking-[0.2em] text-[var(--ink2)]">PRO-KOM</div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -136,10 +151,10 @@ export function AdminSidebar() {
         </div>
       </div>
 
-      <nav className="mt-6 flex-1 overflow-auto px-4 pb-6">
+      <nav className="mt-6 flex-1 overflow-auto scroll-smooth px-4 pb-6">
         <div className="space-y-5">
           <div>
-            {sectionTitle("Skróty")}
+            {sectionTitle("Główne")}
             <div className="space-y-1">
               <Link href="/admin-panel/dashboard" className={navRowClass(isUnder("/admin-panel/dashboard"))}>
                 <div className="flex items-center gap-3">
@@ -158,7 +173,7 @@ export function AdminSidebar() {
                   </span>
                   <span className="text-base font-semibold">Naprawy</span>
                 </div>
-                {countBadge(myActiveCount)}
+                {countBadge(allRepairsCount)}
               </Link>
 
               <Link href="/admin-panel/zgloszenia" className={navRowClass(zgloszeniaActive)}>
@@ -190,31 +205,6 @@ export function AdminSidebar() {
                 </div>
                 {countBadge(notifBadgeCount)}
               </Link>
-            </div>
-          </div>
-
-          <div>
-            {sectionTitle("Panel")}
-            <div className="space-y-1">
-              <Link href="/admin-panel/intake" className={navRowClass(isUnder("/admin-panel/intake"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/intake"))}>
-                    <PlusCircle size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Przyjęcie Stacjonarne</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/intake"))}
-              </Link>
-
-              <Link href="/admin-panel/comm" className={navRowClass(isUnder("/admin-panel/comm"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/comm"))}>
-                    <MessageSquareText size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Komunikacja</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/comm"))}
-              </Link>
 
               <Link href="/admin-panel/tasks" className={navRowClass(isUnder("/admin-panel/tasks"))}>
                 <div className="flex items-center gap-3">
@@ -226,44 +216,14 @@ export function AdminSidebar() {
                 {dotActive(isUnder("/admin-panel/tasks"))}
               </Link>
 
-               <Link href="/admin-panel/search" className={navRowClass(isUnder("/admin-panel/search"))}>
-                 <div className="flex items-center gap-3">
-                   <span className={navIconShell(isUnder("/admin-panel/search"))}>
-                     <Search size={20} />
-                   </span>
-                   <span className="text-base font-semibold">Wyszukiwanie</span>
-                 </div>
-                 {dotActive(isUnder("/admin-panel/search"))}
-               </Link>
-
-               <Link href="/admin-panel/archive" className={navRowClass(isUnder("/admin-panel/archive"))}>
-                 <div className="flex items-center gap-3">
-                   <span className={navIconShell(isUnder("/admin-panel/archive"))}>
-                     <Archive size={20} />
-                   </span>
-                   <span className="text-base font-semibold">Historia napraw</span>
-                 </div>
-                 {dotActive(isUnder("/admin-panel/archive"))}
-               </Link>
-
-               <Link href="/admin-panel/claims" className={navRowClass(isUnder("/admin-panel/claims"))}>
+              <Link href="/admin-panel/pickups" className={navRowClass(isUnder("/admin-panel/pickups"))}>
                 <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/claims"))}>
-                    <ClipboardList size={20} />
+                  <span className={navIconShell(isUnder("/admin-panel/pickups"))}>
+                    <Truck size={20} />
                   </span>
-                  <span className="text-base font-semibold">Reklamacje</span>
+                  <span className="text-base font-semibold">Odbiory</span>
                 </div>
-                {dotActive(isUnder("/admin-panel/claims"))}
-              </Link>
-
-              <Link href="/admin-panel/parts" className={navRowClass(isUnder("/admin-panel/parts"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/parts"))}>
-                    <Boxes size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Części</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/parts"))}
+                {dotActive(isUnder("/admin-panel/pickups"))}
               </Link>
 
               <Link href="/admin-panel/calendar" className={navRowClass(isUnder("/admin-panel/calendar"))}>
@@ -276,6 +236,71 @@ export function AdminSidebar() {
                 {dotActive(isUnder("/admin-panel/calendar"))}
               </Link>
 
+              <Link href="/admin-panel/stats" className={navRowClass(isUnder("/admin-panel/stats"))}>
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(isUnder("/admin-panel/stats"))}>
+                    <Activity size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Statystyki</span>
+                </div>
+                {dotActive(isUnder("/admin-panel/stats"))}
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            {sectionTitle("Panel")}
+            <div className="space-y-1">
+              <Link href="/admin-panel/parts" className={navRowClass(isUnder("/admin-panel/parts"))}>
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(isUnder("/admin-panel/parts"))}>
+                    <Boxes size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Części</span>
+                </div>
+                {dotActive(isUnder("/admin-panel/parts"))}
+              </Link>
+
+              <Link href="/admin-panel/comm" className={navRowClass(isUnder("/admin-panel/comm"))}>
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(isUnder("/admin-panel/comm"))}>
+                    <MessageSquareText size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Komunikacja</span>
+                </div>
+                {dotActive(isUnder("/admin-panel/comm"))}
+              </Link>
+
+              <Link href="/admin-panel/intake" className={navRowClass(isUnder("/admin-panel/intake"))}>
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(isUnder("/admin-panel/intake"))}>
+                    <PlusCircle size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Przyjęcie Stacjonarne</span>
+                </div>
+                {dotActive(isUnder("/admin-panel/intake"))}
+              </Link>
+
+              <Link href="/admin-panel/search" className={navRowClass(isUnder("/admin-panel/search"))}>
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(isUnder("/admin-panel/search"))}>
+                    <Search size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Wyszukiwanie</span>
+                </div>
+                {dotActive(isUnder("/admin-panel/search"))}
+              </Link>
+
+              <Link href="/admin-panel/archive" className={navRowClass(isUnder("/admin-panel/archive"))}>
+                <div className="flex items-center gap-3">
+                  <span className={navIconShell(isUnder("/admin-panel/archive"))}>
+                    <Archive size={20} />
+                  </span>
+                  <span className="text-base font-semibold">Historia Napraw</span>
+                </div>
+                {dotActive(isUnder("/admin-panel/archive"))}
+              </Link>
+
               <Link href="/admin-panel/clients" className={navRowClass(isUnder("/admin-panel/clients"))}>
                 <div className="flex items-center gap-3">
                   <span className={navIconShell(isUnder("/admin-panel/clients"))}>
@@ -286,14 +311,14 @@ export function AdminSidebar() {
                 {dotActive(isUnder("/admin-panel/clients"))}
               </Link>
 
-              <Link href="/admin-panel/pickups" className={navRowClass(isUnder("/admin-panel/pickups"))}>
+              <Link href="/admin-panel/claims" className={navRowClass(isUnder("/admin-panel/claims"))}>
                 <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/pickups"))}>
-                    <Truck size={20} />
+                  <span className={navIconShell(isUnder("/admin-panel/claims"))}>
+                    <ClipboardList size={20} />
                   </span>
-                  <span className="text-base font-semibold">Odbiory</span>
+                  <span className="text-base font-semibold">Reklamacje</span>
                 </div>
-                {dotActive(isUnder("/admin-panel/pickups"))}
+                {dotActive(isUnder("/admin-panel/claims"))}
               </Link>
             </div>
           </div>
@@ -301,14 +326,14 @@ export function AdminSidebar() {
           <div>
             {sectionTitle("Zarządzanie")}
             <div className="space-y-1">
-              <Link href="/admin-panel/workload" className={navRowClass(isUnder("/admin-panel/workload"))}>
+              <Link href="/admin-panel/team" className={navRowClass(isUnder("/admin-panel/team"))}>
                 <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/workload"))}>
-                    <Users2 size={20} />
+                  <span className={navIconShell(isUnder("/admin-panel/team"))}>
+                    <Users size={20} />
                   </span>
-                  <span className="text-base font-semibold">Obciążenie</span>
+                  <span className="text-base font-semibold">Zespół</span>
                 </div>
-                {dotActive(isUnder("/admin-panel/workload"))}
+                {dotActive(isUnder("/admin-panel/team"))}
               </Link>
 
               <Link href="/admin-panel/hurtownie" className={navRowClass(isUnder("/admin-panel/hurtownie"))}>
@@ -321,44 +346,14 @@ export function AdminSidebar() {
                 {dotActive(isUnder("/admin-panel/hurtownie"))}
               </Link>
 
-              <Link href="/admin-panel/stats" className={navRowClass(isUnder("/admin-panel/stats"))}>
+              <Link href="/admin-panel/workload" className={navRowClass(isUnder("/admin-panel/workload"))}>
                 <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/stats"))}>
-                    <Activity size={20} />
+                  <span className={navIconShell(isUnder("/admin-panel/workload"))}>
+                    <Users2 size={20} />
                   </span>
-                  <span className="text-base font-semibold">Statystyki</span>
+                  <span className="text-base font-semibold">Obciążenie</span>
                 </div>
-                {dotActive(isUnder("/admin-panel/stats"))}
-              </Link>
-
-              <Link href="/admin-panel/team" className={navRowClass(isUnder("/admin-panel/team"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/team"))}>
-                    <Users size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Zespół</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/team"))}
-              </Link>
-
-              <Link href="/admin-panel/availability" className={navRowClass(isUnder("/admin-panel/availability"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/availability"))}>
-                    <Settings size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Dostępność</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/availability"))}
-              </Link>
-
-              <Link href="/admin-panel/orders" className={navRowClass(isUnder("/admin-panel/orders"))}>
-                <div className="flex items-center gap-3">
-                  <span className={navIconShell(isUnder("/admin-panel/orders"))}>
-                    <Boxes size={20} />
-                  </span>
-                  <span className="text-base font-semibold">Zamówienia</span>
-                </div>
-                {dotActive(isUnder("/admin-panel/orders"))}
+                {dotActive(isUnder("/admin-panel/workload"))}
               </Link>
 
               <Link href="/admin-panel/config" className={navRowClass(isUnder("/admin-panel/config"))}>

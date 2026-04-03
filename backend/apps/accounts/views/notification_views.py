@@ -32,17 +32,42 @@ class StaffNotificationListView(APIView):
         notif_type = request.query_params.get("type")
         if notif_type:
             qs = qs.filter(notification_type=notif_type)
-        limit = int(request.query_params.get("limit", 50))
-        qs = qs[:limit]
-        return Response(StaffNotificationSerializer(qs, many=True).data)
+
+        phrase = (request.query_params.get("q") or "").strip()
+        if phrase:
+            qs = qs.filter(
+                Q(title__icontains=phrase)
+                | Q(description__icontains=phrase)
+            )
+
+        try:
+            limit = int(request.query_params.get("limit", 500))
+        except (TypeError, ValueError):
+            limit = 500
+        limit = max(1, min(limit, 1000))
+
+        total_count = qs.count()
+        sliced = qs[:limit]
+        return Response({
+            "count": total_count,
+            "results": StaffNotificationSerializer(sliced, many=True).data,
+        })
 
 
 class StaffNotificationDetailView(APIView):
     """
-    PATCH /api/v1/accounts/notifications/<id>/
-    Oznacz jako przeczytane lub zarchiwizowane (body: status=read|archived).
+    GET/PATCH /api/v1/accounts/notifications/<id>/
+    Szczegół oraz aktualizacja statusu (read/archived) dla zalogowanego użytkownika.
     """
     permission_classes = [IsAuthenticated, IsStaffOrAdmin]
+
+    def get(self, request, pk):
+        if request.user.role not in ("staff", "admin"):
+            return Response({"detail": "Brak uprawnień."}, status=403)
+        notif = StaffNotification.objects.filter(user=request.user, id=pk).first()
+        if not notif:
+            return Response({"detail": "Nie znaleziono."}, status=404)
+        return Response(StaffNotificationSerializer(notif).data)
 
     def patch(self, request, pk):
         if request.user.role not in ("staff", "admin"):

@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ShieldAlert } from "lucide-react";
-import { fetchAllPages } from "@/lib/api";
+import { ArrowUpRight, Sparkles } from "lucide-react";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -45,6 +45,15 @@ function badgeLabel(bucket: ReturnType<typeof complaintBucket>) {
   if (bucket === "awaiting") return "Oczekuje";
   if (bucket === "closed") return "Zamknięta";
   return "—";
+}
+
+function typeBadgeClass(type: string | null | undefined) {
+  if (type === "warranty") return "border-[#3b82f6]/35 bg-[#3b82f6]/12 text-[#bfdbfe]";
+  return "border-[#f59e0b]/35 bg-[#f59e0b]/12 text-[#fde68a]";
+}
+
+function typeBadgeLabel(type: string | null | undefined) {
+  return type === "warranty" ? "Gwarancja" : "Reklamacja";
 }
 
 function assignedLabel(r: RepairRequestListItem): string {
@@ -106,14 +115,16 @@ export default function AdminClaimsPage() {
     try {
       const params = new URLSearchParams();
       params.set("ordering", "-created_at");
-      params.set("is_complaint", "true");
       if (type === "complaint") params.set("repair_type", "complaint");
-      if (type === "warranty") params.set("repair_type", "warranty");
+      else if (type === "warranty") params.set("repair_type", "warranty");
+      else params.set("repair_types", "complaint,warranty");
       const inQuery = statusInQuery(status);
       if (inQuery) params.set("complaint_warranty_status_in", inQuery);
-      params.set("page_size", "200");
-      const rows = await fetchAllPages<RepairRequestListItem>(`/repairs/?${params.toString()}`, token);
-      setItems(rows);
+      const rows = await api.get<RepairRequestListItem[]>(`/staff/repairs/?${params.toString()}`, token);
+      const safeRows = (Array.isArray(rows) ? rows : []).filter(
+        (row) => row.repair_type === "complaint" || row.repair_type === "warranty",
+      );
+      setItems(safeRows);
     } catch (e) {
       setError(e instanceof Error ? e : new Error("Nie udało się pobrać reklamacji."));
       setItems([]);
@@ -139,19 +150,52 @@ export default function AdminClaimsPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.2em] text-[#9ca3af]">Panel Admina</p>
-          <h1 className="mt-2 text-2xl font-semibold text-white">Reklamacje i Gwarancje</h1>
+          <h1 className="mt-2 flex items-center gap-2 text-2xl font-semibold text-white">
+            <Sparkles size={20} className="text-[#f59e0b]" />
+            Reklamacje i Gwarancje
+          </h1>
+          <p className="mt-1 text-sm text-[#9ca3af]">Widok premium tylko dla spraw reklamacyjnych i gwarancyjnych.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => router.push("/admin-panel/intake")}
-          className="rounded-2xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b81818]"
-        >
-          + Nowa reklamacja
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => void load()}
+            disabled={loading}
+            className="rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-[#d1d5db] transition hover:bg-white/10 hover:text-white disabled:opacity-60"
+          >
+            Odśwież
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin-panel/intake")}
+            className="rounded-2xl bg-[#dc1e1e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b81818]"
+          >
+            + Nowa reklamacja
+          </button>
+        </div>
       </header>
+
+      <section className="mb-5 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-[#0c0d12] p-4">
+          <p className="text-xs uppercase tracking-wide text-[#6b7280]">Wszystkie</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{items.length}</p>
+        </div>
+        <div className="rounded-2xl border border-[#f59e0b]/25 bg-[#f59e0b]/10 p-4">
+          <p className="text-xs uppercase tracking-wide text-[#fcd34d]">W toku</p>
+          <p className="mt-2 text-2xl font-semibold text-[#fde68a]">
+            {items.filter((i) => complaintBucket(i.complaint_warranty_status) === "in_progress").length}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[#3b82f6]/25 bg-[#3b82f6]/10 p-4">
+          <p className="text-xs uppercase tracking-wide text-[#bfdbfe]">Oczekujące</p>
+          <p className="mt-2 text-2xl font-semibold text-[#dbeafe]">
+            {items.filter((i) => complaintBucket(i.complaint_warranty_status) === "awaiting").length}
+          </p>
+        </div>
+      </section>
 
       <div className="mb-5 rounded-3xl border border-white/10 bg-[#0c0d12] p-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -212,60 +256,44 @@ export default function AdminClaimsPage() {
         </div>
       ) : (
         <ul className="space-y-3">
-          {items.map((r, idx) => {
+          {items.map((r) => {
             const bucket = complaintBucket(r.complaint_warranty_status);
+            const bucketLabel = badgeLabel(bucket);
             const created = new Date(r.created_at).toLocaleString("pl-PL");
             const icon = symbolFor(r);
-            const codePrefix = icon === "⚠️" ? "GAW" : "REK";
+            const caseCode = `${r.repair_type === "warranty" ? "GAW" : "REK"}-${r.id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
             return (
               <li key={r.id}>
                 <Link
                   href={`/admin-panel/repairs/${r.id}`}
-                  className="block rounded-2xl border border-white/10 bg-[#0b0c10] p-4 transition hover:border-white/20 hover:bg-[#0c0d14]"
+                  className="group block rounded-2xl border border-white/10 bg-[#0b0c10] p-4 transition hover:border-white/20 hover:bg-[#0c0d14]"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-lg">{icon}</span>
                         <span className="font-mono text-sm font-bold text-white">
-                          {codePrefix}-{String(idx + 1).padStart(3, "0")}
+                          {caseCode}
                         </span>
                         <span className="text-[#6b7280]">·</span>
                         <span className="font-mono text-sm font-semibold text-[#9ca3af]">{r.repair_number}</span>
+                        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${typeBadgeClass(r.repair_type)}`}>
+                          {typeBadgeLabel(r.repair_type)}
+                        </span>
                       </div>
-                      <p className="mt-2 text-sm text-[#e5e7eb]">{r.device_name} - {r.problem_description ?? "Brak opisu"}</p>
+                      <p className="mt-2 line-clamp-2 text-sm text-[#e5e7eb]">{r.device_name} - {r.problem_description ?? "Brak opisu"}</p>
                       <p className="mt-2 text-xs text-[#9ca3af]">
                         {r.client_name} · {created} · {assignedLabel(r)}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <span className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${badgeClass(bucket)}`}>
-                        {badgeLabel(bucket)}
+                        {bucketLabel}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // decyzja admina - endpoint docelowy do podpięcia w następnym kroku
-                          }}
-                          className="rounded-lg border border-[#22c55e]/35 bg-[#22c55e]/12 px-2.5 py-1 text-[11px] font-semibold text-[#bbf7d0]"
-                        >
-                          Uznana
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // decyzja admina - endpoint docelowy do podpięcia w następnym kroku
-                          }}
-                          className="rounded-lg border border-[#dc1e1e]/35 bg-[#dc1e1e]/12 px-2.5 py-1 text-[11px] font-semibold text-[#ffb4b4]"
-                        >
-                          Odrzucona
-                        </button>
-                      </div>
+                      <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-[#d1d5db] transition group-hover:border-white/25 group-hover:text-white">
+                        Szczegóły
+                        <ArrowUpRight size={13} />
+                      </span>
                     </div>
                   </div>
                 </Link>

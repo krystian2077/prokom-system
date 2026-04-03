@@ -15,6 +15,7 @@ export type StaffProfile = {
 export type StaffListItem = {
   id: string;
   email: string;
+  phone?: string;
   full_name: string;
   first_name: string;
   last_name: string;
@@ -29,4 +30,67 @@ export type StaffListItem = {
   completed_repairs_count?: number;
   health_score_level?: StaffHealthLevel;
 };
+
+export type TeamTodayStatus = "working_today" | "off_today" | "planned_off" | "unknown";
+
+export type TeamAbsenceRange = {
+  availability_type: string;
+  availability_type_label: string;
+  start_date: string;
+  end_date: string;
+  note?: string;
+};
+
+export type TeamTodayEntry = {
+  id: string;
+  availability_type: string;
+  availability_type_display?: string;
+  availability_type_label: string;
+  date: string;
+  is_all_day: boolean;
+  start_time?: string | null;
+  end_time?: string | null;
+  note?: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+export type TeamOverviewRow = StaffListItem & {
+  phone?: string;
+  today_status: TeamTodayStatus;
+  today_status_label: string;
+  today_entries: TeamTodayEntry[];
+  next_absence?: TeamAbsenceRange | null;
+  planned_absence_ranges: TeamAbsenceRange[];
+};
+
+export type TeamOverviewResponse = {
+  date: string;
+  to: string;
+  results: TeamOverviewRow[];
+};
+
+export type AbsenceRequestStatus = "pending" | "approved" | "rejected";
+
+export type TeamAbsenceRequest = {
+  id: string;
+  employee: string;
+  employee_name: string;
+  availability_type: "day_off" | "vacation";
+  availability_type_display: string;
+  start_date: string;
+  end_date: string;
+  days_count: number;
+  note?: string;
+  status: AbsenceRequestStatus;
+  status_display: string;
+  reviewed_by?: string | null;
+  reviewed_by_name?: string | null;
+  reviewed_at?: string | null;
+  review_note?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TeamAbsenceRequestsResponse = TeamAbsenceRequest[];
 

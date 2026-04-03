@@ -80,6 +80,18 @@ class ClientCreateUpdateSerializer(serializers.ModelSerializer):
             validate_polish_phone(value)
         return value
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if getattr(user, "role", None) == "staff":
+            forbidden = {"is_vip", "is_blacklisted"}
+            if forbidden.intersection(attrs.keys()):
+                raise serializers.ValidationError(
+                    "Tylko administrator może zmieniać status VIP i blacklist klienta."
+                )
+        return attrs
+
 
 class ClientSerializer(serializers.ModelSerializer):
     """Pełny serializer klienta (szczegóły)."""

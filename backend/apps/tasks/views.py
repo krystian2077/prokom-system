@@ -22,7 +22,7 @@ from .suggestions import suggestions_for_repair
 class TaskViewSet(viewsets.ModelViewSet):
     """
     Zadania wewnętrzne.
-    Staff: widzi tylko zadania przypisane do siebie. Może tworzyć dla każdego.
+    Staff: widzi zadania przypisane do siebie lub utworzone przez siebie.
     Admin: widzi i edytuje wszystko, może przepisywać.
     """
     permission_classes = [IsStaffOrAdmin]
@@ -36,7 +36,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         ).prefetch_related("comments").annotate(comment_count=Count("comments")).order_by("-created_at")
         if getattr(self.request.user, "role", None) == "admin":
             return qs
-        return qs.filter(assigned_to=self.request.user)
+        return qs.filter(Q(assigned_to=self.request.user) | Q(created_by=self.request.user)).distinct()
 
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):
@@ -82,7 +82,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         if not can_see_task(request.user, task):
             return Response({"detail": "Brak dostępu."}, status=403)
         if not can_edit_task(request.user, task):
-            return Response({"detail": "Tylko administrator może usuwać zadania."}, status=403)
+            return Response({"detail": "Brak dostępu do usuwania tego zadania."}, status=403)
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
@@ -90,14 +90,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         if not can_see_task(request.user, task):
             return Response({"detail": "Brak dostępu do tego zadania."}, status=403)
         if not can_edit_task(request.user, task):
-            if task.assigned_to_id != request.user.id:
-                return Response({"detail": "Brak dostępu do edycji tego zadania."}, status=403)
-            # Staff może zmieniać tylko status swojego zadania
-            if set(request.data.keys()) - {"status"}:
-                return Response(
-                    {"detail": "Pracownik może zmieniać tylko status zadania. Pełna edycja: administrator."},
-                    status=403,
-                )
+            return Response({"detail": "Brak dostępu do edycji tego zadania."}, status=403)
         return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=["post"], url_path="comments")
