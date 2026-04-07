@@ -29,6 +29,8 @@ export type IntakeSearchClient = {
 export type IntakeSearchDevice = {
   id: string;
   device_name: string;
+  device_brand?: string | null;
+  device_model?: string | null;
   category?: string | null;
   serial_number?: string | null;
   imei?: string | null;

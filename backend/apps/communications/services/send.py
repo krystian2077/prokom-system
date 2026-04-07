@@ -166,8 +166,6 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         if getattr(repair, "estimated_completion_date", None)
         else ""
     )
-    priority_display = repair.get_priority_display() if hasattr(repair, "get_priority_display") else ""
-
     context = {
         "client_name": client_name,
         "repair_number": repair.repair_number,
@@ -193,7 +191,6 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         "phone_last4": phone_last4,
         "estimated_cost_display": est_cost,
         "estimated_completion_display": est_date,
-        "priority_display": priority_display,
         "estimated_duration_display": repair.get_estimated_duration_display() if hasattr(repair, "get_estimated_duration_display") else "",
     }
     subject = (
@@ -214,8 +211,6 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
             body_plain += f"Wstępna wycena: {est_cost}\n"
         if est_date:
             body_plain += f"Szacowana data zakończenia: {est_date}\n"
-        if priority_display:
-            body_plain += f"Priorytet: {priority_display}\n"
         body_plain += f"Dostawa: {delivery_display}\nZwrot: {return_display}\n"
         if hammer_glass_display:
             body_plain += f"Folia Hammer Glass / szkło hartowane: {hammer_glass_display}\n"

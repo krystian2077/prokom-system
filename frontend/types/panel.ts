@@ -90,6 +90,7 @@ export interface Repair {
   repairNumber: string;
   clientId: string;
   deviceCategory: DeviceCategory;
+  deviceBrand: string;
   deviceModel: string;
   problemDescription: string;
   imei: string | null;
@@ -135,10 +136,10 @@ export interface DashboardStats {
 // ─── Mapowanie statusu API → panel ───
 const API_STATUS_TO_PANEL: Record<string, RepairStatus> = {
   new: "new",
-  accepted: "diagnosed",
-  in_diagnostics: "in_progress",
+  accepted: "new",
+  in_diagnostics: "diagnosed",
   diagnostics_done: "diagnosed",
-  quote_pending: "in_progress",
+  quote_pending: "wait_decision",
   quote_sent: "wait_decision",
   quote_accepted: "in_progress",
   quote_rejected: "cancelled",

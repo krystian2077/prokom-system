@@ -58,7 +58,8 @@ export default function ComplaintWarrantyIntakePage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [deviceCategory, setDeviceCategory] = useState("phone");
-  const [brandAndModel, setBrandAndModel] = useState("");
+  const [deviceBrand, setDeviceBrand] = useState("");
+  const [deviceModel, setDeviceModel] = useState("");
   const [hammerGlassChoice, setHammerGlassChoice] = useState<"yes" | "no" | null>(null);
 
   const [problemDescription, setProblemDescription] = useState("");
@@ -96,6 +97,7 @@ export default function ComplaintWarrantyIntakePage() {
     if (!problemDescription.trim()) return false;
     if (needsManualWarranty) {
       if (!firstName.trim() || !lastName.trim() || !phone.trim() || !deviceCategory) return false;
+      if (!deviceBrand.trim() || !deviceModel.trim()) return false;
       if (showHammerGlass && hammerGlassChoice === null) return false;
       return true;
     }
@@ -110,6 +112,8 @@ export default function ComplaintWarrantyIntakePage() {
     lastName,
     phone,
     deviceCategory,
+    deviceBrand,
+    deviceModel,
     showHammerGlass,
     hammerGlassChoice,
     needsParentBlock,
@@ -164,7 +168,8 @@ export default function ComplaintWarrantyIntakePage() {
         payload.phone = phone.trim();
         if (email.trim()) payload.email = email.trim();
         payload.device_category = deviceCategory;
-        payload.device_model_name = brandAndModel.trim() || "Do uzupełnienia";
+        payload.device_brand_name = deviceBrand.trim();
+        payload.device_model_name = deviceModel.trim() || "Do uzupełnienia";
         if (showHammerGlass && hammerGlassChoice) {
           payload.hammer_glass_interest = hammerGlassChoice;
         }
@@ -431,11 +436,20 @@ export default function ComplaintWarrantyIntakePage() {
                 </div>
               </div>
               <div className="mt-4">
-                <label className={labelClass}>Marka i model</label>
+                <label className={labelClass}>Marka</label>
                 <input
-                  value={brandAndModel}
-                  onChange={(e) => setBrandAndModel(e.target.value)}
-                  placeholder="np. Samsung Galaxy S24"
+                  value={deviceBrand}
+                  onChange={(e) => setDeviceBrand(e.target.value)}
+                  placeholder="np. Samsung"
+                  className="mt-1.5 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-3 text-sm text-[var(--white)]"
+                />
+              </div>
+              <div className="mt-4">
+                <label className={labelClass}>Model</label>
+                <input
+                  value={deviceModel}
+                  onChange={(e) => setDeviceModel(e.target.value)}
+                  placeholder="np. Galaxy S24"
                   className="mt-1.5 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-3 text-sm text-[var(--white)]"
                 />
               </div>
@@ -558,7 +572,9 @@ export default function ComplaintWarrantyIntakePage() {
                     <dt className="text-xs text-[var(--muted)]">Urządzenie</dt>
                     <dd className="text-[#d1d5db]">
                       {categoryLabel(deviceCategory)}
-                      {brandAndModel.trim() ? ` · ${brandAndModel.trim()}` : ""}
+                      {[deviceBrand.trim(), deviceModel.trim()].filter(Boolean).join(" ")
+                        ? ` · ${[deviceBrand.trim(), deviceModel.trim()].filter(Boolean).join(" ")}`
+                        : ""}
                     </dd>
                   </div>
                 </>
@@ -646,7 +662,8 @@ export default function ComplaintWarrantyIntakePage() {
                   setLastName("");
                   setPhone("");
                   setEmail("");
-                  setBrandAndModel("");
+                  setDeviceBrand("");
+                  setDeviceModel("");
                   setHammerGlassChoice(null);
                   setDeviceCategory("phone");
                   setRepairKind("complaint");

@@ -51,6 +51,23 @@ class TimelineStatusChangeSerializer(serializers.ModelSerializer):
         return obj.get_new_status_display()
 
 
+class TimelineStatusChangeClientSerializer(TimelineStatusChangeSerializer):
+    """Zdarzenie: zmiana statusu dla klienta (bez notatek wewnętrznych)."""
+
+    class Meta(TimelineStatusChangeSerializer.Meta):
+        fields = [
+            "type",
+            "id",
+            "old_status",
+            "new_status",
+            "old_status_display",
+            "new_status_display",
+            "changed_by",
+            "changed_by_name",
+            "created_at",
+        ]
+
+
 class TimelineNoteSerializer(serializers.ModelSerializer):
     """Zdarzenie: notatka (wewnętrzna lub publiczna)."""
     type = serializers.SerializerMethodField()

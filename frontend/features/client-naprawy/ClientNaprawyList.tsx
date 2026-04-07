@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, Clock3, Filter, Wrench } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/panel/StatusBadge";
@@ -26,13 +27,13 @@ function filterRepairs(repairs: Repair[] | null, activeFilter: string): Repair[]
 }
 
 function getFilterCounts(repairs: Repair[] | null): Record<string, number> {
-  if (!repairs) return { Wszystkie: 0, "W naprawie": 0, Gotowe: 0, Oczekuje: 0, Zakończone: 0 };
+  if (!repairs) return { Wszystkie: 0, "W naprawie": 0, Gotowe: 0, Oczekuje: 0, Zakonczone: 0 };
   return {
     Wszystkie: repairs.length,
     "W naprawie": repairs.filter((r) => r.status === "in_progress").length,
     Gotowe: repairs.filter((r) => r.status === "ready" || r.status === "done").length,
     Oczekuje: repairs.filter((r) => r.status === "wait_decision" || r.status === "diagnosed").length,
-    Zakończone: repairs.filter((r) => r.status === "done").length,
+    Zakonczone: repairs.filter((r) => r.status === "done").length,
   };
 }
 
@@ -82,7 +83,7 @@ export function ClientNaprawyList() {
 
   if (error && !repairs) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
         <div className="panel-card p-6" style={{ color: "var(--ink)" }}>
           <p style={{ color: "var(--red)" }}>{error}</p>
           <button
@@ -98,40 +99,76 @@ export function ClientNaprawyList() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
       <div className="panel-card">
         <div className="panel-card-header flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="mb-1 text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
-              PANEL KLIENTA
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
+              Panel klienta
             </p>
             <h1 className="cp-heading font-extrabold" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(20px, 2.2vw, 28px)" }}>
               Moje naprawy
             </h1>
             <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-              Lista Twoich zgłoszeń — kliknij wiersz, aby zobaczyć szczegóły
+              Najważniejsze statusy i pełna historia zgłoszeń w jednym miejscu.
             </p>
           </div>
           <Link
             href="/zgloszenie"
-            className="shrink-0 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+            className="shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
             style={{ background: "var(--red)" }}
           >
             + Zgłoś naprawę
           </Link>
         </div>
 
-        {/* Filter tabs */}
+        {!loading && (
+          <div className="grid gap-3 border-b border-[var(--border)] px-5 py-4 sm:grid-cols-3">
+            <div className="rounded-xl border p-3" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                Aktywne
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-xl font-semibold cp-heading">
+                <Wrench size={16} />
+                {filterCounts["W naprawie"]}
+              </p>
+            </div>
+            <div className="rounded-xl border p-3" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                Gotowe
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-xl font-semibold cp-heading">
+                <CheckCircle2 size={16} />
+                {filterCounts.Gotowe}
+              </p>
+            </div>
+            <div className="rounded-xl border p-3" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                Oczekuje decyzji
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-xl font-semibold cp-heading">
+                <Clock3 size={16} />
+                {filterCounts.Oczekuje}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-2 border-b border-[var(--border)] px-5 py-3">
+          <span className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold" style={{ color: "var(--muted)" }}>
+            <Filter size={13} />
+            Filtry
+          </span>
           {FILTERS.map((f) => (
             <button
               key={f}
               type="button"
               onClick={() => setActiveFilter(f)}
-              className="rounded-lg px-3 py-2 text-sm font-medium transition"
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium transition"
               style={{
-                background: activeFilter === f ? "var(--red)" : "transparent",
-                color: activeFilter === f ? "#fff" : "var(--ink2)",
+                background: activeFilter === f ? "var(--red-l)" : "transparent",
+                color: activeFilter === f ? "var(--red)" : "var(--ink2)",
+                borderColor: activeFilter === f ? "var(--red-border)" : "var(--border)",
               }}
             >
               {f} {filterCounts[f] != null ? filterCounts[f] : 0}
@@ -144,7 +181,7 @@ export function ClientNaprawyList() {
           {loading ? (
             <div className="p-5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex gap-4 border-b border-[var(--border)] py-4" style={{ animation: `rowIn .4s ${i * 0.06}s ease both` }}>
+                  <div key={i} className="flex gap-4 border-b border-[var(--border)] py-4">
                   <div className="skeleton h-10 w-10 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="skeleton mb-2 h-4 w-3/4 rounded" />
@@ -186,7 +223,7 @@ export function ClientNaprawyList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pageRepairs.map((repair, index) => (
+                  {pageRepairs.map((repair) => (
                     <tr
                       key={repair.id}
                       role="button"
@@ -194,16 +231,18 @@ export function ClientNaprawyList() {
                       onClick={() => router.push(`/client/naprawy/${repair.id}`)}
                       onKeyDown={(e) => e.key === "Enter" && router.push(`/client/naprawy/${repair.id}`)}
                       className="group cp-row-hover cursor-pointer border-t border-[var(--border)] transition"
-                      style={{ animation: `rowIn .4s ${index * 0.06}s ease both` }}
                     >
                       <td className="p-4">
+                        {(() => {
+                          const deviceLabel = [repair.deviceBrand, repair.deviceModel].filter(Boolean).join(" ") || repair.deviceModel;
+                          return (
                         <div className="flex items-center gap-3">
                           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg" style={{ background: "var(--island3)" }}>
                             {getDeviceEmoji(repair.deviceCategory)}
                           </span>
                           <div className="min-w-0">
                             <p className="cp-heading font-medium">
-                              {truncate(repair.problemDescription ? `${repair.deviceModel} – ${repair.problemDescription}` : repair.deviceModel, 55)}
+                              {truncate(repair.problemDescription ? `${deviceLabel} – ${repair.problemDescription}` : deviceLabel, 55)}
                             </p>
                             <p className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs" style={{ color: "var(--muted)", fontFamily: "'Courier New', monospace" }}>
                               <span>{repair.repairNumber}</span>
@@ -215,6 +254,8 @@ export function ClientNaprawyList() {
                             </p>
                           </div>
                         </div>
+                          );
+                        })()}
                       </td>
                       <td className="p-4 text-sm" style={{ color: "var(--ink)" }}>
                         {formatDate(repair.createdAt)}

@@ -19,8 +19,8 @@ type IntakePreviewPanelProps = {
   email: string;
   linkedFromDb: boolean;
   deviceCategory: string;
-  /** Jedno pole: marka i model (np. „Samsung Galaxy S24”) */
-  deviceBrandModel: string;
+  deviceBrand: string;
+  deviceModel: string;
   deviceColor: string;
   visualCondition: string;
   serviceType: string;
@@ -122,7 +122,8 @@ export function IntakePreviewPanel({
   email,
   linkedFromDb,
   deviceCategory,
-  deviceBrandModel,
+  deviceBrand,
+  deviceModel,
   deviceColor,
   visualCondition,
   serviceType,
@@ -146,7 +147,7 @@ export function IntakePreviewPanel({
 }: IntakePreviewPanelProps) {
   const catOpt = categoryOptions.find((c) => c.value === deviceCategory);
   const clientName = [firstName, lastName].filter(Boolean).join(" ").trim() || "—";
-  const dm = deviceBrandModel.trim();
+  const dm = [deviceBrand.trim(), deviceModel.trim()].filter(Boolean).join(" ");
   const deviceSubtitle = deviceColor.trim() ? ` · ${deviceColor.trim()}` : "";
   const deviceLine = dm ? `${dm}${deviceSubtitle}` : deviceSubtitle ? `—${deviceSubtitle}` : "—";
   const scopeBlock = [serviceType.trim(), problemDescription.trim()].filter(Boolean).join(" — ") || "—";

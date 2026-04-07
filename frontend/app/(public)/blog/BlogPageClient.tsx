@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { ArrowRight, CalendarDays, Clock3, Phone, ShieldCheck, Sparkles, UserRound, Wrench } from "lucide-react";
 import { BLOG_POSTS, getFeaturedPost } from "@/lib/blog-posts";
 import { BLOG_CATEGORIES, getCategoryStyle } from "@/lib/blog-categories";
 
@@ -36,35 +38,98 @@ const TOPIC_GROUPS = [
   },
 ];
 
-function PostCard({ post }: { post: (typeof BLOG_POSTS)[0] }) {
+const FALLBACK_AUTHOR = "Zespół PRO-KOM";
+
+const TRUST_ITEMS = [
+  {
+    icon: "🔧",
+    title: "Serwis + sklep w jednym miejscu",
+    desc: "Naprawy i akcesoria GSM, laptopy, komputery oraz drukarki - bez rozbijania procesu na kilka firm.",
+  },
+  {
+    icon: "⚡",
+    title: "Bezpłatna diagnoza",
+    desc: "Najpierw diagnoza i jasna wycena, dopiero później decyzja o naprawie. Zero niespodzianek.",
+  },
+  {
+    icon: "📍",
+    title: "Obsługa całego regionu",
+    desc: "Rabka-Zdrój, Mszana Dolna, Jordanów, Raba Wyżna, Nowy Targ i okolice - lokalnie i wysyłkowo.",
+  },
+] as const;
+
+function makeVariants(reducedMotion: boolean): { container: Variants; item: Variants } {
+  return {
+    container: {
+      hidden: {},
+      show: {
+        transition: {
+          staggerChildren: reducedMotion ? 0 : 0.08,
+        },
+      },
+    },
+    item: {
+      hidden: {
+        opacity: 0,
+        y: reducedMotion ? 0 : 20,
+      },
+      show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          duration: reducedMotion ? 0.01 : 0.45,
+          ease: "easeOut",
+        },
+      },
+    },
+  };
+}
+
+function PostCard({ post, reducedMotion }: { post: (typeof BLOG_POSTS)[0]; reducedMotion: boolean }) {
   const cs = getCategoryStyle(post.category);
+
   return (
-    <Link href={`/blog/${post.slug}`} className="group">
-      <article className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-card transition-all hover:border-red-200 hover:shadow-md">
-        <div className="mb-3 flex items-center gap-2">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${cs.pill}`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${cs.dot}`} />
-            {post.category}
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: reducedMotion ? 0 : 18 },
+        show: { opacity: 1, y: 0, transition: { duration: reducedMotion ? 0.01 : 0.38, ease: "easeOut" } },
+      }}
+    >
+      <Link href={`/blog/${post.slug}`} className="group block h-full">
+        <article className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-red-100 bg-white p-6 shadow-[0_10px_30px_rgba(15,23,42,.08)] transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-[0_18px_44px_rgba(220,38,38,.18)]">
+          <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-red-100/70 blur-2xl" />
+
+          <div className="relative mb-4 flex items-center justify-between gap-2">
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${cs.pill}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${cs.dot}`} />
+              {post.category}
+            </span>
+            <span className="text-[11px] text-slate-500">{post.readingTime}</span>
+          </div>
+
+          <h2 className="relative line-clamp-2 text-lg font-semibold leading-tight text-slate-900 transition-colors group-hover:text-red-700">
+            {post.title}
+          </h2>
+          <p className="relative mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600">{post.description}</p>
+
+          <div className="relative mt-5 grid gap-2 border-t border-slate-100 pt-4 text-xs text-slate-500">
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays size={13} />
+              {formatDate(post.date)}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <UserRound size={13} />
+              {FALLBACK_AUTHOR}
+            </span>
+          </div>
+
+          <span className="relative mt-5 inline-flex items-center gap-2 text-sm font-semibold text-red-700">
+            Czytaj artykuł
+            <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
           </span>
-        </div>
-        <h2 className="flex-1 text-base font-bold leading-snug text-prokom-black transition-colors group-hover:text-primary">
-          {post.title}
-        </h2>
-        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-prokom-gray">
-          {post.description}
-        </p>
-        <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-          <span className="text-xs text-prokom-gray">{formatDate(post.date)}</span>
-          <span className="text-xs text-prokom-gray">{post.readingTime}</span>
-        </div>
-        <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-primary">
-          Czytaj
-          <span className="transition-transform group-hover:translate-x-1">→</span>
-        </div>
-      </article>
-    </Link>
+        </article>
+      </Link>
+    </motion.div>
   );
 }
 
@@ -72,6 +137,8 @@ export default function BlogPageClient() {
   const featured = getFeaturedPost();
   const [activeGroup, setActiveGroup] = useState("Wszystko");
   const [activeCategory, setActiveCategory] = useState("Wszystkie w grupie");
+  const reducedMotion = useReducedMotion();
+  const variants = makeVariants(Boolean(reducedMotion));
 
   const sorted = useMemo(
     () => [...BLOG_POSTS].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
@@ -91,31 +158,65 @@ export default function BlogPageClient() {
   const rest = filtered.filter((p) => !p.featured || activeCategory !== "Wszystkie w grupie");
 
   return (
-    <>
-      {/* ─── Hero ─── */}
-      <section className="relative overflow-hidden border-b border-gray-100 bg-white">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full bg-red-50 opacity-60 blur-3xl" />
-          <div className="absolute -bottom-24 left-0 h-[300px] w-[300px] rounded-full bg-gray-50 opacity-80 blur-3xl" />
-        </div>
-        <div className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-            PRO-KOM Serwis · Rabka-Zdrój
-          </p>
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-prokom-black sm:text-5xl">
-            Blog i poradniki
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-prokom-gray sm:text-lg">
-            Praktyczne porady od serwisu i sklepu PRO-KOM w Rabce-Zdroju. Laptopy, komputery,
-            drukarki, gaming, poleasing i telefony — odpowiadamy na pytania klientów.
-          </p>
+    <div className="relative overflow-hidden bg-white text-slate-900">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-44 left-1/2 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-red-100/80 blur-3xl" />
+        <div className="absolute right-0 top-56 h-[320px] w-[320px] rounded-full bg-rose-100/70 blur-3xl" />
+      </div>
 
-        </div>
+      <section className="relative border-b border-red-100/80">
+        <motion.div
+          variants={variants.container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          className="mx-auto max-w-6xl px-4 pb-14 pt-16 sm:px-6 sm:pt-20"
+        >
+          <motion.div variants={variants.item} className="max-w-3xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700">
+              <Sparkles size={13} />
+              Blog PRO-KOM Serwis
+            </span>
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.2] tracking-tight text-slate-900 sm:text-5xl sm:leading-[1.15]">
+              Poradniki serwisowe PRO-KOM w Rabce-Zdroju,
+              <span className="block bg-gradient-to-r from-red-700 via-red-600 to-rose-500 bg-clip-text text-transparent">
+                telefony, laptopy i komputery bez tajemnic
+              </span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+              Praktyczne poradniki i doświadczenie serwisu PRO-KOM. Telefony, laptopy, komputery, drukarki i sprzęt
+              poleasingowy - podane lekko, czytelnie i bez lania wody.
+            </p>
+          </motion.div>
+
+          <motion.div variants={variants.container} className="mt-8 grid gap-3 sm:grid-cols-3">
+            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)]">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+                <Wrench size={13} />
+                Artykułów
+              </div>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">{BLOG_POSTS.length}</p>
+            </motion.div>
+            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)]">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+                <CalendarDays size={13} />
+                Najnowsza publikacja
+              </div>
+              <p className="mt-2 text-sm font-semibold text-slate-800">{sorted[0] ? formatDate(sorted[0].date) : "Brak danych"}</p>
+            </motion.div>
+            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)]">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+                <Clock3 size={13} />
+                Średni czas czytania
+              </div>
+              <p className="mt-2 text-sm font-semibold text-slate-800">3-6 minut</p>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* ─── Filter bar: group + category ─── */}
-      <div className="sticky top-16 z-30 border-b border-gray-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6">
+      <div className="sticky top-16 z-30 border-b border-red-100 bg-white/85 backdrop-blur-xl">
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
           <div className="overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex min-w-max items-center gap-2">
               {TOPIC_GROUPS.map((group) => (
@@ -128,8 +229,8 @@ export default function BlogPageClient() {
                   }}
                   className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
                     activeGroup === group.label
-                      ? "bg-prokom-black text-white shadow-sm"
-                      : "border border-gray-200 bg-white text-prokom-gray hover:border-gray-300 hover:text-prokom-black"
+                      ? "border border-red-300 bg-red-50 text-red-700 shadow-[0_6px_18px_rgba(239,68,68,.22)]"
+                      : "border border-slate-200 bg-white text-slate-600 hover:border-red-200 hover:text-red-700"
                   }`}
                 >
                   {group.label}
@@ -142,14 +243,17 @@ export default function BlogPageClient() {
             <div className="flex min-w-max items-center gap-2">
               <button
                 type="button"
-                onClick={() => setActiveCategory("Wszystkie w grupie")}
+                onClick={() => {
+                  setActiveGroup("Wszystko");
+                  setActiveCategory("Wszystkie w grupie");
+                }}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  activeCategory === "Wszystkie w grupie"
-                    ? "bg-primary text-white"
-                    : "border border-gray-200 bg-white text-prokom-gray hover:border-gray-300"
+                  activeGroup === "Wszystko" && activeCategory === "Wszystkie w grupie"
+                    ? "border border-red-300 bg-red-600 text-white"
+                    : "border border-slate-200 bg-white text-slate-600 hover:border-red-200"
                 }`}
               >
-                Wszystkie w grupie
+                Wszystkie wpisy
               </button>
 
               {BLOG_CATEGORIES.filter((cat) => categoriesInGroup.includes(cat.label)).map((cat) => (
@@ -159,8 +263,8 @@ export default function BlogPageClient() {
                   onClick={() => setActiveCategory(cat.label)}
                   className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                     activeCategory === cat.label
-                      ? `${cat.pill}`
-                      : "border border-gray-200 bg-white text-prokom-gray hover:border-gray-300"
+                      ? "border border-red-300 bg-red-50 text-red-700"
+                      : "border border-slate-200 bg-white text-slate-600 hover:border-red-200"
                   }`}
                 >
                   <span className={`h-1.5 w-1.5 rounded-full ${cat.dot}`} />
@@ -172,132 +276,148 @@ export default function BlogPageClient() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-        {/* ─── Featured post (tylko przy "Wszystko" i wszystkich podkategoriach) ─── */}
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6">
         {featured && activeGroup === "Wszystko" && activeCategory === "Wszystkie w grupie" && (
-          <div className="mb-14">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-prokom-gray">
-              Wyróżniony artykuł
-            </p>
+          <motion.section
+            initial={{ opacity: 0, y: reducedMotion ? 0 : 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: reducedMotion ? 0.01 : 0.45, ease: "easeOut" }}
+            className="mb-14"
+          >
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Wyróżniony artykuł</p>
             <Link href={`/blog/${featured.slug}`} className="group block">
-              <article className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card transition-all hover:border-red-200 hover:shadow-md">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-red-50/40 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                <div className="p-8 sm:p-10">
-                  <div className="mb-4 flex flex-wrap items-center gap-3">
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${getCategoryStyle(featured.category).pill}`}
-                    >
-                      <span className={`h-1.5 w-1.5 rounded-full ${getCategoryStyle(featured.category).dot}`} />
-                      {featured.category}
-                    </span>
-                    <span className="text-xs text-prokom-gray">{formatDate(featured.date)}</span>
-                    <span className="text-xs text-prokom-gray">· {featured.readingTime} czytania</span>
-                  </div>
-                  <h2 className="text-2xl font-extrabold leading-tight text-prokom-black transition-colors group-hover:text-primary sm:text-3xl">
-                    {featured.title}
-                  </h2>
-                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-prokom-gray">
-                    {featured.description}
-                  </p>
-                  {featured.keyTakeaways && featured.keyTakeaways.length > 0 && (
-                    <ul className="mt-5 space-y-2">
-                      {featured.keyTakeaways.slice(0, 3).map((point) => (
-                        <li key={point} className="flex items-start gap-2 text-sm text-prokom-gray">
-                          <span className="mt-0.5 flex-none text-primary">✓</span>
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  <div className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-primary">
-                    Czytaj artykuł
-                    <span className="transition-transform group-hover:translate-x-1">→</span>
-                  </div>
+              <article className="relative overflow-hidden rounded-[30px] border border-red-100 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(254,242,242,.92))] p-8 shadow-[0_20px_56px_rgba(15,23,42,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-[0_28px_66px_rgba(239,68,68,.20)] sm:p-10">
+                <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-red-200/45 blur-3xl" />
+
+                <div className="relative mb-4 flex flex-wrap items-center gap-3 text-xs">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold ${getCategoryStyle(featured.category).pill}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${getCategoryStyle(featured.category).dot}`} />
+                    {featured.category}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-slate-500">
+                    <CalendarDays size={13} />
+                    {formatDate(featured.date)}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-slate-500">
+                    <Clock3 size={13} />
+                    {featured.readingTime}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-slate-500">
+                    <UserRound size={13} />
+                    {FALLBACK_AUTHOR}
+                  </span>
+                </div>
+
+                <h2 className="relative max-w-4xl text-2xl font-semibold leading-tight text-slate-900 transition-colors group-hover:text-red-700 sm:text-3xl">
+                  {featured.title}
+                </h2>
+                <p className="relative mt-4 max-w-3xl text-base leading-relaxed text-slate-600">{featured.description}</p>
+
+                {featured.keyTakeaways && featured.keyTakeaways.length > 0 && (
+                  <ul className="relative mt-6 grid gap-2 sm:grid-cols-2">
+                    {featured.keyTakeaways.slice(0, 4).map((point) => (
+                      <li key={point} className="flex items-start gap-2 rounded-xl border border-red-100 bg-white/85 p-3 text-sm text-slate-700">
+                        <ShieldCheck size={14} className="mt-0.5 shrink-0 text-red-500" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <div className="relative mt-7 inline-flex items-center gap-2 text-sm font-semibold text-red-700">
+                  Przeczytaj wyróżniony poradnik
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </div>
               </article>
             </Link>
-          </div>
+          </motion.section>
         )}
 
-        <div>
-          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-prokom-gray">
+        <section>
+          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
             {rest.length} {rest.length === 1 ? "artykuł" : "artykułów"} · {activeGroup}
             {activeCategory !== "Wszystkie w grupie" ? ` · ${activeCategory}` : ""}
           </p>
+
           {rest.length === 0 ? (
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-10 text-center">
-              <p className="text-prokom-gray">Brak artykułów dla wybranych filtrów.</p>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-10 text-center">
+              <p className="text-slate-600">Brak artykułów dla wybranych filtrów.</p>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              key={`${activeGroup}-${activeCategory}`}
+              variants={variants.container}
+              initial="hidden"
+              animate="show"
+              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {rest.map((post) => (
-                <PostCard key={post.slug} post={post} />
+                <PostCard key={post.slug} post={post} reducedMotion={Boolean(reducedMotion)} />
               ))}
-            </div>
+            </motion.div>
           )}
-        </div>
+        </section>
 
-        {/* ─── Trust strip ─── */}
-        <div className="mt-16 grid gap-5 sm:grid-cols-3">
-          {[
-            {
-              icon: "🔧",
-              title: "Serwis i sklep w jednym",
-              desc: "Naprawiamy telefony, laptopy, komputery i drukarki. Sprzedajemy akcesoria GSM i sprzęt poleasingowy.",
-            },
-            {
-              icon: "✓",
-              title: "Bezpłatna diagnoza",
-              desc: "Oceniamy usterkę bezpłatnie. Wycena przed naprawą — płacisz tylko jeśli się zgadzasz.",
-            },
-            {
-              icon: "📦",
-              title: "Obsługujemy całą okolicę",
-              desc: "Klienci z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca — osobiście i wysyłkowo.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
+        <motion.section
+          variants={variants.container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          className="mt-16 grid gap-5 md:grid-cols-3"
+        >
+          {TRUST_ITEMS.map((item) => (
+            <motion.article
+              key={item.title}
+              variants={variants.item}
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,.06)] transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_18px_42px_rgba(239,68,68,.16)]"
+            >
               <div className="mb-3 text-2xl">{item.icon}</div>
-              <p className="font-bold text-prokom-black">{item.title}</p>
-              <p className="mt-1 text-sm leading-relaxed text-prokom-gray">{item.desc}</p>
-            </div>
+              <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.desc}</p>
+            </motion.article>
           ))}
-        </div>
+        </motion.section>
 
-        {/* ─── CTA ─── */}
-        <div className="mt-10 rounded-2xl bg-prokom-black p-8 text-white">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+        <motion.section
+          initial={{ opacity: 0, y: reducedMotion ? 0 : 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: reducedMotion ? 0.01 : 0.45, ease: "easeOut" }}
+          className="mt-10 overflow-hidden rounded-[30px] border border-red-200 bg-[linear-gradient(145deg,rgba(254,242,242,.8),rgba(255,255,255,.96))] p-8 shadow-[0_20px_56px_rgba(15,23,42,.10)] sm:p-10"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-700/90">
             PRO-KOM Serwis · ul. Orkana 16B, Rabka-Zdrój
           </p>
-          <p className="mt-3 text-xl font-extrabold">
-            Masz pytanie lub potrzebujesz naprawy?
+          <h2 className="mt-3 text-2xl font-semibold text-slate-900 sm:text-3xl">Masz pytanie lub potrzebujesz szybkiej diagnozy?</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
+            Skontaktuj się z nami i dobierzemy najlepsze rozwiązanie: naprawa, modernizacja albo nowy sprzęt.
+            Działamy od poniedziałku do piątku 9:00-17:00 i w soboty 9:00-14:00.
           </p>
-          <p className="mt-2 text-sm text-white/70">
-            Zadzwoń lub odwiedź nas. Pon–Pt 9:00–17:00, Sob 9:00–14:00.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
+
+          <div className="mt-6 flex flex-wrap gap-3">
             <a
               href="tel:883200151"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
+              className="inline-flex items-center gap-2 rounded-2xl border border-red-300 bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
             >
+              <Phone size={16} />
               Zadzwoń: 883 200 151
             </a>
             <Link
               href="/zgloszenie"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20"
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-red-200 hover:text-red-700"
             >
               Zgłoś naprawę online
             </Link>
             <Link
               href="/oferta"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20"
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-red-200 hover:text-red-700"
             >
               Zobacz ofertę sprzętu
             </Link>
           </div>
-        </div>
-
+        </motion.section>
       </div>
-    </>
+    </div>
   );
 }

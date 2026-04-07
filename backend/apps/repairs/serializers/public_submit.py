@@ -33,6 +33,7 @@ class PublicSubmitDeviceSerializer(serializers.Serializer):
     """Dane urządzenia w formularzu publicznym."""
     category = serializers.ChoiceField(choices=DeviceCategory.choices, required=True)
     brand_id = serializers.UUIDField(required=False, allow_null=True)
+    brand_name = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     device_model_id = serializers.UUIDField(required=False, allow_null=True)
     model_name = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
     serial_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
@@ -48,9 +49,13 @@ class PublicSubmitDeviceSerializer(serializers.Serializer):
         category = attrs.get("category")
         # Dla phone/tablet/smartwatch wymagane: model (nazwa lub wybór z listy)
         if category in (DeviceCategory.PHONE, DeviceCategory.TABLET, DeviceCategory.SMARTWATCH):
+            if not (attrs.get("brand_name") or "").strip() and not attrs.get("brand_id"):
+                raise serializers.ValidationError(
+                    {"brand_name": "Dla telefonu/tabletu/smartwatcha podaj markę urządzenia."}
+                )
             if not (attrs.get("model_name") or "").strip() and not attrs.get("device_model_id"):
                 raise serializers.ValidationError(
-                    {"model": "Dla telefonu/tabletu/smartwatcha podaj nazwę modelu lub wybierz z listy."}
+                    {"model_name": "Dla telefonu/tabletu/smartwatcha podaj nazwę modelu lub wybierz z listy."}
                 )
         return attrs
 

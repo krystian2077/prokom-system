@@ -8,7 +8,7 @@ import { useStore } from "@/store";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PanelDateRangePicker } from "@/components/panel/PanelDateRangePicker";
-import type { TeamAbsenceRequest, TeamOverviewResponse, TeamOverviewRow } from "@/types/staff";
+import type { AttendanceMonthSummary, TeamAbsenceRequest, TeamOverviewResponse, TeamOverviewRow } from "@/types/staff";
 
 function todayIso() {
   const now = new Date();
@@ -25,6 +25,11 @@ function datePlusDaysIso(days: number) {
   const m = String(next.getMonth() + 1).padStart(2, "0");
   const d = String(next.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
+}
+
+function currentMonthIso() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function fmtDate(value: string | null | undefined) {
@@ -49,6 +54,14 @@ function fmtDuration(fromIso: string | null | undefined, nowMs: number) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+}
+
+function fmtHoursMinutes(seconds: number | null | undefined) {
+  const total = Math.max(0, Number(seconds ?? 0));
+  const minutes = Math.floor(total / 60);
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours}h ${String(mins).padStart(2, "0")}m`;
 }
 
 function statusBadge(status: string) {
@@ -96,6 +109,9 @@ export function WorkerTeamPage() {
   const [error, setError] = useState<string | null>(null);
   const [team, setTeam] = useState<TeamOverviewResponse | null>(null);
   const [requests, setRequests] = useState<TeamAbsenceRequest[]>([]);
+  const [attendanceMonth, setAttendanceMonth] = useState(currentMonthIso());
+  const [attendance, setAttendance] = useState<AttendanceMonthSummary | null>(null);
+  const [activeTab, setActiveTab] = useState<"team" | "attendance">("team");
 
   const [formBusy, setFormBusy] = useState(false);
   const [formAction, setFormAction] = useState<"confirm" | "finish" | null>(null);
@@ -110,21 +126,24 @@ export function WorkerTeamPage() {
     setLoading(true);
     setError(null);
     try {
-      const [teamRes, requestsRes] = await Promise.all([
+      const [teamRes, requestsRes, attendanceRes] = await Promise.all([
         api.get<TeamOverviewResponse>(`/accounts/staff/team-overview/?to=${encodeURIComponent(datePlusDaysIso(45))}`, token),
         api.get<TeamAbsenceRequest[]>(`/availability/requests/`, token),
+        api.get<AttendanceMonthSummary>(`/availability/work-sessions/me/month-summary/?month=${encodeURIComponent(attendanceMonth)}`, token),
       ]);
       setTeam(teamRes);
       setRequests(Array.isArray(requestsRes) ? requestsRes : []);
+      setAttendance(attendanceRes);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się pobrać danych zespołu.";
       setError(msg);
       setTeam(null);
       setRequests([]);
+      setAttendance(null);
     } finally {
       setLoading(false);
     }
-  }, [token, user]);
+  }, [token, user, attendanceMonth]);
 
   useEffect(() => {
     void load();
@@ -293,6 +312,34 @@ export function WorkerTeamPage() {
         </div>
       </header>
 
+      <section className="rounded-3xl border border-white/10 bg-[#0c0f18] p-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("team")}
+            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+              activeTab === "team"
+                ? "border border-[#3b82f6]/45 bg-[#3b82f6]/15 text-white"
+                : "border border-white/10 bg-white/[0.03] text-[#9ca3af] hover:bg-white/[0.08] hover:text-white"
+            }`}
+          >
+            Przegląd zespołu
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("attendance")}
+            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+              activeTab === "attendance"
+                ? "border border-[#3b82f6]/45 bg-[#3b82f6]/15 text-white"
+                : "border border-white/10 bg-white/[0.03] text-[#9ca3af] hover:bg-white/[0.08] hover:text-white"
+            }`}
+          >
+            Lista obecności
+          </button>
+        </div>
+      </section>
+
+      {activeTab === "team" ? (
       <section className="grid gap-4 xl:grid-cols-[1.02fr_.98fr]">
         <SectionCard title="Zespół dzisiaj" subtitle="Widzisz obecnych pracowników. Twój wpis pokazuje godzinę startu i czas pracy.">
           <div className="space-y-2 max-h-[64vh] overflow-auto pr-1">
@@ -451,6 +498,72 @@ export function WorkerTeamPage() {
           </SectionCard>
         </div>
       </section>
+      ) : (
+      <section>
+        <SectionCard title="Lista obecności (miesiąc)" subtitle="Podsumowanie Twojej pracy i nieobecności">
+          <div className="space-y-3">
+            <label className="space-y-1">
+              <span className="block text-[11px] uppercase tracking-[0.12em] text-[#8ea2c8]">Miesiąc</span>
+              <input
+                type="month"
+                value={attendanceMonth}
+                onChange={(e) => setAttendanceMonth(e.target.value || currentMonthIso())}
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+              />
+            </label>
+
+            <div className="grid gap-2 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[11px] uppercase tracking-[0.12em] text-[#8ea2c8]">Przepracowano</p>
+                <p className="mt-1 text-lg font-semibold text-white">{fmtHoursMinutes(attendance?.total_work_seconds)}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[11px] uppercase tracking-[0.12em] text-[#8ea2c8]">Dni pracy</p>
+                <p className="mt-1 text-lg font-semibold text-white">{attendance?.worked_days_count ?? 0}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[11px] uppercase tracking-[0.12em] text-[#8ea2c8]">Dni nieobecności</p>
+                <p className="mt-1 text-lg font-semibold text-white">{attendance?.absence_days_count ?? 0}</p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[11px] uppercase tracking-[0.12em] text-[#8ea2c8]">Dni pracy</p>
+                <div className="mt-2 max-h-64 space-y-1 overflow-auto pr-1">
+                  {attendance?.worked_days?.length ? (
+                    attendance.worked_days.map((day) => (
+                      <div key={day.date} className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0f1320] px-2.5 py-1.5 text-xs">
+                        <span className="text-[#cbd5e1]">{fmtDate(day.date)}</span>
+                        <span className="font-semibold text-white">{fmtHoursMinutes(day.seconds)}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-[#7e8aa5]">Brak dni pracy w wybranym miesiącu.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[11px] uppercase tracking-[0.12em] text-[#8ea2c8]">Dni nieobecności</p>
+                <div className="mt-2 max-h-64 space-y-1 overflow-auto pr-1">
+                  {attendance?.absence_days?.length ? (
+                    attendance.absence_days.map((day) => (
+                      <div key={day.date} className="rounded-xl border border-white/10 bg-[#0f1320] px-2.5 py-1.5 text-xs">
+                        <p className="font-semibold text-white">{fmtDate(day.date)}</p>
+                        <p className="mt-0.5 text-[#cbd5e1]">{day.types.map((t) => t.label).join(", ") || "Nieobecność"}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-[#7e8aa5]">Brak nieobecności w wybranym miesiącu.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
+      </section>
+      )}
     </main>
   );
 }

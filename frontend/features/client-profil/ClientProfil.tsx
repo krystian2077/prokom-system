@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MapPin, Shield, UserRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { useClientProfile } from "@/hooks/useClientProfile";
-import { apiClientProfileToPanel, type ApiClientProfile } from "@/lib/panel-api";
+import { type ApiClientProfile } from "@/lib/panel-api";
 import { apiMySummaryToDashboardStats, type ApiMySummary } from "@/lib/panel-api";
 import { formatDate, formatMonthYear } from "@/lib/format";
 import type { PreferredContact } from "@/types/panel";
@@ -26,7 +27,6 @@ export function ClientProfil() {
   const { profile: profileFromHook, loading: profileLoading, refetch: refetchProfile } = useClientProfile();
   const readOnly = !user?.email_verified;
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
 
@@ -63,16 +63,12 @@ export function ClientProfil() {
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
-    setLoading(true);
     api
       .get<ApiMySummary>("/repairs/my-summary/", token)
       .then((data) => {
         if (!cancelled) setStats(apiMySummaryToDashboardStats(data as ApiMySummary));
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
@@ -124,7 +120,7 @@ export function ClientProfil() {
 
   if (profileLoading && !profile) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
           <div className="panel-card h-fit p-6">
             <div className="skeleton mx-auto mb-4 h-20 w-20 rounded-full" />
@@ -142,8 +138,11 @@ export function ClientProfil() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
+          Panel klienta
+        </p>
         <h1 className="cp-heading font-extrabold" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(22px, 2.5vw, 28px)" }}>
           Profil
         </h1>
@@ -159,7 +158,7 @@ export function ClientProfil() {
             <>
               <div
                 className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold text-white"
-                style={{ background: "linear-gradient(135deg, var(--red), var(--red-h))" }}
+                style={{ background: "var(--red)" }}
               >
                 {profile.firstName?.[0]?.toUpperCase() ?? "?"}
               </div>
@@ -173,7 +172,7 @@ export function ClientProfil() {
                 className="mx-auto mt-3 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold"
                 style={readOnly ? { background: "rgba(220,30,30,.15)", color: "var(--red)", border: "1px solid rgba(220,30,30,.3)" } : { background: "var(--green-l)", color: "var(--green)", border: "1px solid var(--green-b)" }}
               >
-                {readOnly ? "⚠ E-MAIL NIEZWERYFIKOWANY" : "✓ KONTO AKTYWNE"}
+                {readOnly ? "E-MAIL NIEZWERYFIKOWANY" : "KONTO AKTYWNE"}
               </div>
               <ul className="mt-4 space-y-2 text-sm">
                 <li className="flex justify-between">
@@ -214,8 +213,8 @@ export function ClientProfil() {
           {/* Dane kontaktowe */}
           <div className="panel-card">
             <div className="panel-card-header flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--red-l)", border: "1px solid var(--red-border)" }}>
-                👤
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--red-l)", border: "1px solid var(--red-border)", color: "var(--red)" }}>
+                <UserRound size={16} />
               </span>
               <div>
                 <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
@@ -308,8 +307,8 @@ export function ClientProfil() {
           {/* Adres dostawy */}
           <div className="panel-card">
             <div className="panel-card-header flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--blue-l)", border: "1px solid var(--blue-b)" }}>
-                📍
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--blue-l)", border: "1px solid var(--blue-b)", color: "var(--blue)" }}>
+                <MapPin size={16} />
               </span>
               <div>
                 <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
@@ -390,8 +389,8 @@ export function ClientProfil() {
           {/* Hasło i bezpieczeństwo */}
           <div className="panel-card">
             <div className="panel-card-header flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)" }}>
-                🔒
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)", color: "var(--amber)" }}>
+                <Shield size={16} />
               </span>
               <div>
                 <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
@@ -533,9 +532,9 @@ export function ClientProfil() {
       {toastVisible && (
         <div
           className="fixed bottom-7 right-7 z-[500] flex items-center gap-3 rounded-xl border border-[var(--green-b)] px-4 py-3 shadow-lg"
-          style={{ background: "var(--island2)", animation: "saveSuccess .3s ease both" }}
+          style={{ background: "var(--island2)" }}
         >
-          <span className="text-xl">✅</span>
+          <span className="text-xl">✓</span>
           <span className="cp-heading text-sm font-medium">Zmiany zostały zapisane</span>
         </div>
       )}

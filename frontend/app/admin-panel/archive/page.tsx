@@ -115,11 +115,11 @@ function SummaryCard({
             <div className="mt-3 h-8 w-[100px] rounded-lg bg-white/[0.08] animate-pulse" />
           ) : (
             <>
-              <div className="mt-3 text-3xl font-bold text-white">
+              <div className="mt-3 text-3xl font-bold text-[var(--white)]">
                 {value == null ? "—" : v}
-                {valueSuffix ? <span className="text-xl font-semibold text-white/60 ml-1">{valueSuffix}</span> : ""}
+                {valueSuffix ? <span className="text-xl font-semibold text-[var(--ink2)] ml-1">{valueSuffix}</span> : ""}
               </div>
-              {hint ? <p className="mt-2 text-xs leading-snug text-white/50">{hint}</p> : null}
+              {hint ? <p className="mt-2 text-xs leading-snug text-[var(--muted)]">{hint}</p> : null}
             </>
           )}
         </div>
@@ -264,11 +264,11 @@ export default function AdminArchivePage() {
                     <Archive className="h-6 w-6 text-[#60a5fa]" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#9db0d4]">Panel administratora</p>
-                    <h1 className="mt-1 text-3xl font-bold text-white">Historia napraw</h1>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel administratora</p>
+                    <h1 className="mt-1 text-3xl font-bold text-[var(--white)]">Historia napraw</h1>
                   </div>
                 </div>
-                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#a9b8d6]">
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--ink2)]">
                   Przegląd wszystkich zamkniętych zleceń naprawczych z pełnymi statystykami. Reklamacje, gwarancje i klienci
                   powracający są automatycznie oznaczani dla łatwej identyfikacji.
                 </p>
@@ -278,7 +278,7 @@ export default function AdminArchivePage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Szukaj: numer, klient, urządzenie…"
-                  className="w-full rounded-xl border border-[#3b82f6]/30 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-[#6b7280] outline-none transition focus:border-[#3b82f6] focus:bg-white/[0.08] focus:ring-2 focus:ring-[#3b82f6]/20"
+                  className="w-full rounded-xl border border-[var(--border2)] bg-[var(--s2)] px-4 py-3 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] outline-none transition focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--bl)]"
                 />
               </div>
             </div>
@@ -331,12 +331,12 @@ export default function AdminArchivePage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3b82f6]/20">
                 <span className="text-sm font-bold text-[#60a5fa]">📋</span>
               </div>
-              <h2 className="text-xl font-bold text-white">Wszystkie zamknięte naprawy</h2>
+              <h2 className="text-xl font-bold text-[var(--white)]">Wszystkie zamknięte naprawy</h2>
             </div>
             {loading ? (
-              <span className="h-4 w-32 animate-pulse rounded bg-[#3b82f6]/20" aria-hidden />
+              <span className="h-4 w-32 animate-pulse rounded bg-[var(--bl)]" aria-hidden />
             ) : (
-              <div className="text-sm font-semibold text-[#a9b8d6]">
+              <div className="text-sm font-semibold text-[var(--ink2)]">
                 {items.length} z {count} pozycji
               </div>
             )}

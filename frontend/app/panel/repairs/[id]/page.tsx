@@ -323,6 +323,9 @@ function RepairDetailPageContent() {
   const repair = repairQuery.data ?? null;
   const timeline = timelineQuery.data ?? [];
   const threadMessages = messagesQuery.data ?? [];
+  const repairDeviceTitle = repair
+    ? [String(repair.device_brand ?? "").trim(), String(repair.device_model ?? "").trim()].filter(Boolean).join(" ") || repair.device_name
+    : "";
 
   const repairOverviewTimelineStatuses = useMemo(() => {
     const statuses = timeline.filter((e) => e.type === "status_change");
@@ -1008,7 +1011,7 @@ function RepairDetailPageContent() {
                       {repair.repair_number}
                     </span>
                     <span className="min-w-0 text-lg font-semibold leading-snug tracking-tight text-[#e8edf5] md:text-xl">
-                      {repair.device_name}
+                      {repairDeviceTitle}
                     </span>
                   </h1>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -1246,7 +1249,7 @@ function RepairDetailPageContent() {
                         <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
                           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Urządzenie</div>
                           <div className="mt-2 text-base font-semibold leading-snug tracking-tight text-[#e8edf5] md:text-lg">
-                            {repair.device_name}
+                            {repairDeviceTitle}
                           </div>
                           <div className="mt-1 text-xs text-[var(--ink2)]">{repair.device.category}</div>
                           <div className="mt-2 text-xs text-[var(--ink2)]">Weryfikacja: {repair.device_turns_on ? "tak" : "—"}</div>
@@ -1621,14 +1624,14 @@ function RepairDetailPageContent() {
                     value={commEmailSubject}
                     onChange={(e) => setCommEmailSubject(e.target.value)}
                     placeholder="Temat e-maila…"
-                    className="mb-3 mt-3 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
+                    className="mb-3 mt-3 w-full rounded-2xl border border-[var(--border)] bg-[var(--s2)] px-4 py-2.5 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
                   />
                 ) : null}
                 <textarea
                   ref={commTextareaRef}
                   value={commDraft}
                   onChange={(e) => setCommDraft(e.target.value)}
-                  className="mt-1 w-full resize-y rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-3 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
+                  className="mt-1 w-full resize-y rounded-2xl border border-[var(--border)] bg-[var(--s2)] px-4 py-3 text-sm text-[var(--white)] outline-none focus:border-[#3b82f6]"
                   rows={4}
                   placeholder={
                     commChannel === "email"
@@ -2203,7 +2206,7 @@ function RepairDetailPageContent() {
                             </div>
                             <div className="sm:col-span-2">
                               <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--ink2)]">Cena całkowita (pozycji)</label>
-                              <div className="rounded-xl border border-[var(--border)] bg-[#111318] px-3 py-2 text-sm font-semibold text-[var(--white)]">
+                              <div className="rounded-xl border border-[var(--border)] bg-[var(--s2)] px-3 py-2 text-sm font-semibold text-[var(--white)]">
                                 {quoteLineTotalPreview !== null ? `${quoteLineTotalPreview.toFixed(2)} zł` : "—"}
                               </div>
                               <p className="mt-1 text-[11px] text-[var(--ink2)]">Ilość × (cena części + cena robocizny) na jednostkę.</p>

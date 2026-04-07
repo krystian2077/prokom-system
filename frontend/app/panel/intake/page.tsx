@@ -86,8 +86,8 @@ export default function IntakePage() {
 
   const [deviceCategory, setDeviceCategory] = useState("phone");
   const [serviceType, setServiceType] = useState("");
-  /** Jedno pole UI: marka + model (backend: device_model_name, manual_brand puste) */
-  const [brandAndModel, setBrandAndModel] = useState("");
+  const [deviceBrand, setDeviceBrand] = useState("");
+  const [deviceModel, setDeviceModel] = useState("");
   const [deviceColor, setDeviceColor] = useState("");
   const [visualCondition, setVisualCondition] = useState("");
   const [devicePassword, setDevicePassword] = useState("");
@@ -249,12 +249,12 @@ export default function IntakePage() {
     if (linkedClientId) {
       if (!deviceChoice) return false;
       if (deviceChoice === "new") {
-        return Boolean(deviceCategory && brandAndModel.trim());
+        return Boolean(deviceCategory && deviceBrand.trim() && deviceModel.trim());
       }
       return true;
     }
     return Boolean(
-      firstName.trim() && lastName.trim() && phone.trim() && deviceCategory && brandAndModel.trim() && problemDescription.trim(),
+      firstName.trim() && lastName.trim() && phone.trim() && deviceCategory && deviceBrand.trim() && deviceModel.trim() && problemDescription.trim(),
     );
   }, [
     problemBlock,
@@ -263,7 +263,8 @@ export default function IntakePage() {
     linkedClientId,
     deviceChoice,
     deviceCategory,
-    brandAndModel,
+    deviceBrand,
+    deviceModel,
     firstName,
     lastName,
     phone,
@@ -276,9 +277,11 @@ export default function IntakePage() {
     setSubmitting(true);
     setError(null);
     try {
+      const normalizedBrand = deviceBrand.trim();
+      const shouldSendBrand = normalizedBrand !== "" && normalizedBrand.toLowerCase() !== "inna marka";
+
       let payload: Record<string, unknown> = {
         problem_description: problemBlock,
-        manual_brand: "",
         device_color: deviceColor.trim(),
         visual_condition: visualCondition.trim(),
         device_password: devicePassword.trim(),
@@ -315,15 +318,21 @@ export default function IntakePage() {
           client_id: linkedClientId,
           device_id: deviceChoice,
         };
-        if (brandAndModel.trim()) {
-          payload.device_model_name = brandAndModel.trim();
+        if (shouldSendBrand) {
+          payload.manual_brand = normalizedBrand;
+          payload.device_brand_name = normalizedBrand;
+        }
+        if (deviceModel.trim()) {
+          payload.device_model_name = deviceModel.trim();
         }
       } else if (linkedClientId && deviceChoice === "new") {
         payload = {
           ...payload,
           client_id: linkedClientId,
           device_category: deviceCategory,
-          device_model_name: brandAndModel.trim() || "Do uzupełnienia",
+          manual_brand: shouldSendBrand ? normalizedBrand : "",
+          device_brand_name: shouldSendBrand ? normalizedBrand : "",
+          device_model_name: deviceModel.trim() || "Do uzupełnienia",
         };
       } else {
         payload = {
@@ -333,7 +342,9 @@ export default function IntakePage() {
           phone: phone.trim(),
           email: email.trim(),
           device_category: deviceCategory,
-          device_model_name: brandAndModel.trim() || "Do uzupełnienia",
+          manual_brand: shouldSendBrand ? normalizedBrand : "",
+          device_brand_name: shouldSendBrand ? normalizedBrand : "",
+          device_model_name: deviceModel.trim() || "Do uzupełnienia",
         };
       }
 
@@ -535,7 +546,8 @@ export default function IntakePage() {
                           checked={deviceChoice === d.id}
                           onChange={() => {
                             setDeviceChoice(d.id);
-                            setBrandAndModel(d.device_name || "");
+                            setDeviceBrand((d.device_brand || "").trim());
+                            setDeviceModel((d.device_model || "").trim());
                           }}
                         />
                         <div>
@@ -561,7 +573,8 @@ export default function IntakePage() {
                         checked={deviceChoice === "new"}
                         onChange={() => {
                           setDeviceChoice("new");
-                          setBrandAndModel("");
+                          setDeviceBrand("");
+                          setDeviceModel("");
                           setTimeout(() => modelRef.current?.focus(), 100);
                         }}
                       />
@@ -610,15 +623,26 @@ export default function IntakePage() {
             {(!linkedClientId || deviceChoice) && (
               <div className="mt-6 space-y-5 border-t border-[var(--border)] pt-6">
                 <h3 className="text-sm font-semibold text-[var(--white)]">Szczegóły sprzętu</h3>
-                <div>
-                  <div className={labelClass}>Marka i model urządzenia</div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <div className={labelClass}>Marka urządzenia</div>
+                    <input
+                      value={deviceBrand}
+                      onChange={(e) => setDeviceBrand(e.target.value)}
+                      placeholder="np. Apple, Samsung, Lenovo…"
+                      className="mt-1.5 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none transition focus:border-[#3b82f6]/45"
+                    />
+                  </div>
+                  <div>
+                    <div className={labelClass}>Model urządzenia</div>
                   <input
                     ref={modelRef}
-                    value={brandAndModel}
-                    onChange={(e) => setBrandAndModel(e.target.value)}
-                    placeholder="np. Apple iPhone 15 Pro, Samsung Galaxy S24, Dell Latitude 5520…"
+                    value={deviceModel}
+                    onChange={(e) => setDeviceModel(e.target.value)}
+                    placeholder="np. iPhone 15 Pro, Galaxy S24, Latitude 5520…"
                     className="mt-1.5 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none transition focus:border-[#3b82f6]/45"
                   />
+                  </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
@@ -909,7 +933,8 @@ export default function IntakePage() {
             email={email}
             linkedFromDb={Boolean(linkedClientId)}
             deviceCategory={deviceCategory}
-            deviceBrandModel={brandAndModel}
+            deviceBrand={deviceBrand}
+            deviceModel={deviceModel}
             deviceColor={deviceColor}
             visualCondition={visualCondition}
             serviceType={serviceType}
@@ -997,7 +1022,8 @@ export default function IntakePage() {
                   setSuccess(null);
                   setProblemDescription("");
                   setServiceType("");
-                  setBrandAndModel("");
+                  setDeviceBrand("");
+                  setDeviceModel("");
                   setDeviceColor("");
                   setVisualCondition("");
                   setDevicePassword("");

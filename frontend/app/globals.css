@@ -113,6 +113,7 @@ h4,
 h5,
 h6 {
   margin: 0;
+  font-family: var(--font-dm-sans, inherit);
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.1;
@@ -362,146 +363,6 @@ b {
   background: #141720;
   color: #fff;
 }
-
-/* Natywne selecty w ciemnych panelach — spójne tło list rozwijanych */
-.worker-shell select,
-.client-panel select,
-.login-page select,
-.zgloszenie-page select,
-.uslugi-page select,
-[data-theme="dark"] select {
-  color-scheme: dark;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  min-height: 48px;
-  padding: 0.85rem 2.9rem 0.85rem 1rem;
-  border-radius: 16px;
-  background-color: #141720;
-  background-image: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.68) 50%), linear-gradient(135deg, rgba(255, 255, 255, 0.68) 50%, transparent 50%);
-  background-position: calc(100% - 1.15rem) calc(50% - 2px), calc(100% - 0.95rem) calc(50% - 2px);
-  background-size: 7px 7px, 7px 7px;
-  background-repeat: no-repeat;
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 10px 28px rgba(0, 0, 0, 0.22);
-  font-size: 0.98rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-}
-
-.worker-shell select:hover:not(:disabled),
-.client-panel select:hover:not(:disabled),
-.login-page select:hover:not(:disabled),
-.zgloszenie-page select:hover:not(:disabled),
-.uslugi-page select:hover:not(:disabled),
-[data-theme="dark"] select:hover:not(:disabled) {
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18), 0 14px 34px rgba(0, 0, 0, 0.28);
-}
-
-.worker-shell select:focus-visible,
-.client-panel select:focus-visible,
-.login-page select:focus-visible,
-.zgloszenie-page select:focus-visible,
-.uslugi-page select:focus-visible,
-[data-theme="dark"] select:focus-visible {
-  outline: none;
-  border-color: rgba(59, 130, 246, 0.85);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22), 0 16px 36px rgba(0, 0, 0, 0.3);
-}
-
-.worker-shell select:disabled,
-.client-panel select:disabled,
-.login-page select:disabled,
-.zgloszenie-page select:disabled,
-.uslugi-page select:disabled,
-[data-theme="dark"] select:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-  transform: none;
-}
-
-.worker-shell select option,
-.worker-shell select optgroup,
-.client-panel select option,
-.client-panel select optgroup,
-.login-page select option,
-.login-page select optgroup,
-.zgloszenie-page select option,
-.zgloszenie-page select optgroup,
-.uslugi-page select option,
-.uslugi-page select optgroup,
-[data-theme="dark"] select option,
-[data-theme="dark"] select optgroup {
-  background-color: #141720;
-  color: #ffffff;
-  font-size: 0.96rem;
-}
-
-[data-theme="light"] select,
-.worker-shell[data-worker-theme="light"] select,
-.client-panel.client-panel--light select {
-  color-scheme: light;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  min-height: 48px;
-  padding: 0.85rem 2.9rem 0.85rem 1rem;
-  border-radius: 16px;
-  background-color: #ffffff;
-  background-image: linear-gradient(45deg, transparent 50%, rgba(15, 23, 42, 0.5) 50%), linear-gradient(135deg, rgba(15, 23, 42, 0.5) 50%, transparent 50%);
-  background-position: calc(100% - 1.15rem) calc(50% - 2px), calc(100% - 0.95rem) calc(50% - 2px);
-  background-size: 7px 7px, 7px 7px;
-  background-repeat: no-repeat;
-  color: #1f2937;
-  border-color: rgba(15, 23, 42, 0.14);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 10px 28px rgba(15, 23, 42, 0.08);
-  font-size: 0.98rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-}
-
-[data-theme="light"] select:hover:not(:disabled),
-.worker-shell[data-worker-theme="light"] select:hover:not(:disabled),
-.client-panel.client-panel--light select:hover:not(:disabled) {
-  transform: translateY(-1px);
-  border-color: rgba(15, 23, 42, 0.2);
-  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 14px 34px rgba(15, 23, 42, 0.12);
-}
-
-[data-theme="light"] select:focus-visible,
-.worker-shell[data-worker-theme="light"] select:focus-visible,
-.client-panel.client-panel--light select:focus-visible {
-  outline: none;
-  border-color: rgba(59, 130, 246, 0.9);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18), 0 16px 36px rgba(15, 23, 42, 0.12);
-}
-
-[data-theme="light"] select:disabled,
-.worker-shell[data-worker-theme="light"] select:disabled,
-.client-panel.client-panel--light select:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-  transform: none;
-}
-
-[data-theme="light"] select option,
-[data-theme="light"] select optgroup,
-.worker-shell[data-worker-theme="light"] select option,
-.worker-shell[data-worker-theme="light"] select optgroup,
-.client-panel.client-panel--light select option,
-.client-panel.client-panel--light select optgroup {
-  background-color: #ffffff;
-  color: #1f2937;
-  font-size: 0.96rem;
-}
-
 .zgloszenie-page .fta {
   resize: vertical;
   min-height: 108px;
@@ -1244,8 +1105,9 @@ b {
   --panel-nav-home-hover: #d0d4de;
   --panel-nav-divider: rgba(255, 255, 255, 0.07);
   min-height: 100vh;
-  background: var(--page);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.025'/%3E%3C/svg%3E");
+  --panel-card-shadow: 0 8px 26px rgba(15, 23, 42, 0.16);
+  --panel-card-shadow-hover: 0 12px 30px rgba(15, 23, 42, 0.2);
+  background: radial-gradient(circle at 90% -20%, rgba(220, 30, 30, 0.07), transparent 42%), var(--page);
   position: relative;
 }
 
@@ -1274,9 +1136,8 @@ b {
   --panel-nav-home-hover: #374151;
   --panel-nav-divider: rgba(15, 23, 42, 0.12);
   /* Cień kart (używany w regule .panel-card poniżej) */
-  --panel-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 6px 20px rgba(15, 23, 42, 0.07);
-  --panel-card-shadow-hover: 0 2px 4px rgba(15, 23, 42, 0.06), 0 10px 28px rgba(15, 23, 42, 0.09);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.035'/%3E%3C/svg%3E");
+  --panel-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 22px rgba(15, 23, 42, 0.07);
+  --panel-card-shadow-hover: 0 2px 4px rgba(15, 23, 42, 0.05), 0 12px 30px rgba(15, 23, 42, 0.1);
 }
 
 .client-panel .cp-heading {
@@ -1292,16 +1153,16 @@ b {
 .client-panel::before {
   content: "";
   position: fixed;
-  top: -20%;
-  left: -15%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(ellipse, rgba(220, 30, 30, 0.05), transparent 65%);
+  top: -26%;
+  left: -22%;
+  width: 72vw;
+  height: 72vw;
+  background: radial-gradient(ellipse, rgba(220, 30, 30, 0.05), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 .client-panel.client-panel--light::before {
-  background: radial-gradient(ellipse, rgba(220, 30, 30, 0.04), transparent 62%);
+  background: radial-gradient(ellipse, rgba(220, 30, 30, 0.035), transparent 68%);
 }
 
 @keyframes fadeUp {
@@ -1355,13 +1216,14 @@ b {
 .client-panel .panel-card {
   background: var(--island);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 18px;
   overflow: hidden;
+  box-shadow: var(--panel-card-shadow, none);
 }
 .client-panel.client-panel--light .panel-card {
   border-color: rgba(15, 23, 42, 0.13);
   box-shadow: var(--panel-card-shadow, none);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
 }
 /* Delikatne podbicie cienia tylko na interaktywnych kafelkach (np. statystyki) */
 .client-panel.client-panel--light .panel-card.group:hover {
@@ -1369,12 +1231,7 @@ b {
   border-color: rgba(15, 23, 42, 0.17);
 }
 .client-panel .panel-card::before {
-  content: "";
-  display: block;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--red) 25%, #ff5555 50%, var(--red) 75%, transparent);
-  background-size: 300% 100%;
-  animation: shimmerSlide 4s linear infinite;
+  content: none;
 }
 .client-panel .panel-card-header {
   padding: 16px 22px 14px;
@@ -1391,7 +1248,7 @@ b {
   border: 1px solid var(--amber-b);
 }
 .client-panel .status-badge.progress .status-dot {
-  animation: statusPulse 1.5s ease infinite;
+  opacity: 0.9;
 }
 .client-panel .status-badge.ready {
   background: rgba(245, 158, 11, 0.14);
@@ -1399,7 +1256,7 @@ b {
   border: 1px solid var(--amber-b);
 }
 .client-panel .status-badge.ready .status-dot {
-  animation: statusPulse 1.2s ease infinite;
+  opacity: 0.9;
 }
 .client-panel .status-badge.done {
   background: var(--green-l);
@@ -1420,22 +1277,13 @@ b {
   background: rgba(0, 0, 0, 0.04);
 }
 .client-panel .skeleton {
-  background: linear-gradient(90deg, var(--island2) 25%, var(--island3) 50%, var(--island2) 75%);
-  background-size: 200% 100%;
-  animation: skeletonPulse 1.5s ease infinite;
+  background: var(--island2);
 }
 .client-panel .panel-nav {
   position: relative;
 }
 .client-panel .panel-nav::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(220,30,30,.3) 30%, rgba(220,30,30,.3) 70%, transparent);
-  pointer-events: none;
+  content: none;
 }
 
 /* ─── Panel pracownika (worker) shimmer ─── */
@@ -1540,32 +1388,37 @@ b {
 }
 
 .worker-shell[data-worker-theme="light"] {
-  --page: #eef1f8;
+  /* ── Tła i powierzchnie (niebieskawa biel) ── */
+  --page: #edf1fb;
   --s1: #ffffff;
-  --s2: #f4f6fc;
-  --s3: #eaecf4;
-  --s4: #e0e3ef;
-  --s5: #d5d9e8;
-  --faint: #c5c9d8;
-  --white: #111827;
-  --ink: #1f2334;
-  --ink2: #4b5268;
-  --muted: #7c859e;
-  --border: rgba(0, 0, 0, 0.08);
-  --border2: rgba(0, 0, 0, 0.14);
+  --s2: #f3f7ff;
+  --s3: #e8eefa;
+  --s4: #dde5f7;
+  --s5: #cfd9f0;
+  --faint: #b8c7e0;
+  /* ── Tekst ── */
+  --white: #0d1225;
+  --ink: #0d1225;
+  --ink2: #3e4f6b;
+  --muted: #7285a0;
+  /* ── Obramowania (niebieska tonia) ── */
+  --border: rgba(37, 99, 235, 0.10);
+  --border2: rgba(37, 99, 235, 0.18);
+  /* ── Kolor bazowy marki ── */
   --red: #c81919;
   --red-h: #a31414;
   --rl: rgba(200, 25, 25, 0.07);
   --rb: rgba(200, 25, 25, 0.18);
+  /* ── Kolory semantyczne ── */
   --green: #15803d;
   --gl: rgba(21, 128, 61, 0.09);
   --gb: rgba(21, 128, 61, 0.22);
   --amber: #b45309;
   --al: rgba(180, 83, 9, 0.09);
   --ab: rgba(180, 83, 9, 0.22);
-  --blue: #1d4ed8;
-  --bl: rgba(29, 78, 216, 0.09);
-  --bb: rgba(29, 78, 216, 0.22);
+  --blue: #2563eb;
+  --bl: rgba(37, 99, 235, 0.09);
+  --bb: rgba(37, 99, 235, 0.22);
   --purple: #6d28d9;
   --pl: rgba(109, 40, 217, 0.09);
   --pb: rgba(109, 40, 217, 0.22);
@@ -1576,24 +1429,682 @@ b {
   --cl: rgba(3, 105, 161, 0.09);
   --cb: rgba(3, 105, 161, 0.22);
   --nav: 352px;
-  --row-hover: rgba(15, 23, 42, 0.06);
-  --row-active: rgba(15, 23, 42, 0.09);
+  /* ── Hover / active rows (subtelny niebieski) ── */
+  --row-hover: rgba(37, 99, 235, 0.04);
+  --row-active: rgba(37, 99, 235, 0.08);
+  /* ── Dedykowane tokeny light-only ── */
+  --card-shadow: 0 1px 3px rgba(37, 99, 235, 0.08), 0 6px 24px rgba(37, 99, 235, 0.06);
+  --card-shadow-hover: 0 2px 8px rgba(37, 99, 235, 0.13), 0 12px 36px rgba(37, 99, 235, 0.09);
+  --modal-shadow: 0 20px 60px rgba(13, 18, 37, 0.18), 0 4px 16px rgba(37, 99, 235, 0.10), 0 0 0 1px rgba(37, 99, 235, 0.08);
+  --topbar-shadow: 0 1px 0 rgba(37, 99, 235, 0.07), 0 4px 20px rgba(37, 99, 235, 0.06);
+  --sidebar-shadow: 2px 0 20px rgba(37, 99, 235, 0.07);
+  --input-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.13), 0 0 16px rgba(37, 99, 235, 0.06);
+  --dropdown-shadow: 0 16px 48px rgba(37, 99, 235, 0.14), 0 4px 12px rgba(37, 99, 235, 0.08), 0 0 0 1px rgba(37, 99, 235, 0.10);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PREMIUM LIGHT MODE — component overrides
+   Selektor: .worker-shell[data-worker-theme="light"]
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Strona / tło ── */
+.worker-shell[data-worker-theme="light"] {
+  background: var(--page);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.018'/%3E%3C/svg%3E");
+}
+
+/* ── Subtelny ambient glow (niebieski zamiast czerwonego) ── */
+.worker-shell[data-worker-theme="light"]::before {
+  content: "";
+  position: fixed;
+  top: -25%;
+  left: -20%;
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.05), transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Topbar / header ── */
+.worker-shell[data-worker-theme="light"] header.sticky {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-bottom-color: rgba(37, 99, 235, 0.10) !important;
+  box-shadow: var(--topbar-shadow) !important;
+  backdrop-filter: blur(20px);
+}
+
+/* ── Sidebar / pasek boczny ── */
+.worker-shell[data-worker-theme="light"] aside {
+  background: linear-gradient(180deg, var(--s2) 0%, var(--s1) 55%, var(--page) 100%) !important;
+  border-right-color: rgba(37, 99, 235, 0.10) !important;
+  box-shadow: var(--sidebar-shadow) !important;
+}
+
+/* ── Karty (worker-card-shimmer) — niebieski shimmer zamiast niebieskiego na ciemnym ── */
+.worker-shell[data-worker-theme="light"] .worker-card-shimmer::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(37, 99, 235, 0.22) 25%,
+    rgba(96, 165, 250, 0.30) 50%,
+    rgba(37, 99, 235, 0.22) 75%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+}
+
+/* ── Ogólne karty z var(--s1) + border ── */
+.worker-shell[data-worker-theme="light"] .rounded-3xl.border.bg-\[var\(--s1\)\],
+.worker-shell[data-worker-theme="light"] .rounded-2xl.border.bg-\[var\(--s1\)\],
+.worker-shell[data-worker-theme="light"] [class*="rounded"][class*="border"][class*="bg-[var(--s1)]"] {
+  box-shadow: var(--card-shadow);
+}
+
+/* ── Tabele — nagłówek ── */
+.worker-shell[data-worker-theme="light"] thead,
+.worker-shell[data-worker-theme="light"] .thead,
+.worker-shell[data-worker-theme="light"] [class*="bg-\[var\(--s2\)\]"][class*="border-b"] {
+  background: linear-gradient(180deg, var(--s2) 0%, var(--s3) 100%);
+}
+
+/* ── Dropdown wyszukiwarki (topbar) ── */
+.worker-shell[data-worker-theme="light"] .absolute.rounded-2xl.border.bg-\[var\(--s1\)\],
+.worker-shell[data-worker-theme="light"] [class*="absolute"][class*="rounded-2xl"][class*="bg-[var(--s1)]"][class*="shadow"] {
+  box-shadow: var(--dropdown-shadow) !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+}
+
+/* ── Modale ── */
+.worker-shell[data-worker-theme="light"] .modal-overlay,
+.worker-shell[data-worker-theme="light"] [class*="fixed"][class*="inset-0"][class*="bg-black"] {
+  background: rgba(13, 18, 37, 0.50) !important;
+  backdrop-filter: blur(5px);
+}
+.worker-shell[data-worker-theme="light"] .modal,
+.worker-shell[data-worker-theme="light"] [class*="fixed"][class*="z-"][class*="rounded"][class*="bg-[var(--s1)]"] {
+  box-shadow: var(--modal-shadow) !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+}
+
+/* ── Formularze — inputy i selecty ── */
+.worker-shell[data-worker-theme="light"] .finput,
+.worker-shell[data-worker-theme="light"] .sel,
+.worker-shell[data-worker-theme="light"] .cia-ta {
+  background: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
+  color: var(--ink) !important;
+}
+.worker-shell[data-worker-theme="light"] .finput:focus,
+.worker-shell[data-worker-theme="light"] .sel:focus,
+.worker-shell[data-worker-theme="light"] .cia-ta:focus {
+  border-color: var(--blue) !important;
+  background: var(--s1) !important;
+  box-shadow: var(--input-focus-ring) !important;
+}
+.worker-shell[data-worker-theme="light"] .finput::placeholder,
+.worker-shell[data-worker-theme="light"] .cia-ta::placeholder {
+  color: var(--muted) !important;
+}
+
+/* Tailwind input klasy w panelu */
+.worker-shell[data-worker-theme="light"] input[class*="bg-[var(--s"],
+.worker-shell[data-worker-theme="light"] textarea[class*="bg-[var(--s"],
+.worker-shell[data-worker-theme="light"] select[class*="bg-[var(--s"] {
+  background-color: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
+  color: var(--ink) !important;
+}
+.worker-shell[data-worker-theme="light"] input[class*="bg-[var(--s"]:focus,
+.worker-shell[data-worker-theme="light"] textarea[class*="bg-[var(--s"]:focus,
+.worker-shell[data-worker-theme="light"] select[class*="bg-[var(--s"]:focus {
+  border-color: var(--blue) !important;
+  background-color: var(--s1) !important;
+  box-shadow: var(--input-focus-ring) !important;
+}
+
+/* ── Wiersze tabel ── */
+.worker-shell[data-worker-theme="light"] .trow:hover,
+.worker-shell[data-worker-theme="light"] .rrow:hover,
+.worker-shell[data-worker-theme="light"] .mi:hover,
+.worker-shell[data-worker-theme="light"] .arch-row:hover {
+  background: var(--row-hover) !important;
+}
+
+/* ── Status badges — poprawiona czytelność w jasnym tle ── */
+.worker-shell[data-worker-theme="light"] .sp.new {
+  background: rgba(37, 99, 235, 0.07);
+  border-color: rgba(37, 99, 235, 0.18);
+  color: #1d4ed8;
+}
+.worker-shell[data-worker-theme="light"] .sp.done {
+  background: rgba(21, 128, 61, 0.07);
+  border-color: rgba(21, 128, 61, 0.20);
+  color: #166534;
+}
+.worker-shell[data-worker-theme="light"] .sp.progress,
+.worker-shell[data-worker-theme="light"] .sp.in_progress {
+  background: rgba(180, 83, 9, 0.08);
+  border-color: rgba(180, 83, 9, 0.22);
+  color: #92400e;
+}
+.worker-shell[data-worker-theme="light"] .sp.waiting,
+.worker-shell[data-worker-theme="light"] .sp.waiting_for_parts {
+  background: rgba(109, 40, 217, 0.08);
+  border-color: rgba(109, 40, 217, 0.22);
+  color: #5b21b6;
+}
+.worker-shell[data-worker-theme="light"] .sp.ready {
+  background: rgba(180, 83, 9, 0.09);
+  border-color: rgba(180, 83, 9, 0.22);
+  color: #92400e;
+}
+.worker-shell[data-worker-theme="light"] .sp.complaint,
+.worker-shell[data-worker-theme="light"] .sp.reklamacja {
+  background: rgba(200, 25, 25, 0.07);
+  border-color: rgba(200, 25, 25, 0.22);
+  color: #991b1b;
+}
+
+/* ── Cieniowanie kart / sekcji ── */
+.worker-shell[data-worker-theme="light"] .sc,
+.worker-shell[data-worker-theme="light"] .twrap,
+.worker-shell[data-worker-theme="light"] .card {
+  box-shadow: var(--card-shadow);
+  border-color: rgba(37, 99, 235, 0.10);
+}
+.worker-shell[data-worker-theme="light"] .sc:hover,
+.worker-shell[data-worker-theme="light"] .twrap:hover,
+.worker-shell[data-worker-theme="light"] .card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* ── Modal overlay ── */
+.worker-shell[data-worker-theme="light"] .modal-overlay {
+  background: rgba(13, 18, 37, 0.45);
+}
+.worker-shell[data-worker-theme="light"] .modal {
+  box-shadow: var(--modal-shadow);
+  border-color: rgba(37, 99, 235, 0.13);
+}
+
+/* ── Pasek przewijania wewnątrz kart (wąski) ── */
+.worker-shell[data-worker-theme="light"] .repair-timeline-scroll {
+  scrollbar-color: rgba(37, 99, 235, 0.35) rgba(37, 99, 235, 0.05);
+}
+.worker-shell[data-worker-theme="light"] .repair-timeline-scroll::-webkit-scrollbar-track {
+  background: rgba(37, 99, 235, 0.04);
+}
+.worker-shell[data-worker-theme="light"] .repair-timeline-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.55), rgba(37, 99, 235, 0.45));
+}
+.worker-shell[data-worker-theme="light"] .repair-timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.75), rgba(37, 99, 235, 0.65));
+}
+
+/* ── Animacje / keyframes — kalendarze, wykresy, inne ── */
+.worker-shell[data-worker-theme="light"] [class*="[scrollbar-color:rgba(255,255,255"] {
+  scrollbar-color: rgba(37, 99, 235, 0.2) transparent !important;
+}
+
+/* ── Tekst pomocniczy (hardkodowane ciemne odcienie w komponentach) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-[#9ca3af]"],
+.worker-shell[data-worker-theme="light"] [class*="text-[#9db0d5]"],
+.worker-shell[data-worker-theme="light"] [class*="text-[#a9b8d6]"],
+.worker-shell[data-worker-theme="light"] [class*="text-[#9fb1d3]"] {
+  color: var(--ink2) !important;
+}
+
+/* ── Tekst biały w kartach (odznaki, etykiety) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-[#dbeafe]"],
+.worker-shell[data-worker-theme="light"] [class*="text-[#e5e7eb]"],
+.worker-shell[data-worker-theme="light"] [class*="text-[#fca5a5]"] {
+  color: var(--ink) !important;
+}
+
+/* ── Tła sekcji z hardkodowanym dark ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-[#"] {
+  /* selektywne nadpisania dalej poniżej */
+}
+
+/* ── Priorytety / urgency strip (pionowy pasek po lewej) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-red-500/10"] {
+  background: rgba(200, 25, 25, 0.07) !important;
+  border-color: rgba(200, 25, 25, 0.22) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-red-500/25"],
+.worker-shell[data-worker-theme="light"] [class*="border-red-500/30"] {
+  border-color: rgba(200, 25, 25, 0.30) !important;
+}
+
+/* ── Focus ring globalny ── */
+.worker-shell[data-worker-theme="light"] :focus-visible {
+  outline-color: var(--blue);
+}
+
+/* ── Nagłówki sekcji w tabelach ── */
+.worker-shell[data-worker-theme="light"] [class*="uppercase"][class*="tracking-"][class*="text-[var(--ink2)]"] {
+  color: var(--ink2);
+}
+
+/* ── Amber badge/reklamacja w claims (hardkodowany) ── */
+.worker-shell[data-worker-theme="light"] [class*="border-[#f59e0b]/35"],
+.worker-shell[data-worker-theme="light"] [class*="bg-[#f59e0b]/12"] {
+  background: rgba(180, 83, 9, 0.09) !important;
+  border-color: rgba(180, 83, 9, 0.30) !important;
+  color: #92400e !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="text-[#fde68a]"] {
+  color: #92400e !important;
+}
+
+/* ── Calendar popup ── */
+.worker-shell[data-worker-theme="light"] [class*="text-[#9ca3af]"] {
+  color: var(--ink2) !important;
+}
+
+/* ── Panel parts / admin parts hardkodowane ── */
+.worker-shell[data-worker-theme="light"] [class*="text-white"]:not([class*="bg-"]) {
+  color: var(--white);
+}
+.worker-shell[data-worker-theme="light"] p[class*="text-[#e5e7eb]"],
+.worker-shell[data-worker-theme="light"] p[class*="text-white"] {
+  color: var(--ink) !important;
+}
+
+/* ── Notification detail ── */
+.worker-shell[data-worker-theme="light"] [class*="text-[#9db0d5]"],
+.worker-shell[data-worker-theme="light"] [class*="text-[#a9b8d6]"] {
+  color: var(--ink2) !important;
+}
+
+/* ── Workload page ── */
+.worker-shell[data-worker-theme="light"] [class*="text-[#9ca3af]"]:not(svg *) {
+  color: var(--ink2) !important;
+}
+
+/* ── Tło nagłówka sekcji w tabeli workload/dashboard ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient-to-b"][class*="from-[var(--s2)]"] {
+  background: linear-gradient(180deg, var(--s2) 0%, var(--s3) 100%);
+}
+
+/* ── Tagi "pilne" i "flagi" w liście napraw (inline colored) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-red-500"][class*="text-white"] {
+  background: var(--red) !important;
+  color: #fff !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-[#22c55e]"] {
+  background: #15803d !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-[#16a34a]"]:hover {
+  background: #166534 !important;
+}
+
+/* ── Pipeline chart (dashboard admin) — zachowanie kolorów akcentu ── */
+.worker-shell[data-worker-theme="light"] [class*="from-[var(--blue)]"],
+.worker-shell[data-worker-theme="light"] [class*="to-[var(--blue)]"] {
+  /* kolory zachowane — czerpią z --blue który jest już prawidłowy */
+}
+
+/* ── Date picker (panel-date-picker) ── */
+.worker-shell[data-worker-theme="light"] .prokom-dp-root {
+  background: var(--s1) !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+  box-shadow: var(--dropdown-shadow) !important;
+}
+.worker-shell[data-worker-theme="light"] .prokom-dp-root .day-cell:hover {
+  background: var(--bl) !important;
+  color: var(--blue) !important;
+}
+.worker-shell[data-worker-theme="light"] .prokom-dp-root .day-cell.selected {
+  background: var(--blue) !important;
+  color: #fff !important;
+}
+.worker-shell[data-worker-theme="light"] .prokom-dp-root .day-cell.in-range {
+  background: var(--bl) !important;
+  color: var(--blue) !important;
+}
+
+/* ── Acceptance protocol preview modal ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-[var(--s3)]"][class*="rounded"] {
+  background: var(--s3) !important;
+}
+
+/* ── Sugerowane statusy (SuggestedNextStatusStrip) ── */
+.worker-shell[data-worker-theme="light"] [class*="rounded-2xl"][class*="border"][class*="bg-[var(--s2)]"] {
+  background: var(--s2) !important;
+  box-shadow: var(--card-shadow);
+}
+
+/* ── Wirtualny scrollbar wewnątrz list ── */
+.worker-shell[data-worker-theme="light"] [style*="scrollbar-color:rgba(255,255,255"] {
+  scrollbar-color: rgba(37, 99, 235, 0.25) transparent !important;
+}
+
+/* ── Tooltip / popover shadows ── */
+.worker-shell[data-worker-theme="light"] [class*="z-[300]"][class*="rounded"][class*="bg-[var(--s1)]"],
+.worker-shell[data-worker-theme="light"] [class*="z-[200]"][class*="rounded"][class*="bg-[var(--s1)]"] {
+  box-shadow: var(--dropdown-shadow) !important;
+  border-color: rgba(37, 99, 235, 0.13) !important;
+}
+
+/* ── Wiersze unassigned (przyjęcie stacjonarne itp.) ── */
+.worker-shell[data-worker-theme="light"] [class*="border-b"][class*="border-[var(--border)]"]:hover {
+  background: var(--row-hover);
+}
+
+/* ── Toggle przycisku dark/light ── */
+.worker-shell[data-worker-theme="light"] button[class*="rounded"][class*="border"][class*="bg-[var(--row-hover)]"][aria-label*="motyw"],
+.worker-shell[data-worker-theme="light"] button[class*="rounded"][class*="border"][class*="bg-[var(--s2)]"][title*="motyw"] {
+  background: var(--bl) !important;
+  border-color: var(--bb) !important;
+  color: var(--blue) !important;
+}
+
+/* ── text-white w nagłówkach stron (nie dotyczy przycisków z kolorowym tłem) ── */
+.worker-shell[data-worker-theme="light"] h1.text-white,
+.worker-shell[data-worker-theme="light"] h2.text-white,
+.worker-shell[data-worker-theme="light"] h3.text-white {
+  color: var(--white) !important;
+}
+
+/* ── Scrollbar wewnątrz list (hardkodowana klasa Tailwind arbitrary) ── */
+.worker-shell[data-worker-theme="light"] .\[scrollbar-color\:rgba\(255\2c 255\2c 255\2c \.12\)_transparent\] {
+  scrollbar-color: rgba(37, 99, 235, 0.20) transparent !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   GŁĘBIA: dodatkowe tła, cienie, separatory — "nie za biało"
+   ───────────────────────────────────────────────────────────────── */
+
+/* Strona ma wyraźnie ciemniejsze tło niż karty */
+.worker-shell[data-worker-theme="light"] {
+  --page: #e2e8f7;
+}
+
+/* Sidebar — niebieskawy gradient, odróżnia się od głównej treści */
+.worker-shell[data-worker-theme="light"] aside {
+  background: linear-gradient(180deg, #eef4ff 0%, #f5f9ff 40%, #edf2fd 100%) !important;
+  box-shadow: 2px 0 28px rgba(37, 99, 235, 0.10), inset -1px 0 0 rgba(37, 99, 235, 0.06) !important;
+  border-right-color: rgba(37, 99, 235, 0.13) !important;
+}
+
+/* Karty (rounded-3xl / rounded-2xl z bg s1) — wyraźne cienie z niebieską tonią */
+.worker-shell[data-worker-theme="light"] [class*="rounded-3xl"][class*="border"][class*="bg-\[var\(--s1\)\]"],
+.worker-shell[data-worker-theme="light"] [class*="rounded-2xl"][class*="border"][class*="bg-\[var\(--s1\)\]"] {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 2px 4px rgba(37, 99, 235, 0.07),
+    0 8px 28px rgba(37, 99, 235, 0.09) !important;
+  border-color: rgba(37, 99, 235, 0.11) !important;
+}
+
+/* Sekcje s2/s3 — widoczniejszy kontrast między warstwami */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[var\(--s2\)\]"] {
+  background-color: #f0f5ff !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[var\(--s3\)\]"] {
+  background-color: #e4ecfb !important;
+}
+
+/* Nagłówki kart (card-header) — subtelny gradient */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[var\(--s2\)\]"][class*="border-b"] {
+  background: linear-gradient(180deg, #eef3ff 0%, #e8eefa 100%) !important;
+}
+
+/* Separator wewnątrz list (border-t / border-b) */
+.worker-shell[data-worker-theme="light"] [class*="border-t"][class*="border-\[var\(--border\)\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-b"][class*="border-\[var\(--border\)\]"] {
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* Topbar — cień wyraźniejszy */
+.worker-shell[data-worker-theme="light"] header.sticky {
+  box-shadow: 0 1px 0 rgba(37, 99, 235, 0.10), 0 6px 28px rgba(37, 99, 235, 0.08) !important;
+}
+
+/* Przyciski back / icon-buttons w topbarze */
+.worker-shell[data-worker-theme="light"] header button[class*="bg-\[var\(--row-hover\)\]"] {
+  background: var(--s2) !important;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
+}
+
+/* Pasek nawigacyjny sidebar — separator sekcji */
+.worker-shell[data-worker-theme="light"] [class*="text-\[12px\]"][class*="uppercase"][class*="tracking-"] {
+  color: var(--muted);
+}
+
+/* Aktywny link nav — głębszy cień */
+.worker-shell[data-worker-theme="light"] [class*="border-\[var\(--blue\)\]"][class*="bg-\[var\(--bl\)\]"] {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 24px -8px rgba(37, 99, 235, 0.30) !important;
+}
+
+/* Tabela — nagłówek z gradientem */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[var\(--s2\)\]"][class*="border-b"][class*="text-\[var\(--ink2\)\]"] {
+  background: linear-gradient(180deg, #eef3ff 0%, #e5edfb 100%) !important;
+}
+
+/* user row footer sidebar */
+.worker-shell[data-worker-theme="light"] [class*="border-t"][class*="border-\[var\(--border\)\]"][class*="p-5"] {
+  background: linear-gradient(180deg, transparent, rgba(37, 99, 235, 0.03));
+  border-top-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LIGHT-ON-DARK TEXT OVERRIDES — jasny tekst na ciemnym tle staje się
+   ciemnym na jasnym tle (badge kolory, nagłówki stron itp.)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Czerwone (jasne na ciemnym → ciemne na jasnym) */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffb4b4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fecaca\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fca5a5\]"] {
+  color: #991b1b !important;
+}
+
+/* Niebieskie jasne */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bcd6ff\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#93c5fd\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#60a5fa\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#3b82f6\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#dbeafe\]"] {
+  color: #1d4ed8 !important;
+}
+
+/* Zielone jasne */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bbf7d0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a7f3d0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#86efac\]"] {
+  color: #14532d !important;
+}
+
+/* Bursztynowe jasne */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffd89b\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffe3b0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fbbf24\]"] {
+  color: #78350f !important;
+}
+
+/* Fioletowe jasne */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ddd6fe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c4b5fd\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a78bfa\]"] {
+  color: #4c1d95 !important;
+}
+
+/* Cyjanowe jasne */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bae6fd\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#67e8f9\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7dd3fc\]"] {
+  color: #0c4a6e !important;
+}
+
+/* Szare jasne (pomocnicze) */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#d1d5db\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e5e7eb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9ca3af\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#6b7280\]"] {
+  color: var(--ink2) !important;
+}
+
+/* Niebieskawe jasne (dashboard info) */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a9b8d6\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9db0d4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9db0d5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9fb1d3\]"] {
+  color: var(--ink2) !important;
+}
+
+/* Biały tekst na stronach (nagłówki h1/h2/h3 i ważniejszy tekst) */
+.worker-shell[data-worker-theme="light"] h1.text-white,
+.worker-shell[data-worker-theme="light"] h2.text-white,
+.worker-shell[data-worker-theme="light"] h3.text-white,
+.worker-shell[data-worker-theme="light"] h4.text-white {
+  color: var(--white) !important;
+}
+
+/* Tła jasnych badge'y — utrzymanie poprawnych kolorów */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]\/20"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]\/10"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]\/15"] {
+  background: rgba(37, 99, 235, 0.10) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#ef4444\]\/10"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#ef4444\]\/15"] {
+  background: rgba(200, 25, 25, 0.08) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#22c55e\]\/15"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#22c55e\]\/10"] {
+  background: rgba(21, 128, 61, 0.09) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#f59e0b\]\/15"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#f59e0b\]\/12"] {
+  background: rgba(180, 83, 9, 0.09) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#8b5cf6\]\/15"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba\(34,197,94,.15\)\]"] {
+  background: rgba(109, 40, 217, 0.09) !important;
+}
+
+/* Tła bg-white/[0.05] / bg-white/[0.08] (dark glassmorphism) → biale karty */
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.0"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.1"] {
+  background: var(--s2) !important;
+}
+
+/* Obramowania kolorowe */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#3b82f6\]\/30"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#3b82f6\]\/35"] {
+  border-color: rgba(37, 99, 235, 0.22) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#ef4444\]\/30"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#ef4444\]\/35"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#ef4444\]\/40"] {
+  border-color: rgba(200, 25, 25, 0.25) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#f59e0b\]\/40"] {
+  border-color: rgba(180, 83, 9, 0.25) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#8b5cf6\]\/40"] {
+  border-color: rgba(109, 40, 217, 0.25) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#06b6d4\]\/40"] {
+  border-color: rgba(3, 105, 161, 0.25) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-dashed"][class*="border-white\/10"] {
+  border-color: rgba(37, 99, 235, 0.18) !important;
+}
+
+/* Zielony tekst (przychód, wyniki pozytywne) */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#22c55e\]"] {
+  color: #15803d !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HARDCODED DARK BACKGROUNDS — strony używające bg-[#0c0d12] itp.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Główne ciemne tła kontenerów → białe karty */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0d12\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0b0c10\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0d14\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d0e13\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#080910\]"] {
+  background-color: var(--s1) !important;
+  border-color: rgba(37, 99, 235, 0.11) !important;
+}
+
+/* hover: ciemne tła → lekki niebieski hover */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0c0d14\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0d0f18\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/10"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/\[0.1"]:hover {
+  background-color: var(--row-hover) !important;
+}
+
+/* border-white/5, border-white/10, border-white/20 → niebieskie obramowanie */
+.worker-shell[data-worker-theme="light"] [class*="border-white\/5"],
+.worker-shell[data-worker-theme="light"] [class*="border-white\/\[0.0"] {
+  border-color: rgba(37, 99, 235, 0.08) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-white\/10"] {
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-white\/20"],
+.worker-shell[data-worker-theme="light"] [class*="border-white\/25"] {
+  border-color: rgba(37, 99, 235, 0.22) !important;
+}
+
+/* bg-white/10 jako tło aktywnego przycisku → var(--bl) */
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/10"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.1"] {
+  background-color: var(--s3) !important;
+}
+/* Aktywna wersja z wyraźniejszym niebieskim */
+.worker-shell[data-worker-theme="light"] [class*="border-white\/20"][class*="bg-white\/10"] {
+  background-color: var(--bl) !important;
+  border-color: var(--bb) !important;
+  color: var(--blue) !important;
+}
+
+/* text-white w zwykłych komponentach nie będących przyciskami na kolorowym tle */
+.worker-shell[data-worker-theme="light"] [class*="text-white"]:not([class*="bg-\[#dc"]):not([class*="bg-\[#b8"]):not([class*="bg-blue"]):not([class*="bg-red"]):not([class*="bg-green"]):not([class*="bg-\[var(--blue)\]"]):not([class*="bg-\[var(--red)\]"]):not([class*="btn"]):not(button[class*="bg-gradient"]):not([class*="bg-\[var(--bb)\]"]) {
+  color: var(--white) !important;
+}
+
+/* rgba glassmorphism backgrounds → light equivalents */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba(255,255,255,.06\)"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba(255,255,255,0.06\)"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba(255,255,255,.04\)"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba(255,255,255,.03\)"] {
+  background: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.10) !important;
+}
+
+/* ── Popup/overlay ciemne tło w kalendarzu ── */
+.worker-shell[data-worker-theme="light"] [class*="rounded-2xl"][class*="border-white\/10"][class*="shadow"] {
+  background: var(--s1) !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+  box-shadow: var(--dropdown-shadow) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="rounded-2xl"][class*="border-white\/10"][class*="shadow"] * {
+  color: var(--ink);
 }
 
 [data-theme="light"] {
-  --page: #eef1f8;
+  --page: #edf1fb;
   --s1: #ffffff;
-  --s2: #f4f6fc;
-  --s3: #eaecf4;
-  --s4: #e0e3ef;
-  --s5: #d5d9e8;
-  --faint: #c5c9d8;
-  --white: #111827;
-  --ink: #1f2334;
-  --ink2: #4b5268;
-  --muted: #7c859e;
-  --border: rgba(0, 0, 0, 0.08);
-  --border2: rgba(0, 0, 0, 0.14);
+  --s2: #f3f7ff;
+  --s3: #e8eefa;
+  --s4: #dde5f7;
+  --s5: #cfd9f0;
+  --faint: #b8c7e0;
+  --white: #0d1225;
+  --ink: #0d1225;
+  --ink2: #3e4f6b;
+  --muted: #7285a0;
+  --border: rgba(37, 99, 235, 0.10);
+  --border2: rgba(37, 99, 235, 0.18);
   --red: #c81919;
   --red-h: #a31414;
   --rl: rgba(200, 25, 25, 0.07);
@@ -1604,9 +2115,9 @@ b {
   --amber: #b45309;
   --al: rgba(180, 83, 9, 0.09);
   --ab: rgba(180, 83, 9, 0.22);
-  --blue: #1d4ed8;
-  --bl: rgba(29, 78, 216, 0.09);
-  --bb: rgba(29, 78, 216, 0.22);
+  --blue: #2563eb;
+  --bl: rgba(37, 99, 235, 0.09);
+  --bb: rgba(37, 99, 235, 0.22);
   --purple: #6d28d9;
   --pl: rgba(109, 40, 217, 0.09);
   --pb: rgba(109, 40, 217, 0.22);
@@ -1619,50 +2130,63 @@ b {
 }
 
 [data-theme="light"] body::before {
-  background: radial-gradient(ellipse, rgba(29, 78, 216, 0.06), transparent 65%);
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.05), transparent 65%);
 }
 
 [data-theme="light"] .topbar {
-  background: rgba(238, 241, 248, 0.92);
-  border-bottom-color: rgba(0, 0, 0, 0.09);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom-color: rgba(37, 99, 235, 0.10);
+  box-shadow: 0 1px 0 rgba(37, 99, 235, 0.07), 0 4px 20px rgba(37, 99, 235, 0.06);
 }
 
 [data-theme="light"] .card,
 [data-theme="light"] .twrap,
 [data-theme="light"] .sc {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08), 0 6px 24px rgba(37, 99, 235, 0.06);
+  border-color: rgba(37, 99, 235, 0.10);
 }
 
 [data-theme="light"] .trow:hover,
 [data-theme="light"] .rrow:hover,
 [data-theme="light"] .mi:hover,
 [data-theme="light"] .arch-row:hover {
-  background: rgba(0, 0, 0, 0.025);
+  background: rgba(37, 99, 235, 0.04);
 }
 
 [data-theme="light"] .sp.new {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(37, 99, 235, 0.07);
+  border-color: rgba(37, 99, 235, 0.18);
+  color: #1d4ed8;
 }
 
 [data-theme="light"] .sp.done {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(21, 128, 61, 0.07);
+  border-color: rgba(21, 128, 61, 0.20);
+  color: #166534;
 }
 
 [data-theme="light"] .modal-overlay {
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(13, 18, 37, 0.45);
 }
 
 [data-theme="light"] .modal {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 20px 60px rgba(13, 18, 37, 0.18), 0 4px 16px rgba(37, 99, 235, 0.10), 0 0 0 1px rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.13);
 }
 
 [data-theme="light"] .finput,
 [data-theme="light"] .sel,
 [data-theme="light"] .cia-ta {
-  background: var(--s1);
-  border-color: var(--faint);
+  background: var(--s2);
+  border-color: rgba(37, 99, 235, 0.18);
   color: var(--ink);
+}
+[data-theme="light"] .finput:focus,
+[data-theme="light"] .sel:focus,
+[data-theme="light"] .cia-ta:focus {
+  border-color: var(--blue);
+  background: var(--s1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
 }
 
 @keyframes glowR {
@@ -1781,4 +2305,881 @@ b {
     opacity: 1;
     transform: none;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LIGHT MODE — KOMPLETNE OVERRIDES HARDKODOWANYCH CIEMNYCH KOLORÓW
+   Pokrywa wszystkie wzorce z admin-panel/* i panel/*
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Ciemne tła kontenerów (#111318, #0f1117, #0c0d12 itp.) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#111318\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0f1117\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0e0f14\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d0e13\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0d12\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0d14\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0b0c10\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#080910\]"] {
+  background-color: var(--s1) !important;
+  border-color: rgba(37, 99, 235, 0.11) !important;
+}
+
+/* hover: ciemniejsza wersja → light row hover */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0c0d14\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0d0f18\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#111318\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0f1117\]"]:hover {
+  background-color: var(--row-hover) !important;
+}
+
+/* ── border-white/* → blue borders ── */
+.worker-shell[data-worker-theme="light"] [class*="border-white\/5"],
+.worker-shell[data-worker-theme="light"] [class*="border-white\/\[0.05\]"] {
+  border-color: rgba(37, 99, 235, 0.07) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-white\/10"] {
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-white\/12"],
+.worker-shell[data-worker-theme="light"] [class*="border-white\/15"] {
+  border-color: rgba(37, 99, 235, 0.16) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-white\/20"] {
+  border-color: rgba(37, 99, 235, 0.20) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-white\/25"],
+.worker-shell[data-worker-theme="light"] [class*="border-white\/30"] {
+  border-color: rgba(37, 99, 235, 0.26) !important;
+}
+
+/* ── bg-white/* glassmorphism → light surfaces ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/5"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.04\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.05\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.06\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.07\]"] {
+  background-color: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.10) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/10"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.1"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.08\]"] {
+  background-color: var(--s3) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/15"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/20"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.2"] {
+  background-color: var(--s4) !important;
+}
+
+/* Aktywny przycisk filtra (bg-white/10 + border-white/20 razem) */
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/10"][class*="border-white\/20"],
+.worker-shell[data-worker-theme="light"] [class*="border-white\/20"][class*="bg-white\/10"] {
+  background-color: var(--bl) !important;
+  border-color: var(--bb) !important;
+  color: var(--blue) !important;
+}
+
+/* ── hover:bg-white/* ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/5"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/\[0.03\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/\[0.035\]"]:hover {
+  background-color: var(--row-hover) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/10"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-white\/\[0.1"]:hover {
+  background-color: var(--row-hover) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="hover:border-white\/20"]:hover {
+  border-color: var(--border2) !important;
+}
+
+/* ── rgba glassmorphism tła ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba(255,255,255,"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[rgba(255,255,255,."] {
+  background-color: var(--s2) !important;
+}
+
+/* ── TEKST: jasne kolory na ciemnym → czytelne na jasnym ── */
+
+/* Szare pomocnicze */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9ca3af\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#94a3b8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#64748b\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#6b7280\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8b93a8\]"] {
+  color: var(--muted) !important;
+}
+
+/* Jasno-szare (prawie białe) → ink */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e5e7eb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e2e8f0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#d1d5db\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#cbd5e1\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c7d2eb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#d0d4de\]"] {
+  color: var(--ink) !important;
+}
+
+/* Niebieskie jasne → nasycony niebieski */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#93c5fd\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bfdbfe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bcd6ff\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#dbeafe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#dbe7ff\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7dd3fc\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#60a5fa\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#38bdf8\]"] {
+  color: var(--blue) !important;
+}
+
+/* Niebieskawe (info, secondary) */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c7d2eb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9fb1d3\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9db0d4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9db0d5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a9b8d6\]"] {
+  color: var(--ink2) !important;
+}
+
+/* Czerwone jasne → ciemny czerwony */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fca5a5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fecaca\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffb4b4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#f87171\]"] {
+  color: #991b1b !important;
+}
+
+/* Zielone jasne → ciemna zieleń */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bbf7d0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a7f3d0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#86efac\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#4ade80\]"] {
+  color: #14532d !important;
+}
+
+/* Bursztynowe jasne → ciemny amber */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffe3b0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fde68a\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fbbf24\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fcd34d\]"] {
+  color: #78350f !important;
+}
+
+/* Fioletowe jasne → ciemny fiolet */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ddd6fe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c4b5fd\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a78bfa\]"] {
+  color: #4c1d95 !important;
+}
+
+/* Cyjanowe jasne */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7dd3fc\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bae6fd\]"] {
+  color: #0c4a6e !important;
+}
+
+/* Zielony tekst (pozytywne wyniki) */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#22c55e\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#16a34a\]"] {
+  color: #15803d !important;
+}
+
+/* Niebieski tekst (linki, akcenty) — zachowaj ale użyj ciemniejszego */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#3b82f6\]"] {
+  color: var(--blue) !important;
+}
+
+/* Biały tekst — zamień na ink */
+.worker-shell[data-worker-theme="light"] [class*="text-white"]:not([class*="bg-\[var(--blue)\]"]):not([class*="bg-\[#dc"]):not([class*="bg-\[#b8"]):not([class*="bg-gradient"]):not(button[class*="btn-"]) {
+  color: var(--white) !important;
+}
+
+/* ── TŁA AKCENTOWE (zachowaj kolor, popraw tekst w środku) ── */
+
+/* Niebieskie akcenty bg → zachowane */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]"] {
+  /* zachowany — niebieski akcent */
+}
+
+/* Czerwony btn (Usuń, Reklamacja) → zachowany ciemny czerwony */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#dc1e1e\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#b81818\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#ef4444\]"] {
+  /* zachowane jako przyciski czerwone */
+}
+
+/* Zielony btn → zachowany */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#22c55e\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#16a34a\]"] {
+  /* zachowane */
+}
+
+/* ── BADGE tła z opacity → light equivalents ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#60a5fa\]\/"] {
+  background: var(--bl) !important;
+  color: var(--blue) !important;
+  border-color: var(--bb) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#ef4444\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#dc1e1e\]\/"] {
+  background: var(--rl) !important;
+  color: #991b1b !important;
+  border-color: var(--rb) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#22c55e\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#16a34a\]\/"] {
+  background: var(--gl) !important;
+  color: #14532d !important;
+  border-color: var(--gb) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#f59e0b\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#fbbf24\]\/"] {
+  background: var(--al) !important;
+  color: #78350f !important;
+  border-color: var(--ab) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#8b5cf6\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#a78bfa\]\/"] {
+  background: var(--pl) !important;
+  color: #4c1d95 !important;
+  border-color: var(--pb) !important;
+}
+
+/* ── BORDER akcentowe z opacity ── */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#3b82f6\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#60a5fa\]\/"] {
+  border-color: var(--bb) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#ef4444\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#dc1e1e\]\/"] {
+  border-color: var(--rb) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#22c55e\]\/"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#16a34a\]\/"] {
+  border-color: var(--gb) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#f59e0b\]\/"] {
+  border-color: var(--ab) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#8b5cf6\]\/"] {
+  border-color: var(--pb) !important;
+}
+
+/* ── DIVIDE (tabele, listy) ── */
+.worker-shell[data-worker-theme="light"] [class*="divide-white\/10"] > * + * {
+  border-color: rgba(37, 99, 235, 0.10) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="divide-white\/5"] > * + * {
+  border-color: rgba(37, 99, 235, 0.07) !important;
+}
+
+/* ── ring-white/* (focus rings) ── */
+.worker-shell[data-worker-theme="light"] [class*="ring-white\/10"],
+.worker-shell[data-worker-theme="light"] [class*="ring-white\/20"] {
+  --tw-ring-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+/* ── from-white\/5, to-white\/10 (gradienty) ── */
+.worker-shell[data-worker-theme="light"] [class*="from-white\/"],
+.worker-shell[data-worker-theme="light"] [class*="to-white\/"] {
+  --tw-gradient-from: rgba(37, 99, 235, 0.04) !important;
+  --tw-gradient-to: rgba(37, 99, 235, 0.08) !important;
+}
+
+/* ── shadow-black/* → blue shadow ── */
+.worker-shell[data-worker-theme="light"] [class*="shadow-black\/"] {
+  --tw-shadow-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+/* ── Nagłówki stron (eyebrow labels) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9ca3af\]"][class*="uppercase"][class*="tracking-"] {
+  color: var(--muted) !important;
+}
+
+/* ── Links w dark mode (jasne) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#60a5fa\]"]:not(svg *),
+.worker-shell[data-worker-theme="light"] [class*="hover:text-\[#60a5fa\]"]:hover {
+  color: var(--blue) !important;
+}
+
+/* ── Placeholder teksty ── */
+.worker-shell[data-worker-theme="light"] [class*="placeholder:text-\[#"],
+.worker-shell[data-worker-theme="light"] [class*="placeholder-\[#"] {
+  color: var(--muted) !important;
+}
+
+/* ── Cal-day w kalendarzu (już przepisane, ale jako fallback) ── */
+.worker-shell[data-worker-theme="light"] .cal-day {
+  background: var(--s1) !important;
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
+}
+
+/* ── Separator / divider linie ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/10"][class*="h-px"],
+.worker-shell[data-worker-theme="light"] [class*="h-px"][class*="bg-white\/"] {
+  background: var(--border) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="w-px"][class*="bg-white\/"] {
+  background: var(--border) !important;
+}
+
+/* ── Border solid kolorowe (#4f69a3) → blue border ── */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#4f69a3\]"] {
+  border-color: var(--bb) !important;
+}
+
+/* ── Sidebar accent border na stronie ── */
+.worker-shell[data-worker-theme="light"] aside [class*="border-r"] {
+  border-right-color: rgba(37, 99, 235, 0.13) !important;
+}
+
+/* ── Inputy / selecty z ciemnym hardkodowanym tłem ── */
+.worker-shell[data-worker-theme="light"] input[class*="bg-\[#"],
+.worker-shell[data-worker-theme="light"] textarea[class*="bg-\[#"],
+.worker-shell[data-worker-theme="light"] select[class*="bg-\[#"] {
+  background-color: var(--s2) !important;
+  color: var(--ink) !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
+}
+.worker-shell[data-worker-theme="light"] input[class*="bg-\[#"]:focus,
+.worker-shell[data-worker-theme="light"] textarea[class*="bg-\[#"]:focus,
+.worker-shell[data-worker-theme="light"] select[class*="bg-\[#"]:focus {
+  background-color: var(--s1) !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ── Zagnieżdżone karty (bg-[#0f1117] wewnątrz sekcji) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0f1117\]"] {
+  background-color: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.10) !important;
+}
+
+/* ── Przycisk aktywny w filtrach (pattern: border-[var(--border)] bg-[#...]) ── */
+.worker-shell[data-worker-theme="light"] button[class*="bg-\[#0"][class*="border"] {
+  background-color: var(--s2) !important;
+  color: var(--ink2) !important;
+}
+.worker-shell[data-worker-theme="light"] button[class*="bg-\[#0"][class*="border"]:hover {
+  background-color: var(--bl) !important;
+  color: var(--blue) !important;
+  border-color: var(--bb) !important;
+}
+
+/* ── Tekst na białym tle który jest już odpowiedni ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[var(--white)\]"] {
+  color: var(--white);
+}
+.worker-shell[data-worker-theme="light"] [class*="text-\[var(--ink)\]"] {
+  color: var(--ink);
+}
+.worker-shell[data-worker-theme="light"] [class*="text-\[var(--ink2)\]"] {
+  color: var(--ink2);
+}
+.worker-shell[data-worker-theme="light"] [class*="text-\[var(--muted)\]"] {
+  color: var(--muted);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   EXTENDED LIGHT MODE OVERRIDES — dodatkowe wzorce hex z panel/* i admin-panel/*
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Dodatkowe ciemne tła kontenerów ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0b1222\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0e1015\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#111c31\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#1a1d26\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#050509\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0e14\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0f18\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d1018\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d1322\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d1527\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0f141d\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0f1729\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0f172a\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#101118\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0b0c10\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0a0c10\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0a0c12\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0a0b0e\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0a0b0f\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#060708\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#08090d\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#111420\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#111a32\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#191d28\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#1e293b\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c0b0f\]"] {
+  background-color: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.12) !important;
+  color: var(--ink) !important;
+}
+/* hover versions */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#111420\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0c0d12\]"]:hover {
+  background-color: var(--row-hover) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#1a2743\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#111b33\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#12182a\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#131b2e\]"] {
+  background-color: var(--bl) !important;
+  border-color: var(--bb) !important;
+  color: var(--blue) !important;
+}
+
+/* ── Hover na ciemnych niebieskich tłach ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#12182a\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#111b33\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#131b2e\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#1a2743\]"]:hover {
+  background-color: var(--bl) !important;
+}
+
+/* ── Ciemne niebieskie obramowania ── */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2a3142\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2a3245\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2a3246\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2b3650\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2b3750\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2d3548\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#2b3142\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#1e2a40\]"] {
+  border-color: rgba(37, 99, 235, 0.18) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="hover:border-\[#4f69a3\]"]:hover {
+  border-color: var(--blue) !important;
+}
+
+/* ── Focus borders ── */
+.worker-shell[data-worker-theme="light"] [class*="focus:border-\[#4f69a3\]"]:focus,
+.worker-shell[data-worker-theme="light"] [class*="focus:border-\[#60a5fa\]"]:focus {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ── Placeholder text ── */
+.worker-shell[data-worker-theme="light"] [class*="placeholder:text-\[#7f8da8\]"]::placeholder,
+.worker-shell[data-worker-theme="light"] [class*="placeholder:text-\[#6b7280\]"]::placeholder,
+.worker-shell[data-worker-theme="light"] [class*="placeholder:text-\[#9ca3af\]"]::placeholder {
+  color: var(--muted) !important;
+}
+
+/* ── Jasne niebiesko-szare teksty (na ciemnym tle) → ciemne na jasnym tle ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c7d2eb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#d0d4de\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e2e8f0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e8edf5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c5d4f0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#dbe7ff\]"] {
+  color: var(--ink) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9fb1d3\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8b93a8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#94a3b8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a9b8d6\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9db0d4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8ea2c7\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#b8c9e8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#64748b\]"] {
+  color: var(--ink2) !important;
+}
+
+/* ── Jasne niebieskie (highlight) teksty → brand blue ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bfdbfe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#dbeafe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7dd3fc\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#60a5fa\]"] {
+  color: var(--blue) !important;
+}
+
+/* ── Jasne czerwone → ciemna czerwień ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fecaca\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ef4444\]"] {
+  color: #b91c1c !important;
+}
+
+/* ── Jasne zielone → ciemna zieleń ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bbf7d0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#86efac\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#22c55e\]"] {
+  color: #15803d !important;
+}
+
+/* ── Jasne bursztynowe → ciemny bursztyn ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffe3b0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffd9a6\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#f0d9a8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fbbf24\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#f59e0b\]"] {
+  color: var(--amber) !important;
+}
+
+/* ── Fioletowe teksty (na ciemnym tle) → ciemny fiolet ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ddd6fe\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c4b5fd\]"] {
+  color: #6d28d9 !important;
+}
+
+/* ── Fioletowe badge tła (bg-[#8b5cf6]) — zachowaj kolor, ale dostosuj cień ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#8b5cf6\]"] {
+  box-shadow: 0 1px 3px rgba(109, 40, 217, 0.25) !important;
+}
+
+/* ── Hover na przyciskach akcji ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#b81818\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#b61717\]"]:hover {
+  background-color: #991b1b !important;
+}
+
+/* ── bg-white z opacity → surface ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/3"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.03\]"] {
+  background-color: rgba(37, 99, 235, 0.03) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/8"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.08\]"] {
+  background-color: var(--s2) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/15"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.15\]"] {
+  background-color: var(--s3) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/20"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/25"] {
+  background-color: var(--s4) !important;
+}
+
+/* ── Hover text: jasne niebieskie ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:text-\[#93c5fd\]"]:hover {
+  color: var(--blue) !important;
+}
+
+/* ── Divide / separator ── */
+.worker-shell[data-worker-theme="light"] [class*="divide-white\/10"] > * + * {
+  border-color: rgba(37, 99, 235, 0.10) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="divide-white\/5"] > * + * {
+  border-color: rgba(37, 99, 235, 0.06) !important;
+}
+
+/* ── text-white na przycisku z kolorowym tłem (pozostaw białe) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]"] .text-white,
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#dc1e1e\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#ef4444\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#22c55e\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#f59e0b\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#8b5cf6\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#06b6d4\]"][class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* ── Hover bg-[#2563eb] (ciemny niebieski przycisk hover) ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#2563eb\]"]:hover {
+  background-color: #1d4ed8 !important;
+}
+
+/* ── Ciemne gradienty nagłówków → jasny gradient premium ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#0"] {
+  background-image: linear-gradient(135deg, #eef3ff 0%, #f5f8ff 100%) !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#12"],
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#15"],
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#16"] {
+  background-image: linear-gradient(135deg, #eef3ff 0%, #f5f8ff 100%) !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+}
+/* Tekst w gradientowych nagłówkach */
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#0"] *,
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#12"] *,
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#15"] *,
+.worker-shell[data-worker-theme="light"] [class*="bg-gradient"][class*="from-\[#16"] * {
+  color: inherit;
+}
+
+/* ── Dodatkowe teksty niebiesko-szare (midtony) → var(--ink2) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7384a5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7487ac\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7f8fb0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8194bb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8b9cbb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8da0c5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#8da2c5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#93a6cb\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9db0d5\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#9fb3d9\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a7b6d2\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#b4b8c4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#b7c3db\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#b7c7e4\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#b8c7e2\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#b9c8e3\]"] {
+  color: var(--ink2) !important;
+}
+
+/* ── Jasne błękitne teksty → var(--ink) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c8d2e9\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c4d2ec\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#c7d5f3\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#d7e3f8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e6eeff\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#edf3ff\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#f1f5f9\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#f3f7ff\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#cfe0ff\]"] {
+  color: var(--ink) !important;
+}
+
+/* ── Muted grays ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#525b6e\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#4b5563\]"] {
+  color: var(--muted) !important;
+}
+
+/* ── Cyan teksty → var(--blue) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#22d3ee\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#67e8f9\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bae6fd\]"] {
+  color: var(--blue) !important;
+}
+
+/* ── Jasne zielone (kolejne odcienie) → ciemna zieleń ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a7f3d0\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#d1fae5\]"] {
+  color: #15803d !important;
+}
+
+/* ── Fioletowe (jasne) → ciemny fiolet ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a78bfa\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#e9d5ff\]"] {
+  color: #6d28d9 !important;
+}
+
+/* ── Bursztynowe/pomarańczowe (dodatkowe) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fcd34d\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fde68a\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fed7aa\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#ffd89b\]"] {
+  color: var(--amber) !important;
+}
+
+/* ── bg-[#0c1322]/88 (przezroczyste ciemne tło sekcji filtrów) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c1322\]"] {
+  background-color: var(--s1) !important;
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ── bg-[#0e1423] (nagłówkowe gradienty bez bg-gradient) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0e1423\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d1424\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#151821\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#161a22\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#121b31\]"] {
+  background-color: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ── hover na jasnych tekstach białych (hover:text-white → hover:text-[var(--white)]) ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:text-white"]:hover {
+  color: var(--white) !important;
+}
+
+/* ── shadow-[...rgba(0,0,0,...)] → niebiesko-cienista wersja ── */
+.worker-shell[data-worker-theme="light"] [class*="shadow-\[0_"][class*="rgba(0,0,0"] {
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08), 0 1px 4px rgba(37, 99, 235, 0.06) !important;
+}
+
+/* ── ring-white/* → ring niebieski ── */
+.worker-shell[data-worker-theme="light"] [class*="ring-white\/10"],
+.worker-shell[data-worker-theme="light"] [class*="ring-white\/20"] {
+  --tw-ring-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+/* ── Fioletowe przyciski AI/sparkle (bg-[#a855f7]/xx) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#a855f7\]\/"] {
+  background-color: rgba(168, 85, 247, 0.08) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#a855f7\]\/"]  :hover {
+  background-color: rgba(168, 85, 247, 0.14) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#a855f7\]\/"] {
+  border-color: rgba(168, 85, 247, 0.30) !important;
+}
+
+/* ── Niebieskie elementy z opacity (bg-[#3b82f6]/xx) + text-white → text-blue ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3b82f6\]\/"][class*="text-white"] {
+  color: var(--blue) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#dc1e1e\]\/"][class*="text-white"] {
+  color: var(--red) !important;
+}
+
+/* ── border-[#7dd3fc], border-[#bae6fd] → brand blue border ── */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#7dd3fc\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#bae6fd\]"],
+.worker-shell[data-worker-theme="light"] [class*="group-hover:border-\[#bae6fd\]"] {
+  border-color: var(--blue) !important;
+}
+
+/* ── bg-black/20, bg-black/30 w tabelach (nagłówek tabeli) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-black\/20"],
+.worker-shell[data-worker-theme="light"] [class*="bg-black\/25"],
+.worker-shell[data-worker-theme="light"] [class*="bg-black\/30"] {
+  background-color: var(--s3) !important;
+}
+
+/* ── backdrop-blur z ciemnym bg (backdrop-blur-sm) — same bg override ── */
+.worker-shell[data-worker-theme="light"] [class*="backdrop-blur"][class*="bg-\[#0"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ── Specjalne obramowania niebieskie z opacity (border-[#60a5fa]/xx) ── */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#60a5fa\]\/"] {
+  border-color: rgba(37, 99, 235, 0.35) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#1d4ed8\]\/"] {
+  border-color: rgba(37, 99, 235, 0.35) !important;
+}
+
+/* ── hover:text-[#93c5fd], hover:text-[#60a5fa] → hover brand blue ── */
+.worker-shell[data-worker-theme="light"] [class*="hover:text-\[#93c5fd\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:text-\[#60a5fa\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:text-\[#bcd6ff\]"]:hover {
+  color: var(--blue) !important;
+}
+
+/* ── Linie (hr, divider) na ciemnym tle ── */
+.worker-shell[data-worker-theme="light"] hr {
+  border-color: rgba(37, 99, 235, 0.10);
+}
+
+/* ── Scrollbar (webkit) w light mode ── */
+.worker-shell[data-worker-theme="light"] ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.worker-shell[data-worker-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--s2);
+}
+.worker-shell[data-worker-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.20);
+  border-radius: 3px;
+}
+.worker-shell[data-worker-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 99, 235, 0.35);
+}
+
+/* ── Text opacity classes → dostosowanie do jasnego tła ── */
+.worker-shell[data-worker-theme="light"] [class*="text-white\/60"],
+.worker-shell[data-worker-theme="light"] [class*="text-white\/70"],
+.worker-shell[data-worker-theme="light"] [class*="text-white\/80"] {
+  color: var(--ink2) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="text-white\/40"],
+.worker-shell[data-worker-theme="light"] [class*="text-white\/50"] {
+  color: var(--muted) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="text-white\/90"],
+.worker-shell[data-worker-theme="light"] [class*="text-white\/95"] {
+  color: var(--white) !important;
+}
+
+/* ── before: i after: pseudo obramowania i linie ── */
+.worker-shell[data-worker-theme="light"] [class*="before:bg-white\/10"]::before,
+.worker-shell[data-worker-theme="light"] [class*="after:bg-white\/10"]::after {
+  background-color: rgba(37, 99, 235, 0.10) !important;
+}
+
+/* ── Ciemne elementy z bg-[#1f2937] (bardzo ciemny niebieski-szary) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#1f2937\]"] {
+  background-color: var(--s3) !important;
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ── Cyan/teal badge (bg-[#06b6d4]) — zachowaj kolor ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#06b6d4\]"][class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* ── Tekst na tle coloured badges — zachowaj biel gdy bg jest pełnokolorowy ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#8b5cf6\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#f59e0b\]"][class*="text-white"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#22c55e\]"][class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* ── Dodatkowe teksty specjalne ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a1a1aa\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#a8a29e\]"] {
+  color: var(--muted) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="text-\[#4ade80\]"] {
+  color: #15803d !important;
+}
+
+/* ── Modalе i overlaye (bg ciemne) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#"] [class*="bg-\[#111318\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#"] [class*="bg-\[#0c0d12\]"] {
+  background-color: var(--s1) !important;
+}
+
+/* ── Modalе — dodatkowe ciemne kontenery wewnątrz modali ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#1a1a1a\]"] {
+  background-color: var(--s2) !important;
+}
+
+/* ── Alerty / "pilne" ciemne tła (comm page) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#7f1d1d\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#3f1f2a\]"] {
+  background-color: var(--rl) !important;
+  color: var(--red) !important;
+}
+/* ── bg-[#1e3a8a]/xx (ciemny niebieski z opacity) → var(--bl) ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#1e3a8a\]"] {
+  background-color: var(--bl) !important;
+}
+/* ── border-[#334155] (slate) → granica ── */
+.worker-shell[data-worker-theme="light"] [class*="border-\[#334155\]"] {
+  border-color: rgba(37, 99, 235, 0.20) !important;
+}
+
+/* ── Kanban / zgloszenia ciemne tła i obramowania ── */
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0c101a\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0a1020\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0d1428\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0b1020\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-\[#0a0f1d\]"] {
+  background-color: var(--s2) !important;
+  border-color: rgba(37, 99, 235, 0.12) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="border-\[#263042\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#27334a\]"],
+.worker-shell[data-worker-theme="light"] [class*="border-\[#28374f\]"] {
+  border-color: rgba(37, 99, 235, 0.18) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#111a32\]"]:hover,
+.worker-shell[data-worker-theme="light"] [class*="hover:bg-\[#0f1830\]"]:hover {
+  background-color: var(--bl) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.02\]"],
+.worker-shell[data-worker-theme="light"] [class*="bg-white\/\[0.03\]"] {
+  background-color: rgba(37, 99, 235, 0.02) !important;
+}
+
+/* ── Dodatkowe teksty (komponenty) ── */
+.worker-shell[data-worker-theme="light"] [class*="text-\[#7f8da8\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#bcd0ef\]"] {
+  color: var(--ink2) !important;
+}
+.worker-shell[data-worker-theme="light"] [class*="text-\[#f97316\]"],
+.worker-shell[data-worker-theme="light"] [class*="text-\[#fdba74\]"] {
+  color: var(--orange) !important;
 }

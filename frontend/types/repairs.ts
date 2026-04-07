@@ -7,6 +7,8 @@ export interface RepairRequestListItem {
   /** UUID urządzenia (lista staff zwraca FK). */
   device?: string | { id: string } | null;
   device_name: string;
+  device_brand?: string | null;
+  device_model?: string | null;
   assigned_to?:
     | string
     | {
@@ -77,6 +79,8 @@ export interface RepairDevice {
   id: string;
   device_name: string;
   brand_name: string;
+  device_brand?: string | null;
+  device_model?: string | null;
   category: string;
   serial_number?: string;
 }

@@ -56,6 +56,7 @@ class QuickAcceptSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     device_category = serializers.ChoiceField(choices=DeviceCategory.choices, required=False, allow_null=True)
     device_model_name = serializers.CharField(required=False, allow_blank=True, max_length=200, default="Do uzupełnienia")
+    device_brand_name = serializers.CharField(required=False, allow_blank=True, max_length=100)
 
     manual_brand = serializers.CharField(required=False, allow_blank=True, max_length=100)
     device_color = serializers.CharField(required=False, allow_blank=True, max_length=64)
@@ -120,6 +121,9 @@ class QuickAcceptSerializer(serializers.Serializer):
         else:
             attrs["hammer_glass_interest"] = None
 
+        if not (attrs.get("manual_brand") or "").strip() and (attrs.get("device_brand_name") or "").strip():
+            attrs["manual_brand"] = (attrs.get("device_brand_name") or "").strip()
+
         return attrs
 
 
@@ -141,6 +145,7 @@ class QuickComplaintWarrantySerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     device_category = serializers.ChoiceField(choices=DeviceCategory.choices, required=False, allow_null=True)
     device_model_name = serializers.CharField(required=False, allow_blank=True, max_length=200, default="Do uzupełnienia")
+    device_brand_name = serializers.CharField(required=False, allow_blank=True, max_length=100)
     manual_brand = serializers.CharField(required=False, allow_blank=True, max_length=100)
     device_color = serializers.CharField(required=False, allow_blank=True, max_length=64)
     visual_condition = serializers.CharField(required=False, allow_blank=True, max_length=2000)
@@ -202,6 +207,9 @@ class QuickComplaintWarrantySerializer(serializers.Serializer):
                 )
         else:
             attrs["hammer_glass_interest"] = None
+
+        if not (attrs.get("manual_brand") or "").strip() and (attrs.get("device_brand_name") or "").strip():
+            attrs["manual_brand"] = (attrs.get("device_brand_name") or "").strip()
 
         return attrs
 

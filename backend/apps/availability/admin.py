@@ -1,7 +1,7 @@
 """PRO-KOM Serwis — Admin: Dostępność pracowników."""
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import EmployeeAvailability, EmployeeAbsenceRequest
+from .models import EmployeeAvailability, EmployeeAbsenceRequest, WorkSession
 
 
 @admin.register(EmployeeAvailability)
@@ -43,4 +43,27 @@ class EmployeeAbsenceRequestAdmin(admin.ModelAdmin):
         (_("Decyzja"), {"fields": ("reviewed_by", "reviewed_at", "review_note")}),
         (_("System"), {"fields": ("created_at", "updated_at")}),
     )
+
+
+@admin.register(WorkSession)
+class WorkSessionAdmin(admin.ModelAdmin):
+    list_display = ["employee", "started_at", "ended_at", "duration_readable", "is_open"]
+    list_filter = ["ended_at", "started_at"]
+    search_fields = ["employee__email", "employee__first_name", "employee__last_name"]
+    autocomplete_fields = ["employee"]
+    date_hierarchy = "started_at"
+    readonly_fields = ["created_at", "updated_at", "duration_seconds"]
+    fieldsets = (
+        (None, {"fields": ("employee", "started_at", "ended_at", "duration_seconds")}),
+        (_("System"), {"fields": ("created_at", "updated_at")}),
+    )
+
+    def duration_readable(self, obj):
+        seconds = obj.duration_seconds if obj.duration_seconds is not None else obj.elapsed_seconds
+        hours, remainder = divmod(int(seconds), 3600)
+        minutes, secs = divmod(remainder, 60)
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+    duration_readable.short_description = _("Czas pracy")
+
 

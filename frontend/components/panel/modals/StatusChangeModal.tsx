@@ -81,7 +81,7 @@ export function StatusChangeModal({
     if (!open) return;
     setNewStatus(normalizeStatusToQuickChangeValue(currentStatus));
     setNotes("");
-  }, [open, currentStatus]);
+  }, [open]);
 
   if (!open) return null;
 

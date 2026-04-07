@@ -249,6 +249,7 @@ class StaffNotification(models.Model):
         (ARCHIVED, _("zarchiwizowane")),
     ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

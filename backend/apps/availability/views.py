@@ -1,16 +1,262 @@
 """Widoki API dostępności (pracownik: własne wpisy + odczyt zespołu; admin: wszystko)."""
+from calendar import monthrange
 from datetime import date, timedelta
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import EmployeeAvailability, EmployeeAbsenceRequest
-from .serializers import EmployeeAvailabilitySerializer, EmployeeAbsenceRequestSerializer
+from .models import EmployeeAvailability, EmployeeAbsenceRequest, WorkSession
+from .serializers import EmployeeAvailabilitySerializer, EmployeeAbsenceRequestSerializer, WorkSessionSerializer
 from .permissions import IsStaffOrAdmin, can_edit_availability
 from .enums import AbsenceRequestStatus
 
+
+User = get_user_model()
+
+
+def _month_bounds(month_raw: str | None):
+    today = timezone.localdate()
+    raw = (month_raw or "").strip()
+    if raw:
+        y_raw, m_raw = raw.split("-", 1)
+        year = int(y_raw)
+        month = int(m_raw)
+        start = date(year, month, 1)
+    else:
+        start = date(today.year, today.month, 1)
+    end = date(start.year, start.month, monthrange(start.year, start.month)[1])
+    return start, end
+
+
+def _employee_month_summary(employee, month_start: date, month_end: date):
+    sessions = WorkSession.objects.filter(
+        employee=employee,
+        started_at__date__gte=month_start,
+        started_at__date__lte=month_end,
+    ).order_by("started_at")
+
+    worked_by_day = {}
+    for session in sessions:
+        d = timezone.localtime(session.started_at).date().isoformat()
+        row = worked_by_day.setdefault(
+            d,
+            {
+                "date": d,
+                "seconds": 0,
+                "hours": 0.0,
+                "sessions_count": 0,
+                "is_open": False,
+            },
+        )
+        seconds = session.duration_seconds if session.duration_seconds is not None else session.elapsed_seconds
+        row["seconds"] += max(0, int(seconds))
+        row["sessions_count"] += 1
+        if session.ended_at is None:
+            row["is_open"] = True
+
+    for row in worked_by_day.values():
+        row["hours"] = round(row["seconds"] / 3600, 2)
+
+    absences_qs = EmployeeAvailability.objects.filter(
+        employee=employee,
+        is_active=True,
+        date__gte=month_start,
+        date__lte=month_end,
+    ).exclude(availability_type="available").order_by("date")
+
+    absence_by_day = {}
+    for entry in absences_qs:
+        key = entry.date.isoformat()
+        row = absence_by_day.setdefault(
+            key,
+            {
+                "date": key,
+                "types": [],
+                "notes": [],
+            },
+        )
+        type_payload = {
+            "key": entry.availability_type,
+            "label": entry.get_availability_type_display(),
+        }
+        if type_payload not in row["types"]:
+            row["types"].append(type_payload)
+        note = (entry.note or "").strip()
+        if note and note not in row["notes"]:
+            row["notes"].append(note)
+
+    worked_days = sorted(worked_by_day.values(), key=lambda x: x["date"])
+    absence_days = sorted(absence_by_day.values(), key=lambda x: x["date"])
+    total_seconds = sum(int(d["seconds"]) for d in worked_days)
+
+    daily = []
+    day = month_start
+    while day <= month_end:
+        key = day.isoformat()
+        w = worked_by_day.get(key)
+        a = absence_by_day.get(key)
+        daily.append(
+            {
+                "date": key,
+                "worked_seconds": int(w["seconds"]) if w else 0,
+                "worked_hours": round((int(w["seconds"]) / 3600), 2) if w else 0.0,
+                "worked": bool(w),
+                "absent": bool(a),
+                "absence_labels": [t["label"] for t in (a["types"] if a else [])],
+            }
+        )
+        day += timedelta(days=1)
+
+    return {
+        "total_work_seconds": total_seconds,
+        "total_work_hours": round(total_seconds / 3600, 2),
+        "worked_days_count": len(worked_days),
+        "absence_days_count": len(absence_days),
+        "worked_days": worked_days,
+        "absence_days": absence_days,
+        "daily": daily,
+    }
+
+
+
+class WorkSessionActiveView(APIView):
+    """GET /availability/work-sessions/me/ — aktywna sesja pracy bieżącego użytkownika."""
+
+    permission_classes = [IsStaffOrAdmin]
+
+    def get(self, request):
+        session = WorkSession.active_for_employee(request.user)
+        return Response({"active_session": WorkSessionSerializer(session).data if session else None})
+
+
+class WorkSessionStartView(APIView):
+    """POST /availability/work-sessions/me/start/ — rozpoczęcie pracy."""
+
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request):
+        active = WorkSession.active_for_employee(request.user)
+        if active:
+            return Response(
+                {
+                    "detail": "Masz już rozpoczętą pracę.",
+                    "active_session": WorkSessionSerializer(active).data,
+                },
+                status=409,
+            )
+
+        try:
+            with transaction.atomic():
+                session = WorkSession.objects.create(employee=request.user)
+        except IntegrityError:
+            session = WorkSession.active_for_employee(request.user)
+            return Response(
+                {
+                    "detail": "Masz już rozpoczętą pracę.",
+                    "active_session": WorkSessionSerializer(session).data if session else None,
+                },
+                status=409,
+            )
+
+        return Response(
+            {
+                "detail": "Praca została rozpoczęta.",
+                "active_session": WorkSessionSerializer(session).data,
+            },
+            status=201,
+        )
+
+
+class WorkSessionEndView(APIView):
+    """POST /availability/work-sessions/me/end/ — zakończenie aktywnej pracy."""
+
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request):
+        session = WorkSession.active_for_employee(request.user)
+        if not session:
+            return Response({"detail": "Nie masz aktywnej pracy do zakończenia."}, status=409)
+
+        session.close()
+        return Response(
+            {
+                "detail": "Praca została zakończona.",
+                "ended_session": WorkSessionSerializer(session).data,
+                "active_session": None,
+            }
+        )
+
+
+class WorkSessionMonthSummaryView(APIView):
+    """GET /availability/work-sessions/me/month-summary/?month=YYYY-MM — lista obecności za miesiąc."""
+
+    permission_classes = [IsStaffOrAdmin]
+
+    def get(self, request):
+        month_raw = (request.query_params.get("month") or "").strip()
+        if month_raw:
+            try:
+                month_start, month_end = _month_bounds(month_raw)
+            except (ValueError, TypeError):
+                return Response({"detail": "Nieprawidłowy parametr month. Użyj formatu YYYY-MM."}, status=400)
+        else:
+            month_start, month_end = _month_bounds(None)
+
+        summary = _employee_month_summary(request.user, month_start, month_end)
+
+        return Response(
+            {
+                "month": f"{month_start.year:04d}-{month_start.month:02d}",
+                "from": month_start.isoformat(),
+                "to": month_end.isoformat(),
+                **summary,
+            }
+        )
+
+
+class AdminWorkSessionMonthSummaryView(APIView):
+    """GET /availability/work-sessions/admin/month-summary/?month=YYYY-MM — lista obecności zespołu (admin)."""
+
+    permission_classes = [IsStaffOrAdmin]
+
+    def get(self, request):
+        if getattr(request.user, "role", None) != "admin":
+            return Response({"detail": "Brak uprawnień."}, status=403)
+
+        month_raw = (request.query_params.get("month") or "").strip()
+        try:
+            month_start, month_end = _month_bounds(month_raw or None)
+        except (ValueError, TypeError):
+            return Response({"detail": "Nieprawidłowy parametr month. Użyj formatu YYYY-MM."}, status=400)
+
+        users = User.objects.filter(role__in=["staff", "admin"]).order_by("-is_active", "first_name", "last_name", "email")
+        rows = []
+        for employee in users:
+            summary = _employee_month_summary(employee, month_start, month_end)
+            rows.append(
+                {
+                    "employee_id": str(employee.id),
+                    "full_name": employee.get_full_name(),
+                    "email": employee.email,
+                    "role": employee.role,
+                    "is_active": bool(employee.is_active),
+                    **summary,
+                }
+            )
+
+        return Response(
+            {
+                "month": f"{month_start.year:04d}-{month_start.month:02d}",
+                "from": month_start.isoformat(),
+                "to": month_end.isoformat(),
+                "employees": rows,
+            }
+        )
 
 
 class EmployeeAvailabilityViewSet(viewsets.ModelViewSet):

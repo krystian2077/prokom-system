@@ -48,6 +48,7 @@ class PublicRepairSubmitView(APIView):
                 category=device_data["category"],
                 problem_description=device_data["problem_description"],
                 brand_id=device_data.get("brand_id"),
+                brand_name=device_data.get("brand_name", ""),
                 device_model_id=device_data.get("device_model_id"),
                 model_name=device_data.get("model_name", ""),
                 serial_number=device_data.get("serial_number", ""),

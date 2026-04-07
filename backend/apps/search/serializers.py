@@ -106,13 +106,15 @@ class GlobalSearchRepairSerializer(serializers.ModelSerializer):
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     client_name = serializers.SerializerMethodField()
     device_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model = serializers.SerializerMethodField()
     repair_type = serializers.CharField(read_only=True)
 
     class Meta:
         model = RepairRequest
         fields = [
             "id", "repair_number", "status", "status_display", "repair_type",
-            "client", "client_name", "device", "device_name",
+            "client", "client_name", "device", "device_name", "device_brand", "device_model",
             "problem_description", "assigned_to", "created_at",
         ]
 
@@ -122,10 +124,18 @@ class GlobalSearchRepairSerializer(serializers.ModelSerializer):
     def get_device_name(self, obj):
         return obj.device.get_device_name() if obj.device else None
 
+    def get_device_brand(self, obj):
+        return obj.device.get_brand_name() if obj.device else None
+
+    def get_device_model(self, obj):
+        return obj.device.get_model_name() if obj.device else None
+
 
 class GlobalSearchDeviceSerializer(serializers.ModelSerializer):
     """Urządzenie w wynikach wyszukiwania (lekki)."""
     device_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model = serializers.SerializerMethodField()
     client_name = serializers.SerializerMethodField()
     repair_count = serializers.SerializerMethodField()
 
@@ -133,11 +143,17 @@ class GlobalSearchDeviceSerializer(serializers.ModelSerializer):
         model = Device
         fields = [
             "id", "device_name", "category", "serial_number", "imei",
-            "client", "client_name", "repair_count", "created_at",
+            "client", "client_name", "repair_count", "created_at", "device_brand", "device_model",
         ]
 
     def get_device_name(self, obj):
         return obj.get_device_name()
+
+    def get_device_brand(self, obj):
+        return obj.get_brand_name()
+
+    def get_device_model(self, obj):
+        return obj.get_model_name()
 
     def get_client_name(self, obj):
         return obj.client.get_full_name() if obj.client else None
@@ -149,10 +165,19 @@ class GlobalSearchDeviceSerializer(serializers.ModelSerializer):
 class IntakeSearchDeviceSerializer(serializers.ModelSerializer):
     """Urządzenie klienta do szybkiego wyboru przy intake."""
     device_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model = serializers.SerializerMethodField()
 
     class Meta:
         model = Device
-        fields = ["id", "device_name", "category", "serial_number", "imei", "client"]
+        fields = ["id", "device_name", "device_brand", "device_model", "category", "serial_number", "imei", "client"]
 
     def get_device_name(self, obj):
         return obj.get_device_name()
+
+    def get_device_brand(self, obj):
+        return obj.get_brand_name()
+
+    def get_device_model(self, obj):
+        return obj.get_model_name()
+

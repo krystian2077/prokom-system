@@ -10,7 +10,7 @@ import { PartUsageDetailModal } from "@/components/panel/PartUsageDetailModal";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWorkerStore, type DashboardScope } from "@/stores/workerStore";
-import { ChevronRight, Clock4, Mail, MessageSquareText, RotateCcw, Smartphone, Zap } from "lucide-react";
+import { ChevronRight, Clock4, Mail, MessageSquareText, Play, RotateCcw, Smartphone, Square, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { ScopeBar } from "@/components/layout/ScopeBar";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
@@ -31,6 +31,19 @@ interface StaffDashboardBuckets {
   my_active_count: number;
   /** „W trakcie naprawy” — staff: moje; admin: cały warsztat (jak lista wszystkich napraw). */
   in_repair_kpi_count: number;
+}
+
+interface WorkSessionApiItem {
+  id: string;
+  started_at: string;
+  ended_at?: string | null;
+  duration_seconds?: number | null;
+  is_open?: boolean;
+  elapsed_seconds?: number;
+}
+
+interface WorkSessionApiResponse {
+  active_session: WorkSessionApiItem | null;
 }
 
 function priorityRank(priority: string | null | undefined) {
@@ -65,6 +78,14 @@ function taskPriorityPillClass(priorityRaw: string | undefined): string {
   if (p === "urgent") return "border-[#dc1e1e]/40 bg-[#dc1e1e]/15 text-[#ffb4b4]";
   if (p === "important") return "border-[#f59e0b]/40 bg-[#f59e0b]/15 text-[#ffd9a6]";
   return "border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)]";
+}
+
+function formatWorkDuration(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
 const TASK_PRIORITY_LABEL: Record<string, string> = {
@@ -349,8 +370,8 @@ function StaffDashboardPage() {
   const showToast = useWorkerStore((s) => s.addToast);
   const queryClient = useQueryClient();
   const [partsModalUsage, setPartsModalUsage] = useState<PartUsage | null>(null);
+  const [workClockTick, setWorkClockTick] = useState(0);
 
-  const panelLabel = user?.role === "admin" ? "Panel administratora" : "Panel pracownika";
 
   const scopeDaysWithoutUpdate = useMemo(() => {
     switch (scope) {
@@ -392,6 +413,68 @@ function StaffDashboardPage() {
         my_active_count: Number(dashboardRes.my_active_count ?? 0),
         in_repair_kpi_count: Number(dashboardRes.in_repair_kpi_count ?? 0),
       } as StaffDashboardBuckets;
+    },
+  });
+
+  const workSessionQueryKey = useMemo(() => ["dashboard", "work-session", user?.id] as const, [user?.id]);
+
+  const workSessionQuery = useQuery({
+    queryKey: workSessionQueryKey,
+    enabled: Boolean(token && user?.id),
+    queryFn: async () => {
+      if (!token || !user?.id) throw new Error("Missing token/user");
+      return api.get<WorkSessionApiResponse>("/availability/work-sessions/me/", token);
+    },
+    staleTime: 5_000,
+  });
+
+  const activeWorkSession = workSessionQuery.data?.active_session ?? null;
+
+  useEffect(() => {
+    if (!activeWorkSession?.started_at) {
+      setWorkClockTick(0);
+      return;
+    }
+
+    setWorkClockTick(0);
+    const timer = window.setInterval(() => {
+      setWorkClockTick((current) => current + 1);
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [activeWorkSession?.id, activeWorkSession?.started_at]);
+
+  const activeWorkSessionElapsedSeconds = useMemo(() => {
+    if (!activeWorkSession?.started_at) return 0;
+    const startedAt = new Date(activeWorkSession.started_at).getTime();
+    if (!Number.isFinite(startedAt)) return 0;
+    return Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+  }, [activeWorkSession?.started_at, workClockTick]);
+
+  const startWorkMutation = useMutation({
+    mutationFn: async () => {
+      if (!token) throw new Error("Brak sesji.");
+      return api.post<WorkSessionApiResponse>("/availability/work-sessions/me/start/", undefined, token);
+    },
+    onSuccess: (res) => {
+      queryClient.setQueryData(workSessionQueryKey, res);
+      showToast("Rozpoczęto rejestrację czasu pracy.", "success");
+    },
+    onError: (e: unknown) => {
+      showToast(e instanceof Error ? e.message : "Nie udało się rozpocząć pracy.", "error");
+    },
+  });
+
+  const endWorkMutation = useMutation({
+    mutationFn: async () => {
+      if (!token) throw new Error("Brak sesji.");
+      return api.post<WorkSessionApiResponse>("/availability/work-sessions/me/end/", undefined, token);
+    },
+    onSuccess: (res) => {
+      queryClient.setQueryData(workSessionQueryKey, res);
+      showToast("Zakończono pracę.", "success");
+    },
+    onError: (e: unknown) => {
+      showToast(e instanceof Error ? e.message : "Nie udało się zakończyć pracy.", "error");
     },
   });
 
@@ -464,13 +547,14 @@ function StaffDashboardPage() {
     () =>
       [
         ["dashboard", "staff", scope, daysWithoutUpdateForApi],
+        workSessionQueryKey,
         ["dashboard", "requires-action", user?.id, user?.role, scope],
         ["dashboard", "tasks", "preview"],
         ["dashboard", "parts-status"],
         ["dashboard", "comms", "preview"],
         ["sidebar", "dashboard-buckets"],
       ] as const,
-    [scope, daysWithoutUpdateForApi, user?.id, user?.role],
+    [scope, daysWithoutUpdateForApi, user?.id, user?.role, workSessionQueryKey],
   );
 
   const { countdown, isRefreshing, refresh: runAutoRefresh } = useAutoRefresh([...refreshQueryKeys], 30_000);
@@ -579,6 +663,61 @@ function StaffDashboardPage() {
               <Link href={p.intakePath} className="rounded-2xl bg-[#dc1e1e] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b81818]">
                 Nowe przyjęcie
               </Link>
+            </div>
+
+            <div className="w-full max-w-[560px] rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 shadow-[0_18px_40px_rgba(0,0,0,.16)]">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-[0.22em] text-[var(--ink2)]">Czas pracy</p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--white)]">
+                    {activeWorkSession ? "Praca trwa" : "Gotowy do startu"}
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--ink2)]">
+                    {activeWorkSession ? (
+                      <>
+                        Od {new Date(activeWorkSession.started_at).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}
+                        {" · "}
+                        {formatWorkDuration(activeWorkSessionElapsedSeconds)}
+                      </>
+                    ) : (
+                      "Kliknij, aby rozpocząć rejestrację czasu pracy."
+                    )}
+                  </p>
+                  {workSessionQuery.error instanceof Error ? (
+                    <p className="mt-2 text-xs text-[#fca5a5]">{workSessionQuery.error.message}</p>
+                  ) : null}
+                </div>
+
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => startWorkMutation.mutate()}
+                    disabled={Boolean(activeWorkSession) || startWorkMutation.isPending || endWorkMutation.isPending}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#22c55e]/35 bg-[#22c55e]/15 px-4 py-2.5 text-sm font-semibold text-[#86efac] transition hover:bg-[#22c55e]/22 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {startWorkMutation.isPending ? (
+                      <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <Play size={16} />
+                    )}
+                    Rozpocznij pracę
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => endWorkMutation.mutate()}
+                    disabled={!activeWorkSession || startWorkMutation.isPending || endWorkMutation.isPending}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#dc1e1e]/35 bg-[#dc1e1e]/15 px-4 py-2.5 text-sm font-semibold text-[#ffb4b4] transition hover:bg-[#dc1e1e]/22 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {endWorkMutation.isPending ? (
+                      <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <Square size={16} />
+                    )}
+                    Zakończ Pracę
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </header>

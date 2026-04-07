@@ -1,7 +1,6 @@
 """Serializery dla Device (urządzenie klienta)."""
 from rest_framework import serializers
 from ..models import Device
-from apps.common.enums import DeviceCategory
 from .device_model import DeviceModelListSerializer
 from .brand import BrandListSerializer
 
@@ -10,6 +9,8 @@ class DeviceListSerializer(serializers.ModelSerializer):
     """Krótka lista urządzeń."""
     device_name = serializers.SerializerMethodField()
     brand_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model = serializers.SerializerMethodField()
 
     class Meta:
         model = Device
@@ -17,6 +18,8 @@ class DeviceListSerializer(serializers.ModelSerializer):
             "id",
             "device_name",
             "brand_name",
+            "device_brand",
+            "device_model",
             "category",
             "client",
             "serial_number",
@@ -28,6 +31,12 @@ class DeviceListSerializer(serializers.ModelSerializer):
 
     def get_brand_name(self, obj):
         return obj.get_brand_name()
+
+    def get_device_brand(self, obj):
+        return obj.get_brand_name()
+
+    def get_device_model(self, obj):
+        return obj.get_model_name()
 
 
 class DeviceCreateUpdateSerializer(serializers.ModelSerializer):
@@ -73,6 +82,8 @@ class DeviceSerializer(serializers.ModelSerializer):
     """Pełny serializer urządzenia."""
     device_name = serializers.SerializerMethodField()
     brand_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model_name = serializers.SerializerMethodField()
     brand = BrandListSerializer(read_only=True)
     device_model = DeviceModelListSerializer(read_only=True)
 
@@ -90,6 +101,8 @@ class DeviceSerializer(serializers.ModelSerializer):
             "manual_model",
             "device_name",
             "brand_name",
+            "device_brand",
+            "device_model_name",
             "serial_number",
             "imei",
             "condition_on_arrival",
@@ -108,3 +121,10 @@ class DeviceSerializer(serializers.ModelSerializer):
 
     def get_brand_name(self, obj):
         return obj.get_brand_name()
+
+    def get_device_brand(self, obj):
+        return obj.get_brand_name()
+
+    def get_device_model_name(self, obj):
+        return obj.get_model_name()
+

@@ -24,10 +24,45 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RepairTableSkeleton } from "@/components/ui/Skeleton";
-import { WorkerTeamPage } from "../../../components/panel/WorkerTeamPage";
+import { WorkerTeamPage } from "@/components/panel/WorkerTeamPage";
 import { AdminAbsenceRequestsPanel } from "@/components/panel/AdminAbsenceRequestsPanel";
 import type { UserRole } from "@/types/auth";
 import type { TeamOverviewResponse, TeamOverviewRow, TeamTodayStatus } from "@/types/staff";
+
+type AttendanceWorkedDay = {
+  date: string;
+  seconds: number;
+  hours: number;
+  sessions_count: number;
+  is_open: boolean;
+};
+
+type AttendanceAbsenceDay = {
+  date: string;
+  types: { key: string; label: string }[];
+  notes: string[];
+};
+
+type AdminAttendanceEmployee = {
+  employee_id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  total_work_seconds: number;
+  total_work_hours: number;
+  worked_days_count: number;
+  absence_days_count: number;
+  worked_days: AttendanceWorkedDay[];
+  absence_days: AttendanceAbsenceDay[];
+};
+
+type AdminAttendanceMonthSummary = {
+  month: string;
+  from: string;
+  to: string;
+  employees: AdminAttendanceEmployee[];
+};
 
 type StaffForm = {
   first_name: string;
@@ -98,6 +133,19 @@ function absenceRangeLabel(startDate: string, endDate: string): string {
   return `${toDate(startDate)} - ${toDate(endDate)}`;
 }
 
+function currentMonthIso(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function hoursMinutesFromSeconds(seconds: number | null | undefined): string {
+  const total = Math.max(0, Number(seconds ?? 0));
+  const mins = Math.floor(total / 60);
+  const hours = Math.floor(mins / 60);
+  const rest = mins % 60;
+  return `${hours}h ${String(rest).padStart(2, "0")}m`;
+}
+
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3.5">
@@ -124,6 +172,15 @@ export default function TeamAdminPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "staff">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeAdminTab, setActiveAdminTab] = useState<"team" | "attendance">("team");
+
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [attendanceError, setAttendanceError] = useState<string | null>(null);
+  const [attendanceMonth, setAttendanceMonth] = useState(currentMonthIso());
+  const [attendanceQuery, setAttendanceQuery] = useState("");
+  const [attendanceEmployeeFilter, setAttendanceEmployeeFilter] = useState<string>("all");
+  const [attendanceRows, setAttendanceRows] = useState<AdminAttendanceEmployee[]>([]);
+  const [attendanceSelectedId, setAttendanceSelectedId] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
@@ -157,10 +214,34 @@ export default function TeamAdminPage() {
     }
   }, [token]);
 
+  const loadAttendance = useCallback(async () => {
+    if (!token || !isAdmin) return;
+    setAttendanceLoading(true);
+    setAttendanceError(null);
+    try {
+      const res = await api.get<AdminAttendanceMonthSummary>(
+        `/availability/work-sessions/admin/month-summary/?month=${encodeURIComponent(attendanceMonth)}`,
+        token,
+      );
+      setAttendanceRows(Array.isArray(res?.employees) ? res.employees : []);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Nie udało się pobrać listy obecności.";
+      setAttendanceError(msg);
+      setAttendanceRows([]);
+    } finally {
+      setAttendanceLoading(false);
+    }
+  }, [attendanceMonth, isAdmin, token]);
+
   useEffect(() => {
     if (!token || !isAdmin) return;
     void load();
   }, [token, isAdmin, load]);
+
+  useEffect(() => {
+    if (!token || !isAdmin) return;
+    void loadAttendance();
+  }, [token, isAdmin, loadAttendance]);
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -190,6 +271,29 @@ export default function TeamAdminPage() {
   }, [filteredRows, selectedId]);
 
   const selected = useMemo(() => filteredRows.find((r) => r.id === selectedId) ?? null, [filteredRows, selectedId]);
+
+  const attendanceFilteredRows = useMemo(() => {
+    const q = attendanceQuery.trim().toLowerCase();
+    return attendanceRows.filter((r) => {
+      if (attendanceEmployeeFilter !== "all" && r.employee_id !== attendanceEmployeeFilter) return false;
+      if (!q) return true;
+      return `${r.full_name} ${r.email} ${r.role}`.toLowerCase().includes(q);
+    });
+  }, [attendanceRows, attendanceEmployeeFilter, attendanceQuery]);
+
+  useEffect(() => {
+    if (attendanceFilteredRows.length === 0) {
+      setAttendanceSelectedId(null);
+      return;
+    }
+    const exists = attendanceFilteredRows.some((r) => r.employee_id === attendanceSelectedId);
+    if (!exists) setAttendanceSelectedId(attendanceFilteredRows[0].employee_id);
+  }, [attendanceFilteredRows, attendanceSelectedId]);
+
+  const attendanceSelected = useMemo(
+    () => attendanceFilteredRows.find((r) => r.employee_id === attendanceSelectedId) ?? null,
+    [attendanceFilteredRows, attendanceSelectedId],
+  );
 
   const stats = useMemo(() => {
     const total = rows.length;
@@ -389,11 +493,17 @@ export default function TeamAdminPage() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => void load()}
-              disabled={loading}
+              onClick={() => {
+                if (activeAdminTab === "attendance") {
+                  void loadAttendance();
+                } else {
+                  void load();
+                }
+              }}
+              disabled={activeAdminTab === "attendance" ? attendanceLoading : loading}
               className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#9ca3af] transition hover:bg-white/10 hover:text-white disabled:opacity-50"
             >
-              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+              <RefreshCw size={16} className={(activeAdminTab === "attendance" ? attendanceLoading : loading) ? "animate-spin" : ""} />
               Odśwież
             </button>
             <button
@@ -416,11 +526,40 @@ export default function TeamAdminPage() {
         </div>
       </header>
 
-      <AdminAbsenceRequestsPanel />
+      <section className="rounded-3xl border border-white/10 bg-[#0c0f18] p-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveAdminTab("team")}
+            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+              activeAdminTab === "team"
+                ? "border border-[#3b82f6]/45 bg-[#3b82f6]/15 text-white"
+                : "border border-white/10 bg-white/[0.03] text-[#9ca3af] hover:bg-white/[0.08] hover:text-white"
+            }`}
+          >
+            Przegląd zespołu
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveAdminTab("attendance")}
+            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+              activeAdminTab === "attendance"
+                ? "border border-[#3b82f6]/45 bg-[#3b82f6]/15 text-white"
+                : "border border-white/10 bg-white/[0.03] text-[#9ca3af] hover:bg-white/[0.08] hover:text-white"
+            }`}
+          >
+            Lista obecności
+          </button>
+        </div>
+      </section>
 
-      {error ? <ErrorState error={new Error(error)} onRetry={() => void load()} title="Błąd panelu zespołu" /> : null}
+      {activeAdminTab === "team" ? (
+        <>
+          <AdminAbsenceRequestsPanel />
 
-      <section className="grid gap-4 xl:grid-cols-[1.08fr_.92fr]">
+          {error ? <ErrorState error={new Error(error)} onRetry={() => void load()} title="Błąd panelu zespołu" /> : null}
+
+          <section className="grid gap-4 xl:grid-cols-[1.08fr_.92fr]">
         <div className="rounded-3xl border border-white/10 bg-[#0c0f18] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8ea2c8]">Lista pracowników</h2>
@@ -655,7 +794,176 @@ export default function TeamAdminPage() {
             </div>
           )}
         </div>
-      </section>
+          </section>
+        </>
+      ) : (
+        <>
+          {attendanceError ? (
+            <ErrorState error={new Error(attendanceError)} onRetry={() => void loadAttendance()} title="Błąd listy obecności" />
+          ) : null}
+
+          <section className="grid gap-4 xl:grid-cols-[1.08fr_.92fr]">
+            <div className="rounded-3xl border border-white/10 bg-[#0c0f18] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8ea2c8]">Lista obecności pracowników</h2>
+                <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white">{attendanceFilteredRows.length}</span>
+              </div>
+
+              <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+                <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
+                  <Search size={14} className="text-[#7f8ca6]" />
+                  <input
+                    value={attendanceQuery}
+                    onChange={(e) => setAttendanceQuery(e.target.value)}
+                    placeholder="Szukaj po imieniu lub e-mailu..."
+                    className="w-full bg-transparent text-white outline-none placeholder:text-[#60708f]"
+                  />
+                </label>
+
+                <input
+                  type="month"
+                  value={attendanceMonth}
+                  onChange={(e) => setAttendanceMonth(e.target.value || currentMonthIso())}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                />
+
+                <select
+                  value={attendanceEmployeeFilter}
+                  onChange={(e) => setAttendanceEmployeeFilter(e.target.value)}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                >
+                  <option value="all">Wszyscy pracownicy</option>
+                  {attendanceRows.map((r) => (
+                    <option key={r.employee_id} value={r.employee_id}>
+                      {r.full_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-3 max-h-[72vh] space-y-2 overflow-auto pr-1">
+                {attendanceLoading ? (
+                  <RepairTableSkeleton rows={8} />
+                ) : attendanceFilteredRows.length === 0 ? (
+                  <EmptyState icon="📊" title="Brak danych" description="Brak wpisów obecności dla wybranego filtra/miesiąca." />
+                ) : (
+                  attendanceFilteredRows.map((r) => {
+                    const selectedRow = attendanceSelectedId === r.employee_id;
+                    return (
+                      <button
+                        key={r.employee_id}
+                        type="button"
+                        onClick={() => setAttendanceSelectedId(r.employee_id)}
+                        className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
+                          selectedRow ? "border-[#3b82f6]/40 bg-[#3b82f6]/12" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">{r.full_name}</p>
+                            <p className="mt-0.5 text-[11px] text-[#8ea2c8]">{r.email}</p>
+                          </div>
+                          <span className="inline-flex items-center rounded-full border border-white/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-[#bfdbfe]">
+                            {r.role}
+                          </span>
+                        </div>
+                        <div className="mt-2 grid grid-cols-3 gap-1 text-[11px]">
+                          <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[#9ca3af]">
+                            Godziny: <span className="font-semibold text-white">{hoursMinutesFromSeconds(r.total_work_seconds)}</span>
+                          </div>
+                          <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[#9ca3af]">
+                            Dni pracy: <span className="font-semibold text-white">{r.worked_days_count}</span>
+                          </div>
+                          <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[#9ca3af]">
+                            Nieobecności: <span className="font-semibold text-white">{r.absence_days_count}</span>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-[#0c0f18] p-4">
+              {!attendanceSelected ? (
+                <EmptyState icon="🗓" title="Wybierz pracownika" description="Po lewej wybierz osobę, aby zobaczyć miesięczne podsumowanie i szczegóły obecności." />
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8ea2c8]">Szczegóły obecności</p>
+                    <h3 className="mt-1 truncate text-xl font-semibold text-white">{attendanceSelected.full_name}</h3>
+                    <p className="mt-0.5 text-xs text-[#9ca3af]">{attendanceSelected.email} · {attendanceMonth}</p>
+                  </div>
+
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    <MetricBox
+                      label="Suma godzin"
+                      value={hoursMinutesFromSeconds(attendanceSelected.total_work_seconds)}
+                      tone="border-[#3b82f6]/30 bg-[#3b82f6]/10 text-[#bfdbfe]"
+                    />
+                    <MetricBox
+                      label="Dni pracy"
+                      value={attendanceSelected.worked_days_count}
+                      tone="border-[#22c55e]/30 bg-[#22c55e]/10 text-[#bbf7d0]"
+                    />
+                    <MetricBox
+                      label="Dni nieobecności"
+                      value={attendanceSelected.absence_days_count}
+                      tone="border-[#ef4444]/30 bg-[#ef4444]/10 text-[#fecaca]"
+                    />
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <h4 className="text-sm font-semibold text-white">Dni pracy</h4>
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-[#9ca3af]">
+                          {attendanceSelected.worked_days.length}
+                        </span>
+                      </div>
+                      {attendanceSelected.worked_days.length === 0 ? (
+                        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-[#7e8aa5]">Brak dni pracy w wybranym miesiącu.</div>
+                      ) : (
+                        <div className="max-h-[42vh] space-y-2 overflow-auto pr-1">
+                          {attendanceSelected.worked_days.map((day) => (
+                            <div key={day.date} className="rounded-xl border border-white/10 bg-[#0f1320] px-3 py-2">
+                              <p className="text-sm font-semibold text-white">{toDate(day.date)}</p>
+                              <p className="text-[11px] text-[#8ea2c8]">Czas: {hoursMinutesFromSeconds(day.seconds)} · Sesje: {day.sessions_count}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <h4 className="text-sm font-semibold text-white">Dni nieobecności</h4>
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-[#9ca3af]">
+                          {attendanceSelected.absence_days.length}
+                        </span>
+                      </div>
+                      {attendanceSelected.absence_days.length === 0 ? (
+                        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-[#7e8aa5]">Brak nieobecności w wybranym miesiącu.</div>
+                      ) : (
+                        <div className="max-h-[42vh] space-y-2 overflow-auto pr-1">
+                          {attendanceSelected.absence_days.map((day) => (
+                            <div key={day.date} className="rounded-xl border border-white/10 bg-[#0f1320] px-3 py-2">
+                              <p className="text-sm font-semibold text-white">{toDate(day.date)}</p>
+                              <p className="text-[11px] text-[#8ea2c8]">{day.types.map((t) => t.label).join(", ") || "Nieobecność"}</p>
+                              {day.notes.length ? <p className="mt-1 text-[11px] text-[#9ca3af]">{day.notes.join(" · ")}</p> : null}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      )}
 
       {modalOpen ? (
         <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/65 p-4" role="dialog" aria-modal="true">

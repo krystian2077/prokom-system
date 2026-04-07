@@ -54,6 +54,7 @@ export interface PublicSubmitClient {
 export interface PublicSubmitDevice {
   category: string;
   brand_id?: string | null;
+  brand_name?: string;
   device_model_id?: string | null;
   model_name?: string;
   serial_number?: string;

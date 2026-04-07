@@ -51,10 +51,10 @@ urlpatterns = [
     path("notifications/requires-action/", StaffNotificationRequiresActionView.as_view(), name="notifications-requires-action"),
     path("notifications/mark-all-read/", StaffNotificationMarkAllReadView.as_view(), name="notifications-mark-all-read"),
     path("notifications/unread-count/", StaffNotificationUnreadCountView.as_view(), name="notifications-unread-count"),
-    path("notifications/<int:pk>/", StaffNotificationDetailView.as_view(), name="notifications-detail"),
+    path("notifications/<uuid:pk>/", StaffNotificationDetailView.as_view(), name="notifications-detail"),
     path("notifications/admin/", AdminNotificationListView.as_view(), name="notifications-admin-list"),
     path("notifications/admin/mark-all-read/", AdminNotificationMarkAllReadView.as_view(), name="notifications-admin-mark-all-read"),
-    path("notifications/admin/<int:pk>/", AdminNotificationDetailView.as_view(), name="notifications-admin-detail"),
+    path("notifications/admin/<uuid:pk>/", AdminNotificationDetailView.as_view(), name="notifications-admin-detail"),
     # Lista do przypisywania napraw (staff/admin, bez siebie)
     path("staff/assignable-for-repairs/", StaffAssignableForRepairView.as_view(), name="staff-assignable-for-repairs"),
     # Zarządzanie pracownikami (tylko admin)

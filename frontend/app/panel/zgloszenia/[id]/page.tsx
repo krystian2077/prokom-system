@@ -218,6 +218,9 @@ export default function PanelRepairDetailPage() {
 
   const client = data.client ?? { full_name: data.client_name, email: "", phone: "" };
   const device = data.device ?? { device_name: data.device_name, brand_name: "", category: "" };
+  const deviceBrand = (device.device_brand ?? device.brand_name ?? data.device_brand ?? "").trim();
+  const deviceModel = (device.device_model ?? data.device_model ?? "").trim();
+  const deviceTitle = [deviceBrand, deviceModel].filter(Boolean).join(" ") || device.device_name;
   const deliveryLabel = deliveryMethodLabel(data.delivery_method);
   const returnLabel = returnMethodLabel(data.return_method);
 
@@ -239,7 +242,7 @@ export default function PanelRepairDetailPage() {
             {data.repair_number}
           </h1>
           <p className="mt-2 text-sm text-[#b4b8c4]">
-            {device.device_name} · {client.full_name}
+            {deviceTitle} · {client.full_name}
           </p>
         </div>
         <div className="rounded-xl bg-[var(--row-hover)] px-4 py-3 text-right">
@@ -299,8 +302,9 @@ export default function PanelRepairDetailPage() {
 
           <Section title="Urządzenie (z formularza)">
             <dl className="divide-y divide-[var(--border)]">
-              <InfoRow label="Urządzenie" value={device.device_name} />
-              <InfoRow label="Marka" value={device.brand_name} />
+              <InfoRow label="Urządzenie" value={deviceTitle} />
+              <InfoRow label="Marka" value={deviceBrand || "—"} />
+              <InfoRow label="Model" value={deviceModel || "—"} />
               <InfoRow label="Kategoria" value={device.category} />
               <InfoRow label="Numer seryjny" value={device.serial_number} />
             </dl>

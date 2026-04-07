@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ArrowRight, Clock3, Phone, Search, ShieldCheck } from "lucide-react";
 import { api, API_V1 } from "@/lib/api";
 
 interface TrackResult {
@@ -25,6 +26,20 @@ function formatDate(iso: string | null): string {
 function phoneToLast4(raw: string): string {
   const digits = raw.replace(/\D/g, "");
   return digits.slice(-4);
+}
+
+function getStatusTone(status: string): { label: string; className: string } {
+  const normalized = status.toLowerCase();
+  if (normalized.includes("ready") || normalized.includes("got")) {
+    return { label: status, className: "bg-[rgba(34,197,94,.12)] text-[var(--green)] border-[rgba(34,197,94,.22)]" };
+  }
+  if (normalized.includes("wait") || normalized.includes("oczek")) {
+    return { label: status, className: "bg-[rgba(245,158,11,.12)] text-[var(--amber)] border-[rgba(245,158,11,.22)]" };
+  }
+  if (normalized.includes("done") || normalized.includes("zak") || normalized.includes("wyd")) {
+    return { label: status, className: "bg-[rgba(59,130,246,.12)] text-[var(--blue)] border-[rgba(59,130,246,.22)]" };
+  }
+  return { label: status, className: "bg-[rgba(255,255,255,.05)] text-[var(--ink2)] border-[var(--border)]" };
 }
 
 /**
@@ -62,101 +77,151 @@ export function FindMyRepairCard() {
   };
 
   return (
-    <div id="szukaj-naprawy" className="panel-card mt-8 scroll-mt-24">
+    <div
+      id="szukaj-naprawy"
+      className="panel-card mt-8 scroll-mt-24 overflow-hidden"
+    >
       <div className="panel-card-header">
-        <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
-          Szukaj mojej naprawy
-        </h2>
-        <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-          Jeśli zgłoszenie nie jest jeszcze na liście, wpisz numer referencyjny z potwierdzenia oraz telefon podany przy
-          przyjęciu stacjonarnym. Weryfikacja odbywa się na podstawie ostatnich czterech cyfr numeru.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ borderColor: "var(--red-border)", color: "var(--red)", background: "var(--red-l)" }}>
+              <Search size={12} />
+              Szybkie sprawdzenie
+            </span>
+            <h2 className="mt-3 text-[20px] font-semibold leading-tight sm:text-[22px]" style={{ fontFamily: "var(--font-unbounded)", color: "var(--heading)" }}>
+              Szukaj mojej naprawy
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
+              Wpisz numer zgłoszenia oraz pełny numer telefonu z przyjęcia — system automatycznie użyje ostatnich 4 cyfr.
+            </p>
+          </div>
+          <div className="hidden rounded-2xl border px-3 py-2 sm:flex items-center gap-2" style={{ borderColor: "var(--border)", background: "var(--island2)", color: "var(--ink2)" }}>
+            <ShieldCheck size={15} />
+            <span className="text-xs font-medium">Bezpieczna weryfikacja</span>
+          </div>
+        </div>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-4 p-4 pt-0">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+
+      <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6 pt-0">
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+          <label className="block">
+            <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
               Numer zgłoszenia (ref)
-            </label>
+            </span>
             <input
               type="text"
               value={ref}
               onChange={(e) => setRef(e.target.value)}
               placeholder="np. PROKOM/RMA/123/2025"
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--island)] px-4 py-3 text-sm focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[var(--red)]/20"
-              style={{ color: "var(--ink)" }}
+              className="h-14 w-full rounded-2xl border bg-[var(--island)] px-4 text-[15px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15"
+              style={{ borderColor: "var(--border)", color: "var(--ink)" }}
               autoComplete="off"
             />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
-              Telefon z przyjęcia
-            </label>
+          </label>
+
+          <label className="block">
+            <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
+              Telefon z przyjęcia (pełny numer)
+            </span>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Pełny numer — używamy ostatnich 4 cyfr"
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--island)] px-4 py-3 text-sm focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[var(--red)]/20"
-              style={{ color: "var(--ink)" }}
+              placeholder="Wpisz pełny numer telefonu"
+              className="h-14 w-full rounded-2xl border bg-[var(--island)] px-4 text-[15px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15"
+              style={{ borderColor: "var(--border)", color: "var(--ink)" }}
               autoComplete="tel"
             />
-          </div>
+          </label>
         </div>
-        {error && <p className="text-sm" style={{ color: "var(--red)" }}>{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition disabled:opacity-60"
-          style={{ background: "var(--red)" }}
-        >
-          {loading ? "Szukam…" : "Szukaj"}
-        </button>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
+            <Clock3 size={16} className="mt-0.5 shrink-0" />
+            <span>System sam wytnie ostatnie 4 cyfry z wpisanego numeru telefonu.</span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl px-6 text-[15px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ background: loading ? "var(--red-h)" : "var(--red)" }}
+          >
+            <Search size={16} />
+            {loading ? "Szukam…" : "Sprawdź status"}
+          </button>
+        </div>
+
+        {error && (
+          <div className="rounded-2xl border px-4 py-3 text-sm" style={{ borderColor: "rgba(220,30,30,.22)", background: "rgba(220,30,30,.08)", color: "var(--red)" }}>
+            {error}
+          </div>
+        )}
       </form>
 
       {result && (
-        <div className="border-t border-[var(--border)] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
-            Wynik
-          </p>
-          <p className="mt-1 font-mono text-base font-bold" style={{ color: "var(--ink)" }}>
-            {result.repair_number}
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="border-t border-[var(--border)] p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
+                Wynik wyszukiwania
+              </p>
+              <p className="mt-1 font-mono text-lg font-bold tracking-wide" style={{ color: "var(--heading)" }}>
+                {result.repair_number}
+              </p>
+            </div>
+            <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${getStatusTone(result.status).className}`}>
+              {getStatusTone(result.status).label}
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
                 Status
               </p>
-              <p className="mt-0.5 text-sm font-medium" style={{ color: "var(--ink)" }}>
+              <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--ink)" }}>
                 {result.status}
               </p>
             </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+            <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
                 Data przyjęcia
               </p>
-              <p className="mt-0.5 text-sm" style={{ color: "var(--ink)" }}>
+              <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--ink)" }}>
                 {formatDate(result.accepted_at)}
               </p>
             </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+            <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
                 Szacowany termin / czas
               </p>
-              <p className="mt-0.5 text-sm" style={{ color: "var(--ink)" }}>
-                {result.estimated_completion_date
-                  ? formatDate(result.estimated_completion_date)
-                  : result.estimated_duration || "—"}
+              <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--ink)" }}>
+                {result.estimated_completion_date ? formatDate(result.estimated_completion_date) : result.estimated_duration || "—"}
               </p>
             </div>
           </div>
-          <p className="mt-4 text-xs leading-relaxed" style={{ color: "var(--ink2)" }}>
-            Pełny podgląd w panelu może wymagać przypisania naprawy do konta (np. link z wiadomości e-mail lub pomoc w
-            serwisie).{" "}
-            <Link href="/client/naprawy" className="font-medium underline" style={{ color: "var(--red)" }}>
+
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
+              Pełny podgląd może wymagać przypisania naprawy do konta.
+            </p>
+            <Link href="/client/naprawy" className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--red)" }}>
               Lista napraw
+              <ArrowRight size={14} />
             </Link>
-          </p>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2 text-xs" style={{ color: "var(--ink2)" }}>
+            <span className="inline-flex items-center gap-1 rounded-full border px-3 py-1" style={{ borderColor: "var(--border)" }}>
+              <Phone size={12} />
+              Wsparcie: 883 200 151
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border px-3 py-1" style={{ borderColor: "var(--border)" }}>
+              <ShieldCheck size={12} />
+              Ostatnie 4 cyfry telefonu
+            </span>
+          </div>
         </div>
       )}
     </div>

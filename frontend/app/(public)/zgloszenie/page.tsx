@@ -201,6 +201,7 @@ export default function ZgloszeniePage() {
     return () => { cancelled = true; };
   }, [token, authLoading]);
   const [category, setCategory] = useState("");
+  const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [problem, setProblem] = useState("");
   const [imei, setImei] = useState("");
@@ -320,6 +321,7 @@ export default function ZgloszeniePage() {
       },
       device: {
         category: apiCategory,
+        brand_name: brand.trim(),
         model_name: model.trim(),
         problem_description: (problem.trim() || "—").slice(0, 2000),
         serial_number: "",
@@ -357,7 +359,8 @@ export default function ZgloszeniePage() {
   };
 
   const contactPreview = [fname.trim(), lname.trim()].filter(Boolean).length ? `${fname.trim()} ${lname.trim()} · ${email.trim() || "—"}` : null;
-  const devicePreview = category && model ? `${category} — ${model}` : category || null;
+  const deviceIdentity = [brand.trim(), model.trim()].filter(Boolean).join(" ");
+  const devicePreview = category ? `${category}${deviceIdentity ? ` — ${deviceIdentity}` : ""}` : null;
   const problemPreview = problem.trim().length === 0 ? "" : problem.trim().slice(0, 58) + (problem.trim().length > 58 ? "…" : "");
 
   const stepIcon = (i: number) => {
@@ -812,9 +815,15 @@ export default function ZgloszeniePage() {
                         </div>
                         <div>
                           <label className="flabel">
+                            <span className="flabel-req" /> Marka urządzenia
+                          </label>
+                          <input type="text" className="fi mt-1.5" placeholder="np. Apple, Samsung, Dell" value={brand} onChange={(e) => setBrand(e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="flabel">
                             <span className="flabel-req" /> Model urządzenia
                           </label>
-                          <input type="text" className="fi mt-1.5" placeholder="np. iPhone 15 Pro, Samsung Galaxy S24 Ultra" value={model} onChange={(e) => setModel(e.target.value)} />
+                          <input type="text" className="fi mt-1.5" placeholder="np. iPhone 15 Pro, Galaxy S24 Ultra" value={model} onChange={(e) => setModel(e.target.value)} />
                           {(category === "Telefon" || category === "Tablet") && (
                             <div className="mt-2 flex items-start gap-2 rounded-[10px] border px-[15px] py-3" style={{ borderColor: "rgba(220,30,30,.2)", background: "rgba(220,30,30,.06)" }}>
                               <span className="text-base">💡</span>
@@ -1121,7 +1130,7 @@ export default function ZgloszeniePage() {
                         <div className="space-y-0">
                           {[
                             { key: "Kontakt", val: [fname, lname].filter(Boolean).join(" ") ? `${[fname, lname].filter(Boolean).join(" ")} · ${email || "—"} · ${phone || "—"}` : "—" },
-                            { key: "Urządzenie", val: category && model ? `${category} — ${model}` : "—" },
+                            { key: "Urządzenie", val: category ? `${category}${[brand.trim(), model.trim()].filter(Boolean).join(" ") ? ` — ${[brand.trim(), model.trim()].filter(Boolean).join(" ")}` : ""}` : "—" },
                             { key: "Problem", val: problem.trim() || "—" },
                             { key: "IMEI", val: imei.trim() || "—" },
                             { key: "Dostawa", val: delivery === "osobiscie" ? "Osobiście w serwisie" : "Wysyłka kurierska" },

@@ -59,6 +59,7 @@ const emptyClient: PublicSubmitClient = {
 
 const emptyDevice: PublicSubmitDevice = {
   category: "",
+  brand_name: "",
   model_name: "",
   problem_description: "",
   serial_number: "",
@@ -174,6 +175,7 @@ export function SubmissionForm() {
     if (!device.category) err.device_category = "Wybierz kategorię urządzenia.";
     if (!device.problem_description.trim()) err.device_problem_description = "Opisz problem.";
     const needsModel = ["phone", "tablet", "smartwatch"].includes(device.category);
+    if (needsModel && !(device.brand_name || "").trim()) err.device_brand_name = "Podaj markę urządzenia.";
     if (needsModel && !(device.model_name || "").trim()) err.device_model_name = "Podaj model urządzenia.";
     setFieldErrors(err);
     return Object.keys(err).length === 0;
@@ -215,6 +217,7 @@ export function SubmissionForm() {
       },
       device: {
         ...device,
+        brand_name: device.brand_name || "",
         model_name: device.model_name || "",
         serial_number: device.serial_number || "",
         imei: device.imei || "",
@@ -409,7 +412,14 @@ export function SubmissionForm() {
                 error={fieldErrors.device_category}
               />
               <Input
-                label="Model urządzenia (np. iPhone 14, Samsung Galaxy S23)"
+                label="Marka urządzenia (np. Apple, Samsung, Dell)"
+                name="brand_name"
+                value={device.brand_name || ""}
+                onChange={(e) => updateDevice("brand_name", e.target.value)}
+                error={fieldErrors.device_brand_name}
+              />
+              <Input
+                label="Model urządzenia (np. iPhone 14, Galaxy S23, Latitude 5520)"
                 name="model_name"
                 value={device.model_name || ""}
                 onChange={(e) => updateDevice("model_name", e.target.value)}
@@ -517,7 +527,7 @@ export function SubmissionForm() {
           {step === 5 && (
             <div className="space-y-3 text-sm">
               <p><strong>Kontakt:</strong> {client.first_name} {client.last_name}, {client.email}, {client.phone}</p>
-              <p><strong>Urządzenie:</strong> {DEVICE_CATEGORIES.find((c) => c.value === device.category)?.label ?? device.category} — {device.model_name || "—"}</p>
+              <p><strong>Urządzenie:</strong> {DEVICE_CATEGORIES.find((c) => c.value === device.category)?.label ?? device.category} — {[device.brand_name, device.model_name].filter(Boolean).join(" ") || "—"}</p>
               <p><strong>Problem:</strong> {device.problem_description}</p>
               <p><strong>Dostawa:</strong> {DELIVERY_METHODS.find((d) => d.value === deliveryMethod)?.label}, <strong>Zwrot:</strong> {RETURN_METHODS.find((r) => r.value === returnMethod)?.label}</p>
               {hammerGlassInterest && (

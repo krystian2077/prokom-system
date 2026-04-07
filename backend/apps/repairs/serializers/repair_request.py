@@ -44,6 +44,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
     """Krótka lista zgłoszeń napraw."""
     client_name = serializers.SerializerMethodField()
     device_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     priority_display = serializers.CharField(source="get_priority_display", read_only=True)
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
@@ -64,6 +66,8 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "client_name",
             "device",
             "device_name",
+            "device_brand",
+            "device_model",
             "status",
             "status_display",
             "priority",
@@ -111,6 +115,14 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
 
     def get_device_name(self, obj):
         return obj.device.get_device_name()
+
+    def get_device_brand(self, obj):
+        dev = getattr(obj, "device", None)
+        return dev.get_brand_name() if dev else None
+
+    def get_device_model(self, obj):
+        dev = getattr(obj, "device", None)
+        return dev.get_model_name() if dev else None
 
     def get_auto_tags(self, obj):
         return getattr(obj, "get_auto_tags", lambda: [])()
@@ -224,6 +236,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     return_address = ClientAddressSerializer(read_only=True, allow_null=True)
     client_name = serializers.SerializerMethodField()
     device_name = serializers.SerializerMethodField()
+    device_brand = serializers.SerializerMethodField()
+    device_model = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     priority_display = serializers.CharField(source="get_priority_display", read_only=True)
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
@@ -258,6 +272,8 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "client_name",
             "device",
             "device_name",
+            "device_brand",
+            "device_model",
             "status",
             "status_display",
             "public_status",
@@ -342,6 +358,14 @@ class RepairRequestSerializer(serializers.ModelSerializer):
 
     def get_device_name(self, obj):
         return obj.device.get_device_name()
+
+    def get_device_brand(self, obj):
+        dev = getattr(obj, "device", None)
+        return dev.get_brand_name() if dev else None
+
+    def get_device_model(self, obj):
+        dev = getattr(obj, "device", None)
+        return dev.get_model_name() if dev else None
 
     def get_public_status(self, obj):
         return get_public_repair_status(obj.status)

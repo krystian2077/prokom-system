@@ -100,6 +100,16 @@ def create_repair_request(
         from apps.clients.services import update_client_visit_and_segment
         update_client_visit_and_segment(client_id)
 
+    if repair.assigned_to_id:
+        from apps.accounts.services.notification_service import notify_repair_assigned
+
+        notify_repair_assigned(repair, repair.assigned_to_id)
+
+    # Powiadom adminów o każdej nowej naprawie
+    from apps.accounts.services.notification_service import notify_new_repair_to_admins
+
+    notify_new_repair_to_admins(repair)
+
     return repair
 
 
@@ -182,6 +192,7 @@ def quick_accept_repair(
     email=None,
     device_id=None,
     device_category=None,
+    device_brand_name=None,
     device_model_name=None,
     manual_brand=None,
     device_color=None,
@@ -233,8 +244,10 @@ def quick_accept_repair(
         skip_auto_assign=skip_auto_assign,
     )
 
+    effective_manual_brand = (device_brand_name or manual_brand or "").strip() or None
+
     dev_kw = dict(
-        manual_brand=manual_brand,
+        manual_brand=effective_manual_brand,
         device_color=device_color,
         visual_condition=visual_condition,
         device_password=device_password,
@@ -267,7 +280,7 @@ def quick_accept_repair(
             client=client,
             category=device_category,
             model_name=(device_model_name or "").strip() or "Do uzupełnienia",
-            manual_brand=(manual_brand or "").strip()[:100],
+            manual_brand=(effective_manual_brand or "")[:100],
             color=(device_color or "").strip()[:64],
             condition_on_arrival=(visual_condition or "").strip(),
             password=(device_password or "").strip()[:100],
@@ -308,7 +321,7 @@ def quick_accept_repair(
         client=client,
         category=device_category,
         model_name=(device_model_name or "").strip() or "Do uzupełnienia",
-        manual_brand=(manual_brand or "").strip()[:100],
+        manual_brand=(effective_manual_brand or "")[:100],
         color=(device_color or "").strip()[:64],
         condition_on_arrival=(visual_condition or "").strip(),
         password=(device_password or "").strip()[:100],
@@ -362,6 +375,7 @@ def quick_complaint_warranty_intake(
     phone=None,
     email=None,
     device_category=None,
+    device_brand_name=None,
     device_model_name=None,
     manual_brand=None,
     device_color=None,
@@ -424,8 +438,10 @@ def quick_complaint_warranty_intake(
         accessory_box=accessory_box,
     )
 
+    effective_manual_brand = (device_brand_name or manual_brand or "").strip() or None
+
     dev_kw = dict(
-        manual_brand=manual_brand,
+        manual_brand=effective_manual_brand,
         device_color=device_color,
         visual_condition=visual_condition,
         device_password=device_password,
@@ -445,6 +461,11 @@ def quick_complaint_warranty_intake(
             repair.hammer_glass_interest = hammer_glass_interest
             repair.save(update_fields=["hammer_glass_interest"])
         _maybe_send_intake_confirmation_email(repair, send_confirmation_email)
+
+        # Powiadom adminów o reklamacji/gwarancji
+        from apps.accounts.services.notification_service import notify_complaint_warranty_to_admins
+        notify_complaint_warranty_to_admins(repair)
+
         return repair
 
     # --- Tylko gwarancja bez parent: nowy klient + urządzenie (jak quick accept) ---
@@ -470,7 +491,7 @@ def quick_complaint_warranty_intake(
         client=client,
         category=device_category,
         model_name=(device_model_name or "").strip() or "Do uzupełnienia",
-        manual_brand=(manual_brand or "").strip()[:100],
+        manual_brand=(effective_manual_brand or "")[:100],
         color=(device_color or "").strip()[:64],
         condition_on_arrival=(visual_condition or "").strip(),
         password=(device_password or "").strip()[:100],
@@ -488,4 +509,9 @@ def quick_complaint_warranty_intake(
         repair.hammer_glass_interest = hammer_glass_interest
         repair.save(update_fields=["hammer_glass_interest"])
     _maybe_send_intake_confirmation_email(repair, send_confirmation_email)
+
+    # Powiadom adminów o gwarancji
+    from apps.accounts.services.notification_service import notify_complaint_warranty_to_admins
+    notify_complaint_warranty_to_admins(repair)
+
     return repair

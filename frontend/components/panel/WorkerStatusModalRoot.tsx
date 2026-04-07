@@ -42,11 +42,11 @@ export function WorkerStatusModalRoot() {
       repairNumber={data?.repair_number}
       currentStatus={data?.status}
       onClose={closeStatusModal}
-      onStatusSaved={() => {
-        void qc.invalidateQueries({ queryKey: ["repair", repairId] });
-        void qc.invalidateQueries({ queryKey: ["repair", "status-modal", repairId] });
-        showToast("✓ Status zmieniony", "success");
-      }}
+       onStatusSaved={() => {
+         void qc.invalidateQueries({ queryKey: ["repair", repairId] });
+         void qc.invalidateQueries({ queryKey: ["repair", "status-modal", repairId] });
+         showToast("✓ Status zmieniony", "success");
+       }}
     />
   );
 }

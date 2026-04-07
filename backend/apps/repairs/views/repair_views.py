@@ -31,6 +31,7 @@ from apps.repairs.serializers import (
 from apps.repairs.serializers.staff_dashboard import RecentActivityEntrySerializer
 from apps.repairs.serializers.timeline import (
     TimelineStatusChangeSerializer,
+    TimelineStatusChangeClientSerializer,
     TimelineNoteSerializer,
     TimelineCommunicationSerializer,
 )
@@ -204,6 +205,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
                 phone=data.get("phone") or None,
                 email=data.get("email") or None,
                 device_category=data.get("device_category"),
+                device_brand_name=data.get("device_brand_name") or None,
                 device_model_name=data.get("device_model_name") or None,
                 manual_brand=data.get("manual_brand") or None,
                 device_color=data.get("device_color") or None,
@@ -250,6 +252,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
                 phone=data.get("phone") or None,
                 email=data.get("email") or None,
                 device_category=data.get("device_category"),
+                device_brand_name=data.get("device_brand_name") or None,
                 device_model_name=data.get("device_model_name") or None,
                 manual_brand=data.get("manual_brand") or None,
                 device_color=data.get("device_color") or None,
@@ -363,10 +366,12 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         for c in repair.communication_logs.all().order_by("-sent_at"):
             events.append(("communication", c.sent_at, c))
         events.sort(key=lambda x: x[1], reverse=True)
+        is_staff_or_admin = getattr(request.user, "role", None) in ("staff", "admin")
         result = []
         for typ, _, obj in events:
             if typ == "status_change":
-                result.append(TimelineStatusChangeSerializer(obj).data)
+                serializer_cls = TimelineStatusChangeSerializer if is_staff_or_admin else TimelineStatusChangeClientSerializer
+                result.append(serializer_cls(obj).data)
             elif typ == "note":
                 result.append(TimelineNoteSerializer(obj).data)
             else:

@@ -82,6 +82,23 @@ def notify_repair_assigned(repair, assigned_to_id):
     )
 
 
+def notify_new_repair_to_admins(repair):
+    """Powiadom wszystkich aktywnych adminów o nowej naprawie w systemie."""
+    from apps.accounts.models import User, UserRole
+
+    admins = User.objects.filter(role=UserRole.ADMIN, is_active=True)
+    for admin in admins:
+        create_staff_notification(
+            user_id=admin.id,
+            notification_type=TYPE_REPAIR_ASSIGNED,
+            title=f"Nowa naprawa przyjęta: {repair.repair_number}",
+            description=repair.problem_description[:200] if repair.problem_description else "",
+            repair_id=repair.id,
+            priority="standard",
+            link=f"/staff/repairs/{repair.id}/",
+        )
+
+
 def notify_note_added(
     repair,
     note_author_id,
@@ -205,6 +222,24 @@ def notify_complaint_warranty_assigned(repair, assigned_to_id):
         priority="important",
         link=f"/staff/repairs/{repair.id}/",
     )
+
+
+def notify_complaint_warranty_to_admins(repair):
+    """Powiadom adminów o nowej reklamacji lub gwarancji."""
+    from apps.accounts.models import User, UserRole
+
+    kind = "Reklamacja" if repair.repair_type == "complaint" else "Gwarancja"
+    admins = User.objects.filter(role=UserRole.ADMIN, is_active=True)
+    for admin in admins:
+        create_staff_notification(
+            user_id=admin.id,
+            notification_type=TYPE_COMPLAINT_WARRANTY_ASSIGNED,
+            title=f"Nowa {kind.lower()}: {repair.repair_number}",
+            description="",
+            repair_id=repair.id,
+            priority="important",
+            link=f"/staff/repairs/{repair.id}/",
+        )
 
 
 def notify_absence_request_created(request_obj):

@@ -94,3 +94,61 @@ export type TeamAbsenceRequest = {
 
 export type TeamAbsenceRequestsResponse = TeamAbsenceRequest[];
 
+export type AttendanceWorkedDay = {
+  date: string;
+  seconds: number;
+  hours: number;
+  sessions_count: number;
+  is_open: boolean;
+};
+
+export type AttendanceAbsenceDay = {
+  date: string;
+  types: { key: string; label: string }[];
+  notes: string[];
+};
+
+export type AttendanceDailyRow = {
+  date: string;
+  worked_seconds: number;
+  worked_hours: number;
+  worked: boolean;
+  absent: boolean;
+  absence_labels: string[];
+};
+
+export type AttendanceMonthSummary = {
+  month: string;
+  from: string;
+  to: string;
+  total_work_seconds: number;
+  total_work_hours: number;
+  worked_days_count: number;
+  absence_days_count: number;
+  worked_days: AttendanceWorkedDay[];
+  absence_days: AttendanceAbsenceDay[];
+  daily: AttendanceDailyRow[];
+};
+
+export type AdminAttendanceEmployee = {
+  employee_id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  total_work_seconds: number;
+  total_work_hours: number;
+  worked_days_count: number;
+  absence_days_count: number;
+  worked_days: AttendanceWorkedDay[];
+  absence_days: AttendanceAbsenceDay[];
+  daily: AttendanceDailyRow[];
+};
+
+export type AdminAttendanceMonthSummary = {
+  month: string;
+  from: string;
+  to: string;
+  employees: AdminAttendanceEmployee[];
+};
+

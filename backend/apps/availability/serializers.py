@@ -2,7 +2,9 @@
 
 from rest_framework import serializers
 
-from .models import EmployeeAvailability, EmployeeAbsenceRequest
+from django.utils import timezone
+
+from .models import EmployeeAvailability, EmployeeAbsenceRequest, WorkSession
 from .enums import AvailabilityType
 
 
@@ -113,4 +115,29 @@ class EmployeeAbsenceRequestSerializer(serializers.ModelSerializer):
         if not self.instance and request and getattr(request.user, "role", None) == "admin" and not data.get("employee"):
             raise serializers.ValidationError({"employee": "Administrator musi wskazać pracownika."})
         return data
+
+
+class WorkSessionSerializer(serializers.ModelSerializer):
+    is_open = serializers.SerializerMethodField()
+    elapsed_seconds = serializers.SerializerMethodField()
+
+    class Meta:
+        model = WorkSession
+        fields = [
+            "id",
+            "started_at",
+            "ended_at",
+            "duration_seconds",
+            "is_open",
+            "elapsed_seconds",
+        ]
+        read_only_fields = fields
+
+    def get_is_open(self, obj):
+        return obj.is_open
+
+    def get_elapsed_seconds(self, obj):
+        end = obj.ended_at or timezone.now()
+        return max(0, int((end - obj.started_at).total_seconds()))
+
 

@@ -44,6 +44,8 @@ export interface ApiRepairListItem {
   id: string;
   repair_number: string;
   device_name: string;
+  device_brand?: string | null;
+  device_model?: string | null;
   device?: { id: string; category?: string };
   status: string;
   status_display?: string;
@@ -60,8 +62,16 @@ export interface ApiRepairDetail {
   id: string;
   repair_number: string;
   client?: string;
-  device?: { id: string; category?: string; device_name?: string };
+  device?: {
+    id: string;
+    category?: string;
+    device_name?: string;
+    device_brand?: string | null;
+    device_model?: string | null;
+  };
   device_name?: string;
+  device_brand?: string | null;
+  device_model?: string | null;
   problem_description?: string | null;
   status: string;
   status_display?: string;
@@ -172,6 +182,12 @@ function parsePrice(v: number | string | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function splitDeviceNameFallback(raw: string | null | undefined): { brand: string; model: string } {
+  const name = String(raw ?? "").trim();
+  // Legacy records (sprzed rozdzielenia pola) mają tylko `device_name` i mają być wyświetlane po staremu.
+  return { brand: "", model: name };
+}
+
 const DELIVERY_MAP_LIST: Record<string, "osobiscie" | "kurier"> = {
   in_person: "osobiscie",
   osobiscie: "osobiscie",
@@ -182,12 +198,16 @@ const DELIVERY_MAP_LIST: Record<string, "osobiscie" | "kurier"> = {
 export function apiRepairListItemToPanel(api: ApiRepairListItem): Repair {
   const category = api.device?.category != null ? apiCategoryToPanelCategory(api.device.category) : "Inne";
   const totalPrice = parsePrice(api.final_cost ?? api.estimated_cost ?? null);
+  const fallback = splitDeviceNameFallback(api.device_name ?? "");
+  const deviceBrand = String(api.device_brand ?? "").trim() || fallback.brand;
+  const deviceModel = String(api.device_model ?? "").trim() || fallback.model;
   return {
     id: api.id,
     repairNumber: api.repair_number ?? api.id,
     clientId: "",
     deviceCategory: category,
-    deviceModel: api.device_name ?? "",
+    deviceBrand,
+    deviceModel,
     problemDescription: "",
     imei: null,
     deliveryMethod: DELIVERY_MAP_LIST[api.delivery_method ?? ""] ?? "osobiscie",
@@ -291,6 +311,10 @@ export function apiRepairDetailToPanel(api: ApiRepairDetail): Repair {
   const category = api.device?.category != null ? apiCategoryToPanelCategory(api.device.category) : "Inne";
   const clientVisibleQuote = mapClientVisibleQuote(api.client_visible_quote ?? null);
 
+  const fallback = splitDeviceNameFallback(api.device_name ?? api.device?.device_name ?? "");
+  const deviceBrand = String(api.device_brand ?? api.device?.device_brand ?? "").trim() || fallback.brand;
+  const deviceModel = String(api.device_model ?? api.device?.device_model ?? "").trim() || fallback.model;
+
   let totalPrice = parsePrice(api.final_cost ?? api.estimated_cost ?? null);
   const priceItems: RepairItem[] = [];
 
@@ -319,7 +343,8 @@ export function apiRepairDetailToPanel(api: ApiRepairDetail): Repair {
     repairNumber: api.repair_number ?? api.id,
     clientId: api.client ?? "",
     deviceCategory: category,
-    deviceModel: api.device_name ?? api.device?.device_name ?? "",
+    deviceBrand,
+    deviceModel,
     problemDescription: api.problem_description ?? "",
     imei: null,
     deliveryMethod: DELIVERY_MAP[api.delivery_method ?? ""] ?? "osobiscie",

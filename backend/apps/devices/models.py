@@ -320,9 +320,23 @@ class Device(BaseModel):
 
     def get_brand_name(self):
         """Zwraca nazwę marki."""
+        if self.device_model and self.device_model.brand:
+            return self.device_model.brand.name
         if self.brand:
             return self.brand.name
-        return "Inna marka"
+        if self.manual_brand:
+            return self.manual_brand
+        return ""
+
+    def get_model_name(self):
+        """Zwraca sam model urządzenia (bez marki) do prezentacji w osobnym polu UI."""
+        if self.device_model:
+            return self.device_model.name
+        if self.manual_model:
+            return self.manual_model
+        if self.model_name:
+            return self.model_name
+        return ""
 
 
 class DeviceImage(TimestampedModel):

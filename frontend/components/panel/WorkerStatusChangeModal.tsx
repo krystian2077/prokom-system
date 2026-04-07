@@ -64,6 +64,7 @@ export function WorkerStatusChangeModal({
   const [suggestedMessage, setSuggestedMessage] = useState("");
   const [loadingSuggested, setLoadingSuggested] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [usedPrefill, setUsedPrefill] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,16 +83,31 @@ export function WorkerStatusChangeModal({
     setSavedBanner(null);
     setNotes("");
     setSuggestedMessage("");
+
+    // Pobierz prefill (sugerowany status) ze store'a
     const prefill = useWorkerStore.getState().statusModalPrefillNewStatus;
-    const v = prefill
-      ? (prefill as RepairStatusValue)
-      : normalizeStatusToQuickChangeValue(currentStatus);
-    setNewStatus(v);
-    setPublicStatus(v);
+
     if (prefill) {
-      useWorkerStore.setState({ statusModalPrefillNewStatus: null });
+      // Jeśli jest prefill (sugerowany status), ZAWSZE go użyj
+      setNewStatus(prefill as RepairStatusValue);
+      setPublicStatus(prefill as RepairStatusValue);
+      setUsedPrefill(true);
+      // Wyczyść prefill ze store'a DOPIERO PO ZAMKNIĘCIU MODALA (w useEffect cleanup)
+    } else if (currentStatus) {
+      // Tylko jeśli nie ma prefilla, użyj znormalizowanego currentStatus
+      const v = normalizeStatusToQuickChangeValue(currentStatus);
+      setNewStatus(v);
+      setPublicStatus(v);
+      setUsedPrefill(false);
     }
   }, [open, currentStatus]);
+
+  // Wyczyść prefill ze store'a gdy modal się zamyka
+  useEffect(() => {
+    if (open) return; // Jeśli modal jest otwarty, nic nie rób
+    // Gdy modal się zamyka (open === false), wyczyść prefill
+    useWorkerStore.setState({ statusModalPrefillNewStatus: null });
+  }, [open]);
 
   useEffect(() => {
     if (!open || !token || !publicStatus) return;
