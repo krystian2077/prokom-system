@@ -4,14 +4,14 @@ PRO-KOM Serwis — Selectory listy i pojedynczej naprawy.
 from django.db.models import Q
 from django.utils import timezone
 from apps.repairs.models import RepairRequest
-from apps.common.enums import RepairStatus, RepairPriority
+from apps.common.enums import RepairStatus
 
 
 def _tag_to_q(tag):
     """Mapowanie tagu systemowego na warunek Q (do filtrowania listy)."""
     t = (tag or "").strip().lower()
     if t == "pilne":
-        return Q(is_urgent=True) | Q(priority__in=[RepairPriority.HIGH, RepairPriority.URGENT, RepairPriority.SAME_DAY])
+        return Q(is_urgent=True) | Q(is_same_day=True)
     if t == "same_day":
         return Q(is_same_day=True)
     if t == "wysyłkowe":
@@ -70,7 +70,8 @@ def repair_list(
     if client_id:
         qs = qs.filter(client_id=client_id)
     if priority:
-        qs = qs.filter(priority=priority)
+        # Priorytet naprawy jest wygaszony; parametr pozostaje kompatybilny i jest ignorowany.
+        pass
     if search:
         # Spójnie z global_search: także marka/model urządzenia (ręczny wpis i katalog).
         qs = qs.filter(

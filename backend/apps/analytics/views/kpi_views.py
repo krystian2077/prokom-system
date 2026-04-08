@@ -4,9 +4,10 @@ KPI i rankingi: dashboard dla admina, statystyki napraw, ranking pracowników, r
 from datetime import timedelta
 from decimal import Decimal
 
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Value, DecimalField, OuterRef, Subquery, Prefetch
 from django.utils import timezone
 from django.db.models.functions import TruncDate
+from django.db.models.functions import Coalesce
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -15,6 +16,76 @@ from apps.repairs.models import RepairRequest
 from apps.accounts.models import User
 from apps.accounts.models import UserRole
 from apps.common.enums import RepairStatus
+from apps.pricing.models import Quote, QuoteStatus
+
+
+def _repair_revenue_expr():
+    """Kwota przychodu dla naprawy: final_cost, a jeśli brak — ostatnia wysłana/zaakceptowana wycena."""
+    quote_total_subq = Subquery(
+        Quote.objects.filter(
+            repair_id=OuterRef("pk"),
+            status__in=[QuoteStatus.SENT, QuoteStatus.ACCEPTED],
+        )
+        .order_by("-sent_at", "-created_at")
+        .values("total_amount")[:1],
+        output_field=DecimalField(max_digits=10, decimal_places=2),
+    )
+    return Coalesce(
+        "final_cost",
+        quote_total_subq,
+        Value(Decimal("0"), output_field=DecimalField(max_digits=10, decimal_places=2)),
+    )
+
+
+def _closed_repairs_revenue_breakdown(qs):
+    """Rozbicie przychodu zamkniętych napraw na części i robociznę.
+
+    Zasady:
+    - przychód naprawy: final_cost, a gdy brak — ostatnia wycena sent/accepted,
+    - split części/robocizna bierzemy z pozycji tej samej wyceny,
+    - gdy final_cost różni się od sumy wyceny, skalujemy proporcjonalnie,
+    - gdy brak wyceny/pozycji, całość traktujemy jako robociznę.
+    """
+    parts_total = Decimal("0")
+    labour_total = Decimal("0")
+
+    quote_qs = (
+        Quote.objects.filter(status__in=[QuoteStatus.SENT, QuoteStatus.ACCEPTED])
+        .prefetch_related("items")
+        .order_by("-sent_at", "-created_at")
+    )
+
+    repairs = qs.prefetch_related(Prefetch("quotes", queryset=quote_qs, to_attr="analytics_quotes"))
+
+    for repair in repairs:
+        chosen_quote = repair.analytics_quotes[0] if getattr(repair, "analytics_quotes", None) else None
+        revenue = repair.final_cost
+        if revenue is None and chosen_quote is not None:
+            revenue = chosen_quote.total_amount
+        revenue = revenue or Decimal("0")
+        if revenue <= 0:
+            continue
+
+        if not chosen_quote:
+            labour_total += revenue
+            continue
+
+        quote_parts = Decimal("0")
+        quote_labour = Decimal("0")
+        for item in chosen_quote.items.all():
+            qty = item.quantity or Decimal("0")
+            quote_parts += qty * (item.parts_price or Decimal("0"))
+            quote_labour += qty * (item.labour_price or Decimal("0"))
+
+        quote_total = quote_parts + quote_labour
+        if quote_total > 0:
+            scale = revenue / quote_total
+            parts_total += quote_parts * scale
+            labour_total += quote_labour * scale
+        else:
+            labour_total += revenue
+
+    return parts_total, labour_total
 
 
 def _staff_or_admin(request):
@@ -46,7 +117,7 @@ class KPIDashboardView(APIView):
         by_priority = dict(
             qs.values_list("priority").annotate(c=Count("id")).values_list("priority", "c")
         )
-        total_revenue = qs.aggregate(s=Sum("final_cost"))["s"] or Decimal("0")
+        total_revenue = qs.aggregate(s=Sum(_repair_revenue_expr()))["s"] or Decimal("0")
         total_estimated = qs.aggregate(s=Sum("estimated_cost"))["s"] or Decimal("0")
         overdue = RepairRequest.objects.filter(
             status__in=[
@@ -110,7 +181,7 @@ class StaffRankingView(APIView):
                 updated_at__gte=since,
             )
             .values("assigned_to_id")
-            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+            .annotate(count=Count("id"), revenue=Sum(_repair_revenue_expr()))
         )
         by_user = {r["assigned_to_id"]: r for r in completed}
         users = User.objects.filter(id__in=staff_ids)
@@ -156,7 +227,7 @@ class RepairsReportView(APIView):
             qs = qs.annotate(period=TruncMonth("created_at"))
         rows = (
             qs.values("period")
-            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+            .annotate(count=Count("id"), revenue=Sum(_repair_revenue_expr()))
             .order_by("period")
         )
         report = [
@@ -331,8 +402,10 @@ class AdminDashboardView(APIView):
         unclaimed_count = unclaimed_qs.count()
         revenue_agg = base_qs.filter(
             status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
-        ).aggregate(s=Sum("final_cost"))
+        ).aggregate(s=Sum(_repair_revenue_expr()))
         revenue_total = revenue_agg["s"] or Decimal("0")
+        closed_qs = base_qs.filter(status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED])
+        revenue_parts_total, revenue_labour_total = _closed_repairs_revenue_breakdown(closed_qs)
         quote_value_agg = base_qs.filter(
             status__in=[RepairStatus.QUOTE_SENT, RepairStatus.QUOTE_ACCEPTED],
         ).aggregate(s=Sum("estimated_cost"))
@@ -347,6 +420,8 @@ class AdminDashboardView(APIView):
             "overdue_count": overdue_count,
             "unclaimed_count": unclaimed_count,
             "revenue_total": str(revenue_total),
+            "revenue_parts_total": str(revenue_parts_total),
+            "revenue_labour_total": str(revenue_labour_total),
             "quote_value_total": str(quote_value_total),
             "complaints_count": complaints_count,
             "warranties_count": warranties_count,
@@ -423,7 +498,7 @@ class AdminDashboardView(APIView):
                 updated_at__gte=since,
             )
             .values("assigned_to_id")
-            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+            .annotate(count=Count("id"), revenue=Sum(_repair_revenue_expr()))
         )
         by_user = {r["assigned_to_id"]: r for r in completed}
         top_staff = []
@@ -469,7 +544,7 @@ class AdminDashboardView(APIView):
         repairs_over_time = list(
             qs_chart.annotate(period=TruncDate("created_at"))
             .values("period")
-            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+            .annotate(count=Count("id"), revenue=Sum(_repair_revenue_expr()))
             .order_by("period")
         )
 

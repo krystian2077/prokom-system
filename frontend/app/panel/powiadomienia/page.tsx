@@ -238,7 +238,7 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <section className="mb-5 rounded-[28px] border border-white/10 bg-[#0d1119] p-4 shadow-[0_18px_50px_rgba(0,0,0,.28)] backdrop-blur">
+      <section className="relative z-20 mb-5 rounded-[28px] border border-white/10 bg-[#0d1119] p-4 shadow-[0_18px_50px_rgba(0,0,0,.28)] backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex flex-wrap items-center gap-2">
             {FILTERS.map((f) => (
@@ -267,6 +267,7 @@ export default function NotificationsPage() {
           <Select
             className="w-full"
             label="Priorytet"
+            solidMenu
             value={priority === "all" ? "" : priority}
             placeholder="Wszystkie priorytety"
             onChange={(e) => setParam({ priority: e.target.value })}
@@ -310,7 +311,7 @@ export default function NotificationsPage() {
       ) : null}
 
       {!loading && !error && filteredItems.length > 0 ? (
-        <section className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#0d1119,#0b1020)] p-4 shadow-[0_22px_60px_rgba(0,0,0,.36)]">
+        <section className="relative z-0 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#0d1119,#0b1020)] p-4 shadow-[0_22px_60px_rgba(0,0,0,.36)]">
           <div className="mb-4 flex items-center justify-between px-1">
             <p className="text-sm text-[#9fb1d3]">
               Pokazuje <span className="font-semibold text-white">{filteredItems.length}</span> z {totalCount}

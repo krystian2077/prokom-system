@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ClipboardList, Info, Loader2, Sparkles } from "lucide-react";
+import { ClipboardList, Loader2 } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,6 +43,23 @@ function parseTaskList(res: unknown): TaskListItem[] {
   const r = res as { results?: unknown } | null;
   if (r && Array.isArray(r.results)) return r.results as TaskListItem[];
   return [];
+}
+
+const TASK_PRIORITY_RANK: Record<string, number> = {
+  urgent: 0,
+  important: 1,
+  standard: 2,
+  low: 3,
+};
+
+function getTaskPriorityRank(priority?: string | null) {
+  return TASK_PRIORITY_RANK[(priority ?? "").toLowerCase()] ?? 99;
+}
+
+function getTaskDateRank(date?: string | null) {
+  if (!date) return Number.POSITIVE_INFINITY;
+  const ts = Date.parse(date);
+  return Number.isNaN(ts) ? Number.POSITIVE_INFINITY : ts;
 }
 
 export function RepairTasksPanel({
@@ -123,6 +140,20 @@ export function RepairTasksPanel({
     const s = (t.status ?? "").toLowerCase();
     return s !== "completed" && s !== "cancelled";
   });
+  const prioritizedOpenTasks = [...openTasks].sort((a, b) => {
+    const priorityDiff = getTaskPriorityRank(a.priority) - getTaskPriorityRank(b.priority);
+    if (priorityDiff !== 0) return priorityDiff;
+
+    const dueDiff = getTaskDateRank(a.due_date) - getTaskDateRank(b.due_date);
+    if (dueDiff !== 0) return dueDiff;
+
+    const updatedDiff = getTaskDateRank(b.updated_at) - getTaskDateRank(a.updated_at);
+    if (updatedDiff !== 0) return updatedDiff;
+
+    return getTaskDateRank(b.created_at) - getTaskDateRank(a.created_at);
+  });
+  const featuredOpenTask = prioritizedOpenTasks[0] ?? null;
+  const remainingOpenTasks = prioritizedOpenTasks.slice(1);
 
   const zadaniaFilteredHref = `${tasksListHref}?${new URLSearchParams({ related_repair: repairId }).toString()}`;
 
@@ -134,10 +165,7 @@ export function RepairTasksPanel({
             <ClipboardList size={16} className="text-[#3b82f6]" aria-hidden />
             Zadania przy tej naprawie
           </div>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Szybkie zadania na siebie, powiązane z {repairNumber}. Propozycje systemu (gdy nie masz otwartych zadań przy
-            tej naprawie) dodasz jednym kliknięciem.
-          </p>
+          <p className="mt-1 text-sm text-[var(--muted)]">Szybkie zadania na siebie, powiązane z {repairNumber}.</p>
         </div>
         <Link
           href={zadaniaFilteredHref}
@@ -147,88 +175,74 @@ export function RepairTasksPanel({
         </Link>
       </div>
 
-      {openTasks.length > 0 ? (
-        <div
-          className="mt-4 rounded-2xl border border-[#3b82f6]/30 bg-gradient-to-br from-[#3b82f6]/12 to-transparent px-4 py-3"
-          role="status"
-        >
-          <div className="flex gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#3b82f6]/35 bg-[#3b82f6]/15">
-              <Info className="h-4 w-4 text-[#93c5fd]" aria-hidden />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-[var(--white)]">Masz już otwarte zadania przy tej naprawie</p>
-              <p className="mt-1 text-sm leading-relaxed text-[var(--ink2)]">
-                Łącznie:{" "}
-                <span className="font-medium text-[#e5e7eb]">
-                  {openTasks.length}{" "}
-                  {openTasks.length === 1 ? "aktywne zadanie" : "aktywnych zadań"}
-                </span>{" "}
-                przy tym zgłoszeniu.{" "}
-                <span className="font-medium text-[#e5e7eb]">Propozycje systemu są wstrzymane</span>, dopóki coś
-                jest otwarte — po zamknięciu (Zakończ) system zaproponuje kolejne kroki. Nadal możesz dodać zadanie
-                ręcznie lub z szablonu poniżej.
-              </p>
-            </div>
-          </div>
+      <div className="mt-5 rounded-2xl border border-[#3b82f6]/20 bg-gradient-to-br from-[#3b82f6]/10 to-transparent p-4">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
+            Aktywne zadania ({openTasks.length})
+          </span>
+          {tasksQuery.isLoading ? <Loader2 className="h-4 w-4 animate-spin text-[#3b82f6]" aria-hidden /> : null}
         </div>
-      ) : null}
-
-      <div className="mt-4">
-        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-          <Sparkles size={14} className="text-[#f59e0b]" aria-hidden />
-          Propozycje systemu
-        </div>
-        {suggestionsQuery.isLoading ? (
-          <div className="mt-2 flex items-center gap-2 text-sm text-[var(--ink2)]">
-            <Loader2 className="h-4 w-4 animate-spin text-[#3b82f6]" aria-hidden />
-            Ładowanie propozycji…
-          </div>
-        ) : suggestions.length === 0 ? (
-          <p className="mt-2 text-sm text-[var(--muted)]">
-            {openTasks.length > 0
-              ? "Propozycje systemu pojawią się tutaj, gdy zamkniesz wszystkie otwarte zadania przy tej naprawie (np. „Zakończ” w Moje zadania). Do tego czasu skorzystaj z formularza lub szablonów poniżej."
-              : "Brak dopasowanych propozycji dla bieżącego statusu i opisu problemu — użyj formularza lub szablonów poniżej."}
-          </p>
+        {tasksQuery.isError ? (
+          <p className="mt-2 text-sm text-[#fca5a5]">Nie udało się wczytać listy zadań.</p>
+        ) : openTasks.length === 0 && !tasksQuery.isLoading ? (
+          <p className="mt-2 text-sm text-[var(--muted)]">Brak otwartych zadań przypisanych do Ciebie przy tej naprawie.</p>
         ) : (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {suggestions.map((s) => (
-              <div
-                key={s.suggestion_key}
-                className="flex max-w-full flex-col gap-1 rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2 sm:max-w-[320px] sm:flex-row sm:items-center sm:gap-3"
+          <div className="mt-3 space-y-2">
+            {featuredOpenTask ? (
+              <Link
+                href={zadaniaFilteredHref}
+                className="block rounded-2xl border border-[#f59e0b]/40 bg-gradient-to-br from-[#f59e0b]/20 via-[#3b82f6]/10 to-transparent px-4 py-3 shadow-[0_14px_28px_-16px_rgba(245,158,11,0.65)] transition hover:border-[#f59e0b]/60 hover:shadow-[0_18px_34px_-18px_rgba(245,158,11,0.75)]"
               >
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-                    {s.reason_label === "problem" ? "Problem" : "Status"}
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-[#f59e0b]/40 bg-[#f59e0b]/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#fbbf24]">
+                        Najważniejsze teraz
+                      </span>
+                      <span className="text-[11px] font-semibold text-[var(--ink2)]">
+                        {featuredOpenTask.priority_display ?? featuredOpenTask.priority}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-base font-semibold text-[var(--white)]">{featuredOpenTask.title}</p>
+                    <p className="mt-1 text-sm text-[var(--ink2)]">
+                      {featuredOpenTask.status_display ?? featuredOpenTask.status}
+                      {featuredOpenTask.due_date ? ` · termin ${featuredOpenTask.due_date}` : " · bez terminu"}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-[#3b82f6]/25 bg-[#3b82f6]/10 px-2.5 py-1 text-[11px] font-semibold text-[#93c5fd]">
+                    Otwórz
                   </span>
-                  <p className="text-sm font-medium text-[var(--white)]">{s.title}</p>
                 </div>
-                <button
-                  type="button"
-                  disabled={createMutation.isPending}
-                  onClick={() =>
-                    createMutation.mutate({
-                      title: s.title,
-                      priority: s.priority,
-                      description: [s.description, `Propozycja systemu (${s.suggestion_key}).`].filter(Boolean).join(" "),
-                    })
-                  }
-                  className="shrink-0 rounded-xl bg-[#3b82f6] px-3 py-1.5 text-xs font-semibold text-[var(--white)] transition hover:bg-[#2563eb] disabled:opacity-60"
-                >
-                  Dodaj
-                </button>
-              </div>
-            ))}
+              </Link>
+            ) : null}
+
+            {remainingOpenTasks.length > 0 ? (
+              <ul className="space-y-2">
+                {remainingOpenTasks.map((t) => (
+                  <li key={t.id}>
+                    <Link
+                      href={zadaniaFilteredHref}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2 text-sm transition hover:border-white/20 hover:bg-[var(--row-hover)]"
+                    >
+                      <span className="min-w-0 font-medium text-[var(--white)]">{t.title}</span>
+                      <span className="shrink-0 text-[11px] font-semibold text-[var(--ink2)]">
+                        {t.status_display ?? t.status}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         )}
       </div>
 
-      <div className="mt-5 border-t border-[var(--border)] pt-4">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Nowe zadanie</div>
+      <div className="mt-4 rounded-2xl border border-[#3b82f6]/25 bg-gradient-to-br from-[#3b82f6]/8 to-transparent p-4">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">Nowe zadanie</div>
         <p className="mt-1 text-xs text-[var(--muted)]">
           Wpisz tytuł poniżej lub użyj szablonu — wstawi on tekst w pole (możesz go edytować).
         </p>
-        <div className="mt-3 rounded-2xl border border-[#3b82f6]/25 bg-[var(--s1)] p-3">
+        <div className="mt-3 rounded-2xl border border-[#3b82f6]/25 bg-[var(--s1)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
           <label htmlFor={`repair-task-title-${repairId}`} className="sr-only">
             Tytuł zadania
           </label>
@@ -290,33 +304,47 @@ export function RepairTasksPanel({
         </div>
       </div>
 
-      <div className="mt-5 border-t border-[var(--border)] pt-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-            Twoje otwarte zadania ({openTasks.length})
-          </span>
-          {tasksQuery.isLoading ? <Loader2 className="h-4 w-4 animate-spin text-[#3b82f6]" aria-hidden /> : null}
-        </div>
-        {tasksQuery.isError ? (
-          <p className="mt-2 text-sm text-[#fca5a5]">Nie udało się wczytać listy zadań.</p>
-        ) : openTasks.length === 0 && !tasksQuery.isLoading ? (
-          <p className="mt-2 text-sm text-[var(--muted)]">Brak otwartych zadań przypisanych do Ciebie przy tej naprawie.</p>
-        ) : (
-          <ul className="mt-2 space-y-2">
-            {openTasks.map((t) => (
-              <li key={t.id}>
-                <Link
-                  href={zadaniaFilteredHref}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2 text-sm transition hover:border-white/20 hover:bg-[var(--row-hover)]"
+      {suggestionsQuery.isLoading || suggestions.length > 0 ? (
+        <div className="mt-4 border-t border-[var(--border)] pt-4">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Szybkie propozycje</div>
+          {suggestionsQuery.isLoading ? (
+            <div className="mt-2 flex items-center gap-2 text-sm text-[var(--ink2)]">
+              <Loader2 className="h-4 w-4 animate-spin text-[#3b82f6]" aria-hidden />
+              Ładowanie propozycji…
+            </div>
+          ) : (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {suggestions.map((s) => (
+                <div
+                  key={s.suggestion_key}
+                  className="flex max-w-full flex-col gap-1 rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2 sm:max-w-[320px] sm:flex-row sm:items-center sm:gap-3"
                 >
-                  <span className="min-w-0 font-medium text-[var(--white)]">{t.title}</span>
-                  <span className="shrink-0 text-[11px] font-semibold text-[var(--ink2)]">{t.status_display ?? t.status}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {s.reason_label === "problem" ? "Problem" : "Status"}
+                    </span>
+                    <p className="text-sm font-medium text-[var(--white)]">{s.title}</p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={createMutation.isPending}
+                    onClick={() =>
+                      createMutation.mutate({
+                        title: s.title,
+                        priority: s.priority,
+                        description: [s.description, `Propozycja systemu (${s.suggestion_key}).`].filter(Boolean).join(" "),
+                      })
+                    }
+                    className="shrink-0 rounded-xl bg-[#3b82f6] px-3 py-1.5 text-xs font-semibold text-[var(--white)] transition hover:bg-[#2563eb] disabled:opacity-60"
+                  >
+                    Dodaj
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
     </section>
   );
 }

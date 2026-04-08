@@ -414,9 +414,6 @@ export default function ArchivePage() {
                             Zadzwoń
                           </button>
                         ) : null}
-                        <span className="rounded-full border border-[var(--border)] bg-white/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
-                          {r.priority_display}
-                        </span>
                         <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
                           <span className="hidden sm:inline">Przyjęto</span>
                           <span className="font-medium tabular-nums text-[var(--ink2)]">

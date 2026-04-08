@@ -11,7 +11,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from apps.repairs.models import RepairRequest, RepairStatusHistory
-from apps.common.enums import RepairStatus, RepairPriority
+from apps.common.enums import RepairStatus
 
 
 # Statusy „w toku” (aktywne)
@@ -51,8 +51,7 @@ def staff_repairs_my_new(user_id):
 
 
 def staff_repairs_my_urgent(user_id):
-    """Moje pilne (przypisane, wysoki priorytet / is_urgent / same_day, nie zakończone)."""
-    today = timezone.now().date()
+    """Moje pilne (przypisane, is_urgent / same_day, nie zakończone)."""
     return (
         _base_qs()
         .filter(
@@ -60,8 +59,7 @@ def staff_repairs_my_urgent(user_id):
             status__in=NOT_FINISHED_STATUSES,
         )
         .filter(
-            Q(priority__in=[RepairPriority.HIGH, RepairPriority.URGENT, RepairPriority.SAME_DAY])
-            | Q(is_urgent=True)
+            Q(is_urgent=True)
             | Q(is_same_day=True)
         )
         .order_by("-created_at")

@@ -362,6 +362,41 @@ class RepairRequest(BaseModel):
         help_text=_("Opcjonalnie: numer przesyłki podany przez klienta (wysyłka kurierem do serwisu)."),
     )
 
+    COURIER_CHOICES = [
+        ("inpost", "InPost"),
+        ("dpd", "DPD"),
+        ("dhl", "DHL"),
+        ("gls", "GLS"),
+        ("fedex", "FedEx"),
+        ("ups", "UPS"),
+    ]
+
+    client_courier = models.CharField(
+        _("przewoźnik wysyłki od klienta"),
+        max_length=20,
+        choices=COURIER_CHOICES,
+        blank=True,
+        default="",
+        help_text=_("Przewoźnik, którym klient wysyła urządzenie do serwisu."),
+    )
+
+    service_tracking_number = models.CharField(
+        _("numer listu przewozowego do klienta"),
+        max_length=100,
+        blank=True,
+        default="",
+        help_text=_("Numer przesyłki - gdy serwis wysyła urządzenie do klienta kurierem."),
+    )
+
+    service_courier = models.CharField(
+        _("przewoźnik wysyłki do klienta"),
+        max_length=20,
+        choices=COURIER_CHOICES,
+        blank=True,
+        default="",
+        help_text=_("Przewoźnik, którym serwis wysyła urządzenie do klienta."),
+    )
+
     # Gościnne zgłoszenie: token do przypisania naprawy do konta (link z e-maila)
     claim_token = models.CharField(
         _("token przypisania"),

@@ -514,12 +514,6 @@ export default function PanelZgloszeniaPage() {
                             </div>
 
                             <div className="flex shrink-0 flex-col items-end gap-2">
-                              <span
-                                className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#9fb1d3]"
-                                title="Priorytet"
-                              >
-                                {r.priority_display}
-                              </span>
                               <span className="text-xs text-[#8da0c5]">{createdAt}</span>
                             </div>
                           </div>

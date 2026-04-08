@@ -64,13 +64,6 @@ const CATEGORY_OPTIONS = [
   { value: "other", label: "Inne" },
 ];
 
-const PRIORITY_OPTIONS = [
-  { value: "", label: "Wszystkie priorytety" },
-  { value: "normal", label: "Normalny" },
-  { value: "high", label: "Wysoki" },
-  { value: "urgent", label: "Pilne" },
-];
-
 function isArchived(status: string): boolean {
   return ARCHIVE_STATUSES.includes((status ?? "").toLowerCase() as (typeof ARCHIVE_STATUSES)[number]);
 }
@@ -101,7 +94,6 @@ function AdminSearchPageInner() {
 
   const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
-  const [priority, setPriority] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -117,7 +109,7 @@ function AdminSearchPageInner() {
   const [summaryStats, setSummaryStats] = useState<SummaryStats | null>(null);
 
   const hasAdvancedFilters = Boolean(
-    status || category || priority || assignedTo || dateFrom || dateTo || isWarranty || isComplaint,
+    status || category || assignedTo || dateFrom || dateTo || isWarranty || isComplaint,
   );
 
   const activeRepairs = useMemo(() => repairs.filter((r) => !isArchived(r.status)), [repairs]);
@@ -128,7 +120,7 @@ function AdminSearchPageInner() {
   const showArchive = scope === "all" || scope === "archive";
   const showClients = scope === "all" || scope === "clients";
   const activeFilterCount =
-    [status, category, priority, assignedTo, dateFrom, dateTo].filter(Boolean).length +
+    [status, category, assignedTo, dateFrom, dateTo].filter(Boolean).length +
     (isWarranty ? 1 : 0) +
     (isComplaint ? 1 : 0);
 
@@ -179,7 +171,6 @@ function AdminSearchPageInner() {
           params.set("limit", "20");
           if (status) params.set("status", status);
           if (category) params.set("category", category);
-          if (priority) params.set("priority", priority);
           if (assignedTo) params.set("assigned_to", assignedTo);
           if (dateFrom) params.set("date_from", dateFrom);
           if (dateTo) params.set("date_to", dateTo);
@@ -197,7 +188,7 @@ function AdminSearchPageInner() {
         setLoading(false);
       }
     },
-    [assignedTo, category, dateFrom, dateTo, hasAdvancedFilters, isComplaint, isWarranty, priority, status, token],
+    [assignedTo, category, dateFrom, dateTo, hasAdvancedFilters, isComplaint, isWarranty, status, token],
   );
 
   useEffect(() => {
@@ -404,13 +395,6 @@ function AdminSearchPageInner() {
                   </option>
                 ))}
               </select>
-              <select value={priority} onChange={(e) => setPriority(e.target.value)} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]">
-                {PRIORITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
               <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]">
                 <option value="">Wszyscy przypisani</option>
                 {staff.map((s) => {
@@ -437,7 +421,6 @@ function AdminSearchPageInner() {
                 onClick={() => {
                   setStatus("");
                   setCategory("");
-                  setPriority("");
                   setAssignedTo("");
                   setDateFrom("");
                   setDateTo("");

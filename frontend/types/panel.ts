@@ -105,6 +105,12 @@ export interface Repair {
   visualConditionDescription: string | null;
   /** Numer listu przewozowego (wysyłka do serwisu) — klient może dodać w panelu. */
   clientTrackingNumber: string | null;
+  /** Przewoźnik wysyłki od klienta. */
+  clientCourier: string | null;
+  /** Numer listu przewozowego dla wysyłki do klienta (od serwisu). */
+  serviceTrackingNumber: string | null;
+  /** Przewoźnik dla wysyłki do klienta. */
+  serviceCourier: string | null;
   status: RepairStatus;
   /** Etykieta z API (status_display / public_status) — ta sama co w panelu pracownika. */
   statusDisplay?: string | null;

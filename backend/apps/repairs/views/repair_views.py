@@ -91,7 +91,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsStaffOrAdmin()]
         return [IsAuthenticated()]
     filterset_fields = [
-        "status", "priority", "assigned_to", "client", "is_incomplete",
+        "status", "assigned_to", "client", "is_incomplete",
         "repair_type", "complaint_warranty_status",
     ]
     search_fields = [
@@ -107,7 +107,6 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         "created_at",
         "repair_number",
         "status",
-        "priority",
         "estimated_completion_date",
     ]
     ordering = ["-created_at"]
@@ -169,7 +168,6 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             return_method=data.get("return_method", "in_person"),
             delivery_address_id=data.get("delivery_address").id if data.get("delivery_address") else None,
             return_address_id=data.get("return_address").id if data.get("return_address") else None,
-            priority=data.get("priority", "normal"),
             is_urgent=data.get("is_urgent", False),
             is_same_day=data.get("is_same_day", False),
             is_warranty=data.get("is_warranty", False),
@@ -819,7 +817,7 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
     def set_inbound_tracking(self, request, pk=None):
         """
         POST /api/v1/repairs/<id>/set-inbound-tracking/
-        Body: { "tracking_number": "..." } — opcjonalny numer listu przewozowego (wysyłka do serwisu).
+        Body: { "tracking_number": "...", "courier": "..." } — numer listu przewozowego i przewoźnik (wysyłka do serwisu).
         Klient może ustawić tylko dla własnej naprawy.
         """
         repair = self.get_object()
@@ -828,8 +826,10 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
             if client_profile is None or repair.client_id != client_profile.id:
                 raise PermissionDenied("Brak dostępu do tej naprawy.")
         tracking = (request.data.get("tracking_number") or "").strip()[:100]
+        courier = (request.data.get("courier") or "").strip()[:20]
         repair.client_tracking_number = tracking
-        repair.save(update_fields=["client_tracking_number", "updated_at"])
+        repair.client_courier = courier
+        repair.save(update_fields=["client_tracking_number", "client_courier", "updated_at"])
         return Response(RepairRequestSerializer(repair, context={"request": request}).data, status=status.HTTP_200_OK)
 
     # ---------- Etap 5: Panel klienta — status (polling) ----------

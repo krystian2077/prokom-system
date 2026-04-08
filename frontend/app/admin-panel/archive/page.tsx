@@ -436,9 +436,6 @@ export default function AdminArchivePage() {
                             ☎️ Zadzwoń
                           </button>
                         ) : null}
-                        <span className="rounded-lg border border-[#3b82f6]/30 bg-[#3b82f6]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#93c5fd]">
-                          {r.priority_display}
-                        </span>
                         <div className="flex items-center gap-2 text-xs text-[#6b7280]">
                           <span className="hidden sm:inline">Od</span>
                           <span className="font-mono font-medium text-[#a9b8d6]">

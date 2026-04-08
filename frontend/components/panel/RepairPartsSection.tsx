@@ -2,9 +2,11 @@
 
 import { ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { api, fetchAllPages } from "@/lib/api";
 import type { InventorySupplier } from "@/types/inventory";
 import { PanelDatePicker } from "@/components/panel/PanelDatePicker";
+import { Select } from "@/components/ui/Select";
 import { partUsageDisplayName, type PartOrderStatusValue, type PartUsage, type PartUsageStatusValue } from "@/types/repairs";
 
 /** Kolejka zamówienia (spójna z dashboardem „Status części”). */
@@ -41,13 +43,12 @@ function formPipelineToStatuses(key: FormPipelineKey): {
 }
 
 function pipelineStepActive(u: PartUsage, step: (typeof PIPELINE_STEPS)[number]): boolean {
-  if (step.body.usage_status === "arrived") {
-    return u.usage_status === "arrived";
-  }
-  if (u.usage_status !== "ordered") return false;
   const o = orderStatusEffective(u);
   if (step.body.order_status === "to_order") return o === "to_order";
   if (step.body.order_status === "ordered") return o === "ordered" || o === "delayed";
+  if (step.body.order_status === "arrived") {
+    return o === "arrived" || u.usage_status === "arrived" || u.usage_status === "used" || u.usage_status === "unused";
+  }
   return false;
 }
 
@@ -56,6 +57,12 @@ function formatMoney(v: string | number | null | undefined): string {
   const n = typeof v === "string" ? Number(v) : v;
   if (!Number.isFinite(n)) return String(v);
   return n.toLocaleString("pl-PL", { maximumFractionDigits: 2 });
+}
+
+function parseIsoTimestamp(value?: string | null): number {
+  if (!value) return 0;
+  const ts = Date.parse(value);
+  return Number.isNaN(ts) ? 0 : ts;
 }
 
 function supplierWebsiteHref(url: string | null | undefined): string | null {
@@ -74,6 +81,7 @@ export function RepairPartsSection({
   token: string | null;
   onAfterMutation?: () => Promise<void> | void;
 }) {
+  const queryClient = useQueryClient();
   const [usages, setUsages] = useState<PartUsage[]>([]);
   const [loadingUsages, setLoadingUsages] = useState(false);
   const [usagesError, setUsagesError] = useState<string | null>(null);
@@ -114,6 +122,7 @@ export function RepairPartsSection({
       await api.patch(`/repairs/${repairId}/parts/${usageId}/`, body, token);
       await loadUsages();
       if (onAfterMutation) await onAfterMutation();
+      await refreshPartsDashboardPreview();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się zaktualizować statusu części.";
       setUsagesError(msg);
@@ -162,7 +171,16 @@ export function RepairPartsSection({
       supplierId ? suppliers.find((s) => String(s.id) === String(supplierId)) ?? null : null,
     [suppliers, supplierId],
   );
+  const sortedUsages = useMemo(
+    () => [...usages].sort((a, b) => parseIsoTimestamp(b.created_at) - parseIsoTimestamp(a.created_at)),
+    [usages],
+  );
+  const newestUsageId = sortedUsages[0]?.id ?? null;
   const supplierLinkHref = selectedSupplier ? supplierWebsiteHref(selectedSupplier.website_url) : null;
+
+  const refreshPartsDashboardPreview = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["dashboard", "parts-status"] });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,6 +226,7 @@ export function RepairPartsSection({
 
       await loadUsages();
       if (onAfterMutation) await onAfterMutation();
+      await refreshPartsDashboardPreview();
       resetForm();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nie udało się dodać użycia części.";
@@ -218,8 +237,8 @@ export function RepairPartsSection({
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex justify-end">
+    <div className="flex flex-col gap-5">
+      <div className="order-2 flex justify-end">
         <button
           type="button"
           onClick={() => resetForm()}
@@ -229,7 +248,8 @@ export function RepairPartsSection({
         </button>
       </div>
 
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+      <div className="order-3 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+        <div className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">Dodaj pozycję części</div>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="md:col-span-2">
             <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
@@ -248,18 +268,14 @@ export function RepairPartsSection({
             <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Hurtownia
             </label>
-            <select
+            <Select
               value={supplierId ?? ""}
+              solidMenu
+              placeholder="— wybierz hurtownię —"
+              options={suppliers.map((s) => ({ value: String(s.id), label: s.name }))}
               onChange={(e) => setSupplierId(e.target.value || null)}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
-            >
-              <option value="">— wybierz hurtownię —</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              className="w-full"
+            />
             {supplierLinkHref ? (
               <a
                 href={supplierLinkHref}
@@ -311,15 +327,17 @@ export function RepairPartsSection({
             <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">
               Status części
             </label>
-            <select
+            <Select
               value={formPipeline}
+              solidMenu
+              options={[
+                { value: "to_order", label: "Do zamówienia" },
+                { value: "in_transit", label: "W drodze" },
+                { value: "arrived", label: "Dotarła" },
+              ]}
               onChange={(e) => setFormPipeline(e.target.value as FormPipelineKey)}
               className="w-full rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]"
-            >
-              <option value="to_order">Do zamówienia</option>
-              <option value="in_transit">W drodze</option>
-              <option value="arrived">Dotarła</option>
-            </select>
+            />
           </div>
 
           <div className="md:col-span-2">
@@ -350,32 +368,62 @@ export function RepairPartsSection({
         </form>
       </div>
 
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
+      <div className="order-1 rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4">
         <div className="flex items-center justify-between gap-3">
           <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--ink2)]">Użycia części</h4>
           {loadingUsages && <span className="text-xs text-[var(--ink2)]">Ładowanie…</span>}
         </div>
 
         {usagesError && <p className="mt-3 text-sm text-[#fca5a5]">{usagesError}</p>}
-        {!usagesError && !loadingUsages && usages.length === 0 && (
+        {!usagesError && !loadingUsages && sortedUsages.length === 0 && (
           <p className="mt-3 text-sm text-[var(--muted)]">Brak użyć części w tej naprawie.</p>
         )}
 
         <div className="mt-4 space-y-3">
-          {usages.map((u) => (
-            <div key={u.id} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+          {sortedUsages.map((u) => {
+            const isNewest = u.id === newestUsageId;
+            return (
+            <div
+              key={u.id}
+              className={`rounded-2xl border p-4 transition ${
+                isNewest
+                  ? "border-[#3b82f6]/45 bg-gradient-to-br from-[#3b82f6]/14 to-transparent shadow-[0_14px_26px_-18px_rgba(59,130,246,0.65)]"
+                  : "border-[var(--border)] bg-[var(--row-hover)]"
+              }`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="min-w-[220px]">
-                  <p className="text-sm font-semibold text-[var(--white)]">
-                    {partUsageDisplayName(u)}{" "}
-                    {u.part?.code ? <span className="text-[var(--ink2)]">({u.part.code})</span> : null}
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--ink2)]">Ilość: {u.quantity}</p>
-                  {u.supplier_detail?.name ? (
-                    <p className="mt-1 text-xs text-[var(--ink2)]">Hurtownia: {u.supplier_detail.name}</p>
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    {isNewest ? (
+                      <span className="rounded-full border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#93c5fd]">
+                        Nowo dodana
+                      </span>
+                    ) : null}
+                    {u.part?.code ? <span className="text-xs text-[var(--ink2)]">Kod: {u.part.code}</span> : null}
+                  </div>
+                  <p className="text-lg font-semibold leading-tight text-[var(--white)]">{partUsageDisplayName(u)}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-right">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ink2)]">Status</p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--white)]">{u.usage_status_display}</p>
+                  {u.order_status_display ? (
+                    <p className="mt-0.5 text-xs text-[var(--ink2)]">Zamówienie: {u.order_status_display}</p>
                   ) : null}
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] text-[var(--muted)]">Planowana dostawa</span>
+                </div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div className="rounded-xl border border-white/10 bg-black/15 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">Ilość</p>
+                  <p className="mt-1 text-base font-semibold text-[var(--white)]">{u.quantity}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/15 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">Hurtownia</p>
+                  <p className="mt-1 text-sm font-medium text-[var(--white)]">{u.supplier_detail?.name ?? "—"}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/15 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">Planowana dostawa</p>
+                  <div className="mt-1">
                     <PanelDatePicker
                       compact
                       value={u.expected_arrival_date?.slice(0, 10) ?? ""}
@@ -386,17 +434,13 @@ export function RepairPartsSection({
                     />
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink2)]">Status</p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--white)]">{u.usage_status_display}</p>
-                  {u.order_status_display ? (
-                    <p className="mt-0.5 text-xs text-[var(--ink2)]">Zamówienie: {u.order_status_display}</p>
-                  ) : null}
-                </div>
               </div>
 
-              {(u.usage_status === "ordered" || u.usage_status === "arrived") && (
-                <div className="mt-3 flex flex-wrap gap-2">
+              {(u.usage_status === "ordered" || u.usage_status === "arrived" || u.usage_status === "used" || u.usage_status === "unused") && (
+                <div className="mt-3 rounded-xl border border-white/10 bg-black/15 p-3">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Etap zamówienia</p>
+                  <p className="mb-2 text-xs text-[var(--ink2)]">Możesz poprawić etap dostawy, jeśli kliknięto status przez pomyłkę.</p>
+                  <div className="flex flex-wrap gap-2">
                   {PIPELINE_STEPS.map((step) => {
                     const active = pipelineStepActive(u, step);
                     const disabled = patchingId === u.id;
@@ -423,12 +467,14 @@ export function RepairPartsSection({
                       </button>
                     );
                   })}
+                  </div>
                 </div>
               )}
 
               {(u.usage_status === "arrived" || u.usage_status === "used" || u.usage_status === "unused") && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="mr-1 self-center text-[11px] text-[var(--muted)]">Po dostawie:</span>
+                <div className="mt-2 rounded-xl border border-white/10 bg-black/15 p-3">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Po dostawie</p>
+                  <div className="flex flex-wrap gap-2">
                   {(
                     [
                       { label: "Użyta", v: "used" as const },
@@ -452,29 +498,23 @@ export function RepairPartsSection({
                       {label}
                     </button>
                   ))}
+                  </div>
                 </div>
               )}
 
-              <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
+              <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Podsumowanie kosztów</p>
                 <div>
-                  <p className="text-xs text-[var(--ink2)]">Cena zastosowana</p>
-                  <p className="text-sm text-[var(--white)]">
-                    {formatMoney(u.unit_price_used)} {u.part?.unit ?? ""}
-                  </p>
+                <div>
+                  <p className="text-xs text-[var(--ink2)]">Koszt zakupu części</p>
+                  <p className="text-sm font-medium text-[var(--white)]">{u.purchase_cost ? formatMoney(u.purchase_cost) : "–"}</p>
                 </div>
-                <div>
-                  <p className="text-xs text-[var(--ink2)]">Koszt zakupu (opcjonalnie)</p>
-                  <p className="text-sm text-[var(--white)]">{u.purchase_cost ? formatMoney(u.purchase_cost) : "–"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[var(--ink2)]">Suma</p>
-                  <p className="text-sm font-semibold text-[var(--white)]">{formatMoney(u.total)}</p>
                 </div>
               </div>
 
               {u.notes ? <p className="mt-3 whitespace-pre-wrap text-sm text-[#e5e7eb]">Notatka: {u.notes}</p> : null}
             </div>
-          ))}
+          );})}
         </div>
       </div>
     </div>

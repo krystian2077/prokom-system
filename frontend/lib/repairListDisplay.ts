@@ -110,6 +110,19 @@ export function compareRepairListByRepairNumber(
   return newestFirst ? -cmp : cmp;
 }
 
+/** Ranking priorytetu dla sortowania (wyższy numer = wyższy priorytet). */
+export function priorityRank(priority: string | null | undefined): number {
+  const p = (priority ?? "").toLowerCase().trim();
+  const ranks: Record<string, number> = {
+    same_day: 5,
+    urgent: 4,
+    high: 3,
+    normal: 2,
+    low: 1,
+  };
+  return ranks[p] ?? 0;
+}
+
 /**
  * Wyszukiwanie po fragmencie: nr ref, data przyjęcia (różne zapisy), klient, telefon, urządzenie, status.
  * Kilka słów (rozdzielonych spacją) — wszystkie muszą wystąpić.
@@ -156,16 +169,6 @@ export function repairListMatchesSearch(item: RepairRequestListItem, rawQuery: s
   return tokens.every((t) => hay.includes(t));
 }
 
-export function priorityRank(priority: string | null | undefined): number {
-  const p = (priority ?? "").toLowerCase();
-  if (p === "urgent") return 0;
-  if (p === "same_day") return 1;
-  if (p === "high") return 2;
-  if (p === "normal") return 3;
-  if (p === "low") return 4;
-  return 5;
-}
-
 export function statusBadge(item: RepairRequestListItem) {
   const display = (item.public_status ?? item.status_display ?? "").trim();
   const s = (item.status ?? "").toLowerCase();
@@ -180,7 +183,7 @@ export function statusBadge(item: RepairRequestListItem) {
 
 export function nextAction(item: RepairRequestListItem) {
   const s = (item.status ?? "").toLowerCase();
-  const urgent = (item.auto_tags ?? []).includes("pilne") || priorityRank(item.priority) <= 1;
+  const urgent = (item.auto_tags ?? []).includes("pilne");
 
   if (s === "ready_for_pickup") return { text: "▶ Wyślij SMS do klienta", tone: "good" as const };
   if (s === "waiting_for_parts" || (item.auto_tags ?? []).includes("czeka_na_czesc"))

@@ -24,6 +24,8 @@ type AdminDashboardKpi = {
   overdue_count: number;
   unclaimed_count: number;
   revenue_total: string;
+  revenue_parts_total?: string;
+  revenue_labour_total?: string;
   quote_value_total: string;
   complaints_count: number;
   warranties_count: number;
@@ -75,10 +77,6 @@ const SOURCE_LABELS: Record<string, string> = {
   email: "E-mail", facebook: "Facebook", whatsapp: "WhatsApp", other: "Inne",
 };
 
-const PRIORITY_LABELS: Record<string, string> = {
-  low: "Niski", normal: "Normalny", high: "Wysoki", urgent: "Pilny", same_day: "Same Day",
-};
-
 const CATEGORY_LABELS: Record<string, string> = {
   phone: "Telefon", tablet: "Tablet", smartwatch: "Smartwatch", laptop: "Laptop",
   desktop: "Komputer", printer: "Drukarka", console: "Konsola",
@@ -89,10 +87,6 @@ const PALETTE = [
   "#6366f1", "#3b82f6", "#22c55e", "#f59e0b", "#ef4444",
   "#8b5cf6", "#06b6d4", "#ec4899", "#84cc16", "#f97316",
 ];
-
-const PRIORITY_COLORS: Record<string, string> = {
-  low: "#4b5563", normal: "#3b82f6", high: "#f59e0b", urgent: "#ef4444", same_day: "#ec4899",
-};
 
 const SOURCE_COLORS: Record<string, string> = {
   online: "#6366f1", in_person: "#22c55e", phone: "#f59e0b",
@@ -556,7 +550,7 @@ function RevenueBarChart({ points }: { points: TimePoint[] }) {
 
   useEffect(() => { const t = setTimeout(() => setReady(true), 200); return () => clearTimeout(t); }, [points]);
 
-  const pts = points.filter((p) => Number(p.revenue) > 0).slice(-30);
+  const pts = points.filter((p) => Number.isFinite(Number(p.revenue))).slice(-30);
   const H = 200;
   const pad = { t: 16, r: 16, b: 36, l: 52 };
   const iw = width - pad.l - pad.r;
@@ -564,11 +558,12 @@ function RevenueBarChart({ points }: { points: TimePoint[] }) {
 
   if (!pts.length) return <p className="py-8 text-center text-sm text-[#4b5563]">Brak przychodów w wybranym okresie.</p>;
 
-  const maxRev = Math.max(1, ...pts.map((p) => Number(p.revenue)));
-  const barW = Math.max(4, iw / pts.length - 3);
-  const xStep = Math.max(1, Math.floor(pts.length / 7));
+   const maxRev = Math.max(1, ...pts.map((p) => Number(p.revenue)));
+   const slotW = iw / Math.max(pts.length, 1);
+   const barW = Math.min(20, Math.max(8, slotW - 6));
+   const xStep = Math.max(1, Math.floor(pts.length / 7));
 
-  const yTicks = 4;
+   const yTicks = 4;
 
   return (
     <div ref={containerRef} className="w-full" onMouseLeave={() => setHovered(null)}>
@@ -600,38 +595,39 @@ function RevenueBarChart({ points }: { points: TimePoint[] }) {
 
         {/* Bars */}
         {pts.map((p, i) => {
-          const bh = Math.max(2, (Number(p.revenue) / maxRev) * ih);
-          const x = pad.l + (i / (pts.length - 1 || 1)) * iw - barW / 2;
-          const y = pad.t + ih - bh;
-          const isHov = hovered === i;
-          return (
-            <g key={p.period} onMouseEnter={() => setHovered(i)}>
-              {/* Bar */}
-              <motion.rect
-                x={x} y={isHov ? y - 2 : y}
-                width={barW}
-                height={isHov ? bh + 2 : bh}
-                rx={Math.min(4, barW / 3)}
-                fill={isHov ? "url(#revbar-hov)" : "url(#revbar)"}
-                opacity={hovered !== null && !isHov ? 0.35 : 1}
-                initial={{ height: 0, y: pad.t + ih }}
-                animate={ready ? { height: isHov ? bh + 2 : bh, y: isHov ? y - 2 : y } : {}}
-                transition={{ duration: 0.6, delay: i * 0.02, ease: [0.16, 1, 0.3, 1] }}
-              />
+           const bh = Math.max(2, (Number(p.revenue) / maxRev) * ih);
+           const x = pad.l + i * slotW + (slotW - barW) / 2;
+           const yBase = pad.t + ih - bh;
+           const isHov = hovered === i;
+           const yFinal = isHov ? yBase - 2 : yBase;
+           const bhFinal = isHov ? bh + 2 : bh;
+           return (
+             <g key={p.period} onMouseEnter={() => setHovered(i)}>
+               {/* Bar */}
+               <motion.rect
+                 x={x}
+                 width={barW}
+                 rx={Math.min(3, barW / 4)}
+                 fill={isHov ? "url(#revbar-hov)" : "url(#revbar)"}
+                 opacity={hovered !== null && !isHov ? 0.35 : 1}
+                 initial={{ height: 0, y: pad.t + ih }}
+                 animate={ready ? { height: bhFinal, y: yFinal } : {}}
+                 transition={{ duration: 0.6, delay: i * 0.02, ease: [0.16, 1, 0.3, 1] }}
+               />
               {/* X label */}
               {i % xStep === 0 && (
                 <text x={x + barW / 2} y={H - 6} textAnchor="middle" fill="#4b5563" fontSize="9">
                   {fmtDate(p.period)}
                 </text>
               )}
-              {/* Hover value label */}
-              {isHov && (
-                <text x={x + barW / 2} y={y - 6} textAnchor="middle" fill="#4ade80" fontSize="10" fontWeight="700">
-                  {Math.round(Number(p.revenue) / 1000) >= 1
-                    ? `${(Number(p.revenue) / 1000).toFixed(1)}k`
-                    : Math.round(Number(p.revenue)).toString()}
-                </text>
-              )}
+               {/* Hover value label */}
+               {isHov && (
+                 <text x={x + barW / 2} y={yFinal - 6} textAnchor="middle" fill="#4ade80" fontSize="10" fontWeight="700">
+                   {Math.round(Number(p.revenue) / 1000) >= 1
+                     ? `${(Number(p.revenue) / 1000).toFixed(1)}k`
+                     : Math.round(Number(p.revenue)).toString()}
+                 </text>
+               )}
             </g>
           );
         })}
@@ -1163,13 +1159,6 @@ export default function AdminStatsPage() {
       .map(([key, value]) => ({ key, label: SOURCE_LABELS[key] ?? key, value, color: SOURCE_COLORS[key] ?? "#6b7280" }));
   }, [charts]);
 
-  const priorityData = useMemo(() => {
-    if (!charts?.repairs_by_priority) return [];
-    return Object.entries(charts.repairs_by_priority)
-      .filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1])
-      .map(([key, value]) => ({ key, label: PRIORITY_LABELS[key] ?? key, value, color: PRIORITY_COLORS[key] ?? "#6b7280" }));
-  }, [charts]);
-
   const categoryData = useMemo(() => {
     if (!charts?.repairs_by_category) return [];
     return Object.entries(charts.repairs_by_category)
@@ -1178,7 +1167,6 @@ export default function AdminStatsPage() {
   }, [charts]);
 
   const maxSource = useMemo(() => Math.max(1, ...sourceData.map((d) => d.value)), [sourceData]);
-  const maxPriority = useMemo(() => Math.max(1, ...priorityData.map((d) => d.value)), [priorityData]);
   const maxCategory = useMemo(() => Math.max(1, ...categoryData.map((d) => d.value)), [categoryData]);
 
   if (!canView) {
@@ -1253,6 +1241,25 @@ export default function AdminStatsPage() {
             </div>
           </section>
 
+          <section>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <KpiCard
+                label="Kwota części"
+                value={fmtPln(kpi.revenue_parts_total ?? "0")}
+                sub="Udział części w przychodzie zamkniętych napraw"
+                icon={<Package size={16} />}
+                color="#22c55e"
+              />
+              <KpiCard
+                label="Kwota robocizny"
+                value={fmtPln(kpi.revenue_labour_total ?? "0")}
+                sub="Udział robocizny w przychodzie zamkniętych napraw"
+                icon={<Activity size={16} />}
+                color="#06b6d4"
+              />
+            </div>
+          </section>
+
           {/* ── Secondary KPI ── */}
           <section>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -1298,7 +1305,7 @@ export default function AdminStatsPage() {
           </SectionCard>
 
           {/* ── Brands / Sources / Categories ── */}
-          <section className="grid gap-4 lg:grid-cols-3">
+          <section className="grid gap-4 lg:grid-cols-2">
             <SectionCard title="Źródła zgłoszeń" subtitle="Kanały, którymi trafiają klienci"
               badge={<Target size={13} className="text-[#4b5563]" />}>
               {sourceData.length > 0 ? (
@@ -1325,19 +1332,6 @@ export default function AdminStatsPage() {
                 <p className="py-6 text-center text-sm text-[#4b5563]">Brak danych.</p>
               )}
             </SectionCard>
-
-            <SectionCard className="lg:col-span-1" title="Priorytety" subtitle="Rozkład pilności zgłoszeń">
-              {priorityData.length > 0 ? (
-                <div className="space-y-3">
-                  {priorityData.map((p, i) => (
-                    <HBar key={p.key} label={p.label} value={p.value} max={maxPriority}
-                      color={p.color} rank={i + 1} />
-                  ))}
-                </div>
-              ) : (
-                <p className="py-6 text-center text-sm text-[#4b5563]">Brak danych.</p>
-              )}
-            </SectionCard>
           </section>
 
           {/* ── Marki & Modele (całość systemu) ── */}
@@ -1355,44 +1349,52 @@ export default function AdminStatsPage() {
             <StaffRanking staff={tables.top_staff} />
           </SectionCard>
 
-          {/* ── Operational Tables ── */}
-          <section>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#374151]">Tabele operacyjne</p>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <SectionCard title="Najbardziej zaległe"
-                subtitle="Naprawy po terminie — najstarsze pierwsze"
-                badge={<AlertTriangle size={13} className="text-[#ef4444]" />}>
-                {tables.most_overdue.length > 0
-                  ? tables.most_overdue.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
-                  : <p className="py-6 text-center text-sm text-[#22c55e]">Brak zaległości!</p>}
-              </SectionCard>
+           {/* ── Operational Tables ── */}
+           <section>
+             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#374151]">Tabele operacyjne</p>
+             <div className="grid gap-4 lg:grid-cols-2">
+               <SectionCard title="Najbardziej zaległe"
+                 subtitle="Naprawy po terminie — najstarsze pierwsze"
+                 badge={<AlertTriangle size={13} className="text-[#ef4444]" />}>
+                 {tables.most_overdue.length > 0
+                   ? tables.most_overdue.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
+                   : <p className="py-6 text-center text-sm text-[#22c55e]">Brak zaległości!</p>}
+               </SectionCard>
 
-              <SectionCard title="Długo nieodebrane"
-                subtitle="Gotowe do odbioru ponad 7 dni"
-                badge={<Clock size={13} className="text-[#f59e0b]" />}>
-                {tables.unclaimed_repairs.length > 0
-                  ? tables.unclaimed_repairs.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
-                  : <p className="py-6 text-center text-sm text-[#22c55e]">Brak nieodebranych!</p>}
-              </SectionCard>
+               <SectionCard title="Bez wyceny"
+                 subtitle="Naprawy czekające na wycenę"
+                 badge={<AlertTriangle size={13} className="text-[#f59e0b]" />}>
+                 {tables.no_quote_repairs.length > 0
+                   ? tables.no_quote_repairs.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
+                   : <p className="py-6 text-center text-sm text-[#22c55e]">Wszystkie wycenione!</p>}
+               </SectionCard>
 
-              <SectionCard title="Aktywne reklamacje" subtitle="Otwarte sprawy reklamacyjne"
-                badge={
-                  <Link href={claimsHref} className="text-[11px] font-semibold text-[#6366f1] hover:underline">
-                    Wszystkie →
-                  </Link>
-                }>
-                {tables.active_complaints.length > 0
-                  ? tables.active_complaints.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
-                  : <p className="py-6 text-center text-sm text-[#4b5563]">Brak reklamacji.</p>}
-              </SectionCard>
+               <SectionCard title="Długo nieodebrane"
+                 subtitle="Gotowe do odbioru ponad 7 dni"
+                 badge={<Clock size={13} className="text-[#f59e0b]" />}>
+                 {tables.unclaimed_repairs.length > 0
+                   ? tables.unclaimed_repairs.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
+                   : <p className="py-6 text-center text-sm text-[#22c55e]">Brak nieodebranych!</p>}
+               </SectionCard>
 
-              <SectionCard title="Aktywne gwarancje" subtitle="Otwarte sprawy gwarancyjne">
-                {tables.active_warranties.length > 0
-                  ? tables.active_warranties.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
-                  : <p className="py-6 text-center text-sm text-[#4b5563]">Brak gwarancji.</p>}
-              </SectionCard>
-            </div>
-          </section>
+               <SectionCard title="Aktywne reklamacje" subtitle="Otwarte sprawy reklamacyjne"
+                 badge={
+                   <Link href={claimsHref} className="text-[11px] font-semibold text-[#6366f1] hover:underline">
+                     Wszystkie →
+                   </Link>
+                 }>
+                 {tables.active_complaints.length > 0
+                   ? tables.active_complaints.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
+                   : <p className="py-6 text-center text-sm text-[#4b5563]">Brak reklamacji.</p>}
+               </SectionCard>
+
+               <SectionCard title="Aktywne gwarancje" subtitle="Otwarte sprawy gwarancyjne">
+                 {tables.active_warranties.length > 0
+                   ? tables.active_warranties.map((r) => <RepairRow key={r.id} r={r} repairHrefBase={repairHrefBase} />)
+                   : <p className="py-6 text-center text-sm text-[#4b5563]">Brak gwarancji.</p>}
+               </SectionCard>
+             </div>
+           </section>
         </>
       ) : null}
     </main>

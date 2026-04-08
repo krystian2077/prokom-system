@@ -544,6 +544,66 @@ def send_quote_summary_email_to_client(repair, quote, sent_by, *, fail_silently=
     return (True, None) if ok else (False, "send_failed")
 
 
+def send_repair_completion_thank_you_email(repair, sent_by=None, *, fail_silently=True):
+    """
+    Wysyła automatyczny e-mail z podziękowaniem po zakończeniu naprawy (status gotowe do odbioru).
+    Zwraca (success: bool, detail: str | None) — detail np. 'no_email' lub 'send_failed'.
+    """
+    client = getattr(repair, "client", None)
+    if not client_email_is_deliverable(getattr(client, "email", None) or ""):
+        return False, "no_email"
+
+    base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3000").rstrip("/")
+    panel_detail_url = f"{base}/client/naprawy/{repair.id}"
+    track_url = f"{base}/track?ref={repair.repair_number}"
+
+    client_name = client.get_full_name() if client else ""
+    device_label = repair.device.get_device_name() if getattr(repair, "device", None) else "Urządzenie"
+    completed_at = getattr(repair, "ready_for_pickup_at", None) or getattr(repair, "completed_at", None)
+    completed_at_display = ""
+    if completed_at:
+        try:
+            completed_at_display = timezone.localtime(completed_at).strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            completed_at_display = str(completed_at)
+
+    subject = f"Dziękujemy za zaufanie — {repair.repair_number} | PRO-KOM Serwis"
+    body_plain = (
+        f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
+        "Dziękujemy za zaufanie i skorzystanie z usług PRO-KOM Serwis.\n"
+        "Twoja naprawa została zakończona, a urządzenie jest gotowe do odbioru.\n\n"
+        f"Numer zgłoszenia: {repair.repair_number}\n"
+        f"Urządzenie: {device_label}\n"
+    )
+    if completed_at_display:
+        body_plain += f"Data zakończenia: {completed_at_display}\n"
+    body_plain += (
+        f"\nPanel klienta: {panel_detail_url}\n"
+        f"Śledzenie bez logowania: {track_url}\n\n"
+        "Dziękujemy za wybór naszego serwisu.\n"
+        "Zespół PRO-KOM Serwis"
+    )
+
+    ctx = {
+        "client_name": client_name,
+        "repair_number": repair.repair_number,
+        "device_name": device_label,
+        "completed_at_display": completed_at_display,
+        "panel_detail_url": panel_detail_url,
+        "track_url": track_url,
+    }
+    html_content = render_to_string("emails/repair_completion_thank_you.html", ctx)
+    _log, ok = send_freeform_email_to_repair_client(
+        repair,
+        subject,
+        body_plain,
+        sent_by,
+        fail_silently=fail_silently,
+        html_content=html_content,
+    )
+    return (True, None) if ok else (False, "send_failed")
+
+
 def _outbound_client_email_footer(repair):
     """Stopka ułatwiająca dopasowanie odpowiedzi klienta (numer w temacie wątku)."""
     rn = repair.repair_number

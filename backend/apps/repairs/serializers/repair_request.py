@@ -47,7 +47,6 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
     device_brand = serializers.SerializerMethodField()
     device_model = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
-    priority_display = serializers.CharField(source="get_priority_display", read_only=True)
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
     auto_tags = serializers.SerializerMethodField()
     waiting_for_client_days = serializers.SerializerMethodField()
@@ -70,10 +69,9 @@ class RepairRequestListSerializer(serializers.ModelSerializer):
             "device_model",
             "status",
             "status_display",
-            "priority",
-            "priority_display",
             "payment_status",
             "payment_status_display",
+            "priority",
             "assigned_to",
             "estimated_completion_date",
             "staff_planned_work_date",
@@ -166,7 +164,6 @@ class RepairRequestCreateSerializer(serializers.ModelSerializer):
             "return_method",
             "delivery_address",
             "return_address",
-            "priority",
             "is_urgent",
             "is_same_day",
             "is_warranty",
@@ -239,7 +236,6 @@ class RepairRequestSerializer(serializers.ModelSerializer):
     device_brand = serializers.SerializerMethodField()
     device_model = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
-    priority_display = serializers.CharField(source="get_priority_display", read_only=True)
     payment_status_display = serializers.CharField(source="get_payment_status_display", read_only=True)
     source_display = serializers.CharField(source="get_source_display", read_only=True)
     public_status = serializers.SerializerMethodField()
@@ -277,8 +273,6 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "status",
             "status_display",
             "public_status",
-            "priority",
-            "priority_display",
             "payment_status",
             "payment_status_display",
             "internal_status",
@@ -346,6 +340,9 @@ class RepairRequestSerializer(serializers.ModelSerializer):
             "device_turns_on",
             "visual_condition_description",
             "client_tracking_number",
+            "client_courier",
+            "service_tracking_number",
+            "service_courier",
             "client_visible_quote",
         ]
         read_only_fields = [

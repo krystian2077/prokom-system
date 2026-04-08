@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Smartphone,
   Package,
+  Truck,
   CalendarDays,
   Tag,
   Plus,
@@ -39,13 +40,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useWorkerStore } from "@/stores/workerStore";
 import { RepairPartsSection } from "@/components/panel/RepairPartsSection";
 import { RepairTasksPanel } from "@/components/panel/RepairTasksPanel";
+import { RepairCourierTab } from "@/components/panel/RepairCourierTab";
 import { SuggestedNextStatusStrip } from "@/components/panel/SuggestedNextStatusStrip";
 import { RepairDetailLoadingSkeleton } from "@/components/panel/RepairDetailLoadingSkeleton";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-type TabId = "details" | "tasks" | "parts" | "comms" | "pricing" | "client_history";
+type TabId = "details" | "tasks" | "parts" | "comms" | "pricing" | "courier" | "client_history";
 
-const TAB_QUERY_VALUES: TabId[] = ["details", "tasks", "parts", "comms", "pricing", "client_history"];
+const TAB_QUERY_VALUES: TabId[] = ["details", "tasks", "parts", "comms", "pricing", "courier", "client_history"];
 
 const QUOTE_PART_ORIGIN_OPTIONS = [
   { value: "original", label: "Oryginalna (OEM)" },
@@ -143,7 +145,7 @@ function StatusPill({ status_display, status }: { status_display?: string | null
 
   return (
     <span
-      className="rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide"
+      className="rounded-full border px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide"
       style={{ background: bg, borderColor: border, color: text }}
       title="Status"
     >
@@ -169,7 +171,7 @@ function TabButton({
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
       transition={{ type: "spring", stiffness: 520, damping: 32, mass: 0.85 }}
-      className="inline-flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm font-semibold transition-[border-color,background,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 text-sm font-semibold transition-[border-color,background,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
       style={{
         borderColor: active ? "rgba(59,130,246,.45)" : "rgba(255,255,255,.10)",
         background: active ? "linear-gradient(135deg, rgba(59,130,246,.18), rgba(37,99,235,.10))" : "transparent",
@@ -933,11 +935,11 @@ function RepairDetailPageContent() {
   return (
     <Fragment>
       <main className="mx-auto min-h-screen max-w-[1400px] px-4 py-8">
-        <div className="flex flex-col gap-6">
-        <div className="sticky top-14 z-[100] space-y-3">
-          <SuggestedNextStatusStrip repairId={repair.id} currentStatus={repair.status} />
-          <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)]/95 p-4 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-md">
-            <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-8">
+        <SuggestedNextStatusStrip repairId={repair.id} currentStatus={repair.status} />
+        <div className="sticky top-28 z-[100]">
+          <section className="rounded-3xl border border-white/15 bg-[linear-gradient(180deg,rgba(14,20,32,0.96),rgba(10,14,22,0.96))] p-5 shadow-[0_14px_40px_-16px_rgba(0,0,0,0.72)] backdrop-blur-xl">
+            <div className="flex flex-wrap gap-3.5">
               <TabButton
                 active={activeTab === "details"}
                 onClick={() => {
@@ -963,6 +965,12 @@ function RepairDetailPageContent() {
               <TabButton active={activeTab === "parts"} onClick={() => setActiveTab("parts")} icon={<Package size={16} />} label="Części" />
               <TabButton active={activeTab === "comms"} onClick={() => setActiveTab("comms")} icon={<MessageSquareText size={16} />} label="Komunikacja" />
               <TabButton active={activeTab === "pricing"} onClick={() => setActiveTab("pricing")} icon={<Receipt size={16} />} label="Wycena" />
+              <TabButton
+                active={activeTab === "courier"}
+                onClick={() => setActiveTab("courier")}
+                icon={<Truck size={16} />}
+                label="Kurier"
+              />
               <TabButton
                 active={activeTab === "client_history"}
                 onClick={() => setActiveTab("client_history")}
@@ -990,23 +998,23 @@ function RepairDetailPageContent() {
             </Fragment>
           </div>
 
-        <section className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+        <section className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6 lg:p-7">
           <div
             className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent opacity-90"
             aria-hidden
           />
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:justify-between lg:gap-8">
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-start gap-4">
+              <div className="flex flex-wrap items-start gap-5">
                 <div
-                  className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--s2)]"
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--s2)]"
                   style={{ background: "var(--s2, #141720)" }}
                 >
                   <Smartphone size={24} className="text-[#3b82f6]" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Naprawa</div>
-                  <h1 className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1 md:gap-x-5">
+                  <h1 className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-2 md:gap-x-5">
                     <span className="shrink-0 font-display text-base font-bold tracking-tight text-[var(--white)] md:text-lg">
                       {repair.repair_number}
                     </span>
@@ -1014,22 +1022,17 @@ function RepairDetailPageContent() {
                       {repairDeviceTitle}
                     </span>
                   </h1>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <div className="mt-4 flex flex-wrap items-center gap-2.5">
                     <StatusPill status_display={repair.public_status ?? repair.status_display} status={repair.status} />
-                    {repair.priority_display ? (
-                      <span className="inline-flex rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold text-[var(--ink2)]">
-                        {repair.priority_display}
-                      </span>
-                    ) : null}
                     {repair.estimated_completion_date ? (
-                      <span className="inline-flex rounded-full border border-[#3b82f6]/25 bg-[#3b82f6]/10 px-3 py-1 text-[11px] font-semibold text-[#93c5fd]">
+                      <span className="inline-flex rounded-full border border-[#3b82f6]/25 bg-[#3b82f6]/10 px-3.5 py-1.5 text-xs font-semibold text-[#93c5fd]">
                         Termin oddania:{" "}
                         {parseRepairDate(repair.estimated_completion_date)?.toLocaleDateString("pl-PL") ??
                           repair.estimated_completion_date}
                       </span>
                     ) : null}
                     {repair.requires_attention ? (
-                      <span className="inline-flex items-center gap-2 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#f59e0b]">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#f59e0b]">
                         <ShieldAlert size={14} />
                         Wymaga reakcji
                       </span>
@@ -1038,11 +1041,11 @@ function RepairDetailPageContent() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-[var(--border)]/60 pt-4">
                 <button
                   type="button"
                   onClick={() => openStatusModal(repair.id)}
-                  className="rounded-2xl bg-[#22c55e] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[#22c55e]/25 transition hover:bg-[#16a34a]"
+                  className="min-h-[42px] rounded-2xl bg-[#22c55e] px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#22c55e]/25 transition hover:bg-[#16a34a]"
                 >
                   Zmień status
                 </button>
@@ -1055,7 +1058,7 @@ function RepairDetailPageContent() {
                       commTextareaRef.current?.focus();
                     }, 80);
                   }}
-                  className="rounded-2xl bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb]"
+                  className="min-h-[42px] rounded-2xl bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-[var(--white)] transition hover:bg-[#2563eb]"
                 >
                   Wiadomość
                 </button>
@@ -1063,7 +1066,7 @@ function RepairDetailPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowQuickMenu((v) => !v)}
-                    className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+                    className="min-h-[42px] rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
                   >
                     ...
                   </button>
@@ -1089,7 +1092,7 @@ function RepairDetailPageContent() {
                   ) : null}
                 </div>
                 <div
-                  className="inline-flex min-h-[42px] max-w-[min(100%,20rem)] items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-gradient-to-r from-[var(--row-hover)] to-[var(--row-hover)]/70 px-2 py-1.5 pl-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:border-white/12 hover:from-[var(--row-active)] hover:to-[var(--row-hover)]"
+                  className="inline-flex min-h-[44px] max-w-[min(100%,24rem)] items-center gap-3 rounded-2xl border border-[var(--border)] bg-gradient-to-r from-[var(--row-hover)] to-[var(--row-hover)]/70 px-2.5 py-2 pl-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:border-white/12 hover:from-[var(--row-active)] hover:to-[var(--row-hover)]"
                   title={`Źródło zgłoszenia: ${repairSourceLabel(repair.source, repair.source_display)}`}
                 >
                   <span
@@ -1112,7 +1115,7 @@ function RepairDetailPageContent() {
                 <MotionDiv
                 key="repair-overview"
                 id="repair-overview-section"
-                className="mt-5 w-full space-y-4 scroll-mt-24"
+                className="mt-5 w-full space-y-4 scroll-mt-32"
                 {...heroBlockMotion}
               >
                 <div className="rounded-2xl border border-[var(--border)] bg-gradient-to-br from-[var(--s2)]/80 to-[var(--s1)] px-4 py-5 sm:px-6">
@@ -2318,6 +2321,16 @@ function RepairDetailPageContent() {
             </div>
               </>
             )}
+          </MotionSection>
+        ) : null}
+
+        {activeTab === "courier" ? (
+          <MotionSection
+            key="tab-courier"
+            className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5"
+            {...tabPanelMotion}
+          >
+            <RepairCourierTab repair={repair} repairId={repairId} />
           </MotionSection>
         ) : null}
 

@@ -360,7 +360,6 @@ export default function PanelRepairDetailPage() {
           <Section title="Status i wewnętrzne">
             <dl className="divide-y divide-[var(--border)]">
               <InfoRow label="Status wewnętrzny" value={data.internal_status} />
-              <InfoRow label="Priorytet" value={data.priority_display} />
               <InfoRow label="Typ naprawy" value={data.repair_type} />
               <InfoRow label="Wymaga uwagi" value={data.requires_attention ? "Tak" : "Nie"} />
               <InfoRow label="Data zgłoszenia" value={new Date(data.created_at).toLocaleString("pl-PL")} />

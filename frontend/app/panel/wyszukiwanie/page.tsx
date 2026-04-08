@@ -45,13 +45,6 @@ const CATEGORY_OPTIONS = [
   { value: "other", label: "Inne" },
 ];
 
-const PRIORITY_OPTIONS = [
-  { value: "", label: "Wszystkie priorytety" },
-  { value: "normal", label: "Normalny" },
-  { value: "high", label: "Wysoki" },
-  { value: "urgent", label: "Pilne" },
-];
-
 function isArchived(status: string): boolean {
   return ARCHIVE_STATUSES.includes((status ?? "").toLowerCase() as (typeof ARCHIVE_STATUSES)[number]);
 }
@@ -80,7 +73,6 @@ function SearchPageInner() {
   const [showFilters, setShowFilters] = useState(false);
   const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
-  const [priority, setPriority] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [isWarranty, setIsWarranty] = useState(false);
@@ -93,7 +85,7 @@ function SearchPageInner() {
   const [clients, setClients] = useState<GlobalSearchClient[]>([]);
 
   const hasAdvancedFilters = Boolean(
-    status || category || priority || dateFrom || dateTo || isWarranty || isComplaint,
+    status || category || dateFrom || dateTo || isWarranty || isComplaint,
   );
 
   const activeRepairs = useMemo(() => repairs.filter((r) => !isArchived(r.status)), [repairs]);
@@ -104,7 +96,7 @@ function SearchPageInner() {
   const showArchive = scope === "all" || scope === "archive";
   const showClients = scope === "all" || scope === "clients";
   const activeFilterCount =
-    [status, category, priority, dateFrom, dateTo].filter(Boolean).length +
+    [status, category, dateFrom, dateTo].filter(Boolean).length +
     (isWarranty ? 1 : 0) +
     (isComplaint ? 1 : 0);
 
@@ -139,7 +131,6 @@ function SearchPageInner() {
         params.set("assigned_to", String(user.id));
         if (status) params.set("status", status);
         if (category) params.set("category", category);
-        if (priority) params.set("priority", priority);
         if (dateFrom) params.set("date_from", dateFrom);
         if (dateTo) params.set("date_to", dateTo);
         if (isWarranty) params.set("is_warranty", "true");
@@ -155,7 +146,7 @@ function SearchPageInner() {
     } finally {
       setLoading(false);
     }
-  }, [category, dateFrom, dateTo, hasAdvancedFilters, isComplaint, isWarranty, priority, status, token, user]);
+  }, [category, dateFrom, dateTo, hasAdvancedFilters, isComplaint, isWarranty, status, token, user]);
 
   useEffect(() => {
     if (!token || !user) return;
@@ -325,13 +316,6 @@ function SearchPageInner() {
                   </option>
                 ))}
               </select>
-              <select value={priority} onChange={(e) => setPriority(e.target.value)} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]">
-                {PRIORITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
               <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]" />
               <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[var(--white)]" />
               <label className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 text-sm text-[#cbd5e1]">
@@ -347,7 +331,6 @@ function SearchPageInner() {
                 onClick={() => {
                   setStatus("");
                   setCategory("");
-                  setPriority("");
                   setDateFrom("");
                   setDateTo("");
                   setIsWarranty(false);

@@ -12,10 +12,25 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: SelectOption[];
   placeholder?: string;
   className?: string;
+  solidMenu?: boolean;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, placeholder, className = "", id: idProp, value, defaultValue, disabled, onChange, name, ...props }, ref) => {
+  ({
+    label,
+    error,
+    options,
+    placeholder,
+    className = "",
+    solidMenu = false,
+    id: idProp,
+    value,
+    defaultValue,
+    disabled,
+    onChange,
+    name,
+    ...props
+  }, ref) => {
     const id = idProp || name;
     const rootRef = useRef<HTMLDivElement | null>(null);
     const hiddenSelectRef = useRef<HTMLSelectElement | null>(null);
@@ -114,7 +129,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
         {open ? (
           <div
-            className="absolute left-0 top-full z-[80] mt-2 w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0f1117] shadow-[0_24px_60px_rgba(0,0,0,.45)] backdrop-blur-xl"
+            className={[
+              "absolute left-0 top-full z-[220] mt-2 w-full overflow-hidden rounded-2xl border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,.45)] pointer-events-auto",
+              solidMenu ? "bg-[#0b1220]" : "bg-[#0f1117] backdrop-blur-xl",
+            ].join(" ")}
           >
             <div className="max-h-[280px] overflow-auto p-2">
               {menuOptions.length === 0 ? (
@@ -133,8 +151,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
                       className={[
                         "flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-sm font-semibold transition cursor-pointer select-none",
                         active
-                          ? "bg-[rgba(59,130,246,.16)] text-white shadow-[0_0_0_1px_rgba(59,130,246,.18)]"
-                          : "text-[#cbd5e1] hover:bg-white/[.05] hover:text-white",
+                          ? solidMenu
+                            ? "bg-[#1a2a48] text-white shadow-[0_0_0_1px_rgba(96,165,250,.35)]"
+                            : "bg-[rgba(59,130,246,.16)] text-white shadow-[0_0_0_1px_rgba(59,130,246,.18)]"
+                          : solidMenu
+                            ? "bg-[#0f1626] text-[#cbd5e1] hover:bg-[#162036] hover:text-white"
+                            : "text-[#cbd5e1] hover:bg-white/[.05] hover:text-white",
                       ].join(" ")}
                     >
                       <span className="truncate">{opt.label}</span>

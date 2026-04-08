@@ -4,40 +4,45 @@ import uuid
 from django.db import migrations, models
 
 
+def populate_uuid_ids(apps, schema_editor):
+    StaffNotification = apps.get_model("accounts", "StaffNotification")
+    db_alias = schema_editor.connection.alias
+    for obj in StaffNotification.objects.using(db_alias).all().iterator():
+        if not getattr(obj, "uuid_id", None):
+            obj.uuid_id = uuid.uuid4()
+            obj.save(update_fields=["uuid_id"])
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("accounts", "0010_verification_attempt_and_block"),
+        ("accounts", "0011_password_reset_token"),
     ]
 
     operations = [
-        # Dodaj nowe pole UUID
         migrations.AddField(
-            model_name='staffnotification',
-            name='uuid_id',
+            model_name="staffnotification",
+            name="uuid_id",
+            field=models.UUIDField(null=True, editable=False),
+        ),
+        migrations.RunPython(populate_uuid_ids, migrations.RunPython.noop),
+        migrations.AlterField(
+            model_name="staffnotification",
+            name="uuid_id",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
-        # Operacja surowego SQL: poprawnie skopiuj dane
-        migrations.RunSQL(
-            sql="UPDATE accounts_staffnotification SET uuid_id = gen_random_uuid() WHERE uuid_id IS NULL;",
-            reverse_sql="",
-            state_operations=[],
-        ),
-        # Usuń stare id
         migrations.RemoveField(
-            model_name='staffnotification',
-            name='id',
+            model_name="staffnotification",
+            name="id",
         ),
-        # Rename uuid_id na id
         migrations.RenameField(
-            model_name='staffnotification',
-            old_name='uuid_id',
-            new_name='id',
+            model_name="staffnotification",
+            old_name="uuid_id",
+            new_name="id",
         ),
-        # Ustaw id jako primary key
         migrations.AlterField(
-            model_name='staffnotification',
-            name='id',
+            model_name="staffnotification",
+            name="id",
             field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
         ),
     ]

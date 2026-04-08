@@ -11,8 +11,6 @@ export function globalSearchRepairToListItem(g: GlobalSearchRepair): RepairReque
     device: g.device ?? undefined,
     status: g.status,
     status_display: g.status_display,
-    priority: "normal",
-    priority_display: "Normalny",
     created_at: g.created_at ?? new Date(0).toISOString(),
     problem_description: g.problem_description ?? null,
     repair_type: g.repair_type ?? null,

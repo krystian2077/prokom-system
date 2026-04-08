@@ -157,13 +157,6 @@ function assignedInfo(
   return { name, inits: initials(name) };
 }
 
-function priorityAccent(priority: string): string {
-  const p = (priority ?? "").toLowerCase();
-  if (p.includes("urgent") || p.includes("wysok") || p.includes("high")) return "#ef4444";
-  if (p.includes("low") || p.includes("nisk")) return "#525b6e";
-  return "#3b82f6";
-}
-
 function statusBadge(item: RepairRequestListItem) {
   const display = (item.public_status ?? item.status_display ?? "").trim();
   const s = (item.status ?? "").toLowerCase();
@@ -764,11 +757,6 @@ export default function AdminDashboardPage() {
                           <div className="min-w-0 flex-1 pl-2">
                             <div className="flex items-center gap-2">
                               <span className="font-mono text-[12px] font-bold text-[var(--white)]">{r.repair_number}</span>
-                              {r.priority && r.priority !== "normal" && (
-                                <span className="rounded-full border border-[#ef4444]/30 bg-[#ef4444]/14 px-1.5 py-px text-[9px] font-bold text-[#ef4444]">
-                                  {r.priority_display}
-                                </span>
-                              )}
                             </div>
                             <p className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{r.client_name} · {r.device_name}</p>
                           </div>
@@ -1110,7 +1098,6 @@ export default function AdminDashboardPage() {
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                     {items.map((r) => {
-                      const pAccent = priorityAccent(r.priority);
                       const badge = statusBadge(r);
                       const assigned = assignedInfo(r.assigned_to);
                       return (
@@ -1138,14 +1125,6 @@ export default function AdminDashboardPage() {
                             {!assigned && (
                               <span className="rounded-full border border-[var(--rb)] bg-[var(--rl)] px-2 py-px text-[10px] font-semibold text-[#ffb4b4]">
                                 Nieprzypisane
-                              </span>
-                            )}
-                            {r.priority && r.priority !== "normal" && (
-                              <span
-                                className="rounded-full border px-2 py-px text-[10px] font-semibold"
-                                style={{ background: pAccent + "1a", borderColor: pAccent + "44", color: pAccent }}
-                              >
-                                {r.priority_display}
                               </span>
                             )}
                           </div>
@@ -1191,7 +1170,6 @@ export default function AdminDashboardPage() {
               <div className="max-h-[448px] space-y-1 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
                 {recentRepairs.map((r) => {
                   const badge = statusBadge(r);
-                  const pAccent = priorityAccent(r.priority);
                   const assigned = assignedInfo(r.assigned_to);
                   const cost = toNum(r.final_cost) > 0 ? r.final_cost : toNum(r.estimated_cost) > 0 ? r.estimated_cost : null;
                   const costLabel = toNum(r.final_cost) > 0 ? fmtPln(r.final_cost) : cost ? `~${fmtPln(r.estimated_cost)}` : null;
@@ -1203,7 +1181,7 @@ export default function AdminDashboardPage() {
                       className="group flex items-center gap-4 rounded-2xl border bg-[var(--s1)] px-4 py-3.5 transition hover:border-white/15 hover:bg-[var(--row-hover)]"
                       style={{
                         borderColor: "var(--border)",
-                        borderLeftColor: pAccent,
+                        borderLeftColor: badge.text,
                         borderLeftWidth: "2px",
                       }}
                     >

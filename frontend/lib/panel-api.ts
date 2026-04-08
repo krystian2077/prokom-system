@@ -84,10 +84,13 @@ export interface ApiRepairDetail {
   accessory_choose_for_me?: boolean;
   accessory_wishlist?: string | null;
   client_notes?: string | null;
-  device_turns_on?: boolean | null;
-  visual_condition_description?: string | null;
-  client_tracking_number?: string | null;
-  estimated_cost?: number | string | null;
+   device_turns_on?: boolean | null;
+   visual_condition_description?: string | null;
+   client_tracking_number?: string | null;
+   client_courier?: string | null;
+   service_tracking_number?: string | null;
+   service_courier?: string | null;
+   estimated_cost?: number | string | null;
   final_cost?: number | string | null;
   /** Szczegóły: obiekt pracownika; starsze odpowiedzi mogły zwracać sam UUID jako string. */
   assigned_to?:
@@ -219,6 +222,9 @@ export function apiRepairListItemToPanel(api: ApiRepairListItem): Repair {
     deviceTurnsOn: null,
     visualConditionDescription: null,
     clientTrackingNumber: null,
+    clientCourier: null,
+    serviceTrackingNumber: null,
+    serviceCourier: null,
     status: apiStatusToPanelStatus(api.status),
     statusDisplay: (api.public_status ?? api.status_display ?? "").trim() || null,
     statusUpdatedAt: api.updated_at ?? api.created_at,
@@ -356,6 +362,9 @@ export function apiRepairDetailToPanel(api: ApiRepairDetail): Repair {
     deviceTurnsOn: api.device_turns_on ?? null,
     visualConditionDescription: (api.visual_condition_description ?? "").trim() || null,
     clientTrackingNumber: (api.client_tracking_number ?? "").trim() || null,
+    clientCourier: (api.client_courier ?? "").trim() || null,
+    serviceTrackingNumber: (api.service_tracking_number ?? "").trim() || null,
+    serviceCourier: (api.service_courier ?? "").trim() || null,
     status: apiStatusToPanelStatus(api.status),
     statusDisplay: (api.public_status ?? api.status_display ?? "").trim() || null,
     statusUpdatedAt: api.updated_at,

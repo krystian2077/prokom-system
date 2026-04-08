@@ -142,6 +142,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [trackingInput, setTrackingInput] = useState("");
+  const [courierInput, setCourierInput] = useState("");
   const [trackingSaving, setTrackingSaving] = useState(false);
   const [trackingMessage, setTrackingMessage] = useState<"ok" | "err" | null>(null);
   const [thread, setThread] = useState<RepairThreadItem[]>([]);
@@ -163,6 +164,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
       const r = apiRepairDetailToPanel(data);
       setRepair(r);
       setTrackingInput(r.clientTrackingNumber ?? "");
+      setCourierInput(r.clientCourier ?? "");
       setNotFound(false);
       setError(null);
     } catch (e) {
@@ -439,46 +441,103 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
             {repair.deliveryMethod === "kurier" && (
               <div className="border-t p-5" style={{ borderColor: "var(--border)" }}>
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
-                  Numer listu przewozowego (opcjonalnie)
+                  Numer listu przewozowego i przewoźnik (opcjonalnie)
                 </p>
                 <p className="mt-1 text-sm" style={{ color: "var(--ink2)" }}>
-                  Podaj numer śledzenia przesyłki — serwis sprawdzi kiedy dotrze do nas.
+                  Podaj numer śledzenia przesyłki i którym przewoźnikiem wysyłasz sprzęt — serwis sprawdzi kiedy dotrze do nas.
                 </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2.5">
-                  <input
-                    type="text"
-                    className="min-w-[220px] flex-1 rounded-xl border bg-[var(--island)] px-4 py-3 text-sm font-mono"
-                    style={{ borderColor: "var(--border)", color: "var(--ink)" }}
-                    placeholder="np. 1234567890123456"
-                    value={trackingInput}
-                    onChange={(e) => { setTrackingInput(e.target.value); setTrackingMessage(null); }}
-                    maxLength={100}
-                  />
-                  <button
-                    type="button"
-                    disabled={trackingSaving}
-                    onClick={async () => {
-                      if (!token) return;
-                      setTrackingSaving(true);
-                      setTrackingMessage(null);
-                      try {
-                        const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/set-inbound-tracking/`, { tracking_number: trackingInput.trim() }, token);
-                        setRepair(apiRepairDetailToPanel(data));
-                        setTrackingMessage("ok");
-                      } catch {
-                        setTrackingMessage("err");
-                      } finally {
-                        setTrackingSaving(false);
-                      }
-                    }}
-                    className="rounded-xl px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
-                    style={{ background: "var(--red)" }}
-                  >
-                    {trackingSaving ? "Zapisywanie…" : "Zapisz numer"}
-                  </button>
+                <div className="mt-3 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <input
+                      type="text"
+                      className="min-w-[220px] flex-1 rounded-xl border bg-[var(--island)] px-4 py-3 text-sm font-mono"
+                      style={{ borderColor: "var(--border)", color: "var(--ink)" }}
+                      placeholder="np. 1234567890123456"
+                      value={trackingInput}
+                      onChange={(e) => { setTrackingInput(e.target.value); setTrackingMessage(null); }}
+                      maxLength={100}
+                    />
+                    <button
+                      type="button"
+                      disabled={trackingSaving}
+                      onClick={async () => {
+                        if (!token) return;
+                        setTrackingSaving(true);
+                        setTrackingMessage(null);
+                        try {
+                          const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/set-inbound-tracking/`, { tracking_number: trackingInput.trim(), courier: courierInput.trim() }, token);
+                          setRepair(apiRepairDetailToPanel(data));
+                          setTrackingMessage("ok");
+                        } catch {
+                          setTrackingMessage("err");
+                        } finally {
+                          setTrackingSaving(false);
+                        }
+                      }}
+                      className="rounded-xl px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                      style={{ background: "var(--red)" }}
+                    >
+                      {trackingSaving ? "Zapisywanie…" : "Zapisz"}
+                    </button>
+                  </div>
+                  <div>
+                    <select
+                      value={courierInput}
+                      onChange={(e) => { setCourierInput(e.target.value); setTrackingMessage(null); }}
+                      className="w-full rounded-xl border bg-[var(--island)] px-4 py-3 text-sm"
+                      style={{ borderColor: "var(--border)", color: "var(--ink)" }}
+                    >
+                      <option value="">— Wybierz przewoźnika (opcjonalnie) —</option>
+                      <option value="inpost">InPost</option>
+                      <option value="dpd">DPD</option>
+                      <option value="dhl">DHL</option>
+                      <option value="gls">GLS</option>
+                      <option value="fedex">FedEx</option>
+                      <option value="ups">UPS</option>
+                    </select>
+                  </div>
                 </div>
                 {trackingMessage === "ok" && <p className="mt-2 text-xs font-medium" style={{ color: "var(--green)" }}>✓ Zapisano pomyślnie.</p>}
                 {trackingMessage === "err" && <p className="mt-2 text-xs font-medium" style={{ color: "var(--red)" }}>Nie udało się zapisać. Spróbuj ponownie.</p>}
+              </div>
+            )}
+
+            {/* Courier info for outbound delivery */}
+            {(repair.serviceTrackingNumber || repair.serviceCourier) && (
+              <div className="border-t p-5" style={{ borderColor: "var(--border)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                  Wysyłka do Ciebie
+                </p>
+                <p className="mt-1 text-sm" style={{ color: "var(--ink2)" }}>
+                  Naprawa jest gotowa! Nasze dane do śledzenia przesyłki:
+                </p>
+                <div className="mt-4 space-y-3 rounded-xl bg-[rgba(34,197,94,0.08)] p-4" style={{ border: "1px solid rgba(34,197,94,0.2)" }}>
+                  {repair.serviceTrackingNumber && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                        Numer listu przewozowego
+                      </p>
+                      <p className="mt-1 font-mono text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                        {repair.serviceTrackingNumber}
+                      </p>
+                    </div>
+                  )}
+                  {repair.serviceCourier && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                        Przewoźnik
+                      </p>
+                      <p className="mt-1 text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                        {repair.serviceCourier === "inpost" && "InPost"}
+                        {repair.serviceCourier === "dpd" && "DPD"}
+                        {repair.serviceCourier === "dhl" && "DHL"}
+                        {repair.serviceCourier === "gls" && "GLS"}
+                        {repair.serviceCourier === "fedex" && "FedEx"}
+                        {repair.serviceCourier === "ups" && "UPS"}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

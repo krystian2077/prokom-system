@@ -22,9 +22,8 @@ export interface RepairRequestListItem {
   status_display: string;
   /** Jak `status_display` — etykieta publiczna (klient + serwis). */
   public_status?: string | null;
-  priority: string;
-  priority_display: string;
   repair_type?: string | null;
+  priority?: string | null;
   payment_status_display?: string | null;
   auto_tags?: string[] | null;
   waiting_for_client_days?: number | null;
@@ -109,9 +108,15 @@ export interface RepairDetail extends RepairRequestListItem {
   accessory_wishlist?: string | null;
   /** Złączone zainteresowania akcesoriami z formularza (produkty + „dobierz za mnie”). */
   accessory_selection_summary?: string | null;
-  /** Tekst z pola urządzenia „dołączone akcesoria”. */
+  /** Tekst z pola urządzenia „dołączone akcesoria". */
   device_accessories_included?: string | null;
   client_tracking_number?: string | null;
+  /** Przewoźnik wysyłki od klienta (InPost, DPD, DHL, GLS, FedEx, UPS). */
+  client_courier?: string | null;
+  /** Numer listu przewozowego dla wysyłki do klienta (od serwisu). */
+  service_tracking_number?: string | null;
+  /** Przewoźnik dla wysyłki do klienta (InPost, DPD, DHL, GLS, FedEx, UPS). */
+  service_courier?: string | null;
   is_urgent: boolean;
   is_same_day: boolean;
   is_warranty: boolean;
