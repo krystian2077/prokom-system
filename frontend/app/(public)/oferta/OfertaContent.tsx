@@ -119,6 +119,8 @@ type BrandTab = "samsung" | "iphone" | "xiaomi";
 export function OfertaContent() {
   const [brand, setBrand] = useState<BrandTab>("samsung");
   const [formSent, setFormSent] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [formLoading, setFormLoading] = useState(false);
   const [interestOpen, setInterestOpen] = useState(false);
   const [interestValue, setInterestValue] = useState("");
 
@@ -981,12 +983,41 @@ export function OfertaContent() {
             </div>
             <div className="cf-form rounded-[22px] border border-white/10 bg-white/[0.03] overflow-hidden">
               <form
-                onSubmit={(e) => { e.preventDefault(); setFormSent(true); }}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setFormError("");
+                  setFormLoading(true);
+                  const fd = new FormData(e.currentTarget);
+                  try {
+                    const res = await fetch("/api/v1/communications/inquiry/", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        first_name: fd.get("first_name"),
+                        last_name: fd.get("last_name"),
+                        phone: fd.get("phone"),
+                        email: fd.get("email"),
+                        interest: interestValue,
+                        message: fd.get("message"),
+                      }),
+                    });
+                    if (res.ok) {
+                      setFormSent(true);
+                    } else {
+                      const data = await res.json().catch(() => ({}));
+                      setFormError(data.detail || "Wystąpił błąd. Spróbuj ponownie.");
+                    }
+                  } catch {
+                    setFormError("Brak połączenia. Spróbuj ponownie.");
+                  } finally {
+                    setFormLoading(false);
+                  }
+                }}
                 className="p-6 sm:p-8"
               >
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <input type="text" placeholder="Imię" className="w-full rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)]" required />
-                  <input type="text" placeholder="Nazwisko" className="w-full rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)]" required />
+                  <input type="text" name="first_name" placeholder="Imię" className="w-full rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)]" required />
+                  <input type="text" name="last_name" placeholder="Nazwisko" className="w-full rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)]" required />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <input type="tel" name="phone" placeholder="Telefon" className="w-full rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)]" />
@@ -1018,13 +1049,15 @@ export function OfertaContent() {
                     ))}
                   </div>
                 </div>
-                <textarea placeholder="Twoje pytanie" rows={4} className="w-full min-h-[100px] rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)] mb-4 resize-y" required />
+                <textarea name="message" placeholder="Twoje pytanie" rows={4} className="w-full min-h-[100px] rounded-[11px] border border-[#2c3145] bg-[#1c2030] px-4 py-3 text-white placeholder:text-[#525b6e] focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[rgba(220,30,30,.14)] mb-4 resize-y" required />
+                {formError && <p className="text-[13px] text-red-400 mb-3">{formError}</p>}
                 <button
                   type="submit"
-                  className={`cf-submit w-full py-3.5 rounded-[13px] font-semibold text-white transition-colors ${formSent ? "bg-[#16a34a]" : ""}`}
+                  disabled={formLoading || formSent}
+                  className={`cf-submit w-full py-3.5 rounded-[13px] font-semibold text-white transition-colors disabled:opacity-70 ${formSent ? "bg-[#16a34a]" : ""}`}
                   style={formSent ? {} : { background: "linear-gradient(135deg, #dc1e1e, #b81818)" }}
                 >
-                  {formSent ? "✓ Wysłano! Odezwiemy się wkrótce" : "Wyślij zapytanie"}
+                  {formSent ? "✓ Wysłano! Odezwiemy się wkrótce" : formLoading ? "Wysyłanie..." : "Wyślij zapytanie"}
                 </button>
                 <p className="text-[12px] text-[#525b6e] mt-3">Nie spamujemy. Odpowiadamy zazwyczaj w ciągu kilku godzin.</p>
               </form>
