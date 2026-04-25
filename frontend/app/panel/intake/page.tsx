@@ -18,6 +18,7 @@ import {
   UserRound,
   Users,
   Wrench,
+  X,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -970,11 +971,27 @@ export default function IntakePage() {
       />
 
       {success ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 backdrop-blur-[2px]">
-          <div className="w-full max-w-md rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6 shadow-2xl">
-            <div className="flex items-center gap-2 text-[#22c55e]">
-              <CheckCircle2 size={22} />
-              <span className="text-sm font-semibold uppercase tracking-wide">Naprawa przyjęta</span>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 backdrop-blur-[2px]"
+          onClick={() => setSuccess(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[#22c55e]">
+                <CheckCircle2 size={22} />
+                <span className="text-sm font-semibold uppercase tracking-wide">Naprawa przyjęta</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSuccess(null)}
+                className="flex h-7 w-7 items-center justify-center rounded-xl text-[var(--muted)] transition hover:bg-white/10 hover:text-[var(--white)]"
+                aria-label="Zamknij"
+              >
+                <X size={16} />
+              </button>
             </div>
             <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-[var(--muted)]">Numer przyjęcia</p>
             <p className="mt-1 font-mono text-2xl font-bold tracking-tight text-[var(--white)]">{success.repair_number}</p>
