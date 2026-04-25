@@ -35,7 +35,7 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
 
-  const isLoginPage = pathname === "/panel/login";
+  const isLoginPage = pathname === "/panel/login" || pathname === "/admin-panel/login";
 
   useEffect(() => {
     if (loading) return;

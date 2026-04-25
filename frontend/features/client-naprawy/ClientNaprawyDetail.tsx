@@ -432,6 +432,15 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                   tag
                 />
               )}
+              {repair.requiresDataBackup && (
+                <div className="col-span-full">
+                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>Kopia zapasowa danych</p>
+                  <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2.5" style={{ borderColor: "rgba(59,130,246,.35)", background: "rgba(59,130,246,.07)" }}>
+                    <span className="text-base">💾</span>
+                    <span className="text-sm font-semibold" style={{ color: "#93c5fd" }}>Tak — poprosiłem/am o wykonanie backupu danych</span>
+                  </div>
+                </div>
+              )}
               {repair.clientNotes && (
                 <DetailItem label="Dodatkowe uwagi" value={repair.clientNotes} full />
               )}

@@ -98,11 +98,14 @@ def change_repair_status(
         from apps.communications.tasks import send_notification_for_repair_event
         from apps.communications.services.send import send_repair_completion_thank_you_email
 
-        send_notification_for_repair_event.delay(
-            str(repair.id),
-            "ready_for_pickup",
-            sent_by_id=changed_by_id,
-        )
+        try:
+            send_notification_for_repair_event.delay(
+                str(repair.id),
+                "ready_for_pickup",
+                sent_by_id=changed_by_id,
+            )
+        except Exception:
+            pass
         send_repair_completion_thank_you_email(repair, sent_by=None, fail_silently=True)
 
     return repair

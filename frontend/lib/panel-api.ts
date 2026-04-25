@@ -86,6 +86,7 @@ export interface ApiRepairDetail {
   client_notes?: string | null;
    device_turns_on?: boolean | null;
    visual_condition_description?: string | null;
+   requires_data_backup?: boolean;
    client_tracking_number?: string | null;
    client_courier?: string | null;
    service_tracking_number?: string | null;
@@ -221,6 +222,7 @@ export function apiRepairListItemToPanel(api: ApiRepairListItem): Repair {
     clientNotes: null,
     deviceTurnsOn: null,
     visualConditionDescription: null,
+    requiresDataBackup: false,
     clientTrackingNumber: null,
     clientCourier: null,
     serviceTrackingNumber: null,
@@ -361,6 +363,7 @@ export function apiRepairDetailToPanel(api: ApiRepairDetail): Repair {
     clientNotes: (api.client_notes ?? "").trim() || null,
     deviceTurnsOn: api.device_turns_on ?? null,
     visualConditionDescription: (api.visual_condition_description ?? "").trim() || null,
+    requiresDataBackup: api.requires_data_backup ?? false,
     clientTrackingNumber: (api.client_tracking_number ?? "").trim() || null,
     clientCourier: (api.client_courier ?? "").trim() || null,
     serviceTrackingNumber: (api.service_tracking_number ?? "").trim() || null,

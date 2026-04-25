@@ -47,6 +47,7 @@ def submit_repair_from_public_form(
     accessory_choose_for_me=False,
     accessory_wishlist="",
     additional_notes="",
+    requires_data_backup=False,
     device_turns_on=None,
     visual_condition_description="",
     client_id=None,
@@ -153,7 +154,7 @@ def submit_repair_from_public_form(
         is_urgent=False,
         is_same_day=False,
         is_warranty=False,
-        requires_data_backup=False,
+        requires_data_backup=requires_data_backup,
         source="online",
     )
 

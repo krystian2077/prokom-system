@@ -208,6 +208,7 @@ export default function ZgloszeniePage() {
   const [delivery, setDelivery] = useState<"osobiscie" | "kurier">("osobiscie");
   const [pickup, setPickup] = useState<"osobiscie" | "kurier">("osobiscie");
   const [hammer, setHammer] = useState("");
+  const [requiresBackup, setRequiresBackup] = useState(false);
   const [wantsAccessories, setWantsAccessories] = useState(false);
   const [accessoryWishlist, setAccessoryWishlist] = useState("");
   const [notes, setNotes] = useState("");
@@ -337,6 +338,7 @@ export default function ZgloszeniePage() {
       delivery_postal_code: (delivery === "kurier" || pickup === "kurier") ? zip.trim() : "",
       delivery_country: "Polska",
       hammer_glass_interest: hammer === "tak" ? "yes" : hammer === "nie" ? "no" : null,
+      requires_data_backup: requiresBackup,
       accessory_interest: [],
       accessory_choose_for_me: wantsAccessories || (accessoryWishlist.trim() !== ""),
       accessory_wishlist: accessoryWishlist.trim(),
@@ -1096,6 +1098,33 @@ export default function ZgloszeniePage() {
                             />
                           </div>
                         </div>
+                        {(category === "Laptop" || category === "Komputer" || category === "Telefon" || category === "Tablet") && (
+                          <div className="rounded-xl border p-4" style={{ borderColor: requiresBackup ? "rgba(59,130,246,.4)" : "var(--border)", background: requiresBackup ? "rgba(59,130,246,.06)" : "var(--island2)", transition: "all .2s ease" }}>
+                            <label className="flex cursor-pointer items-start gap-3">
+                              <span
+                                className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-[1.5px] transition-all"
+                                style={requiresBackup ? { borderColor: "#3b82f6", background: "#3b82f6", boxShadow: "0 2px 8px rgba(59,130,246,.35)" } : { borderColor: "var(--border2)", background: "var(--island5)" }}
+                              >
+                                {requiresBackup && (
+                                  <span className="text-white [&>svg]:h-3 [&>svg]:w-3" style={{ animation: "zgl-dotBounce .35s ease" }}>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                  </span>
+                                )}
+                              </span>
+                              <input type="checkbox" className="sr-only" checked={requiresBackup} onChange={(e) => setRequiresBackup(e.target.checked)} />
+                              <div>
+                                <p className="text-[13.5px] font-bold" style={{ color: requiresBackup ? "#93c5fd" : "var(--ink)" }}>
+                                  💾 Potrzebuję kopii zapasowej danych
+                                </p>
+                                <p className="mt-0.5 text-[11.5px] leading-relaxed" style={{ color: "var(--ink2)" }}>
+                                  Zaznacz, jeśli chcesz abyśmy przed naprawą wykonali backup Twoich danych (zdjęcia, kontakty, dokumenty). Poinformujemy Cię o możliwościach i kosztach.
+                                </p>
+                              </div>
+                            </label>
+                          </div>
+                        )}
                         <div>
                           <label className="flabel text-[var(--muted)] italic normal-case">Dodatkowe uwagi (opcjonalnie)</label>
                           <textarea className="fi mt-1.5 min-h-[90px] resize-y leading-[1.7]" placeholder="Cokolwiek chcesz nam przekazać — np. hasło ekranu blokady, specyficzne zachowanie urządzenia, historia naprawy..." value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -1135,6 +1164,7 @@ export default function ZgloszeniePage() {
                             { key: "IMEI", val: imei.trim() || "—" },
                             { key: "Dostawa", val: delivery === "osobiscie" ? "Osobiście w serwisie" : "Wysyłka kurierska" },
                             { key: "Odbiór", val: pickup === "osobiscie" ? "Odbiór osobisty" : "Kurier do domu" },
+                            { key: "Kopia danych", val: requiresBackup ? "💾 Tak — potrzebuję backupu" : "—" },
                             { key: "Hammer Glass", val: hammer === "tak" ? "Tak — interesuje mnie folia" : hammer === "nie" ? "Nie" : "—" },
                             { key: "Akcesoria", val: accessoryWishlist.trim() ? accessoryWishlist.trim() : wantsAccessories ? "Proszę doradzić przy odbiorze" : "—" },
                             { key: "Uwagi", val: notes.trim() || "—" },

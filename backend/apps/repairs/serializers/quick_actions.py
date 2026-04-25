@@ -108,17 +108,9 @@ class QuickAcceptSerializer(serializers.Serializer):
                 effective_cat = dev.category
 
         hg = attrs.get("hammer_glass_interest")
-        if effective_cat in ("phone", "tablet", "smartwatch"):
-            if hg not in ("yes", "no"):
-                raise serializers.ValidationError(
-                    {
-                        "hammer_glass_interest": (
-                            "Dla telefonu, tableta lub smartwatcha wybierz zainteresowanie "
-                            "folią Hammer Glass lub szkłem hartowanym (Tak / Nie)."
-                        )
-                    }
-                )
-        else:
+        if effective_cat not in ("phone", "tablet", "smartwatch"):
+            attrs["hammer_glass_interest"] = None
+        elif hg not in ("yes", "no"):
             attrs["hammer_glass_interest"] = None
 
         if not (attrs.get("manual_brand") or "").strip() and (attrs.get("device_brand_name") or "").strip():

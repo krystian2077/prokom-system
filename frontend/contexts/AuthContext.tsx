@@ -44,6 +44,7 @@ interface AuthContextValue extends AuthState {
   register: (data: RegisterData) => Promise<{ ok: boolean; error?: string; email?: string }>;
   verifyEmail: (email: string, code: string) => Promise<{ ok: boolean; error?: string }>;
   resendVerificationCode: (email: string) => Promise<{ ok: boolean; error?: string; retryAfterSeconds?: number }>;
+  loginWithGoogle: (credential: string) => Promise<{ ok: boolean; error?: string; user?: User }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -226,6 +227,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const loginWithGoogle = useCallback(
+    async (accessToken: string): Promise<{ ok: boolean; error?: string; user?: User }> => {
+      try {
+        const res = await api.post<{ token: string; user: User }>("/accounts/auth/google/", { access_token: accessToken });
+        const data = res as { token: string; user: User };
+        setStoredToken(data.token);
+        setStoredRole(data.user.role);
+        setSessionCookies(data.token, data.user.role);
+        setToken(data.token);
+        setUser(data.user);
+        return { ok: true, user: data.user };
+      } catch (e) {
+        const raw = e instanceof Error ? e.message : "Logowanie przez Google nie powiodło się.";
+        const msg =
+          raw === "Failed to fetch" || raw.includes("fetch")
+            ? "Nie można połączyć z serwerem."
+            : raw;
+        return { ok: false, error: msg };
+      }
+    },
+    []
+  );
+
   const logout = useCallback(async () => {
     const t = getStoredToken();
     if (t) {
@@ -251,6 +275,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     verifyEmail,
     resendVerificationCode,
+    loginWithGoogle,
     logout,
     refreshUser,
   };

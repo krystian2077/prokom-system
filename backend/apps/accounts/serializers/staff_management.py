@@ -35,6 +35,7 @@ class StaffListSerializer(serializers.ModelSerializer):
             "active_repairs_count",
             "completed_repairs_count",
             "health_score_level",
+            "specialization_display",
         ]
         read_only_fields = fields
 

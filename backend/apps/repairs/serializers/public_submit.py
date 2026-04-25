@@ -104,6 +104,11 @@ class PublicRepairSubmitSerializer(serializers.Serializer):
         max_length=1000,
         help_text="Tekst od klienta: co dobrać (np. zasilacz, torba).",
     )
+    requires_data_backup = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Czy klient potrzebuje kopii zapasowej danych przed naprawą.",
+    )
     additional_notes = serializers.CharField(
         required=False,
         allow_blank=True,

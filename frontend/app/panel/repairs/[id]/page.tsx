@@ -1302,6 +1302,18 @@ function RepairDetailPageContent() {
                             {hammerGlassInterestLabel(repair.hammer_glass_interest)}
                           </div>
                         </div>
+                        <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4"
+                          style={repair.requires_data_backup ? { borderColor: "rgba(59,130,246,.4)", background: "rgba(59,130,246,.08)" } : {}}>
+                          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Kopia zapasowa danych</div>
+                          {repair.requires_data_backup ? (
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-sm" style={{ background: "#3b82f6" }}>💾</span>
+                              <span className="text-sm font-semibold" style={{ color: "#93c5fd" }}>Tak — klient prosi o backup</span>
+                            </div>
+                          ) : (
+                            <div className="mt-2 text-sm text-[var(--ink2)]">—</div>
+                          )}
+                        </div>
                         <div className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:col-span-2 xl:col-span-3">
                           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Notatki klienta</div>
                           <p className="mt-2 max-h-[min(22rem,45vh)] overflow-y-auto text-sm leading-relaxed text-[#e5e7eb] whitespace-pre-wrap">

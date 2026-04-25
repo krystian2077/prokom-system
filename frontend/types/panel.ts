@@ -103,6 +103,7 @@ export interface Repair {
   clientNotes: string | null;
   deviceTurnsOn: boolean | null;
   visualConditionDescription: string | null;
+  requiresDataBackup: boolean;
   /** Numer listu przewozowego (wysyłka do serwisu) — klient może dodać w panelu. */
   clientTrackingNumber: string | null;
   /** Przewoźnik wysyłki od klienta. */

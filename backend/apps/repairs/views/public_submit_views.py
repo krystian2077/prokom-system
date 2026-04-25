@@ -65,6 +65,7 @@ class PublicRepairSubmitView(APIView):
                 accessory_choose_for_me=data.get("accessory_choose_for_me", False),
                 accessory_wishlist=data.get("accessory_wishlist", "") or "",
                 additional_notes=data.get("additional_notes", "") or "",
+                requires_data_backup=data.get("requires_data_backup", False),
                 device_turns_on=device_data.get("device_turns_on"),
                 visual_condition_description=(device_data.get("visual_condition_description") or "").strip(),
                 client_id=linked_client_id,

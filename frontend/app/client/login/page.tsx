@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/contexts/AuthContext";
 import type { RegisterData } from "@/contexts/AuthContext";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -57,7 +58,7 @@ export default function ClientLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get("returnUrl") || "/client/dashboard";
-  const { login, register } = useAuth();
+  const { login, register, loginWithGoogle } = useAuth();
 
   const [tab, setTab] = useState<"login" | "register">("login");
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +108,23 @@ export default function ClientLoginPage() {
     }
     setError(result.error || "Rejestracja nie powiodła się.");
   };
+
+  const handleGoogleSuccess = async (accessToken: string) => {
+    setError(null);
+    setSubmitting(true);
+    const result = await loginWithGoogle(accessToken);
+    setSubmitting(false);
+    if (result.ok) {
+      router.push(returnUrl);
+      return;
+    }
+    setError(result.error || "Logowanie przez Google nie powiodło się.");
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: (response) => void handleGoogleSuccess(response.access_token),
+    onError: () => setError("Logowanie przez Google nie powiodło się. Spróbuj ponownie."),
+  });
 
   const switchToRegister = () => {
     setTab("register");
@@ -208,7 +226,7 @@ export default function ClientLoginPage() {
                 <span className="sep-txt">lub kontynuuj z</span>
                 <span className="sep-line" />
               </div>
-              <button type="button" className="btn-google">
+              <button type="button" className="btn-google" onClick={() => googleLogin()} disabled={submitting}>
                 <IconGoogle />
                 Kontynuuj z Google
               </button>
@@ -304,7 +322,7 @@ export default function ClientLoginPage() {
                 <span className="sep-txt">lub kontynuuj z</span>
                 <span className="sep-line" />
               </div>
-              <button type="button" className="btn-google">
+              <button type="button" className="btn-google" onClick={() => googleLogin()} disabled={submitting}>
                 <IconGoogle />
                 Kontynuuj z Google
               </button>

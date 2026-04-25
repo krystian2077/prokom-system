@@ -148,6 +148,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =============================================================================
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
 
+# =============================================================================
+# GOOGLE OAUTH2
+# =============================================================================
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID", default="")
+
 # SMTP — limit czasu połączenia/wysyłki (sek.); zapobiega nieskończonemu „Wysyłanie…” przy zawieszonym hoście
 EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=25)
 

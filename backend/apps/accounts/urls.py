@@ -33,10 +33,12 @@ from .views.staff_management_views import (
     StaffActivateView,
     StaffLoginActivityView,
 )
+from .views.google_auth_view import GoogleAuthView
 
 app_name = "accounts"
 
 urlpatterns = [
+    path("auth/google/", GoogleAuthView.as_view(), name="auth-google"),
     path("login/", LoginView.as_view(), name="login"),
     path("staff-login/", StaffLoginView.as_view(), name="staff-login"),
     path("register/", RegisterView.as_view(), name="register"),
