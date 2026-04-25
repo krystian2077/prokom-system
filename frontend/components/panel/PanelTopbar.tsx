@@ -377,10 +377,10 @@ export function PanelTopbar() {
           ) : null}
 
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
+            <div className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ background: "linear-gradient(90deg, var(--bb) 0%, var(--ink2) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
               {user?.role === "admin" ? "Panel administratora" : "Panel pracownika"}
             </div>
-            <div className="truncate text-sm font-semibold text-[var(--white)]">{breadcrumb}</div>
+            <div className="truncate text-lg font-bold tracking-tight text-[var(--white)]" style={{ letterSpacing: "-0.01em", lineHeight: 1.2 }}>{breadcrumb}</div>
           </div>
         </div>
 

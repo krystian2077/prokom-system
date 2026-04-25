@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(venv/Scripts/python manage.py runserver 8000)"
+      "Bash(venv/Scripts/python manage.py runserver 8000)",
+      "Read(//d/prokom-system/frontend/components/panel/**)"
     ]
   }
 }
