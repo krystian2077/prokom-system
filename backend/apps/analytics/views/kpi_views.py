@@ -429,6 +429,23 @@ class AdminDashboardView(APIView):
         top_staff.sort(key=lambda x: (x["completed_repairs"], float(x["revenue"])), reverse=True)
         tables["top_staff"] = top_staff[:15]
 
+        # Dodatkowe KPI: zakończone w okresie i średni czas realizacji
+        completed_in_period = base_qs.filter(
+            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+        ).count()
+        finished_qs = base_qs.filter(
+            status__in=[RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED],
+            completed_at__isnull=False,
+            accepted_at__isnull=False,
+        )
+        from django.db.models import F, ExpressionWrapper, DurationField
+        avg_duration = finished_qs.annotate(
+            dur=ExpressionWrapper(F("completed_at") - F("accepted_at"), output_field=DurationField())
+        ).aggregate(avg=Avg("dur"))["avg"]
+        avg_completion_days = round(avg_duration.total_seconds() / 86400, 1) if avg_duration else None
+        kpi["completed_count"] = completed_in_period
+        kpi["avg_completion_days"] = avg_completion_days
+
         # ---------- Wykresy ----------
         qs_chart = RepairRequest.objects.filter(created_at__gte=since)
         if assigned_to:
@@ -442,12 +459,69 @@ class AdminDashboardView(APIView):
             .annotate(count=Count("id"), revenue=Sum("final_cost"))
             .order_by("period")
         )
+
+        # Źródła zgłoszeń
+        by_source = dict(
+            qs_chart.values_list("source").annotate(c=Count("id")).values_list("source", "c")
+        )
+
+        # Priorytety
+        by_priority = dict(
+            qs_chart.values_list("priority").annotate(c=Count("id")).values_list("priority", "c")
+        )
+
+        # Kategorie urządzeń
+        by_category = dict(
+            qs_chart.values("device__category")
+            .annotate(c=Count("id"))
+            .values_list("device__category", "c")
+        )
+
+        # Top marki (po liczbie napraw)
+        top_brands_qs = (
+            qs_chart
+            .exclude(device__brand__isnull=True)
+            .values("device__brand__name")
+            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+            .order_by("-count")[:10]
+        )
+        top_brands = [
+            {
+                "name": r["device__brand__name"],
+                "count": r["count"],
+                "revenue": str(r["revenue"] or "0"),
+            }
+            for r in top_brands_qs
+        ]
+
+        # Top modele (po liczbie napraw)
+        top_models_qs = (
+            qs_chart
+            .exclude(device__device_model__isnull=True)
+            .values("device__device_model__name", "device__brand__name")
+            .annotate(count=Count("id"))
+            .order_by("-count")[:10]
+        )
+        top_models = [
+            {
+                "model": r["device__device_model__name"],
+                "brand": r["device__brand__name"],
+                "count": r["count"],
+            }
+            for r in top_models_qs
+        ]
+
         charts = {
             "repairs_by_status": by_status,
             "repairs_over_time": [
                 {"period": str(r["period"]), "count": r["count"], "revenue": str(r["revenue"] or "0")}
                 for r in repairs_over_time
             ],
+            "repairs_by_source": by_source,
+            "repairs_by_priority": by_priority,
+            "repairs_by_category": {k: v for k, v in by_category.items() if k},
+            "top_brands": top_brands,
+            "top_models": top_models,
         }
 
         return Response(

@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(venv/Scripts/python manage.py runserver 8000)"
+      "Bash(venv/Scripts/python manage.py runserver 8000)",
+      "Bash(node -e \":*)",
+      "Bash(npx tsc:*)",
+      "Bash(node_modules/.bin/tsc --noEmit --skipLibCheck)",
+      "Read(//d/prokom-system/frontend/app/admin-panel/stats//**)",
+      "Read(//d/prokom-system/backend/apps/analytics/views//**)",
+      "Bash(cp \"/d/prokom-system/.claude/worktrees/nifty-moser/frontend/app/admin-panel/stats/page.tsx\" \"/d/prokom-system/frontend/app/admin-panel/stats/page.tsx\")",
+      "Bash(cp \"/d/prokom-system/.claude/worktrees/nifty-moser/backend/apps/analytics/views/kpi_views.py\" \"/d/prokom-system/backend/apps/analytics/views/kpi_views.py\")"
     ]
   }
 }
