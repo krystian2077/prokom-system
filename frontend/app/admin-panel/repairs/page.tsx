@@ -329,9 +329,9 @@ export default function AdminRepairsPage() {
     "grid min-w-[2100px] grid-cols-[44px_minmax(172px,1fr)_minmax(280px,1.45fr)_minmax(172px,1fr)_minmax(150px,.95fr)_minmax(210px,1.1fr)_minmax(190px,1fr)_minmax(180px,1fr)_minmax(240px,1.15fr)] gap-x-4 gap-y-2";
 
   return (
-    <main className="mx-auto min-h-screen max-w-[2260px] px-4 py-8">
+    <main className="mx-auto min-h-screen max-w-[2260px] px-3 py-4 md:px-4 md:py-8">
       <div className="flex flex-col gap-4">
-        <header className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+        <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel administratora</p>
             <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Lista napraw</h1>

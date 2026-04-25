@@ -4049,3 +4049,29 @@ b {
 .worker-shell[data-worker-theme="light"] [class*="text-\[#fdba74\]"] {
   color: var(--orange) !important;
 }
+
+@media (max-width: 767px) {
+  .worker-shell main[class*="max-w-"] {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 1rem !important;
+  }
+
+  .worker-shell .worker-card-shimmer {
+    border-radius: 1rem !important;
+    padding: 0.75rem !important;
+  }
+
+  .worker-shell [class*="rounded-3xl"] {
+    border-radius: 1rem;
+  }
+}
+
+.staff-mobile-bottom-nav,
+.staff-mobile-drawer {
+  display: block;
+}
+
+.dashboard-mobile-hard-nav {
+  display: block;
+}

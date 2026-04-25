@@ -168,9 +168,9 @@ function RepairsPageInner() {
     "grid min-w-[1280px] grid-cols-[minmax(168px,1fr)_minmax(260px,1.55fr)_minmax(148px,1fr)_minmax(132px,1fr)_minmax(200px,1.15fr)_minmax(112px,0.95fr)_minmax(132px,1fr)] gap-x-3 gap-y-2";
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
+    <main className="mx-auto min-h-screen max-w-[1500px] px-3 py-4 md:px-4 md:py-8">
       <div className="flex flex-col gap-4">
-        <header className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+        <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Pracownik</p>
             <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Moje naprawy</h1>

@@ -9,6 +9,7 @@ import { PanelTopbar } from "@/components/panel/PanelTopbar";
 import { StaffPanelShell } from "@/components/panel/StaffPanelShell";
 import { StaffLoginChrome } from "@/components/panel/StaffLoginChrome";
 import { WorkerStatusModalRoot } from "@/components/panel/WorkerStatusModalRoot";
+import { MobilePanelNavigation } from "@/components/panel/MobilePanelNavigation";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { ToastContainer } from "@/components/ui/Toast";
 
@@ -63,14 +64,14 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
             <div className="flex min-h-screen">
               <Suspense
                 fallback={
-                  <aside className="relative z-[120] hidden w-[352px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--s1)] md:flex" />
+                  <aside className="relative z-[120] hidden w-[352px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--s1)] lg:flex" />
                 }
               >
                 <AdminSidebar />
               </Suspense>
               <div className="flex min-w-0 flex-1 flex-col">
                 <PanelTopbar />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 pb-24 lg:pb-0">
                   <WorkerStatusModalRoot />
                   <div key={pathname} className="page-transition">
                     {children}
@@ -78,6 +79,7 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
                 </div>
               </div>
             </div>
+            <MobilePanelNavigation />
           </ConfirmProvider>
         </StaffPanelShell>
       )}

@@ -487,8 +487,8 @@ export function AdminTasksWorkspace({ mode = "admin" }: { mode?: WorkspaceMode }
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1600px] px-4 py-8">
-      <header className="mb-6 rounded-[2rem] border border-[#2a3246] bg-gradient-to-r from-[#0e1423] via-[#121b31] to-[#0d1629] p-5 shadow-[0_18px_50px_rgba(0,0,0,.35)]">
+    <main className="mx-auto min-h-screen max-w-[1600px] px-3 py-4 md:px-4 md:py-8">
+      <header className="mb-4 rounded-2xl border border-[#2a3246] bg-gradient-to-r from-[#0e1423] via-[#121b31] to-[#0d1629] p-4 shadow-[0_18px_50px_rgba(0,0,0,.35)] md:mb-6 md:rounded-[2rem] md:p-5">
         <p className="text-xs uppercase tracking-[0.2em] text-[#9db0d4]">{isStaffMode ? "Panel Pracownika" : "Panel Admina"}</p>
         <h1 className="mt-2 text-3xl font-semibold text-white">{isStaffMode ? "Zadania" : "Zadania zespołu"}</h1>
         <p className="mt-1 max-w-4xl text-sm text-[#a9b8d6]">
@@ -504,7 +504,7 @@ export function AdminTasksWorkspace({ mode = "admin" }: { mode?: WorkspaceMode }
         </div>
       </header>
 
-      <section className="mb-4 rounded-[2rem] border border-[#2b3650] bg-[#0c1322]/88 p-4">
+      <section className="mb-4 rounded-2xl border border-[#2b3650] bg-[#0c1322]/88 p-3 md:rounded-[2rem] md:p-4">
         <div className="grid gap-3 xl:grid-cols-[1fr_260px]">
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((filter) => (
@@ -542,7 +542,7 @@ export function AdminTasksWorkspace({ mode = "admin" }: { mode?: WorkspaceMode }
       ) : null}
 
       <section className="grid gap-4 xl:grid-cols-[390px_1fr_380px]">
-        <aside className="rounded-[2rem] border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-4 shadow-[0_16px_46px_rgba(0,0,0,.35)]">
+        <aside className="rounded-2xl border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-3 shadow-[0_16px_46px_rgba(0,0,0,.35)] md:rounded-[2rem] md:p-4">
           <div className="mb-3 flex items-center justify-between">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9fb1d3]">Lista zadań</div>
@@ -627,7 +627,7 @@ export function AdminTasksWorkspace({ mode = "admin" }: { mode?: WorkspaceMode }
           )}
         </aside>
 
-        <div className="rounded-[2rem] border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-4 shadow-[0_16px_46px_rgba(0,0,0,.35)]">
+        <div className="rounded-2xl border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-3 shadow-[0_16px_46px_rgba(0,0,0,.35)] md:rounded-[2rem] md:p-4">
           {!selectedTask ? (
             <div className="py-8">
               <EmptyState
@@ -843,7 +843,7 @@ export function AdminTasksWorkspace({ mode = "admin" }: { mode?: WorkspaceMode }
           )}
         </div>
 
-        <aside className="space-y-4 rounded-[2rem] border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-4 shadow-[0_16px_46px_rgba(0,0,0,.35)]">
+        <aside className="space-y-4 rounded-2xl border border-[#2a3245] bg-gradient-to-b from-[#0d1424] to-[#0a0f1d] p-3 shadow-[0_16px_46px_rgba(0,0,0,.35)] md:rounded-[2rem] md:p-4">
           <div className="rounded-3xl border border-[#3b82f6]/35 bg-gradient-to-r from-[#1e3a8a]/35 to-[#172554]/35 p-4">
             <button
               type="button"

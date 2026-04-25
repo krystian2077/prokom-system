@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -1244,6 +1245,28 @@ export default function AdminDashboardPage() {
           </section>
         </>
       )}
+      <AdminDashboardBottomNavPortal />
     </main>
+  );
+}
+
+function AdminDashboardBottomNavPortal() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(
+    <nav
+      className="dashboard-mobile-hard-nav border-t border-[var(--border)] bg-[var(--s1)]/95 px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 backdrop-blur-xl"
+      style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 2147483647 }}
+    >
+      <ul className="grid grid-cols-5 gap-1">
+        <li><Link href="/admin-panel/dashboard" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--white)]">Start</Link></li>
+        <li><Link href="/admin-panel/repairs" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Naprawy</Link></li>
+        <li><Link href="/admin-panel/tasks" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Zadania</Link></li>
+        <li><Link href="/admin-panel/notif" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Alerty</Link></li>
+        <li><Link href="/admin-panel/profil" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Profil</Link></li>
+      </ul>
+    </nav>,
+    document.body,
   );
 }

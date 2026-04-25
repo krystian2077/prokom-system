@@ -762,7 +762,85 @@ export function UnassignedRepairsView({
               />
             </div>
           ) : (
-            <div className="overflow-x-auto" style={{ overflowY: "visible" }}>
+            <>
+              <div className="space-y-3 p-3 md:hidden">
+                {slice.map((r) => {
+                  const bucket = deviceBucket(r.device_name);
+                  const wait = waitingMeta(r.created_at);
+                  const ws = waitStyle(wait.level);
+                  const showSuggest = matchesSpecialization(spec, bucket);
+                  return (
+                    <article key={r.id} className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <Link href={`${repairDetailBasePath}/${r.id}`} className="font-mono text-sm font-semibold text-[#93c5fd] hover:underline">
+                            {r.repair_number}
+                          </Link>
+                          <p className="mt-1 text-sm font-semibold text-[var(--white)]">{r.device_name}</p>
+                          <p className="mt-1 text-xs text-[#cbd5e1]">{r.client_name}</p>
+                        </div>
+                        <span
+                          className="shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold"
+                          style={{ color: ws.color, background: ws.bg, borderColor: `${ws.color}55` }}
+                        >
+                          {wait.label}
+                          {wait.suffix}
+                        </span>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-xl border border-[var(--border)] bg-[var(--s1)] px-2 py-1.5 text-[var(--ink2)]">
+                          Kategoria: <span className="font-semibold text-[var(--white)]">{categoryLabel(bucket)}</span>
+                        </div>
+                        <div className="rounded-xl border border-[var(--border)] bg-[var(--s1)] px-2 py-1.5 text-[var(--ink2)]">
+                          Sugerowany: <span className="font-semibold text-[var(--white)]">{suggestedTechnicianName(bucket)}</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap justify-end gap-2">
+                        {isAdminMode ? (
+                          <button
+                            type="button"
+                            onClick={() => openAdminAssignModal(r)}
+                            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] px-3 py-2 text-xs font-semibold text-white"
+                          >
+                            <Users2 size={14} />
+                            Przypisz
+                          </button>
+                        ) : (
+                          <AssignRepairActions
+                            busy={Boolean(assigningFor === r.id || postingFor === r.id)}
+                            assignableSorted={assignableSorted}
+                            assignableLoading={assignableQuery.isLoading}
+                            allowAssignMe={!isAdminMode}
+                            assignOtherLabel={isAdminMode ? "Przypisz" : "Do kogoś innego"}
+                            emptyOtherLabel={isAdminMode ? "Brak serwisantów" : "Brak osób"}
+                            onAssignMe={isAdminMode ? undefined : () => void assignToMe(r.id)}
+                            onAssignUser={(u) => void assignToUser(r.id, u)}
+                          >
+                            {!isAdminMode && showSuggest ? (
+                              <button
+                                type="button"
+                                disabled={postingFor === r.id || assigningFor === r.id}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  onSuggest(r, bucket);
+                                }}
+                                className="rounded-lg border border-[#3b82f6]/40 bg-[#3b82f6]/15 px-3 py-1.5 text-xs font-semibold text-[#93c5fd] transition hover:bg-[#3b82f6]/25 disabled:opacity-60"
+                              >
+                                {postingFor === r.id ? "…" : "Sugestia"}
+                              </button>
+                            ) : null}
+                          </AssignRepairActions>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <div className="hidden overflow-x-auto md:block" style={{ overflowY: "visible" }}>
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--ink2)]">
@@ -845,6 +923,7 @@ export function UnassignedRepairsView({
                 </tbody>
               </table>
             </div>
+            </>
           )}
 
           {!repairsQuery.isLoading && slice.length > 0 ? (

@@ -18,7 +18,7 @@ export function StaffPanelShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="worker-shell min-h-screen bg-[var(--page)] text-[var(--ink)] antialiased"
+      className="worker-shell min-h-screen bg-[var(--page)] pb-[env(safe-area-inset-bottom,0px)] text-[var(--ink)] antialiased"
       data-worker-theme={theme}
     >
       {children}

@@ -355,7 +355,7 @@ export function PanelTopbar() {
 
   return (
     <header className="sticky top-0 z-[110] border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--s1)_85%,transparent)] backdrop-blur-xl">
-      <div className="mx-auto flex min-h-[96px] max-w-[1500px] items-center gap-4 pl-2 pr-5 py-6 md:min-h-[100px] md:py-6">
+      <div className="mx-auto flex min-h-[82px] max-w-[1500px] items-center gap-3 px-3 py-4 md:min-h-[100px] md:gap-4 md:pl-2 md:pr-5 md:py-6">
         <div className="flex flex-1 items-center gap-5 min-w-0">
           {showBack ? (
             <button
@@ -369,10 +369,10 @@ export function PanelTopbar() {
           ) : null}
 
           <div className="min-w-0">
-            <div className="mb-1 text-[12px] font-bold uppercase tracking-[0.22em]" style={{ color: "#e8445a" }}>
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] md:text-[12px] md:tracking-[0.22em]" style={{ color: "#e8445a" }}>
               {user?.role === "admin" ? "Panel administratora" : "Panel pracownika"}
             </div>
-            <div className="truncate text-lg font-bold tracking-tight text-[var(--white)]" style={{ letterSpacing: "-0.01em", lineHeight: 1.2 }}>{breadcrumb}</div>
+            <div className="truncate text-base font-bold tracking-tight text-[var(--white)] md:text-lg" style={{ letterSpacing: "-0.01em", lineHeight: 1.2 }}>{breadcrumb}</div>
           </div>
         </div>
 
@@ -714,7 +714,7 @@ export function PanelTopbar() {
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-3">
+        <div className="flex flex-1 items-center justify-end gap-2 md:gap-3">
           <button
             type="button"
             onClick={() => {
@@ -744,7 +744,7 @@ export function PanelTopbar() {
 
           <Link
             href={isAdminPanel ? "/admin-panel/comm" : "/panel/comm"}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)]"
+            className="hidden h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] sm:inline-flex"
             aria-label="Wiadomości"
           >
             <MessageSquareText size={18} />
@@ -769,6 +769,27 @@ export function PanelTopbar() {
               Wyloguj
             </button>
           ) : null}
+        </div>
+      </div>
+      <div className="px-3 pb-3 md:hidden">
+        <div ref={wrapperRef} className="relative">
+          <div
+            className="flex min-h-[48px] w-full items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--s2)_88%,transparent)] px-4 py-2.5 transition-all duration-200 focus-within:border-[var(--bb)]"
+            style={{ color: "var(--ink2)", boxShadow: "0 1px 8px rgba(59,130,246,0.07), 0 0 0 1px rgba(59,130,246,0.06)" }}
+          >
+            <Search size={18} className="shrink-0 opacity-90" />
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Szukaj naprawy, klienta, IMEI..."
+              onFocus={() => {
+                if (query.trim().length >= 2) setOpen(true);
+              }}
+              className="w-full min-w-0 bg-transparent text-sm leading-snug text-[var(--ink)] outline-none placeholder:text-[var(--muted)]"
+              autoComplete="off"
+            />
+          </div>
         </div>
       </div>
     </header>

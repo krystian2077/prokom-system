@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { partUsageDisplayName, type PartUsage, type RepairRequestListItem } from "@/types/repairs";
@@ -1248,6 +1249,7 @@ function StaffDashboardPage() {
         usageRow={partsModalUsage}
         token={token}
       />
+      <DashboardBottomNavPortal />
     </main>
   );
 }
@@ -1264,5 +1266,26 @@ export default function StaffDashboardPageWithSuspense() {
     >
       <StaffDashboardPage />
     </Suspense>
+  );
+}
+
+export function DashboardBottomNavPortal() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(
+    <nav
+      className="dashboard-mobile-hard-nav border-t border-[var(--border)] bg-[var(--s1)]/95 px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 backdrop-blur-xl"
+      style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 2147483647 }}
+    >
+      <ul className="grid grid-cols-5 gap-1">
+        <li><Link href="/panel/dashboard" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--white)]">Start</Link></li>
+        <li><Link href="/panel/naprawy" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Naprawy</Link></li>
+        <li><Link href="/panel/zadania" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Zadania</Link></li>
+        <li><Link href="/panel/powiadomienia" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Alerty</Link></li>
+        <li><Link href="/panel/profil" className="flex min-h-[52px] items-center justify-center rounded-xl text-xs font-semibold text-[var(--ink2)]">Profil</Link></li>
+      </ul>
+    </nav>,
+    document.body,
   );
 }

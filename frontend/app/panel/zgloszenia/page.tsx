@@ -294,7 +294,7 @@ export default function PanelZgloszeniaPage() {
   }, [scopedItems]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1840px] px-4 py-8">
+    <main className="mx-auto min-h-screen max-w-[1840px] px-3 py-4 md:px-4 md:py-8">
       <header className="mb-6">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--ink2)]">{panelLabel}</p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
@@ -441,13 +441,13 @@ export default function PanelZgloszeniaPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink2)]">Kanban</p>
           </div>
 
-          <div className="flex gap-5 overflow-x-auto pb-2">
+          <div className="flex gap-3 overflow-x-auto pb-2 md:gap-5">
             {KANBAN_COLUMNS.map((col) => {
               const colItems = kanbanByColumn[col.key];
               return (
                 <div
                   key={col.key}
-                  className="min-w-[330px] flex-1 rounded-3xl border border-[#2b3650] bg-[#0a1020]/88 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.05)]"
+                  className="min-w-[286px] flex-1 rounded-2xl border border-[#2b3650] bg-[#0a1020]/88 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] md:min-w-[330px] md:rounded-3xl"
                 >
                   <div className="flex items-center justify-between gap-3 px-2 py-1">
                     <div className="text-sm font-semibold text-[#edf3ff]">{col.title}</div>

@@ -128,7 +128,7 @@ export function AdminSidebar() {
   const zgloszeniaActive = pathname.startsWith("/admin-panel/zgloszenia");
 
   return (
-    <aside className="relative z-[120] hidden w-[352px] flex-col border-r border-[var(--border)] bg-gradient-to-b from-[var(--s3)] via-[var(--s1)] to-[var(--page)] md:flex">
+    <aside className="relative z-[120] hidden w-[352px] flex-col border-r border-[var(--border)] bg-gradient-to-b from-[var(--s3)] via-[var(--s1)] to-[var(--page)] lg:flex">
       <div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#60a5fa] via-[#3b82f6] to-[#1d4ed8] opacity-90 shadow-[0_0_12px_rgba(59,130,246,.45)]" />
 
       <div className="px-6 pt-5">
