@@ -351,6 +351,7 @@ export default function IntakePage() {
 
       const res = await api.post<{ id: string; repair_number: string }>(`/repairs/quick-accept/`, payload, token);
       setSuccess({ id: res.id, repair_number: res.repair_number });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (ex) {
       setError(ex instanceof Error ? ex.message : "Nie udało się przyjąć zgłoszenia.");
     } finally {
