@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(venv/Scripts/python manage.py runserver 8000)"
+      "Bash(venv/Scripts/python manage.py runserver 8000)",
+      "Bash(xargs grep *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
