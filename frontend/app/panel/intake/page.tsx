@@ -27,6 +27,7 @@ import { AcceptanceProtocolPreviewModal } from "@/components/panel/AcceptancePro
 import { downloadAcceptanceProtocolPdf, openRepairQrLabel } from "@/lib/acceptance-pdf";
 import { IntakePreviewPanel } from "@/components/panel/intake/IntakePreviewPanel";
 import { deviceCategoryToBucket, isStaffSuggestedForCategory } from "@/lib/intake-assignment";
+import DatePickerInput from "@/components/ui/DatePickerInput";
 import type { IntakeSearchClient, IntakeSearchDevice } from "@/types/intake";
 
 type AssignableStaffRow = {
@@ -789,11 +790,11 @@ export default function IntakePage() {
               </div>
               <div>
                 <div className={labelClass}>Termin realizacji (planowana data)</div>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={estimatedCompletionDate}
-                  onChange={(e) => setEstimatedCompletionDate(e.target.value)}
-                  className="mt-1.5 w-full rounded-2xl border border-[var(--border)] bg-[#111318] px-4 py-2.5 text-sm text-[var(--white)] outline-none transition focus:border-[#3b82f6]/45"
+                  onChange={setEstimatedCompletionDate}
+                  placeholder="Wybierz datę realizacji"
+                  minDate={new Date()}
                 />
               </div>
             </div>
