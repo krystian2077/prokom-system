@@ -10,10 +10,12 @@ from .views import (
     StaffSnapshotsView,
     StaffManagerView,
     StaffHealthScoreView,
+    StaffKpiListView,
 )
 
 urlpatterns = [
     path("kpi/", KPIDashboardView.as_view(), name="analytics-kpi"),
+    path("staff-kpi/", StaffKpiListView.as_view(), name="analytics-staff-kpi"),
     path("staff-ranking/", StaffRankingView.as_view(), name="analytics-staff-ranking"),
     path("repairs-report/", RepairsReportView.as_view(), name="analytics-repairs-report"),
     path("summary/", SummaryStatsView.as_view(), name="analytics-summary"),

@@ -2,141 +2,186 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { usePanelBasePath } from "@/lib/panelPaths";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
+import type { CalendarCategoryKey, CalendarEventDTO, CalendarMonthResponse } from "@/types/calendar";
 
-type CalendarEvent = {
-  id: string | number;
-  title: string;
-  event_type: "repair_eta" | "pickup" | "part_arrival" | "task" | "availability" | "sla" | string;
-  date: string;
-  repair?: string | number;
-  description?: string;
-};
+type PopupState = { event: CalendarEventDTO; x: number; y: number } | null;
+type StaffOption = { id: string; full_name: string; role: string; staff_profile?: { calendar_color?: string } | null };
+type DropdownOption = { value: string; label: string };
 
-type AvailabilityItem = {
-  id: string | number;
-  user_name?: string;
-  user_full_name?: string;
-  user?: { full_name?: string; first_name?: string; last_name?: string };
-  availability_type?: string;
-  availability_type_display?: string;
-  note?: string;
-};
-
-type PopupState = { ev: CalendarEvent; x: number; y: number } | null;
-
-const DOW = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
-
-function pad(n: number): string {
-  return String(n).padStart(2, "0");
-}
-
-function isoDate(d: Date): string {
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-function monthGrid(viewMonth: Date): Date[] {
-  const first = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1);
-  const jsDay = first.getDay();
-  const mondayOffset = (jsDay + 6) % 7;
-  const start = new Date(first);
-  start.setDate(first.getDate() - mondayOffset);
-  const out: Date[] = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    out.push(d);
-  }
-  return out;
-}
-
-function eventClass(kind: string): string {
-  if (kind === "pickup") return "bg-[rgba(34,197,94,.15)] text-[#22c55e]";
-  if (kind === "task") return "bg-[rgba(245,158,11,.15)] text-[#f59e0b]";
-  if (kind === "sla") return "bg-[rgba(220,30,30,.15)] text-[#dc1e1e]";
-  if (kind === "repair_eta" || kind === "part_arrival") return "bg-[rgba(59,130,246,.15)] text-[#3b82f6]";
-  if (kind === "availability") return "bg-[var(--s3)] text-[var(--ink2)]";
-  return "bg-[var(--s3)] text-[var(--ink2)]";
-}
-
-function availabilityDotClass(item: AvailabilityItem): string {
-  const v = (item.availability_type ?? item.availability_type_display ?? "").toLowerCase();
-  if (v.includes("dost") || v.includes("available")) return "bg-[#22c55e]";
-  if (v.includes("zaj") || v.includes("busy")) return "bg-[#f59e0b]";
-  if (v.includes("zew") || v.includes("external")) return "bg-[#f97316]";
-  return "bg-[var(--muted)]";
-}
-
-export default function AdminCalendarPage() {
-  const { token, user } = useAuth();
-  const popupRef = useRef<HTMLDivElement | null>(null);
-  const today = useMemo(() => new Date(), []);
-  const [viewMonth, setViewMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const [selectedDate, setSelectedDate] = useState(new Date(today));
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [availability, setAvailability] = useState<AvailabilityItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState<Error | null>(null);
-  const [popup, setPopup] = useState<PopupState>(null);
-
-  const monthStart = useMemo(() => isoDate(new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1)), [viewMonth]);
-  const monthEnd = useMemo(() => isoDate(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0)), [viewMonth]);
-  const selectedIso = useMemo(() => isoDate(selectedDate), [selectedDate]);
-  const tomorrowIso = useMemo(() => {
-    const t = new Date(selectedDate);
-    t.setDate(t.getDate() + 1);
-    return isoDate(t);
-  }, [selectedDate]);
-
-  useEffect(() => {
-    if (!token || user?.role !== "admin") return;
-    let cancelled = false;
-    const run = async () => {
-      setLoading(true);
-      setLoadError(null);
-      try {
-        const [eventRes, availRes] = await Promise.all([
-          api.get<CalendarEvent[] | { results?: CalendarEvent[] }>(
-            `/calendar/events/?start=${encodeURIComponent(monthStart)}&end=${encodeURIComponent(monthEnd)}&assigned_to=all`,
-            token,
-          ),
-          api.get<AvailabilityItem[] | { results?: AvailabilityItem[] }>(
-            `/availability/?date=${encodeURIComponent(isoDate(today))}`,
-            token,
-          ),
-        ]);
-        if (cancelled) return;
-        setEvents(Array.isArray(eventRes) ? eventRes : eventRes?.results ?? []);
-        setAvailability(Array.isArray(availRes) ? availRes : availRes?.results ?? []);
-      } catch (err) {
-        if (cancelled) return;
-        setLoadError(err instanceof Error ? err : new Error("Nie udało się załadować kalendarza"));
-        setEvents([]);
-        setAvailability([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [token, user?.role, monthStart, monthEnd, today]);
+function PremiumDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  disabled = false,
+  placeholder = "Wybierz",
+}: {
+  label: string;
+  value: string;
+  options: DropdownOption[];
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const current = options.find((o) => o.value === value);
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
-      if (popupRef.current && !popupRef.current.contains(e.target as Node)) setPopup(null);
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  const byDate = useMemo(() => {
-    const map = new Map<string, CalendarEvent[]>();
+  return (
+    <div ref={rootRef} className="relative">
+      <div className="mb-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#94a3b8]">{label}</div>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) setOpen((v) => !v);
+        }}
+        className="flex min-h-[48px] w-full items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))] px-4 py-3 text-left text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,.18)] transition duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_18px_36px_rgba(0,0,0,.28)] focus:outline-none focus:ring-4 focus:ring-[rgba(59,130,246,.18)] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <span className="truncate">{current?.label ?? placeholder}</span>
+        <ChevronDown size={16} className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open ? (
+        <div className="absolute left-0 top-full z-[80] mt-2 w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0f1117] shadow-[0_24px_60px_rgba(0,0,0,.45)] backdrop-blur-xl">
+          <div className="max-h-[280px] overflow-auto p-2">
+            {options.map((opt) => {
+              const active = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                  className={[
+                    "flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-sm font-semibold transition",
+                    active
+                      ? "bg-[rgba(59,130,246,.16)] text-white shadow-[0_0_0_1px_rgba(59,130,246,.18)]"
+                      : "text-[#cbd5e1] hover:bg-white/[.05] hover:text-white",
+                  ].join(" ")}
+                >
+                  <span className="truncate">{opt.label}</span>
+                  {active ? <span className="ml-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#93c5fd]">Wybrane</span> : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+const DOW = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
+
+const CATEGORY_META: Record<CalendarCategoryKey, { label: string; className: string }> = {
+  sla: { label: "SLA / blokady", className: "border border-[rgba(220,38,38,.3)] bg-[rgba(220,38,38,.15)] text-[#fca5a5]" },
+  delivery: { label: "Odbiory", className: "border border-[rgba(34,197,94,.28)] bg-[rgba(34,197,94,.15)] text-[#86efac]" },
+  event: { label: "Zdarzenia", className: "border border-[rgba(139,92,246,.3)] bg-[rgba(139,92,246,.13)] text-[#ddd6fe]" },
+  intake: { label: "Przyjęcia", className: "border border-[rgba(245,158,11,.28)] bg-[rgba(245,158,11,.15)] text-[#fde68a]" },
+  eta: { label: "Planowany termin oddania", className: "border border-[rgba(59,130,246,.28)] bg-[rgba(59,130,246,.15)] text-[#bfdbfe]" },
+  parts: { label: "Części", className: "border border-[rgba(34,211,238,.28)] bg-[rgba(34,211,238,.12)] text-[#a5f3fc]" },
+};
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function toISODate(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function monthGrid(viewMonth: Date): Date[] {
+  const first = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1);
+  const mondayOffset = (first.getDay() + 6) % 7;
+  const start = new Date(first);
+  start.setDate(first.getDate() - mondayOffset);
+  return Array.from({ length: 42 }).map((_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+}
+
+export default function AdminCalendarPage() {
+  const panelPaths = usePanelBasePath();
+  const { token, user } = useAuth();
+  const popupRef = useRef<HTMLDivElement | null>(null);
+  const today = useMemo(() => new Date(), []);
+
+  const [viewMonth, setViewMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDate, setSelectedDate] = useState(new Date(today));
+  const [employee, setEmployee] = useState<string>("all");
+  const [category, setCategory] = useState<string>("all");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [popup, setPopup] = useState<PopupState>(null);
+
+  const monthStartISO = useMemo(() => toISODate(new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1)), [viewMonth]);
+  const monthEndISO = useMemo(() => toISODate(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0)), [viewMonth]);
+  const selectedISO = useMemo(() => toISODate(selectedDate), [selectedDate]);
+  const tomorrowISO = useMemo(() => {
+    const t = new Date(selectedDate);
+    t.setDate(t.getDate() + 1);
+    return toISODate(t);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 280);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    const onClickOutside = (ev: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(ev.target as Node)) {
+        setPopup(null);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  const staffQuery = useQuery({
+    queryKey: ["admin-calendar-staff"],
+    enabled: Boolean(token),
+    queryFn: () => api.get<StaffOption[]>("/accounts/staff/?is_active=true", token),
+    staleTime: 60_000,
+  });
+
+  const calendarQuery = useQuery({
+    queryKey: ["admin-calendar-month", monthStartISO, monthEndISO, employee, category, debouncedSearch],
+    enabled: Boolean(token),
+    queryFn: async () => {
+      const params = new URLSearchParams({ from: monthStartISO, to: monthEndISO, scope: "team" });
+      if (employee && employee !== "all") params.set("employee", employee);
+      if (category !== "all") params.set("category", category);
+      if (debouncedSearch) params.set("q", debouncedSearch);
+      return api.get<CalendarMonthResponse>(`/calendar/month/?${params.toString()}`, token);
+    },
+    staleTime: 10_000,
+  });
+
+  const events = calendarQuery.data?.events ?? [];
+  const grid = useMemo(() => monthGrid(viewMonth), [viewMonth]);
+  const eventsByDate = useMemo(() => {
+    const map = new Map<string, CalendarEventDTO[]>();
     for (const ev of events) {
       const arr = map.get(ev.date) ?? [];
       arr.push(ev);
@@ -145,211 +190,163 @@ export default function AdminCalendarPage() {
     return map;
   }, [events]);
 
-  const grid = useMemo(() => monthGrid(viewMonth), [viewMonth]);
-  const todayEvents = byDate.get(selectedIso) ?? [];
-  const tomorrowEvents = byDate.get(tomorrowIso) ?? [];
+  const selectedEvents = eventsByDate.get(selectedISO) ?? [];
+  const tomorrowEvents = eventsByDate.get(tomorrowISO) ?? [];
+  const workload = calendarQuery.data?.workload_by_employee ?? [];
+
+  const summary = calendarQuery.data?.summary ?? {
+    total_events: events.length,
+    days_with_events: new Set(events.map((e) => e.date)).size,
+    today_events: events.filter((e) => e.date === toISODate(today)).length,
+    tomorrow_events: events.filter((e) => e.date === toISODate(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1))).length,
+    by_category: {},
+  };
 
   if (user?.role !== "admin") {
     return (
       <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-        <p className="text-sm text-[#fca5a5]">Tylko administrator.</p>
+        <p className="text-sm text-[#fca5a5]">Brak uprawnień.</p>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-      <header>
-        <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel Admina</p>
-        <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Kalendarz</h1>
+    <main className="mx-auto flex min-h-screen max-w-[1550px] flex-col gap-5 px-5 py-7">
+      <header className="rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,.18),transparent_45%),#0d1119] p-5">
+        <p className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#94a3b8]">
+          <CalendarDays size={14} /> Panel Admina · kalendarz całego zespołu
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-white">Kalendarz</h1>
+        <p className="mt-1 text-sm text-[#9fb0c8]">Widok SLA, odbiorów, przyjęć i dostaw części dla wszystkich pracowników. Filtruj po pracowniku lub kategorii.</p>
       </header>
 
-      {loadError && (
-        <div className="mt-4">
-          <ErrorState error={loadError} onRetry={() => setLoadError(null)} title="Nie udało się załadować kalendarza" />
-        </div>
-      )}
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-2xl border border-white/10 bg-[#0d1119] p-4"><div className="text-xs text-[#94a3b8]">Wydarzenia w miesiącu</div><div className="mt-1 text-2xl font-semibold text-white">{summary.total_events}</div></div>
+        <div className="rounded-2xl border border-white/10 bg-[#0d1119] p-4"><div className="text-xs text-[#94a3b8]">Dni z aktywnością</div><div className="mt-1 text-2xl font-semibold text-white">{summary.days_with_events}</div></div>
+        <div className="rounded-2xl border border-white/10 bg-[#0d1119] p-4"><div className="text-xs text-[#94a3b8]">Dziś</div><div className="mt-1 text-2xl font-semibold text-[#93c5fd]">{summary.today_events}</div></div>
+        <div className="rounded-2xl border border-white/10 bg-[#0d1119] p-4"><div className="text-xs text-[#94a3b8]">Jutro</div><div className="mt-1 text-2xl font-semibold text-[#86efac]">{summary.tomorrow_events}</div></div>
+      </section>
 
-      <section className="mt-4 grid gap-5 lg:grid-cols-[1fr,360px]">
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
+      <section className="rounded-3xl border border-white/10 bg-[#0d1119] p-4">
+        <div className="grid gap-3 md:grid-cols-3">
+          <PremiumDropdown
+            label="Pracownik"
+            value={employee}
+            onChange={setEmployee}
+            placeholder="Wszyscy"
+            options={[
+              { value: "all", label: "Wszyscy" },
+              ...(staffQuery.data ?? []).map((s) => ({ value: s.id, label: s.full_name })),
+            ]}
+          />
+          <PremiumDropdown
+            label="Kategoria"
+            value={category}
+            onChange={setCategory}
+            options={[
+              { value: "all", label: "Wszystkie" },
+              ...(Object.keys(CATEGORY_META) as CalendarCategoryKey[]).map((c) => ({ value: c, label: CATEGORY_META[c].label })),
+            ]}
+          />
+          <label className="text-xs text-[#94a3b8]">Szukaj
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nr naprawy, klient, pracownik..." className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-[#6b7280]" />
+          </label>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr,380px]">
+        <div className="rounded-3xl border border-white/10 bg-[#0d1119] p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-                className="rounded-xl border border-[var(--border)] bg-[var(--s2)] p-2 text-[var(--ink2)]"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <div className="text-lg font-semibold text-[var(--white)]">
-                {viewMonth.toLocaleDateString("pl-PL", { month: "long", year: "numeric" })}
-              </div>
-              <button
-                type="button"
-                onClick={() => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-                className="rounded-xl border border-[var(--border)] bg-[var(--s2)] p-2 text-[var(--ink2)]"
-              >
-                <ChevronRight size={16} />
-              </button>
+              <button type="button" onClick={() => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))} className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/5 text-[#cbd5e1]"><ChevronLeft size={18} /></button>
+              <div className="text-xl font-semibold text-white">{viewMonth.toLocaleDateString("pl-PL", { month: "long", year: "numeric" })}</div>
+              <button type="button" onClick={() => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))} className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/5 text-[#cbd5e1]"><ChevronRight size={18} /></button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                const now = new Date();
-                setSelectedDate(now);
-                setViewMonth(new Date(now.getFullYear(), now.getMonth(), 1));
-              }}
-              className="rounded-xl border border-[var(--border)] bg-[var(--s2)] px-3 py-2 text-xs font-semibold text-[var(--ink2)]"
-            >
-              Dziś
-            </button>
+            <button type="button" onClick={() => { const now = new Date(); setSelectedDate(now); setViewMonth(new Date(now.getFullYear(), now.getMonth(), 1)); }} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#cbd5e1]">Dziś</button>
           </div>
 
-          <div className="mt-4 grid grid-cols-7 gap-1">
-            {DOW.map((d, idx) => (
-              <div key={d} className="text-center text-xs font-semibold uppercase tracking-[.14em] text-[var(--ink2)]" style={{ opacity: idx === 5 ? 0.75 : idx === 6 ? 0.6 : 1 }}>
-                {d}
-              </div>
-            ))}
+          <div className="mt-5 grid grid-cols-7 gap-1">
+            {DOW.map((d, idx) => <div key={d} className="text-center text-xs font-semibold uppercase tracking-[.14em] text-[#6b7280]" style={{ opacity: idx > 4 ? 0.75 : 1 }}>{d}</div>)}
           </div>
 
-          <div className="mt-2 grid grid-cols-7 gap-1">
-            {grid.map((d) => {
-              const iso = isoDate(d);
-              const inMonth = d.getMonth() === viewMonth.getMonth();
-              const isToday = iso === isoDate(today);
-              const dayEvents = byDate.get(iso) ?? [];
-              return (
-                <button
-                  key={iso}
-                  type="button"
-                  onClick={() => setSelectedDate(new Date(d))}
-                  className={`cal-day min-h-[80px] rounded-[10px] border px-2 py-1 text-left ${
-                    isToday ? "border-[rgba(220,30,30,.2)] bg-[rgba(220,30,30,.07)]" : "border-[var(--border)] bg-[var(--s2)] hover:bg-[var(--row-hover)]"
-                  } ${inMonth ? "" : "opacity-35"}`}
-                >
-                  <div className="text-sm font-semibold text-[var(--white)]">{d.getDate()}</div>
-                  <div className="mt-1 space-y-1">
-                    {dayEvents.slice(0, 3).map((ev) => (
-                      <button
-                        key={String(ev.id)}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPopup({ ev, x: e.clientX, y: e.clientY });
-                        }}
-                        className={`cal-event block w-full truncate rounded-[5px] px-1.5 py-0.5 text-left text-[9.5px] font-semibold ${eventClass(ev.event_type)}`}
-                      >
-                        {ev.title}
-                      </button>
-                    ))}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          {calendarQuery.isLoading && !calendarQuery.data ? (
+            <div className="mt-2 grid grid-cols-7 gap-1">{Array.from({ length: 42 }).map((_, i) => <Skeleton key={i} className="min-h-[90px] rounded-[10px]" />)}</div>
+          ) : calendarQuery.isError ? (
+            <div className="mt-5"><ErrorState error={calendarQuery.error} onRetry={() => void calendarQuery.refetch()} title="Nie udało się załadować kalendarza" /></div>
+          ) : (
+            <div className="mt-2 grid grid-cols-7 gap-1">
+              {grid.map((d) => {
+                const iso = toISODate(d);
+                const inMonth = d.getMonth() === viewMonth.getMonth();
+                const isSelected = iso === selectedISO;
+                const isToday = iso === toISODate(today);
+                const dayEvents = eventsByDate.get(iso) ?? [];
+                return (
+                  <button key={iso} type="button" onClick={() => setSelectedDate(new Date(d))} className={["min-h-[95px] rounded-[10px] border px-2 py-1 text-left transition", inMonth ? "bg-white/[.03]" : "bg-white/[.015] opacity-40", isToday ? "border-[#dc2626]/40" : "border-white/5", isSelected ? "ring-1 ring-[#3b82f6]/50" : "hover:bg-white/[.06]"].join(" ")}>
+                    <div className="text-sm font-semibold text-[#d0d4de]">{d.getDate()}</div>
+                    <div className="mt-1 space-y-1">
+                      {dayEvents.slice(0, 3).map((ev) => (
+                        <button key={ev.id} type="button" onClick={(e) => { e.stopPropagation(); setPopup({ event: ev, x: e.clientX, y: e.clientY }); }} className={`block w-full truncate rounded-[6px] px-1.5 py-0.5 text-left text-[10px] font-semibold ${CATEGORY_META[ev.category].className}`}>
+                          {ev.title}
+                        </button>
+                      ))}
+                      {dayEvents.length > 3 ? <div className="text-[10px] font-semibold text-[#94a3b8]">+{dayEvents.length - 3}</div> : null}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--white)]">Legenda</h2>
-            <div className="mt-3 space-y-2 text-xs text-[var(--ink2)]">
-              <div>pickup - zielony</div>
-              <div>task - amber</div>
-              <div>repair/sla - niebieski/czerwony</div>
-              <div>availability - szary</div>
+          <div className="rounded-3xl border border-white/10 bg-[#0d1119] p-4">
+            <h2 className="text-sm font-semibold text-white">Dzień · {selectedDate.toLocaleDateString("pl-PL")}</h2>
+            <div className="mt-3 space-y-2">
+              {selectedEvents.length === 0 ? <p className="text-xs text-[#6b7280]">Brak zdarzeń.</p> : selectedEvents.slice(0, 8).map((ev) => (
+                <button key={`selected-${ev.id}`} type="button" onClick={(e) => { const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect(); setPopup({ event: ev, x: r.left, y: r.bottom }); }} className="flex w-full items-start gap-3 rounded-xl border border-transparent px-1 py-1 text-left transition hover:border-white/10 hover:bg-white/[.04]">
+                  <span className="mt-1.5 h-2 w-2 rounded-full" style={{ background: ev.employee_color || "#64748b" }} />
+                  <span className="min-w-0 truncate text-xs font-semibold text-[#d0d4de]">{ev.title} {ev.employee_name ? `· ${ev.employee_name}` : ""}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--white)]">Dziś</h2>
+          <div className="rounded-3xl border border-white/10 bg-[#0d1119] p-4">
+            <h2 className="text-sm font-semibold text-white">Jutro</h2>
             <div className="mt-3 space-y-2">
-              {loading ? (
-                <div className="space-y-2">
-                  {[0, 1, 2].map((i) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <Skeleton key={i} className="h-4 w-full max-w-[200px]" />
-                  ))}
+              {tomorrowEvents.length === 0 ? <p className="text-xs text-[#6b7280]">Brak zdarzeń na jutro.</p> : tomorrowEvents.slice(0, 6).map((ev) => <div key={`tomorrow-${ev.id}`} className="truncate text-xs text-[#cbd5e1]">{ev.title}</div>)}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-[#0d1119] p-4">
+            <h2 className="text-sm font-semibold text-white">Obciążenie zespołu</h2>
+            <div className="mt-3 space-y-2">
+              {workload.length === 0 ? <p className="text-xs text-[#6b7280]">Brak danych dla wybranych filtrów.</p> : workload.slice(0, 8).map((row) => (
+                <div key={row.employee_id} className="rounded-xl border border-white/10 bg-white/[.03] px-3 py-2">
+                  <div className="flex items-center justify-between gap-2"><div className="truncate text-xs font-semibold text-[#e2e8f0]">{row.employee_name}</div><div className="text-xs font-semibold text-[#93c5fd]">{row.total_events}</div></div>
+                  <div className="mt-1 text-[11px] text-[#94a3b8]">plan: {row.planned_work} · odbiory: {row.ready_for_pickup} · zakończone: {row.completed}</div>
                 </div>
-              ) : null}
-              {!loading && todayEvents.length === 0 ? <p className="text-xs text-[var(--muted)]">Brak zdarzeń.</p> : null}
-              {!loading
-                ? todayEvents.map((ev) => (
-                    <div key={`today-${ev.id}`} className="text-xs text-[var(--ink)]">
-                      {ev.title}
-                    </div>
-                  ))
-                : null}
+              ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--white)]">Jutro</h2>
+          <div className="rounded-3xl border border-white/10 bg-[#0d1119] p-4">
+            <h2 className="text-sm font-semibold text-white">Legenda</h2>
             <div className="mt-3 space-y-2">
-              {loading ? (
-                <div className="space-y-2">
-                  {[0, 1, 2].map((i) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <Skeleton key={i} className="h-4 w-full max-w-[200px]" />
-                  ))}
-                </div>
-              ) : null}
-              {!loading && tomorrowEvents.length === 0 ? <p className="text-xs text-[var(--muted)]">Brak zdarzeń.</p> : null}
-              {!loading
-                ? tomorrowEvents.map((ev) => (
-                    <div key={`tom-${ev.id}`} className="text-xs text-[var(--ink)]">
-                      {ev.title}
-                    </div>
-                  ))
-                : null}
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--white)]">Dostępność zespołu</h2>
-            <div className="mt-3 space-y-2">
-              {availability.length === 0 ? <p className="text-xs text-[var(--muted)]">Brak danych.</p> : null}
-              {availability.map((a) => {
-                const name =
-                  a.user_full_name || a.user_name || a.user?.full_name || `${a.user?.first_name ?? ""} ${a.user?.last_name ?? ""}`.trim() || "Pracownik";
-                return (
-                  <div key={String(a.id)} className="flex items-start gap-2">
-                    <span className={`mt-1.5 h-2 w-2 rounded-full ${availabilityDotClass(a)}`} />
-                    <div className="min-w-0">
-                      <div className="truncate text-xs font-semibold text-[var(--white)]">{name}</div>
-                      <div className="truncate text-[11px] text-[var(--ink2)]">
-                        {a.availability_type_display || a.availability_type || "status nieznany"}
-                        {a.note ? ` · ${a.note}` : ""}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {(Object.keys(CATEGORY_META) as CalendarCategoryKey[]).map((key) => <div key={key} className="flex items-center gap-2 text-xs text-[#cbd5e1]"><span className={`inline-block h-2.5 w-2.5 rounded ${CATEGORY_META[key].className}`} />{CATEGORY_META[key].label} ({summary.by_category[key] ?? 0})</div>)}
             </div>
           </div>
         </aside>
       </section>
 
       {popup ? (
-        <div
-          ref={popupRef}
-          className="fixed z-[300] w-[320px] rounded-2xl border border-[var(--border2)] bg-[var(--s1)] p-4 shadow-2xl"
-          style={{ left: popup.x + 10, top: popup.y + 10 }}
-        >
-          <div className="text-sm font-semibold text-[var(--white)]">{popup.ev.title}</div>
-          {popup.ev.description ? <p className="mt-2 text-xs text-[var(--ink2)]">{popup.ev.description}</p> : null}
-          <p className="mt-2 text-xs text-[var(--muted)]">
-            {popup.ev.date} · {popup.ev.event_type}
-          </p>
-          {popup.ev.repair ? (
-            <Link href={`/admin-panel/repairs/${popup.ev.repair}`} className="mt-3 inline-block text-xs font-semibold text-[var(--blue)] hover:underline">
-              Otwórz naprawę →
-            </Link>
-          ) : popup.ev.event_type === "task" ? (
-            <Link href="/admin-panel/tasks" className="mt-3 inline-block text-xs font-semibold text-[var(--blue)] hover:underline">
-              Otwórz zadanie →
-            </Link>
-          ) : null}
+        <div ref={popupRef} className="fixed z-[300] w-[340px] rounded-2xl border border-white/10 bg-[#0d1119] p-4 shadow-2xl" style={{ left: Math.min(popup.x + 10, typeof window !== "undefined" ? window.innerWidth - 360 : 0), top: Math.min(popup.y + 10, typeof window !== "undefined" ? window.innerHeight - 220 : 0) }}>
+          <div className="text-sm font-semibold text-white">{popup.event.title}</div>
+          <div className="mt-2 text-xs text-[#94a3b8]">{popup.event.date}{popup.event.time ? ` · ${popup.event.time}` : ""}</div>
+          {popup.event.subtitle ? <p className="mt-2 text-xs text-[#cbd5e1]">{popup.event.subtitle}</p> : null}
+          {popup.event.employee_name ? <p className="mt-2 text-xs text-[#93c5fd]">Odpowiedzialny: {popup.event.employee_name}</p> : null}
+          {popup.event.repair_id ? <Link href={panelPaths.repairDetailPath(popup.event.repair_id)} className="mt-3 inline-block text-xs font-semibold text-[#3b82f6] hover:underline">Otwórz naprawę →</Link> : null}
         </div>
       ) : null}
     </main>

@@ -7,7 +7,7 @@ from .kpi_views import (
     HealthOverviewView,
     AdminDashboardView,
 )
-from .staff_views import StaffSnapshotsView, StaffManagerView, StaffHealthScoreView
+from .staff_views import StaffSnapshotsView, StaffManagerView, StaffHealthScoreView, StaffKpiListView
 
 __all__ = [
     "KPIDashboardView",
@@ -19,4 +19,5 @@ __all__ = [
     "StaffSnapshotsView",
     "StaffManagerView",
     "StaffHealthScoreView",
+    "StaffKpiListView",
 ]

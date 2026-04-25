@@ -3,8 +3,9 @@ Widok menedżerski pracownika i snapshoty statystyk (tylko admin).
 Health score pracownika (Etap 4).
 """
 from datetime import datetime
+from decimal import Decimal
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +22,50 @@ from apps.repairs.serializers import RepairRequestListSerializer
 
 def _is_admin(request):
     return request.user and request.user.is_authenticated and getattr(request.user, "role", None) == UserRole.ADMIN
+
+
+_HEALTH_SCORE_MAP = {"green": 100, "yellow": 50, "red": 0}
+
+
+class StaffKpiListView(APIView):
+    """
+    GET /api/v1/analytics/staff-kpi/
+    Lista KPI wszystkich pracowników: health score, ukończone naprawy, revenue. Tylko admin.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not _is_admin(request):
+            return Response({"detail": "Tylko administrator."}, status=403)
+
+        staff_users = list(User.objects.filter(role=UserRole.STAFF).order_by("first_name", "last_name"))
+        staff_ids = [u.id for u in staff_users]
+
+        completed_statuses = [RepairStatus.PICKED_UP, RepairStatus.DELIVERED, RepairStatus.SHIPPED]
+        completed_agg = (
+            RepairRequest.objects.filter(assigned_to_id__in=staff_ids, status__in=completed_statuses)
+            .values("assigned_to_id")
+            .annotate(count=Count("id"), revenue=Sum("final_cost"))
+        )
+        by_user = {str(r["assigned_to_id"]): r for r in completed_agg}
+
+        result = []
+        for u in staff_users:
+            uid = str(u.id)
+            hs_data = staff_health_score(u.id)
+            level = hs_data.get("level", "green")
+            agg = by_user.get(uid, {})
+            result.append({
+                "user_id": uid,
+                "full_name": u.get_full_name(),
+                "email": u.email,
+                "health_score": _HEALTH_SCORE_MAP.get(level, 100),
+                "health_score_level": level,
+                "repairs_completed": agg.get("count", 0),
+                "revenue": str(agg.get("revenue") or Decimal("0")),
+            })
+
+        return Response(result)
 
 
 class StaffSnapshotsView(APIView):
