@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { Search, LogOut, Play, CheckCircle2, Bell, MessageSquareText, ChevronLeft, Moon, Sun } from "lucide-react";
+import { Search, LogOut, Play, CheckCircle2, Bell, MessageSquareText, ChevronLeft, Moon, Sun, Wrench, UserRound, Building2, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
@@ -466,13 +466,27 @@ export function PanelTopbar() {
                           ].join(" ")}
                         >
                           <div className="flex min-w-0 flex-1 items-center gap-3">
-                            <div
+                            <span
                               className={[
-                                "h-9 w-9 shrink-0 rounded-xl border",
-                                urgent ? "border-red-500/30 bg-red-500/10" : "border-[var(--border)] bg-[var(--row-hover)]",
-                                waitingForParts ? "border-emerald-500/30 bg-emerald-500/10" : "",
+                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+                                urgent
+                                  ? "border-red-500/30 bg-red-500/10"
+                                  : waitingForParts
+                                  ? "border-emerald-500/30 bg-emerald-500/10"
+                                  : "border-[var(--border)] bg-[var(--row-hover)]",
                               ].join(" ")}
-                            />
+                            >
+                              <Wrench
+                                size={16}
+                                className={
+                                  urgent
+                                    ? "text-red-400"
+                                    : waitingForParts
+                                    ? "text-emerald-400"
+                                    : "text-[var(--blue)]"
+                                }
+                              />
+                            </span>
                             <div className="min-w-0">
                               <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">
                                 {r.repair_number} · {r.device_name}
@@ -587,16 +601,34 @@ export function PanelTopbar() {
                                   isSelected ? "bg-[var(--row-active)]" : "",
                                 ].join(" ")}
                               >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="min-w-0">
-                                    <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{c.full_name}</p>
+                                <div className="flex items-start gap-3">
+                                  <span
+                                    className={[
+                                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-bold",
+                                      badgeCompany
+                                        ? "border-[var(--bb)] bg-[var(--bl)] text-[var(--blue)]"
+                                        : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--white)]",
+                                    ].join(" ")}
+                                  >
+                                    {badgeCompany ? (
+                                      <Building2 size={16} />
+                                    ) : c.full_name?.[0] ? (
+                                      c.full_name[0].toUpperCase()
+                                    ) : (
+                                      <UserRound size={16} className="text-[var(--ink2)]" />
+                                    )}
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{c.full_name}</p>
+                                      {last?.repair_number ? (
+                                        <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[10px] font-semibold text-[var(--ink2)]">
+                                          {last.repair_number}
+                                        </span>
+                                      ) : null}
+                                    </div>
                                     <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{c.email}</p>
                                   </div>
-                                  {last?.repair_number ? (
-                                    <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[10px] font-semibold text-[var(--ink2)]">
-                                      {last.repair_number}
-                                    </span>
-                                  ) : null}
                                 </div>
                                 {(badgeReturns || badgeCompany) && (
                                   <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -642,11 +674,18 @@ export function PanelTopbar() {
                                   isSelected ? "bg-[var(--row-active)]" : "",
                                 ].join(" ")}
                               >
-                                <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{d.device_name}</p>
-                                <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{d.client_name ?? "—"}</p>
-                                <p className="mt-2 text-[10px] text-[var(--ink2)]">
-                                  {d.category ?? "—"} · Napraw: {d.repair_count ?? 0}
-                                </p>
+                                <div className="flex items-start gap-3">
+                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--row-hover)]">
+                                    <Smartphone size={16} className="text-[var(--blue)]" />
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{d.device_name}</p>
+                                    <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{d.client_name ?? "—"}</p>
+                                    <p className="mt-1 text-[10px] text-[var(--muted)]">
+                                      {d.category ?? "—"} · Napraw: {d.repair_count ?? 0}
+                                    </p>
+                                  </div>
+                                </div>
                               </div>
                             );
                           })}
