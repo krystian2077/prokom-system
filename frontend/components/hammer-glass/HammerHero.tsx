@@ -32,7 +32,7 @@ export default function HammerHero() {
           </div>
 
           {/* Tag */}
-          <p className="mb-3 mt-4 font-syne text-[11px] font-bold uppercase tracking-[0.18em] text-[#3a3d44]">
+          <p className="mb-3 mt-4 font-syne text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">
             HAMMER GLASS CUT
           </p>
 

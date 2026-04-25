@@ -418,7 +418,7 @@ export default function KontaktPage() {
               <span className="font-semibold text-[#4ade80]">
                 {status?.isOpen ? "Teraz otwarte" : "Zamknięte"}
               </span>
-              <span className="text-[#2a6040]">
+              <span className="text-green-400">
                 {status?.isOpen ? `· czynne ${status.until}` : status?.until}
               </span>
             </div>
@@ -445,7 +445,7 @@ export default function KontaktPage() {
                   className={`text-[11px] font-semibold uppercase tracking-[0.14em] ${
                     isWeekdayToday
                       ? "text-[rgba(220,30,30,.7)]"
-                      : "text-[#3a3d44]"
+                      : "text-[#9ca3af]"
                   }`}
                 >
                   Poniedziałek – Piątek
@@ -462,7 +462,7 @@ export default function KontaktPage() {
               >
                 9:00 – 17:00
               </p>
-              <p className="mt-2 text-[12px] text-[#3a3d44]">5 dni roboczych</p>
+              <p className="mt-2 text-[12px] text-[#9ca3af]">5 dni roboczych</p>
             </div>
 
             {/* Sobota */}
@@ -474,7 +474,7 @@ export default function KontaktPage() {
               } hover:-translate-y-[3px] hover:border-[rgba(255,255,255,.1)] hover:bg-[#1a1d23]`}
             >
               <div className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-[rgba(255,255,255,.04)]" />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#3a3d44]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
                 Sobota
               </p>
               <p
@@ -483,7 +483,7 @@ export default function KontaktPage() {
               >
                 9:00 – 14:00
               </p>
-              <p className="mt-2 text-[12px] text-[#3a3d44]">
+              <p className="mt-2 text-[12px] text-[#9ca3af]">
                 skrócone godziny
               </p>
             </div>
@@ -491,11 +491,11 @@ export default function KontaktPage() {
             {/* Niedziela */}
             <div className="relative rounded-[18px] border border-[rgba(255,255,255,.06)] bg-[#13151a] px-7 pb-6 pt-7 opacity-60 transition-all duration-200 hover:-translate-y-[3px] hover:border-[rgba(255,255,255,.1)] hover:bg-[#1a1d23]">
               <div className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-[rgba(255,255,255,.04)]" />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#3a3d44]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
                 Niedziela
               </p>
-              <p className="mt-3 text-[20px] text-[#2a2d34]">Zamknięte</p>
-              <p className="mt-2 text-[12px] text-[#3a3d44]">dzień wolny</p>
+              <p className="mt-3 text-[20px] text-white/40">Zamknięte</p>
+              <p className="mt-2 text-[12px] text-[#9ca3af]">dzień wolny</p>
             </div>
           </div>
         </div>
@@ -516,7 +516,7 @@ export default function KontaktPage() {
           <div className="relative overflow-hidden rounded-[22px] border border-[rgba(255,255,255,.07)] bg-[#13151a] px-6 py-8 sm:px-10 sm:py-11 lg:flex lg:items-center lg:justify-between lg:gap-10">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left bg-[linear-gradient(90deg,#dc1e1e,rgba(220,30,30,.2),transparent)] animate-scaleX" />
             <div className="max-w-xl space-y-3">
-              <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#3a3d44]">
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#9ca3af]">
                 Bezpłatna wycena · bez zobowiązań
               </p>
               <h2
@@ -527,7 +527,7 @@ export default function KontaktPage() {
                 <br />
                 <span className="text-[#dc1e1e]">Zgłoś naprawę online.</span>
               </h2>
-              <p className="text-[14px] text-[#3a3d44]">
+              <p className="text-[14px] text-[#9ca3af]">
                 Wypełnij formularz w mniej niż minutę. Oddzwonimy i ustalimy
                 szczegóły — bez opłat za diagnostykę.
               </p>
@@ -604,7 +604,7 @@ export default function KontaktPage() {
                 >
                   {item.value}
                 </div>
-                <p className="mt-2 text-[13px] text-[#3a3d44]">{item.label}</p>
+                <p className="mt-2 text-[13px] text-[#9ca3af]">{item.label}</p>
               </div>
             ))}
           </div>

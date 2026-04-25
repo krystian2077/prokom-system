@@ -489,7 +489,7 @@ export function UslugiContent() {
               <div className="guarantee-after absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-[var(--red)] to-transparent opacity-0 transition-opacity" />
               <span className="flex h-12 w-12 items-center justify-center rounded-[13px] text-xl" style={{ background: "rgba(220,30,30,.07)", border: "1px solid rgba(220,30,30,.22)" }}>{item.emoji}</span>
               <h3 className="mt-4 text-[12.5px] font-bold leading-snug text-white" style={{ fontFamily: "var(--font-dm-sans)", letterSpacing: "-0.01em" }}>{item.titlePrefix}<span style={{ color: "var(--red)" }}>{item.titleAccent}</span></h3>
-              <p className="mt-2 text-[13px] leading-[1.72]" style={{ color: "#3e4255" }}>{item.desc}</p>
+              <p className="mt-2 text-[13px] leading-[1.72]" style={{ color: "#9ca3af" }}>{item.desc}</p>
             </div>
           ))}
         </div>

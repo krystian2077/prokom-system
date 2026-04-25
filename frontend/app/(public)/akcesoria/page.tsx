@@ -795,7 +795,7 @@ export default function AkcesoriaPage() {
         />
         <div className="relative mx-auto grid max-w-[1280px] grid-cols-1 gap-12 px-4 sm:px-[52px] lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2a2d34]">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
               Serwis + Sklep w jednym miejscu
             </p>
             <h2
@@ -805,7 +805,7 @@ export default function AkcesoriaPage() {
               Nie wiesz co wybrać?{" "}
               <span className="text-[#dc1e1e]">Pomożemy.</span>
             </h2>
-            <p className="mt-3 max-w-[480px] text-[14px] leading-[1.75] text-[#3a3d44]">
+            <p className="mt-3 max-w-[480px] text-[14px] leading-[1.75] text-[#9ca3af]">
               Doradzimy w wyborze akcesoriów, sprawdzimy kompatybilność z Twoim
               urządzeniem i zamówimy co potrzebujesz. Zapraszamy do serwisu lub
               zadzwoń.

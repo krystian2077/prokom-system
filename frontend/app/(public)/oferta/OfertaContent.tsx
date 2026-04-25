@@ -443,7 +443,7 @@ export function OfertaContent() {
             <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
               Tablety dla pracy <span style={{ color: "var(--red)" }}>i rozrywki.</span>
             </h2>
-            <p className="text-[#3e4255] max-w-[560px] mx-auto">Od kompaktowego iPad mini po Galaxy Tab S10 Ultra. Przeglądaj, pracuj, twórz.</p>
+            <p className="text-[#9ca3af] max-w-[560px] mx-auto">Od kompaktowego iPad mini po Galaxy Tab S10 Ultra. Przeglądaj, pracuj, twórz.</p>
           </div>
           <div className="tablets-grid grid lg:grid-cols-2 gap-5 mt-14">
             <Link href="#formularz" className="tablet-brand-card block rounded-[22px] border border-white/10 bg-white/[0.025] p-0 overflow-hidden hover:border-[rgba(220,30,30,.25)] hover:-translate-y-0.5 transition-all duration-300">
@@ -544,7 +544,7 @@ export function OfertaContent() {
               <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
                 Laptopy <span style={{ color: "var(--red)" }}>biznesowe.</span>
               </h2>
-              <p className="text-[#3e4255] max-w-[480px]">
+              <p className="text-[#9ca3af] max-w-[480px]">
                 Dell, Lenovo, HP — nowe laptopy klasy biznesowej z gwarancją producenta.
               </p>
             </div>
@@ -906,7 +906,7 @@ export function OfertaContent() {
             <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
               Dlaczego warto <span style={{ color: "var(--red)" }}>kupić u nas.</span>
             </h2>
-            <p className="text-[#3e4255] max-w-[560px] mx-auto">Sklep stacjonarny, doradztwo bez wciskania, gwarancja i serwis w jednym miejscu.</p>
+            <p className="text-[#9ca3af] max-w-[560px] mx-auto">Sklep stacjonarny, doradztwo bez wciskania, gwarancja i serwis w jednym miejscu.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-14">
             {[
@@ -935,7 +935,7 @@ export function OfertaContent() {
             <h2 className="font-[family-name:var(--font-unbounded)] font-bold text-3xl sm:text-4xl text-white mb-4">
               Dobierzemy <span style={{ color: "var(--red)" }}>najlepsze rozwiązanie.</span>
             </h2>
-            <p className="text-[#3e4255] max-w-[560px] mx-auto">Opowiedz czego szukasz — odezwiemy się z konkretną ofertą.</p>
+            <p className="text-[#9ca3af] max-w-[560px] mx-auto">Opowiedz czego szukasz — odezwiemy się z konkretną ofertą.</p>
           </div>
           <div className="cf-layout grid lg:grid-cols-2 gap-16 lg:gap-[72px] mt-14">
             <div className="space-y-4">
@@ -1074,7 +1074,7 @@ export function OfertaContent() {
           <h2 className="font-[family-name:var(--font-unbounded)] font-black text-white mb-4" style={{ fontSize: "clamp(38px, 5vw, 70px)" }}>
             Odwiedź nas. <em className="italic" style={{ color: "var(--red)" }}>Czekamy.</em>
           </h2>
-          <p className="text-[#3e4255] mb-8">Sklep stacjonarny otwarty od poniedziałku do soboty. Przyjdź, obejrzyj sprzęt, porozmawiaj ze specjalistą.</p>
+          <p className="text-[#9ca3af] mb-8">Sklep stacjonarny otwarty od poniedziałku do soboty. Przyjdź, obejrzyj sprzęt, porozmawiaj ze specjalistą.</p>
           <div className="fct-btns flex flex-wrap justify-center gap-4">
             <a href="tel:883200151" className="btn-primary">Zadzwoń: 883 200 151</a>
             <Link href="#formularz" className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/50 bg-white/10 px-5 py-3 text-base font-semibold text-white hover:border-white hover:bg-white/20 transition-all">
