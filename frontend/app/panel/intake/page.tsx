@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -352,7 +353,6 @@ export default function IntakePage() {
 
       const res = await api.post<{ id: string; repair_number: string }>(`/repairs/quick-accept/`, payload, token);
       setSuccess({ id: res.id, repair_number: res.repair_number });
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (ex) {
       setError(ex instanceof Error ? ex.message : "Nie udało się przyjąć zgłoszenia.");
     } finally {
@@ -970,7 +970,7 @@ export default function IntakePage() {
         token={token}
       />
 
-      {success ? (
+      {success ? createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 backdrop-blur-[2px]"
           onClick={() => setSuccess(null)}
@@ -1071,7 +1071,8 @@ export default function IntakePage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </main>
   );
