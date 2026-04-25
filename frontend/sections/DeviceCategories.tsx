@@ -88,24 +88,15 @@ const item = {
   },
 };
 
-const sectionPanelStyle = {
-  background: "#ffffff",
-  border: "2px solid rgba(220, 30, 30, 0.55)",
-  borderRadius: "28px",
-  boxShadow:
-    "0 0 0 1px rgba(255,255,255,0.8) inset, 0 2px 8px rgba(220, 30, 30, 0.10), 0 8px 24px rgba(220, 30, 30, 0.12), 0 32px 80px rgba(180, 20, 20, 0.14), 0 80px 160px rgba(0,0,0,0.14), 0 140px 200px rgba(0,0,0,0.08)",
-};
-
 export function DeviceCategories() {
   return (
     <section className="devices-section bg-white py-8 px-4 sm:py-14 sm:px-6 md:py-16 lg:py-[80px] lg:px-12">
       <div
-        className="devices-section-inner relative mx-auto max-w-[1200px] overflow-hidden rounded-xl pt-8 px-4 pb-8 sm:rounded-2xl sm:pt-14 sm:px-6 sm:pb-12 lg:rounded-[28px] lg:pt-20 lg:px-14 lg:pb-[90px]"
-        style={sectionPanelStyle}
+        className="devices-section-inner relative mx-auto max-w-[1200px] overflow-hidden bg-white border border-gray-100 rounded-[20px] shadow-premium-card pt-8 px-5 pb-8 sm:pt-14 sm:px-6 sm:pb-12 lg:border-2 lg:border-[rgba(220,30,30,0.55)] lg:rounded-[28px] lg:shadow-devices-panel lg:pt-20 lg:px-14 lg:pb-[90px]"
       >
         {/* Czerwona linia na górze */}
         <div
-          className="pointer-events-none absolute left-[5%] right-[5%] top-0 h-[2px] rounded-b sm:h-[3px]"
+          className="pointer-events-none absolute left-[5%] right-[5%] top-0 h-[2px] rounded-b sm:h-[3px] max-lg:hidden"
           style={{
             background: "linear-gradient(90deg, transparent, rgba(220,30,30,0.85) 25%, rgba(220,30,30,0.85) 75%, transparent)",
           }}
@@ -143,18 +134,13 @@ export function DeviceCategories() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="mt-8 grid grid-cols-1 gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-8 lg:mt-28 lg:grid-cols-4 lg:gap-10"
+            className="mt-8 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 zgl-scrollbar-hide sm:mt-14 lg:mt-28 lg:grid lg:grid-cols-4 lg:gap-10 lg:overflow-visible lg:pb-0"
           >
             {categories.map(({ label, href, image, imageAlt, highlight }) => (
-              <motion.div key={href} variants={item}>
+              <motion.div key={href} variants={item} className="max-lg:min-w-[240px] max-lg:w-[72vw] max-lg:max-w-[300px] max-lg:shrink-0 max-lg:snap-center">
                 <Link href={href} className="block h-full">
                   <motion.div
-                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl sm:rounded-[24px] lg:rounded-[28px]"
-                    style={{
-                      background: "#fffafa",
-                      border: "1px solid rgba(220, 30, 30, 0.12)",
-                      boxShadow: "0 16px 48px -12px rgba(0,0,0,0.14), 0 8px 24px -8px rgba(0,0,0,0.08)",
-                    }}
+                    className="group relative flex h-full flex-col overflow-hidden bg-white border border-gray-100 rounded-[20px] shadow-premium-card lg:bg-[#fffafa] lg:border-[rgba(220,30,30,0.12)] lg:shadow-device-card lg:rounded-[28px]"
                     transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
                     whileHover={{
                       y: -6,

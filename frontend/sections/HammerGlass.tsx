@@ -80,67 +80,67 @@ const STATS = [
 
 export function HammerGlass() {
   return (
-    <section className="bg-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
+    <section className="bg-white py-12 sm:py-20 lg:py-24 max-lg:py-10 max-lg:px-0">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 max-lg:px-5">
+        <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16 max-lg:gap-8">
           {/* Lewa kolumna – opis i liczby */}
           <motion.div
             initial={{ opacity: 0, x: -32 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
           >
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white sm:text-sm">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white sm:text-sm max-lg:px-3.5 max-lg:py-1.5 max-lg:text-[11px]">
               <span
                 className="h-1.5 w-1.5 rounded-full bg-white"
                 aria-hidden
               />
               Dostępne w serwisie PRO-KOM
             </span>
-            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.28em] text-neutral">
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.28em] text-neutral max-lg:mt-3">
               HAMMER GLASS <span className="text-primary">CUT</span>
             </p>
-            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl max-lg:text-[28px] max-lg:leading-[1.2]">
               Folia ochronna wycinana{" "}
               <span className="text-primary">precyzyjnie na miejscu</span>
             </h2>
-            <p className="mt-6 max-w-xl text-lg text-neutral" style={{ lineHeight: 1.7 }}>
+            <p className="mt-6 max-w-xl text-lg text-neutral max-lg:mt-4 max-lg:text-[15px]" style={{ lineHeight: 1.7 }}>
               Ploter Hammer Glass CUT wycina folię perfekcyjnie dopasowaną do Twojego telefonu,
               tabletu lub smartwatcha — w naszym serwisie, w kilkadziesiąt sekund. Zero
               kompromisów, pełna ochrona.
             </p>
 
-            <ul className="mt-8 space-y-4 text-sm sm:text-base">
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Shield className="h-4 w-4" />
+            <ul className="mt-8 space-y-4 text-sm sm:text-base max-lg:mt-6 max-lg:space-y-3">
+              <li className="flex items-start gap-3 max-lg:gap-3 max-lg:rounded-2xl max-lg:bg-white max-lg:p-3.5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+                <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary max-lg:mt-0 max-lg:h-11 max-lg:w-11 max-lg:rounded-xl">
+                  <Shield className="h-4 w-4 max-lg:h-5 max-lg:w-5" />
                 </span>
                 <div>
                   <p className="font-semibold text-dark">
                     Baza 10 000+ modeli
                   </p>
-                  <p className="text-neutral">
+                  <p className="text-neutral max-lg:text-[13px] max-lg:leading-relaxed">
                     Telefony, tablety, smartwatche — perfekcyjne wycięcie dla każdego urządzenia.
                   </p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Sparkles className="h-4 w-4" />
+              <li className="flex items-start gap-3 max-lg:gap-3 max-lg:rounded-2xl max-lg:bg-white max-lg:p-3.5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+                <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary max-lg:mt-0 max-lg:h-11 max-lg:w-11 max-lg:rounded-xl">
+                  <Sparkles className="h-4 w-4 max-lg:h-5 max-lg:w-5" />
                 </span>
                 <div>
                   <p className="font-semibold text-dark">9 rodzajów folii</p>
-                  <p className="text-neutral">
+                  <p className="text-neutral max-lg:text-[13px] max-lg:leading-relaxed">
                     Clear, Matte, Private View, UV, Prime i więcej — każda z certyfikatami PZH i RoHS.
                   </p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Shield className="h-4 w-4" />
+              <li className="flex items-start gap-3 max-lg:gap-3 max-lg:rounded-2xl max-lg:bg-white max-lg:p-3.5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+                <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary max-lg:mt-0 max-lg:h-11 max-lg:w-11 max-lg:rounded-xl">
+                  <Shield className="h-4 w-4 max-lg:h-5 max-lg:w-5" />
                 </span>
                 <div>
                   <p className="font-semibold text-dark">Montaż w ~5 minut</p>
-                  <p className="text-neutral">
+                  <p className="text-neutral max-lg:text-[13px] max-lg:leading-relaxed">
                     Cięcie i aplikacja na miejscu — sucho, bez bąbelków i bez oczekiwania.
                   </p>
                 </div>
@@ -148,27 +148,27 @@ export function HammerGlass() {
             </ul>
 
             {/* Liczby – dolny panel */}
-            <div className="mt-8 grid gap-3 rounded-2xl bg-[#fafafa] p-4 text-xs sm:grid-cols-4 sm:gap-4 sm:p-5 sm:text-sm">
+            <div className="mt-8 grid gap-3 rounded-2xl bg-[#fafafa] p-4 text-xs sm:grid-cols-4 sm:gap-4 sm:p-5 sm:text-sm max-lg:mt-6 max-lg:grid-cols-2 max-lg:gap-2.5 max-lg:rounded-[20px] max-lg:bg-[#f8f8fa] max-lg:p-3">
               {STATS.map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-xl bg-white/70 px-3 py-3 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:px-3.5"
+                  className="rounded-xl bg-white/70 px-3 py-3 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:px-3.5 max-lg:rounded-2xl max-lg:bg-white max-lg:py-4 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06)]"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral max-lg:text-[10px]">
                     {item.label}
                   </p>
-                  <p className="mt-1 text-lg font-extrabold text-dark sm:text-xl">
+                  <p className="mt-1 text-lg font-extrabold text-dark sm:text-xl max-lg:text-xl">
                     {item.value}
                   </p>
-                  <p className="mt-1 text-[11px] text-neutral">
+                  <p className="mt-1 text-[11px] text-neutral max-lg:text-[10px]">
                     {item.helper}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <PremiumButton href="/hammer-glass" variant="primary" size="lg">
+            <div className="mt-8 flex flex-wrap gap-3 max-lg:mt-6">
+              <PremiumButton href="/hammer-glass" variant="primary" size="lg" className="max-lg:w-full max-lg:justify-center max-lg:rounded-2xl max-lg:min-h-[48px] max-lg:text-base">
                 Więcej o produkcie
               </PremiumButton>
             </div>
@@ -183,7 +183,7 @@ export function HammerGlass() {
           >
             {/* Główna karta wizualizacji – samo wideo na całą powierzchnię */}
             <div
-              className="relative overflow-hidden rounded-3xl border border-[#e5e5e5] bg-black shadow-[0_18px_45px_rgba(0,0,0,0.45)]"
+              className="relative overflow-hidden rounded-3xl border border-[#e5e5e5] bg-black shadow-[0_18px_45px_rgba(0,0,0,0.45)] max-lg:rounded-[20px] max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
               style={{ minHeight: 260 }}
             >
               <video
@@ -197,7 +197,7 @@ export function HammerGlass() {
             </div>
 
             {/* Karty rodzajów folii */}
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 max-lg:mt-4 max-lg:grid-cols-2 max-lg:gap-2.5">
               {VARIANTS.map((v, i) => (
                 <motion.div
                   key={v.name}
@@ -205,7 +205,7 @@ export function HammerGlass() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 + i * 0.04 }}
-                  className="group relative overflow-hidden rounded-2xl border border-neutral/20 bg-white shadow-[0_6px_20px_rgba(0,0,0,0.04)]"
+                  className="group relative overflow-hidden rounded-2xl border border-neutral/20 bg-white shadow-[0_6px_20px_rgba(0,0,0,0.04)] max-lg:rounded-[16px] max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06)]"
                 >
                   {/* Kolorowa linia u góry karty */}
                   <div
@@ -250,7 +250,7 @@ export function HammerGlass() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.25 }}
-              className="mt-4 overflow-hidden rounded-2xl border border-neutral/15 bg-white/95 shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
+              className="mt-4 overflow-hidden rounded-2xl border border-neutral/15 bg-white/95 shadow-[0_10px_30px_rgba(0,0,0,0.06)] max-lg:mt-3 max-lg:rounded-[20px] max-lg:bg-white max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
             >
               <div className="h-[3px] w-full bg-gradient-to-r from-primary via-amber-400 to-emerald-400" />
               <motion.div

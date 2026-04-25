@@ -138,22 +138,22 @@ export function ClientProfil() {
   }
 
   return (
-    <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
+    <div className="mx-auto max-w-[1520px] px-4 py-6 max-lg:px-3 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mb-6 max-sm:mb-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
           Panel klienta
         </p>
         <h1 className="cp-heading font-extrabold" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(22px, 2.5vw, 28px)" }}>
           Profil
         </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+        <p className="mt-1 text-sm max-sm:text-xs" style={{ color: "var(--muted)" }}>
           {readOnly ? "Podgląd danych. Zweryfikuj e-mail, aby edytować." : "Edytuj swoje dane kontaktowe i ustawienia konta"}
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+      <div className="grid gap-8 max-lg:gap-5 lg:grid-cols-[280px_1fr]">
         {/* Identity card (left) */}
-        <div className="panel-card sticky top-24 h-fit p-6">
+        <div className="panel-card sticky top-24 h-fit p-6 max-lg:rounded-[22px]">
           {profile ? (
             <>
               <div
@@ -209,9 +209,9 @@ export function ClientProfil() {
         </div>
 
         {/* Form cards (right) */}
-        <div className="space-y-6">
+        <div className="space-y-6 max-lg:space-y-4">
           {/* Dane kontaktowe */}
-          <div className="panel-card">
+          <div className="panel-card max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--red-l)", border: "1px solid var(--red-border)", color: "var(--red)" }}>
                 <UserRound size={16} />
@@ -225,61 +225,61 @@ export function ClientProfil() {
                 </p>
               </div>
             </div>
-            <div className="space-y-4 p-5">
+            <div className="space-y-4 p-5 max-sm:p-4">
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>
+                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>
                   E-mail
                 </label>
                 <input
                   type="email"
                   readOnly
                   value={profile?.email ?? ""}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] read-only:opacity-80"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] read-only:opacity-80 max-sm:min-h-[48px] max-sm:rounded-[14px]"
                 />
                 <p className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>tylko do odczytu</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Imię</label>
+                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Imię</label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Nazwisko</label>
+                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Nazwisko</label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                   />
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Telefon</label>
+                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Telefon</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   readOnly={readOnly}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Preferowany kontakt</label>
+                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Preferowany kontakt</label>
                 <select
                   value={preferredContact}
                   onChange={(e) => setPreferredContact(e.target.value as PreferredContact)}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                 >
                   {PREFERRED_CONTACT_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
@@ -289,7 +289,7 @@ export function ClientProfil() {
                 </select>
               </div>
               {!readOnly && (
-                <div className="flex justify-end">
+                <div className="flex justify-end max-sm:hidden">
                   <button
                     type="button"
                     onClick={handleSaveContact}
@@ -305,7 +305,7 @@ export function ClientProfil() {
           </div>
 
           {/* Adres dostawy */}
-          <div className="panel-card">
+          <div className="panel-card max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--blue-l)", border: "1px solid var(--blue-b)", color: "var(--blue)" }}>
                 <MapPin size={16} />
@@ -319,9 +319,9 @@ export function ClientProfil() {
                 </p>
               </div>
             </div>
-            <div className="space-y-4 p-5">
+            <div className="space-y-4 p-5 max-sm:p-4">
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Ulica i numer</label>
+                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Ulica i numer</label>
                 <input
                   type="text"
                   placeholder="np. ul. Leśna 7/3"
@@ -329,12 +329,12 @@ export function ClientProfil() {
                   onChange={(e) => setStreet(e.target.value)}
                   readOnly={readOnly}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Miasto</label>
+                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Miasto</label>
                   <input
                     type="text"
                     placeholder="np. Kraków"
@@ -342,11 +342,11 @@ export function ClientProfil() {
                     onChange={(e) => setCity(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Kod pocztowy</label>
+                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Kod pocztowy</label>
                   <input
                     type="text"
                     placeholder="00-000"
@@ -354,24 +354,24 @@ export function ClientProfil() {
                     onChange={(e) => setZip(e.target.value)}
                     readOnly={readOnly}
                     disabled={readOnly}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                   />
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Kraj</label>
+                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Kraj</label>
                 <input
                   type="text"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   readOnly={readOnly}
                   disabled={readOnly}
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--island3)] px-3 py-2.5 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
                 />
               </div>
               <p className="text-[11px]" style={{ color: "var(--muted)" }}>Adres używany przy zleceniach kurierskich</p>
               {!readOnly && (
-                <div className="flex justify-end">
+                <div className="flex justify-end max-sm:hidden">
                   <button
                     type="button"
                     onClick={handleSaveAddress}
@@ -387,7 +387,7 @@ export function ClientProfil() {
           </div>
 
           {/* Hasło i bezpieczeństwo */}
-          <div className="panel-card">
+          <div className="panel-card max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)", color: "var(--amber)" }}>
                 <Shield size={16} />
@@ -401,7 +401,7 @@ export function ClientProfil() {
                 </p>
               </div>
             </div>
-            <div className="space-y-4 p-5">
+            <div className="space-y-4 p-5 max-sm:p-4">
               <label className={`flex items-center gap-2 ${readOnly ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}>
                 <input
                   type="checkbox"
@@ -423,38 +423,38 @@ export function ClientProfil() {
                 ) : (
                   <>
                     <div>
-                      <label className="block text-[11px] mb-1" style={{ color: "var(--muted)" }}>Aktualne hasło</label>
+                      <label className="block text-[11px] mb-1.5" style={{ color: "var(--muted)" }}>Aktualne hasło</label>
                       <input
                         type="password"
                         value={currentPassword}
                         onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError(null); }}
                         placeholder="••••••••"
                         autoComplete="current-password"
-                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
+                        className="w-full rounded-xl border bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)] max-sm:min-h-[48px] max-sm:rounded-[14px]"
                         style={{ borderColor: "var(--border)" }}
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] mb-1" style={{ color: "var(--muted)" }}>Nowe hasło (min. 8 znaków)</label>
+                      <label className="block text-[11px] mb-1.5" style={{ color: "var(--muted)" }}>Nowe hasło (min. 8 znaków)</label>
                       <input
                         type="password"
                         value={newPassword}
                         onChange={(e) => { setNewPassword(e.target.value); setPasswordError(null); }}
                         placeholder="••••••••"
                         autoComplete="new-password"
-                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
+                        className="w-full rounded-xl border bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)] max-sm:min-h-[48px] max-sm:rounded-[14px]"
                         style={{ borderColor: "var(--border)" }}
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] mb-1" style={{ color: "var(--muted)" }}>Powtórz nowe hasło</label>
+                      <label className="block text-[11px] mb-1.5" style={{ color: "var(--muted)" }}>Powtórz nowe hasło</label>
                       <input
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(null); }}
                         placeholder="••••••••"
                         autoComplete="new-password"
-                        className="w-full rounded-lg border bg-[var(--island3)] px-3 py-2 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)]"
+                        className="w-full rounded-xl border bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)] max-sm:min-h-[48px] max-sm:rounded-[14px]"
                         style={{ borderColor: "var(--border)" }}
                       />
                     </div>
@@ -536,6 +536,40 @@ export function ClientProfil() {
         >
           <span className="text-xl">✓</span>
           <span className="cp-heading text-sm font-medium">Zmiany zostały zapisane</span>
+        </div>
+      )}
+      {!readOnly && (
+        <div
+          className="fixed inset-x-0 z-[230] px-4 sm:hidden"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)" }}
+        >
+          <div
+            className="grid grid-cols-2 gap-2 rounded-[18px] p-2.5 backdrop-blur-2xl"
+            style={{
+              borderColor: "var(--border)",
+              background: "var(--island2)",
+              border: "1px solid var(--border)",
+              boxShadow: "0 -2px 8px rgba(15,23,42,0.06), 0 -12px 28px rgba(15,23,42,0.09)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleSaveContact}
+              disabled={isSaving}
+              className="min-h-[48px] rounded-[14px] bg-[var(--red)] px-3 py-3 text-sm font-semibold text-white disabled:opacity-60 active:scale-[0.97] transition"
+            >
+              Zapisz kontakt
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveAddress}
+              disabled={isSaving}
+              className="min-h-[48px] rounded-[14px] border px-3 py-3 text-sm font-semibold disabled:opacity-60 active:scale-[0.97] transition"
+              style={{ borderColor: "var(--border)", color: "var(--ink)", background: "var(--island3)" }}
+            >
+              Zapisz adres
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -12,8 +12,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-10">
-      <h2 className="text-lg font-bold text-prokom-black">{title}</h2>
+    <section className="mt-6 rounded-2xl bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:mt-10 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
+      <h2 className="text-base font-bold text-prokom-black lg:text-lg">{title}</h2>
       <div className="mt-3 space-y-3 text-sm leading-relaxed text-prokom-gray">
         {children}
       </div>
@@ -27,8 +27,8 @@ function Li({ children }: { children: React.ReactNode }) {
 
 export default function PolitykaPrywatnosciPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold text-prokom-black">
+    <div className="mx-auto max-w-3xl px-5 py-8 sm:px-6 lg:px-4 lg:py-12">
+      <h1 className="text-2xl font-bold text-prokom-black lg:text-3xl">
         Polityka prywatności
       </h1>
       <p className="mt-2 text-sm text-prokom-gray">
@@ -398,7 +398,7 @@ export default function PolitykaPrywatnosciPage() {
         </p>
       </Section>
 
-      <div className="mt-12 border-t border-gray-100 pt-6 text-xs text-gray-400">
+      <div className="mt-8 border-t border-gray-100 pt-5 text-xs text-gray-400 lg:mt-12 lg:pt-6">
         Data ostatniej aktualizacji: 25 kwietnia 2026 r.
       </div>
     </div>

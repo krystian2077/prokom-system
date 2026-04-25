@@ -72,33 +72,39 @@ export default function TrackPage() {
     }
   };
 
+  const inputCls =
+    "min-h-[48px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-prokom-black placeholder:text-prokom-gray/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 lg:min-h-0 lg:rounded-xl lg:border-[rgba(255,255,255,.1)] lg:bg-[#0f1117] lg:text-white lg:placeholder:opacity-50 lg:focus:border-[#dc1e1e] lg:focus:ring-[#dc1e1e]/20";
+
   return (
     <div
-      className={`min-h-screen ${unbounded.variable} ${jakarta.variable}`}
-      style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)", background: "var(--dark, #0a0a0b)" }}
+      className={`min-h-screen bg-white lg:bg-[#0a0a0b] ${unbounded.variable} ${jakarta.variable}`}
+      style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}
     >
-      <div className="mx-auto max-w-[560px] px-6 py-14">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--muted)" }}>
+      <div className="mx-auto max-w-[560px] px-5 py-8 lg:px-6 lg:py-14">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-prokom-gray lg:text-[#525b6e]">
           Śledzenie naprawy
         </p>
-        <h1 className="mt-3 font-black tracking-tight text-white" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(24px, 4vw, 32px)" }}>
+        <h1
+          className="mt-3 font-black tracking-tight text-prokom-black lg:text-white"
+          style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(24px, 4vw, 32px)" }}
+        >
           Podgląd statusu zgłoszenia
         </h1>
-        <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
+        <p className="mt-2 text-sm leading-relaxed text-prokom-gray lg:text-[#8b93a8]">
           Tu sprawdzisz podstawowy status po numerze referencyjnym i telefonie. Pełne śledzenie, historia i wiadomości
           są dostępne w panelu klienta po{" "}
-          <Link href="/client/rejestracja" className="font-medium text-white underline decoration-[var(--red)] underline-offset-2 hover:no-underline">
+          <Link href="/client/rejestracja" className="font-medium text-primary underline underline-offset-2 hover:no-underline lg:text-white lg:decoration-[#dc1e1e]">
             założeniu konta
           </Link>{" "}
-          i zalogowaniu — na stronie głównej panelu użyj sekcji „Szukaj mojej naprawy”, jeśli naprawa nie pojawi się sama na liście.
+          i zalogowaniu — na stronie głównej panelu użyj sekcji „Szukaj mojej naprawy", jeśli naprawa nie pojawi się sama na liście.
         </p>
-        <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
+        <p className="mt-3 text-sm text-prokom-gray lg:text-[#525b6e]">
           Wpisz numer zgłoszenia oraz ostatnie 4 cyfry numeru telefonu z przyjęcia.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-3 lg:mt-8 lg:space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
               Numer zgłoszenia
             </label>
             <input
@@ -106,12 +112,11 @@ export default function TrackPage() {
               value={ref}
               onChange={(e) => setRef(e.target.value)}
               placeholder="np. PROKOM/RMA/123/2025"
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--island)] px-4 py-3 text-white placeholder:opacity-50 focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[var(--red)]/20"
-              style={{ borderColor: "rgba(255,255,255,.1)" }}
+              className={inputCls}
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
               Ostatnie 4 cyfry telefonu
             </label>
             <input
@@ -121,68 +126,66 @@ export default function TrackPage() {
               value={phoneLast4}
               onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
               placeholder="1234"
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--island)] px-4 py-3 text-white placeholder:opacity-50 focus:border-[var(--red)] focus:outline-none focus:ring-2 focus:ring-[var(--red)]/20"
-              style={{ borderColor: "rgba(255,255,255,.1)" }}
+              className={inputCls}
             />
           </div>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-500 lg:text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl px-4 py-3.5 text-sm font-bold text-white transition disabled:opacity-60"
-            style={{ background: "var(--red, #dc1e1e)" }}
+            className="min-h-[48px] w-full rounded-2xl bg-primary px-4 py-3.5 text-sm font-bold text-white transition disabled:opacity-60 lg:min-h-0 lg:rounded-xl"
           >
             {loading ? "Sprawdzam…" : "Sprawdź status"}
           </button>
         </form>
 
         {result && (
-          <div className="mt-10 rounded-2xl border border-[rgba(255,255,255,.08)] p-6" style={{ background: "rgba(255,255,255,.03)" }}>
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+          <div className="mt-8 rounded-2xl border-0 bg-gray-50 p-5 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:mt-10 lg:border lg:border-[rgba(255,255,255,.08)] lg:bg-[rgba(255,255,255,.03)] lg:p-6 lg:shadow-none">
+            <p className="text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
               Numer zgłoszenia
             </p>
-            <p className="mt-1 font-mono text-lg font-bold text-white">{result.repair_number}</p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <p className="mt-1 font-mono text-lg font-bold text-prokom-black lg:text-white">{result.repair_number}</p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:mt-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
                   Status
                 </p>
-                <p className="mt-1 font-medium text-white">{result.status}</p>
+                <p className="mt-1 font-medium text-prokom-black lg:text-white">{result.status}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
                   Data przyjęcia
                 </p>
-                <p className="mt-1 text-white">{formatDate(result.accepted_at)}</p>
+                <p className="mt-1 text-prokom-black lg:text-white">{formatDate(result.accepted_at)}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
                   Szacowany termin
                 </p>
-                <p className="mt-1 text-white">{result.estimated_completion_date ? formatDate(result.estimated_completion_date) : (result.estimated_duration || "—")}</p>
+                <p className="mt-1 text-prokom-black lg:text-white">{result.estimated_completion_date ? formatDate(result.estimated_completion_date) : (result.estimated_duration || "—")}</p>
               </div>
               {result.estimated_duration && result.estimated_completion_date && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-prokom-gray lg:text-[#525b6e]">
                     Szacowany czas
                   </p>
-                  <p className="mt-1 text-white">{result.estimated_duration}</p>
+                  <p className="mt-1 text-prokom-black lg:text-white">{result.estimated_duration}</p>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        <p className="mt-10 text-center text-sm" style={{ color: "var(--muted)" }}>
-          <Link href="/" className="underline hover:text-white">
+        <p className="mt-8 text-center text-sm text-prokom-gray lg:mt-10 lg:text-[#525b6e]">
+          <Link href="/" className="inline-block min-h-[44px] content-center underline hover:text-prokom-black lg:hover:text-white">
             ← Strona główna
           </Link>
           {" · "}
-          <Link href="/client/login" className="underline hover:text-white">
+          <Link href="/client/login" className="inline-block min-h-[44px] content-center underline hover:text-prokom-black lg:hover:text-white">
             Logowanie do panelu
           </Link>
           {" · "}
-          <Link href="/client/login?returnUrl=%2Fclient%2Fdashboard%23szukaj-naprawy" className="underline hover:text-white">
+          <Link href="/client/login?returnUrl=%2Fclient%2Fdashboard%23szukaj-naprawy" className="inline-block min-h-[44px] content-center underline hover:text-prokom-black lg:hover:text-white">
             Panel — Szukaj mojej naprawy
           </Link>
         </p>

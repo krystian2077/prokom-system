@@ -48,38 +48,42 @@ export default function ClaimRepairPage() {
 
   if (authLoading || status === "claiming") {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center px-4">
-        <p className="text-[var(--muted)]">Ładowanie…</p>
+      <div className="flex min-h-[50vh] flex-col items-center justify-center px-5">
+        <p className="text-prokom-gray">Ładowanie…</p>
       </div>
     );
   }
 
   if (status === "success" && message) {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-        <p className="text-lg font-medium text-white">{message}</p>
-        <p className="mt-2 text-sm text-[var(--muted)]">Przekierowanie do listy napraw…</p>
-        <Link href="/client/naprawy" className="mt-6 text-[var(--red)] underline hover:no-underline">
-          Przejdź do napraw
-        </Link>
+      <div className="flex min-h-[50vh] flex-col items-center justify-center px-5 text-center">
+        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
+          <p className="text-lg font-medium text-prokom-black">{message}</p>
+          <p className="mt-2 text-sm text-prokom-gray">Przekierowanie do listy napraw…</p>
+          <Link href="/client/naprawy" className="mt-6 inline-block min-h-[44px] content-center text-primary underline hover:no-underline">
+            Przejdź do napraw
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (status === "error" && message) {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-        <p className="text-lg text-red-400">{message}</p>
-        <Link href="/client/dashboard" className="mt-6 text-[var(--red)] underline hover:no-underline">
-          Przejdź do panelu
-        </Link>
+      <div className="flex min-h-[50vh] flex-col items-center justify-center px-5 text-center">
+        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
+          <p className="text-lg text-red-500">{message}</p>
+          <Link href="/client/dashboard" className="mt-6 inline-block min-h-[44px] content-center text-primary underline hover:no-underline">
+            Przejdź do panelu
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center px-4">
-      <p className="text-[var(--muted)]">Przekierowanie…</p>
+    <div className="flex min-h-[50vh] flex-col items-center justify-center px-5">
+      <p className="text-prokom-gray">Przekierowanie…</p>
     </div>
   );
 }

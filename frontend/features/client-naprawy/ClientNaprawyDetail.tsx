@@ -295,24 +295,24 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
   }[nextAction.color];
 
   return (
-      <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1520px] px-4 py-6 max-lg:px-3 sm:px-6 lg:px-8 lg:py-8">
 
       {/* Back link */}
       <Link
         href="/client/naprawy"
-        className="mb-5 inline-flex items-center gap-1.5 text-base font-medium transition hover:opacity-70"
+        className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 text-base font-medium transition hover:opacity-70 max-sm:mb-3 max-sm:text-sm"
         style={{ color: "var(--ink2)" }}
       >
         ← Wróć do listy napraw
       </Link>
 
       {/* ── HERO CARD ── */}
-      <div className="panel-card mb-6 overflow-hidden">
+      <div className="panel-card mb-6 overflow-hidden max-lg:mb-4 max-lg:rounded-[22px]">
 
-        <div className="flex flex-wrap items-center justify-between gap-5 p-6 sm:p-7">
-          <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-5 p-6 max-sm:gap-3 max-sm:p-4 sm:p-7">
+          <div className="flex items-center gap-5 max-sm:gap-3">
             <div
-              className="flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-2xl text-4xl"
+              className="flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-2xl text-4xl max-sm:h-14 max-sm:w-14 max-sm:rounded-[14px] max-sm:text-3xl"
               style={{ background: "var(--island3)", border: "1.5px solid var(--border)" }}
             >
               {getDeviceEmoji(repair.deviceCategory)}
@@ -321,10 +321,10 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               <p className="font-mono text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
                 {repair.repairNumber}
               </p>
-              <h1 className="mt-1 text-2xl font-bold leading-tight sm:text-3xl" style={{ color: "var(--heading)", fontFamily: "var(--font-unbounded)" }}>
+              <h1 className="mt-1 text-2xl font-bold leading-tight max-sm:text-lg sm:text-3xl" style={{ color: "var(--heading)", fontFamily: "var(--font-unbounded)" }}>
                 {deviceTitle}
               </h1>
-              <p className="mt-2 text-base leading-relaxed" style={{ color: "var(--ink2)" }}>
+              <p className="mt-2 text-base leading-relaxed max-sm:mt-1 max-sm:text-sm" style={{ color: "var(--ink2)" }}>
                 Przyjęto {formatDate(repair.createdAt)}
                 {repair.problemDescription ? ` · ${repair.problemDescription.slice(0, 50)}…` : ""}
               </p>
@@ -333,8 +333,11 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
           <StatusBadge status={repair.status} labelOverride={repair.statusDisplay} large />
         </div>
 
-        {/* ── Progress stepper ── */}
-        <div className="border-t px-5 py-5 sm:px-6" style={{ borderColor: "var(--border)", background: "var(--island3)" }}>
+        {/* ── Progress stepper — mobile: show step labels + icons ── */}
+        <div
+          className="border-t px-5 py-5 max-sm:px-3 max-sm:py-4 sm:px-6"
+          style={{ borderColor: "var(--border)", background: "var(--island3)" }}
+        >
           <div className="flex items-start">
             {REPAIR_STEPS.map((step, i) => {
               const stepDone = i < currentStep;
@@ -349,7 +352,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                       />
                     )}
                     <div
-                      className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-bold"
+                      className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-bold max-sm:h-7 max-sm:w-7 max-sm:text-[11px]"
                       style={{
                         background: stepDone ? "var(--green)" : stepActive ? "var(--red)" : "var(--island)",
                         border: stepDone ? "2px solid var(--green)" : stepActive ? "2px solid var(--red)" : "2px solid var(--border)",
@@ -360,7 +363,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                     </div>
                   </div>
                   <span
-                    className="hidden text-center text-[10px] font-semibold leading-tight sm:block"
+                    className="text-center text-[10px] font-semibold leading-tight max-sm:text-[8px]"
                     style={{ color: stepDone ? "var(--green)" : stepActive ? "var(--ink)" : "var(--muted)" }}
                   >
                     {step.label}
@@ -374,23 +377,27 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
 
       {/* ── "Co dalej?" strip ── */}
       <div
-        className="mb-6 flex items-start gap-3 rounded-2xl border p-5"
-        style={{ borderColor: actionBorderColor, background: actionBgColor }}
+        className="mb-6 flex items-start gap-3 rounded-2xl border p-5 max-lg:mb-4 max-lg:rounded-[18px] max-lg:p-4"
+        style={{
+          borderColor: actionBorderColor,
+          background: actionBgColor,
+          boxShadow: "0 2px 8px rgba(15,23,42,0.06)",
+        }}
       >
-        <span className="mt-0.5 text-2xl">{nextAction.icon}</span>
+        <span className="mt-0.5 text-2xl max-sm:text-xl">{nextAction.icon}</span>
         <div>
-          <p className="text-base font-bold" style={{ color: "var(--ink)" }}>{nextAction.title}</p>
-          <p className="mt-1 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>{nextAction.body}</p>
+          <p className="text-base font-bold max-sm:text-[15px]" style={{ color: "var(--ink)" }}>{nextAction.title}</p>
+          <p className="mt-1 text-sm leading-relaxed max-sm:text-[13px]" style={{ color: "var(--ink2)" }}>{nextAction.body}</p>
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-8 max-lg:gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
 
         {/* ══ LEFT COLUMN ══ */}
-        <div className="space-y-6">
+        <div className="space-y-6 max-lg:space-y-4">
 
           {/* ── Szczegóły zgłoszenia ── */}
-          <div className="panel-card overflow-hidden">
+          <div className="panel-card overflow-hidden max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)" }}>
                 🔧
@@ -403,7 +410,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               </div>
             </div>
 
-            <div className="grid gap-x-7 gap-y-6 p-6 sm:grid-cols-2">
+            <div className="grid gap-x-7 gap-y-6 p-6 max-sm:gap-y-4 max-sm:p-4 sm:grid-cols-2">
               <DetailItem label="Kategoria urządzenia" value={repair.deviceCategory} />
               <DetailItem label="Marka urządzenia" value={repair.deviceBrand} />
               <DetailItem label="Model urządzenia" value={repair.deviceModel} />
@@ -554,7 +561,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
           {/* ── Wycena ── */}
           {repair.clientVisibleQuote ? (
             <div
-              className="panel-card overflow-hidden"
+              className="panel-card overflow-hidden max-lg:rounded-[22px]"
               style={{
                 borderColor: repair.status === "wait_decision" ? "rgba(245,158,11,0.5)" : "rgba(34,197,94,0.35)",
                 boxShadow:
@@ -590,7 +597,37 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               </div>
 
               <div className="space-y-5 p-6">
-                <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: "var(--border2)", background: "var(--island3)" }}>
+                <div className="space-y-2.5 sm:hidden">
+                  {repair.clientVisibleQuote.items.map((line) => (
+                    <div
+                      key={`m-${String(line.id)}`}
+                      className="rounded-[16px] border p-4"
+                      style={{
+                        borderColor: "var(--border2)",
+                        background: "var(--island3)",
+                        boxShadow: "0 2px 8px rgba(15,23,42,0.06)",
+                      }}
+                    >
+                      <p className="text-[14px] font-semibold leading-snug" style={{ color: "var(--heading)" }}>
+                        {line.description || line.item_type_display || "Pozycja"}
+                      </p>
+                      <p className="mt-1 text-xs" style={{ color: "var(--ink2)" }}>
+                        {line.part_origin_display ?? "Bez części"}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                        <span style={{ color: "var(--muted)" }}>Ilość: <strong style={{ color: "var(--ink)" }}>{String(line.quantity)}</strong></span>
+                        <span style={{ color: "var(--muted)" }}>Części: <strong style={{ color: "var(--ink)" }}>{formatPrice(typeof line.parts_price === "number" ? line.parts_price : parseFloat(String(line.parts_price ?? 0)))}</strong></span>
+                        <span style={{ color: "var(--muted)" }}>Robocizna: <strong style={{ color: "var(--ink)" }}>{formatPrice(typeof line.labour_price === "number" ? line.labour_price : parseFloat(String(line.labour_price ?? 0)))}</strong></span>
+                      </div>
+                      <div className="mt-3 flex items-center justify-end border-t pt-3" style={{ borderColor: "var(--border)" }}>
+                        <span className="text-[15px] font-bold" style={{ color: "var(--heading)" }}>
+                          {formatPrice(typeof line.total === "number" ? line.total : parseFloat(String(line.total ?? 0)))}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="hidden overflow-x-auto rounded-2xl border sm:block" style={{ borderColor: "var(--border2)", background: "var(--island3)" }}>
                   <table className="w-full min-w-[560px] text-left text-[14px]">
                     <thead>
                       <tr className="border-b text-[11px] uppercase tracking-[0.08em]" style={{ borderColor: "var(--border2)", color: "var(--muted)" }}>
@@ -709,7 +746,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
           ) : null}
 
           {/* ── Historia statusów ── */}
-          <div className="panel-card">
+          <div className="panel-card max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)" }}>
                 ⏱️
@@ -721,7 +758,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 <p className="text-xs" style={{ color: "var(--muted)" }}>Chronologiczny przebieg naprawy</p>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-6 max-sm:p-4">
               {timelineLoading && statusTimeline.length === 0 ? (
                 <p className="py-4 text-center text-base" style={{ color: "var(--muted)" }}>Ładowanie historii…</p>
               ) : timelineError ? (
@@ -766,7 +803,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
           </div>
 
           {/* ── Wiadomości z serwisem ── */}
-          <div className="panel-card">
+          <div className="panel-card max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg" style={{ background: "var(--blue-l)", border: "1px solid var(--blue-b)" }}>
                 💬
@@ -778,7 +815,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 <p className="text-xs" style={{ color: "var(--muted)" }}>Bezpośrednia komunikacja z technikiem</p>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-6 max-sm:p-4">
               {/* Thread */}
               {threadLoading ? (
                 <p className="py-6 text-center text-base" style={{ color: "var(--muted)" }}>Ładowanie wiadomości…</p>
@@ -899,17 +936,17 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               </div>
 
               {/* Quick contact */}
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2 max-sm:flex-col">
                 <a
                   href="tel:883200151"
-                  className="flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition hover:opacity-80"
+                  className="flex min-h-[48px] items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition hover:opacity-80 max-sm:rounded-[14px]"
                   style={{ background: "var(--island3)", borderColor: "var(--border)", color: "var(--ink)" }}
                 >
                   📞 <span>883 200 151</span>
                 </a>
                 <a
                   href="mailto:sklep@pro-kom.eu"
-                  className="flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition hover:opacity-80"
+                  className="flex min-h-[48px] items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition hover:opacity-80 max-sm:rounded-[14px]"
                   style={{ background: "var(--island3)", borderColor: "var(--border)", color: "var(--ink)" }}
                 >
                   ✉️ <span>sklep@pro-kom.eu</span>
@@ -921,10 +958,10 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
         </div>
 
         {/* ══ RIGHT SIDEBAR ══ */}
-        <aside className="space-y-6">
+        <aside className="space-y-6 max-lg:space-y-4">
 
           {/* ── Kosztorys ── */}
-          <div className="panel-card overflow-hidden">
+          <div className="panel-card overflow-hidden max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-center gap-3">
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold"
@@ -939,7 +976,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                 <p className="text-xs" style={{ color: "var(--muted)" }}>Aktualny stan rozliczeń</p>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-6 max-sm:p-4">
               {repair.priceItems.length > 0 ? (
                 <>
                   <div>
@@ -967,7 +1004,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
           </div>
 
           {/* ── Informacje serwisowe ── */}
-          <div className="panel-card min-h-[560px]">
+          <div className="panel-card min-h-[560px] max-lg:min-h-0 max-lg:rounded-[22px]">
             <div className="panel-card-header flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg" style={{ background: "var(--red-l)", border: "1px solid var(--red-border)", color: "var(--red)" }}>
                 ⚙️
@@ -985,7 +1022,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
               </div>
             </div>
 
-            <div className="flex min-h-[480px] flex-col gap-5 p-6">
+            <div className="flex min-h-[480px] flex-col gap-5 p-6 max-lg:min-h-0 max-sm:p-4">
               <div className="rounded-2xl border p-4" style={{ background: "var(--island2)", borderColor: "var(--border)" }}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
@@ -1057,6 +1094,63 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
 
         </aside>
       </div>
+      {repair.status === "wait_decision" && (
+        <div
+          className="fixed inset-x-0 z-[230] px-4 sm:hidden"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)" }}
+        >
+          <div
+            className="flex items-center gap-2 rounded-[18px] p-2.5 backdrop-blur-2xl"
+            style={{
+              background: "var(--island2)",
+              border: "1px solid var(--amber-b)",
+              boxShadow: "0 -2px 8px rgba(15,23,42,0.06), 0 -12px 28px rgba(15,23,42,0.09)",
+            }}
+          >
+            <button
+              type="button"
+              disabled={quoteRespondBusy}
+              onClick={async () => {
+                if (!token) return;
+                setQuoteRespondError(null);
+                setQuoteRespondBusy(true);
+                try {
+                  const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/quote-respond/`, { action: "accept" }, token);
+                  setRepair(apiRepairDetailToPanel(data));
+                } catch (e) {
+                  setQuoteRespondError(e instanceof Error ? e.message : "Nie udalo sie zapisac decyzji.");
+                } finally {
+                  setQuoteRespondBusy(false);
+                }
+              }}
+              className="flex-1 rounded-[14px] bg-[var(--green)] px-4 py-3 text-sm font-bold text-white min-h-[48px] active:scale-[0.97] transition disabled:opacity-60"
+            >
+              ✓ Akceptuję
+            </button>
+            <button
+              type="button"
+              disabled={quoteRespondBusy}
+              onClick={async () => {
+                if (!token) return;
+                setQuoteRespondError(null);
+                setQuoteRespondBusy(true);
+                try {
+                  const data = await api.post<ApiRepairDetail>(`/repairs/${repairId}/quote-respond/`, { action: "reject" }, token);
+                  setRepair(apiRepairDetailToPanel(data));
+                } catch (e) {
+                  setQuoteRespondError(e instanceof Error ? e.message : "Nie udalo sie zapisac decyzji.");
+                } finally {
+                  setQuoteRespondBusy(false);
+                }
+              }}
+              className="flex-1 rounded-[14px] border px-4 py-3 text-sm font-semibold min-h-[48px] active:scale-[0.97] transition disabled:opacity-60"
+              style={{ borderColor: "var(--border)", color: "var(--ink)", background: "var(--island)" }}
+            >
+              Odrzucam
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

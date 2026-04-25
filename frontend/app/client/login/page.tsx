@@ -141,6 +141,12 @@ export default function ClientLoginPage() {
       style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
     >
       <div className="card">
+        <div className="login-mobile-brand">
+          <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
+            PRO<span>–</span>KOM
+          </Link>
+          <span className="brand-tagline">Panel Klienta</span>
+        </div>
         <div className="lp">
           <Link href="/" className="lp-logo" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900, fontSize: "15px", letterSpacing: "-0.02em", color: "#fff", textDecoration: "none" }}>
             PRO<span style={{ color: "#dc1e1e" }}>–</span>KOM

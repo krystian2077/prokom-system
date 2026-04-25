@@ -54,15 +54,15 @@ const faq = [
 
 export default function FaqPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-bold text-prokom-black">FAQ — Najczęstsze pytania o serwis telefonów w Rabce-Zdroju</h1>
-      <p className="mt-2 text-prokom-gray">Odpowiadamy na najczęstsze pytania klientów z Rabki-Zdroju i okolic dotyczące naprawy telefonów, akcesoriów GSM i naszego serwisu.</p>
-      <div className="mt-8 space-y-4">
+    <div className="mx-auto max-w-3xl px-5 py-8 sm:px-6 lg:px-4 lg:py-10">
+      <h1 className="text-2xl font-bold text-prokom-black lg:text-3xl">FAQ — Najczęstsze pytania o serwis telefonów w Rabce-Zdroju</h1>
+      <p className="mt-2 text-[15px] leading-relaxed text-prokom-gray lg:text-base">Odpowiadamy na najczęstsze pytania klientów z Rabki-Zdroju i okolic dotyczące naprawy telefonów, akcesoriów GSM i naszego serwisu.</p>
+      <div className="mt-6 space-y-3 lg:mt-8 lg:space-y-4">
         {faq.map(({ q, a }) => (
-          <Card key={q}>
-            <CardContent className="p-4">
-              <h2 className="font-semibold text-prokom-black">{q}</h2>
-              <p className="mt-2 text-prokom-gray">{a}</p>
+          <Card key={q} className="!rounded-2xl !border-0 !shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:!rounded-lg lg:!border lg:!border-gray-200 lg:!shadow-sm">
+            <CardContent className="p-5 lg:p-4">
+              <h2 className="text-[15px] font-semibold text-prokom-black lg:text-base">{q}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-prokom-gray">{a}</p>
             </CardContent>
           </Card>
         ))}

@@ -75,14 +75,14 @@ const item = {
 
 export function TrustStats() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50/40 to-white py-12 sm:py-20 lg:py-24 xl:py-28">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50/40 to-white py-12 sm:py-20 lg:py-24 xl:py-28 max-lg:bg-none max-lg:bg-white">
       {/* Subtle decorative elements */}
       <div
-        className="pointer-events-none absolute -right-64 top-1/4 h-96 w-96 rounded-full opacity-[0.04] blur-3xl"
+        className="pointer-events-none absolute -right-64 top-1/4 h-96 w-96 rounded-full opacity-[0.04] blur-3xl max-lg:hidden"
         style={{ background: "#e11d1d" }}
       />
       <div
-        className="pointer-events-none absolute -left-40 bottom-1/4 h-72 w-72 rounded-full opacity-[0.03] blur-3xl"
+        className="pointer-events-none absolute -left-40 bottom-1/4 h-72 w-72 rounded-full opacity-[0.03] blur-3xl max-lg:hidden"
         style={{ background: "#e11d1d" }}
       />
 
@@ -113,7 +113,7 @@ export function TrustStats() {
                 {BADGE}
               </span>
             </span>
-            <h2 className="mt-6 text-2xl font-bold leading-tight tracking-tight text-dark xs:text-3xl sm:mt-9 sm:text-4xl lg:mt-10 lg:text-[2.25rem] lg:leading-[1.2] xl:text-[2.5rem]">
+            <h2 className="mt-6 text-2xl font-bold leading-tight tracking-tight text-dark xs:text-3xl sm:mt-9 sm:text-4xl lg:mt-10 lg:text-[2.25rem] lg:leading-[1.2] xl:text-[2.5rem] max-lg:tracking-[-0.035em]">
               {TITLE}
             </h2>
           </div>
@@ -135,7 +135,7 @@ export function TrustStats() {
               key={title}
               variants={item}
               whileHover={{ y: -6 }}
-              className="group flex flex-col overflow-hidden rounded-[24px] border border-gray-100 bg-white p-6 shadow-[0_4px 24px -8px rgba(0,0,0,0.08)] transition-shadow duration-300 hover:shadow-[0_20px 48px -16px rgba(0,0,0,0.12)] sm:p-7"
+              className="group flex flex-col overflow-hidden rounded-[24px] border border-gray-100 bg-white p-6 shadow-[0_4px 24px -8px rgba(0,0,0,0.08)] transition-shadow duration-300 hover:shadow-[0_20px 48px -16px rgba(0,0,0,0.12)] sm:p-7 max-lg:border-0 max-lg:p-7 max-lg:rounded-[20px] max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
             >
               {/* Icon */}
               <div className="relative">

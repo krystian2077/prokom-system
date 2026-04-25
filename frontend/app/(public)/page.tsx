@@ -29,7 +29,7 @@ import { Contact } from "@/sections/Contact";
 
 export default function HomePage() {
   return (
-    <div>
+    <div className="public-home-page">
       <Hero />
       <TrustStats />
       <DeviceCategories />

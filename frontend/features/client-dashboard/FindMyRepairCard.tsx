@@ -79,20 +79,20 @@ export function FindMyRepairCard() {
   return (
     <div
       id="szukaj-naprawy"
-      className="panel-card mt-8 scroll-mt-24 overflow-hidden"
+      className="panel-card mt-8 scroll-mt-24 overflow-hidden max-lg:mt-5 max-lg:rounded-[18px]"
     >
-      <div className="panel-card-header">
+      <div className="panel-card-header max-lg:px-5 max-lg:py-4">
         <div className="flex items-start justify-between gap-4">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ borderColor: "var(--red-border)", color: "var(--red)", background: "var(--red-l)" }}>
               <Search size={12} />
               Szybkie sprawdzenie
             </span>
-            <h2 className="mt-3 text-[20px] font-semibold leading-tight sm:text-[22px]" style={{ fontFamily: "var(--font-unbounded)", color: "var(--heading)" }}>
+            <h2 className="mt-3 text-[18px] font-semibold leading-tight sm:text-[22px]" style={{ fontFamily: "var(--font-unbounded)", color: "var(--heading)" }}>
               Szukaj mojej naprawy
             </h2>
-            <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
-              Wpisz numer zgłoszenia oraz pełny numer telefonu z przyjęcia — system automatycznie użyje ostatnich 4 cyfr.
+            <p className="mt-3 text-[13px] leading-relaxed sm:text-sm" style={{ color: "var(--ink2)" }}>
+              Wpisz numer zgłoszenia oraz pełny numer telefonu z przyjęcia — system automatycznie użyje ostatnich 4&nbsp;cyfr.
             </p>
           </div>
           <div className="hidden rounded-2xl border px-3 py-2 sm:flex items-center gap-2" style={{ borderColor: "var(--border)", background: "var(--island2)", color: "var(--ink2)" }}>
@@ -102,10 +102,10 @@ export function FindMyRepairCard() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6 pt-0">
-        <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+      <form onSubmit={handleSubmit} className="space-y-5 p-5 pt-0 sm:space-y-5 sm:p-5 sm:pt-0 lg:p-6 lg:pt-0">
+        <div className="grid gap-4 pt-3.5 sm:gap-4 lg:grid-cols-[1.2fr_1fr]">
           <label className="block">
-            <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
+            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] sm:text-[11px]" style={{ color: "var(--muted)" }}>
               Numer zgłoszenia (ref)
             </span>
             <input
@@ -113,14 +113,14 @@ export function FindMyRepairCard() {
               value={ref}
               onChange={(e) => setRef(e.target.value)}
               placeholder="np. PROKOM/RMA/123/2025"
-              className="h-14 w-full rounded-2xl border bg-[var(--island)] px-4 text-[15px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15"
+              className="h-12 w-full rounded-xl border bg-[var(--island)] px-3.5 text-[14px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15 sm:h-14 sm:rounded-2xl sm:px-4 sm:text-[15px]"
               style={{ borderColor: "var(--border)", color: "var(--ink)" }}
               autoComplete="off"
             />
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
+            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] sm:text-[11px]" style={{ color: "var(--muted)" }}>
               Telefon z przyjęcia (pełny numer)
             </span>
             <input
@@ -128,23 +128,23 @@ export function FindMyRepairCard() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Wpisz pełny numer telefonu"
-              className="h-14 w-full rounded-2xl border bg-[var(--island)] px-4 text-[15px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15"
+              className="h-12 w-full rounded-xl border bg-[var(--island)] px-3.5 text-[14px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15 sm:h-14 sm:rounded-2xl sm:px-4 sm:text-[15px]"
               style={{ borderColor: "var(--border)", color: "var(--ink)" }}
               autoComplete="tel"
             />
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-2 text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
-            <Clock3 size={16} className="mt-0.5 shrink-0" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2.5 text-[12px] leading-relaxed sm:text-sm" style={{ color: "var(--ink2)" }}>
+            <Clock3 size={14} className="mt-0.5 shrink-0 sm:h-4 sm:w-4" />
             <span>System sam wytnie ostatnie 4 cyfry z wpisanego numeru telefonu.</span>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl px-6 text-[15px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl text-[14px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 sm:h-14 sm:w-auto sm:rounded-2xl sm:px-6 sm:text-[15px]"
             style={{ background: loading ? "var(--red-h)" : "var(--red)" }}
           >
             <Search size={16} />

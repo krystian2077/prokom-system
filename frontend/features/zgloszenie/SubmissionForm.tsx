@@ -261,7 +261,7 @@ export function SubmissionForm() {
 
   if (result) {
     return (
-      <PremiumCard hover={false} className="mx-auto max-w-lg p-8 text-center">
+      <PremiumCard hover={false} className="mx-auto max-w-lg p-8 text-center max-lg:p-5">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -291,10 +291,10 @@ export function SubmissionForm() {
   const StepIcon = currentStepMeta.icon;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <div className="mx-auto max-w-2xl px-4 py-8 max-lg:px-4 max-lg:py-5">
       {/* Progress bar */}
       <div className="mb-8">
-        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 max-lg:h-1.5">
           <motion.div
             className="h-full rounded-full bg-primary"
             initial={false}
@@ -313,27 +313,27 @@ export function SubmissionForm() {
                 }`}
               >
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 max-lg:h-9 max-lg:w-9 ${
                     step >= s.id ? "border-primary bg-primary/10" : "border-gray-200 bg-gray-50"
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5 max-lg:h-4 max-lg:w-4" />
                 </div>
-                <span className="hidden text-xs font-medium sm:block">{s.title}</span>
+                <span className="text-[10px] font-medium sm:text-xs max-lg:leading-tight">{s.title}</span>
               </div>
             );
           })}
         </div>
       </div>
 
-      <PremiumCard hover={false} className="p-6 sm:p-8">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <StepIcon className="h-6 w-6" />
+      <PremiumCard hover={false} className="p-6 sm:p-8 max-lg:p-4">
+        <div className="mb-6 flex items-center gap-3 max-lg:mb-4 max-lg:gap-2.5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary max-lg:h-10 max-lg:w-10">
+            <StepIcon className="h-6 w-6 max-lg:h-5 max-lg:w-5" />
           </div>
-          <h2 className="text-xl font-semibold text-dark">{currentStepMeta.title}</h2>
+          <h2 className="text-xl font-semibold text-dark max-lg:text-lg">{currentStepMeta.title}</h2>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 max-lg:space-y-5">
           {/* Step 1: Client */}
           {step === 1 && (
             <>
@@ -383,7 +383,7 @@ export function SubmissionForm() {
                 value={client.street || ""}
                 onChange={(e) => updateClient("street", e.target.value)}
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 max-lg:grid-cols-1">
                 <Input
                   label="Miasto"
                   name="city"
@@ -434,7 +434,7 @@ export function SubmissionForm() {
                 placeholder="Opisz usterkę, co się dzieje z urządzeniem..."
                 required
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 max-lg:grid-cols-1">
                 <Input
                   label="Numer seryjny (opcjonalnie)"
                   name="serial_number"
@@ -477,7 +477,7 @@ export function SubmissionForm() {
                     onChange={(e) => setDeliveryHouseNumber(e.target.value)}
                     placeholder="np. 26, 12/5"
                   />
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 max-lg:grid-cols-1">
                     <Input
                       label="Miasto"
                       value={deliveryCity}
@@ -511,7 +511,7 @@ export function SubmissionForm() {
                 value={hammerGlassInterest ?? ""}
                 onChange={(e) => setHammerGlassInterest(e.target.value || null)}
               />
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50">
+              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50 max-lg:min-h-[48px] max-lg:p-3.5">
                 <input
                   type="checkbox"
                   checked={accessoryChooseForMe}
@@ -541,7 +541,7 @@ export function SubmissionForm() {
           {submitError && (
             <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{submitError}</p>
           )}
-          <div className="flex justify-between gap-4 pt-6">
+          <div className="flex justify-between gap-4 pt-6 max-lg:pt-5">
             <PremiumButton
               type="button"
               variant="ghost"

@@ -11,7 +11,7 @@ export function ConditionalPublicLayout({
   return (
     <>
       <PublicNavbar />
-      <div className="overflow-x-hidden">
+      <div className="public-mobile-shell overflow-x-hidden">
         <main className="min-h-[calc(100vh-8rem)] pt-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(4rem+env(safe-area-inset-top,0px))] lg:pt-[calc(5rem+env(safe-area-inset-top,0px))]">
           {children}
         </main>

@@ -395,7 +395,7 @@ export default function ZgloszeniePage() {
   return (
     <div className={`zgloszenie-page min-h-screen ${unbounded.variable} ${jakarta.variable}`} style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}>
       <div
-        className="relative z-10 mx-auto grid min-h-screen max-w-[1340px] grid-cols-1 gap-7 px-6 pb-[60px] pt-10 lg:grid-cols-[1fr_340px] lg:items-start lg:gap-7 lg:px-7 max-[1000px]:px-5 max-[480px]:px-4 max-[480px]:pt-6 max-[480px]:pb-12"
+        className="relative z-10 mx-auto grid min-h-screen max-w-[1340px] grid-cols-1 gap-7 px-6 pb-[60px] pt-10 lg:grid-cols-[1fr_340px] lg:items-start lg:gap-7 lg:px-7 max-lg:px-4 max-lg:pt-6 max-lg:pb-[calc(env(safe-area-inset-bottom,0px)+160px)] max-lg:gap-5"
         style={{ alignContent: "start" }}
       >
         {/* MAIN COLUMN */}
@@ -406,7 +406,7 @@ export default function ZgloszeniePage() {
               <span className="h-0.5 w-5 shrink-0 rounded-full" style={{ background: "linear-gradient(90deg, #dc1e1e, transparent)" }} />
               FORMULARZ ZGŁOSZENIA NAPRAWY
             </p>
-            <h1 className="mt-7 font-bold leading-[1.12] tracking-[-0.02em] max-[480px]:mt-6 max-[480px]:text-[24px] sm:text-[clamp(26px,3.4vw,44px)]" style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--white)", animation: "zgl-fadeUp .55s .06s ease both" }}>
+            <h1 className="mt-7 font-bold leading-[1.12] tracking-[-0.02em] max-lg:mt-5 max-lg:text-[26px] sm:text-[clamp(26px,3.4vw,44px)]" style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--white)", animation: "zgl-fadeUp .55s .06s ease both" }}>
               Zgłoś naprawę <span style={{ color: "var(--red)" }}>online.</span>
             </h1>
             <p className="mt-6 max-w-[540px] pb-4 text-[14px] leading-[1.75] max-[480px]:mt-5 max-[480px]:pb-3" style={{ color: "var(--ink2)", animation: "zgl-fadeUp .55s .12s ease both" }}>
@@ -576,8 +576,8 @@ export default function ZgloszeniePage() {
         <div className="min-w-0 max-[1000px]:max-w-full lg:col-start-1 lg:row-start-2">
           <div className="main-inner w-full">
             {/* Stepper */}
-            <div className="mt-8 max-[480px]:mt-6" style={{ animation: "zgl-fadeUp .55s .18s ease both" }}>
-              <div className="relative mb-6 h-[3px] w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,.07)" }}>
+            <div className="mt-8 max-lg:mt-5" style={{ animation: "zgl-fadeUp .55s .18s ease both" }}>
+              <div className="relative mb-6 h-[3px] w-full overflow-hidden rounded-full max-lg:mb-5 max-lg:h-1" style={{ background: "rgba(255,255,255,.07)" }}>
                 <div
                   className="relative h-full rounded-full transition-[width] duration-[.6s] ease-[cubic-bezier(.4,0,.2,1)]"
                   style={{
@@ -596,7 +596,7 @@ export default function ZgloszeniePage() {
                   return (
                     <div key={s.id} className="relative z-10 flex flex-1 flex-col items-center gap-2">
                       <div
-                        className={`relative flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-full max-[480px]:h-9 max-[480px]:w-9 sm:h-[42px] sm:w-[42px] ${
+                        className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-[42px] sm:w-[42px] ${
                           state === "done"
                             ? "border-[var(--red)] bg-[var(--red)] text-white"
                             : state === "active"
@@ -617,7 +617,7 @@ export default function ZgloszeniePage() {
                         )}
                       </div>
                       <span
-                        className="text-[10px] font-semibold"
+                        className="text-[10px] font-semibold max-lg:text-[9.5px] max-lg:mt-1"
                         style={{
                           color: state === "active" ? "var(--red)" : state === "default" ? "var(--muted)" : "var(--ink)",
                           fontWeight: state === "active" ? 700 : undefined,
@@ -632,9 +632,9 @@ export default function ZgloszeniePage() {
             </div>
 
             {/* Form island */}
-            <div id="formCard" ref={formCardRef} className="form-island relative mt-8">
+            <div id="formCard" ref={formCardRef} className="form-island relative mt-8 max-lg:mt-5">
               {submitted ? (
-                <div className="px-8 py-14 text-center">
+                <div className="px-8 py-14 text-center max-lg:px-5 max-lg:py-10">
                   <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-zglf-red-border bg-gradient-to-br from-zglf-red-l to-zglf-red-l/60 text-zglf-red shadow-[0_0_0_10px_rgba(220,30,30,.05),0_8px_28px_rgba(220,30,30,.15)] animate-success-bounce">
                     <IconCheckLarge />
                   </div>
@@ -675,18 +675,18 @@ export default function ZgloszeniePage() {
                   {/* Step 1 */}
                   {currentStep === 1 && (
                     <div key="1" style={{ animation: goingBack ? "zgl-stepBwd .28s ease both" : "zgl-stepFwd .28s ease both" }}>
-                      <div className="flex items-center gap-3.5 border-b px-7 py-5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)", padding: "22px 28px 18px" }}>
-                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
+                      <div className="flex items-center gap-3.5 border-b px-7 pt-[22px] pb-[18px] max-lg:gap-3 max-lg:px-4 max-lg:py-3.5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)" }}>
+                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)] max-lg:h-9 max-lg:w-9 max-lg:rounded-[11px]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
                           <IconPersonHeader />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>Dane kontaktowe</h3>
+                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)] max-lg:text-[14px]" style={{ fontFamily: "var(--font-unbounded)" }}>Dane kontaktowe</h3>
                           <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>Podaj swoje dane — skontaktujemy się po diagnozie</p>
                         </div>
-                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 1 z 5</span>
+                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)] max-lg:text-[9px] max-lg:px-2 max-lg:whitespace-nowrap" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 1 z 5</span>
                       </div>
-                      <div className="space-y-4 px-7 py-6" style={{ background: "var(--island)", padding: "26px 28px" }}>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" style={{ gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                      <div className="space-y-4 px-7 py-[26px] max-lg:space-y-5 max-lg:px-4 max-lg:py-5 max-lg:pb-[140px]" style={{ background: "var(--island)" }}>
+                        <div className="grid grid-cols-2 gap-3.5 max-lg:grid-cols-1 max-lg:gap-4">
                           <div>
                             <label className="flabel mt-0">
                               <span className="flabel-req" /> Imię
@@ -714,13 +714,13 @@ export default function ZgloszeniePage() {
                         </div>
                         <div>
                           <label className="flabel">Preferowany kontakt</label>
-                          <div className="mt-2 flex flex-wrap gap-2">
+                          <div className="mt-2 flex flex-wrap gap-2 max-lg:flex-col max-lg:gap-2.5">
                             {(["email", "telefon", "sms"] as const).map((p) => (
                               <button
                                 key={p}
                                 type="button"
                                 onClick={() => setPref(p)}
-                                className={`flex min-w-[120px] flex-1 items-center gap-[13px] rounded-[14px] border px-[15px] py-[13px] transition-all ${
+                                className={`flex min-w-[120px] flex-1 items-center gap-[13px] rounded-[14px] border px-[15px] py-[13px] transition-all max-lg:min-h-[48px] ${
                                   pref === p
                                     ? "-translate-y-px"
                                     : "hover:-translate-y-px"
@@ -759,7 +759,7 @@ export default function ZgloszeniePage() {
                           </label>
                           <input type="text" className="fi mt-1.5" placeholder="np. 26, 12/5" value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} />
                         </div>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" style={{ gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                        <div className="grid grid-cols-2 gap-3.5 max-lg:grid-cols-1 max-lg:gap-4">
                           <div>
                             <label className="flabel text-[var(--muted)] italic normal-case">Miasto (opcjonalnie)</label>
                             <input type="text" className="fi mt-1.5" placeholder="Miasto" value={city} onChange={(e) => setCity(e.target.value)} />
@@ -772,7 +772,7 @@ export default function ZgloszeniePage() {
                       </div>
                       <div className="card-ft">
                         <span className="text-[12px]" style={{ color: "var(--muted)" }}>Pola oznaczone ● są wymagane</span>
-                        <button type="button" onClick={() => goNext(1)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
+                        <button type="button" onClick={() => goNext(1)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px] max-lg:min-h-[48px] max-lg:px-5 max-lg:py-3.5 max-lg:text-[14px] max-lg:rounded-[14px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
                           Dalej — Urządzenie
                           <IconChevronRight />
                         </button>
@@ -783,17 +783,17 @@ export default function ZgloszeniePage() {
                   {/* Step 2 */}
                   {currentStep === 2 && (
                     <div key="2" style={{ animation: goingBack ? "zgl-stepBwd .28s ease both" : "zgl-stepFwd .28s ease both" }}>
-                      <div className="flex items-center gap-3.5 border-b px-7 py-5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)", padding: "22px 28px 18px" }}>
-                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
+                      <div className="flex items-center gap-3.5 border-b px-7 pt-[22px] pb-[18px] max-lg:gap-3 max-lg:px-4 max-lg:py-3.5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)" }}>
+                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)] max-lg:h-9 max-lg:w-9 max-lg:rounded-[11px]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
                           <IconPhoneHeader />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>Urządzenie</h3>
+                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)] max-lg:text-[14px]" style={{ fontFamily: "var(--font-unbounded)" }}>Urządzenie</h3>
                           <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>Wybierz kategorię i opisz problem</p>
                         </div>
-                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 2 z 5</span>
+                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)] max-lg:text-[9px] max-lg:px-2 max-lg:whitespace-nowrap" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 2 z 5</span>
                       </div>
-                      <div className="space-y-4 px-7 py-6" style={{ background: "var(--island)", padding: "26px 28px" }}>
+                      <div className="space-y-4 px-7 py-[26px] max-lg:space-y-5 max-lg:px-4 max-lg:py-5 max-lg:pb-[140px]" style={{ background: "var(--island)" }}>
                         <div>
                           <label className="flabel">
                             <span className="flabel-req" /> Kategoria urządzenia
@@ -806,7 +806,7 @@ export default function ZgloszeniePage() {
                                   key={cat}
                                   type="button"
                                   onClick={() => setCategory(val)}
-                                  className={`rounded-full border px-4 py-[9px] text-[13px] font-semibold transition-all ${category === val ? "-translate-y-px" : "hover:-translate-y-px"}`}
+                                  className={`rounded-full border px-4 py-[9px] text-[13px] font-semibold transition-all max-lg:py-3 max-lg:px-5 ${category === val ? "-translate-y-px" : "hover:-translate-y-px"}`}
                                   style={category === val ? { borderColor: "var(--red)", background: "var(--red)", color: "var(--white)", boxShadow: "0 3px 12px rgba(220,30,30,.3)" } : { borderColor: "var(--border)", background: "var(--island4)", color: "var(--ink)" }}
                                 >
                                   {cat}
@@ -856,7 +856,7 @@ export default function ZgloszeniePage() {
                                 key={opt}
                                 type="button"
                                 onClick={() => setDeviceTurnsOn(deviceTurnsOn === opt ? "" : opt)}
-                                className={`rounded-full border px-4 py-[9px] text-[13px] font-semibold transition-all ${deviceTurnsOn === opt ? "-translate-y-px" : "hover:-translate-y-px"}`}
+                                className={`rounded-full border px-4 py-[9px] text-[13px] font-semibold transition-all max-lg:py-3 max-lg:px-5 ${deviceTurnsOn === opt ? "-translate-y-px" : "hover:-translate-y-px"}`}
                                 style={deviceTurnsOn === opt ? { borderColor: "var(--red)", background: "var(--red)", color: "var(--white)", boxShadow: "0 3px 12px rgba(220,30,30,.3)" } : { borderColor: "var(--border)", background: "var(--island4)", color: "var(--ink)" }}
                               >
                                 {opt === "tak" ? "Tak" : "Nie"}
@@ -876,10 +876,10 @@ export default function ZgloszeniePage() {
                         </div>
                       </div>
                       <div className="card-ft">
-                        <button type="button" onClick={() => goBack(2)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px]" style={{ color: "var(--muted)" }}>
+                        <button type="button" onClick={() => goBack(2)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px] max-lg:min-h-[44px] max-lg:px-3 max-lg:py-2 max-lg:rounded-xl" style={{ color: "var(--muted)" }}>
                           <IconChevronLeft /> Wstecz
                         </button>
-                        <button type="button" onClick={() => goNext(2)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
+                        <button type="button" onClick={() => goNext(2)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px] max-lg:min-h-[48px] max-lg:px-5 max-lg:py-3.5 max-lg:text-[14px] max-lg:rounded-[14px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
                           {stepLabels[2]}
                           <IconChevronRight />
                         </button>
@@ -890,17 +890,17 @@ export default function ZgloszeniePage() {
                   {/* Step 3 */}
                   {currentStep === 3 && (
                     <div key="3" style={{ animation: goingBack ? "zgl-stepBwd .28s ease both" : "zgl-stepFwd .28s ease both" }}>
-                      <div className="flex items-center gap-3.5 border-b px-7 py-5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)", padding: "22px 28px 18px" }}>
-                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
+                      <div className="flex items-center gap-3.5 border-b px-7 pt-[22px] pb-[18px] max-lg:gap-3 max-lg:px-4 max-lg:py-3.5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)" }}>
+                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)] max-lg:h-9 max-lg:w-9 max-lg:rounded-[11px]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
                           <IconTruckHeader />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>Dostarczenie i zwrot</h3>
+                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)] max-lg:text-[14px]" style={{ fontFamily: "var(--font-unbounded)" }}>Dostarczenie i zwrot</h3>
                           <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>Wybierz jak dostarczyć i jak odebrać sprzęt</p>
                         </div>
-                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 3 z 5</span>
+                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)] max-lg:text-[9px] max-lg:px-2 max-lg:whitespace-nowrap" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 3 z 5</span>
                       </div>
-                      <div className="space-y-6 px-7 py-6" style={{ background: "var(--island)", padding: "26px 28px" }}>
+                      <div className="space-y-6 px-7 py-[26px] max-lg:px-4 max-lg:py-5 max-lg:pb-[140px]" style={{ background: "var(--island)" }}>
                         <div>
                           <label className="flabel">
                             <span className="flabel-req" /> Jak dostarczysz urządzenie?
@@ -914,7 +914,7 @@ export default function ZgloszeniePage() {
                                 key={opt.v}
                                 type="button"
                                 onClick={() => setDelivery(opt.v)}
-                                className={`flex w-full items-center gap-[13px] rounded-[14px] border px-[15px] py-[13px] text-left transition-all ${delivery === opt.v ? "-translate-y-px" : "hover:-translate-y-px"}`}
+                                className={`flex w-full items-center gap-[13px] rounded-[14px] border px-[15px] py-[13px] text-left transition-all max-lg:min-h-[56px] max-lg:py-3.5 max-lg:rounded-2xl ${delivery === opt.v ? "-translate-y-px" : "hover:-translate-y-px"}`}
                                 style={delivery === opt.v ? { borderColor: "var(--red)", background: "rgba(220,30,30,.08)", boxShadow: "0 0 0 2px rgba(220,30,30,.25), 0 3px 12px rgba(220,30,30,.12)", color: "var(--white)" } : { borderColor: "var(--border)", background: "var(--island4)", color: "var(--ink)" }}
                               >
                                 <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-2" style={delivery === opt.v ? { borderColor: "var(--red)", background: "var(--island)" } : { borderColor: "var(--border2)", background: "var(--island5)" }}>
@@ -942,7 +942,7 @@ export default function ZgloszeniePage() {
                                 key={opt.v}
                                 type="button"
                                 onClick={() => setPickup(opt.v)}
-                                className={`flex w-full items-center gap-[13px] rounded-[14px] border px-[15px] py-[13px] text-left transition-all ${pickup === opt.v ? "-translate-y-px" : "hover:-translate-y-px"}`}
+                                className={`flex w-full items-center gap-[13px] rounded-[14px] border px-[15px] py-[13px] text-left transition-all max-lg:min-h-[56px] max-lg:py-3.5 max-lg:rounded-2xl ${pickup === opt.v ? "-translate-y-px" : "hover:-translate-y-px"}`}
                                 style={pickup === opt.v ? { borderColor: "var(--red)", background: "rgba(220,30,30,.08)", boxShadow: "0 0 0 2px rgba(220,30,30,.25), 0 3px 12px rgba(220,30,30,.12)", color: "var(--white)" } : { borderColor: "var(--border)", background: "var(--island4)", color: "var(--ink)" }}
                               >
                                 <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-2" style={pickup === opt.v ? { borderColor: "var(--red)", background: "var(--island)" } : { borderColor: "var(--border2)", background: "var(--island5)" }}>
@@ -1004,10 +1004,10 @@ export default function ZgloszeniePage() {
                         )}
                       </div>
                       <div className="card-ft">
-                        <button type="button" onClick={() => goBack(3)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px]" style={{ color: "var(--muted)" }}>
+                        <button type="button" onClick={() => goBack(3)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px] max-lg:min-h-[44px] max-lg:px-3 max-lg:py-2 max-lg:rounded-xl" style={{ color: "var(--muted)" }}>
                           <IconChevronLeft /> Wstecz
                         </button>
-                        <button type="button" onClick={() => goNext(3)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
+                        <button type="button" onClick={() => goNext(3)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px] max-lg:min-h-[48px] max-lg:px-5 max-lg:py-3.5 max-lg:text-[14px] max-lg:rounded-[14px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
                           {stepLabels[3]}
                           <IconChevronRight />
                         </button>
@@ -1018,17 +1018,17 @@ export default function ZgloszeniePage() {
                   {/* Step 4 */}
                   {currentStep === 4 && (
                     <div key="4" style={{ animation: goingBack ? "zgl-stepBwd .28s ease both" : "zgl-stepFwd .28s ease both" }}>
-                      <div className="flex items-center gap-3.5 border-b px-7 py-5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)", padding: "22px 28px 18px" }}>
-                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
+                      <div className="flex items-center gap-3.5 border-b px-7 pt-[22px] pb-[18px] max-lg:gap-3 max-lg:px-4 max-lg:py-3.5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)" }}>
+                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)] max-lg:h-9 max-lg:w-9 max-lg:rounded-[11px]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
                           <IconPackageHeader />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>Hammer Glass / akcesoria</h3>
+                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)] max-lg:text-[14px]" style={{ fontFamily: "var(--font-unbounded)" }}>Hammer Glass / akcesoria</h3>
                           <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>Opcjonalne dodatki do Twojego zlecenia</p>
                         </div>
-                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 4 z 5</span>
+                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)] max-lg:text-[9px] max-lg:px-2 max-lg:whitespace-nowrap" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 4 z 5</span>
                       </div>
-                      <div className="space-y-4 px-7 py-6" style={{ background: "var(--island)", padding: "26px 28px" }}>
+                      <div className="space-y-4 px-7 py-[26px] max-lg:space-y-5 max-lg:px-4 max-lg:py-5 max-lg:pb-[140px]" style={{ background: "var(--island)" }}>
                         <div className={!isPhoneOrTablet ? "opacity-60" : ""}>
                           <label className="flabel text-[var(--muted)] italic normal-case">
                             Zainteresowanie folią Hammer Glass (opcjonalnie)
@@ -1131,10 +1131,10 @@ export default function ZgloszeniePage() {
                         </div>
                       </div>
                       <div className="card-ft">
-                        <button type="button" onClick={() => goBack(4)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px]" style={{ color: "var(--muted)" }}>
+                        <button type="button" onClick={() => goBack(4)} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px] max-lg:min-h-[44px] max-lg:px-3 max-lg:py-2 max-lg:rounded-xl" style={{ color: "var(--muted)" }}>
                           <IconChevronLeft /> Wstecz
                         </button>
-                        <button type="button" onClick={() => goNext(4)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
+                        <button type="button" onClick={() => goNext(4)} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px] max-lg:min-h-[48px] max-lg:px-5 max-lg:py-3.5 max-lg:text-[14px] max-lg:rounded-[14px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
                           {stepLabels[4]}
                           <IconChevronRight />
                         </button>
@@ -1145,17 +1145,17 @@ export default function ZgloszeniePage() {
                   {/* Step 5 */}
                   {currentStep === 5 && (
                     <div key="5" style={{ animation: goingBack ? "zgl-stepBwd .28s ease both" : "zgl-stepFwd .28s ease both" }}>
-                      <div className="flex items-center gap-3.5 border-b px-7 py-5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)", padding: "22px 28px 18px" }}>
-                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
+                      <div className="flex items-center gap-3.5 border-b px-7 pt-[22px] pb-[18px] max-lg:gap-3 max-lg:px-4 max-lg:py-3.5" style={{ background: "var(--island2)", borderColor: "rgba(255,255,255,.07)" }}>
+                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] text-[var(--red)] max-lg:h-9 max-lg:w-9 max-lg:rounded-[11px]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)", boxShadow: "0 0 16px rgba(220,30,30,.12)" }}>
                           <IconCheckHeader />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>Podsumowanie zgłoszenia</h3>
+                          <h3 className="text-[15px] font-black tracking-[-0.03em] text-[var(--white)] max-lg:text-[14px]" style={{ fontFamily: "var(--font-unbounded)" }}>Podsumowanie zgłoszenia</h3>
                           <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>Sprawdź dane i wyślij zlecenie</p>
                         </div>
-                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)]" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 5 z 5</span>
+                        <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold text-[var(--red)] max-lg:text-[9px] max-lg:px-2 max-lg:whitespace-nowrap" style={{ background: "rgba(220,30,30,.1)", border: "1px solid rgba(220,30,30,.28)" }}>Krok 5 z 5</span>
                       </div>
-                      <div className="px-7 py-6" style={{ background: "var(--island)", padding: "26px 28px" }}>
+                      <div className="px-7 py-[26px] max-lg:px-4 max-lg:py-5 max-lg:pb-[140px]" style={{ background: "var(--island)" }}>
                         <div className="space-y-0">
                           {[
                             { key: "Kontakt", val: [fname, lname].filter(Boolean).join(" ") ? `${[fname, lname].filter(Boolean).join(" ")} · ${email || "—"} · ${phone || "—"}` : "—" },
@@ -1187,10 +1187,10 @@ export default function ZgloszeniePage() {
                         )}
                       </div>
                       <div className="card-ft">
-                        <button type="button" onClick={() => goBack(5)} disabled={submitLoading} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px] disabled:opacity-50" style={{ color: "var(--muted)" }}>
+                        <button type="button" onClick={() => goBack(5)} disabled={submitLoading} className="inline-flex items-center gap-[7px] text-[13px] font-semibold transition-all hover:gap-[10px] disabled:opacity-50 max-lg:min-h-[44px] max-lg:px-3 max-lg:py-2 max-lg:rounded-xl" style={{ color: "var(--muted)" }}>
                           <IconChevronLeft /> Wstecz
                         </button>
-                        <button type="button" onClick={handleSubmit} disabled={submitLoading} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-70 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
+                        <button type="button" onClick={handleSubmit} disabled={submitLoading} className="inline-flex items-center gap-2 rounded-[12px] border-0 px-6 py-3 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-70 [&>svg]:transition-transform hover:[&>svg]:translate-x-[3px] max-lg:min-h-[48px] max-lg:px-5 max-lg:py-3.5 max-lg:text-[14px] max-lg:rounded-[14px]" style={{ background: "linear-gradient(135deg, #dc1e1e 0%, #b81818 100%)", boxShadow: "0 4px 20px rgba(220,30,30,.4), 0 0 0 1px rgba(255,255,255,.08) inset" }}>
                           {submitLoading ? "Wysyłanie…" : "Wyślij zgłoszenie"}
                           {!submitLoading && <IconSend />}
                         </button>

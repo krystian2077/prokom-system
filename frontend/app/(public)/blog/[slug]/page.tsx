@@ -245,24 +245,24 @@ export default async function BlogPostPage({ params }: Props) {
       )}
 
       {/* Article hero */}
-      <section className="relative overflow-hidden border-b border-gray-100 bg-white">
-        <div className="pointer-events-none absolute inset-0">
+      <section className="relative overflow-hidden border-b border-gray-100 bg-white max-lg:border-b-0">
+        <div className="pointer-events-none absolute inset-0 max-lg:hidden">
           <div className="absolute -right-24 top-0 h-72 w-72 rounded-full bg-red-50 opacity-50 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="relative mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 max-lg:px-5 max-lg:pb-6 max-lg:pt-6">
 
           {/* Breadcrumbs */}
-          <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-prokom-gray">
-            <Link href="/" className="hover:text-prokom-black">Strona główna</Link>
+          <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-prokom-gray max-lg:mb-4 max-lg:text-[11px]">
+            <Link href="/" className="hover:text-prokom-black min-h-[44px] inline-flex items-center lg:min-h-0">Strona główna</Link>
             <span className="text-gray-300">/</span>
-            <Link href="/blog" className="hover:text-prokom-black">Blog</Link>
+            <Link href="/blog" className="hover:text-prokom-black min-h-[44px] inline-flex items-center lg:min-h-0">Blog</Link>
             <span className="text-gray-300">/</span>
-            <span className="text-prokom-black">{post.title}</span>
+            <span className="text-prokom-black line-clamp-1">{post.title}</span>
           </nav>
 
           {/* Meta row */}
-          <div className="mb-5 flex flex-wrap items-center gap-3">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${cs.pill}`}>
+          <div className="mb-5 flex flex-wrap items-center gap-3 max-lg:mb-3 max-lg:gap-2">
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold max-lg:px-3 max-lg:py-1.5 ${cs.pill}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${cs.dot}`} />
               {post.category}
             </span>
@@ -270,18 +270,18 @@ export default async function BlogPostPage({ params }: Props) {
             <span className="text-xs text-prokom-gray">· {post.readingTime} czytania</span>
           </div>
 
-          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-prokom-black sm:text-4xl">
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-prokom-black sm:text-4xl max-lg:text-[24px] max-lg:leading-[1.2]">
             {post.title}
           </h1>
-          <p className="mt-4 text-lg leading-relaxed text-prokom-gray">{post.description}</p>
+          <p className="mt-4 text-lg leading-relaxed text-prokom-gray max-lg:mt-3 max-lg:text-[15px] max-lg:leading-[1.65]">{post.description}</p>
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2 max-lg:mt-4 max-lg:gap-1.5">
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs text-prokom-gray"
+                  className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs text-prokom-gray max-lg:px-2.5 max-lg:py-1 max-lg:text-[11px]"
                 >
                   #{tag}
                 </span>
@@ -291,21 +291,21 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </section>
 
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 max-lg:px-5 max-lg:py-6">
 
         {/* Key Takeaways */}
         {post.keyTakeaways && post.keyTakeaways.length > 0 && (
-          <div className="mb-10 rounded-2xl border border-red-100 bg-red-50/60 p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
+          <div className="mb-10 rounded-2xl border border-red-100 bg-red-50/60 p-6 max-lg:mb-6 max-lg:rounded-[20px] max-lg:border-red-100/60 max-lg:bg-red-50/40 max-lg:p-4">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-red-600 max-lg:mb-3 max-lg:text-[10px]">
               Najważniejsze informacje
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-3 max-lg:space-y-2">
               {post.keyTakeaways.map((point) => (
-                <li key={point} className="flex items-start gap-3">
+                <li key={point} className="flex items-start gap-3 max-lg:gap-2.5">
                   <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                     ✓
                   </span>
-                  <span className="text-sm leading-relaxed text-prokom-black">{point}</span>
+                  <span className="text-sm leading-relaxed text-prokom-black max-lg:text-[13px]">{point}</span>
                 </li>
               ))}
             </ul>
@@ -320,16 +320,16 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* FAQ */}
         {post.faq && post.faq.length > 0 && (
-          <div className="mt-14">
-            <h2 className="mb-6 text-xl font-extrabold text-prokom-black">Najczęstsze pytania</h2>
-            <div className="space-y-4">
+          <div className="mt-14 max-lg:mt-8">
+            <h2 className="mb-6 text-xl font-extrabold text-prokom-black max-lg:mb-4 max-lg:text-lg">Najczęstsze pytania</h2>
+            <div className="space-y-4 max-lg:space-y-3">
               {post.faq.map((item, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card"
+                  className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card max-lg:rounded-[20px] max-lg:p-4 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
                 >
-                  <p className="font-bold text-prokom-black">{item.q}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-prokom-gray">{item.a}</p>
+                  <p className="font-bold text-prokom-black max-lg:text-[15px]">{item.q}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-prokom-gray max-lg:mt-1.5 max-lg:text-[13px]">{item.a}</p>
                 </div>
               ))}
             </div>
@@ -338,13 +338,13 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Related service link */}
         {post.relatedServiceHref && post.relatedServiceLabel && (
-          <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-prokom-gray">
+          <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50 p-5 max-lg:mt-6 max-lg:rounded-[20px] max-lg:p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-prokom-gray max-lg:text-[10px]">
               Powiązana usługa
             </p>
             <Link
               href={post.relatedServiceHref}
-              className="mt-2 inline-flex items-center gap-2 text-base font-bold text-primary hover:text-red-700"
+              className="mt-2 inline-flex min-h-[44px] items-center gap-2 text-base font-bold text-primary hover:text-red-700 lg:min-h-0"
             >
               {post.relatedServiceLabel}
               <span>→</span>
@@ -353,30 +353,30 @@ export default async function BlogPostPage({ params }: Props) {
         )}
 
         {/* CTA */}
-        <div className="mt-10 rounded-2xl bg-prokom-black p-8 text-white">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+        <div className="mt-10 rounded-2xl bg-prokom-black p-8 text-white max-lg:mt-6 max-lg:rounded-[20px] max-lg:p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40 max-lg:text-[10px]">
             PRO-KOM Serwis
           </p>
-          <p className="mt-3 text-xl font-extrabold">Masz pytanie lub potrzebujesz naprawy?</p>
-          <p className="mt-2 text-sm leading-relaxed text-white/70">
+          <p className="mt-3 text-xl font-extrabold max-lg:mt-2 max-lg:text-lg max-lg:leading-snug">Masz pytanie lub potrzebujesz naprawy?</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/70 max-lg:text-[13px]">
             Jesteśmy w centrum Rabki-Zdroju przy ul. Orkana 16B. Diagnoza bezpłatna — wycena przed naprawą.
           </p>
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3 max-lg:mt-4 max-lg:flex-col max-lg:gap-2.5">
             <a
               href="tel:883200151"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700 max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               Zadzwoń: 883 200 151
             </a>
             <Link
               href="/zgloszenie"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20 max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               Zgłoś naprawę online
             </Link>
             <Link
               href="/kontakt"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20 max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               Dane i mapa
             </Link>
@@ -385,27 +385,27 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Related posts */}
         {related.length > 0 && (
-          <div className="mt-14">
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-prokom-gray">
+          <div className="mt-14 max-lg:mt-8">
+            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-prokom-gray max-lg:mb-3 max-lg:text-[11px]">
               Powiązane artykuły
             </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-lg:grid-cols-1 max-lg:gap-3">
               {related.map((r) => {
                 const rcs = getCategoryStyle(r.category);
                 return (
                   <Link
                     key={r.slug}
                     href={`/blog/${r.slug}`}
-                    className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-card transition-all hover:border-red-200 hover:shadow-md"
+                    className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-card transition-all hover:border-red-200 hover:shadow-md max-lg:rounded-[20px] max-lg:p-4 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
                   >
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${rcs.pill}`}>
                       <span className={`h-1 w-1 rounded-full ${rcs.dot}`} />
                       {r.category}
                     </span>
-                    <p className="mt-3 text-sm font-bold leading-snug text-prokom-black transition-colors group-hover:text-primary">
+                    <p className="mt-3 text-sm font-bold leading-snug text-prokom-black transition-colors group-hover:text-primary max-lg:mt-2">
                       {r.title}
                     </p>
-                    <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-prokom-gray">
+                    <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-prokom-gray max-lg:text-[12px]">
                       {r.description}
                     </p>
                   </Link>
@@ -416,10 +416,10 @@ export default async function BlogPostPage({ params }: Props) {
         )}
 
         {/* Back link */}
-        <div className="mt-10 border-t border-gray-100 pt-8">
+        <div className="mt-10 border-t border-gray-100 pt-8 max-lg:mt-6 max-lg:pt-5">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-red-700"
+            className="inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-primary hover:text-red-700 lg:min-h-0"
           >
             ← Wróć do bloga
           </Link>

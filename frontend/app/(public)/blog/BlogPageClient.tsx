@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { ArrowRight, CalendarDays, Clock3, Phone, ShieldCheck, Sparkles, UserRound, Wrench } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock3, Phone, Search, ShieldCheck, Sparkles, UserRound, Wrench } from "lucide-react";
 import { BLOG_POSTS, getFeaturedPost } from "@/lib/blog-posts";
 import { BLOG_CATEGORIES, getCategoryStyle } from "@/lib/blog-categories";
 
@@ -96,23 +96,23 @@ function PostCard({ post, reducedMotion }: { post: (typeof BLOG_POSTS)[0]; reduc
       }}
     >
       <Link href={`/blog/${post.slug}`} className="group block h-full">
-        <article className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-red-100 bg-white p-6 shadow-[0_10px_30px_rgba(15,23,42,.08)] transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-[0_18px_44px_rgba(220,38,38,.18)]">
-          <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-red-100/70 blur-2xl" />
+        <article className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-red-100 bg-white p-6 shadow-[0_10px_30px_rgba(15,23,42,.08)] transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-[0_18px_44px_rgba(220,38,38,.18)] max-lg:rounded-[20px] max-lg:border-white/80 max-lg:p-5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+          <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-red-100/70 blur-2xl max-lg:hidden" />
 
-          <div className="relative mb-4 flex items-center justify-between gap-2">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${cs.pill}`}>
+          <div className="relative mb-4 flex items-center justify-between gap-2 max-lg:mb-3">
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold max-lg:px-3 max-lg:py-1.5 max-lg:text-xs ${cs.pill}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${cs.dot}`} />
               {post.category}
             </span>
-            <span className="text-[11px] text-slate-500">{post.readingTime}</span>
+            <span className="text-[11px] text-slate-500 max-lg:text-xs">{post.readingTime}</span>
           </div>
 
-          <h2 className="relative line-clamp-2 text-lg font-semibold leading-tight text-slate-900 transition-colors group-hover:text-red-700">
+          <h2 className="relative line-clamp-2 text-lg font-semibold leading-tight text-slate-900 transition-colors group-hover:text-red-700 max-lg:text-base max-lg:leading-snug">
             {post.title}
           </h2>
-          <p className="relative mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600">{post.description}</p>
+          <p className="relative mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600 max-lg:mt-2 max-lg:line-clamp-2 max-lg:text-[13px]">{post.description}</p>
 
-          <div className="relative mt-5 grid gap-2 border-t border-slate-100 pt-4 text-xs text-slate-500">
+          <div className="relative mt-5 grid gap-2 border-t border-slate-100 pt-4 text-xs text-slate-500 max-lg:mt-auto max-lg:pt-3">
             <span className="inline-flex items-center gap-2">
               <CalendarDays size={13} />
               {formatDate(post.date)}
@@ -123,7 +123,7 @@ function PostCard({ post, reducedMotion }: { post: (typeof BLOG_POSTS)[0]; reduc
             </span>
           </div>
 
-          <span className="relative mt-5 inline-flex items-center gap-2 text-sm font-semibold text-red-700">
+          <span className="relative mt-5 inline-flex items-center gap-2 text-sm font-semibold text-red-700 max-lg:mt-3 max-lg:min-h-[44px] max-lg:items-center">
             Czytaj artykuł
             <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
           </span>
@@ -137,6 +137,7 @@ export default function BlogPageClient() {
   const featured = getFeaturedPost();
   const [activeGroup, setActiveGroup] = useState("Wszystko");
   const [activeCategory, setActiveCategory] = useState("Wszystkie w grupie");
+  const [searchQuery, setSearchQuery] = useState("");
   const reducedMotion = useReducedMotion();
   const variants = makeVariants(Boolean(reducedMotion));
 
@@ -155,70 +156,81 @@ export default function BlogPageClient() {
     return p.category === activeCategory;
   });
 
-  const rest = filtered.filter((p) => !p.featured || activeCategory !== "Wszystkie w grupie");
+  const searchFiltered = searchQuery.trim()
+    ? filtered.filter((p) => {
+        const q = searchQuery.toLowerCase();
+        return (
+          p.title.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q)
+        );
+      })
+    : filtered;
+
+  const rest = searchFiltered.filter((p) => !p.featured || activeCategory !== "Wszystkie w grupie");
 
   return (
     <div className="relative overflow-hidden bg-white text-slate-900">
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 max-lg:hidden">
         <div className="absolute -top-44 left-1/2 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-red-100/80 blur-3xl" />
         <div className="absolute right-0 top-56 h-[320px] w-[320px] rounded-full bg-rose-100/70 blur-3xl" />
       </div>
 
-      <section className="relative border-b border-red-100/80">
+      <section className="relative border-b border-red-100/80 max-lg:border-b-0">
         <motion.div
           variants={variants.container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
-          className="mx-auto max-w-6xl px-4 pb-14 pt-16 sm:px-6 sm:pt-20"
+          className="mx-auto max-w-6xl px-4 pb-14 pt-16 sm:px-6 sm:pt-20 max-lg:px-5 max-lg:pb-8 max-lg:pt-8"
         >
           <motion.div variants={variants.item} className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700">
+            <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 max-lg:px-3.5 max-lg:py-1.5 max-lg:text-[10px]">
               <Sparkles size={13} />
               Blog PRO-KOM Serwis
             </span>
-            <h1 className="mt-5 text-4xl font-semibold leading-[1.2] tracking-tight text-slate-900 sm:text-5xl sm:leading-[1.15]">
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.2] tracking-tight text-slate-900 sm:text-5xl sm:leading-[1.15] max-lg:mt-4 max-lg:text-[26px] max-lg:leading-[1.18]">
               Poradniki serwisowe PRO-KOM w Rabce-Zdroju,
               <span className="block bg-gradient-to-r from-red-700 via-red-600 to-rose-500 bg-clip-text text-transparent">
                 telefony, laptopy i komputery bez tajemnic
               </span>
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg max-lg:mt-3 max-lg:text-[14px] max-lg:leading-[1.7]">
               Praktyczne poradniki i doświadczenie serwisu PRO-KOM. Telefony, laptopy, komputery, drukarki i sprzęt
               poleasingowy - podane lekko, czytelnie i bez lania wody.
             </p>
           </motion.div>
 
-          <motion.div variants={variants.container} className="mt-8 grid gap-3 sm:grid-cols-3">
-            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)]">
-              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+          <motion.div variants={variants.container} className="mt-8 grid gap-3 sm:grid-cols-3 max-lg:mt-5 max-lg:grid-cols-3 max-lg:gap-2">
+            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)] max-lg:rounded-[16px] max-lg:p-3 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500 max-lg:text-[10px]">
                 <Wrench size={13} />
                 Artykułów
               </div>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">{BLOG_POSTS.length}</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900 max-lg:mt-1 max-lg:text-lg">{BLOG_POSTS.length}</p>
             </motion.div>
-            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)]">
-              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)] max-lg:rounded-[16px] max-lg:p-3 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500 max-lg:text-[10px]">
                 <CalendarDays size={13} />
-                Najnowsza publikacja
+                Publikacja
               </div>
-              <p className="mt-2 text-sm font-semibold text-slate-800">{sorted[0] ? formatDate(sorted[0].date) : "Brak danych"}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-800 max-lg:mt-1 max-lg:text-[12px]">{sorted[0] ? formatDate(sorted[0].date) : "Brak danych"}</p>
             </motion.div>
-            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)]">
-              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+            <motion.div variants={variants.item} className="rounded-2xl border border-red-100 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,.06)] max-lg:rounded-[16px] max-lg:p-3 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500 max-lg:text-[10px]">
                 <Clock3 size={13} />
-                Średni czas czytania
+                Czytanie
               </div>
-              <p className="mt-2 text-sm font-semibold text-slate-800">3-6 minut</p>
+              <p className="mt-2 text-sm font-semibold text-slate-800 max-lg:mt-1 max-lg:text-[12px]">3-6 minut</p>
             </motion.div>
           </motion.div>
         </motion.div>
       </section>
 
-      <div className="sticky top-16 z-30 border-b border-red-100 bg-white/85 backdrop-blur-xl">
-        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+      <div className="sticky top-16 z-30 border-b border-red-100 bg-white/85 backdrop-blur-xl max-lg:top-[60px] max-lg:bg-white/95 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06)]">
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 max-lg:px-3 max-lg:py-2.5">
           <div className="overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex min-w-max items-center gap-2">
+            <div className="flex min-w-max items-center gap-2 max-lg:gap-1.5">
               {TOPIC_GROUPS.map((group) => (
                 <button
                   key={group.label}
@@ -227,7 +239,7 @@ export default function BlogPageClient() {
                     setActiveGroup(group.label);
                     setActiveCategory("Wszystkie w grupie");
                   }}
-                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all max-lg:min-h-[40px] max-lg:px-3.5 max-lg:py-2 max-lg:text-[12px] ${
                     activeGroup === group.label
                       ? "border border-red-300 bg-red-50 text-red-700 shadow-[0_6px_18px_rgba(239,68,68,.22)]"
                       : "border border-slate-200 bg-white text-slate-600 hover:border-red-200 hover:text-red-700"
@@ -239,15 +251,15 @@ export default function BlogPageClient() {
             </div>
           </div>
 
-          <div className="mt-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex min-w-max items-center gap-2">
+          <div className="mt-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden max-lg:mt-1.5">
+            <div className="flex min-w-max items-center gap-2 max-lg:gap-1.5">
               <button
                 type="button"
                 onClick={() => {
                   setActiveGroup("Wszystko");
                   setActiveCategory("Wszystkie w grupie");
                 }}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors max-lg:min-h-[40px] max-lg:px-3.5 max-lg:py-2 max-lg:text-[12px] ${
                   activeGroup === "Wszystko" && activeCategory === "Wszystkie w grupie"
                     ? "border border-red-300 bg-red-600 text-white"
                     : "border border-slate-200 bg-white text-slate-600 hover:border-red-200"
@@ -261,7 +273,7 @@ export default function BlogPageClient() {
                   key={cat.slug}
                   type="button"
                   onClick={() => setActiveCategory(cat.label)}
-                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all max-lg:min-h-[40px] max-lg:px-3.5 max-lg:py-2 max-lg:text-[12px] ${
                     activeCategory === cat.label
                       ? "border border-red-300 bg-red-50 text-red-700"
                       : "border border-slate-200 bg-white text-slate-600 hover:border-red-200"
@@ -273,24 +285,37 @@ export default function BlogPageClient() {
               ))}
             </div>
           </div>
+
+          <div className="mt-2 hidden max-lg:block">
+            <div className="relative">
+              <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Szukaj artykułów…"
+                className="min-h-[44px] w-full rounded-2xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-[15px] text-slate-900 placeholder:text-slate-400 focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        {featured && activeGroup === "Wszystko" && activeCategory === "Wszystkie w grupie" && (
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 max-lg:px-4 max-lg:py-6">
+        {featured && activeGroup === "Wszystko" && activeCategory === "Wszystkie w grupie" && !searchQuery.trim() && (
           <motion.section
             initial={{ opacity: 0, y: reducedMotion ? 0 : 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: reducedMotion ? 0.01 : 0.45, ease: "easeOut" }}
-            className="mb-14"
+            className="mb-14 max-lg:mb-8"
           >
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Wyróżniony artykuł</p>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 max-lg:mb-3 max-lg:text-[11px]">Wyróżniony artykuł</p>
             <Link href={`/blog/${featured.slug}`} className="group block">
-              <article className="relative overflow-hidden rounded-[30px] border border-red-100 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(254,242,242,.92))] p-8 shadow-[0_20px_56px_rgba(15,23,42,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-[0_28px_66px_rgba(239,68,68,.20)] sm:p-10">
-                <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-red-200/45 blur-3xl" />
+              <article className="relative overflow-hidden rounded-[30px] border border-red-100 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(254,242,242,.92))] p-8 shadow-[0_20px_56px_rgba(15,23,42,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-[0_28px_66px_rgba(239,68,68,.20)] sm:p-10 max-lg:rounded-[20px] max-lg:border-white/80 max-lg:bg-white max-lg:p-5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
+                <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-red-200/45 blur-3xl max-lg:hidden" />
 
-                <div className="relative mb-4 flex flex-wrap items-center gap-3 text-xs">
+                <div className="relative mb-4 flex flex-wrap items-center gap-3 text-xs max-lg:mb-3 max-lg:gap-2">
                   <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold ${getCategoryStyle(featured.category).pill}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${getCategoryStyle(featured.category).dot}`} />
                     {featured.category}
@@ -299,25 +324,25 @@ export default function BlogPageClient() {
                     <CalendarDays size={13} />
                     {formatDate(featured.date)}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-slate-500">
+                  <span className="inline-flex items-center gap-1.5 text-slate-500 max-lg:hidden">
                     <Clock3 size={13} />
                     {featured.readingTime}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-slate-500">
+                  <span className="inline-flex items-center gap-1.5 text-slate-500 max-lg:hidden">
                     <UserRound size={13} />
                     {FALLBACK_AUTHOR}
                   </span>
                 </div>
 
-                <h2 className="relative max-w-4xl text-2xl font-semibold leading-tight text-slate-900 transition-colors group-hover:text-red-700 sm:text-3xl">
+                <h2 className="relative max-w-4xl text-2xl font-semibold leading-tight text-slate-900 transition-colors group-hover:text-red-700 sm:text-3xl max-lg:text-xl max-lg:leading-snug">
                   {featured.title}
                 </h2>
-                <p className="relative mt-4 max-w-3xl text-base leading-relaxed text-slate-600">{featured.description}</p>
+                <p className="relative mt-4 max-w-3xl text-base leading-relaxed text-slate-600 max-lg:mt-2.5 max-lg:text-[13px] max-lg:leading-[1.65]">{featured.description}</p>
 
                 {featured.keyTakeaways && featured.keyTakeaways.length > 0 && (
-                  <ul className="relative mt-6 grid gap-2 sm:grid-cols-2">
+                  <ul className="relative mt-6 grid gap-2 sm:grid-cols-2 max-lg:mt-4 max-lg:grid-cols-1 max-lg:gap-2">
                     {featured.keyTakeaways.slice(0, 4).map((point) => (
-                      <li key={point} className="flex items-start gap-2 rounded-xl border border-red-100 bg-white/85 p-3 text-sm text-slate-700">
+                      <li key={point} className="flex items-start gap-2 rounded-xl border border-red-100 bg-white/85 p-3 text-sm text-slate-700 max-lg:rounded-[14px] max-lg:p-2.5 max-lg:text-[13px]">
                         <ShieldCheck size={14} className="mt-0.5 shrink-0 text-red-500" />
                         <span>{point}</span>
                       </li>
@@ -325,7 +350,7 @@ export default function BlogPageClient() {
                   </ul>
                 )}
 
-                <div className="relative mt-7 inline-flex items-center gap-2 text-sm font-semibold text-red-700">
+                <div className="relative mt-7 inline-flex items-center gap-2 text-sm font-semibold text-red-700 max-lg:mt-4 max-lg:min-h-[44px] max-lg:items-center">
                   Przeczytaj wyróżniony poradnik
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </div>
@@ -335,14 +360,28 @@ export default function BlogPageClient() {
         )}
 
         <section>
-          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 max-lg:mb-4 max-lg:text-[11px]">
             {rest.length} {rest.length === 1 ? "artykuł" : "artykułów"} · {activeGroup}
             {activeCategory !== "Wszystkie w grupie" ? ` · ${activeCategory}` : ""}
           </p>
 
           {rest.length === 0 ? (
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-10 text-center">
-              <p className="text-slate-600">Brak artykułów dla wybranych filtrów.</p>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-10 text-center max-lg:rounded-[20px] max-lg:p-6">
+              <p className="text-lg font-semibold text-slate-700 max-lg:text-base">Brak wyników</p>
+              <p className="mt-2 text-sm text-slate-500 max-lg:text-[13px]">
+                {searchQuery.trim()
+                  ? `Nie znaleziono artykułów dla „${searchQuery}".`
+                  : "Brak artykułów dla wybranych filtrów."}
+              </p>
+              {searchQuery.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-red-200 bg-white px-5 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50 max-lg:min-h-[44px] max-lg:w-full max-lg:justify-center"
+                >
+                  Wyczyść wyszukiwanie
+                </button>
+              )}
             </div>
           ) : (
             <motion.div
@@ -350,7 +389,7 @@ export default function BlogPageClient() {
               variants={variants.container}
               initial="hidden"
               animate="show"
-              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-lg:grid-cols-1 max-lg:gap-4"
             >
               {rest.map((post) => (
                 <PostCard key={post.slug} post={post} reducedMotion={Boolean(reducedMotion)} />
@@ -364,17 +403,19 @@ export default function BlogPageClient() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
-          className="mt-16 grid gap-5 md:grid-cols-3"
+          className="mt-16 grid gap-5 md:grid-cols-3 max-lg:mt-10 max-lg:grid-cols-1 max-lg:gap-3"
         >
           {TRUST_ITEMS.map((item) => (
             <motion.article
               key={item.title}
               variants={variants.item}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,.06)] transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_18px_42px_rgba(239,68,68,.16)]"
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,.06)] transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_18px_42px_rgba(239,68,68,.16)] max-lg:flex max-lg:items-start max-lg:gap-4 max-lg:rounded-[20px] max-lg:p-5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
             >
-              <div className="mb-3 text-2xl">{item.icon}</div>
-              <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.desc}</p>
+              <div className="mb-3 text-2xl max-lg:mb-0 max-lg:text-xl">{item.icon}</div>
+              <div>
+                <h3 className="text-base font-semibold text-slate-900 max-lg:text-[15px]">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 max-lg:mt-1 max-lg:text-[13px]">{item.desc}</p>
+              </div>
             </motion.article>
           ))}
         </motion.section>
@@ -384,34 +425,34 @@ export default function BlogPageClient() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: reducedMotion ? 0.01 : 0.45, ease: "easeOut" }}
-          className="mt-10 overflow-hidden rounded-[30px] border border-red-200 bg-[linear-gradient(145deg,rgba(254,242,242,.8),rgba(255,255,255,.96))] p-8 shadow-[0_20px_56px_rgba(15,23,42,.10)] sm:p-10"
+          className="mt-10 overflow-hidden rounded-[30px] border border-red-200 bg-[linear-gradient(145deg,rgba(254,242,242,.8),rgba(255,255,255,.96))] p-8 shadow-[0_20px_56px_rgba(15,23,42,.10)] sm:p-10 max-lg:mt-8 max-lg:rounded-[20px] max-lg:border-white/80 max-lg:bg-white max-lg:p-5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-700/90">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-700/90 max-lg:text-[10px]">
             PRO-KOM Serwis · ul. Orkana 16B, Rabka-Zdrój
           </p>
-          <h2 className="mt-3 text-2xl font-semibold text-slate-900 sm:text-3xl">Masz pytanie lub potrzebujesz szybkiej diagnozy?</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
+          <h2 className="mt-3 text-2xl font-semibold text-slate-900 sm:text-3xl max-lg:mt-2 max-lg:text-xl max-lg:leading-tight">Masz pytanie lub potrzebujesz szybkiej diagnozy?</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 max-lg:mt-2 max-lg:text-[13px]">
             Skontaktuj się z nami i dobierzemy najlepsze rozwiązanie: naprawa, modernizacja albo nowy sprzęt.
             Działamy od poniedziałku do piątku 9:00-17:00 i w soboty 9:00-14:00.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-3 max-lg:mt-4 max-lg:flex-col max-lg:gap-2.5">
             <a
               href="tel:883200151"
-              className="inline-flex items-center gap-2 rounded-2xl border border-red-300 bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-300 bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               <Phone size={16} />
               Zadzwoń: 883 200 151
             </a>
             <Link
               href="/zgloszenie"
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-red-200 hover:text-red-700"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-red-200 hover:text-red-700 max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               Zgłoś naprawę online
             </Link>
             <Link
               href="/oferta"
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-red-200 hover:text-red-700"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-red-200 hover:text-red-700 max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               Zobacz ofertę sprzętu
             </Link>

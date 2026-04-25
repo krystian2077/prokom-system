@@ -63,18 +63,31 @@ const steps = [
 
 function StepCardContent({
   step,
+  stepNumber,
 }: {
   step: (typeof steps)[number];
+  stepNumber: number;
 }) {
   return (
     <div className="relative">
+      <div className="flex items-center gap-3 lg:hidden">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-sm">
+          {stepNumber}
+        </span>
+        <span
+          className="text-xs font-semibold uppercase tracking-widest text-primary"
+          style={{ letterSpacing: "0.12em" }}
+        >
+          {step.label}
+        </span>
+      </div>
       <span
-        className="text-xs font-semibold uppercase tracking-widest text-primary"
+        className="hidden text-xs font-semibold uppercase tracking-widest text-primary lg:inline-block"
         style={{ letterSpacing: "0.12em" }}
       >
         {step.label}
       </span>
-      <h3 className="mt-2 text-lg font-extrabold text-dark sm:text-xl lg:text-2xl" style={{ fontWeight: 800 }}>
+      <h3 className="mt-3 text-lg font-extrabold text-dark sm:text-xl lg:mt-2 lg:text-2xl" style={{ fontWeight: 800 }}>
         {step.title}
       </h3>
       <p className="mt-3 text-sm text-neutral sm:text-base" style={{ lineHeight: 1.7 }}>
@@ -149,20 +162,20 @@ export function HowItWorks() {
         <div className="relative mt-10 sm:mt-16">
           <div
             ref={lineRef}
-            className="absolute left-1/2 top-0 hidden w-0.5 -translate-x-1/2 bg-primary transition-all duration-500 ease-out md:block"
+            className="absolute left-1/2 top-0 hidden w-0.5 -translate-x-1/2 bg-primary transition-all duration-500 ease-out lg:block"
             style={{ height: `${lineHeight}%`, minHeight: 0 }}
           />
 
-          <div ref={stepsRef} className="space-y-8 sm:space-y-12 lg:space-y-16">
+          <div ref={stepsRef} className="space-y-10 sm:space-y-12 lg:space-y-16">
             {steps.map((step, i) => {
               const isLeft = i % 2 === 0;
-              const cardClass = "group/card relative w-full max-w-[460px] overflow-hidden rounded-2xl border-[1.5px] border-[#eaeaea] bg-white py-5 px-4 transition-all duration-300 sm:py-6 sm:px-6 lg:py-[26px] lg:px-[28px] lg:rounded-[20px]";
+              const cardClass = "group/card relative w-full max-w-[460px] overflow-hidden bg-white py-5 px-5 transition-all duration-300 sm:py-6 sm:px-6 lg:py-[26px] lg:px-[28px] max-lg:!rounded-[20px] max-lg:!border max-lg:!border-gray-200/60 max-lg:!shadow-premium-card lg:rounded-[20px] lg:border-[1.5px] lg:border-[#eaeaea]";
               const cardStyle = { boxShadow: "0 2px 6px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.07)" };
               const cardHover = { y: -5, borderColor: "rgba(220,30,30,0.22)", boxShadow: "0 8px 24px rgba(220,30,30,0.12), 0 4px 12px rgba(0,0,0,0.06)", transition: { duration: 0.28, ease: [0.25, 0.1, 0.25, 1] } };
               return (
-                <div key={step.label} className="relative flex min-h-0 flex-col items-center md:min-h-[200px] md:flex-row md:items-center">
+                <div key={step.label} className="relative flex min-h-0 flex-col items-center lg:min-h-[200px] lg:flex-row lg:items-center">
                   {/* Desktop: lewa połowa */}
-                  <div className="hidden min-w-0 flex-1 items-center justify-end pr-[30px] md:flex">
+                  <div className="hidden min-w-0 flex-1 items-center justify-end pr-[30px] lg:flex">
                     {isLeft && (
                       <motion.div
                         initial={{ opacity: 0, x: -40 }}
@@ -174,30 +187,30 @@ export function HowItWorks() {
                         whileHover={cardHover}
                       >
                         <div className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover/card:scale-x-100" aria-hidden />
-                        <StepCardContent step={step} />
+                        <StepCardContent step={step} stepNumber={i + 1} />
                       </motion.div>
                     )}
                   </div>
 
                   {/* Kropka — na mobile nad kartą, na desktop na środku */}
-                  <div className="relative z-10 flex shrink-0 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
+                  <div className="relative z-10 hidden shrink-0 lg:flex lg:absolute lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2">
                     <TimelineDot emoji={step.emoji} />
                   </div>
 
                   {/* Mobile: karta zawsze pod kropką; Desktop: prawa połowa */}
-                  <div className="flex w-full flex-1 flex-col items-center pt-4 md:min-w-0 md:items-start md:justify-start md:pl-[30px] md:pt-0">
+                  <div className="flex w-full flex-1 flex-col items-center lg:min-w-0 lg:items-start lg:justify-start lg:pl-[30px]">
                     {(isLeft && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-40px" }}
                         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                        className={`w-full ${cardClass} md:hidden`}
+                        className={`w-full ${cardClass} lg:hidden`}
                         style={cardStyle}
                         whileHover={cardHover}
                       >
                         <div className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover/card:scale-x-100" aria-hidden />
-                        <StepCardContent step={step} />
+                        <StepCardContent step={step} stepNumber={i + 1} />
                       </motion.div>
                     )) || (
                       <motion.div
@@ -205,12 +218,12 @@ export function HowItWorks() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-80px" }}
                         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                        className={`w-full ${cardClass} md:max-w-[460px]`}
+                        className={`w-full ${cardClass} lg:max-w-[460px]`}
                         style={cardStyle}
                         whileHover={cardHover}
                       >
                         <div className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover/card:scale-x-100" aria-hidden />
-                        <StepCardContent step={step} />
+                        <StepCardContent step={step} stepNumber={i + 1} />
                       </motion.div>
                     )}
                   </div>

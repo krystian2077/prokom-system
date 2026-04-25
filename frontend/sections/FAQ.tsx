@@ -139,7 +139,7 @@ export function FAQ() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.03 * (sectionIdx + localIndex) }}
-                  className={`group relative overflow-hidden rounded-2xl border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all duration-200 ${
+                  className={`group relative overflow-hidden rounded-2xl border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all duration-200 max-lg:rounded-[20px] max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] ${
                     isOpen
                       ? "border-[rgba(220,30,30,.35)] bg-[#fff5f5] shadow-[0_18px_45px_rgba(220,30,30,.10),0_10px_30px_rgba(15,23,42,0.06)]"
                       : "border-[#ededed] hover:-translate-y-0.5 hover:border-[rgba(220,30,30,.22)] hover:shadow-[0_14px_34px_rgba(15,23,42,0.07)]"
@@ -156,7 +156,7 @@ export function FAQ() {
                   <button
                     type="button"
                     onClick={() => setOpen(isOpen ? null : globalIndex)}
-                    className="relative flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors sm:px-5 sm:py-4"
+                    className="relative flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors sm:px-5 sm:py-4 max-lg:min-h-[56px] max-lg:px-5 max-lg:py-5"
                     aria-expanded={isOpen}
                   >
                     <div className="flex items-center gap-4">
@@ -172,12 +172,12 @@ export function FAQ() {
                       </p>
                     </div>
                     <span
-                      className={`flex h-7 w-7 items-center justify-center rounded-full border ${
+                      className={`flex h-7 w-7 max-lg:h-10 max-lg:w-10 items-center justify-center rounded-full border ${
                         isOpen ? "border-[rgba(220,30,30,.25)] bg-white" : "border-[#e0e0e0]"
                       }`}
                     >
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
+                        className={`h-4 w-4 max-lg:h-5 max-lg:w-5 transition-transform ${
                           isOpen ? "rotate-180 text-primary" : "text-neutral"
                         }`}
                       />
@@ -209,7 +209,7 @@ export function FAQ() {
   );
 
   return (
-    <section className="bg-[#fafafa] py-12 sm:py-20 lg:py-24">
+    <section className="bg-[#fafafa] max-lg:bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:items-start">
           {/* Lewa kolumna – nagłówek + box CTA */}
@@ -218,7 +218,7 @@ export function FAQ() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 rounded-full bg-[#fff0f0] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary"
+              className="inline-flex items-center gap-2 rounded-full bg-[#fff0f0] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary max-lg:px-5 max-lg:py-2 max-lg:text-xs"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
               Często zadawane pytania
@@ -227,7 +227,7 @@ export function FAQ() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-4 text-2xl font-extrabold tracking-tight text-dark xs:text-3xl sm:text-4xl lg:text-5xl"
+              className="mt-4 text-2xl font-extrabold tracking-tight text-dark xs:text-3xl sm:text-4xl lg:text-5xl max-lg:text-[22px] max-lg:leading-tight"
               style={{ lineHeight: 1.25 }}
             >
               Masz pytania?{" "}
@@ -249,7 +249,7 @@ export function FAQ() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="mt-8 rounded-2xl bg-white p-5 text-sm text-dark shadow-[0_12px_30px_rgba(15,23,42,0.05)] sm:p-6"
+              className="mt-8 rounded-2xl bg-white p-5 text-sm text-dark shadow-[0_12px_30px_rgba(15,23,42,0.05)] sm:p-6 max-lg:rounded-[20px] max-lg:p-6 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
               style={{
                 border: "1px solid rgba(220, 30, 30, 0.14)",
               }}
@@ -263,7 +263,7 @@ export function FAQ() {
               </p>
               <button
                 type="button"
-                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(220,38,38,0.45)]"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(220,38,38,0.45)] max-lg:min-h-[48px] max-lg:rounded-[14px] max-lg:px-6 max-lg:text-base"
               >
                 <PhoneCall className="h-4 w-4" aria-hidden />
                 Zadzwoń do nas
@@ -300,7 +300,7 @@ export function FAQ() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.03 * (sectionIdx + localIndex) }}
-                        className={`group relative overflow-hidden rounded-2xl border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all duration-200 ${
+                        className={`group relative overflow-hidden rounded-2xl border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all duration-200 max-lg:rounded-[20px] max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] ${
                           isOpen
                             ? "border-[rgba(220,30,30,.35)] bg-[#fff5f5] shadow-[0_18px_45px_rgba(220,30,30,0.10),0_10px_30px_rgba(15,23,42,0.06)]"
                             : "border-[#ededed] hover:-translate-y-0.5 hover:border-[rgba(220,30,30,.22)] hover:shadow-[0_14px_34px_rgba(15,23,42,0.07)]"
@@ -318,7 +318,7 @@ export function FAQ() {
                           onClick={() =>
                             setOpen(isOpen ? null : globalIndex)
                           }
-                          className="relative flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors sm:px-5 sm:py-4"
+                          className="relative flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors sm:px-5 sm:py-4 max-lg:min-h-[56px] max-lg:px-5 max-lg:py-5"
                           aria-expanded={isOpen}
                         >
                           <div className="flex items-center gap-4">
@@ -338,12 +338,12 @@ export function FAQ() {
                             </p>
                           </div>
                           <span
-                            className={`flex h-7 w-7 items-center justify-center rounded-full border ${
+                            className={`flex h-7 w-7 max-lg:h-10 max-lg:w-10 items-center justify-center rounded-full border ${
                               isOpen ? "border-[rgba(220,30,30,.25)] bg-white" : "border-[#e0e0e0]"
                             }`}
                           >
                             <ChevronDown
-                              className={`h-4 w-4 transition-transform ${
+                              className={`h-4 w-4 max-lg:h-5 max-lg:w-5 transition-transform ${
                                 isOpen ? "rotate-180 text-primary" : "text-neutral"
                               }`}
                             />

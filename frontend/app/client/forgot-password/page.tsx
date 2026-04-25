@@ -71,6 +71,12 @@ export default function ClientForgotPasswordPage() {
       className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
       style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
     >
+      <div className="login-mobile-brand">
+        <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
+          PRO<span>–</span>KOM
+        </Link>
+        <span className="brand-tagline">Reset hasła</span>
+      </div>
       <div className="card">
         <div className="lp" style={{ minHeight: "320px" }}>
           <Link href="/" className="lp-logo" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900, fontSize: "15px", letterSpacing: "-0.02em", color: "#fff", textDecoration: "none" }}>
@@ -114,7 +120,7 @@ export default function ClientForgotPasswordPage() {
                 />
               </div>
               {message && (message.type === "success" ? (
-                <p className="text-[12px]" style={{ color: "var(--ink2)" }}>{message.text}</p>
+                <p className="success-text">{message.text}</p>
               ) : (
                 <ErrorMessage message={message.text} className="mb-3" />
               ))}

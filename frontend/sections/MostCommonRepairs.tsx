@@ -577,7 +577,7 @@ export function MostCommonRepairs() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[14px]"
+                className="max-sm:flex max-sm:overflow-x-auto max-sm:snap-x max-sm:snap-mandatory max-sm:gap-5 max-sm:pb-4 max-sm:-mx-4 max-sm:px-4 max-sm:[scrollbar-width:none] grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[14px]"
               >
                 {category.repairs.map((repair, i) => (
                   <motion.div
@@ -589,10 +589,7 @@ export function MostCommonRepairs() {
                       delay: i * 0.07,
                       ease: [0.25, 0.1, 0.25, 1],
                     }}
-                    className="group relative overflow-hidden rounded-2xl border border-[#e8e8e8] bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgba(220,30,30,.2)] hover:shadow-[0_10px_28px_rgba(0,0,0,.09),0_0_28px_rgba(220,30,30,.09)]"
-                    style={{
-                      boxShadow: "0 1px 3px rgba(0,0,0,.06)",
-                    }}
+                    className="group relative overflow-hidden rounded-2xl border border-[#e8e8e8] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgba(220,30,30,.2)] hover:shadow-[0_10px_28px_rgba(0,0,0,.09),0_0_28px_rgba(220,30,30,.09)] max-sm:min-w-[280px] max-sm:max-w-[85vw] max-sm:snap-center max-sm:flex-shrink-0 max-lg:rounded-[20px] max-lg:border-[#f0f0f0] max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
                   >
                     <div
                       className="absolute left-0 top-0 h-[3px] w-full origin-left scale-x-0 bg-[#dc1e1e] transition-transform duration-300 group-hover:scale-x-100"
@@ -605,7 +602,7 @@ export function MostCommonRepairs() {
                         Najpopularniejsza
                       </span>
                     )}
-                    <div className="p-5 sm:p-6">
+                      <div className="p-6">
                       <div
                         className="flex h-12 w-12 items-center justify-center rounded-[13px] bg-[#fff0f0] text-[22px] transition-all duration-300 group-hover:rotate-[-5deg] group-hover:scale-105 group-hover:bg-[#dc1e1e]"
                         style={{ fontSize: "22px" }}
@@ -639,7 +636,7 @@ export function MostCommonRepairs() {
               </motion.div>
             </AnimatePresence>
             <div
-              className="mt-6 flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-base font-bold text-[#333] sm:text-lg"
+              className="mt-6 flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-base font-bold text-[#333] sm:text-lg max-lg:rounded-[20px] max-lg:px-6 max-lg:py-5"
               style={{
                 background: "linear-gradient(135deg, #fff8f8 0%, #fff0f0 100%)",
                 borderColor: "rgba(220,30,30,.25)",
@@ -763,15 +760,15 @@ export function MostCommonRepairs() {
 
         {/* CTA */}
         <div className="mt-16 text-center">
-          <h3 className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl">
+          <h3 className="mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl max-lg:text-2xl">
             {CTA_TITLE}
           </h3>
-          <p className="mx-auto mt-3 max-w-2xl text-neutral" style={{ lineHeight: 1.6 }}>
+          <p className="mx-auto mt-3 max-w-2xl text-neutral max-lg:text-sm max-lg:mt-2" style={{ lineHeight: 1.6 }}>
             {CTA_SUBTITLE}
           </p>
           <Link
             href="/zgloszenie"
-            className="mt-6 inline-flex items-center gap-2 rounded-[13px] bg-[#dc1e1e] px-10 py-4 text-lg font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02]"
+            className="mt-6 inline-flex items-center gap-2 rounded-[13px] bg-[#dc1e1e] px-10 py-4 text-lg font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] max-lg:w-full max-lg:justify-center max-lg:rounded-[16px] max-lg:py-[14px] max-lg:text-base max-lg:shadow-[0_4px_20px_rgba(220,30,30,0.28)]"
             style={{
               boxShadow: "0 4px 20px rgba(220,30,30,.32)",
             }}

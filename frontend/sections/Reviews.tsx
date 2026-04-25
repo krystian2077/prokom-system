@@ -77,13 +77,13 @@ export function Reviews() {
   }, []);
 
   return (
-    <section className="bg-[#fafafa] py-12 sm:py-20 lg:py-24">
+    <section className="bg-[#fafafa] max-lg:bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl"
+          className="text-center mt-4 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl max-lg:text-2xl max-lg:leading-tight"
         >
           <span className="text-primary">Zaufanie</span> klientów to nasza najlepsza rekomendacja
         </motion.h2>
@@ -92,7 +92,7 @@ export function Reviews() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.05 }}
-          className="mx-auto mt-6 max-w-2xl text-center text-lg text-[#666] sm:mt-8"
+          className="mx-auto mt-6 max-w-2xl text-center text-lg text-[#666] sm:mt-8 max-lg:text-sm max-lg:mt-4"
         >
           Setki zadowolonych klientów potwierdzają jakość naszego serwisu — sprawdź opinie osób, które skorzystały z naszych usług.
         </motion.p>
@@ -108,27 +108,24 @@ export function Reviews() {
                 duration: 0.45,
                 ease: [0.25, 0.1, 0.25, 1],
               }}
-              className="rounded-2xl border border-[#e8e8e8] bg-white p-8 shadow-lg sm:p-10"
-              style={{
-                boxShadow: "0 4px 6px rgba(0,0,0,.04), 0 20px 48px rgba(0,0,0,.08)",
-              }}
+              className="rounded-2xl border border-[#e8e8e8] bg-white p-8 shadow-[0_4px_6px_rgba(0,0,0,0.04),0_20px_48px_rgba(0,0,0,0.08)] sm:p-10 max-lg:rounded-[20px] max-lg:border-[#f0f0f0] max-lg:p-6 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
             >
-              <Quote className="h-10 w-10 text-[#dc1e1e]/25" aria-hidden />
+              <Quote className="h-10 w-10 text-[#dc1e1e]/25 max-lg:h-8 max-lg:w-8" aria-hidden />
               <div className="mt-4 flex gap-1">
                 {Array.from({ length: 5 }).map((_, j) => (
                   <Star
                     key={j}
-                    className="h-5 w-5 fill-amber-400 text-amber-400"
+                    className="h-5 w-5 fill-amber-400 text-amber-400 max-lg:h-6 max-lg:w-6"
                     aria-hidden
                   />
                 ))}
               </div>
-              <blockquote className="mt-5 text-lg leading-relaxed text-[#333] sm:text-xl" style={{ lineHeight: 1.7 }}>
+              <blockquote className="mt-5 text-lg leading-relaxed text-[#333] sm:text-xl max-lg:text-base max-lg:mt-4" style={{ lineHeight: 1.7 }}>
                 „{review.text}”
               </blockquote>
-              <footer className="mt-6 flex items-center gap-3">
+              <footer className="mt-6 flex items-center gap-3 max-lg:mt-5">
                 <span
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#dc1e1e]/10 font-syne text-lg font-bold text-[#dc1e1e]"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#dc1e1e]/10 font-syne text-lg font-bold text-[#dc1e1e] max-lg:h-10 max-lg:w-10 max-lg:text-base"
                   aria-hidden
                 >
                   {review.name.charAt(0)}
@@ -142,13 +139,13 @@ export function Reviews() {
         </div>
 
         {/* Dots */}
-        <div className="mt-8 flex justify-center gap-2">
+        <div className="mt-8 flex justify-center gap-2 max-lg:gap-3 max-lg:mt-10">
           {REVIEWS.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setIndex(i)}
-              className="h-2 rounded-full transition-all duration-300"
+              className="h-2 rounded-full transition-all duration-300 max-lg:h-2.5"
               style={{
                 width: index === i ? 24 : 8,
                 backgroundColor: index === i ? "#dc1e1e" : "#d1d5db",

@@ -457,20 +457,20 @@ function ProductCard({ product }: { product: Product }) {
         />
       </div>
       <div className="pcard-body">
-        <p className="mb-1 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[#dc1e1e]">
+        <p className="mb-1 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[#dc1e1e] max-lg:text-[10px]">
           {product.cat}
         </p>
-        <h3 className="mb-1.5 text-[12px] font-bold tracking-[-0.01em] text-[#0d0d0d]">
+        <h3 className="mb-1.5 text-[12px] font-bold tracking-[-0.01em] text-[#0d0d0d] max-lg:text-[13px]">
           {product.name}
         </h3>
-        <p className="mb-3 text-[12px] leading-[1.65] text-[#888]">
+        <p className="mb-3 text-[12px] leading-[1.65] text-[#888] max-lg:mb-2 max-lg:text-[12px]">
           {product.desc}
         </p>
-        <div className="flex flex-wrap gap-[5px] text-[9.5px]">
+        <div className="flex flex-wrap gap-[5px] text-[9.5px] max-lg:gap-1.5 max-lg:text-[10px]">
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-[6px] border border-[#e5e5e3] bg-[#f4f4f2] px-2 py-[3px] font-semibold text-[#666]"
+              className="rounded-[6px] border border-[#e5e5e3] bg-[#f4f4f2] px-2 py-[3px] font-semibold text-[#666] max-lg:rounded-[8px] max-lg:border-slate-200 max-lg:bg-slate-50 max-lg:px-2 max-lg:py-1"
             >
               {tag}
             </span>
@@ -540,38 +540,76 @@ export default function AkcesoriaPage() {
     PRODUCTS.filter((p) => p.slug === slug);
 
   return (
-    <div className="min-h-[100vh] bg-[#f4f4f2]">
+    <div className="min-h-[100vh] bg-[#f4f4f2] max-lg:bg-white">
       {/* HERO */}
-      <section className="akcesoria-hero bg-[#0d0e10] pt-[120px] pb-20">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-6 sm:px-[52px] lg:grid lg:grid-cols-[auto_1fr] lg:items-end lg:gap-20">
+      <section className="akcesoria-hero relative bg-[#0d0e10] pt-[120px] pb-20 max-lg:min-h-[68vh] max-lg:pb-8 max-lg:pt-10">
+        <div
+          className="pointer-events-none absolute -right-24 -top-28 h-[520px] w-[520px] max-lg:-right-16 max-lg:-top-20 max-lg:h-[320px] max-lg:w-[320px]"
+          style={{ background: "radial-gradient(ellipse, rgba(220,30,30,.16), transparent 66%)" }}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -left-20 bottom-0 h-[420px] w-[420px] max-lg:-left-14 max-lg:bottom-8 max-lg:h-[240px] max-lg:w-[240px]"
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,.14), transparent 68%)" }}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-55 max-lg:opacity-70"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            maskImage: "radial-gradient(ellipse 90% 80% at 50% 30%, black 25%, transparent 100%)",
+          }}
+          aria-hidden
+        />
+        <span className="pointer-events-none absolute left-8 top-28 h-1.5 w-1.5 rounded-full bg-[#dc1e1e] opacity-80 animate-pulse lg:hidden" />
+        <span className="pointer-events-none absolute right-10 top-40 h-1.5 w-1.5 rounded-full bg-[#8b5cf6] opacity-80 animate-pulse lg:hidden" style={{ animationDelay: "0.8s" }} />
+        <span className="pointer-events-none absolute right-20 bottom-16 h-1.5 w-1.5 rounded-full bg-[#3b82f6] opacity-70 animate-pulse lg:hidden" style={{ animationDelay: "1.5s" }} />
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-6 sm:px-[52px] lg:grid lg:grid-cols-[auto_1fr] lg:items-end lg:gap-20 max-lg:min-h-[inherit] max-lg:justify-center max-lg:gap-5 max-lg:px-5">
           {/* Left */}
-          <div className="animate-fade-up space-y-6">
-            <div className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b7280]">
-              <span className="h-px w-6 rounded-full bg-[#6b7280]" />
+          <div className="animate-fade-up space-y-6 max-lg:space-y-3">
+            <div className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9ca3af]">
+              <span className="h-px w-6 rounded-full bg-[#9ca3af]" />
               Sklep PRO-KOM
             </div>
             <h1
-              className="font-sans text-white font-extrabold leading-[1.02] tracking-tight"
+              className="font-sans text-white font-extrabold leading-[1.02] tracking-tight max-lg:!text-[32px]"
               style={{ fontSize: "clamp(38px,5.2vw,72px)" }}
             >
               Akces
               <span className="text-[#dc1e1e]">oria</span>
             </h1>
-            <p className="max-w-[380px] text-[15px] leading-[1.8] text-[#9ca3af]">
+            <p className="max-w-[380px] text-[15px] leading-[1.8] text-[#9ca3af] max-lg:text-[14px] max-lg:leading-[1.7]">
               Ładowarki, etui, folie i gadżety od sprawdzonych marek. Dostępne
               od ręki w serwisie przy ul. Orkana 16B.
             </p>
-            <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-[#cccccc]">
+            <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-[#d1d5db]">
               {["⚡ GaN", "🛡 Hammer Glass", "🔋 MagSafe", "📱 Etui"].map(
                 (chip) => (
                   <span
                     key={chip}
-                    className="rounded-full border border-white/10 bg-white/[0.06] px-[14px] py-[6px]"
+                    className="rounded-full border border-white/15 bg-white/[0.08] px-[14px] py-[6px] backdrop-blur-sm max-lg:px-3 max-lg:py-1.5"
                   >
                     {chip}
                   </span>
                 )
               )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 md:hidden">
+            <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-3 text-center shadow-[0_10px_24px_rgba(0,0,0,.35)] backdrop-blur-sm">
+              <Image src={getProductById("gan100w").image} alt="GaN 100W" width={64} height={64} className="mx-auto h-12 w-12 object-contain" />
+              <p className="mt-1 text-[10px] font-semibold text-white/85">GaN 100W</p>
+            </div>
+            <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-3 text-center shadow-[0_10px_24px_rgba(0,0,0,.35)] backdrop-blur-sm">
+              <Image src={getProductById("pb-magsafe").image} alt="Powerbank MagSafe" width={64} height={64} className="mx-auto h-12 w-12 object-contain" />
+              <p className="mt-1 text-[10px] font-semibold text-white/85">MagSafe</p>
+            </div>
+            <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-3 text-center shadow-[0_10px_24px_rgba(0,0,0,.35)] backdrop-blur-sm">
+              <Image src={getProductById("etui-iphone").image} alt="Etui iPhone" width={64} height={64} className="mx-auto h-12 w-12 object-contain" />
+              <p className="mt-1 text-[10px] font-semibold text-white/85">Etui</p>
             </div>
           </div>
 
@@ -608,8 +646,8 @@ export default function AkcesoriaPage() {
       </section>
 
       {/* BAND */}
-      <section className="border-b border-[#e5e5e3] bg-white">
-        <div className="mx-auto grid max-w-[1280px] grid-cols-1 border-l border-[#e5e5e3] sm:grid-cols-2 lg:grid-cols-4">
+      <section className="border-b border-[#e5e5e3] bg-white max-lg:border-b-0 max-lg:px-5 max-lg:pb-4 max-lg:pt-2">
+        <div className="mx-auto grid max-w-[1280px] grid-cols-1 border-l border-[#e5e5e3] sm:grid-cols-2 lg:grid-cols-4 max-lg:grid-cols-2 max-lg:gap-2.5 max-lg:border-l-0">
           {[
             {
               icon: "⚡",
@@ -634,29 +672,29 @@ export default function AkcesoriaPage() {
           ].map((item) => (
             <div
               key={item.title}
-              className="flex items-center gap-4 border-r border-[#e5e5e3] px-8 py-7"
+              className="flex items-center gap-4 border-r border-[#e5e5e3] px-8 py-7 max-lg:gap-3 max-lg:rounded-[16px] max-lg:border max-lg:border-slate-100 max-lg:bg-white max-lg:px-3.5 max-lg:py-3.5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[rgba(220,30,30,0.12)] bg-[#fff0f0] text-[18px]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[rgba(220,30,30,0.12)] bg-[#fff0f0] text-[18px] max-lg:h-9 max-lg:w-9 max-lg:flex-shrink-0 max-lg:rounded-[10px] max-lg:text-[16px]">
                 <span>{item.icon}</span>
               </div>
               <div>
-                <p className="text-[13px] font-bold text-[#0d0d0d]">
+                <p className="text-[13px] font-bold text-[#0d0d0d] max-lg:text-[12px]">
                   {item.title}
                 </p>
-                <p className="mt-1 text-[12px] text-[#888]">{item.text}</p>
+                <p className="mt-1 text-[12px] text-[#888] max-lg:mt-0.5 max-lg:text-[11px]">{item.text}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* FILTER BAR — na mobile przewijanie w poziomie, padding żeby nic nie było ucięte */}
-      <div className="sticky top-16 z-[400] mt-4 border-b border-[#e5e5e3] bg-white/95 backdrop-blur sm:mt-6">
+      {/* FILTER BAR */}
+      <div className="sticky top-16 z-[400] mt-4 border-b border-[#e5e5e3] bg-white/95 backdrop-blur sm:mt-6 max-lg:top-[60px] max-lg:mt-2 max-lg:border-b-0 max-lg:bg-white/98 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06)]">
         <div
-          className="akcesoria-categories-scroll mx-auto max-w-[1280px] overflow-x-auto py-3 sm:overflow-visible sm:px-[52px]"
+          className="akcesoria-categories-scroll mx-auto max-w-[1280px] overflow-x-auto py-3 sm:overflow-visible sm:px-[52px] max-lg:py-2.5"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          <div className="flex min-w-max items-center justify-start gap-3 px-4 sm:min-w-0 sm:justify-center sm:px-0">
+          <div className="flex min-w-max items-center justify-start gap-3 px-4 sm:min-w-0 sm:justify-center sm:px-0 max-lg:gap-2 max-lg:px-4">
             {CATEGORIES.map((cat) => {
               const active = activeFilter === cat.slug;
               return (
@@ -664,10 +702,10 @@ export default function AkcesoriaPage() {
                   key={cat.slug}
                   type="button"
                   onClick={() => setActiveFilter(cat.slug)}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 text-[13px] font-semibold transition-colors sm:px-[22px] sm:py-[9px] sm:text-[14px] ${
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 text-[13px] font-semibold transition-colors sm:px-[22px] sm:py-[9px] sm:text-[14px] max-lg:min-h-[40px] max-lg:px-3.5 max-lg:py-2 max-lg:text-[12px] ${
                     active
-                      ? "border-[#0d0d0d] bg-[#0d0d0d] text-white"
-                      : "border-transparent bg-transparent text-[#888] hover:bg-[#f0f0ee] hover:text-[#0d0d0d]"
+                      ? "border-[#0d0d0d] bg-[#0d0d0d] text-white max-lg:border-[#dc1e1e] max-lg:bg-[#dc1e1e]"
+                      : "border-transparent bg-transparent text-[#888] hover:bg-[#f0f0ee] hover:text-[#0d0d0d] max-lg:border-slate-200 max-lg:bg-white max-lg:text-slate-600"
                   }`}
                 >
                   {cat.emoji && <span className="mr-1.5">{cat.emoji}</span>}
@@ -680,8 +718,8 @@ export default function AkcesoriaPage() {
       </div>
 
       {/* PRODUCT SECTIONS */}
-      <section className="bg-[#f4f4f2] pb-24 pt-10">
-        <div className="mx-auto max-w-[1280px] px-4 sm:px-[52px]">
+      <section className="bg-[#f4f4f2] pb-24 pt-10 max-lg:bg-white max-lg:pb-10 max-lg:pt-6">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-[52px] max-lg:px-4">
           {/* Ładowarki */}
           {(activeFilter === "all" || activeFilter === "ladowarki") && (
             <div className="cat-block reveal">
@@ -689,14 +727,14 @@ export default function AkcesoriaPage() {
                 label="ŁADOWARKI"
                 count={getProductsBySlug("ladowarki").length}
               />
-              <div className="grid gap-3 lg:grid-cols-[1.8fr,1fr,1fr]">
+              <div className="grid gap-3 lg:grid-cols-[1.8fr,1fr,1fr] max-lg:grid-cols-1 max-lg:gap-3">
                 {getProductsBySlug("ladowarki")
                   .slice(0, 3)
                   .map((p) => (
                     <ProductCard key={p.id} product={p} />
                   ))}
               </div>
-              <div className="mt-3 grid gap-3 md:grid-cols-3">
+              <div className="mt-3 grid gap-3 md:grid-cols-3 max-lg:grid-cols-1">
                 {getProductsBySlug("ladowarki")
                   .slice(3)
                   .map((p) => (
@@ -708,12 +746,12 @@ export default function AkcesoriaPage() {
 
           {/* Powerbanki */}
           {(activeFilter === "all" || activeFilter === "powerbank") && (
-            <div className="cat-block reveal mt-10">
+            <div className="cat-block reveal mt-10 max-lg:mt-8">
               <CategoryHeader
                 label="POWERBANKI"
                 count={getProductsBySlug("powerbank").length}
               />
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="grid gap-3 md:grid-cols-3 max-lg:grid-cols-1">
                 {getProductsBySlug("powerbank").map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -723,12 +761,12 @@ export default function AkcesoriaPage() {
 
           {/* Etui */}
           {(activeFilter === "all" || activeFilter === "etui") && (
-            <div className="cat-block reveal mt-10">
+            <div className="cat-block reveal mt-10 max-lg:mt-8">
               <CategoryHeader
                 label="ETUI"
                 count={getProductsBySlug("etui").length}
               />
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2 max-lg:grid-cols-1">
                 {getProductsBySlug("etui").map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -738,12 +776,12 @@ export default function AkcesoriaPage() {
 
           {/* Ochrona ekranu */}
           {(activeFilter === "all" || activeFilter === "ochrona") && (
-            <div className="cat-block reveal mt-10">
+            <div className="cat-block reveal mt-10 max-lg:mt-8">
               <CategoryHeader
                 label="OCHRONA EKRANU"
                 count={getProductsBySlug("ochrona").length}
               />
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2 max-lg:grid-cols-1">
                 {getProductsBySlug("ochrona").map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -753,12 +791,12 @@ export default function AkcesoriaPage() {
 
           {/* Uchwyty / Selfie stick */}
           {(activeFilter === "all" || activeFilter === "uchwyty") && (
-            <div className="cat-block reveal mt-10">
+            <div className="cat-block reveal mt-10 max-lg:mt-8">
               <CategoryHeader
                 label="UCHWYTY / SELFIE STICK"
                 count={getProductsBySlug("uchwyty").length}
               />
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4 max-lg:grid-cols-1">
                 {getProductsBySlug("uchwyty").map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -768,12 +806,12 @@ export default function AkcesoriaPage() {
 
           {/* Kable & inne */}
           {(activeFilter === "all" || activeFilter === "kable") && (
-            <div className="cat-block reveal mt-10">
+            <div className="cat-block reveal mt-10 max-lg:mt-8">
               <CategoryHeader
                 label="KABLE"
                 count={getProductsBySlug("kable").length}
               />
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="grid gap-3 md:grid-cols-3 max-lg:grid-cols-1">
                 {getProductsBySlug("kable").map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -784,44 +822,44 @@ export default function AkcesoriaPage() {
       </section>
 
       {/* CTA DARK */}
-      <section className="relative bg-[#0d0e10] py-20">
+      <section className="relative bg-[#0d0e10] py-20 max-lg:bg-white max-lg:py-8 max-lg:px-4">
         <div
-          className="pointer-events-none absolute left-[-100px] top-1/2 h-[500px] w-[500px] -translate-y-1/2"
+          className="pointer-events-none absolute left-[-100px] top-1/2 h-[500px] w-[500px] -translate-y-1/2 max-lg:hidden"
           style={{
             background:
               "radial-gradient(ellipse, rgba(220,30,30,0.07), transparent 65%)",
           }}
           aria-hidden
         />
-        <div className="relative mx-auto grid max-w-[1280px] grid-cols-1 gap-12 px-4 sm:px-[52px] lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="relative mx-auto grid max-w-[1280px] grid-cols-1 gap-12 px-4 sm:px-[52px] lg:grid-cols-[1fr_auto] lg:items-center max-lg:gap-5 max-lg:rounded-[20px] max-lg:border max-lg:border-slate-100 max-lg:bg-white max-lg:p-5 max-lg:shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)]">
           <div>
-            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40 max-lg:mb-2 max-lg:text-slate-400">
               Serwis + Sklep w jednym miejscu
             </p>
             <h2
-              className="font-bold leading-tight tracking-tight text-white"
+              className="font-bold leading-tight tracking-tight text-white max-lg:!text-[22px] max-lg:text-slate-900"
               style={{ fontSize: "clamp(24px,3.2vw,40px)" }}
             >
               Nie wiesz co wybrać?{" "}
               <span className="text-[#dc1e1e]">Pomożemy.</span>
             </h2>
-            <p className="mt-3 max-w-[480px] text-[14px] leading-[1.75] text-[#9ca3af]">
+            <p className="mt-3 max-w-[480px] text-[14px] leading-[1.75] text-[#9ca3af] max-lg:mt-2 max-lg:text-[13px] max-lg:text-slate-500">
               Doradzimy w wyborze akcesoriów, sprawdzimy kompatybilność z Twoim
               urządzeniem i zamówimy co potrzebujesz. Zapraszamy do serwisu lub
               zadzwoń.
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end max-lg:gap-2.5">
             <Link
               href="tel:883200151"
-              className="inline-flex items-center gap-2 rounded-[13px] bg-[#dc1e1e] px-[26px] py-[13px] text-[13px] font-bold text-white shadow-[0_4px_18px_rgba(220,30,30,0.3)] transition-transform duration-150 hover:-translate-y-[1px]"
+              className="inline-flex items-center justify-center gap-2 rounded-[13px] bg-[#dc1e1e] px-[26px] py-[13px] text-[13px] font-bold text-white shadow-[0_4px_18px_rgba(220,30,30,0.3)] transition-transform duration-150 hover:-translate-y-[1px] max-lg:min-h-[48px] max-lg:w-full max-lg:rounded-[14px] max-lg:text-[14px]"
             >
               <Phone className="h-[14px] w-[14px]" />
               Zadzwoń: 883 200 151
             </Link>
             <Link
               href="/kontakt"
-              className="inline-flex items-center gap-2 rounded-[13px] border border-white/10 bg-white/[0.05] px-[26px] py-[13px] text-[13px] font-bold text-[#888] transition-colors duration-150 hover:border-white/18 hover:text-[#ccc]"
+              className="inline-flex items-center justify-center gap-2 rounded-[13px] border border-white/10 bg-white/[0.05] px-[26px] py-[13px] text-[13px] font-bold text-[#888] transition-colors duration-150 hover:border-white/18 hover:text-[#ccc] max-lg:min-h-[48px] max-lg:w-full max-lg:rounded-[14px] max-lg:border-slate-200 max-lg:bg-white max-lg:text-slate-600 max-lg:text-[14px]"
             >
               Odwiedź nas w serwisie
               <ArrowRight className="h-[12px] w-[12px]" />
@@ -835,12 +873,12 @@ export default function AkcesoriaPage() {
 
 function CategoryHeader({ label, count }: { label: string; count: number }) {
   return (
-    <div className="mb-6 flex items-baseline gap-4">
-      <span className="text-[13px] font-black tracking-[-0.01em] text-[#0d0d0d]">
+    <div className="mb-6 flex items-baseline gap-4 max-lg:mb-4 max-lg:gap-3">
+      <span className="text-[13px] font-black tracking-[-0.01em] text-[#0d0d0d] max-lg:text-[12px]">
         {label}
       </span>
-      <div className="h-px flex-1 bg-[#e5e5e3]" />
-      <span className="text-[12px] text-[#888]">
+      <div className="h-px flex-1 bg-[#e5e5e3] max-lg:bg-slate-200" />
+      <span className="text-[12px] text-[#888] max-lg:text-[11px] max-lg:text-slate-400">
         {count} {count === 1 ? "produkt" : "produkty"}
       </span>
     </div>

@@ -109,7 +109,7 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
       <div className={`${panelClass} relative min-h-screen`}>
         <PanelNav user={profile} />
         {showUnverifiedBanner && <UnverifiedBanner email={user.email} />}
-        <main className="relative z-10 min-h-[calc(100vh-62px)]">{children}</main>
+        <main className="relative z-10 min-h-[calc(100dvh-68px)] overflow-x-hidden pb-[calc(env(safe-area-inset-bottom,0px)+100px)] sm:pb-8">{children}</main>
       </div>
     );
   }

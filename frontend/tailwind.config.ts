@@ -105,11 +105,22 @@ const config: Config = {
       boxShadow: {
         soft: "0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
         card: "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08)",
+        "mobile-glass": "0 16px 38px rgba(7, 10, 24, 0.26)",
+        "mobile-glow": "0 8px 26px rgba(220, 30, 30, 0.26)",
+        "mobile-soft": "0 8px 24px rgba(15, 23, 42, 0.16)",
+        "premium-card":
+          "0 2px 8px rgba(15,23,42,0.06), 0 12px 28px rgba(15,23,42,0.09)",
+        "devices-panel":
+          "0 0 0 1px rgba(255,255,255,0.8) inset, 0 2px 8px rgba(220,30,30,0.10), 0 8px 24px rgba(220,30,30,0.12), 0 32px 80px rgba(180,20,20,0.14), 0 80px 160px rgba(0,0,0,0.14), 0 140px 200px rgba(0,0,0,0.08)",
+        "device-card":
+          "0 16px 48px -12px rgba(0,0,0,0.14), 0 8px 24px -8px rgba(0,0,0,0.08)",
       },
       borderRadius: {
         "zgl-card": "22px",
         "zgl-field": "12px",
         "zgl-pill": "9999px",
+        "mobile-card": "24px",
+        "mobile-input": "16px",
       },
       keyframes: {
         stepIn: {
@@ -231,6 +242,7 @@ const config: Config = {
         "count-up": "countUp .35s ease both",
         "spin-fast": "spinFast .8s linear infinite",
         "shimmer-slow": "shimmer 4s linear infinite",
+        "mobile-rise": "fadeUp 0.45s cubic-bezier(.22,1,.36,1) both",
       },
     },
   },

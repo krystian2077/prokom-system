@@ -139,6 +139,12 @@ export default function ClientVerifyEmailPage() {
       className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
       style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
     >
+      <div className="login-mobile-brand">
+        <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
+          PRO<span>–</span>KOM
+        </Link>
+        <span className="brand-tagline">Weryfikacja</span>
+      </div>
       <div className="card">
         <div className="lp" style={{ minHeight: "320px" }}>
           <Link href="/" className="lp-logo" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900, fontSize: "15px", letterSpacing: "-0.02em", color: "#fff", textDecoration: "none" }}>
@@ -180,7 +186,7 @@ export default function ClientVerifyEmailPage() {
                     inputMode="numeric"
                     maxLength={1}
                     autoComplete="one-time-code"
-                    className="fi text-center w-11 h-12 text-lg font-semibold"
+                    className="fi otp-digit text-center w-11 h-12 text-lg font-semibold"
                     style={{ width: "2.75rem" }}
                     value={d}
                     onChange={(e) => handleChange(i, e.target.value)}
@@ -208,7 +214,7 @@ export default function ClientVerifyEmailPage() {
                 </button>
               )}
             </p>
-            {resendMessage && (resendMessage.startsWith("Nowy") ? <p className="text-[12px] mt-2" style={{ color: "var(--ink2)" }}>{resendMessage}</p> : <ErrorMessage message={resendMessage} className="mt-2" />)}
+            {resendMessage && (resendMessage.startsWith("Nowy") ? <p className="success-text mt-2">{resendMessage}</p> : <ErrorMessage message={resendMessage} className="mt-2" />)}
             <Link href="/client/login" className="back mt-6">
               <IconChevronLeft />
               Wróć do logowania

@@ -88,6 +88,12 @@ function ResetPasswordForm() {
         className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
         style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
       >
+        <div className="login-mobile-brand">
+          <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
+            PRO<span>–</span>KOM
+          </Link>
+          <span className="brand-tagline">Nowe hasło</span>
+        </div>
         <div className="card">
           <div className="rp" style={{ maxWidth: "400px", margin: "0 auto" }}>
             <div className="pnl show">
@@ -113,6 +119,12 @@ function ResetPasswordForm() {
       className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
       style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
     >
+      <div className="login-mobile-brand">
+        <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
+          PRO<span>–</span>KOM
+        </Link>
+        <span className="brand-tagline">Nowe hasło</span>
+      </div>
       <div className="card">
         <div className="lp" style={{ minHeight: "320px" }}>
           <Link href="/" className="lp-logo" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900, fontSize: "15px", letterSpacing: "-0.02em", color: "#fff", textDecoration: "none" }}>

@@ -291,21 +291,21 @@ export function UslugiContent() {
   return (
     <div className="uslugi-page bg-[var(--bg)]" style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
       {/* Hero + Stats Bar — jeden ciemny blok, zawartość w tej samej kolumnie (max-width), jak na zdjęciu */}
-      <section className="relative pt-14 pb-0 lg:pt-20 lg:pb-0" style={{ background: "var(--dark)" }}>
-        <div className="absolute inset-0 pointer-events-none opacity-[0.012]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px)", backgroundSize: "80px 80px", maskImage: "radial-gradient(ellipse 90% 70% at 60% 40%, black 20%, transparent 100%)" }} aria-hidden />
-        <div className="absolute -right-10 -top-20 h-[700px] w-[700px] pointer-events-none rounded-full" style={{ background: "radial-gradient(ellipse, rgba(220,30,30,.06), transparent 65%)" }} aria-hidden />
+      <section className="uslugi-hero relative pt-14 pb-0 lg:pt-20 lg:pb-0" style={{ background: "var(--dark)" }}>
+        <div className="uslugi-grid-overlay absolute inset-0 pointer-events-none opacity-[0.012]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px)", backgroundSize: "80px 80px", maskImage: "radial-gradient(ellipse 90% 70% at 60% 40%, black 20%, transparent 100%)" }} aria-hidden />
+        <div className="uslugi-glow absolute -right-10 -top-20 h-[700px] w-[700px] pointer-events-none rounded-full" style={{ background: "radial-gradient(ellipse, rgba(220,30,30,.06), transparent 65%)" }} aria-hidden />
         <div className="relative mx-auto max-w-[1300px] px-5 md:px-8 lg:px-[52px]">
           {/* Hero: 2 kolumny — tekst | collage */}
           <div className="grid grid-cols-1 items-end gap-14 pb-12 pt-6 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:pb-14 lg:pt-8">
             <div>
-              <p className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.72)" }}>
+              <p className="uslugi-hero-eyebrow mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.72)" }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--red)] ring-pulse-dot" aria-hidden />
                 PROFESJONALNY SERWIS ELEKTRONIKI
               </p>
-              <h1 className="text-[clamp(48px,6.8vw,100px)] font-black leading-[1.2] tracking-[-0.058em] text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
+              <h1 className="uslugi-hero-title text-[clamp(48px,6.8vw,100px)] max-lg:text-[clamp(32px,8vw,48px)] font-black leading-[1.2] tracking-[-0.058em] text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
                 Usługi <span style={{ color: "var(--red)" }}>serwisowe.</span>
               </h1>
-              <p className="mt-5 max-w-[420px] text-[15.5px] leading-[1.82]" style={{ color: "rgba(255,255,255,0.78)" }}>
+              <p className="uslugi-hero-desc mt-5 max-w-[420px] text-[15.5px] leading-[1.82]" style={{ color: "rgba(255,255,255,0.78)" }}>
                 Kompleksowa naprawa elektroniki użytkowej i biurowej. Każde urządzenie trafia w ręce doświadczonego technika.
               </p>
               <div className="mt-8 flex flex-wrap gap-2">
@@ -313,7 +313,7 @@ export function UslugiContent() {
                   <a
                     key={id}
                     href={`#${id}`}
-                    className="group flex items-center gap-2 rounded-full border px-4 py-2 text-[12px] font-medium transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--red)] hover:bg-[var(--red)] hover:text-white hover:shadow-[0_4px_14px_rgba(220,30,30,.35)]"
+                    className="uslugi-hero-pill group flex items-center gap-2 rounded-full border px-4 py-2 max-lg:py-2.5 max-lg:min-h-[40px] text-[12px] font-medium transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--red)] hover:bg-[var(--red)] hover:text-white hover:shadow-[0_4px_14px_rgba(220,30,30,.35)]"
                     style={{ borderColor: "rgba(255,255,255,.15)", background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,0.82)" }}
                   >
                     <span className="inline-block transition-transform duration-200 group-hover:scale-125" aria-hidden>{(id === "telefony" && "📱") || (id === "laptopy" && "💻") || (id === "tablety" && "📟") || (id === "komputery" && "🖥") || (id === "drukarki" && "🖨") || (id === "konsole" && "🎮")}</span>
@@ -355,7 +355,7 @@ export function UslugiContent() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="group relative rounded-2xl border py-6 px-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,.4)] lg:px-6"
+                className="uslugi-stat-card group relative rounded-2xl max-lg:rounded-[20px] border py-6 px-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,.4)] lg:px-6"
                 style={{
                   background: "rgba(255,255,255,.045)",
                   borderColor: "rgba(255,255,255,.08)",
@@ -372,12 +372,12 @@ export function UslugiContent() {
                   e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,.25)";
                 }}
               >
-                <p className="text-[22px] font-black tracking-tight text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                <p className="uslugi-stat-main text-[22px] font-black tracking-tight text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
                   {item.main}
-                  <span style={{ color: "var(--red)" }}>{item.accent}</span>
+                  <span className="uslugi-stat-accent" style={{ color: "var(--red)" }}>{item.accent}</span>
                   {item.main2}
                 </p>
-                <p className="mt-2 text-[12px] leading-[1.5] tracking-wide" style={{ color: "rgba(255,255,255,0.68)", fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
+                <p className="uslugi-stat-desc mt-2 text-[12px] leading-[1.5] tracking-wide" style={{ color: "rgba(255,255,255,0.68)", fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
                   {item.desc}
                 </p>
               </div>
@@ -388,7 +388,7 @@ export function UslugiContent() {
 
       {/* CategoryBar — sticky pod PublicNavbar (h-20 = 80px), większy odstęp od Hero */}
       <div
-        className="sticky top-20 z-[400] mt-12 flex flex-wrap justify-center gap-0 border-b px-4 py-0 md:mt-16 md:px-[52px]"
+        className="uslugi-catbar sticky top-20 z-[400] mt-12 flex flex-wrap justify-center gap-0 border-b px-4 py-0 md:mt-16 md:px-[52px]"
         style={{ background: "#fff", borderColor: "var(--border)", boxShadow: "0 2px 16px rgba(0,0,0,.05)" }}
       >
         {SECTION_IDS.map((id) => (
@@ -410,26 +410,26 @@ export function UslugiContent() {
         return (
           <div key={sec.id} role="region" id={sec.id} aria-label={sec.titleWord + " " + sec.titleAccent} className="scroll-mt-[120px]" style={{ background: bg }}>
             <div className="svc-intro reveal relative mx-auto grid max-w-[1300px] grid-cols-1 gap-12 px-5 py-16 md:px-[52px] lg:grid-cols-[1fr_auto] lg:items-end lg:gap-12 lg:px-[52px] lg:pt-[72px] lg:pb-14" data-num={sec.dataNum}>
-              <div className="absolute right-[52px] top-10 pointer-events-none text-[120px] font-black text-transparent select-none max-[1100px]:text-[80px]" style={{ WebkitTextStroke: "1px rgba(0,0,0,.04)" }} aria-hidden>{sec.dataNum}</div>
+              <div className="uslugi-section-num absolute right-[52px] top-10 pointer-events-none text-[120px] font-black text-transparent select-none max-[1100px]:text-[80px]" style={{ WebkitTextStroke: "1px rgba(0,0,0,.04)" }} aria-hidden>{sec.dataNum}</div>
               <div>
                 <p className="mb-2 text-[11px] font-semibold tracking-wide" style={{ color: "var(--red)", fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
                   — {sec.dataNum}
                 </p>
-                <h2 className="text-[clamp(34px,4vw,62px)] font-black leading-[0.9] tracking-[-0.04em]" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                <h2 className="uslugi-section-title text-[clamp(34px,4vw,62px)] font-black leading-[0.9] tracking-[-0.04em]" style={{ fontFamily: "var(--font-dm-sans)" }}>
                   <span style={{ color: "#000" }}>{sec.titleWord} </span>
                   <span style={{ color: "var(--red)" }}>{sec.titleAccent}</span>
                 </h2>
                 <p className="mt-4 max-w-[580px] text-[15px] leading-[1.78]" style={{ color: "var(--text2)" }}>{sec.tagline}</p>
               </div>
-              <div className="flex flex-wrap justify-end gap-2.5" style={{ maxWidth: 320 }}>
-                <p className="mb-3 w-full text-right text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: "var(--muted)", fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
+              <div className="uslugi-brands-col flex flex-wrap justify-end gap-2.5 max-lg:justify-start max-lg:gap-2" style={{ maxWidth: 320 }}>
+                <p className="uslugi-brands-label mb-3 w-full text-right max-lg:text-left text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: "var(--muted)", fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}>
                   <span className="mr-1.5 inline-block h-px w-4 align-middle" style={{ background: "var(--red)" }} aria-hidden />
                   Marki
                 </p>
                 {sec.brands.map((b) => (
                   <span
                     key={b}
-                    className="rounded-xl border-2 px-4 py-2 text-[12px] font-semibold tracking-wide transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(220,30,30,.22)]"
+                    className="uslugi-brand-pill rounded-xl border-2 px-4 py-2 text-[12px] font-semibold tracking-wide transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(220,30,30,.22)]"
                     style={{ borderColor: "rgba(220,30,30,.35)", color: "var(--text)", background: "#fff", boxShadow: "0 2px 8px rgba(220,30,30,.08)" }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = "var(--red)";
@@ -452,7 +452,7 @@ export function UslugiContent() {
                 {sec.layout === "A" ? <PhotoLayoutA photos={sec.photos} index={idx} /> : <PhotoLayoutB photos={sec.photos} index={idx} />}
               </div>
               <div className="content-col order-1 lg:order-none" style={{ gridArea: "content" }}>
-                <div className="text-[15px] leading-[1.88] mb-8" style={{ color: "var(--text2)" }} dangerouslySetInnerHTML={{ __html: sec.description.replace(/\*\*(.*?)\*\*/g, "<strong style='color:var(--text);font-weight:600'>$1</strong>").replace(/\n/g, "<br />") }} />
+                <div className="uslugi-section-desc text-[15px] leading-[1.88] mb-8" style={{ color: "var(--text2)" }} dangerouslySetInnerHTML={{ __html: sec.description.replace(/\*\*(.*?)\*\*/g, "<strong style='color:var(--text);font-weight:600'>$1</strong>").replace(/\n/g, "<br />") }} />
                 <RepairBlock emoji={sec.blockEmoji} repairs={sec.repairs} isEven={!isOdd} />
                 <Link href="/zgloszenie" className="cta-btn group relative mt-8 inline-flex items-center gap-2 overflow-hidden rounded-[13px] px-7 py-3.5 text-[14px] font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_26px_rgba(220,30,30,.35)]" style={{ background: "var(--dark)", boxShadow: "0 3px 14px rgba(0,0,0,.14)" }} onMouseEnter={(e) => { e.currentTarget.style.background = "var(--red)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "var(--dark)"; }}>
                   <span className="absolute inset-0 rounded-[13px] opacity-0 transition-opacity group-hover:opacity-100" style={{ background: "linear-gradient(135deg, rgba(255,255,255,.1) 0%, transparent 60%)" }} />
@@ -466,12 +466,12 @@ export function UslugiContent() {
       })}
 
       {/* GuaranteeStrip */}
-      <section className="px-5 py-16 md:px-[52px]" style={{ background: "var(--dark)", paddingTop: 72, paddingBottom: 72 }}>
+      <section className="uslugi-guarantee-strip px-5 py-16 md:px-[52px]" style={{ background: "var(--dark)", paddingTop: 72, paddingBottom: 72 }}>
         <div className="mx-auto grid max-w-[1300px] grid-cols-1 gap-5 max-[520px]:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {GUARANTEE_ITEMS.map((item, i) => (
             <div
               key={i}
-              className="reveal delay-1 relative rounded-[18px] border p-6 pb-8 transition-all hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,.3)]"
+              className="uslugi-guarantee-card reveal delay-1 relative rounded-[18px] border p-6 pb-8 transition-all hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,.3)]"
               style={{ background: "rgba(255,255,255,.025)", borderColor: "rgba(255,255,255,.055)" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(255,255,255,.045)";
@@ -487,25 +487,25 @@ export function UslugiContent() {
               }}
             >
               <div className="guarantee-after absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-[var(--red)] to-transparent opacity-0 transition-opacity" />
-              <span className="flex h-12 w-12 items-center justify-center rounded-[13px] text-xl" style={{ background: "rgba(220,30,30,.07)", border: "1px solid rgba(220,30,30,.22)" }}>{item.emoji}</span>
-              <h3 className="mt-4 text-[12.5px] font-bold leading-snug text-white" style={{ fontFamily: "var(--font-dm-sans)", letterSpacing: "-0.01em" }}>{item.titlePrefix}<span style={{ color: "var(--red)" }}>{item.titleAccent}</span></h3>
-              <p className="mt-2 text-[13px] leading-[1.72]" style={{ color: "#9ca3af" }}>{item.desc}</p>
+              <span className="uslugi-guarantee-emoji flex h-12 w-12 items-center justify-center rounded-[13px] text-xl" style={{ background: "rgba(220,30,30,.07)", border: "1px solid rgba(220,30,30,.22)" }}>{item.emoji}</span>
+              <h3 className="uslugi-guarantee-title mt-4 text-[12.5px] font-bold leading-snug text-white" style={{ fontFamily: "var(--font-dm-sans)", letterSpacing: "-0.01em" }}>{item.titlePrefix}<span style={{ color: "var(--red)" }}>{item.titleAccent}</span></h3>
+              <p className="uslugi-guarantee-desc mt-2 text-[13px] leading-[1.72]" style={{ color: "#9ca3af" }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* DarkCTA */}
-      <section className="relative px-5 py-20 text-center md:px-[52px]" style={{ background: "var(--dark)", paddingTop: 88, paddingBottom: 88 }}>
+      <section className="uslugi-dark-cta relative px-5 py-20 text-center md:px-[52px]" style={{ background: "var(--dark)", paddingTop: 88, paddingBottom: 88 }}>
         <div className="absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 pointer-events-none rounded-full" style={{ background: "radial-gradient(ellipse, rgba(220,30,30,.065), transparent 65%)" }} aria-hidden />
         <p className="relative text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "rgba(255,255,255,0.72)", marginBottom: 24 }}>ul. Orkana 16B · Rabka-Zdrój · Bezpłatna diagnostyka</p>
-        <h2 className="relative text-[clamp(42px,6vw,80px)] font-black leading-[0.87] tracking-[-0.055em] text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        <h2 className="relative text-[clamp(42px,6vw,80px)] max-lg:text-[clamp(32px,8vw,48px)] font-black leading-[0.87] tracking-[-0.055em] text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
           Zepsute? <span style={{ color: "var(--red)" }}>Naprawimy.</span>
         </h2>
         <p className="relative mx-auto mt-6 max-w-[500px] text-[15px] leading-[1.8] mb-10" style={{ color: "rgba(255,255,255,0.78)" }}>
           Przynieś sprzęt do serwisu, wyślij kurierem lub zadzwoń. Bezpłatna wycena, szybka realizacja, gwarancja na każdą usługę.
         </p>
-        <div className="relative flex flex-wrap items-center justify-center gap-4 max-[520px]:flex-col">
+        <div className="uslugi-cta-actions relative flex flex-wrap items-center justify-center gap-4 max-lg:flex-col max-lg:gap-3">
           <a href="tel:883200151" className="inline-flex items-center gap-2 rounded-[13px] px-8 py-4 text-[15px] font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(220,30,30,.5)]" style={{ background: "var(--red)", boxShadow: "0 4px 20px rgba(220,30,30,.38)" }}>📞 883 200 151</a>
           <Link href="/zgloszenie" className="inline-flex items-center gap-2 rounded-[13px] border px-8 py-4 text-[15px] font-bold text-white transition-all hover:-translate-y-0.5" style={{ borderColor: "rgba(255,255,255,.12)" }}>Zgłoś naprawę online</Link>
         </div>

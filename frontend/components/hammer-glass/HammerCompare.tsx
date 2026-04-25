@@ -118,22 +118,25 @@ function renderCell(value: CellValue, isPremium?: boolean) {
 
 export default function HammerCompare() {
   return (
-    <section className="bg-white py-24">
-      <div className="mx-auto max-w-6xl px-6 lg:px-20">
+    <section className="bg-white py-16 lg:py-24">
+      <div className="mx-auto max-w-6xl px-5 lg:px-20">
         <div className="text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#dc1e1e] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-white">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#e11d1d] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-white">
             Pełne porównanie
           </span>
-          <h2 className="text-4xl font-bold leading-tight tracking-tight text-[#0d0d0d] sm:text-5xl lg:text-[3rem]">
+          <h2 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0d0d0d] sm:text-5xl lg:text-[3rem]">
             Wszystkie parametry
             <br />
-            <span className="mt-3 block text-[#dc1e1e] sm:mt-4">
+            <span className="mt-2 block text-[#e11d1d] sm:mt-4">
               w jednym miejscu
             </span>
           </h2>
         </div>
 
-        <div className="mt-14 overflow-hidden rounded-[18px] border border-[rgba(0,0,0,0.09)] shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+        <div className="mt-10 lg:mt-14 overflow-hidden rounded-[20px] lg:rounded-[18px] border border-slate-100 lg:border-[rgba(0,0,0,0.09)] shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+          <p className="px-4 py-3 text-[12px] font-medium text-slate-400 bg-slate-50 border-b border-slate-100 lg:hidden text-center">
+            ← Przewiń w prawo, aby zobaczyć wszystkie folie →
+          </p>
           <div className="overflow-x-auto">
             <table className="min-w-[920px] w-full border-collapse bg-white">
               <thead className="bg-[#fafafa] border-b-2 border-[rgba(0,0,0,0.08)]">
