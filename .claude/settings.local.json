@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python manage.py runserver 8000)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -E \"\\\\.py$\")",
+      "Read(//d/prokom-system/frontend/**)",
+      "Bash(npx tsc:*)",
+      "Bash(\"D:/prokom-system/frontend/node_modules/.bin/tsc\" --noEmit --project \"D:/prokom-system/frontend/tsconfig.json\")",
+      "Bash(npx next:*)",
+      "Bash(netstat -ano)",
+      "Bash(grep -E :300[0-9])",
+      "Bash(wmic process:*)"
+    ]
+  }
+}
