@@ -21,7 +21,7 @@ export default function HammerCta() {
             Ochroń swój sprzęt już{" "}
             <span className="not-italic text-[#dc1e1e]">dziś.</span>
           </h2>
-          <p className="mx-auto mb-10 mt-3 max-w-[480px] text-[16px] leading-[1.7] text-[#444]">
+          <p className="mx-auto mb-10 mt-3 max-w-[480px] text-[16px] leading-[1.7] text-[#a0a8b8]">
             Wpadnij do naszego serwisu w Rabce-Zdroju — wytniemy i założymy folię
             ochronną Hammer Glass CUT w kilka minut.
           </p>

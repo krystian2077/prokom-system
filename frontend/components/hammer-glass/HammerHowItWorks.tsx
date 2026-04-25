@@ -48,47 +48,33 @@ export default function HammerHowItWorks() {
           </h2>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="mt-20 overflow-hidden rounded-[22px] border border-[rgba(0,0,0,0.06)] bg-[rgba(0,0,0,0.05)]"
-        >
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ staggerChildren: 0.06, delayChildren: 0.08 }}
-            className="grid grid-cols-1 gap-px bg-[rgba(0,0,0,0.04)] sm:grid-cols-5"
-          >
-            {steps.map((step, idx) => (
-              <motion.div
-                key={step.number}
-                className="flex h-full flex-col bg-[#fafafa] p-7 transition-all duration-200 hover:-translate-y-1 hover:bg-white sm:p-9 rounded-[20px] border border-white/60 shadow-[0_10px_28px_rgba(15,23,42,0.08)]"
-                transition={{
-                  duration: 0.45,
-                  ease: [0.25, 0.1, 0.25, 1],
-                  delay: idx * 0.06,
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-              >
-                <div className="mb-[18px] flex-shrink-0">
-                  <div className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-gradient-to-br from-[#ff4b4b] to-[#dc1e1e] font-syne text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(220,30,30,0.45)]">
-                    {step.number}
-                  </div>
+        <div className="mt-20 grid grid-cols-1 gap-4 sm:grid-cols-5">
+          {steps.map((step, idx) => (
+            <motion.div
+              key={step.number}
+              className="group relative flex flex-col rounded-2xl border border-[rgba(0,0,0,0.07)] bg-white p-6 shadow-[0_2px_12px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgba(220,30,30,0.18)] hover:shadow-[0_12px_32px_rgba(15,23,42,0.1)]"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1], delay: idx * 0.07 }}
+            >
+              <div className="mb-5 flex-shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ff4b4b] to-[#dc1e1e] font-syne text-[15px] font-bold text-white shadow-[0_4px_14px_rgba(220,30,30,0.4)] transition-shadow duration-300 group-hover:shadow-[0_6px_20px_rgba(220,30,30,0.55)]">
+                  {step.number}
                 </div>
-                <h3 className="mb-2 font-syne text-[15px] font-semibold leading-[1.25] text-[#0d0d0d]">
-                  {step.title}
-                </h3>
-                <p className="text-[12.5px] leading-[1.65] text-[#aaa]">
-                  {step.desc}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
+              </div>
+              <h3 className="mb-2 font-syne text-[14.5px] font-bold leading-snug text-[#0d0d0d]">
+                {step.title}
+              </h3>
+              <p className="text-[12.5px] leading-[1.7] text-[#888]">
+                {step.desc}
+              </p>
+              {idx < steps.length - 1 && (
+                <div className="pointer-events-none absolute -right-2.5 top-9 hidden h-px w-5 bg-gradient-to-r from-[rgba(220,30,30,0.3)] to-[rgba(220,30,30,0.1)] sm:block" />
+              )}
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
