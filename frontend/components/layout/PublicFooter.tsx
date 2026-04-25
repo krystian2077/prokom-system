@@ -18,7 +18,7 @@ const shop = [
 ];
 
 const info = [
-  { href: "/o-nas", label: "O nas" },
+  { href: "https://www.pro-kom.eu/index.php/firma", label: "O nas", external: true },
   { href: "/faq", label: "FAQ" },
   { href: "/blog", label: "Blog" },
   { href: "/obslugiwane-miejscowosci", label: "Obsługiwane miejscowości" },
@@ -127,14 +127,25 @@ export function PublicFooter() {
                 Informacje
               </h3>
               <ul className="mt-4 space-y-3 text-sm sm:space-y-2.5">
-                {info.map(({ href, label }) => (
+                {info.map(({ href, label, external }) => (
                   <li key={href}>
-                    <Link
-                      href={href}
-                      className="inline-block py-1.5 text-white/80 transition-colors hover:text-white"
-                    >
-                      {label}
-                    </Link>
+                    {external ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block py-1.5 text-white/80 transition-colors hover:text-white"
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={href}
+                        className="inline-block py-1.5 text-white/80 transition-colors hover:text-white"
+                      >
+                        {label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
