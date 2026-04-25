@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(grep -r storage D:prokom-systemfrontend --include=*.ts --include=*.tsx --exclude-dir=node_modules --exclude-dir=.next)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
+    ]
+  }
+}
