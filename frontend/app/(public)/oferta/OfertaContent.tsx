@@ -989,7 +989,7 @@ export function OfertaContent() {
                   setFormLoading(true);
                   const fd = new FormData(e.currentTarget);
                   try {
-                    const res = await fetch("/api/proxy/communications/inquiry/", {
+                    const res = await fetch("/api/proxy/communications/inquiry", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({

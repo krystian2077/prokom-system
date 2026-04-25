@@ -15,4 +15,5 @@ urlpatterns = [
     path("send/", SendMessageAction.as_view(), name="communications-send"),
     path("inbound-email/", EmailInboundWebhookView.as_view(), name="communications-inbound-email"),
     path("inquiry/", InquiryFormView.as_view(), name="communications-inquiry"),
+    path("inquiry", InquiryFormView.as_view(), name="communications-inquiry-noslash"),
 ]
