@@ -41,6 +41,6 @@ def test_staff_notification_detail_get_is_scoped_to_logged_user(api_client):
     foreign_response = api_client.get(reverse("accounts:notifications-detail", kwargs={"pk": foreign.id}))
 
     assert mine_response.status_code == 200
-    assert mine_response.data["id"] == mine.id
+    assert mine_response.data["id"] == str(mine.id)
     assert foreign_response.status_code == 404
 

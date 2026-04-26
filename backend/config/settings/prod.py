@@ -26,6 +26,13 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# Dodatkowe nagłówki security (m.in. Permissions-Policy) bez wdrażania pełnego CSP.
+MIDDLEWARE = [*MIDDLEWARE, "apps.common.security_headers.SecurityHeadersMiddleware"]
 
 # =============================================================================
 # BAZA DANYCH — Render Managed PostgreSQL

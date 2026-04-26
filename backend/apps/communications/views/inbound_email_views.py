@@ -16,6 +16,7 @@ class EmailInboundWebhookView(APIView):
     """POST — przetwarza skrzynkę przychodzącą (treść w JSON)."""
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_scope = "public_inbound_webhook"
 
     def post(self, request):
         secret = getattr(settings, "EMAIL_INBOUND_WEBHOOK_SECRET", "") or ""

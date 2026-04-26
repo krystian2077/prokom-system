@@ -199,6 +199,26 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "120/minute",
+        "user": "600/minute",
+        "auth_login": "8/minute",
+        "auth_staff_login": "8/minute",
+        "auth_register": "10/hour",
+        "auth_verify_email": "20/hour",
+        "auth_resend_verification": "12/hour",
+        "auth_request_password_reset": "10/hour",
+        "auth_reset_password": "20/hour",
+        "public_submit": "15/hour",
+        "public_track": "60/hour",
+        "public_inquiry": "20/hour",
+        "public_inbound_webhook": "120/hour",
+    },
 }
 
 # =============================================================================

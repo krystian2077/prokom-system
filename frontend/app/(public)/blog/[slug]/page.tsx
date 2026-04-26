@@ -87,8 +87,17 @@ function renderContent(raw: string): string {
     }
   };
 
+  const escapeHtml = (text: string): string =>
+    text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
   const processInline = (text: string): string => {
-    return text
+    const safeText = escapeHtml(text);
+    return safeText
       .replace(/\*\*(.+?)\*\*/g, '<span class="font-bold text-prokom-black">$1</span>')
       .replace(/`(.+?)`/g, '<code class="rounded bg-gray-100 px-1.5 py-0.5 text-sm font-mono text-prokom-black">$1</code>')
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="font-medium text-primary underline underline-offset-2 hover:text-red-700">$1</a>');

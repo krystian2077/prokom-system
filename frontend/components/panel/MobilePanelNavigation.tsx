@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ComponentType, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Bell,
@@ -15,12 +15,13 @@ import {
   Wrench,
   X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { usePanelBasePath } from "@/lib/panelPaths";
 
 type NavItem = {
   href: string;
   label: string;
-  icon: ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
 };
 
 function isActive(pathname: string, href: string): boolean {

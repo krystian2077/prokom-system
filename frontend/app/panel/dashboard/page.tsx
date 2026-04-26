@@ -2,12 +2,12 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { createPortal } from "react-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { partUsageDisplayName, type PartUsage, type RepairRequestListItem } from "@/types/repairs";
 import type { PartsDashboardSummary } from "@/types/inventory";
-import { PartUsageDetailModal } from "@/components/panel/PartUsageDetailModal";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWorkerStore, type DashboardScope } from "@/stores/workerStore";
@@ -16,6 +16,11 @@ import { motion } from "framer-motion";
 import { ScopeBar } from "@/components/layout/ScopeBar";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { usePanelBasePath } from "@/lib/panelPaths";
+
+const PartUsageDetailModal = dynamic(
+  () => import("@/components/panel/PartUsageDetailModal").then((mod) => mod.PartUsageDetailModal),
+  { ssr: false },
+);
 
 type Scope = DashboardScope;
 
@@ -1272,7 +1277,7 @@ export default function StaffDashboardPageWithSuspense() {
   );
 }
 
-export function DashboardBottomNavPortal() {
+function DashboardBottomNavPortal() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;

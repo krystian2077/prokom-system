@@ -156,6 +156,7 @@ class LoginView(APIView):
     Limity: 10 prób z IP / 15 min → 429; 20 prób na konto / 15 min → blokada konta + e-mail.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "auth_login"
 
     def post(self, request):
         blocked, response = _check_login_ip_block(request)
@@ -196,6 +197,7 @@ class StaffLoginView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_scope = "auth_staff_login"
 
     def post(self, request):
         blocked, response = _check_login_ip_block(request)
@@ -256,6 +258,7 @@ class RegisterView(APIView):
     Zwraca: { "email": "..." }.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "auth_register"
 
     def post(self, request):
         serializer = ClientRegisterSerializer(data=request.data)
@@ -324,6 +327,7 @@ class VerifyEmailView(APIView):
     Sprawdza kod OTP. Maks. 5 prób na kod. Po poprawnym: email_verified=True, zwraca token + user.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "auth_verify_email"
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
@@ -420,6 +424,7 @@ class ResendVerificationCodeView(APIView):
     Wysyła nowy kod OTP. Limity: 60s od ostatniego wysłania, max 5 na godzinę; przy przekroczeniu blokada 1h.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "auth_resend_verification"
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
@@ -512,6 +517,7 @@ class RequestPasswordResetView(APIView):
     Zawsze zwraca 200 (nie ujawniamy, czy konto istnieje). Limit: 3 prośby / 15 min na adres.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "auth_request_password_reset"
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
@@ -559,6 +565,7 @@ class ResetPasswordView(APIView):
     Ustawia nowe hasło i unieważnia token. Min. 8 znaków.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "auth_reset_password"
 
     def post(self, request):
         token_str = (request.data.get("token") or "").strip()

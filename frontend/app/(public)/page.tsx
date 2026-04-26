@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 
 export const metadata: Metadata = {
   title: "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój",
@@ -19,13 +20,14 @@ import { Hero } from "@/sections/Hero";
 import { TrustStats } from "@/sections/TrustStats";
 import { DeviceCategories } from "@/sections/DeviceCategories";
 import { HowItWorks } from "@/sections/HowItWorks";
-import { HammerGlass } from "@/sections/HammerGlass";
-import { Accessories } from "@/sections/Accessories";
 import { MostCommonRepairs } from "@/sections/MostCommonRepairs";
-import { CTA } from "@/sections/CTA";
-import { Reviews } from "@/sections/Reviews";
-import { FAQ } from "@/sections/FAQ";
-import { Contact } from "@/sections/Contact";
+
+const Reviews = dynamic(() => import("@/sections/Reviews").then((mod) => mod.Reviews));
+const HammerGlass = dynamic(() => import("@/sections/HammerGlass").then((mod) => mod.HammerGlass));
+const Accessories = dynamic(() => import("@/sections/Accessories").then((mod) => mod.Accessories));
+const CTA = dynamic(() => import("@/sections/CTA").then((mod) => mod.CTA));
+const FAQ = dynamic(() => import("@/sections/FAQ").then((mod) => mod.FAQ));
+const Contact = dynamic(() => import("@/sections/Contact").then((mod) => mod.Contact));
 
 export default function HomePage() {
   return (

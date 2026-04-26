@@ -21,6 +21,7 @@ class PublicRepairSubmitView(APIView):
     Zwraca: { "repair_number": "REP-...", "message": "...", "tracking_url": "..." }
     """
     permission_classes = [AllowAny]
+    throttle_scope = "public_submit"
 
     def post(self, request):
         serializer = PublicRepairSubmitSerializer(data=request.data)

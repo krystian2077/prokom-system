@@ -33,6 +33,7 @@ class TrackRepairView(APIView):
     Zwraca: repair_number, status (publiczny), accepted_at, estimated_completion_date, estimated_duration.
     """
     permission_classes = [AllowAny]
+    throttle_scope = "public_track"
 
     def get(self, request):
         ref = (request.query_params.get("ref") or "").strip()

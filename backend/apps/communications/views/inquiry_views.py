@@ -150,6 +150,7 @@ class InquiryFormView(APIView):
     """POST — przyjmuje zapytanie z formularza oferty i wysyla e-mail do serwisu."""
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_scope = "public_inquiry"
 
     def post(self, request):
         try:
