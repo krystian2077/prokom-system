@@ -152,11 +152,32 @@ export function PublicNavbar() {
         <div className="mx-auto flex h-14 min-h-[56px] w-full max-w-[1600px] items-center justify-between gap-4 px-4 sm:h-16 sm:min-h-[64px] sm:px-6 lg:h-20 lg:gap-8 lg:px-8 xl:px-10">
           <Link
             href="/"
-            className={`shrink-0 text-xl font-bold tracking-tight transition-opacity duration-200 hover:opacity-90 sm:text-2xl lg:text-3xl ${
-              isDark ? "text-white" : "text-dark"
-            }`}
+            className="group shrink-0 transition-opacity duration-200 hover:opacity-95"
+            aria-label="PRO-KOM Strona główna"
           >
-            PRO-KOM
+            <span className="flex items-center gap-2.5 sm:gap-3">
+              <span className="flex items-center leading-none">
+                <span
+                  className={`font-unbounded text-[21px] font-extrabold tracking-[-0.05em] sm:text-[24px] lg:text-[28px] ${
+                    isDark ? "text-white" : "text-[#101114]"
+                  }`}
+                >
+                  PRO
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="mx-[1px] inline-block h-[3px] w-3.5 rounded-full bg-primary sm:mx-0.5 sm:w-4 lg:mx-1 lg:w-4.5"
+                >
+                </span>
+                <span
+                  className={`font-unbounded text-[21px] font-extrabold tracking-[-0.05em] sm:text-[24px] lg:text-[28px] ${
+                    isDark ? "text-white" : "text-[#101114]"
+                  }`}
+                >
+                  KOM
+                </span>
+              </span>
+            </span>
           </Link>
 
           <nav
