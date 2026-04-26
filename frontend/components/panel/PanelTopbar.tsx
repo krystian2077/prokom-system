@@ -49,8 +49,10 @@ export function PanelTopbar() {
   const { theme: panelTheme, toggleTheme } = useWorkerPanelTheme();
   const showToast = useWorkerStore((s) => s.addToast);
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const desktopInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileInputRef = useRef<HTMLInputElement | null>(null);
+  const desktopWrapperRef = useRef<HTMLDivElement | null>(null);
+  const mobileWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const breadcrumb = useMemo(() => {
     if (pathname.startsWith("/admin-panel")) {
@@ -276,7 +278,11 @@ export function PanelTopbar() {
       const key = (ev.key || "").toLowerCase();
       if ((ev.ctrlKey || ev.metaKey) && key === "k") {
         ev.preventDefault();
-        inputRef.current?.focus();
+        if (window.matchMedia("(max-width: 767px)").matches) {
+          mobileInputRef.current?.focus();
+        } else {
+          desktopInputRef.current?.focus();
+        }
         if (query.trim().length >= 2) setOpen(true);
       }
       if (ev.key === "Escape") {
@@ -293,7 +299,9 @@ export function PanelTopbar() {
     const onDocDown = (ev: MouseEvent) => {
       const target = ev.target as Node | null;
       if (!target) return;
-      if (wrapperRef.current && !wrapperRef.current.contains(target)) setOpen(false);
+      const inDesktop = desktopWrapperRef.current?.contains(target) ?? false;
+      const inMobile = mobileWrapperRef.current?.contains(target) ?? false;
+      if (!inDesktop && !inMobile) setOpen(false);
     };
     document.addEventListener("mousedown", onDocDown);
     return () => document.removeEventListener("mousedown", onDocDown);
@@ -377,14 +385,14 @@ export function PanelTopbar() {
         </div>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center px-4 md:flex lg:px-8">
-          <div ref={wrapperRef} className="relative w-full max-w-[min(1100px,100%)]">
+          <div ref={desktopWrapperRef} className="relative w-full max-w-[min(1100px,100%)]">
             <div
               className="flex min-h-[48px] w-full items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--s2)_88%,transparent)] px-4 py-2.5 transition-all duration-200 focus-within:border-[var(--bb)] focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_2px_16px_rgba(59,130,246,0.1)]"
               style={{ color: "var(--ink2)", boxShadow: "0 1px 8px rgba(59,130,246,0.07), 0 0 0 1px rgba(59,130,246,0.06)" }}
             >
               <Search size={18} className="shrink-0 opacity-90" />
               <input
-                ref={inputRef}
+                ref={desktopInputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Szukaj naprawy, klienta, IMEI, tel, model..."
@@ -772,24 +780,318 @@ export function PanelTopbar() {
         </div>
       </div>
       <div className="px-3 pb-3 md:hidden">
-        <div ref={wrapperRef} className="relative">
+        <div ref={mobileWrapperRef} className="relative">
           <div
             className="flex min-h-[48px] w-full items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--s2)_88%,transparent)] px-4 py-2.5 transition-all duration-200 focus-within:border-[var(--bb)]"
             style={{ color: "var(--ink2)", boxShadow: "0 1px 8px rgba(59,130,246,0.07), 0 0 0 1px rgba(59,130,246,0.06)" }}
           >
             <Search size={18} className="shrink-0 opacity-90" />
             <input
-              ref={inputRef}
+              ref={mobileInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Szukaj naprawy, klienta, IMEI..."
               onFocus={() => {
                 if (query.trim().length >= 2) setOpen(true);
               }}
+              onKeyDown={(e) => {
+                if (!open || !navItems.length) return;
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  handleNavigate(selectedIndex + 1);
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  handleNavigate(selectedIndex - 1);
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (selectedItem) selectByItem(selectedItem);
+                } else if (e.key === "Escape") {
+                  e.preventDefault();
+                  setOpen(false);
+                }
+              }}
               className="w-full min-w-0 bg-transparent text-sm leading-snug text-[var(--ink)] outline-none placeholder:text-[var(--muted)]"
               autoComplete="off"
             />
           </div>
+
+          {open && (
+            <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-[300] max-h-[66vh] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] shadow-[0_16px_48px_rgba(0,0,0,.2)]">
+              {loading && (
+                <div className="flex items-center gap-3 px-4 py-6 text-[var(--ink2)]">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--blue)] border-t-transparent" />
+                  Szukam…
+                </div>
+              )}
+
+              {!loading && error && <div className="px-4 py-6 text-red-400">{error}</div>}
+
+              {!loading && !error && mergedRepairs.length === 0 && globalClients.length === 0 && devicesFiltered.length === 0 && (
+                <div className="px-4 py-10 text-center text-[var(--muted)]">Brak wyników.</div>
+              )}
+
+              {!loading && !error && (mergedRepairs.length > 0 || globalClients.length > 0 || devicesFiltered.length > 0) && (
+                <div className="flex max-h-[66vh] flex-col overflow-y-auto">
+                  {myRepairs.length > 0 && (
+                    <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
+                      {isAdmin ? "AKTYWNE WYNIKI" : "MOJE NAPRAWY"}
+                    </div>
+                  )}
+
+                  {myRepairs.map((r) => {
+                    const idx = indexByKey.get(`repair:${r.id}`) ?? -1;
+                    const isSelected = idx === selectedIndex;
+                    const urgent = Boolean(r.auto_tags?.includes("pilne"));
+                    const waitingForParts = Boolean(r.auto_tags?.includes("czeka_na_czesc")) || r.status === "waiting_for_parts";
+                    const deadlineHint = deadlineLabelForDate(r.estimated_completion_date);
+
+                    return (
+                      <div
+                        key={r.id}
+                        role="button"
+                        tabIndex={-1}
+                        onMouseDown={(ev) => {
+                          ev.stopPropagation();
+                          goToRepair(r.id);
+                        }}
+                        onMouseEnter={() => {
+                          if (idx >= 0) handleNavigate(idx);
+                        }}
+                        className={[
+                          "flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition",
+                          "hover:bg-[var(--row-hover)]",
+                          isSelected ? "bg-[var(--row-active)]" : "",
+                        ].join(" ")}
+                      >
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                          <span
+                            className={[
+                              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+                              urgent
+                                ? "border-red-500/30 bg-red-500/10"
+                                : waitingForParts
+                                ? "border-emerald-500/30 bg-emerald-500/10"
+                                : "border-[var(--border)] bg-[var(--row-hover)]",
+                            ].join(" ")}
+                          >
+                            <Wrench
+                              size={16}
+                              className={
+                                urgent
+                                  ? "text-red-400"
+                                  : waitingForParts
+                                  ? "text-emerald-400"
+                                  : "text-[var(--blue)]"
+                              }
+                            />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">
+                              {r.repair_number} · {r.device_name}
+                            </p>
+                            <p className="mt-0.5 truncate text-sm text-[var(--ink2)]">
+                              {r.client_name}
+                              {deadlineHint ? ` · Termin: ${deadlineHint}` : ""}
+                            </p>
+                          </div>
+                        </div>
+
+                        {urgent ? (
+                          <span className="flex items-center gap-2 rounded-full border border-red-500/35 bg-red-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-red-400">
+                            <span className="h-2 w-2 rounded-full bg-red-500" />
+                            PILNE
+                          </span>
+                        ) : waitingForParts ? (
+                          <span className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-400">
+                            <Play size={14} />
+                            Montaż
+                          </span>
+                        ) : (
+                          <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
+                            {r.status_display}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {archive.length > 0 && (
+                    <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
+                      ARCHIWUM
+                    </div>
+                  )}
+
+                  {archive.map((r) => {
+                    const idx = indexByKey.get(`repair:${r.id}`) ?? -1;
+                    const isSelected = idx === selectedIndex;
+                    const dateLabel = r.estimated_completion_date ? new Date(r.estimated_completion_date) : new Date(r.created_at);
+                    const dateText = Number.isFinite(dateLabel.getTime())
+                      ? dateLabel.toLocaleDateString("pl-PL", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
+                      : "";
+
+                    return (
+                      <div
+                        key={r.id}
+                        role="button"
+                        tabIndex={-1}
+                        onMouseDown={(ev) => {
+                          ev.stopPropagation();
+                          goToRepair(r.id);
+                        }}
+                        onMouseEnter={() => {
+                          if (idx >= 0) handleNavigate(idx);
+                        }}
+                        className={[
+                          "flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition",
+                          "hover:bg-[var(--row-hover)]",
+                          isSelected ? "bg-[var(--row-active)]" : "",
+                        ].join(" ")}
+                      >
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--row-hover)]">
+                            <CheckCircle2 size={18} className="text-[var(--ink2)]" />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate font-mono text-sm font-semibold text-[var(--white)]">
+                              {r.repair_number} · {r.device_name}
+                            </p>
+                            <p className="mt-0.5 truncate text-sm text-[var(--ink2)]">{r.client_name}</p>
+                          </div>
+                        </div>
+                        <span className="shrink-0 text-xs text-[var(--muted)]">{dateText}</span>
+                      </div>
+                    );
+                  })}
+
+                  {clientSlice.length > 0 && (
+                    <div className="mt-3 px-4 pb-3">
+                      <div className="mb-2 px-0 py-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
+                        KLIENCI
+                      </div>
+                      <div className="space-y-2">
+                        {clientSlice.map((c) => {
+                          const badgeReturns = c.badges?.includes("klient_wraca");
+                          const badgeCompany = c.badges?.includes("firma");
+                          const last = c.last_repair_summary;
+                          const canOpen = Boolean(last?.id);
+                          const idx = indexByKey.get(`client:${c.id}`) ?? -1;
+                          const isSelected = idx === selectedIndex;
+                          return (
+                            <div
+                              key={c.id}
+                              role="button"
+                              tabIndex={-1}
+                              onClick={() => {
+                                if (canOpen && last?.id) goToRepair(last.id);
+                                else setOpen(false);
+                              }}
+                              onMouseEnter={() => {
+                                if (idx >= 0) handleNavigate(idx);
+                              }}
+                              className={[
+                                "cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 transition hover:bg-[var(--row-active)]",
+                                isSelected ? "bg-[var(--row-active)]" : "",
+                              ].join(" ")}
+                            >
+                              <div className="flex items-start gap-3">
+                                <span
+                                  className={[
+                                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-bold",
+                                    badgeCompany
+                                      ? "border-[var(--bb)] bg-[var(--bl)] text-[var(--blue)]"
+                                      : "border-[var(--border)] bg-[var(--row-hover)] text-[var(--white)]",
+                                  ].join(" ")}
+                                >
+                                  {badgeCompany ? (
+                                    <Building2 size={16} />
+                                  ) : c.full_name?.[0] ? (
+                                    c.full_name[0].toUpperCase()
+                                  ) : (
+                                    <UserRound size={16} className="text-[var(--ink2)]" />
+                                  )}
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{c.full_name}</p>
+                                    {last?.repair_number ? (
+                                      <span className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-1 text-[10px] font-semibold text-[var(--ink2)]">
+                                        {last.repair_number}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                  <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{c.email}</p>
+                                </div>
+                              </div>
+                              {(badgeReturns || badgeCompany) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-2">
+                                  {badgeReturns ? (
+                                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold text-emerald-400">
+                                      WRACA
+                                    </span>
+                                  ) : null}
+                                  {badgeCompany ? (
+                                    <span className="rounded-full border border-[var(--bb)] bg-[var(--bl)] px-2 py-1 text-[10px] font-semibold text-[var(--blue)]">
+                                      FIRMA
+                                    </span>
+                                  ) : null}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {deviceSlice.length > 0 && (
+                    <div className="mt-2 px-4 pb-3">
+                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">
+                        URZADZENIA
+                      </div>
+                      <div className="space-y-2">
+                        {deviceSlice.map((d) => {
+                          const idx = indexByKey.get(`device:${d.id}`) ?? -1;
+                          const isSelected = idx === selectedIndex;
+                          return (
+                            <div
+                              key={d.id}
+                              role="button"
+                              tabIndex={-1}
+                              onClick={() => void openLatestRepairForDevice(d)}
+                              onMouseEnter={() => {
+                                if (idx >= 0) handleNavigate(idx);
+                              }}
+                              className={[
+                                "rounded-xl border border-[var(--border)] bg-[var(--row-hover)] px-3 py-2 transition hover:bg-[var(--row-active)]",
+                                isSelected ? "bg-[var(--row-active)]" : "",
+                              ].join(" ")}
+                            >
+                              <div className="flex items-start gap-3">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--row-hover)]">
+                                  <Smartphone size={16} className="text-[var(--blue)]" />
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate font-mono text-xs font-semibold text-[var(--white)]">{d.device_name}</p>
+                                  <p className="mt-0.5 truncate text-[11px] text-[var(--ink2)]">{d.client_name ?? "—"}</p>
+                                  <p className="mt-1 text-[10px] text-[var(--muted)]">
+                                    {d.category ?? "—"} · Napraw: {d.repair_count ?? 0}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>

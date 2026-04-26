@@ -479,14 +479,14 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-[1500px] flex-col gap-6 px-5 py-8">
+    <main className="mx-auto flex min-h-screen max-w-[1500px] flex-col gap-4 overflow-x-hidden px-3 py-4 pb-24 sm:gap-6 sm:px-5 sm:py-8 sm:pb-8">
 
       {/* ── Header ── */}
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-[var(--ink2)]">Panel administratora</p>
-          <h1 className="mt-2 text-2xl font-semibold text-[var(--white)]">Dashboard</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">KPI zarządcze oraz alerty wymagające reakcji zespołu.</p>
+          <h1 className="mt-2 text-xl font-semibold text-[var(--white)] sm:text-2xl">Dashboard</h1>
+          <p className="mt-1 max-w-[38ch] text-sm text-[var(--muted)]">KPI zarządcze oraz alerty wymagające reakcji zespołu.</p>
         </div>
         <button
           type="button"
@@ -501,7 +501,7 @@ export default function AdminDashboardPage() {
       {/* ── Loading ── */}
       {loading && (
         <>
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatCardSkeleton /><StatCardSkeleton /><StatCardSkeleton /><StatCardSkeleton />
           </section>
           <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
@@ -546,14 +546,14 @@ export default function AdminDashboardPage() {
           <section className="grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
 
             {/* Premium Pipeline */}
-            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6">
-              <div className="mb-5 flex items-start justify-between gap-4">
+            <div className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-6">
+              <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Warsztat</div>
                   <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Pipeline statusów</h2>
                   <p className="mt-1 text-xs text-[var(--muted)]">Rozkład aktywnych napraw według etapów</p>
                 </div>
-                <div className="flex items-center gap-4 shrink-0">
+                <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start sm:gap-4">
                   <div className="text-right">
                     <p className="text-2xl font-bold tabular-nums text-[var(--white)]">
                       {pipeline.stages.reduce((a, s) => a + s.count, 0)}
@@ -575,13 +575,13 @@ export default function AdminDashboardPage() {
                     <Link
                       key={stage.label}
                       href={`/admin-panel/repairs?status=${stage.statuses[0]}`}
-                      className="flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-colors hover:bg-white/[0.03]"
+                      className="flex items-center gap-2 rounded-2xl px-2 py-3 transition-colors hover:bg-white/[0.03] sm:gap-4 sm:px-3 sm:py-3.5"
                       style={{ opacity: isDim ? 0.3 : 1, transition: "opacity .15s" }}
                       onMouseEnter={() => setHoveredStage(i)}
                       onMouseLeave={() => setHoveredStage(null)}
                     >
                       {/* Dot + label */}
-                      <div className="flex w-32 shrink-0 items-center gap-2.5">
+                      <div className="flex w-24 shrink-0 items-center gap-2 sm:w-32 sm:gap-2.5">
                         <div
                           className="h-2.5 w-2.5 shrink-0 rounded-full"
                           style={{
@@ -616,9 +616,9 @@ export default function AdminDashboardPage() {
                       </div>
 
                       {/* Count */}
-                      <div className="w-16 shrink-0 text-right">
+                      <div className="w-12 shrink-0 text-right sm:w-16">
                         <span
-                          className="text-xl font-bold tabular-nums transition-colors"
+                          className="text-lg font-bold tabular-nums transition-colors sm:text-xl"
                           style={{ color: isHov ? stage.color : "var(--white)" }}
                         >
                           {stage.count}
@@ -633,18 +633,18 @@ export default function AdminDashboardPage() {
 
                 {pipeline.closed > 0 && (
                   <div
-                    className="flex items-center gap-4 rounded-2xl px-3 py-3.5 border-t border-white/5 mt-1 pt-4"
+                    className="mt-1 flex items-center gap-2 rounded-2xl border-t border-white/5 px-2 py-3 pt-4 sm:gap-4 sm:px-3 sm:py-3.5"
                     style={{ opacity: hoveredStage !== null ? 0.2 : 0.45 }}
                   >
-                    <div className="flex w-32 shrink-0 items-center gap-2.5">
+                    <div className="flex w-24 shrink-0 items-center gap-2 sm:w-32 sm:gap-2.5">
                       <div className="h-2.5 w-2.5 rounded-full bg-white/20" />
                       <span className="text-sm font-medium text-[var(--muted)]">Anulowane</span>
                     </div>
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/5">
                       <div className="h-full w-full rounded-full bg-white/10" />
                     </div>
-                    <div className="w-16 text-right">
-                      <span className="text-xl font-bold tabular-nums text-[var(--muted)]">{pipeline.closed}</span>
+                    <div className="w-12 text-right sm:w-16">
+                      <span className="text-lg font-bold tabular-nums text-[var(--muted)] sm:text-xl">{pipeline.closed}</span>
                     </div>
                   </div>
                 )}
@@ -652,7 +652,7 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Workload per technician */}
-            <div className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+            <div className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-5">
               <div className="mb-4 flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Zespół</div>
@@ -671,11 +671,11 @@ export default function AdminDashboardPage() {
           <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
 
             {/* Centrum uwagi */}
-            <div className="relative flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--s1)]">
+            <div className="relative flex min-w-0 flex-col overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)]">
               {/* Subtle top gradient accent */}
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-              <div className="flex flex-col gap-0 p-6">
+              <div className="flex flex-col gap-0 p-4 sm:p-6">
                 {/* Header */}
                 <div className="mb-6 flex items-start justify-between gap-3">
                   <div>
@@ -747,7 +747,7 @@ export default function AdminDashboardPage() {
                   {tabRepairs.unassigned.length === 0 ? (
                     <p className="text-xs text-[var(--muted)]">Wszystkie naprawy mają przypisanego technika.</p>
                   ) : (
-                    <div className="max-h-[160px] space-y-1.5 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
+                    <div className="max-h-[132px] space-y-1.5 overflow-y-auto pr-0 sm:max-h-[160px] sm:pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
                       {tabRepairs.unassigned.map((r) => (
                         <Link
                           key={r.id}
@@ -789,7 +789,7 @@ export default function AdminDashboardPage() {
                   {notifications.length === 0 ? (
                     <p className="text-xs text-[var(--muted)]">Brak nowych powiadomień.</p>
                   ) : (
-                    <div className="max-h-[260px] space-y-1.5 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
+                    <div className="max-h-[220px] space-y-1.5 overflow-y-auto pr-0 sm:max-h-[260px] sm:pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
                       {notifications.map((n) => {
                         const dot = notifPriorityColor(n.priority);
                         const label = notifTypeLabel(n.notification_type);
@@ -830,23 +830,23 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Top staff performance */}
-            <div className="flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-6">
+            <div className="flex min-w-0 flex-col overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-6">
               {/* Header + period filter */}
-              <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+              <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:flex-wrap">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink2)]">Zespół</p>
                   <h2 className="mt-1.5 text-lg font-semibold text-[var(--white)]">Wyniki techników</h2>
                   <p className="mt-1 text-xs text-[var(--muted)]">Przychód i ukończone naprawy</p>
                 </div>
                 {/* Period tabs */}
-                <div className="flex items-center gap-0.5 rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-0.5">
+                <div className="flex w-full items-center gap-0.5 overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--row-hover)] p-0.5 sm:w-auto">
                   {STAFF_PERIODS.map((p) => (
                     <button
                       key={p.days}
                       type="button"
                       onClick={() => void handleStaffPeriod(p.days)}
                       disabled={staffLoading}
-                      className="rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all disabled:opacity-50"
+                      className="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all disabled:opacity-50"
                       style={
                         staffPeriod === p.days
                           ? { background: "var(--s1)", color: "var(--white)", boxShadow: "0 1px 4px rgba(0,0,0,.35)" }
@@ -960,7 +960,7 @@ export default function AdminDashboardPage() {
                     </div>
 
                     {/* Bucket tabs */}
-                    <div className="mb-3 flex gap-1">
+                    <div className="mb-3 flex gap-1 overflow-x-auto pb-0.5">
                       {PARTS_BUCKETS.map((b) => {
                         const cnt = partsSummary[b.key].count;
                         const isActive = activeBucket === b.key;
@@ -969,7 +969,7 @@ export default function AdminDashboardPage() {
                             key={b.key}
                             type="button"
                             onClick={() => setActiveBucket(b.key)}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-[11px] font-semibold transition-all"
+                            className="flex min-w-[118px] shrink-0 items-center justify-center gap-1.5 rounded-xl border py-2 text-[11px] font-semibold transition-all sm:min-w-0 sm:flex-1"
                             style={
                               isActive
                                 ? { borderColor: b.color + "40", background: b.color + "14", color: b.color }
@@ -1043,7 +1043,7 @@ export default function AdminDashboardPage() {
             const tab = SUBMISSION_TABS.find((t) => t.key === activeTab)!;
             const items = tabRepairs[activeTab];
             return (
-              <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+              <section className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-5">
                 {/* Header */}
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -1057,7 +1057,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Tabs */}
-                <div className="mb-4 flex flex-wrap gap-1.5">
+                <div className="mb-4 flex gap-1.5 overflow-x-auto pb-0.5">
                   {SUBMISSION_TABS.map((t) => {
                     const count = tabRepairs[t.key].length;
                     const isActive = activeTab === t.key;
@@ -1066,7 +1066,7 @@ export default function AdminDashboardPage() {
                         key={t.key}
                         type="button"
                         onClick={() => setActiveTab(t.key)}
-                        className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
+                        className="flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
                         style={
                           isActive
                             ? { borderColor: t.accent + "55", background: t.accent + "18", color: t.accent }
@@ -1139,7 +1139,7 @@ export default function AdminDashboardPage() {
           })()}
 
           {/* ── Row 5: Enhanced last activity ── */}
-          <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+          <section className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-5">
             <div className="mb-4 flex items-end justify-between gap-3">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Aktywność</div>
@@ -1168,7 +1168,7 @@ export default function AdminDashboardPage() {
                 <p className="text-sm text-[var(--ink2)]">Brak niedawnej aktywności.</p>
               </div>
             ) : (
-              <div className="max-h-[448px] space-y-1 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
+              <div className="max-h-[380px] space-y-1 overflow-y-auto pr-0 sm:max-h-[448px] sm:pr-1 [scrollbar-color:rgba(255,255,255,.12)_transparent] [scrollbar-width:thin]">
                 {recentRepairs.map((r) => {
                   const badge = statusBadge(r);
                   const assigned = assignedInfo(r.assigned_to);
@@ -1179,7 +1179,7 @@ export default function AdminDashboardPage() {
                     <Link
                       key={r.id}
                       href={`/admin-panel/repairs/${r.id}`}
-                      className="group flex items-center gap-4 rounded-2xl border bg-[var(--s1)] px-4 py-3.5 transition hover:border-white/15 hover:bg-[var(--row-hover)]"
+                      className="group flex flex-col items-start gap-2 rounded-2xl border bg-[var(--s1)] px-3 py-3 transition hover:border-white/15 hover:bg-[var(--row-hover)] sm:flex-row sm:items-center sm:gap-4 sm:px-4 sm:py-3.5"
                       style={{
                         borderColor: "var(--border)",
                         borderLeftColor: badge.text,
@@ -1187,7 +1187,7 @@ export default function AdminDashboardPage() {
                       }}
                     >
                       {/* Repair number */}
-                      <span className="w-36 shrink-0 font-mono text-xs font-bold text-[var(--white)]">
+                      <span className="w-full shrink-0 truncate font-mono text-xs font-bold text-[var(--white)] sm:w-36">
                         {r.repair_number ?? r.id}
                       </span>
 
@@ -1234,7 +1234,7 @@ export default function AdminDashboardPage() {
                       </span>
 
                       {/* Time */}
-                      <span className="w-12 shrink-0 text-right text-[11px] text-[var(--muted)]">
+                      <span className="w-full shrink-0 text-right text-[11px] text-[var(--muted)] sm:w-12">
                         {relativeTime((r as any).updated_at)}
                       </span>
                     </Link>
@@ -1245,7 +1245,6 @@ export default function AdminDashboardPage() {
           </section>
         </>
       )}
-      <AdminDashboardBottomNavPortal />
     </main>
   );
 }

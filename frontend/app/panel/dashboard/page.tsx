@@ -617,9 +617,9 @@ function StaffDashboardPage() {
   }, [searchParams]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1500px] px-4 py-8">
-      <div className="flex flex-col gap-6">
-        <header className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <main className="mx-auto min-h-screen max-w-[1500px] px-3 py-5 sm:px-4 sm:py-6 lg:py-8">
+      <div className="flex flex-col gap-5 sm:gap-5 lg:gap-6">
+        <header className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.22em] text-[var(--ink2)]">
               Pracownik · {userFirstName}{" "}
@@ -628,15 +628,15 @@ function StaffDashboardPage() {
                 style={{ boxShadow: "0 0 18px rgba(34,197,94,.45)", animation: "pulse 1.6s ease-in-out infinite" }}
               />
             </p>
-            <h1 className="mt-2 text-[28px] font-semibold text-[var(--white)]" style={{ fontFamily: "var(--font-unbounded)" }}>
+            <h1 className="mt-2 text-[34px] leading-[1.04] font-semibold text-[var(--white)] sm:text-[40px]" style={{ fontFamily: "var(--font-unbounded)" }}>
               Dzień dobry, {userFirstName}.
             </h1>
-            <p className="mt-1 text-sm text-[var(--ink2)]">{subtitleByScope}</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--ink2)]">{subtitleByScope}</p>
           </div>
 
-          <div className="flex flex-col items-end gap-3">
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <div className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-2.5 text-sm">
+          <div className="flex flex-col items-stretch gap-4 lg:items-end">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+              <div className="hidden items-center justify-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2 text-sm sm:flex sm:justify-start sm:px-4 sm:py-2.5">
                 <span className="inline-flex items-center justify-center">
                   {isRefreshing ? (
                     <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3b82f6] border-t-transparent" />
@@ -652,7 +652,7 @@ function StaffDashboardPage() {
               <button
                 type="button"
                 onClick={manualRefresh}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-2.5 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60"
+                className="w-full rounded-2xl border border-[var(--border)] bg-[var(--row-hover)] px-4 py-3 text-sm font-semibold text-[var(--ink2)] transition hover:bg-[var(--row-active)] hover:text-[var(--white)] disabled:opacity-60 sm:w-auto sm:py-2.5"
                 disabled={loading}
               >
                 <span className="inline-flex items-center gap-2">
@@ -661,12 +661,15 @@ function StaffDashboardPage() {
                 </span>
               </button>
 
-              <Link href={p.intakePath} className="rounded-2xl bg-[#dc1e1e] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b81818]">
+              <Link
+                href={p.intakePath}
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-[#dc1e1e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#b81818] sm:w-auto sm:py-2.5"
+              >
                 Nowe przyjęcie
               </Link>
             </div>
 
-            <div className="w-full max-w-[560px] rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 shadow-[0_18px_40px_rgba(0,0,0,.16)]">
+            <div className="w-full rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5 shadow-[0_18px_40px_rgba(0,0,0,.16)] sm:max-w-[560px] sm:p-4">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs uppercase tracking-[0.22em] text-[var(--ink2)]">Czas pracy</p>
@@ -689,12 +692,12 @@ function StaffDashboardPage() {
                   ) : null}
                 </div>
 
-                <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="flex flex-col gap-2.5 sm:flex-row">
                   <button
                     type="button"
                     onClick={() => startWorkMutation.mutate()}
                     disabled={Boolean(activeWorkSession) || startWorkMutation.isPending || endWorkMutation.isPending}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#22c55e]/35 bg-[#22c55e]/15 px-4 py-2.5 text-sm font-semibold text-[#86efac] transition hover:bg-[#22c55e]/22 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#22c55e]/35 bg-[#22c55e]/15 px-4 py-3 text-sm font-semibold text-[#86efac] transition hover:bg-[#22c55e]/22 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:py-2.5"
                   >
                     {startWorkMutation.isPending ? (
                       <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -708,7 +711,7 @@ function StaffDashboardPage() {
                     type="button"
                     onClick={() => endWorkMutation.mutate()}
                     disabled={!activeWorkSession || startWorkMutation.isPending || endWorkMutation.isPending}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#dc1e1e]/35 bg-[#dc1e1e]/15 px-4 py-2.5 text-sm font-semibold text-[#ffb4b4] transition hover:bg-[#dc1e1e]/22 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#dc1e1e]/35 bg-[#dc1e1e]/15 px-4 py-3 text-sm font-semibold text-[#ffb4b4] transition hover:bg-[#dc1e1e]/22 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:py-2.5"
                   >
                     {endWorkMutation.isPending ? (
                       <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -727,7 +730,7 @@ function StaffDashboardPage() {
 
         <ScopeBar value={scope} onChange={setScope} />
 
-        <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3">
+        <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-2.5 sm:p-3">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             {[
               {
@@ -791,7 +794,7 @@ function StaffDashboardPage() {
         <section
           ref={requiresActionSectionRef}
           id="requires-action"
-          className="scroll-mt-24 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5"
+          className="scroll-mt-24 rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-5"
         >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
@@ -876,7 +879,7 @@ function StaffDashboardPage() {
 
         <div className="flex flex-col gap-4">
           <div className="grid gap-4 lg:grid-cols-2">
-            <section className="worker-card-shimmer rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+            <section className="worker-card-shimmer overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-5">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Moje naprawy</div>
@@ -889,7 +892,7 @@ function StaffDashboardPage() {
                 </Link>
               </div>
 
-              <div className="mt-4 divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--s1)]">
+              <div className="mt-4 divide-y divide-[var(--border)] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)]">
                 {(loading ? Array.from({ length: 4 }) : myRepairsPreviewRows).map((r: any, idx: number) =>
                   loading ? (
                     <div key={idx} className="h-[62px] animate-pulse px-4 py-3">
@@ -900,23 +903,26 @@ function StaffDashboardPage() {
                     <Link
                       key={r.id}
                       href={p.repairDetailPath(r.id)}
-                      className="group flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-[var(--row-hover)]"
+                      className="group flex flex-col gap-2.5 px-3 py-3.5 transition hover:bg-[var(--row-hover)] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-4 sm:py-3"
                     >
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-semibold text-[var(--ink2)]">{r.repair_number}</span>
-                          <span className="h-7 w-7 rounded-xl bg-[#191d28] border border-[var(--border)]" />
-                          <span className="min-w-0 truncate text-sm font-semibold text-[var(--white)]">{r.device_name}</span>
+                      <div className="min-w-0 w-full sm:w-auto sm:flex-1">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="shrink-0 font-mono text-[11px] font-semibold text-[var(--ink2)] sm:text-xs">{r.repair_number}</span>
+                          <span className="h-7 w-7 shrink-0 rounded-xl border border-[var(--border)] bg-[#191d28]" />
+                          <span className="min-w-0 truncate text-[15px] font-semibold leading-tight text-[var(--white)] sm:text-sm">
+                            {r.device_name}
+                          </span>
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--ink2)]">
-                          <span>{r.client_name}</span>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--ink2)] sm:mt-1.5">
+                          <span className="truncate">{r.client_name}</span>
                           <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-2 py-0.5 font-semibold uppercase tracking-wide text-[10px] text-[var(--ink2)]">
                             {nextAction(r).text.replace("▶ ", "")}
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
+
+                      <div className="flex w-full items-center justify-start sm:w-auto sm:justify-end">
+                        <span className="inline-flex max-w-full items-center rounded-full border border-[var(--border)] bg-[var(--row-hover)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink2)]">
                           {statusBadge(r).label}
                         </span>
                       </div>
@@ -940,7 +946,7 @@ function StaffDashboardPage() {
               ) : null}
             </section>
 
-            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-4 sm:p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Moje zadania</div>
@@ -1020,7 +1026,7 @@ function StaffDashboardPage() {
                           type="button"
                           disabled={finishing}
                           onClick={() => completeDashboardTask.mutate(t.id)}
-                          className="shrink-0 self-center rounded-xl bg-[#22c55e] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#16a34a] disabled:opacity-60"
+                          className="w-full shrink-0 self-center rounded-xl bg-[#22c55e] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#16a34a] disabled:opacity-60 sm:w-auto"
                         >
                           {finishing ? "…" : "Zakończ"}
                         </button>
@@ -1033,12 +1039,12 @@ function StaffDashboardPage() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+            <section className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3.5 sm:p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Wiadomości</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Najnowsze</h2>
-                  <p className="mt-1 max-w-[280px] text-xs leading-snug text-[var(--muted)]">
+                  <h2 className="mt-1 text-base font-semibold text-[var(--white)] sm:text-lg">Najnowsze</h2>
+                  <p className="mt-1 max-w-[300px] text-xs leading-snug text-[var(--muted)]">
                     Ostatnie wpisy: wiadomości od klienta (panel lub e-mail) oraz wychodzące wiadomości z logu — zakres jak w komunikacji przy naprawach.
                   </p>
                 </div>
@@ -1046,7 +1052,7 @@ function StaffDashboardPage() {
                   Wszystkie
                 </Link>
               </div>
-              <div className="mt-4 max-h-[408px] overflow-y-auto space-y-2 pr-0.5">
+              <div className="mt-3 max-h-[320px] overflow-y-auto overflow-x-hidden space-y-2 pr-0.5 sm:mt-4 sm:max-h-[408px]">
                 {commPreviewQuery.isLoading ? (
                   Array.from({ length: 4 }).map((_, idx) => (
                     <div key={idx} className="h-[76px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--s1)]" />
@@ -1074,25 +1080,25 @@ function StaffDashboardPage() {
                         <Link
                           key={row.id}
                           href={`${p.repairDetailPath(row.repair_id)}?tab=comms`}
-                          className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3 transition hover:bg-[var(--row-hover)]"
+                          className="group block overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2.5 transition hover:bg-[var(--row-hover)] sm:px-4 sm:py-3"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex min-w-0 flex-1 items-start gap-3">
                               <div
-                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-500/35 bg-amber-500/15 text-[#fcd34d]"
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-500/35 bg-amber-500/15 text-[#fcd34d] sm:h-9 sm:w-9"
                                 aria-hidden
                               >
                                 <MessageSquareText className="h-4 w-4" strokeWidth={2.25} />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-200/90">{row.label}</div>
-                                <div className="mt-0.5 truncate text-sm font-semibold text-[var(--white)]">{row.preview}</div>
+                                <div className="truncate text-[10px] font-semibold uppercase tracking-wide text-amber-200/90 sm:text-[11px]">{row.label}</div>
+                                <div className="mt-0.5 truncate text-[15px] font-semibold leading-tight text-[var(--white)] sm:text-sm">{row.preview}</div>
                                 <div className="mt-1 text-xs text-[var(--ink2)]">
                                   <span className="font-mono font-semibold">{row.repair_number}</span>
                                 </div>
                               </div>
                             </div>
-                            <div className="shrink-0 text-right text-[11px] text-[var(--ink2)]">
+                            <div className="hidden shrink-0 text-right text-[11px] text-[var(--ink2)] sm:block">
                               {row.at
                                 ? new Date(row.at).toLocaleString("pl-PL", {
                                     day: "2-digit",
@@ -1114,12 +1120,12 @@ function StaffDashboardPage() {
                       <Link
                         key={l.id}
                         href={l.repair ? `${p.repairDetailPath(l.repair)}?tab=comms` : p.commPath}
-                        className="group block rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3 transition hover:bg-[var(--row-hover)]"
+                        className="group block overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2.5 transition hover:bg-[var(--row-hover)] sm:px-4 sm:py-3"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex min-w-0 flex-1 items-start gap-3">
                             <div
-                              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border sm:h-9 sm:w-9 ${
                                 isSms
                                   ? "border-emerald-500/35 bg-emerald-500/15 text-[#a7f3d0]"
                                   : "border-[#3b82f6]/30 bg-[#3b82f6]/15 text-[#bcd6ff]"
@@ -1129,9 +1135,9 @@ function StaffDashboardPage() {
                               {isSms ? <Smartphone className="h-4 w-4" strokeWidth={2.25} /> : <Mail className="h-4 w-4" strokeWidth={2.25} />}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">Wysłane do klienta</div>
+                              <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)] sm:text-[11px]">Wysłane do klienta</div>
                               <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                                <span className="truncate text-sm font-semibold text-[var(--white)]">{preview}</span>
+                                <span className="truncate text-[15px] font-semibold leading-tight text-[var(--white)] sm:text-sm">{preview}</span>
                               </div>
                               <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--ink2)]">
                                 {l.repair_number ? (
@@ -1145,7 +1151,7 @@ function StaffDashboardPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="shrink-0 text-right text-[11px] text-[var(--ink2)]">
+                          <div className="hidden shrink-0 text-right text-[11px] text-[var(--ink2)] sm:block">
                             {l.sent_at
                               ? new Date(l.sent_at).toLocaleString("pl-PL", {
                                   day: "2-digit",
@@ -1163,18 +1169,18 @@ function StaffDashboardPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-5">
+            <section className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--s1)] p-3.5 sm:p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink2)]">Status</div>
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--white)]">Status części</h2>
+                  <h2 className="mt-1 text-base font-semibold text-[var(--white)] sm:text-lg">Status części</h2>
                 </div>
                 <Link href={p.czesciPath} className="text-sm font-semibold text-[#3b82f6] hover:underline">
                   Szczegóły
                 </Link>
               </div>
 
-              <div className="mt-4 space-y-3">
+              <div className="mt-3 space-y-2.5 sm:mt-4 sm:space-y-3">
                 {partsStatusQuery.isLoading ? (
                   Array.from({ length: 3 }).map((_, idx) => (
                     <div key={idx} className="h-[72px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--s1)]" />
@@ -1193,10 +1199,10 @@ function StaffDashboardPage() {
                     return (
                       <div
                         key={bucketKey}
-                        className="rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-4 py-3"
+                        className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--s1)] px-3 py-2.5 sm:px-4 sm:py-3"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-semibold text-[var(--white)]">{labels[bucketKey]}</span>
+                          <span className="text-[15px] font-semibold text-[var(--white)] sm:text-sm">{labels[bucketKey]}</span>
                           <span className="shrink-0 rounded-lg bg-[var(--row-hover)] px-2 py-0.5 text-xs font-mono font-semibold text-[var(--ink2)]">
                             {count}
                           </span>
@@ -1209,14 +1215,12 @@ function StaffDashboardPage() {
                               onClick={() => setPartsModalUsage(item)}
                               className="flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-transparent px-2 py-1.5 text-left text-sm text-[#e5e7eb] transition hover:border-[var(--border)] hover:bg-[var(--row-hover)]"
                             >
-                              <span className="min-w-0 truncate">
-                                <span className="font-mono text-[var(--ink2)]">{item.repair_number ?? "—"}</span>
-                                <span className="text-[var(--muted)]"> · </span>
-                                <span>{partUsageDisplayName(item)}</span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate font-mono text-xs text-[var(--ink2)] sm:text-[13px]">{item.repair_number ?? "—"}</span>
+                                <span className="mt-0.5 block truncate text-[13px] leading-snug sm:text-sm">{partUsageDisplayName(item)}</span>
                                 {item.expected_arrival_date ? (
-                                  <span className="text-[11px] text-[var(--muted)]">
-                                    {" "}
-                                    · dostawa {String(item.expected_arrival_date).slice(0, 10)}
+                                  <span className="mt-0.5 block text-[10px] text-[var(--muted)] sm:text-[11px]">
+                                    Dostawa: {String(item.expected_arrival_date).slice(0, 10)}
                                   </span>
                                 ) : null}
                               </span>
@@ -1249,7 +1253,6 @@ function StaffDashboardPage() {
         usageRow={partsModalUsage}
         token={token}
       />
-      <DashboardBottomNavPortal />
     </main>
   );
 }
@@ -1275,7 +1278,7 @@ export function DashboardBottomNavPortal() {
   if (!mounted) return null;
   return createPortal(
     <nav
-      className="dashboard-mobile-hard-nav border-t border-[var(--border)] bg-[var(--s1)]/95 px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 backdrop-blur-xl"
+      className="dashboard-mobile-hard-nav border-t border-[var(--border)] bg-[var(--s1)]/95 px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 backdrop-blur-xl lg:hidden"
       style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 2147483647 }}
     >
       <ul className="grid grid-cols-5 gap-1">

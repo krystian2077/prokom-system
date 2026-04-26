@@ -937,7 +937,7 @@ function RepairDetailPageContent() {
       <main className="mx-auto min-h-screen max-w-[1400px] px-4 py-8">
         <div className="flex flex-col gap-8">
         <SuggestedNextStatusStrip repairId={repair.id} currentStatus={repair.status} />
-        <div className="sticky top-28 z-[100]">
+        <div className="z-[100] lg:sticky lg:top-28">
           <section className="rounded-3xl border border-white/15 bg-[linear-gradient(180deg,rgba(14,20,32,0.96),rgba(10,14,22,0.96))] p-5 shadow-[0_14px_40px_-16px_rgba(0,0,0,0.72)] backdrop-blur-xl">
             <div className="flex flex-wrap gap-3.5">
               <TabButton

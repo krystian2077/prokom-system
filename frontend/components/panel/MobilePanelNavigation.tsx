@@ -83,8 +83,8 @@ export function MobilePanelNavigation() {
             onClick={() => setOpen(false)}
             aria-label="Zamknij menu"
           />
-          <aside className="absolute right-0 top-0 h-full w-[min(88vw,360px)] border-l border-[var(--border)] bg-[var(--s1)] p-4 shadow-[0_20px_50px_rgba(0,0,0,.45)]">
-            <div className="mb-4 flex items-center justify-between">
+          <aside className="absolute right-0 top-0 flex h-full w-[min(90vw,380px)] flex-col overflow-hidden border-l border-[var(--border)] bg-[linear-gradient(180deg,rgba(11,17,30,0.98),rgba(8,13,24,0.98))] pl-4 pr-4 pt-[max(1rem,env(safe-area-inset-top,0px))] shadow-[0_20px_50px_rgba(0,0,0,.45)]">
+            <div className="mb-3 flex shrink-0 items-center justify-between border-b border-[var(--border)] pb-3">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--ink2)]">Nawigacja</p>
               <button
                 type="button"
@@ -95,7 +95,7 @@ export function MobilePanelNavigation() {
                 <X size={16} />
               </button>
             </div>
-            <nav className="space-y-1 overflow-y-auto pb-12">
+            <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain pb-[calc(env(safe-area-inset-bottom,0px)+16px)] pr-1">
               {drawerItems.map((item) => {
                 const active = isActive(pathname, item.href);
                 const Icon = item.icon;
@@ -106,7 +106,7 @@ export function MobilePanelNavigation() {
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition ${
                       active
-                        ? "border-[#3b82f6]/45 bg-[#3b82f6]/14 text-[var(--white)]"
+                        ? "border-[#3b82f6]/50 bg-[linear-gradient(135deg,rgba(59,130,246,0.22),rgba(37,99,235,0.08))] text-[var(--white)] shadow-[0_10px_26px_rgba(37,99,235,.18)]"
                         : "border-transparent text-[var(--ink2)] hover:border-[var(--border)] hover:bg-[var(--row-hover)] hover:text-[var(--white)]"
                     }`}
                   >

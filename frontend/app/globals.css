@@ -4068,10 +4068,15 @@ b {
 }
 
 .staff-mobile-bottom-nav,
-.staff-mobile-drawer {
-  display: block;
+.staff-mobile-drawer,
+.dashboard-mobile-hard-nav {
+  display: none;
 }
 
-.dashboard-mobile-hard-nav {
-  display: block;
+@media (max-width: 1023px) {
+  .staff-mobile-bottom-nav,
+  .staff-mobile-drawer,
+  .dashboard-mobile-hard-nav {
+    display: block;
+  }
 }
