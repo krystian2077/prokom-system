@@ -37,10 +37,7 @@ Workflow oparty na statusach. Transparentny tracking RMA. Produkcyjna architektu
 **[🔌 API](#-api--przegląd)** ·
 **[🧰 Stack](#-stack-technologiczny)** ·
 **[🚀 Quick Start](#-quick-start)** ·
-**[🔐 Bezpieczeństwo](#-bezpieczeństwo-i-jakość)** ·
-**[🌟 Co nowego](#-ostatnie-usprawnienia-kwiecień-2026)** ·
-**[🛣 Roadmap](#-roadmap)** ·
-**[📚 Dokumentacja](#-dokumentacja-powiązana)**
+**[🔐 Bezpieczeństwo](#-bezpieczeństwo-i-jakość)**
 
 </div>
 
@@ -738,79 +735,6 @@ celery -A config beat -l info --scheduler django_celery_beat.schedulers:Database
 > 📨 `EMAIL_INBOUND_WEBHOOK_SECRET` jest **wymagany**, jeśli włączasz inbound webhook. Dla IMAP pollingu użyj `INBOUND_IMAP_*` + cron `python manage.py poll_inbound_imap`.
 
 > 🌍 Frontend rozmawia z backendem **wyłącznie** przez BFF rewrite `/api/proxy/*` (skonfigurowany w `next.config.js`).
-
----
-
-## 🌟 Ostatnie usprawnienia (kwiecień 2026)
-
-> Wybór z `git log --since="1 month ago"` — najważniejsze zmiany ostatnich tygodni:
-
-- 🛡 **Throttling auth/public** — DRF rate limits na login, register, inquiry, public submit
-- 📅 **Premium calendar admin** — replace 404 + pełny premium kalendarz dopasowany do panelu pracownika
-- 📱 **Mobile-first refactor** — nowe `MobilePanelNavigation`, responsive layouty, dotykowe gesty
-- 🔐 **Google OAuth** — pełna integracja `@react-oauth/google` + endpoint backendowy
-- 💌 **Premium HTML email templates** — branded transactional e-maile (zgłoszenie, gotowość, ankieta)
-- 🗓 **Premium DatePickerInput** — niestandardowy date picker dla pól typu „Termin realizacji"
-- 📩 **Inquiry form** — publiczny formularz kontaktowy `/communications/inquiry/` z anti-spam
-- 🚚 **Courier tracking fields** + thank-you e-mail po zakończeniu naprawy
-- ⏱ **WorkSession model** — pełne sesje pracy pracownika (`/availability/work-sessions/*`)
-- 🏖 **EmployeeAbsenceRequest** — wnioski o nieobecność z workflow akceptacji admin
-- 📊 **WorkloadChart** — premium chart obciążenia zespołu (`/admin-panel/workload`)
-- 📜 **Privacy policy + Terms of service** — pełne treści zgodne z RODO
-- 🖨 **PDF generation enhancements** — nowe drawing functions, lepszy layout protokołów
-- 🔎 **Global search dropdown z ikonami** + admin notifications views
-
----
-
-## 🛣 Roadmap
-
-### Pre-produkcja (przed pełnym wdrożeniem)
-
-- ✅ 21-stopniowy workflow napraw, 4 panele, kompletne API
-- ✅ Premium UI dark/light, mobile responsiveness
-- ✅ Throttling i security hardening
-- ✅ Compliance Center (GDPR + Terms + Backup + Settings + Flags + Audit)
-- ⚠️ Pełne testy automatyczne — szczegóły w [RAPORT_TESTOW_PRE_PRODUKCJA.md](RAPORT_TESTOW_PRE_PRODUKCJA.md)
-- ⚠️ Stabilizacja Celery (notyfikacja przy `ready_for_pickup`)
-- ⚠️ Brakujące publiczne strony (`/serwis-telefonow`)
-- ⚠️ Backup danych w formularzu zgłoszenia
-
-### Roadmap produktowa
-
-- 🔜 **SMS integration** — provider TBD (obecnie stub `send_sms`)
-- 🔜 **Płatności online** — Stripe / Przelewy24 dla zaliczek i końcówek wycen
-- 🔜 **PWA dla technika** — offline-first dla intake na recepcji
-- 🔜 **Eksport CSV/XLSX** raportów dla admina
-- 🔜 **Multi-tenant** — wiele serwisów na jednej instancji
-- 🔜 **Dynamic pricing** — sezonowość, weekendy, ekspresowa naprawa
-- 🔜 **Mobile app** dla klienta (React Native / Expo)
-
----
-
-## 📚 Dokumentacja powiązana
-
-> 🟢 **Aktualne źródła prawdy** o systemie:
-
-- [SCENARIUSZE_UZYTKOWNIKOW.md](SCENARIUSZE_UZYTKOWNIKOW.md) — wszystkie ścieżki użytkownika (gość / klient / staff / admin)
-- [PROKOM_DOKUMENTACJA_FRONTEND.md](PROKOM_DOKUMENTACJA_FRONTEND.md) — pełna dokumentacja frontendu
-- [RAPORT_TESTOW_PRE_PRODUKCJA.md](RAPORT_TESTOW_PRE_PRODUKCJA.md) — status testów i blokery pre-produkcyjne
-
-> 📂 **Dokumentacja modułów** (`docs/`):
-
-- [docs/SEARCH_MODULE.md](docs/SEARCH_MODULE.md) — moduł wyszukiwania (global / intake / advanced)
-- [docs/INVENTORY_PARTS_MODULE.md](docs/INVENTORY_PARTS_MODULE.md) — magazyn i części
-- [docs/ORDERS_MODULE.md](docs/ORDERS_MODULE.md) — zamówienia
-- [docs/TASKS_MODULE.md](docs/TASKS_MODULE.md) — zadania wewnętrzne
-- [docs/AVAILABILITY_MODULE.md](docs/AVAILABILITY_MODULE.md) — dostępność i nieobecności
-- [docs/STAFF_MANAGEMENT.md](docs/STAFF_MANAGEMENT.md) — zarządzanie zespołem
-- [docs/CELERY_URUCHOMIENIE.md](docs/CELERY_URUCHOMIENIE.md) — uruchamianie Celery
-- [docs/FRONTEND_URUCHOMIENIE.md](docs/FRONTEND_URUCHOMIENIE.md) — uruchamianie frontendu
-- [docs/NOWE_FUNKCJONALNOSCI_PROKOM.md](docs/NOWE_FUNKCJONALNOSCI_PROKOM.md) — nowości w systemie
-- [docs/FRONTEND_PANEL_KLIENTA_KROKI.md](docs/FRONTEND_PANEL_KLIENTA_KROKI.md) — panel klienta
-- [docs/PRODUCTION_BRANCH_PROTECTION_CHECKLIST.md](docs/PRODUCTION_BRANCH_PROTECTION_CHECKLIST.md) — checklista produkcyjna
-- [docs/SEO_OFFPAGE_CHECKLIST.md](docs/SEO_OFFPAGE_CHECKLIST.md) — SEO off-page
-
-> ⚠️ Pliki `docs/DOKUMENTACJA_PROJEKTU_AKTUALNA.md`, `docs/POROWNANIE_*`, `docs/ANALIZA_STANU_PROJEKTU.md` mają stan z marca 2026 i są częściowo nieaktualne — aktualne źródło prawdy to **kod** + niniejsze README + [SCENARIUSZE_UZYTKOWNIKOW.md](SCENARIUSZE_UZYTKOWNIKOW.md).
 
 ---
 
