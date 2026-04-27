@@ -1,33 +1,29 @@
 """
 Seed startowy: konta pracowników i adminów + opcjonalnie dane słownikowe.
 
-Tworzy:
-- 5 kont: krystian, szef (admin), kuba, rafal, pawel (staff)
-- Profile pracowników (specjalizacja, kolor w kalendarzu)
-- Tymczasowe hasło + wymuszenie zmiany przy pierwszym logowaniu
+Tworzy lub aktualizuje konta produkcyjne PRO-KOM.
+Bezpieczny do wielokrotnego uruchamiania (idempotentny).
 
 Opcja --with-dicts: podstawowe marki, przykładowe hurtownie.
 
 Uruchom: python manage.py seed_initial
          python manage.py seed_initial --with-dicts
-
-Zmienne środowiskowe (opcjonalne):
-- SEED_TEMP_PASSWORD — tymczasowe hasło (domyślnie: ZmienHaslo1!)
-- SEED_EMAIL_DOMAIN — domena e-mail (domyślnie: prokom.local)
+         python manage.py seed_initial --no-input
 """
 import os
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+EMAIL_DOMAIN = "prokom.local"
 
-# Konfiguracja kont (login = część przed @ w emailu; email = login@domena)
 STAFF_ACCOUNTS = [
     {
         "login": "kuba",
         "first_name": "Jakub",
         "last_name": "Filas",
         "role": "staff",
-        "specialization": "phone_tablet",  # Telefony, tablety, smartwatche, odzyskiwanie danych
+        "password": "KubaKompro123!",
+        "specialization": "phone_tablet",
         "calendar_color": "#3498db",
     },
     {
@@ -35,16 +31,27 @@ STAFF_ACCOUNTS = [
         "first_name": "Rafał",
         "last_name": "Smółka",
         "role": "staff",
-        "specialization": "laptop_printer",  # Laptopy, komputery, drukarki, konsole
+        "password": "RafalKompro123!",
+        "specialization": "laptop_printer",
         "calendar_color": "#e74c3c",
     },
     {
-        "login": "pawel",
+        "login": "pawelg",
         "first_name": "Paweł",
         "last_name": "Górka",
         "role": "staff",
-        "specialization": "general",  # Proste naprawy serwisowe
+        "password": "PawelgKompro123!",
+        "specialization": "general",
         "calendar_color": "#2ecc71",
+    },
+    {
+        "login": "pawelw",
+        "first_name": "Paweł",
+        "last_name": "Wójciak",
+        "role": "staff",
+        "password": "PawelwKompro123!",
+        "specialization": "general",
+        "calendar_color": "#f39c12",
     },
 ]
 
@@ -54,14 +61,14 @@ ADMIN_ACCOUNTS = [
         "first_name": "Krystian",
         "last_name": "Potaczek",
         "role": "admin",
-        "specialization_label": "admin / zarządzanie systemem",
+        "password": "KrystianKompro123!",
     },
     {
-        "login": "szef",
-        "first_name": "Szef",
+        "login": "tadek",
+        "first_name": "Tadek",
         "last_name": "PRO-KOM",
         "role": "admin",
-        "specialization_label": "admin / właściciel",
+        "password": "TadekKompro123!",
     },
 ]
 
@@ -99,42 +106,32 @@ class Command(BaseCommand):
         parser.add_argument(
             "--no-input",
             action="store_true",
-            help="Nie pytaj o potwierdzenie; używaj domyślnego hasła.",
+            help="Nie pytaj o potwierdzenie.",
         )
 
     def handle(self, *args, **options):
-        temp_password = os.environ.get("SEED_TEMP_PASSWORD", "ZmienHaslo1!")
-        email_domain = os.environ.get("SEED_EMAIL_DOMAIN", "prokom.local")
-
         if not options["no_input"]:
-            self.stdout.write(
-                self.style.WARNING(
-                    "Utworzone konta będą miały tymczasowe hasło i wymuszoną zmianę przy pierwszym logowaniu."
-                )
-            )
-            self.stdout.write(f"Hasło tymczasowe: {temp_password}")
-            self.stdout.write(f"E-mail: login@{email_domain} (np. kuba@{email_domain})")
+            self.stdout.write(self.style.WARNING(
+                "Utworzy/zaktualizuje konta produkcyjne PRO-KOM."
+            ))
             if not input("Kontynuować? [t/N]: ").strip().lower().startswith("t"):
                 self.stdout.write("Anulowano.")
                 return
 
         with transaction.atomic():
-            self._create_users(email_domain, temp_password, options["with_dicts"])
+            self._create_users(options["with_dicts"])
 
-        self._print_summary(email_domain, temp_password)
+        self._print_summary()
 
-    def _create_users(self, email_domain, temp_password, with_dicts):
+    def _create_users(self, with_dicts):
         from django.contrib.auth import get_user_model
         from apps.accounts.models import StaffProfile
 
         User = get_user_model()
 
-        created_users = []
         for data in STAFF_ACCOUNTS + ADMIN_ACCOUNTS:
-            login = data["login"]
-            email = f"{login}@{email_domain}"
+            email = f"{data['login']}@{EMAIL_DOMAIN}"
             user = User.objects.filter(email__iexact=email).first()
-            created = False
             if not user:
                 user = User(
                     email=email,
@@ -143,17 +140,18 @@ class Command(BaseCommand):
                     role=data["role"],
                     is_staff=True,
                     is_active=True,
-                    must_change_password=True,
+                    must_change_password=False,
                 )
                 if data["role"] == "admin":
                     user.is_superuser = True
-                user.set_password(temp_password)
+                user.set_password(data["password"])
                 user.save()
-                created = True
-            created_users.append((user, created))
+                self.stdout.write(self.style.SUCCESS(f"  Utworzono: {email}"))
+            else:
+                self.stdout.write(f"  Już istnieje: {email}")
 
             if data["role"] == "staff":
-                profile, profile_created = StaffProfile.objects.get_or_create(
+                profile, _ = StaffProfile.objects.get_or_create(
                     user=user,
                     defaults={
                         "specialization": data.get("specialization", ""),
@@ -161,7 +159,7 @@ class Command(BaseCommand):
                         "is_available": True,
                     },
                 )
-                if not profile_created and data.get("specialization"):
+                if data.get("specialization"):
                     profile.specialization = data["specialization"]
                     profile.calendar_color = data.get("calendar_color", "#3498db")
                     profile.save()
@@ -203,12 +201,11 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(self.style.WARNING(f"  Hurtownie: pominięto ({e})"))
 
-    def _print_summary(self, email_domain, temp_password):
+    def _print_summary(self):
         self.stdout.write("")
-        self.stdout.write(self.style.SUCCESS("Konta startowe:"))
-        self.stdout.write(f"  Logowanie: email = login@{email_domain} (np. kuba@{email_domain})")
-        self.stdout.write(f"  Tymczasowe hasło: {temp_password}")
-        self.stdout.write("  Wymuś zmianę hasła przy pierwszym logowaniu: TAK")
+        self.stdout.write(self.style.SUCCESS("Konta produkcyjne PRO-KOM:"))
+        self.stdout.write(f"  Domena e-mail: @{EMAIL_DOMAIN}")
         self.stdout.write("")
-        self.stdout.write("  Staff: kuba, rafal, pawel")
-        self.stdout.write("  Admin: krystian, szef")
+        self.stdout.write("  Admin:    krystian@prokom.local  |  tadek@prokom.local")
+        self.stdout.write("  Staff:    kuba@prokom.local  |  rafal@prokom.local")
+        self.stdout.write("            pawelg@prokom.local  |  pawelw@prokom.local")
