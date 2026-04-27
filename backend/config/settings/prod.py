@@ -55,6 +55,16 @@ CORS_ALLOWED_ORIGINS = [
 # =============================================================================
 # EMAIL
 # =============================================================================
+# =============================================================================
+# REDIS — produkcja z hasłem
+# =============================================================================
+_redis_url = env("REDIS_URL", default="redis://localhost:6379/0")
+CELERY_BROKER_URL = _redis_url
+CELERY_RESULT_BACKEND = _redis_url
+
+# =============================================================================
+# EMAIL
+# =============================================================================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
