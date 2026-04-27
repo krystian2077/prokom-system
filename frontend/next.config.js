@@ -8,6 +8,7 @@ const cspReportOnly = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
   "connect-src 'self' https: wss:",
+  "frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",
   "form-action 'self'",
