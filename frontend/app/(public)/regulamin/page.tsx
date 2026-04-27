@@ -1,4 +1,4 @@
-export const metadata = {
+﻿export const metadata = {
   title: "Regulamin | PRO-KOM Serwis",
   description:
     "Regulamin świadczenia usług serwisowych i sprzedaży akcesoriów przez PRO-KOM Serwis w Rabce-Zdroju.",

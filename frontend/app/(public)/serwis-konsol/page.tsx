@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/Button";
+﻿import { Button } from "@/components/ui/Button";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata = {
   title: "Serwis konsol Rabka-Zdrój — naprawa PlayStation, Xbox | PRO-KOM",
   description:
     "Naprawa konsol do gier w Rabce-Zdroju: PlayStation 4, PS5, Xbox One, Xbox Series. Wymiana napędu, naprawa złączy HDMI, problemy z zasilaniem. Bezpłatna diagnoza. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/serwis-konsol",
+    canonical: `${SITE_URL}/serwis-konsol`,
   },
 };
 

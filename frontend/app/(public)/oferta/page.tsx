@@ -1,4 +1,5 @@
-import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+﻿import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+import { SITE_URL } from "@/lib/site-config";
 import { OfertaContent } from "./OfertaContent";
 import { BlogTeaser } from "@/components/blog/BlogTeaser";
 import "./oferta.css";
@@ -11,13 +12,13 @@ export const metadata = {
   description:
     "Sklep GSM w Rabce-Zdroju: smartfony Samsung, iPhone, Xiaomi, tablety iPad i Galaxy Tab, laptopy poleasingowe i biznesowe. Certyfikowany partner Amso. ul. Orkana 16B. Akcesoria, szkła, folie i etui dostępne od ręki.",
   alternates: {
-    canonical: "https://pro-kom.eu/oferta",
+    canonical: `${SITE_URL}/oferta`,
   },
   openGraph: {
     title: "Oferta sklep GSM i elektronika | PRO-KOM Rabka-Zdrój",
     description:
       "Smartfony, tablety, laptopy i akcesoria GSM w Rabce-Zdroju. ul. Orkana 16B.",
-    url: "https://pro-kom.eu/oferta",
+    url: `${SITE_URL}/oferta`,
   },
 };
 

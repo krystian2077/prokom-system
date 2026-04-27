@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site-config";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/panel/", "/admin-panel/", "/client/", "/api/"],
       },
     ],
-    sitemap: "https://pro-kom.eu/sitemap.xml",
-    host: "https://pro-kom.eu",
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Syne, DM_Sans, Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { ClientAuthWrapper } from "@/components/providers/ClientAuthWrapper";
+import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
 const syne = Syne({
@@ -25,7 +26,6 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
 });
 
-const SITE_URL = "https://pro-kom.eu";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -109,14 +109,14 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": ["LocalBusiness", "ElectronicsStore", "RepairBusiness"],
-              "@id": "https://pro-kom.eu/#business",
+              "@id": `${SITE_URL}/#business`,
               name: "PRO-KOM Serwis",
               alternateName: "Prokom Serwis Rabka-Zdrój",
               description:
                 "Serwis telefonów, laptopów, tabletów i akcesoriów GSM w Rabce-Zdroju. Naprawa smartfonów, wymiana ekranów i baterii, folie Hammer Glass, szkła hartowane, etui i ładowarki GaN.",
-              url: "https://pro-kom.eu",
-              logo: "https://pro-kom.eu/images/logo.png",
-              image: "https://pro-kom.eu/images/og-prokom.jpg",
+              url: SITE_URL,
+              logo: `${SITE_URL}/images/logo.png`,
+              image: `${SITE_URL}/images/og-prokom.jpg`,
               telephone: "+48883200151",
               email: "sklep@pro-kom.eu",
               priceRange: "$$",
@@ -202,6 +202,7 @@ export default function RootLayout({
                 ],
               },
               sameAs: [
+                "https://www.facebook.com/prokomrabka",
                 "https://www.google.com/maps/place/Orkana+16B,+34-700+Rabka-Zdr%C3%B3j",
               ],
             }),

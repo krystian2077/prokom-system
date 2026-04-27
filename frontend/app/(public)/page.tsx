@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site-config";
 import dynamic from "next/dynamic";
 
 export const metadata: Metadata = {
@@ -6,13 +7,13 @@ export const metadata: Metadata = {
   description:
     "Serwis telefonów, laptopów i tabletów w Rabce-Zdroju. Akcesoria GSM, szkła hartowane, folie Hammer Glass, etui dostępne od ręki. Bezpłatna diagnoza, szybka naprawa. ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu",
+    canonical: `${SITE_URL}`,
   },
   openGraph: {
     title: "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój",
     description:
       "Serwis telefonów, laptopów i tabletów w Rabce-Zdroju. Szkła hartowane, folie Hammer Glass, etui i akcesoria GSM. ul. Orkana 16B.",
-    url: "https://pro-kom.eu",
+    url: `${SITE_URL}`,
   },
 };
 

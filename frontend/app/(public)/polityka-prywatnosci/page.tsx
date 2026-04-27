@@ -1,4 +1,4 @@
-export const metadata = {
+﻿export const metadata = {
   title: "Polityka prywatności | PRO-KOM Serwis",
   description:
     "Polityka prywatności i przetwarzania danych osobowych PRO-KOM Serwis – informacje o administratorze, celach przetwarzania, prawach użytkownika (RODO).",

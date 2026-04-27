@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site-config";
 import { BLOG_POSTS } from "@/lib/blog-posts";
 import BlogPageClient from "./BlogPageClient";
 
@@ -8,14 +9,14 @@ export const metadata: Metadata = {
   description:
     "Praktyczne poradniki od PRO-KOM Serwis w Rabce-Zdroju: naprawa laptopów, komputerów, drukarek i telefonów, akcesoria GSM, gaming, sprzęt biznesowy i poleasingowy. Odpowiedzi na pytania klientów.",
   alternates: {
-    canonical: "https://pro-kom.eu/blog",
+    canonical: `${SITE_URL}/blog`,
   },
   openGraph: {
     title:
       "Blog PRO-KOM — poradniki serwisowe i zakupowe | Rabka-Zdrój",
     description:
       "Laptop, komputer, drukarka, telefon — praktyczne porady i odpowiedzi od serwisu PRO-KOM w Rabce-Zdroju.",
-    url: "https://pro-kom.eu/blog",
+    url: `${SITE_URL}/blog`,
     type: "website",
   },
   twitter: {
@@ -30,22 +31,22 @@ export default function BlogPage() {
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    "@id": "https://pro-kom.eu/blog",
+    "@id": `${SITE_URL}/blog`,
     name: "Blog PRO-KOM Serwis",
     description:
       "Praktyczne poradniki serwisowe i zakupowe: laptopy, komputery, drukarki, telefony, gaming, poleasing — od PRO-KOM Serwis w Rabce-Zdroju.",
-    url: "https://pro-kom.eu/blog",
+    url: `${SITE_URL}/blog`,
     publisher: {
       "@type": "Organization",
       name: "PRO-KOM Serwis",
-      url: "https://pro-kom.eu",
+      url: `${SITE_URL}`,
     },
     blogPost: BLOG_POSTS.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       description: post.description,
       datePublished: post.date,
-      url: `https://pro-kom.eu/blog/${post.slug}`,
+      url: `${SITE_URL}/blog/${post.slug}`,
     })),
   };
 

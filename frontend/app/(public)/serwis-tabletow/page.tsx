@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/Button";
+﻿import { Button } from "@/components/ui/Button";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata = {
   title: "Serwis tabletów Rabka-Zdrój — naprawa iPad, Galaxy Tab | PRO-KOM",
   description:
     "Naprawa tabletów w Rabce-Zdroju: wymiana wyświetlacza, baterii, gniazda ładowania. iPad, Samsung Galaxy Tab, Lenovo, Huawei i inne. Bezpłatna diagnoza i wycena. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/serwis-tabletow",
+    canonical: `${SITE_URL}/serwis-tabletow`,
   },
 };
 

@@ -1,4 +1,5 @@
-import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+﻿import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+import { SITE_URL } from "@/lib/site-config";
 import { UslugiContent } from "./UslugiContent";
 import { BlogTeaser } from "@/components/blog/BlogTeaser";
 
@@ -10,13 +11,13 @@ export const metadata = {
   description:
     "Naprawa telefonów, laptopów, tabletów i smartwatchy w Rabce-Zdroju. Wymiana ekranu, baterii, gniazda ładowania, diagnostyka. Bezpłatna wycena. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa i okolic.",
   alternates: {
-    canonical: "https://pro-kom.eu/uslugi",
+    canonical: `${SITE_URL}/uslugi`,
   },
   openGraph: {
     title: "Serwis telefonów i elektroniki | PRO-KOM Rabka-Zdrój",
     description:
       "Naprawa telefonów, laptopów, tabletów w Rabce-Zdroju. Bezpłatna diagnoza, szybka realizacja.",
-    url: "https://pro-kom.eu/uslugi",
+    url: `${SITE_URL}/uslugi`,
   },
 };
 

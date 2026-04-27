@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/Button";
+﻿import { Button } from "@/components/ui/Button";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata = {
   title: "Odzyskiwanie danych Rabka-Zdrój — dyski, telefony, karty | PRO-KOM",
   description:
     "Odzyskiwanie danych w Rabce-Zdroju: dyski twarde HDD i SSD, pendrive, karty pamięci, telefony. Oferta indywidualna po wstępnej diagnozie. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/odzyskiwanie-danych",
+    canonical: `${SITE_URL}/odzyskiwanie-danych`,
   },
 };
 

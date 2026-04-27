@@ -1,11 +1,12 @@
-import { Card, CardContent } from "@/components/ui/Card";
+﻿import { Card, CardContent } from "@/components/ui/Card";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata = {
   title: "FAQ — Najczęstsze pytania o serwis telefonów | PRO-KOM Rabka-Zdrój",
   description:
     "Odpowiedzi na najczęstsze pytania o serwis telefonów i elektroniki w Rabce-Zdroju: czas naprawy, diagnoza, wycena, wysyłka kurierem, gwarancja. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/faq",
+    canonical: `${SITE_URL}/faq`,
   },
 };
 
@@ -53,8 +54,22 @@ const faq = [
 ];
 
 export default function FaqPage() {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-8 sm:px-6 lg:px-4 lg:py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <h1 className="text-2xl font-bold text-prokom-black lg:text-3xl">FAQ — Najczęstsze pytania o serwis telefonów w Rabce-Zdroju</h1>
       <p className="mt-2 text-[15px] leading-relaxed text-prokom-gray lg:text-base">Odpowiadamy na najczęstsze pytania klientów z Rabki-Zdroju i okolic dotyczące naprawy telefonów, akcesoriów GSM i naszego serwisu.</p>
       <div className="mt-6 space-y-3 lg:mt-8 lg:space-y-4">

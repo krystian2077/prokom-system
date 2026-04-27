@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/Button";
+﻿import { Button } from "@/components/ui/Button";
+import { SITE_URL } from "@/lib/site-config";
 import { BlogTeaser } from "@/components/blog/BlogTeaser";
 
 export const metadata = {
@@ -6,7 +7,7 @@ export const metadata = {
   description:
     "Naprawa drukarek w Rabce-Zdroju: drukarki atramentowe i laserowe, HP, Canon, Epson, Brother. Diagnoza, czyszczenie głowic, wymiana podzespołów. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/serwis-drukarek",
+    canonical: `${SITE_URL}/serwis-drukarek`,
   },
 };
 

@@ -1,4 +1,5 @@
-import Link from "next/link";
+﻿import Link from "next/link";
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,13 +7,13 @@ export const metadata: Metadata = {
   description:
     "PRO-KOM Serwis obsługuje klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca. Naprawa telefonów, akcesoria GSM, Hammer Glass. ul. Orkana 16B, Rabka-Zdrój.",
   alternates: {
-    canonical: "https://pro-kom.eu/obslugiwane-miejscowosci",
+    canonical: `${SITE_URL}/obslugiwane-miejscowosci`,
   },
   openGraph: {
     title: "Obsługiwane miejscowości | PRO-KOM Serwis Rabka-Zdrój",
     description:
       "Serwis telefonów i sklep GSM w Rabce-Zdroju. Obsługujemy klientów z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca.",
-    url: "https://pro-kom.eu/obslugiwane-miejscowosci",
+    url: `${SITE_URL}/obslugiwane-miejscowosci`,
   },
 };
 

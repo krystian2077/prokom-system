@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/Button";
+﻿import { Button } from "@/components/ui/Button";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata = {
   title: "Serwis smartwatchy Rabka-Zdrój — naprawa zegarków | PRO-KOM",
   description:
     "Naprawa smartwatchy i zegarków w Rabce-Zdroju: Apple Watch, Samsung Galaxy Watch, Garmin. Wymiana baterii, naprawa ekranu, diagnostyka. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/serwis-smartwatchy",
+    canonical: `${SITE_URL}/serwis-smartwatchy`,
   },
 };
 

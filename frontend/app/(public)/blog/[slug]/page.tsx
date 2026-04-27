@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPostBySlug, getAllSlugs, getRelatedPosts } from "@/lib/blog-posts";
 import { getCategoryStyle } from "@/lib/blog-categories";
+import { SITE_URL } from "@/lib/site-config";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -29,12 +30,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: post.description,
     keywords: post.tags,
     alternates: {
-      canonical: `https://pro-kom.eu/blog/${post.slug}`,
+      canonical: `${SITE_URL}/blog/${post.slug}`,
     },
     openGraph: {
       title: post.title,
       description: post.description,
-      url: `https://pro-kom.eu/blog/${post.slug}`,
+      url: `${SITE_URL}/blog/${post.slug}`,
       type: "article",
       publishedTime: post.date,
       authors: ["PRO-KOM Serwis"],
@@ -189,31 +190,31 @@ export default async function BlogPostPage({ params }: Props) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "@id": `https://pro-kom.eu/blog/${post.slug}`,
+    "@id": `${SITE_URL}/blog/${post.slug}`,
     headline: post.title,
     description: post.description,
     datePublished: post.date,
     dateModified: post.date,
     keywords: post.tags?.join(", "),
     articleSection: post.category,
-    image: "https://pro-kom.eu/images/og-prokom.jpg",
+    image: `${SITE_URL}/images/og-prokom.jpg`,
     author: {
       "@type": "Organization",
       name: "PRO-KOM Serwis",
-      url: "https://pro-kom.eu",
+      url: SITE_URL,
     },
     publisher: {
       "@type": "Organization",
       name: "PRO-KOM Serwis",
-      url: "https://pro-kom.eu",
+      url: SITE_URL,
       logo: {
         "@type": "ImageObject",
-        url: "https://pro-kom.eu/images/logo.png",
+        url: `${SITE_URL}/images/logo.png`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://pro-kom.eu/blog/${post.slug}`,
+      "@id": `${SITE_URL}/blog/${post.slug}`,
     },
     ...(post.areaServed && {
       contentLocation: post.areaServed.map((city) => ({
@@ -227,9 +228,9 @@ export default async function BlogPostPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Strona główna", item: "https://pro-kom.eu" },
-      { "@type": "ListItem", position: 2, name: "Blog", item: "https://pro-kom.eu/blog" },
-      { "@type": "ListItem", position: 3, name: post.title, item: `https://pro-kom.eu/blog/${post.slug}` },
+      { "@type": "ListItem", position: 1, name: "Strona główna", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+      { "@type": "ListItem", position: 3, name: post.title, item: `${SITE_URL}/blog/${post.slug}` },
     ],
   };
 

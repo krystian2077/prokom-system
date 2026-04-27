@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/Button";
+﻿import { Button } from "@/components/ui/Button";
+import { SITE_URL } from "@/lib/site-config";
 import { BlogTeaser } from "@/components/blog/BlogTeaser";
 
 export const metadata = {
@@ -6,7 +7,7 @@ export const metadata = {
   description:
     "Naprawa laptopów w Rabce-Zdroju: wymiana matrycy, klawiatury, czyszczenie, diagnostyka zasilania. Wszystkie marki — Lenovo, HP, Dell, Asus, Acer, Apple MacBook. Bezpłatna wycena. PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/serwis-laptopow",
+    canonical: `${SITE_URL}/serwis-laptopow`,
   },
 };
 

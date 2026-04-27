@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
+import { SITE_URL } from "@/lib/site-config";
 import { BlogTeaser } from "@/components/blog/BlogTeaser";
 
 export const metadata = {
@@ -6,13 +7,13 @@ export const metadata = {
   description:
     "Akcesoria GSM dostępne od ręki w Rabce-Zdroju: ładowarki GaN, kable, powerbanki, etui, szkła hartowane, folie Hammer Glass i uchwyty samochodowe. Sklep PRO-KOM, ul. Orkana 16B.",
   alternates: {
-    canonical: "https://pro-kom.eu/akcesoria",
+    canonical: `${SITE_URL}/akcesoria`,
   },
   openGraph: {
     title: "Akcesoria GSM — ładowarki, etui, szkła | PRO-KOM Rabka-Zdrój",
     description:
       "Ładowarki GaN, kable, powerbanki, etui i szkła hartowane dostępne od ręki. PRO-KOM, ul. Orkana 16B, Rabka-Zdrój.",
-    url: "https://pro-kom.eu/akcesoria",
+    url: `${SITE_URL}/akcesoria`,
   },
 };
 
