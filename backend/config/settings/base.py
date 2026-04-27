@@ -186,7 +186,7 @@ INBOUND_IMAP_MAILBOX = env("INBOUND_IMAP_MAILBOX", default="INBOX")
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-        "apps.accounts.authentication.ExpiringTokenAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -246,10 +246,7 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-CELERY_RESULT_EXPIRES = 3600  # wyniki zadań w Redis wygasają po 1 godzinie
-
-# Czas wygaśnięcia tokenu API (w godzinach)
-TOKEN_EXPIRY_HOURS = 12
+CELERY_RESULT_EXPIRES = 3600
 
 # =============================================================================
 # PRO-KOM — Adres paczkomatu (formularz zgłoszenia, etykiety)
