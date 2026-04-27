@@ -17,6 +17,7 @@ const cspReportOnly = [
 
 const nextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   /** Domyślnie Next 14 przerywa build/dev przy useSearchParams() bez Suspense (często 500). */
   experimental: {
     missingSuspenseWithCSRBailout: false,

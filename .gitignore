@@ -34,9 +34,11 @@ staticfiles/
 # Environment variables
 .env
 .env.local
+.env.prod
 .env.production
 .env.staging
 !.env.example
+!.env.prod.example
 
 # Testing / Coverage
 .coverage
