@@ -16,7 +16,7 @@ environ.Env.read_env()
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = False
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["prokom-serwis.pl", "www.prokom-serwis.pl", "api.prokom-serwis.pl"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["prokomserwis.pl", "www.prokomserwis.pl"])
 
 # HTTPS / SSL
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -48,13 +48,10 @@ DATABASES = {
 # CORS — tylko produkcyjne domeny
 # =============================================================================
 CORS_ALLOWED_ORIGINS = [
-    "https://prokom-serwis.pl",
-    "https://www.prokom-serwis.pl",
+    "https://prokomserwis.pl",
+    "https://www.prokomserwis.pl",
 ]
 
-# =============================================================================
-# EMAIL
-# =============================================================================
 # =============================================================================
 # REDIS — produkcja z hasłem
 # =============================================================================
