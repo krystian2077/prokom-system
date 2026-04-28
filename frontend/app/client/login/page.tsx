@@ -156,7 +156,7 @@ export default function ClientLoginPage() {
               <span className="lp-dot" />
               PANEL KLIENTA
             </div>
-            <h2 className="lp-title" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900 }}>
+            <h2 className="lp-title" style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 800 }}>
               Twoje naprawy
               <span>w jednym miejscu.</span>
             </h2>
