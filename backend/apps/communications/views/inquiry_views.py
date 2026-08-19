@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
+# Zapasowy adres, gdyby STAFF_NOTIFICATION_EMAILS byla pusta
 INQUIRY_TO_EMAIL = "serwisprokomrabka@gmail.com"
 
 
@@ -183,7 +184,12 @@ class InquiryFormView(APIView):
             html_body = _build_inquiry_html(full_name, phone, email, interest, message, sent_at)
             from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@prokom.pl")
 
-            msg = EmailMultiAlternatives(subject, plain_body, from_email, [INQUIRY_TO_EMAIL])
+            from apps.communications.services.staff_notifications import (
+                staff_notification_recipients,
+            )
+
+            recipients = staff_notification_recipients() or [INQUIRY_TO_EMAIL]
+            msg = EmailMultiAlternatives(subject, plain_body, from_email, recipients)
             msg.attach_alternative(html_body, "text/html")
             msg.send(fail_silently=True)
 

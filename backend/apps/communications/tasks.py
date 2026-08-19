@@ -33,3 +33,23 @@ def send_notification_for_repair_event(self, repair_id, event_name, sent_by_id=N
             log, ok = send_template_to_repair(rule.template, repair, sent_by_id=sent_by_id)
             logs.append({"log_id": log.id, "channel": "panel", "ok": ok})
     return {"ok": True, "event": event_name, "logs": logs}
+
+
+@shared_task(bind=True, name="communications.send_new_repair_staff_notification")
+def send_new_repair_staff_notification_task(self, repair_id):
+    """Powiadamia serwis o nowym zgłoszeniu z publicznego formularza online."""
+    from apps.repairs.models import RepairRequest
+    from apps.communications.services.staff_notifications import (
+        send_new_repair_staff_notification,
+    )
+
+    repair = (
+        RepairRequest.objects.filter(id=repair_id)
+        .select_related("client", "device")
+        .first()
+    )
+    if not repair:
+        return {"ok": False, "error": "repair not found"}
+
+    sent = send_new_repair_staff_notification(repair, fail_silently=False)
+    return {"ok": bool(sent), "repair": repair.repair_number}

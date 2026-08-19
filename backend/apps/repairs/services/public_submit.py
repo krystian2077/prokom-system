@@ -4,6 +4,7 @@ PRO-KOM Serwis — Publiczne zgłoszenie naprawy (formularz online)
 Znajdź lub utwórz klienta, utwórz urządzenie i zgłoszenie. Bez logowania.
 Dla gościa (client_id=None): generowany claim_token, e-mail z linkami do śledzenia i przypisania.
 """
+import logging
 import secrets
 from datetime import timedelta
 from django.db import transaction
@@ -13,6 +14,8 @@ from apps.clients.selectors import client_by_email, client_by_id
 from apps.devices.models import Device, Brand, DeviceModel
 from apps.common.enums import DeliveryMethod, ReturnMethod
 from apps.repairs.services.repair_creation import create_repair_request
+
+logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
@@ -201,4 +204,21 @@ def submit_repair_from_public_form(
     from apps.communications.services.send import send_repair_submission_confirmation
     send_repair_submission_confirmation(repair, fail_silently=True)
 
+    # Powiadomienie wewnętrzne dla serwisu. on_commit — inaczej worker mógłby sięgnąć
+    # po naprawę, zanim ta transakcja zostanie zatwierdzona.
+    transaction.on_commit(lambda: _dispatch_staff_notification(repair))
+
     return repair, client_created
+
+
+def _dispatch_staff_notification(repair):
+    """Zleca powiadomienie serwisu; awaria brokera nie może wywrócić przyjętego zgłoszenia."""
+    try:
+        from apps.communications.tasks import send_new_repair_staff_notification_task
+
+        send_new_repair_staff_notification_task.delay(str(repair.id))
+    except Exception:
+        logger.exception(
+            "Nie udało się zlecić powiadomienia serwisu o zgłoszeniu %s",
+            repair.repair_number,
+        )
