@@ -16,6 +16,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from apps.repairs.models import RepairRequest, RepairClaimSmsCode
 from apps.common.utils import get_public_repair_status
+from apps.repairs.services.public_tracking import build_public_tracking_payload
 from apps.common.permissions import get_client_for_user
 from apps.communications.services.send import send_sms
 
@@ -30,7 +31,8 @@ def _phone_last4(phone):
 class TrackRepairView(APIView):
     """
     GET /api/v1/repairs/track/?ref=PROKOM/RMA/1/2025&phone_last4=1234
-    Zwraca: repair_number, status (publiczny), accepted_at, estimated_completion_date, estimated_duration.
+    Zwraca komplet danych dla klienta: status, os postepu, historia, terminy, sposob odbioru,
+    dane kontaktowe serwisu. Bez notatek wewnetrznych i danych technikow (patrz public_tracking).
     """
     permission_classes = [AllowAny]
     throttle_scope = "public_track"
@@ -46,7 +48,12 @@ class TrackRepairView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        repair = RepairRequest.objects.filter(repair_number=ref).select_related("client").first()
+        repair = (
+            RepairRequest.objects.filter(repair_number=ref)
+            .select_related("client", "device", "device__brand")
+            .prefetch_related("status_history")
+            .first()
+        )
         if not repair:
             return Response(
                 {"detail": "Nie znaleziono zgłoszenia lub nieprawidłowe dane."},
@@ -61,13 +68,7 @@ class TrackRepairView(APIView):
             )
 
         return Response(
-            {
-                "repair_number": repair.repair_number,
-                "status": get_public_repair_status(repair.status),
-                "accepted_at": repair.accepted_at.isoformat() if repair.accepted_at else None,
-                "estimated_completion_date": repair.estimated_completion_date.isoformat() if repair.estimated_completion_date else None,
-                "estimated_duration": repair.get_estimated_duration_display() or None,
-            },
+            build_public_tracking_payload(repair),
             status=status.HTTP_200_OK,
         )
 
