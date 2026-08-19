@@ -66,6 +66,7 @@ Thumbs.db
 node_modules/
 .next/
 out/
+tsconfig.tsbuildinfo
 .vercel/
 .turbo/
 npm-debug.log*
