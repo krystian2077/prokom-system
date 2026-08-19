@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { API_V1 } from "@/lib/api";
 
 const OFFERTA_IMG = "/images/ofertapng";
 
@@ -1012,7 +1013,7 @@ export function OfertaContent() {
                   setFormLoading(true);
                   const fd = new FormData(e.currentTarget);
                   try {
-                    const res = await fetch("/api/proxy/communications/inquiry", {
+                    const res = await fetch(`${API_V1}/communications/inquiry/`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
