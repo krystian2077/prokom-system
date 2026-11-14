@@ -6,11 +6,16 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { getStoredToken } from "@/lib/auth-storage";
+import { IconCheck } from "@/components/tech/icons";
 
+/**
+ * /claim-repair — assigning a repair to the client account with the e-mail link.
+ * TD3 PR 3: new skin only; the logic is the previous one 1:1 (KONTRAKT §5).
+ */
 export default function ClaimRepairPage() {
   const router = useRouter();
   const [tokenFromUrl, setTokenFromUrl] = useState("");
-  const { token, user, loading: authLoading } = useAuth();
+  const { token, loading: authLoading } = useAuth();
   const [status, setStatus] = useState<"idle" | "claiming" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
 
@@ -46,44 +51,54 @@ export default function ClaimRepairPage() {
     }
   }, [authLoading, token, tokenFromUrl, router, status]);
 
-  if (authLoading || status === "claiming") {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center px-5">
-        <p className="text-prokom-gray">Ładowanie…</p>
-      </div>
-    );
-  }
-
+  let body: React.ReactNode;
   if (status === "success" && message) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center px-5 text-center">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
-          <p className="text-lg font-medium text-prokom-black">{message}</p>
-          <p className="mt-2 text-sm text-prokom-gray">Przekierowanie do listy napraw…</p>
-          <Link href="/client/naprawy" className="mt-6 inline-block min-h-[44px] content-center text-primary underline hover:no-underline">
-            Przejdź do napraw
-          </Link>
-        </div>
-      </div>
+    body = (
+      <>
+        <span className="t-claim__ok" aria-hidden="true">
+          <IconCheck size={24} />
+        </span>
+        <h1>Naprawa w Twoim koncie</h1>
+        <p className="t-lead" role="status">
+          {message}
+        </p>
+        <p className="t-muted">Przekierowanie do listy napraw…</p>
+        <Link href="/client/naprawy" className="t-btn t-btn--acc">
+          Przejdź do napraw
+        </Link>
+      </>
     );
-  }
-
-  if (status === "error" && message) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center px-5 text-center">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
-          <p className="text-lg text-red-500">{message}</p>
-          <Link href="/client/dashboard" className="mt-6 inline-block min-h-[44px] content-center text-primary underline hover:no-underline">
+  } else if (status === "error" && message) {
+    body = (
+      <>
+        <h1>Nie udało się przypisać naprawy</h1>
+        <div className="t-alert" role="alert">
+          <p>{message}</p>
+        </div>
+        <div className="t-claim__actions">
+          <Link href="/client/dashboard" className="t-btn t-btn--acc">
             Przejdź do panelu
           </Link>
+          <Link href="/track" className="t-btn t-btn--ghost">
+            Sprawdź status bez logowania
+          </Link>
         </div>
-      </div>
+      </>
+    );
+  } else {
+    body = (
+      <>
+        <h1>Przypisanie naprawy do konta</h1>
+        <p className="t-lead" role="status" aria-busy="true">
+          {authLoading || status === "claiming" ? "Ładowanie…" : "Przekierowanie…"}
+        </p>
+      </>
     );
   }
 
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center px-5">
-      <p className="text-prokom-gray">Przekierowanie…</p>
+    <div className="t-ui t-container t-claim">
+      <div className="t-card t-claim__card">{body}</div>
     </div>
   );
 }
