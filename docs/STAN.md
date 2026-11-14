@@ -4,7 +4,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** **TM+**. Etap A: A1–A4 ✔ (delegacja na Seohost opublikowana 14.11 18:35), A5 (transfer) — 15.11. Etap C: PR #13 (infrastruktura) scalony, obrazy w GHCR (prywatne); **staging na VPS działa od 14.11 18:43** (`dd8e8a3`, `/srv/prokom/prokom-tech`, gateway `127.0.0.1:3301`, smoke 11/11); czeka na vhost w prokom-web (sesja w toku).
+- **W toku:** **TM+**. Etap A: A1–A4 ✔, A5 (transfer) — dziś późno albo 15.11. **Etap B:** domena `prokomserwis.pl` w DirectAdmin SH 1 (`h99.seohost.pl`, bez SSL/PHP), skrzynka `kontakt@prokomserwis.pl` (2000 MB, 300/dzień, hasło w menedżerze), rekordy poczty w strefie Seohost ✔, **testy ✔ 14.11 ~20:30**: mail-tester **10/10** (SPF/DKIM/DMARC pass, rDNS ok), Gmail → kontakt@ dochodzi, odpowiedź kontakt@ → Gmail w Odebranych z SPF/DKIM/DMARC PASS. Wysyłka z aplikacji nadal przez Gmail (etap D). Etap C: staging na VPS za Nginx (`https://staging.prokomserwis.pl`, hasło, cert LE do 12.02.2027), próba automatyczna ✔, kopie + heartbeat ✔, `.env.prod` na VPS gotowy (prod wyłączony do 29.11).
 - **Następny krok:** (1) PR prokom-web z vhostami Tech → certyfikat stagingu → `https://staging.prokomserwis.pl` za hasłem. (2) Próba generalna (MIGRACJA §6–§7): kopia `D:\PRO-KOM\kopie\prokom-tech-import-20261114T181620Z.tar` → VPS → `restore.sh --no-start` → `anonimizuj.sql` → start → smoke + test ręczny. (3) A5 transfer domeny (15.11). (4) Etap B — `kontakt@` na SH 1. (5) `.env.prod` i cron kopii na VPS przed niedzielą 29.11.
 
 ## Pilne
@@ -12,6 +12,11 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - ✔ 14.11.2026: hasła kont z `seed_initial.py`/`seed_staff_profiles.py` zmienione na produkcji (Krystian). Poprawka seedów → backlog w `WYJATKI.md`.
 - ✔ 14.11.2026: build frontu naprawiony bez zmian w panelach (`frontend/scripts/patch-next-font.js` jako `prebuild`, commit `85b96bf`). Usunąć po aktualizacji Nexta, gdy ten obsłuży adresy Google Fonts bez rozszerzenia.
 - ✖ Brak kopii zapasowych produkcji (0 wpisów `BackupLog`, brak crona) — ręczny `pg_dump` przed TM, na VPS kopie od pierwszego dnia.
+
+## Poczta kontakt@prokomserwis.pl (TM+ etap B, 14.11.2026)
+- Hosting poczty Seohost SH 1 (DirectAdmin `h99.seohost.pl`, ten sam co skrzynki prokombiznes/software/instalacje/gaming), skrzynka 2000 MB, limit 300 wysłanych/dzień, hasło w menedżerze haseł („Poczta kontakt@prokomserwis.pl”).
+- **Thunderbird / programy pocztowe:** IMAP `h99.seohost.pl:993` SSL/TLS, SMTP `h99.seohost.pl:465` SSL/TLS, normalne hasło, login = pełny adres. (Nie `mail.prokomserwis.pl` — certyfikat serwera jest na `*.seohost.pl`.) Webmail: Roundcube z DirectAdmin.
+- Etap D (wysyłka z aplikacji przez SH 1): z serwera aplikacji host `srv128408.seohost.com.pl` (certyfikat SMTP na tę nazwę), jak w prokom-web; potem SPF bez `include:_spf.google.com`.
 
 ## Próba generalna — część automatyczna (14.11.2026, VPS, staging)
 | Krok (MIGRACJA §7) | Wynik | Dowód |
@@ -24,6 +29,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | Pamięć (staging, pusty) | ✔ | backend 178/512 MB, frontend 40/320, db 37/384, gateway 5/64, redis 3/96 |
 | Plik importu usunięty z VPS (`shred -u`) | ✔ | `/srv/prokom/import` pusty; kopia zostaje w `D:\PRO-KOM\kopie` i na Hetznerze |
 | Cron kopii stagingu | ✔ | `30 3 * * *` UTC (`scripts/vps/backup.sh staging`), po prokom-web 02:30/02:45 i Gaming 03:00/03:15; prod Tech — po przełączeniu (MIGRACJA §8 pkt 10); heartbeat Better Stack — do dodania |
+| Heartbeat kopii stagingu (Better Stack „Kopia Tech staging”, 1 d + 3 h, e-mail) | ✔ | po `backup.sh staging` status Up; prod — w niedzielę |
+| `.env.prod` na VPS | ✔ | z `.env.prod` Hetznera (ten sam `SECRET_KEY`, Gmail, Google, `SERWIS_PRINT_*`), nowe hasła bazy/Redisa, `GATEWAY_PORT=3300`; kopia z Hetznera usunięta (`shred -u`); compose config OK |
 | Część ręczna (panel, lista napraw, PDF, upload 20 MB) | — | po vhoście `staging.prokomserwis.pl` (prokom-web) |
 | Test odtworzenia kopii (`backup.sh` → B2 → `restore.sh`) | ✔ | `.env.backup` (ten sam `age.pub` i bucket co Gaming); kopia 432 KB w `offsite:prokom-backups-r7k2/tech-staging/daily/`; zgłoszenie testowe dodane po kopii (4) → po odtworzeniu z B2: 3 = manifest; smoke core ok; `age.key` usunięty (`shred -u`) |
 
