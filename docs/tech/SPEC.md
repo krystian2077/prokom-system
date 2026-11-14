@@ -72,7 +72,7 @@ export const line = { key: 'tech', name: 'PRO-KOM Tech', domain: 'prokomserwis.p
 export type ServicePoint = { key: 'rabka' | 'zakopane'; name: string; street: string | null; postal: string; city: string; geo: { lat: number; lng: number } | null; hours: { days: string; open: string | null; close: string | null }[]; phone: string | null; mapsUrl: string | null; parkingNote: string | null; published: boolean };
 export const servicePoints: ServicePoint[] = [
   { key: 'rabka', name: 'Rabka-Zdrój', street: 'ul. Orkana 16B', postal: '34-700', city: 'Rabka-Zdrój', geo: { lat: 49.6130, lng: 19.9629 }, hours: [{ days: 'pn–pt', open: '09:00', close: '17:00' }, { days: 'sob', open: '09:00', close: '14:00' }, { days: 'nd', open: null, close: null }], phone: null /* = line.phone */, mapsUrl: null, parkingNote: null, published: true },
-  { key: 'zakopane', name: 'Zakopane', street: 'ul. Stanisława Staszica 8', postal: '34-500', city: 'Zakopane', geo: null /* TODO(krystian): współrzędne punktu */, hours: [] /* TODO(krystian): godziny */, phone: null /* TODO(krystian): 18 541 20 15 czy 18 341 20 15? */, mapsUrl: null, parkingNote: null, published: false },
+  { key: 'zakopane', name: 'Zakopane', street: 'ul. Stanisława Staszica 8', postal: '34-500', city: 'Zakopane', geo: null /* TODO(krystian): współrzędne punktu */, hours: [] /* TODO(krystian): godziny */, phone: '+48 18 541 20 15', mapsUrl: null, parkingNote: null, published: false },
 ];
 export const lines = [ /* PRO-KOM, Biznes, Instalacje, Software, Tech (bieżąca), Gaming — nazwy, domeny, kolory kresek z wzorca (stopka, pasek marki) */ ];
 ```
@@ -131,7 +131,7 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - Wydajność: Lighthouse telefon ≥ 90, LCP < 2,5 s, CLS < 0,1. `public/` ma dziś 105 MB, w tym dwa pliki mp4 z filmem plotera: film ładujemy po kliknięciu (poster), w paczce budowy zostaje jeden plik.
 
 ## 10. Otwarte (blokują produkcję, nie budowę)
-- **[SZEF]** Zakopane: ~~adres~~ (✔ 14.11: salon i serwis, ul. Stanisława Staszica 8, 34-500 Zakopane), godziny, telefon (do potwierdzenia: 18 541 20 15 czy 18 341 20 15), współrzędne na mapę, czy jest ploter Hammer Glass, czy można oddać w jednym punkcie i odebrać w drugim. Bez tego produkcja idzie tylko z Rabką (Zakopane `published: false`).
+- **[SZEF]** Zakopane: ~~adres~~ (✔ 14.11: salon i serwis, ul. Stanisława Staszica 8, 34-500 Zakopane), godziny, ~~telefon~~ (✔ 14.11: 18 541 20 15), współrzędne na mapę, czy jest ploter Hammer Glass, czy można oddać w jednym punkcie i odebrać w drugim. Bez tego produkcja idzie tylko z Rabką (Zakopane `published: false`).
 - **[SZEF]** liczby i obietnice: „często ok. 1 h”, „2004”, ocena i liczba opinii Google (albo ukryć kartę).
 - **[SZEF/Krystian]** prawa do zdjęć urządzeń i kadrów plotera, źródła w `media-zrodla.json`.
 - **[Krystian]** oficjalny SVG znaku PRO-KOM TECH (dziś rysunek zastępczy), DNS/MX dla `kontakt@prokomserwis.pl`.
