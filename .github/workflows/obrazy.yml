@@ -58,7 +58,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      IMAGE: ghcr.io/krystian2077/prokom-tech-frontend${{ github.ref_name == 'master' && '' || '-staging' }}
+      # Full names on both sides: in GitHub expressions '' is falsy, so `cond && '' || '-staging'`
+      # always gave -staging (the first master build, 3e7e04f, went to prokom-tech-frontend-staging).
+      IMAGE: ${{ github.ref_name == 'master' && 'ghcr.io/krystian2077/prokom-tech-frontend' || 'ghcr.io/krystian2077/prokom-tech-frontend-staging' }}
     steps:
       - name: Pick build variables for the environment
         id: build
