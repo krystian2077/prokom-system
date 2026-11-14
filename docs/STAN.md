@@ -29,7 +29,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 ## Otwarte (blokują produkcję, nie budowę) — SPEC §10
 - [SZEF] dane punktu Zakopane; liczby i obietnice; zdjęcia i prawa.
 - [Krystian] oficjalny SVG znaku PRO-KOM TECH.
-- [Krystian] decyzja: repo publiczne czy prywatne (`BEZPIECZENSTWO.md` — po zmianie haseł brak twardego powodu do zamknięcia).
+- ✔ 14.11.2026: repo `prokom-system` **prywatne** (plan Free) → zmienne buildu frontu jako zmienne repozytorium (`STAGING_`/`PRODUCTION_NEXT_PUBLIC_*`), bez GitHub Environments. Minuty Actions w prywatnym repo: limit planu Free (2000 min/mies.). [Krystian] paczka `prokom-tech-backend` w GHCR nadal publiczna → przełączyć na prywatną (Package settings → Change visibility).
 - [Krystian] termin TM: plan 23–27.11 (staging), przełączenie ndz 29.11.
 - [Krystian] czy 3 zgłoszenia i 8 klientów na produkcji to dane prawdziwe czy testowe (jeśli testowe — VPS może ruszyć na czystej bazie; `INWENTARZ.md` B1.1).
 - [Krystian/TD6] `PublicNavbar`/`PublicFooter` używa logowanie klienta (`app/client/ClientGate.tsx`) → zostają zamrożone albo wyjątek (`MAPA-PLIKOW.md`, TODO).

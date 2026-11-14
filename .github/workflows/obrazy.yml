@@ -3,8 +3,10 @@
 #   push to master  → backend + frontend           (prokomserwis.pl)
 # Tag = full commit SHA (no `latest`); scripts/vps/deploy.sh <stack> <sha> deploys exactly that.
 # The frontend has one image per environment because NEXT_PUBLIC_* are baked in at build time;
-# their values come from the GitHub Environments `staging` / `production` (Variables, not the repo):
-#   NEXT_PUBLIC_API_URL, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_GOOGLE_CLIENT_ID
+# their values come from repository Variables (Settings → Secrets and variables → Actions → Variables),
+# prefixed per environment: STAGING_NEXT_PUBLIC_{API_URL,SITE_URL,GOOGLE_CLIENT_ID} and
+# PRODUCTION_NEXT_PUBLIC_{…}. Not GitHub Environments: the repo is private on the Free plan, where
+# Environments are not available (decision 14.11.2026).
 # Packages are private (ghcr.io/krystian2077/prokom-tech-*); the server pulls them with a
 # read:packages token. The existing CI (backend-ci.yml, frontend-ci.yml) is unchanged.
 # Actions pinned by SHA, the same versions as prokom-gaming/.github/workflows/image.yml.
@@ -55,21 +57,29 @@ jobs:
     name: frontend (${{ github.ref_name == 'master' && 'production' || 'staging' }}) · push to GHCR
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
     env:
       IMAGE: ghcr.io/krystian2077/prokom-tech-frontend${{ github.ref_name == 'master' && '' || '-staging' }}
     steps:
-      - name: Check build variables
+      - name: Pick build variables for the environment
+        id: build
         env:
-          API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-          SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          PREFIX: ${{ github.ref_name == 'master' && 'PRODUCTION' || 'STAGING' }}
+          PROD_API: ${{ vars.PRODUCTION_NEXT_PUBLIC_API_URL }}
+          PROD_SITE: ${{ vars.PRODUCTION_NEXT_PUBLIC_SITE_URL }}
+          PROD_GOOGLE: ${{ vars.PRODUCTION_NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          STG_API: ${{ vars.STAGING_NEXT_PUBLIC_API_URL }}
+          STG_SITE: ${{ vars.STAGING_NEXT_PUBLIC_SITE_URL }}
+          STG_GOOGLE: ${{ vars.STAGING_NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
         run: |
+          if [ "$PREFIX" = PRODUCTION ]; then api="$PROD_API" site="$PROD_SITE" google="$PROD_GOOGLE"
+          else api="$STG_API" site="$STG_SITE" google="$STG_GOOGLE"; fi
           # An image without the API address would talk to localhost in the browser — fail early.
-          [ -n "$API_URL" ] && [ -n "$SITE_URL" ] || {
-            echo "::error::Set NEXT_PUBLIC_API_URL and NEXT_PUBLIC_SITE_URL in the GitHub Environment '${{ github.ref_name == 'master' && 'production' || 'staging' }}'"
+          [ -n "$api" ] && [ -n "$site" ] || {
+            echo "::error::Set repository Variables ${PREFIX}_NEXT_PUBLIC_API_URL and ${PREFIX}_NEXT_PUBLIC_SITE_URL"
             exit 1
           }
-          echo "Building $IMAGE for $SITE_URL"
+          { echo "api=$api"; echo "site=$site"; echo "google=$google"; } >>"$GITHUB_OUTPUT"
+          echo "Building $IMAGE for $site"
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -87,9 +97,9 @@ jobs:
           push: true
           tags: ${{ env.IMAGE }}:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
-            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+            NEXT_PUBLIC_API_URL=${{ steps.build.outputs.api }}
+            NEXT_PUBLIC_SITE_URL=${{ steps.build.outputs.site }}
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.build.outputs.google }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
