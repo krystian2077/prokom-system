@@ -39,6 +39,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
 - [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
 - [Krystian] **Zakopane — została tylko pinezka:** ul. Stanisława Staszica 8 (centrum, przy ul. Weteranów Wojny i parku miejskim; powiat tatrzański), tel. 18 541 20 15, pn–pt 10:00–16:30, sob–nd zamknięte, ploter Hammer Glass jest, odbiór w innym punkcie można. Współrzędne w SPEC są przybliżone (centrum miasta: 49.2990, 19.9489) — przed `published: true` wziąć dokładne z pinezki w Mapach Google. Opis położenia przyda się na stronę lokalną Zakopanego (TD4).
+- [Krystian] **abonent domeny prokomserwis.pl to osoba prywatna, nie firma** (TM+ A1 każe tu się zatrzymać). Decyzja: zmiana abonenta na PRO-KOM Tadeusz Wójciak (NIP) w cyber_Folks przed transferem albo transfer i zmiana w Seohost. Domena wygasa 28.04.2027. Szczegóły: `docs/tech/DNS-PROKOMSERWIS.md`.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
@@ -46,6 +47,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14.11.2026 — stan DNS „przed” z panelu cyber_Folks w `docs/tech/DNS-PROKOMSERWIS.md` (A przez „Przekierowanie IP”, abonent prywatny).
 - 14.11.2026 — Zakopane od szefa: godziny pn–pt 10:00–16:30, ploter Hammer Glass jest, można oddać w jednym punkcie i odebrać w drugim (KONTRAKT §2: linia „Punkt odbioru”).
 - 14.11.2026 — punkt Zakopane: ul. Stanisława Staszica 8, 34-500 Zakopane, tel. 18 541 20 15 (SPEC §5).
 - 14.11.2026 — SPEC §12.10 (naprawa wysyłkowa) i §12.11 (kategorie bloga), plan ≈ 21,25 wieczoru, **zakres zamknięty**. Liczby bloga przeliczone: 49 obiektów / 48 wpisów.
