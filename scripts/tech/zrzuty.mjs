@@ -22,7 +22,7 @@ for (const p of pages) {
   for (const theme of themes) {
     for (const width of widths) {
       const { ctx, page } = await themedPage(browser, { width, theme });
-      await page.goto(origin + p, { waitUntil: "networkidle" });
+      await page.goto(origin + p, { waitUntil: "load" });
       await page.evaluate(() => document.fonts.ready);
       await scrollLikeUser(page);
       const file = `${slug(p)}-${width}-${theme}.png`;

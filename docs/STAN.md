@@ -5,7 +5,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
 - **W toku:** **TM+**. Etap A ✔: A1–A4, **A5 transfer do Seohost ✔ 14.11 21:04** (abonent od razu PRO-KOM Tadeusz Wójciak, wygasa 28.04.2027, DNS bez zmian); auto-odnawianie w Seohost ✔, rezygnacja z usługi domeny w cyber_Folks złożona ✔ (14.11). **Etap B:** domena `prokomserwis.pl` w DirectAdmin SH 1 (`h99.seohost.pl`, bez SSL/PHP), skrzynka `kontakt@prokomserwis.pl` (2000 MB, 300/dzień, hasło w menedżerze), rekordy poczty w strefie Seohost ✔, **testy ✔ 14.11 ~20:30**: mail-tester **10/10** (SPF/DKIM/DMARC pass, rDNS ok), Gmail → kontakt@ dochodzi, odpowiedź kontakt@ → Gmail w Odebranych z SPF/DKIM/DMARC PASS. Wysyłka z aplikacji nadal przez Gmail (etap D). Etap C: staging na VPS za Nginx (`https://staging.prokomserwis.pl`, hasło, cert LE do 12.02.2027), próba automatyczna ✔, kopie + heartbeat ✔, `.env.prod` na VPS gotowy (prod wyłączony do 29.11).
-- **Następny krok:** (1) Przełączenie produkcji na VPS w niedzielę 29.11 (MIGRACJA §8) + heartbeat i cron kopii prod. (2) Etap D: wysyłka z aplikacji przez SH 1, potem SPF bez Gmaila. (3) Budowa strony TD1.
+- **TD1 (fundament i powłoka) — ruszyło 14.11, przed przełączeniem TM** (decyzja Krystiana 14.11: praca idzie tylko do `develop`; nic z `develop` nie trafia do `master` przed 29.11, przełączenie jest 1:1 z `master`; 29.11 TD stoi). Scalone: **#26** (PR 1 fundament: Vitest + Playwright, `panele.spec` ze zrzutami bazowymi z czystego develop, Node 22, next 14.2.35, `config/prokom.ts` z e-mailem `kontakt@prokomserwis.pl`, `lib/tech` — godziny/święta/punkty/motyw/pomiar/JSON-LD, `tech.css` z tokenami). Otwarte: **#27** `feat/tech-powloka` (5e80ea2 + STAN) — TechShell, BrandBar, Capsule z mega menu, Footer, LinesBand, LegalBar, Logo, OsmMap, OpeningStatus, NoticeBar, TabBar, MenuSheet, SectionRail; 47/47 e2e, porownaj 1440: nagłówek 5–7%, stopka ~10% (status na żywo, jedna karta punktu). Pracowano w worktree `D:PRO-KOMeposprokom-system-td1`.
+- **Następny krok:** (1) Przełączenie produkcji na VPS w niedzielę 29.11 (MIGRACJA §8) + heartbeat i cron kopii prod. (2) Etap D: wysyłka z aplikacji przez SH 1, potem SPF bez Gmaila. (3) Krystian: przegląd i scalenie #27 (squash). (4) Po 29.11: `/zadanie TD2 — strona główna i kreator (docs/zadania/tech.md, sekcja TD2). Powłoka i fundament z TD1 są w develop (components/tech, lib/tech, config/prokom.ts, tech.css); przed kodem przeczytaj docs/tech/LOKALNIE.md §7 (testy, port 3002).`
 
 ## Pilne
 - ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.
@@ -41,7 +42,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 |---|---|---|
 | T0 | start, porządki, rozpoznanie, inwentaryzacja do migracji | gotowe i scalone (14.11): #6–#10 |
 | TM+ | domena → Seohost, kontakt@ na SH 1, migracja 1:1 na VPS webh.pl | **w toku** (od 14.11): etap A |
-| TD1 | fundament i powłoka (izolacja, tokeny, dane, nagłówek, stopka, telefon) | czeka na TM |
+| TD1 | fundament i powłoka (izolacja, tokeny, dane, nagłówek, stopka, telefon) | **PR 1 scalony (#26), PR 2 w przeglądzie (#27)** — ruszyło 14.11 przed TM (decyzja 14.11) |
 | TD2 | strona główna + kreator | czeka na TD1 |
 | TD3 | zgłoszenie, status, przypisanie naprawy (kontrakt) | czeka na TD1 |
 | TD4 | punkty, kontakt, o firmie, strony lokalne, `/serwis-telefonow`, 301 | czeka na TD1 |
@@ -50,6 +51,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | TD6 | QA, wydajność, SEO, sprzątanie, staging → produkcja | czeka na TD2–TD5 |
 
 ## Otwarte (blokują produkcję, nie budowę) — SPEC §10
+- [Krystian, TD1] lista miejscowości Zakopanego w JSON-LD (`lib/tech/jsonld.ts`, `TODO(krystian)`) — przed `published: true`; strona „Dostępność” do paska prawnego (TD5).
 - [SZEF] dane punktu Zakopane; liczby i obietnice; zdjęcia i prawa.
 - [Krystian] oficjalny SVG znaku PRO-KOM TECH.
 - ✔ 14.11.2026: repo `prokom-system` **prywatne** (plan Free) → zmienne buildu frontu jako zmienne repozytorium (`STAGING_`/`PRODUCTION_NEXT_PUBLIC_*`), bez GitHub Environments. Minuty Actions w prywatnym repo: limit planu Free (2000 min/mies.). [Krystian] paczka `prokom-tech-backend` w GHCR nadal publiczna → przełączyć na prywatną (Package settings → Change visibility).
@@ -66,6 +68,10 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
+- [TD1] `npm audit`: krytyczna podatność `next` 14.x ma poprawkę dopiero w Next 15/16 (zmiana wersji głównej — osobna decyzja, panele też na Next); wysokie: `postcss`, `browserslist`, `picomatch`.
+- [TD1] `/client/login` traci `<title>` po hydratacji (stan zastany na develop, strefa zakazana).
+- [TD1] `next start` (standalone) zgłasza brak `sharp` przy obrazach starych stron — sprawdzić obraz Dockera przed TD2 (obrazy `next/image`).
+- [TD1] `panele.spec` działa tylko lokalnie (zrzuty Windows); w CI do rozważenia zrzuty linuksowe z kontenera Playwright.
 - prokom-gaming (nie ten projekt): `prokom-gaming-prod-app-1` używa 916 MB z limitu 1 GB (pomiar 14.11) — sprawdzić w Gaming, czy limit nie jest za ciasny.
 - Staging: `/api/` odpowiada bez basic auth (strona za hasłem, API nie) — rozważyć hasło też na `/api/` albo zostawić świadomie (dane i tak zanonimizowane); `meta robots` na stagingu mówi `index, follow` (chroni nagłówek `X-Robots-Tag` i hasło).
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.

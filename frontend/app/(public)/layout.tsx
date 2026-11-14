@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Archivo, Manrope } from "next/font/google";
-import { ConditionalPublicLayout } from "@/components/layout/ConditionalPublicLayout";
+import { TechShell } from "@/components/tech/TechShell";
 import { ThemeBoot } from "@/components/tech/ThemeBoot";
 import { line, servicePoints } from "@/config/prokom";
 import { jsonLdString, siteJsonLd } from "@/lib/tech/jsonld";
@@ -65,7 +65,8 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       {umamiId ? <script defer src={umamiSrc} data-website-id={umamiId} data-tech-umami="" /> : null}
       <ThemeBoot />
       <div className={`tech ${archivo.variable} ${manrope.variable}`}>
-        <ConditionalPublicLayout>{children}</ConditionalPublicLayout>
+        {/* Old pages render inside the new shell until TD2–TD5 rebuild them (ConditionalPublicLayout stays until TD6). */}
+        <TechShell>{children}</TechShell>
       </div>
     </>
   );

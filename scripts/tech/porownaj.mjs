@@ -54,8 +54,9 @@ for (const theme of themes) {
 
   // 2) screenshot of the page (region)
   const { ctx, page } = await themedPage(browser, { width: 1440, theme });
-  await page.goto(origin + pagePath, { waitUntil: "networkidle" });
+  await page.goto(origin + pagePath, { waitUntil: "load" });
   await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(800);
   await scrollLikeUser(page);
   const buf = REGIONS[region]
     ? await page.locator(REGIONS[region]).first().screenshot()
