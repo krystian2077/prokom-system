@@ -49,7 +49,7 @@ const LEGACY_CONTACT = new Set<string>([
   "app/(public)/serwis-smartwatchy/page.tsx",
   "app/(public)/serwis-tabletow/page.tsx",
   "app/(public)/uslugi/UslugiContent.tsx",
-  "app/(public)/zgloszenie/page.tsx",
+  "features/zgloszenie/LegacyZgloszeniePage.tsx",
   "sections/Contact.tsx",
   "components/layout/PublicFooter.tsx",
   "components/hammer-glass/HammerCta.tsx",
