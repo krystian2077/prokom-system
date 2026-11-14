@@ -56,7 +56,7 @@ Te same pliki obsługują oba stosy: aktualizacja przed wdrożeniem stagingu zmi
 1. `sudo mkdir -p /srv/prokom/prokom-tech && sudo chown krystian: /srv/prokom/prokom-tech`; pliki przez `git archive` (§2).
 2. `.env.staging` i `.env.prod` z `.env.vps.example` (`chmod 600`). Hasła bazy i Redisa: `openssl rand -hex 24`, osobne dla prod i staging. `SECRET_KEY` prod = ten z Hetznera (sesje i tokeny zostają ważne). `APP_IMAGE_TAG` = SHA do pierwszego wdrożenia.
 3. `.env.backup`: `AGE_RECIPIENT="$(cat /srv/prokom/secrets/age.pub)"`, `RCLONE_REMOTE=offsite:prokom-backups-r7k2`, `BACKUP_HEARTBEAT_URL_PROD=…`, `BACKUP_HEARTBEAT_URL_STAGING=…` (`chmod 600`).
-4. GHCR: serwer musi czytać paczki z konta `krystian2077`. Token z samym `read:packages` (konto, które ma dostęp do tych paczek): `docker login ghcr.io -u krystian2077`. Sprawdzenie: `docker pull ghcr.io/krystian2077/prokom-tech-backend:<sha>`.
+4. GHCR: **każda nowa paczka** (`prokom-tech-backend`, `-frontend`, `-frontend-staging`) po pierwszym buildzie jest publiczna — przełącz ją na prywatną (Package settings → Change visibility) i sprawdź anonimowo (manifest ma zwrócić 403). Serwer musi czytać paczki z konta `krystian2077`. Token z samym `read:packages` (konto, które ma dostęp do tych paczek): `docker login ghcr.io -u krystian2077`. Sprawdzenie: `docker pull ghcr.io/krystian2077/prokom-tech-backend:<sha>`.
 5. Pierwszy start: `scripts/vps/deploy.sh staging <sha>` (bez poprzedniego SHA nie ma automatycznego cofnięcia).
 6. Wspólny Nginx: PR w prokom-web (prompt w opisie PR `chore/tech-vps`) → certyfikat → nakładka `compose.proxy.tech-staging.yml` w poleceniu startu proxy (`prokom-web/docs/runbook.md`).
 7. Kopie i monitoring (§5).
