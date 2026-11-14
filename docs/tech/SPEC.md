@@ -27,12 +27,17 @@ prokomserwis.pl staje się stroną linii **PRO-KOM Tech**: jeden serwis z dwoma 
 - Pliki wspólne, tylko w opisanym zakresie: `frontend/app/layout.tsx` (metadane domyślne, JSON-LD przenoszone do layoutu publicznego, kroje używane wyłącznie przez stronę publiczną), `frontend/next.config.js` (`redirects`, `images`), `frontend/Dockerfile` i CI (wersja Node)
 - Stare pliki strony publicznej (`frontend/sections/**`, `frontend/components/layout/Public*.tsx`, `ConditionalPublicLayout.tsx`, `ScopeBar.tsx`, `LiveBadge.tsx`, `frontend/components/hammer-glass/**`, `frontend/components/blog/**`, `frontend/features/zgloszenie/**`, publiczne bloki w `globals.css`): usuwamy dopiero w TD6, po dowodzie (grep), że nikt ich nie importuje.
 
+> **Uwaga z T0 (14.11.2026, `MAPA-PLIKOW.md`) — lista wyżej jest za szeroka:**
+> - `ScopeBar.tsx` i `LiveBadge.tsx` **należą do panelu** (`app/panel/dashboard/page.tsx:16,736`) — **nie usuwamy**.
+> - `PublicNavbar.tsx` i `PublicFooter.tsx` renderuje konto klienta (`app/client/ClientGate.tsx:9-10,87-89`, strefa zakazana). Na stronie publicznej je zastępujemy, ale pliki zostają (zamrożone), chyba że Krystian zatwierdzi wyjątek w `WYJATKI.md`. TODO(krystian): decyzja przed TD6.
+> - `/zgloszenie` ma dziś jedną działającą implementację (`app/(public)/zgloszenie/page.tsx`); `features/zgloszenie/SubmissionForm.tsx` nie jest nigdzie importowany.
+
 **Dlaczego tak ostro:** panele i strona są w jednym projekcie Next.js. Dzielą `globals.css` (4083 linie), Tailwinda, kroje i atrybut motywu `data-theme` z kluczem `prokom-theme`. Jedna „porządkująca” zmiana w globalnych stylach może zepsuć panel, w którym serwis pracuje cały dzień.
 
 ## 3. Architektura frontu publicznego
 - **Izolacja stylów:** cały nowy wygląd siedzi w `frontend/app/(public)/tech.css`, importowanym tylko w `app/(public)/layout.tsx`. Każda reguła jest pod korzeniem `.tech` (wrapper w layoucie publicznym). Zero nowych reguł globalnych dla `html`, `body` i `*` poza `.tech`. Klasy komponentów mają prefiks `t-` (np. `.t-hero`, `.t-capsule`), żeby nie zderzyły się z klasami paneli.
 - **Tailwind:** w nowym kodzie nie używamy. Wygląd przenosimy 1:1 z CSS prototypu (`docs/design/tech/prototyp`). Preflight Tailwinda działa globalnie już dziś i to akceptujemy.
-- **Kroje:** Archivo (oś `wdth`, nagłówki: stretch 108%, waga 800) i Manrope (tekst) przez `next/font/google`, podpięte zmiennymi tylko w layoucie publicznym. W root layoucie zostają DM Sans i Unbounded (używają ich panele). Syne i Plus Jakarta Sans usuwamy w TD6, po sprawdzeniu, że nikt ich nie używa (dziś Syne tylko na starej stronie, Jakarta nigdzie).
+- **Kroje:** Archivo (oś `wdth`, nagłówki: stretch 108%, waga 800) i Manrope (tekst) przez `next/font/google`, podpięte zmiennymi tylko w layoucie publicznym. W root layoucie zostają DM Sans i Unbounded (używają ich panele). Syne i Plus Jakarta Sans usuwamy w TD6, po sprawdzeniu, że nikt ich nie używa (dziś Syne tylko na starej stronie, Jakarta nigdzie). *Uwaga z T0: „nigdzie” dotyczy zmiennej `--font-jakarta` z root layoutu; 5 stron `app/client/*` ładuje Jakartę i Unbounded własnym `next/font` — te zostają. Unbounded psuł `next build` (Google podaje go bez rozszerzenia pliku); obejście `frontend/scripts/patch-next-font.js` (prebuild) — sprawdzić po każdej zmianie wersji Nexta.*
 - **Motyw:** panele używają `data-theme` + `localStorage['prokom-theme']` (`lib/theme.ts`, konteksty paneli). Strona publiczna dostaje **osobny** mechanizm: atrybut `data-tech-theme="light|dark"` na `<html>`, klucz `localStorage['pk-theme']` (wspólny dla stron linii PRO-KOM) i domyślnie motyw systemu. Skrypt ustawiający atrybut jest pierwszym elementem layoutu publicznego (inline, przed treścią), więc nie ma mignięcia. Przełącznik: Jasny / Ciemny / Auto (arkusz Menu na telefonie, przycisk w kapsule). Strona publiczna nigdy nie zapisuje `prokom-theme`.
 - **Dane:** jedno źródło `frontend/config/prokom.ts` (§5). Telefon, e-mail, adres i godziny jako literały w komponentach są zakazane (test `tests/tech/literaly.test.ts`).
 - **API:** wywołania tylko przez istniejące `frontend/lib/api.ts` (`api.post`, `API_V1`) albo `fetch(\`${API_V1}/…\`)` jak dziś. Nowe typy żądań i odpowiedzi trzymamy w `frontend/lib/tech/contract.ts`, 1:1 z `KONTRAKT-BACKEND.md`.
@@ -71,7 +76,7 @@ export const servicePoints: ServicePoint[] = [
 ];
 export const lines = [ /* PRO-KOM, Biznes, Instalacje, Software, Tech (bieżąca), Gaming — nazwy, domeny, kolory kresek z wzorca (stopka, pasek marki) */ ];
 ```
-- Godziny „otwarte do …” liczone na żywo w strefie `Europe/Warsaw` (komponent `OpeningStatus`). Bez godzin punkt nie pokazuje statusu.
+- Godziny „otwarte do …” liczone na żywo w strefie `Europe/Warsaw` (komponent `OpeningStatus`). Bez godzin punkt nie pokazuje statusu. Szczegóły statusu dla każdego punktu: §12.1.
 - **Punkt z `published: false` nie renderuje się nigdzie** na produkcji: karta, mapa, wybór w kreatorze i formularzu, JSON-LD, strona lokalna. Na stagingu, przy `NEXT_PUBLIC_TECH_DRAFT=1`, pokazuje się z ramką „do uzupełnienia” jak w prototypie. Test sprawdza oba warianty.
 - Treść pokazuje, że punkty są dwa, dopiero gdy Zakopane ma `published: true`. Do tego czasu strona mówi o Rabce, a Zakopane pojawia się wyłącznie na stagingu. To blokada produkcji pełnej wersji (§10).
 
@@ -96,6 +101,8 @@ export const lines = [ /* PRO-KOM, Biznes, Instalacje, Software, Tech (bieżąca
 | `/akcesoria` | sklep | **usunięte** → 301 na `/hammer-glass` (najbliższa treść: folie i szkła) | TD4 |
 | `/oferta` | sprzedaż sprzętu | **usunięte** → 301 na `/` | TD4 |
 | 404 | domyślna | własna strona 404 w skórce | TD5 |
+| `/jak-przygotowac-sprzet` | — (nowy) | poradnik przed oddaniem sprzętu (§12.3) | TD5 |
+| `/naprawy/[slug]` | — (nowe) | strony konkretnych napraw, start: do 12 (§12.4) | TD5b |
 
 Menu (kapsuła): **Naprawy ▾ · Punkty serwisowe ▾ · Hammer Glass · Blog · O firmie · Kontakt**, po prawej Konto, motyw, „Zgłoś naprawę”. Bez „Sklep”. „Konto” prowadzi do `/client/login` (panel klienta bez zmian).
 Pasek marki: linie PRO-KOM (Tech pogrubiony), status godzin, „Sprawdź status naprawy” → `/track`, „Serwis: 883 200 151”.
@@ -106,6 +113,7 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - Wspólne bloki: `PointCard`, `PodhaleMap` (mapa schematyczna z prototypu, SVG), `OsmMap` (mapa adresu: statyczny SVG albo kafel OSM, bez ramki Google), `Faq`, `CtaBand`, `Steps`, `RepairTracker` (5 etapów), `DeviceGrid`, `BrandMarquee`.
 - Kreator: `RepairWizard` z `wizard-data.ts` (urządzenia, usterki per urządzenie, punkty na zdjęciach, sposoby dostarczenia: Rabka-Zdrój, Zakopane (tylko gdy `published`), kurier). Wynik to przejście do `/zgloszenie` z parametrami (KONTRAKT §1.4).
 - Formularze: `RepairForm` (5 kroków), `InquiryForm`, `TrackForm`. Wspólnie: walidacja, zgoda, ekran sukcesu, obsługa błędów API.
+- Dodatki (§12): `PrepChecklist` (lista „przygotuj sprzęt”, także skrót w formularzu i na ekranie sukcesu), `RepairPage` (szablon strony naprawy), `InstallHint` (dyskretna podpowiedź „Dodaj do ekranu głównego” w arkuszu Menu, bez wyskakujących okien).
 
 ## 8. Treść i zasady treści (obowiązują w każdej sesji)
 - Bez WhatsAppa, bez zdjęć ludzi, bez cen (do decyzji szefa), **bez paczkomatu** (serwis nie nadaje i nie odbiera, decyzja 14.11), **bez sklepu**.
@@ -126,6 +134,8 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - **[SZEF/Krystian]** prawa do zdjęć urządzeń i kadrów plotera, źródła w `media-zrodla.json`.
 - **[Krystian]** oficjalny SVG znaku PRO-KOM TECH (dziś rysunek zastępczy), DNS/MX dla `kontakt@prokomserwis.pl`.
 - **[prawnik]** polityka prywatności po zmianie hostingu.
+- **[Krystian + serwis]** lista do 12 najczęstszych napraw na strony `/naprawy/…` (§12.4) i dla każdej: realny czas, czy na miejscu w Rabce, gwarancja. Strona bez potwierdzonych danych się nie publikuje.
+- **[SZEF]** dni zamknięcia poza świętami ustawowymi (np. inwentaryzacja, urlop) — wpisywane w `closures` w `prokom.ts` (§12.1).
 
 ## 11. Definition of Done każdej sesji z UI
 1. Wygląd zgodny ze wzorcem (`porownaj.mjs` 1440 w obu motywach + zasady `RESPONSYWNOSC.md` na wszystkich szerokościach testowych).
@@ -135,3 +145,38 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 5. Testy treści: brak WhatsApp/wa.me, brak „paczkomat”, brak literałów kontaktowych poza `prokom.ts`, brak zaślepek `[…]` na buildzie produkcyjnym.
 6. Zrzuty przed/po w opisie PR (1440, 1024, 768, 390, 360, jasny i ciemny).
 7. `docs/STAN.md` zaktualizowany (`/koniec-sesji`).
+
+## 12. Dodatki (decyzja Krystiana 14.11.2026)
+
+### 12.1 „Otwarte teraz” przy każdym punkcie (TD1 logika, TD1/TD4 widok)
+- Logika w `lib/tech/hours.ts`, czysta funkcja `getOpeningStatus(point, now)` z testami, strefa `Europe/Warsaw` (także zmiana czasu w marcu i październiku).
+- Komunikaty (dosłownie): „Otwarte do 17:00” · „Zamykamy za 25 min” (ostatnie 30 min) · „Otwieramy dziś o 9:00” · „Zamknięte · otwieramy jutro o 9:00” · „Zamknięte · otwieramy w poniedziałek o 9:00”. Zielona kropka tylko przy „Otwarte”.
+- Święta ustawowe liczone w kodzie (stałe + Wielkanoc, Boże Ciało; od 2025 także Wigilia 24.12) i dodatkowe dni zamknięcia z `prokom.ts` → `closures: { date: 'YYYY-MM-DD'; note: string }[]` (np. inwentaryzacja). W taki dzień: „Zamknięte dziś (święto) · otwieramy …”.
+- Gdzie: pasek marki (punkt najbliższy otwarcia albo oba skrótem), `PointCard`, strony lokalne, ekran sukcesu zgłoszenia przy wybranym punkcie, arkusz Menu na telefonie.
+- Renderowanie: status liczony po stronie klienta po hydratacji (bez zgadywania na serwerze), wcześniej szkielet o stałej szerokości (CLS = 0). Odświeżenie co minutę, gdy karta jest widoczna.
+- `openingHoursSpecification` w JSON-LD z tych samych danych (bez dni wyjątkowych).
+
+### 12.2 Strona jako aplikacja (PWA) (TD5 PR 3)
+- `app/(public)/manifest.ts` → `/manifest.webmanifest`: nazwa „PRO-KOM Tech”, krótka „PRO-KOM Tech”, `start_url: '/?src=pwa'`, `scope: '/'`, `display: 'standalone'`, kolory z tokenów (tło `--bg`, `theme_color` jasny/ciemny przez `<meta name="theme-color" media=…>`), ikony 192/512, wersja `maskable`, skróty: „Zgłoś naprawę” → `/zgloszenie`, „Status naprawy” → `/track`, „Punkty” → `/punkty-serwisowe`.
+- iOS: `apple-touch-icon` 180, `apple-mobile-web-app-capable`, styl paska stanu, `viewport-fit=cover` i bezpieczne marginesy (`env(safe-area-inset-*)`) dla TabBar.
+- Manifest i meta podpinane **tylko w layoucie publicznym** — panele bez zmian.
+- Service worker `public/sw.js` minimalny i bezpieczny: obsługuje wyłącznie stronę offline (`/offline` w skórce: „Brak połączenia”, telefon serwisu, godziny z ostatniego wczytania). **Nie keszuje** HTML, `/api/**`, `/panel/**`, `/admin-panel/**`, `/client/**`, `/_next/data/**` ani niczego z ciasteczkami. Rejestrowany tylko na stronach publicznych, po `load`. Wersjonowany, z procedurą wyrejestrowania opisaną w `WDROZENIE.md`.
+- `InstallHint` w arkuszu Menu: na Androidzie przycisk przez `beforeinstallprompt`, na iOS instrukcja „Udostępnij → Do ekranu początkowego”; ukryty, gdy strona działa jako zainstalowana. Żadnych wyskakujących banerów.
+- Ikony z oficjalnego znaku PRO-KOM TECH (do tego czasu z rysunku z prototypu, wymiana jednym plikiem).
+- Analityka (jeśli wejdzie): `src=pwa` pozwala policzyć wejścia z ikony.
+
+### 12.3 „Jak przygotować sprzęt do serwisu” (TD5 PR 3)
+- Strona `/jak-przygotowac-sprzet` z zakładkami: Telefon / Tablet, Laptop / Komputer, Konsola, Smartwatch. Kroki z krótkim „dlaczego”:
+  kopia zapasowa (iCloud/Google/komputer) · kod odblokowania albo wzór (podajesz przy przyjęciu, albo naprawa bez testu po naprawie) · wyłączenie „Znajdź mój iPhone” / ochrony przed kradzieżą — tylko gdy serwis poprosi, z informacją, że bez tego niektóre naprawy są niemożliwe · konto Google na Androidzie (FRP) — znać login i hasło · wyjęcie karty SIM i karty pamięci · zdjęcie etui i szkła (szkło Hammer Glass założymy nowe) · ładowarka do laptopa · opis usterki i kiedy występuje · dowód zakupu przy gwarancji.
+- Teksty zgodne z zasadami §8 (bez cen, bez obietnic czasu). Każdy krok sprawdzany z serwisem przed publikacją.
+- Wykorzystanie: link w kroku 5 formularza i na ekranie sukcesu (skrót 4 najważniejszych punktów jako `PrepChecklist`), na `/track` przy statusie „Przyjęte”, w FAQ i w stopce (Informacje). Opcja „Wydrukuj” (styl druku).
+- SEO: tytuł „Jak przygotować telefon lub laptop do serwisu | PRO-KOM Tech”, JSON-LD `Article` + `BreadcrumbList` (bez `HowTo` — Google nie pokazuje już tych wyników).
+
+### 12.4 Strony konkretnych napraw `/naprawy/[slug]` (TD5b)
+- Dane w `frontend/config/naprawy.ts`: `slug, title, h1, device (kategoria z KONTRAKT §1.1), usterka (kod z wizard-data), intro, objawy[], przebieg[], czas (tekst potwierdzony przez serwis albo null), gwarancja (tekst albo null), naMiejscu (boolean|null), faq[], powiazane[], published, verified`. Strona publikuje się tylko przy `published && verified` (na stagingu z ramką przy `NEXT_PUBLIC_TECH_DRAFT=1`).
+- **Jedna strona na naprawę, nie na miasto.** Oba punkty w jednym bloku („Gdzie oddać”: karty z `OpeningStatus`). Żadnych wariantów „… Rabka” i „… Zakopane” tej samej naprawy (ryzyko doorway pages). Miasto w tytule tylko w formie „Rabka-Zdrój i Zakopane” (albo samo Rabka-Zdrój do publikacji Zakopanego).
+- Szablon `RepairPage`: hero (H1, 2–3 zdania, „Zgłoś tę naprawę” → `/zgloszenie?category=…&usterka=…`), objawy, jak przebiega naprawa (kroki), ile trwa (tylko potwierdzone), gwarancja, „Zanim przyjdziesz” (`PrepChecklist` dla urządzenia), Hammer Glass przy ekranach telefonów, FAQ (3–5 unikalnych pytań), powiązane naprawy, CTA. Bez cen.
+- Treść: minimum ok. 400 słów własnego tekstu na stronę, każda inna (test: wspólny tekst między stronami < 30% poza blokami szablonu). Lepiej 6 dobrych niż 12 słabych.
+- Kandydaci (wybiera Krystian z serwisem, start do 12): wymiana ekranu iPhone · wymiana ekranu Samsung · wymiana baterii w telefonie · naprawa gniazda ładowania · telefon po zalaniu · wymiana tylnej szybki iPhone · laptop się przegrzewa (czyszczenie i pasta) · wymiana matrycy w laptopie · wymiana klawiatury w laptopie · laptop się nie włącza · wymiana dysku na SSD / przyspieszenie komputera · czyszczenie konsoli PS5/PS4.
+- Linkowanie: hub `/uslugi` i strony urządzeń (TD5) linkują do napraw swojego urządzenia; kreator po wyborze usterki pokazuje „Dowiedz się więcej” (jeśli strona istnieje); blog — linki z pasujących wpisów (bez zmiany treści wpisów, tylko blok „Powiązana naprawa” w szablonie wpisu po tagu/kategorii).
+- SEO: tytuł np. „Wymiana ekranu iPhone — Rabka-Zdrój i Zakopane | PRO-KOM Tech”, opis 120–155, JSON-LD `Service` (provider = punkty opublikowane, `areaServed` z listy miejscowości) + `FAQPage` + `BreadcrumbList`, sitemap tylko opublikowane.
