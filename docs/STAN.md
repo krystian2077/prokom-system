@@ -36,6 +36,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [Krystian + serwis] lista do 12 napraw na `/naprawy/…` z czasem, gwarancją i „na miejscu” (SPEC §12.4) — przed TD5b.
 - [Krystian] Umami dla Tech: identyfikator strony (`UMAMI_WEBSITES` w `.env.prod` prokom-web) i dopisek w polityce prywatności (SPEC §12.5). Skrypt idzie przez Nginx prokom-web (`/_s/script.js`), więc zadziała dopiero po TM.
 - [SZEF/serwis] treść sekcji „Twoje dane są bezpieczne” (SPEC §12.9) — do tego czasu sekcja ukryta flagą.
+- [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
+- [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
@@ -43,6 +45,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14.11.2026 — SPEC §12.10 (naprawa wysyłkowa) i §12.11 (kategorie bloga), plan ≈ 21,25 wieczoru, **zakres zamknięty**. Liczby bloga przeliczone: 49 obiektów / 48 wpisów.
 - 14.11.2026 — SPEC §12.5–§12.9 (Umami, „Moje naprawy”, ekran sukcesu z QR, nawigacja, komunikat i sekcja zaufania), plan ≈ 20,25 wieczoru. Sobota w Rabce: 9:00–14:00.
 - 14.11.2026 — SPEC 1.0 z dodatkami §12 (status godzin, PWA, poradnik, strony napraw) i plan sesji z TD5 PR 3 i TD5b (≈ 19,25 wieczoru). W SPEC dopisane uwagi z T0 (ScopeBar/LiveBadge i PublicNavbar/Footer zostają).
 - 14.11.2026 — **T0**: pakiet w repo (PR 1), strażnik strefy zakazanej + CI, skan sekretów (gitleaks czysty, ale hasła kont w seedach → zmienione), `LOKALNIE.md` (sprawdzone zgłoszenie z formularza na 3003), `MAPA-PLIKOW.md`, KONTRAKT poprawiony wg kodu + 17 fixtures, `INWENTARZ.md` (część z repo + komendy), `anonimizuj.sql` (test na Postgres 16: 12 kontroli = 0). Wykryte: build frontu pada przez Google Fonts (Unbounded).
