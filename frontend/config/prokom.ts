@@ -131,6 +131,8 @@ export const claims = {
   hgCutTime: { text: "Cięcie trwa około minuty", confirmed: false },
   /** Google rating card ("Dlaczego"): rating and number of reviews, e.g. "4,9 · 120 opinii". */
   googleRating: { text: "", confirmed: false },
+  /** "Na Podhalu od 2004 roku" card ("Dlaczego"); the year itself is company.since. */
+  sinceYear: { text: "2004", confirmed: false },
   /** Courier from the whole country (SPEC §10 courier question 5). */
   courierWholeCountry: { text: "z całej Polski", confirmed: false },
 } satisfies Record<string, Claim>;

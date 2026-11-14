@@ -24,15 +24,15 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
             <span className="t-hero__mstatus">
               <OpeningStatus points={points.filter((p) => !p.draft)} variant="pill" skeletonCh={16} />
             </span>
-            <h1 id="t-hero-h1" className="t-hero__h1 t-reveal t-reveal--1">
+            <h1 id="t-hero-h1" className="t-hero__h1">
               Serwis telefonów <br className="t-hero__br" />i&nbsp;komputerów
               <span className="t-hero__sub">{publishedNames.join(" · ")}</span>
             </h1>
-            <p className="t-hero__lead t-reveal t-reveal--2">
+            <p className="t-hero__lead">
               <span className="t-hero__lead--wide">Najpierw diagnoza i wycena. Naprawiamy dopiero wtedy, gdy się zgodzisz.</span>
               <span className="t-hero__lead--phone">Diagnoza i wycena przed naprawą.</span>
             </p>
-            <div className="t-hero__actions t-reveal t-reveal--3">
+            <div className="t-hero__actions">
               <Link href={SUBMIT_HREF} className="t-hbtn t-hbtn--acc t-shine t-hero__submit" data-track="zgloszenie_start" data-track-zrodlo="przycisk">
                 <IconWrench size={18} />
                 Zgłoś naprawę online
@@ -63,13 +63,12 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
               alt="Smartfony naprawiane w PRO-KOM Tech"
               width={433}
               height={577}
-              priority
               unoptimized
             />
           </div>
         </div>
 
-        <div className={`t-hero__points${points.length === 1 ? " is-single" : ""} t-reveal t-reveal--5`}>
+        <div className={`t-hero__points${points.length === 1 ? " is-single" : ""}`}>
           {points.map((p, i) => (
             <div key={p.key} className="t-hero__pointwrap">
               {i > 0 ? <span className="t-hero__sep" aria-hidden="true" /> : null}

@@ -58,8 +58,33 @@ test.describe("desktop 1440", () => {
   test("unpublished Zakopane is not offered anywhere (SPEC §5)", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#kreator").getByRole("button", { name: /Zakopane/ })).toHaveCount(0);
-    await expect(page.locator("main")).not.toContainText("Zakopane");
+    // the town may be listed among served towns, but never as a service point
+    await expect(page.locator(".t-hero__points")).not.toContainText("Zakopane");
+    await expect(page.locator(".t-podhale__pin", { hasText: "Zakopane" })).toHaveCount(0);
+    await expect(page.locator(".t-ptile")).toHaveCount(1);
+    await expect(page.locator(".t-cta-band__point")).toHaveCount(1);
+    await expect(page.locator("main")).not.toContainText("Dwa punkty");
+    await expect(page.locator(".t-near")).toHaveCount(0);
     await expect(page.locator("main")).not.toContainText("paczkomat");
+  });
+
+  test("side rail lists the home sections, FAQ works with the keyboard", async ({ page }) => {
+    await page.goto("/");
+    const rail = page.locator("nav.t-rail");
+    await expect(rail.locator("a[href^='#']")).toHaveCount(8);
+    const faq = page.locator(".t-faq__item").nth(1);
+    await expect(faq).not.toHaveAttribute("open", "");
+    await faq.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(faq).toHaveAttribute("open", "");
+  });
+
+  test("unconfirmed numbers are not shown in production (SPEC §10)", async ({ page }) => {
+    await page.goto("/");
+    const main = page.locator("main");
+    for (const t of ["często ok. 1 h", "10 000+", "0,1 mm", "około 5", "z całej Polski", "Opinie Google"]) {
+      await expect(main).not.toContainText(t);
+    }
   });
 
   test("Dalej navigates to the form", async ({ page }) => {
