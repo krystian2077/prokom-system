@@ -8,6 +8,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - **Następny krok:** (1) scalić PR 1, utworzyć `develop` i przestawić PR 2 na `develop`; (2) na Hetznerze `chmod 600` dla `.env.prod` i `.env.prod.bak-*` (dziś 644); (3) przed TM ręczny `pg_dump` z Hetznera — **nie ma żadnych kopii zapasowych** (`INWENTARZ.md` B1.2); (4) TM+ (domena, poczta, VPS).
 
 ## Pilne
+- ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.
 - ✔ 14.11.2026: hasła kont z `seed_initial.py`/`seed_staff_profiles.py` zmienione na produkcji (Krystian). Poprawka seedów → backlog w `WYJATKI.md`.
 - ✔ 14.11.2026: build frontu naprawiony bez zmian w panelach (`frontend/scripts/patch-next-font.js` jako `prebuild`, commit `85b96bf`). Usunąć po aktualizacji Nexta, gdy ten obsłuży adresy Google Fonts bez rozszerzenia.
 - ✖ Brak kopii zapasowych produkcji (0 wpisów `BackupLog`, brak crona) — ręczny `pg_dump` przed TM, na VPS kopie od pierwszego dnia.
@@ -32,7 +33,6 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [Krystian] termin TM: plan 23–27.11 (staging), przełączenie ndz 29.11.
 - [Krystian] czy 3 zgłoszenia i 8 klientów na produkcji to dane prawdziwe czy testowe (jeśli testowe — VPS może ruszyć na czystej bazie; `INWENTARZ.md` B1.1).
 - [Krystian/TD6] `PublicNavbar`/`PublicFooter` używa logowanie klienta (`app/client/ClientGate.tsx`) → zostają zamrożone albo wyjątek (`MAPA-PLIKOW.md`, TODO).
-- [SZEF/Krystian] **godziny soboty w Rabce:** SPEC §5 ma 9:00–14:00 (i test TD1 „sobota 13:40”), a backend (`SERWIS_PRINT_HOURS`, blok „Twój serwis” w `/track` i wydruki) domyślnie „Sob 9:00–13:00”. Ustalić jedną wartość przed TD1; jeśli 13:00 — poprawić SPEC §5, jeśli 14:00 — zmienić `SERWIS_PRINT_HOURS` w `.env.prod` (bez zmian w kodzie).
 - [Krystian + serwis] lista do 12 napraw na `/naprawy/…` z czasem, gwarancją i „na miejscu” (SPEC §12.4) — przed TD5b.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
