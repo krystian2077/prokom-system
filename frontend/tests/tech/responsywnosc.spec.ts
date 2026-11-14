@@ -23,7 +23,7 @@ async function open(page: Page, url: string, width: number, theme: (typeof THEME
       /* ignore */
     }
   }, theme);
-  await page.goto(url, { waitUntil: "networkidle" });
+  await page.goto(url, { waitUntil: "load" });
 }
 
 async function scrollThrough(page: Page) {
