@@ -31,7 +31,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | Cron kopii stagingu | ✔ | `30 3 * * *` UTC (`scripts/vps/backup.sh staging`), po prokom-web 02:30/02:45 i Gaming 03:00/03:15; prod Tech — po przełączeniu (MIGRACJA §8 pkt 10); heartbeat Better Stack — do dodania |
 | Heartbeat kopii stagingu (Better Stack „Kopia Tech staging”, 1 d + 3 h, e-mail) | ✔ | po `backup.sh staging` status Up; prod — w niedzielę |
 | `.env.prod` na VPS | ✔ | z `.env.prod` Hetznera (ten sam `SECRET_KEY`, Gmail, Google, `SERWIS_PRINT_*`), nowe hasła bazy/Redisa, `GATEWAY_PORT=3300`; kopia z Hetznera usunięta (`shred -u`); compose config OK |
-| Część ręczna (panel, lista napraw, PDF, upload 20 MB) | — | po vhoście `staging.prokomserwis.pl` (prokom-web) |
+| Część ręczna (14.11 ~21:00, `https://staging.prokomserwis.pl`) | ✔ | basic auth ✔, logowanie do panelu admina kontem pracownika ✔ (konta staff zostają po anonimizacji), lista napraw (2 aktywne) i klientów (8, zanonimizowani) ✔, szczegóły naprawy ✔, PDF protokołu przyjęcia („Podgląd wydruku / druk”) ✔, strona główna i `/zgloszenie` bez błędów w konsoli ✔, `X-Robots-Tag: noindex` ✔; limit 20 MB przez oba Nginxy: 19 MB dochodzi do Django, 21,5 MB → 413 ✔. Uwaga: panel nie ma pola do wgrywania zdjęć (backend przyjmuje plik tylko w `mark-package-received`), więc „upload zdjęcia w panelu” sprawdzono samym limitem |
 | Test odtworzenia kopii (`backup.sh` → B2 → `restore.sh`) | ✔ | `.env.backup` (ten sam `age.pub` i bucket co Gaming); kopia 432 KB w `offsite:prokom-backups-r7k2/tech-staging/daily/`; zgłoszenie testowe dodane po kopii (4) → po odtworzeniu z B2: 3 = manifest; smoke core ok; `age.key` usunięty (`shred -u`) |
 
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
@@ -64,6 +64,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
+- Staging: `/api/` odpowiada bez basic auth (strona za hasłem, API nie) — rozważyć hasło też na `/api/` albo zostawić świadomie (dane i tak zanonimizowane); `meta robots` na stagingu mówi `index, follow` (chroni nagłówek `X-Robots-Tag` i hasło).
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
