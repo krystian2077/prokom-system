@@ -27,3 +27,16 @@ jobs:
 
       - name: Run build
         run: npm run build
+
+  # PRO-KOM Tech: backend and panels must stay untouched (docs/tech/SPEC.md §2).
+  strefa-zakazana:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check forbidden zone
+        run: bash scripts/tech/strefa-zakazana.sh "origin/${{ github.base_ref }}"
