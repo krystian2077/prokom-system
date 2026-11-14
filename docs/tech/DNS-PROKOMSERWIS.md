@@ -11,7 +11,7 @@ Zasada (TM+): przed każdą zmianą DNS zapisujemy tu stan „przed”, po zmian
 | Utworzona / wygasa | 28.04.2026 / **28.04.2027** (okres roczny, proforma) |
 | Abonent | **osoba prywatna (Krystian), nie firma PRO-KOM Tadeusz Wójciak** — decyzja 14.11: transfer do Seohost bez zmiany abonenta (AuthInfo i potwierdzenia po stronie obecnego abonenta), **zmiana abonenta na firmę (NIP) w Seohost zaraz po zakończonym transferze** |
 | Serwery DNS | `dns1.tld.pl`, `dns2.tld.pl`, `dns3.tld.pl` (strefa w cyber_Folks) |
-| DNSSEC | brak informacji na zrzucie (do sprawdzenia przed zmianą serwerów DNS) |
+| DNSSEC | **wyłączony** — brak rekordu DS w `.pl` (sprawdzone 14.11), więc zmiana serwerów DNS nie wymaga wyłączania DNSSEC |
 
 ### Strefa
 | Nazwa | Typ | TTL | Wartość | Uwagi |
@@ -20,7 +20,7 @@ Zasada (TM+): przed każdą zmianą DNS zapisujemy tu stan „przed”, po zmian
 | `www.prokomserwis.pl` | A | 3600 | `62.238.0.240` | jw.; `www` to rekord A, nie CNAME |
 | `prokomserwis.pl` | NS | 3600 | `dns1.tld.pl`, `dns2.tld.pl`, `dns3.tld.pl` | |
 | `prokomserwis.pl` | SOA | 3600 | `dns1.tld.pl. hostmaster.prokomserwis.pl.` refresh 10800, retry 3600, expire 604800, minimum 3600 | serial wg resolwerów: `2026111201` |
-| `prokomserwis.pl` | TXT | 3600 | 64-znakowy hash `8ece6fb5…` | pochodzenie do ustalenia — **nie usuwać** |
+| `prokomserwis.pl` | TXT | 3600 | 63-znakowy ciąg hex `8ece6fb5…` | pochodzenie do ustalenia — **nie usuwać** |
 | `prokomserwis.pl` | TXT | 3600 | `google-site-verification=8vUskG…` | Search Console — **nie usuwać** |
 
 Brak: AAAA, MX, CAA, CNAME, SRV. Poczty `@prokomserwis.pl` dziś nie ma.
@@ -31,6 +31,31 @@ Brak: AAAA, MX, CAA, CNAME, SRV. Poczty `@prokomserwis.pl` dziś nie ma.
 | `prokomserwis.pl` (i `www`) | Przekierowanie IP | `62.238.0.240` |
 
 **Ważne dla migracji (TM+ etap C, MIGRACJA §8):** dopóki strefa jest w cyber_Folks, zmiana IP na VPS (`194.28.50.70`) to edycja „Przekierowania IP” (Modyfikuj), a nie wierszy A — te generuje przekierowanie. Po przeniesieniu strefy do Seohost (TM+ etap A) rekordy A wpisujemy normalnie w strefie Seohost, a przekierowanie w cyber_Folks przestaje mieć znaczenie.
+
+## Etap A — sprawdzenie (TM+ A1, A2) — 14.11.2026
+- Resolwery `1.1.1.1` i `8.8.8.8` zgodne ze strefą w panelu: A `@` i `www` = `62.238.0.240`, NS `dns1–3.tld.pl`, SOA serial `2026111201`, 2× TXT; **0 × AAAA, 0 × MX, 0 × CAA**. TTL NS w cache Google 365 s (reszta 3600).
+- **Poczty nie ma (brak MX)** → A2: idziemy dalej bez planu przenoszenia skrzynek.
+- Hosting w cyber_Folks: na zrzucie tylko usługa „FreeDNS — parking domeny”. TODO(krystian): rozwiń „Dodatki (addons)” i potwierdź, że nic tam nie ma.
+- Seohost `dns1.microhost.pl`: strefy `prokomserwis.pl` jeszcze nie ma (NXDOMAIN) — stan oczekiwany przed A3.
+
+## Etap A3 — strefa do wpisania w Seohost (1:1, TTL 3600)
+NS i SOA ustawia Seohost sam (`dns1.microhost.pl`, `dns2.microhost.pl`). Wpisujemy tylko:
+
+| Nazwa | Typ | TTL | Wartość |
+|---|---|---|---|
+| `@` (prokomserwis.pl) | A | 3600 | `62.238.0.240` |
+| `www` | A | 3600 | `62.238.0.240` |
+| `@` | TXT | 3600 | `google-site-verification=8vUskGsYJnyr5rq_dpzDdOy_azqSiY2UlzUwblNN50A` |
+| `@` | TXT | 3600 | `8ece6fb5f49cfbd14415065aa5e0df2356e0c9fc07a875b7492c42a478f0e85` |
+
+Bez MX, bez AAAA (poczta dochodzi w etapie B, IPv6 nie używamy). Jeśli Seohost przy zakładaniu strefy doda sam rekordy domyślne (np. A na swój hosting, MX `mail.prokomserwis.pl`, CNAME `ftp`/`mail`), **usuń je** — strefa ma być dokładnie taka jak wyżej. Wartości TXT są publiczne (każdy je odczyta z DNS), dlatego są tu w całości.
+
+Kontrola po wpisaniu (zanim zmienisz serwery DNS w cyber_Folks):
+```powershell
+foreach ($t in "SOA","NS","A","AAAA","MX","TXT") { Resolve-DnsName prokomserwis.pl -Type $t -Server dns1.microhost.pl -DnsOnly -ErrorAction SilentlyContinue | ? Section -eq Answer | ft Name,Type,TTL,IPAddress,NameHost,Strings -AutoSize }
+Resolve-DnsName www.prokomserwis.pl -Type A -Server dns2.microhost.pl -DnsOnly | ? Section -eq Answer | ft Name,Type,TTL,IPAddress -AutoSize
+```
+Oczekiwane: SOA i NS z `microhost.pl`, A `62.238.0.240` dla `@` i `www` na obu serwerach, 2× TXT jak wyżej, brak AAAA i MX.
 
 ## Dziennik zmian
 | Data | Zmiana | Przed | Po | Sprawdzenie |

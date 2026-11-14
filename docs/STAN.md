@@ -4,8 +4,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** T0 gotowe: PR 1 (#6, pakiet) i PR 2 (#7, `chore/tech-t0`) czekają na scalenie. Inwentarz Hetznera i DNS uzupełniony (`INWENTARZ.md` §B, §B1).
-- **Następny krok:** (1) scalić PR 1, utworzyć `develop` i przestawić PR 2 na `develop`; (2) na Hetznerze `chmod 600` dla `.env.prod` i `.env.prod.bak-*` (dziś 644); (3) przed TM ręczny `pg_dump` z Hetznera — **nie ma żadnych kopii zapasowych** (`INWENTARZ.md` B1.2); (4) TM+ (domena, poczta, VPS).
+- **W toku:** **TM+** (prompt w `docs/zadania/tech.md`). Etap A: A1–A2 sprawdzone 14.11 (brak MX, DNSSEC wyłączony), A3 — tabela strefy dla Seohost gotowa w `docs/tech/DNS-PROKOMSERWIS.md`, czeka na założenie strefy przez Krystiana.
+- **Następny krok:** Krystian zakłada strefę `prokomserwis.pl` w Seohost wg tabeli A3 → kontrola przez `dns1/dns2.microhost.pl` → zmiana serwerów DNS w cyber_Folks (A4). Równolegle przed etapem C: `chmod 600` dla `.env.prod` na Hetznerze, ręczny `pg_dump`, `SERWIS_PRINT_HOURS` z sobotą do 14:00.
 
 ## Pilne
 - ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.
@@ -16,8 +16,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
 | Sesja | Zakres | Stan |
 |---|---|---|
-| T0 | start, porządki, rozpoznanie, inwentaryzacja do migracji | gotowe i scalone (14.11): #6, #7, #8 |
-| TM | migracja 1:1 na VPS webh.pl (staging → przełączenie w niedzielę) | czeka na T0 i start Gaming (20.11) |
+| T0 | start, porządki, rozpoznanie, inwentaryzacja do migracji | gotowe i scalone (14.11): #6–#10 |
+| TM+ | domena → Seohost, kontakt@ na SH 1, migracja 1:1 na VPS webh.pl | **w toku** (od 14.11): etap A |
 | TD1 | fundament i powłoka (izolacja, tokeny, dane, nagłówek, stopka, telefon) | czeka na TM |
 | TD2 | strona główna + kreator | czeka na TD1 |
 | TD3 | zgłoszenie, status, przypisanie naprawy (kontrakt) | czeka na TD1 |
@@ -43,7 +43,6 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
-- Zastąpić prompt TM w `docs/zadania/tech.md` promptem TM+ (domena → Seohost, kontakt@ na SH 1, VPS) — tekst od Krystiana z 14.11.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
