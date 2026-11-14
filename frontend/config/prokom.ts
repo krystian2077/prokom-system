@@ -109,7 +109,34 @@ export const courierService = {
   area: null as null | "polska" | "okolica",
 };
 
-export type LineKey = "prokom" | "biznes" | "instalacje" | "software" | "tech" | "gaming";
+/**
+ * Numbers and promises from the design that still need the boss's confirmation (SPEC §10).
+ * `confirmed: false` → hidden in production (or the sentence goes without the number);
+ * with NEXT_PUBLIC_TECH_DRAFT=1 (staging) shown inside the "do potwierdzenia" frame.
+ * Flip `confirmed` after confirmation — components read it via lib/tech/claims.ts.
+ */
+export type Claim = { text: string; confirmed: boolean };
+export const claims = {
+  /** Phone screen replacement time, pill on "Najczęstsze naprawy". */
+  quickRepair: { text: "często ok. 1 h", confirmed: false },
+  /** Diagnosis is free in most cases (step 2 of "Od zgłoszenia do odbioru"). */
+  freeDiagnosis: { text: "Bezpłatnie w większości przypadków.", confirmed: false },
+  /** Diagnosis usually the same day (step 2). */
+  sameDayDiagnosis: { text: "Zwykle tego samego dnia.", confirmed: false },
+  /** Hammer Glass block. */
+  hgModels: { text: "10 000+", confirmed: false },
+  hgFoils: { text: "9", confirmed: false },
+  hgPrecision: { text: "0,1 mm", confirmed: false },
+  hgMinutes: { text: "W około 5 minut.", confirmed: false },
+  hgCutTime: { text: "Cięcie trwa około minuty", confirmed: false },
+  /** Google rating card ("Dlaczego"): rating and number of reviews, e.g. "4,9 · 120 opinii". */
+  googleRating: { text: "", confirmed: false },
+  /** Courier from the whole country (SPEC §10 courier question 5). */
+  courierWholeCountry: { text: "z całej Polski", confirmed: false },
+} satisfies Record<string, Claim>;
+export type ClaimKey = keyof typeof claims;
+
+export type LineKey ="prokom" | "biznes" | "instalacje" | "software" | "tech" | "gaming";
 export type Line = {
   key: LineKey;
   name: string;

@@ -73,7 +73,8 @@ test.describe("phone 390", () => {
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("link", { name: "Hammer Glass" })).toBeVisible();
     await expect(dialog.getByRole("radiogroup", { name: "Motyw" })).toBeVisible();
-    expect(await page.evaluate(() => document.activeElement?.closest("[role=dialog]") !== null)).toBe(true);
+    // focus moves into the sheet after a short timer — poll instead of a one-shot check
+    await expect.poll(() => page.evaluate(() => document.activeElement?.closest("[role=dialog]") !== null)).toBe(true);
     // focus trap: many Tabs stay inside
     for (let i = 0; i < 30; i++) await page.keyboard.press("Tab");
     expect(await page.evaluate(() => document.activeElement?.closest("[role=dialog]") !== null)).toBe(true);

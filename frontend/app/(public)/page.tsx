@@ -1,49 +1,40 @@
 ﻿import type { Metadata } from "next";
+import { line, servicePoints } from "@/config/prokom";
+import { BrandMarquee } from "@/components/tech/home/BrandMarquee";
+import { DeviceGrid } from "@/components/tech/home/DeviceGrid";
+import { Hero } from "@/components/tech/home/Hero";
+import { RepairWizard } from "@/components/tech/RepairWizard";
+import { claim } from "@/lib/tech/claims";
+import { courierPageHref, courierPaysText } from "@/lib/tech/courier";
+import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { SITE_URL } from "@/lib/site-config";
-import dynamic from "next/dynamic";
+
+const published = publishedPoints(servicePoints);
+// SPEC §9: "… — Rabka-Zdrój i Zakopane | PRO-KOM Tech", Rabka only until Zakopane is published.
+const title = `Serwis telefonów i komputerów — ${published.map((p) => p.city).join(" i ")}`;
+const description =
+  published.length > 1
+    ? `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju i Zakopanem. Najpierw diagnoza i wycena, gwarancja i status naprawy online.`
+    : `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju. Najpierw diagnoza i wycena, gwarancja i status naprawy online.`;
 
 export const metadata: Metadata = {
-  title: "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój",
-  description:
-    "Serwis telefonów, laptopów i tabletów w Rabce-Zdroju. Akcesoria GSM, szkła hartowane, folie Hammer Glass, etui dostępne od ręki. Bezpłatna diagnoza, szybka naprawa. ul. Orkana 16B.",
-  alternates: {
-    canonical: `${SITE_URL}`,
-  },
-  openGraph: {
-    title: "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój",
-    description:
-      "Serwis telefonów, laptopów i tabletów w Rabce-Zdroju. Szkła hartowane, folie Hammer Glass, etui i akcesoria GSM. ul. Orkana 16B.",
-    url: `${SITE_URL}`,
-  },
+  title: { absolute: `${title} | ${line.name}` },
+  description,
+  alternates: { canonical: SITE_URL },
+  openGraph: { title: `${title} | ${line.name}`, description, url: SITE_URL },
 };
 
-import { Hero } from "@/sections/Hero";
-import { TrustStats } from "@/sections/TrustStats";
-import { DeviceCategories } from "@/sections/DeviceCategories";
-import { HowItWorks } from "@/sections/HowItWorks";
-import { MostCommonRepairs } from "@/sections/MostCommonRepairs";
-
-const Reviews = dynamic(() => import("@/sections/Reviews").then((mod) => mod.Reviews));
-const HammerGlass = dynamic(() => import("@/sections/HammerGlass").then((mod) => mod.HammerGlass));
-const Accessories = dynamic(() => import("@/sections/Accessories").then((mod) => mod.Accessories));
-const CTA = dynamic(() => import("@/sections/CTA").then((mod) => mod.CTA));
-const FAQ = dynamic(() => import("@/sections/FAQ").then((mod) => mod.FAQ));
-const Contact = dynamic(() => import("@/sections/Contact").then((mod) => mod.Contact));
-
 export default function HomePage() {
+  const points = visiblePoints();
   return (
-    <div className="public-home-page">
-      <Hero />
-      <TrustStats />
-      <DeviceCategories />
-      <HowItWorks />
-      <MostCommonRepairs />
-      <Reviews />
-      <HammerGlass />
-      <Accessories />
-      <CTA />
-      <FAQ />
-      <Contact />
-    </div>
+    <>
+      <Hero points={points} publishedNames={published.map((p) => p.name)} />
+      <BrandMarquee />
+      <RepairWizard
+        points={points.map((p) => ({ key: p.key, name: p.name, draft: p.draft }))}
+        courier={{ sub: claim("courierWholeCountry"), pays: courierPaysText(), href: courierPageHref() }}
+      />
+      <DeviceGrid />
+    </>
   );
 }
