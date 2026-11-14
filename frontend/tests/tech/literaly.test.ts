@@ -27,15 +27,10 @@ const CONTACT_LITERALS: [string, RegExp][] = [
 
 /** Old files (before TD2–TD5) that still contain contact literals. Only shrinks. */
 const LEGACY_CONTACT = new Set<string>([
-  "app/(public)/akcesoria/layout.tsx",
-  "app/(public)/akcesoria/page.tsx",
   "app/(public)/blog/BlogPageClient.tsx",
   "app/(public)/blog/[slug]/page.tsx",
   "app/(public)/faq/page.tsx",
   "app/(public)/hammer-glass/page.tsx",
-  "app/(public)/obslugiwane-miejscowosci/page.tsx",
-  "app/(public)/oferta/OfertaContent.tsx",
-  "app/(public)/oferta/page.tsx",
   "app/(public)/polityka-prywatnosci/page.tsx",
   "app/(public)/regulamin/page.tsx",
   "features/zgloszenie/LegacyZgloszeniePage.tsx",
@@ -44,7 +39,7 @@ const LEGACY_CONTACT = new Set<string>([
   "components/hammer-glass/HammerCta.tsx",
   "components/hammer-glass/HammerHero.tsx",
 ]);
-const LEGACY_PACZKOMAT = new Set<string>(["app/(public)/faq/page.tsx", "app/(public)/obslugiwane-miejscowosci/page.tsx"]);
+const LEGACY_PACZKOMAT = new Set<string>(["app/(public)/faq/page.tsx"]);
 
 function walk(dir: string): string[] {
   const abs = path.join(FRONTEND, dir);

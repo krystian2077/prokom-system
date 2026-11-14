@@ -1959,3 +1959,98 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
   .tech .t-hub__img { width: auto; height: 136px; }
   .tech .t-hub__more { margin-top: auto; }
 }
+/* TD4 PR 2: local pages, /serwis-telefonow, /obslugiwane-miejscowosci */
+.tech .t-townchips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tech .t-townchip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--bd); font-size: 14px; font-weight: 700; color: var(--ink); }
+.tech .t-townchip--stage { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.14); color: #fff; min-height: 44px; }
+.tech a.t-townchip--stage:hover { background: rgba(255, 255, 255, 0.12); }
+
+.tech .t-loc-hero { display: grid; gap: 28px; padding: clamp(24px, 4.5vw, 60px) clamp(20px, 4.5vw, 64px); }
+.tech .t-loc-hero__text { position: relative; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.tech .t-loc-hero .t-crumbs ol { font-size: 12.5px; }
+.tech .t-loc-hero__h1 { font-size: clamp(40px, 2.8vw + 26px, 64px) !important; line-height: 1 !important; letter-spacing: -0.035em !important; }
+.tech .t-loc-hero__h1 span { display: block; color: #f0584a; }
+.tech .t-loc-hero__towns { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.tech .t-loc-hero__towns > span { font-size: 13px; font-weight: 700; color: #b9aeac; }
+.tech .t-loc-hero__all { font-weight: 800; color: #f29185; }
+.tech .t-loc-hero__card { position: relative; display: grid; gap: 14px; align-content: center; min-width: 0; }
+.tech .t-loc-hero.t-draft { outline-offset: -8px; }
+@media (min-width: 1180px) {
+  .tech .t-loc-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: 48px; align-items: center; }
+}
+@media (min-width: 768px) and (max-width: 1179.98px) {
+  .tech .t-loc-hero--hub .t-loc-hero__card { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+}
+
+.tech .t-loc-access { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-radius: 16px; background: var(--soft); border: 1px solid var(--softbd); font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+.tech .t-faq-eyebrow { display: block; margin-bottom: 14px; }
+
+/* Repairs table */
+.tech .t-phrep { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); }
+.tech .t-phrep__intro { display: flex; flex-direction: column; gap: 14px; }
+.tech .t-phrep__img { position: relative; display: none; width: 220px; margin-top: 18px; }
+.tech .t-phrep__img img { position: relative; width: 100%; height: auto; transform: rotate(-8deg); }
+.tech .t-phrep__glow { position: absolute; inset: 20% -10% 0; border-radius: 50%; background: radial-gradient(closest-side, var(--soft), transparent); }
+.tech .t-phrep__table { border-radius: 24px; background: var(--card); border: 1px solid var(--bd); overflow: hidden; }
+.tech .t-phrep__table ul { list-style: none; margin: 0; padding: 0; }
+.tech .t-phrep__head { display: none; }
+.tech .t-phrep__row { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px 16px; align-items: center; padding: 18px 18px; border-top: 1px solid var(--bd); }
+.tech .t-phrep__row:first-child { border-top: 0; }
+.tech .t-phrep__ico { width: 48px; height: 48px; border-radius: 14px; background: var(--soft); color: var(--acct); display: flex; align-items: center; justify-content: center; }
+.tech .t-phrep__txt { display: flex; flex-direction: column; gap: 3px; }
+.tech .t-phrep__txt h3 { font-size: 18px !important; line-height: 1.2 !important; }
+.tech .t-phrep__txt > span { font-size: 14px; line-height: 1.45; color: var(--ink2); }
+.tech .t-phrep__time { grid-column: 2; font-size: 14px; font-weight: 800; color: var(--ink2); }
+.tech .t-phrep__row .t-pbtn { grid-column: 2; justify-self: start; }
+@media (min-width: 768px) {
+  .tech .t-phrep__head { display: grid; grid-template-columns: 48px minmax(0, 1fr) 140px 96px; gap: 20px; padding: 14px 24px; background: var(--bg2); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink2); }
+  .tech .t-phrep__row { grid-template-columns: 48px minmax(0, 1fr) 140px 96px; gap: 20px; padding: 18px 24px; }
+  .tech .t-phrep__time, .tech .t-phrep__row .t-pbtn { grid-column: auto; }
+  .tech .t-phrep__row .t-pbtn { justify-self: stretch; }
+}
+@media (min-width: 1180px) {
+  .tech .t-phrep { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 56px; align-items: start; }
+  .tech .t-phrep__img { display: block; }
+}
+
+/* Brands */
+.tech .t-phbrands { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 768px) { .tech .t-phbrands { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1180px) { .tech .t-phbrands { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.tech .t-phbrand { min-height: 150px; box-sizing: border-box; padding: 20px; border-radius: 20px; background: var(--card); border: 1px solid var(--bd); display: flex; flex-direction: column; gap: 8px; }
+.tech .t-phbrand h3 { font-size: 21px !important; }
+.tech .t-phbrand p { font-size: 13.5px; line-height: 1.45; color: var(--ink2); }
+
+/* Steps on dark */
+.tech .t-steps-dark { background: var(--stage2); color: #fff; padding-block: clamp(56px, 6vw, 96px); }
+.tech .t-steps-dark .t-h2 { margin: 12px 0 clamp(24px, 3vw, 40px); }
+.tech .t-steps-dark__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .tech .t-steps-dark__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1180px) { .tech .t-steps-dark__list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tech .t-steps-dark__list li { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 22px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
+.tech .t-steps-dark__list li > span { width: 36px; height: 36px; border-radius: 11px; background: rgba(255, 255, 255, 0.1); font-family: var(--t-font-head); font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.tech .t-steps-dark__list li > span.is-first { background: #e2483a; color: #1a0806; }
+.tech .t-steps-dark__list h3 { margin-top: 6px !important; font-size: 21px !important; }
+.tech .t-steps-dark__list p { font-size: 14.5px; line-height: 1.5; color: #b9aeac; }
+
+/* Towns page */
+.tech .t-townchips-hero { padding: clamp(28px, 5vw, 64px) clamp(20px, 5vw, 72px); display: flex; flex-direction: column; gap: 18px; }
+.tech .t-townchips-hero .t-lead { max-width: 640px; }
+.tech .t-townchips-hero__h1 { font-size: clamp(40px, 2.4vw + 28px, 60px) !important; line-height: 1 !important; letter-spacing: -0.035em !important; }
+.tech .t-towngroup { display: grid; gap: 24px; }
+.tech .t-towngroup.t-draft { outline-offset: 8px; }
+.tech .t-towngroup__head { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.tech .t-towngroup__point { font-size: 15px; font-weight: 700; color: var(--ink2); }
+.tech .t-towncards { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) { .tech .t-towncards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .tech .t-towncards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tech .t-towncard { padding: 20px 22px; border-radius: 20px; background: var(--card); border: 1px solid var(--bd); display: flex; flex-direction: column; gap: 6px; }
+.tech .t-towncard h3 { font-size: 21px !important; }
+.tech .t-towncard p { font-size: 14.5px; color: var(--ink2); }
+.tech .t-towncard__more { display: inline-flex; align-items: center; min-height: 44px; font-weight: 800; font-size: 14.5px; color: var(--acct); }
+.tech .t-howto { margin-top: 24px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .tech .t-howto { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tech .t-howto__card { padding: 22px 24px; display: flex; flex-direction: column; gap: 8px; }
+.tech .t-howto__card h3 { font-size: 21px !important; }
+.tech .t-howto__card p { font-size: 14.5px; line-height: 1.5; color: var(--ink2); }
+.tech .t-loc-hero__text > .t-draft-badge, .tech .t-towngroup__head .t-draft-badge { align-self: flex-start; }
