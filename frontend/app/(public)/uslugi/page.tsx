@@ -84,7 +84,9 @@ export default function RepairsHubPage() {
                 <li>Możesz zrezygnować</li>
                 <li>Gwarancja na usługę i części</li>
                 <li>
-                  <Link href={TRACK_HREF}>Status naprawy online</Link>
+                  <Link href={TRACK_HREF} data-t-inline="">
+                    Status naprawy online
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -153,7 +155,7 @@ export default function RepairsHubPage() {
             <span className="t-eyebrow">Pytania</span>
             <h2 className="t-h2">Zanim oddasz sprzęt</h2>
             <p className="t-lead">
-              Więcej odpowiedzi znajdziesz w <Link href="/faq" className="t-inline-link">najczęstszych pytaniach</Link>.
+              Więcej odpowiedzi znajdziesz w <Link href="/faq" className="t-inline-link" data-t-inline="">najczęstszych pytaniach</Link>.
             </p>
           </div>
           <Faq items={FAQ} />
