@@ -13,6 +13,19 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - ✔ 14.11.2026: build frontu naprawiony bez zmian w panelach (`frontend/scripts/patch-next-font.js` jako `prebuild`, commit `85b96bf`). Usunąć po aktualizacji Nexta, gdy ten obsłuży adresy Google Fonts bez rozszerzenia.
 - ✖ Brak kopii zapasowych produkcji (0 wpisów `BackupLog`, brak crona) — ręczny `pg_dump` przed TM, na VPS kopie od pierwszego dnia.
 
+## Próba generalna — część automatyczna (14.11.2026, VPS, staging)
+| Krok (MIGRACJA §7) | Wynik | Dowód |
+|---|---|---|
+| Eksport z Hetznera (`eksport-hetzner.sh`, strona działa) | ✔ | `prokom-tech-import-20261114T181620Z.tar`, 430 KB, sha256 `034b69cb…` zgodny: Hetzner → komputer → VPS |
+| Import do stagingu (`restore.sh --no-start`) | ✔ | 3 naprawy, `source_commit=50f926c` |
+| Anonimizacja (`anonimizuj.sql`) | ✔ | 12 kontroli = 0; e-maile `klient-N@example.test` |
+| Start + smoke | ✔ | 5 kontenerów healthy, smoke all ok; dane: 3 naprawy, 8 klientów |
+| Zgłoszenie testowe (`SMOKE_SUBMIT=1`, przed importem) | ✔ | `PROKOM/RMA/1/2026` → `/track` 200 |
+| Pamięć (staging, pusty) | ✔ | backend 178/512 MB, frontend 40/320, db 37/384, gateway 5/64, redis 3/96 |
+| Plik importu usunięty z VPS (`shred -u`) | — | do potwierdzenia |
+| Część ręczna (panel, lista napraw, PDF, upload 20 MB) | — | po vhoście `staging.prokomserwis.pl` (prokom-web) |
+| Test odtworzenia kopii (`backup.sh` → `restore.sh`) | — | po `.env.backup` na VPS (age + rclone) |
+
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
 | Sesja | Zakres | Stan |
 |---|---|---|
