@@ -75,7 +75,7 @@ Klucze jak w `.env.prod.example`. Różnice między środowiskami:
 ## 7. Próba generalna na stagingu (TM, przed przełączeniem)
 1. Na Hetznerze `pg_dump -Fc` (bez zatrzymywania produkcji) i `tar` wolumenu mediów → kopia na komputer Krystiana → VPS. Na serwerze nie zostawiamy plików z danymi poza wolumenami i katalogiem kopii (uprawnienia 600).
 2. Odtworzenie do stosu staging → `anonimizuj.sql` → kontrola z §6 → start.
-3. Smoke `scripts/vps/smoke.sh staging`: strona główna 200, `/api/v1/` 200/401 zgodnie z dziś, `/admin/` 302, statyczne pliki Django 200, media 200, `/zgloszenie` wysyła zgłoszenie testowe (numer naprawy wraca), `/track` z tym numerem pokazuje status, logowanie do `/panel`, lista napraw w panelu, PDF protokołu przyjęcia się generuje, upload zdjęcia w panelu działa (limit 20 MB).
+3. Smoke `scripts/vps/smoke.sh staging`: strona główna 200, `/api/v1/` 200/401 zgodnie z dziś, `/admin/` 302, statyczne pliki Django 200, media 200, `/zgloszenie` wysyła zgłoszenie testowe (numer naprawy wraca), `/track` z tym numerem pokazuje status, logowanie do `/panel`, lista napraw w panelu, PDF protokołu przyjęcia się generuje, limit uploadu 20 MB przez oba Nginxy (19 MB dochodzi do Django, 21 MB → 413; panel nie ma pola do zdjęć — sprawdzone 14.11).
 4. Pomiar: `docker stats` w czasie testów, czas odpowiedzi strony głównej i `/api/`, limity pamięci bez restartów (`docker inspect … RestartCount`).
 5. Test odtworzenia kopii: `backup.sh staging` → `restore.sh` do świeżej bazy → liczba zgłoszeń się zgadza.
 Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
