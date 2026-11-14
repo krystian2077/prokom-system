@@ -10,6 +10,7 @@ import { BlogCard } from "@/components/tech/blog/BlogCard";
 import { IconArrow, IconCheck } from "@/components/tech/icons";
 import { getAllSlugs, getPostBySlug } from "@/lib/blog-posts";
 import { categoryOf, relatedPosts, serviceLinkOf } from "@/lib/tech/blog-taxonomy";
+import { repairForPost, repairPath } from "@/lib/tech/naprawy";
 import { formatPostDate, renderPostContent } from "@/lib/tech/blog-render";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { breadcrumbJsonLd, faqJsonLd, type Crumb } from "@/lib/tech/seo";
@@ -47,6 +48,7 @@ export default async function BlogPostPage({ params }: Props) {
   const catPath = `/blog/kategoria/${cat.slug}`;
   const service = serviceLinkOf(post);
   const related = relatedPosts(post, 3);
+  const repair = repairForPost(post, cat.slug);
   const url = `${SITE_URL}/blog/${post.slug}`;
   const crumbs: Crumb[] = [
     { name: "Start", path: "/" },
@@ -132,6 +134,15 @@ export default async function BlogPostPage({ params }: Props) {
                 <span className="t-eyebrow">Powiązana usługa</span>
                 <Link href={service.href} className="t-post__service">
                   {service.label}
+                  <IconArrow size={16} />
+                </Link>
+              </div>
+            ) : null}
+            {repair ? (
+              <div className="t-card t-post__box">
+                <span className="t-eyebrow">Powiązana naprawa</span>
+                <Link href={repairPath(repair.slug)} className="t-post__service" data-track="blog_powiazana_naprawa_klik">
+                  {repair.h1}
                   <IconArrow size={16} />
                 </Link>
               </div>

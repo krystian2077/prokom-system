@@ -3,6 +3,7 @@ import { servicePoints, type ServicePoint } from "@/config/prokom";
 import { BLOG_POSTS } from "@/lib/blog-posts";
 import { BLOG_CATEGORIES } from "./blog-taxonomy";
 import { courierInSitemap } from "./courier-page";
+import { liveRepairs, repairPath } from "./naprawy";
 import { publishedLocalPages } from "./local-pages";
 import { SITE_URL } from "@/lib/site-config";
 
@@ -65,5 +66,7 @@ export function buildSitemap(now: Date = new Date(), points: ServicePoint[] = se
     { url: url("/jak-przygotowac-sprzet"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     ...(courierInSitemap() ? [{ url: url("/naprawa-kurierem"), lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 }] : []),
   ];
-  return [...pages, ...locals, ...blog, ...blogCategories, ...td5];
+  // Repair pages: published && verified only (SPEC §12.4, TD5b).
+  const repairs: MetadataRoute.Sitemap = liveRepairs().map((r) => ({ url: url(repairPath(r.slug)), lastModified: now, changeFrequency: "monthly", priority: 0.75 }));
+  return [...pages, ...locals, ...blog, ...blogCategories, ...td5, ...repairs];
 }
