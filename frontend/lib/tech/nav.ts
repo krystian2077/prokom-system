@@ -83,6 +83,9 @@ export const SUBMIT_HREF = "/zgloszenie";
 export const TRACK_HREF = "/track";
 export const POINTS_HREF = "/punkty-serwisowe";
 export const REPAIRS_HREF = "/uslugi";
+/** Preparation guide (SPEC §12.3) — the page arrives in TD5; until then no link to it. */
+export const PREP_GUIDE_HREF = "/jak-przygotowac-sprzet";
+export const PREP_GUIDE_READY = false;
 
 export function isActive(item: { match: string[] }, pathname: string): boolean {
   return item.match.some((m) => (m.endsWith("-") ? pathname.startsWith(m) : pathname === m || pathname.startsWith(`${m}/`)));
