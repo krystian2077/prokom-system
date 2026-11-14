@@ -262,7 +262,7 @@ export default function PolitykaPrywatnosciPage() {
             RODO).
           </Li>
           <Li>
-            <strong>Prawo do usunięcia</strong> („prawo do bycia zapomnianym")
+            <strong>Prawo do usunięcia</strong> („prawo do bycia zapomnianym”)
             – możesz żądać usunięcia danych, gdy nie są już niezbędne do celów,
             dla których zostały zebrane (art. 17 RODO).
           </Li>
