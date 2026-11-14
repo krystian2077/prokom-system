@@ -24,7 +24,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | Pamięć (staging, pusty) | ✔ | backend 178/512 MB, frontend 40/320, db 37/384, gateway 5/64, redis 3/96 |
 | Plik importu usunięty z VPS (`shred -u`) | ✔ | `/srv/prokom/import` pusty; kopia zostaje w `D:\PRO-KOM\kopie` i na Hetznerze |
 | Część ręczna (panel, lista napraw, PDF, upload 20 MB) | — | po vhoście `staging.prokomserwis.pl` (prokom-web) |
-| Test odtworzenia kopii (`backup.sh` → `restore.sh`) | — | po `.env.backup` na VPS (age + rclone) |
+| Test odtworzenia kopii (`backup.sh` → B2 → `restore.sh`) | ✔ | `.env.backup` (ten sam `age.pub` i bucket co Gaming); kopia 432 KB w `offsite:prokom-backups-r7k2/tech-staging/daily/`; zgłoszenie testowe dodane po kopii (4) → po odtworzeniu z B2: 3 = manifest; smoke core ok; `age.key` usunięty (`shred -u`) |
 
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
 | Sesja | Zakres | Stan |

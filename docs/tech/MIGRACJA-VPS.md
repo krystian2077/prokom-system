@@ -10,7 +10,7 @@ Wersja 1.0 · 14.11.2026. Wykonuje Krystian z Claude Code. **Każdy krok na serw
 ## 1. Warunki wejścia (blokery — bez nich nie zaczynamy przełączenia)
 1. Gaming działa stabilnie na tym samym VPS co najmniej 5 dni (wspólny Nginx bez incydentów).
 2. **Dostęp do DNS domeny prokomserwis.pl** — ✔ od 14.11.2026 strefa w **Seohost** (`dns1/dns2.microhost.pl`, TM+ etap A), rejestracja: transfer z cyber_Folks do Seohost (TM+ A5). Poczty (MX) nie ma. Stan i dziennik zmian: `docs/tech/DNS-PROKOMSERWIS.md`.
-3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony.
+3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony. — ✔ 14.11.2026 (staging: `backup.sh` → B2 → `restore.sh`, liczba napraw zgodna; prod — cron po przełączeniu, §8 pkt 10).
 4. Staging `staging.prokomserwis.pl` przeszedł próbę generalną (§7) na kopii bazy z produkcji.
 5. Wolne zasoby VPS po Gaming: `free -h` i `df -h`. Potrzeba ok. 2,5 GB RAM (prod + staging, §4) i ok. 5 GB dysku plus rozmiar mediów razy trzy (wolumen, kopia lokalna, zapas).
 6. Krystian ma dostęp SSH do Hetznera i do VPS, a w menedżerze haseł: `.env.prod` z Hetznera, hasło aplikacji Gmail (SMTP), Google OAuth.
