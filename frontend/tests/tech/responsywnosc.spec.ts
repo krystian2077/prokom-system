@@ -10,7 +10,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const WIDTHS = [360, 390, 414, 430, 768, 820, 1024, 1280, 1366, 1440, 1680, 1920, 2560];
-const PAGES = ["/"];
+const PAGES = ["/", "/punkty-serwisowe", "/kontakt", "/o-firmie"];
 const THEMES = ["light", "dark"] as const;
 
 async function open(page: Page, url: string, width: number, theme: (typeof THEMES)[number]) {

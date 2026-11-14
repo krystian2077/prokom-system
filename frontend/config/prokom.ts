@@ -133,10 +133,20 @@ export const claims = {
   googleRating: { text: "", confirmed: false },
   /** Courier from the whole country (SPEC §10 courier question 5). */
   courierWholeCountry: { text: "z całej Polski", confirmed: false },
+  /** TD4 "O firmie": founding year shown as a number (hero, stat card; SPEC §10 „2004”). */
+  aboutSince: { text: String(company.since), confirmed: false },
+  /** TD4 "O firmie": "4 + 1" — PRO-KOM lines and the Gaming brand. */
+  aboutLines: { text: "4 + 1", confirmed: false },
+  /** TD4 "O firmie" rules outside SPEC §8 promises: which parts we use… */
+  ruleParts: { text: "Oryginalne albo sprawdzone zamienniki. Zawsze mówimy, które.", confirmed: false },
+  /** …and how we treat data on the device. */
+  ruleData: { text: "Nie przeglądamy zawartości urządzeń bez potrzeby.", confirmed: false },
+  /** Google Business profile link(s) for the rating card on "O firmie" (empty = no card). */
+  googleProfiles: { text: "", confirmed: false },
 } satisfies Record<string, Claim>;
 export type ClaimKey = keyof typeof claims;
 
-export type LineKey ="prokom" | "biznes" | "instalacje" | "software" | "tech" | "gaming";
+export type LineKey = "prokom" | "biznes" | "instalacje" | "software" | "tech" | "gaming";
 export type Line = {
   key: LineKey;
   name: string;
