@@ -39,7 +39,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
 - [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
 - [Krystian] **Zakopane — została tylko pinezka:** ul. Stanisława Staszica 8 (centrum, przy ul. Weteranów Wojny i parku miejskim; powiat tatrzański), tel. 18 541 20 15, pn–pt 10:00–16:30, sob–nd zamknięte, ploter Hammer Glass jest, odbiór w innym punkcie można. Współrzędne w SPEC są przybliżone (centrum miasta: 49.2990, 19.9489) — przed `published: true` wziąć dokładne z pinezki w Mapach Google. Opis położenia przyda się na stronę lokalną Zakopanego (TD4).
-- [Krystian] **abonent domeny prokomserwis.pl to osoba prywatna, nie firma** (TM+ A1 każe tu się zatrzymać). Decyzja: zmiana abonenta na PRO-KOM Tadeusz Wójciak (NIP) w cyber_Folks przed transferem albo transfer i zmiana w Seohost. Domena wygasa 28.04.2027. Szczegóły: `docs/tech/DNS-PROKOMSERWIS.md`.
+- [Krystian] **abonent domeny prokomserwis.pl:** decyzja 14.11 — transfer do Seohost jako osoba prywatna, potem w Seohost zmiana abonenta na PRO-KOM Tadeusz Wójciak (NIP). Dopisać do listy kontrolnej TM+ etap A5 (po transferze: zmiana abonenta, auto-odnawianie, rezygnacja z usług w cyber_Folks). Domena wygasa 28.04.2027.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później

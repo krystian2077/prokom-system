@@ -9,7 +9,7 @@ Zasada (TM+): przed każdą zmianą DNS zapisujemy tu stan „przed”, po zmian
 |---|---|
 | Rejestrator | cyber_Folks (usługa „FreeDNS — parking domeny”) |
 | Utworzona / wygasa | 28.04.2026 / **28.04.2027** (okres roczny, proforma) |
-| Abonent | **osoba prywatna (Krystian), nie firma PRO-KOM Tadeusz Wójciak** — TODO(krystian): decyzja przed transferem (TM+ A1) |
+| Abonent | **osoba prywatna (Krystian), nie firma PRO-KOM Tadeusz Wójciak** — decyzja 14.11: transfer do Seohost bez zmiany abonenta (AuthInfo i potwierdzenia po stronie obecnego abonenta), **zmiana abonenta na firmę (NIP) w Seohost zaraz po zakończonym transferze** |
 | Serwery DNS | `dns1.tld.pl`, `dns2.tld.pl`, `dns3.tld.pl` (strefa w cyber_Folks) |
 | DNSSEC | brak informacji na zrzucie (do sprawdzenia przed zmianą serwerów DNS) |
 
