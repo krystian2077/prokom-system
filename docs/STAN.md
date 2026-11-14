@@ -4,14 +4,19 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** **TM+**. Etap A: A1–A4 ✔ (delegacja na Seohost opublikowana 14.11 18:35), A5 (transfer) — 15.11. Etap C: PR #13 (infrastruktura) scalony, obrazy w GHCR (prywatne); **staging na VPS działa od 14.11 18:43** (`dd8e8a3`, `/srv/prokom/prokom-tech`, gateway `127.0.0.1:3301`, smoke 11/11); czeka na vhost w prokom-web (sesja w toku).
-- **Następny krok:** (1) PR prokom-web z vhostami Tech → certyfikat stagingu → `https://staging.prokomserwis.pl` za hasłem. (2) Próba generalna (MIGRACJA §6–§7): kopia `D:\PRO-KOM\kopie\prokom-tech-import-20261114T181620Z.tar` → VPS → `restore.sh --no-start` → `anonimizuj.sql` → start → smoke + test ręczny. (3) A5 transfer domeny (15.11). (4) Etap B — `kontakt@` na SH 1. (5) `.env.prod` i cron kopii na VPS przed niedzielą 29.11.
+- **W toku:** **TM+**. Etap A ✔: A1–A4, **A5 transfer do Seohost ✔ 14.11 21:04** (abonent od razu PRO-KOM Tadeusz Wójciak, wygasa 28.04.2027, DNS bez zmian); auto-odnawianie w Seohost ✔, rezygnacja z usługi domeny w cyber_Folks złożona ✔ (14.11). **Etap B:** domena `prokomserwis.pl` w DirectAdmin SH 1 (`h99.seohost.pl`, bez SSL/PHP), skrzynka `kontakt@prokomserwis.pl` (2000 MB, 300/dzień, hasło w menedżerze), rekordy poczty w strefie Seohost ✔, **testy ✔ 14.11 ~20:30**: mail-tester **10/10** (SPF/DKIM/DMARC pass, rDNS ok), Gmail → kontakt@ dochodzi, odpowiedź kontakt@ → Gmail w Odebranych z SPF/DKIM/DMARC PASS. Wysyłka z aplikacji nadal przez Gmail (etap D). Etap C: staging na VPS za Nginx (`https://staging.prokomserwis.pl`, hasło, cert LE do 12.02.2027), próba automatyczna ✔, kopie + heartbeat ✔, `.env.prod` na VPS gotowy (prod wyłączony do 29.11).
+- **Następny krok:** (1) Przełączenie produkcji na VPS w niedzielę 29.11 (MIGRACJA §8) + heartbeat i cron kopii prod. (2) Etap D: wysyłka z aplikacji przez SH 1, potem SPF bez Gmaila. (3) Budowa strony TD1.
 
 ## Pilne
 - ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.
 - ✔ 14.11.2026: hasła kont z `seed_initial.py`/`seed_staff_profiles.py` zmienione na produkcji (Krystian). Poprawka seedów → backlog w `WYJATKI.md`.
 - ✔ 14.11.2026: build frontu naprawiony bez zmian w panelach (`frontend/scripts/patch-next-font.js` jako `prebuild`, commit `85b96bf`). Usunąć po aktualizacji Nexta, gdy ten obsłuży adresy Google Fonts bez rozszerzenia.
 - ✖ Brak kopii zapasowych produkcji (0 wpisów `BackupLog`, brak crona) — ręczny `pg_dump` przed TM, na VPS kopie od pierwszego dnia.
+
+## Poczta kontakt@prokomserwis.pl (TM+ etap B, 14.11.2026)
+- Hosting poczty Seohost SH 1 (DirectAdmin `h99.seohost.pl`, ten sam co skrzynki prokombiznes/software/instalacje/gaming), skrzynka 2000 MB, limit 300 wysłanych/dzień, hasło w menedżerze haseł („Poczta kontakt@prokomserwis.pl”).
+- **Thunderbird / programy pocztowe:** IMAP `h99.seohost.pl:993` SSL/TLS, SMTP `h99.seohost.pl:465` SSL/TLS, normalne hasło, login = pełny adres. (Nie `mail.prokomserwis.pl` — certyfikat serwera jest na `*.seohost.pl`.) Webmail: Roundcube z DirectAdmin.
+- Etap D (wysyłka z aplikacji przez SH 1): z serwera aplikacji host `srv128408.seohost.com.pl` (certyfikat SMTP na tę nazwę), jak w prokom-web; potem SPF bez `include:_spf.google.com`.
 
 ## Próba generalna — część automatyczna (14.11.2026, VPS, staging)
 | Krok (MIGRACJA §7) | Wynik | Dowód |
@@ -24,6 +29,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | Pamięć (staging, pusty) | ✔ | backend 178/512 MB, frontend 40/320, db 37/384, gateway 5/64, redis 3/96 |
 | Plik importu usunięty z VPS (`shred -u`) | ✔ | `/srv/prokom/import` pusty; kopia zostaje w `D:\PRO-KOM\kopie` i na Hetznerze |
 | Cron kopii stagingu | ✔ | `30 3 * * *` UTC (`scripts/vps/backup.sh staging`), po prokom-web 02:30/02:45 i Gaming 03:00/03:15; prod Tech — po przełączeniu (MIGRACJA §8 pkt 10); heartbeat Better Stack — do dodania |
+| Heartbeat kopii stagingu (Better Stack „Kopia Tech staging”, 1 d + 3 h, e-mail) | ✔ | po `backup.sh staging` status Up; prod — w niedzielę |
+| `.env.prod` na VPS | ✔ | z `.env.prod` Hetznera (ten sam `SECRET_KEY`, Gmail, Google, `SERWIS_PRINT_*`), nowe hasła bazy/Redisa, `GATEWAY_PORT=3300`; kopia z Hetznera usunięta (`shred -u`); compose config OK |
 | Część ręczna (panel, lista napraw, PDF, upload 20 MB) | — | po vhoście `staging.prokomserwis.pl` (prokom-web) |
 | Test odtworzenia kopii (`backup.sh` → B2 → `restore.sh`) | ✔ | `.env.backup` (ten sam `age.pub` i bucket co Gaming); kopia 432 KB w `offsite:prokom-backups-r7k2/tech-staging/daily/`; zgłoszenie testowe dodane po kopii (4) → po odtworzeniu z B2: 3 = manifest; smoke core ok; `age.key` usunięty (`shred -u`) |
 
@@ -53,7 +60,6 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
 - [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
 - [Krystian] **Zakopane — została tylko pinezka:** ul. Stanisława Staszica 8 (centrum, przy ul. Weteranów Wojny i parku miejskim; powiat tatrzański), tel. 18 541 20 15, pn–pt 10:00–16:30, sob–nd zamknięte, ploter Hammer Glass jest, odbiór w innym punkcie można. Współrzędne w SPEC są przybliżone (centrum miasta: 49.2990, 19.9489) — przed `published: true` wziąć dokładne z pinezki w Mapach Google. Opis położenia przyda się na stronę lokalną Zakopanego (TD4).
-- [Krystian] **abonent domeny prokomserwis.pl:** decyzja 14.11 — transfer do Seohost jako osoba prywatna, potem w Seohost zmiana abonenta na PRO-KOM Tadeusz Wójciak (NIP). Dopisać do listy kontrolnej TM+ etap A5 (po transferze: zmiana abonenta, auto-odnawianie, rezygnacja z usług w cyber_Folks). Domena wygasa 28.04.2027.
 - [TM, etap C] Backend **nie ma `/api/health/`** (404 na produkcji, 14.11). `smoke.sh` i healthchecki w compose muszą sprawdzać istniejące adresy (np. `/`, `/panel/login`, `/api/v1/repairs/track/` → 400 bez parametrów, `/admin/login/`), a nie `/api/health/`.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
