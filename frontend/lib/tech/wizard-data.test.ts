@@ -4,7 +4,7 @@ import { courierService } from "@/config/prokom";
 import { claim } from "./claims";
 import { courierPageHref, courierPaysText } from "./courier";
 import { visiblePoints } from "./points";
-import { brands, buildWizardHref, deviceById, lowerFirst, wizardDevices } from "./wizard-data";
+import { EFFECT_FAMILIES, FRAME_BOX, SPOT_TARGET, brands, buildWizardHref, deviceById, faultMeaning, frameSize, lowerFirst, sceneOf, wizardDevices } from "./wizard-data";
 
 const backendCodes = DEVICE_CATEGORIES.map((c) => c.value as string);
 
@@ -36,7 +36,8 @@ describe("wizard-data", () => {
       const [cx, cy, cw, ch] = d.photo.crop;
       expect(cx + cw).toBeLessThanOrEqual(d.photo.width);
       expect(cy + ch).toBeLessThanOrEqual(d.photo.height);
-      expect(d.photo.src).toMatch(/^\/tech\/.+\.webp$/);
+      if (d.photo.art) expect(["watch", "data", "other"]).toContain(d.photo.art);
+      else expect(d.photo.src).toMatch(/^\/tech\/.+\.webp$/);
     }
   });
 
@@ -97,5 +98,84 @@ describe("courier (SPEC §12.10)", () => {
   it("links the courier page only when published", () => {
     expect(courierPageHref({ ...courierService, published: false })).toBeNull();
     expect(courierPageHref({ ...courierService, published: true })).toBe("/naprawa-kurierem");
+  });
+});
+
+describe("scenes (PREMIUM §4): every fault of every device", () => {
+  const inside = (v: number) => v >= 0 && v <= 100;
+
+  it("every device has a photo or an illustration", () => {
+    for (const d of wizardDevices) expect(d.photo, d.label).not.toBeNull();
+  });
+
+  it("each fault has an effect family, a region inside the frame and — when local — a spot inside it", () => {
+    let pairs = 0;
+    for (const d of wizardDevices) {
+      for (const f of d.faults) {
+        const sc = d.scenes[f];
+        expect(sc, `${d.label} · ${f}`).toBeDefined();
+        expect(Object.keys(EFFECT_FAMILIES), `${d.label} · ${f}`).toContain(sc.effect);
+        const [x, y, w, h] = sc.region;
+        expect(w > 0 && h > 0, `${d.label} · ${f}: region size`).toBe(true);
+        expect([x, y, x + w, y + h].every((v) => v >= 0 && v <= 100.05), `${d.label} · ${f}: region ${sc.region}`).toBe(true);
+        if (sc.spot) {
+          expect(sc.spot.every(inside), `${d.label} · ${f}: spot`).toBe(true);
+          expect(sc.focus).toEqual(sc.spot);
+          // the spot belongs to its region (a little slack for edge controls)
+          expect(sc.spot[0] >= x - 4 && sc.spot[0] <= x + w + 4 && sc.spot[1] >= y - 4 && sc.spot[1] <= y + h + 4, `${d.label} · ${f}: spot outside region`).toBe(true);
+        } else {
+          expect(sc.focus, `${d.label} · ${f}: whole has no camera target`).toBeNull();
+        }
+        pairs++;
+      }
+      expect(Object.keys(d.scenes).sort()).toEqual([...d.faults].sort());
+    }
+    expect(pairs).toBe(66);
+  });
+
+  it("photo spots are derived from the local scenes", () => {
+    for (const d of wizardDevices) {
+      const local = d.faults.filter((f) => d.scenes[f].spot);
+      expect(d.photo!.spots.map(([f]) => f), d.label).toEqual(local);
+    }
+  });
+
+  it.each([
+    ["1440", FRAME_BOX.desktop],
+    ["390", FRAME_BOX.phone],
+  ] as const)("spots never collide at %s (centres ≥ 44 px apart)", (_w, box) => {
+    for (const d of wizardDevices) {
+      const [fw, fh] = frameSize(d.photo!.crop, box);
+      const pts = d.photo!.spots.map(([f, x, y]) => [f, (x / 100) * fw, (y / 100) * fh] as const);
+      for (let i = 0; i < pts.length; i++)
+        for (let j = i + 1; j < pts.length; j++) {
+          const dist = Math.hypot(pts[i][1] - pts[j][1], pts[i][2] - pts[j][2]);
+          expect(dist, `${d.label}: ${pts[i][0]} ↔ ${pts[j][0]} = ${dist.toFixed(1)} px`).toBeGreaterThanOrEqual(SPOT_TARGET);
+        }
+    }
+  });
+
+  it("sceneOf falls back to the first fault", () => {
+    const d = deviceById("drukarka");
+    expect(sceneOf(d, "nie ma")).toBe(d.scenes["Nie drukuje"]);
+  });
+});
+
+describe("'co to zwykle znaczy' (PREMIUM §5)", () => {
+  it("every fault of every device has one sentence", () => {
+    for (const d of wizardDevices)
+      for (const f of d.faults) {
+        const m = faultMeaning(d.id, f);
+        expect(m.length, `${d.label} · ${f}`).toBeGreaterThan(20);
+        expect(m.endsWith(".") || m.endsWith("?"), `${d.label} · ${f}`).toBe(true);
+      }
+  });
+
+  it("no prices, no repair times, no promises", () => {
+    for (const d of wizardDevices)
+      for (const f of d.faults) {
+        const m = faultMeaning(d.id, f);
+        expect(m, `${d.label} · ${f}`).not.toMatch(/\d|(^|[\s(])(zł|pln)([\s.,)]|$)|godzin|minut|(^|\s)dni(\s|$)|dzień|od ręki|gwarantujemy|na pewno|zawsze naprawimy|tanio|gratis|darmow/i);
+      }
   });
 });

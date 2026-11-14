@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import type { PointKey } from "@/config/prokom";
 import { trackEvent } from "@/lib/tech/track-event";
 import {
@@ -14,6 +14,8 @@ import {
   type WizardIcon,
 } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconClose, IconPath } from "./icons";
+import { usePill } from "./usePill";
+import { Scene } from "./wizard/Scene";
 
 export type WizardPoint = { key: PointKey; name: string; draft: boolean };
 export type WizardCourier = {
@@ -27,6 +29,7 @@ export type WizardCourier = {
 
 const PHONE_MQ = "(max-width: 767.98px)";
 const STEPS = ["Urządzenie", "Usterka", "Dostarczenie", "Podsumowanie"] as const;
+const SWIPE_PX = 60;
 
 function Glyph({ icon, size = 22 }: { icon: WizardIcon; size?: number }) {
   if (icon === "other") return <IconPath icon="dots" size={size} />;
@@ -38,94 +41,85 @@ function deliveryLabel(d: Delivery, points: WizardPoint[]): string {
   return points.find((p) => p.key === d.point)?.name ?? "";
 }
 
-/** Device photo with clickable fault hotspots (positions in % of the crop box). */
-function PhotoStage({ device, fault, onPick }: { device: WizardDevice; fault: string; onPick: (f: string) => void }) {
-  const photo = device.photo;
+/** Warm the photo cache when a device chip is hovered or focused (PREMIUM §4). */
+const preloaded = new Set<string>();
+function preload(d: WizardDevice) {
+  const src = d.photo?.src;
+  if (!src || preloaded.has(src) || typeof window === "undefined") return;
+  preloaded.add(src);
+  const img = new Image();
+  img.decoding = "async";
+  img.src = src;
+}
+
+/** Roving focus for a radiogroup: ←/→/↑/↓ move and select, Home/End jump. */
+function radioKeys(e: ReactKeyboardEvent<HTMLElement>, values: string[], current: string, select: (v: string) => void) {
+  const i = values.indexOf(current);
+  let n = -1;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") n = (i + 1) % values.length;
+  else if (e.key === "ArrowLeft" || e.key === "ArrowUp") n = (i - 1 + values.length) % values.length;
+  else if (e.key === "Home") n = 0;
+  else if (e.key === "End") n = values.length - 1;
+  if (n < 0) return;
+  e.preventDefault();
+  select(values[n]);
+  const group = e.currentTarget;
+  window.requestAnimationFrame(() => group.querySelector<HTMLElement>(`[data-value="${CSS.escape(values[n])}"]`)?.focus());
+}
+
+/** Values that "jump in" when they change (summary). */
+function Pop({ children, k }: { children: ReactNode; k: string }) {
   return (
-    <div className="t-wiz__stage">
-      {photo ? (
-        <div
-          className="t-wiz__frame"
-          style={{ "--ar": `${photo.crop[2]} / ${photo.crop[3]}`, "--arn": photo.crop[2] / photo.crop[3] } as CSSProperties}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized WebP, positioned by %, no optimizer needed */}
-          <img
-            className="t-wiz__img"
-            src={photo.src}
-            alt={`${device.label} — wybierz usterkę na zdjęciu`}
-            width={photo.width}
-            height={photo.height}
-            loading="lazy"
-            decoding="async"
-            style={{
-              left: `${(-photo.crop[0] / photo.crop[2]) * 100}%`,
-              top: `${(-photo.crop[1] / photo.crop[3]) * 100}%`,
-              width: `${(photo.width / photo.crop[2]) * 100}%`,
-            }}
-          />
-          {photo.spots.map(([t, x, y]) => {
-            const on = t === fault;
-            return (
-              <span key={t} className="t-wiz__spotwrap" style={{ left: `${x}%`, top: `${y}%` }}>
-                <button
-                  type="button"
-                  className={`t-wiz__spot${on ? " is-on" : ""}`}
-                  aria-label={t}
-                  aria-pressed={on}
-                  onClick={() => onPick(t)}
-                >
-                  {on ? "✓" : "+"}
-                </button>
-                {on ? <span className={`t-wiz__hsl${x > 50 ? " is-left" : ""}`}>{t}</span> : null}
-              </span>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="t-wiz__nophoto">
-          <span className="t-wiz__bigico">
-            <Glyph icon={device.icon} size={78} />
-          </span>
-          <span>Wybierz obok, co się dzieje. Resztę opiszesz w zgłoszeniu.</span>
-        </div>
-      )}
-      <div className="t-wiz__stagefoot">
-        <span className="t-wiz__hint">
-          <i aria-hidden="true" />
-          {fault}
-        </span>
-        {photo ? <span className="t-wiz__cap">Zdjęcie poglądowe</span> : null}
-      </div>
-    </div>
+    <span key={k} className="t-pop-in t-wiz__val">
+      {children}
+    </span>
   );
 }
 
 /**
- * "Co się zepsuło?" (design T.Main `#kreator`, SPEC §7, RESPONSYWNOSC §2–§3).
- * ≥ 768: all three groups at once (photo beside the choices ≥ 820, above them at 768).
+ * "Co się zepsuło?" (design T.Main `#kreator`, SPEC §7, RESPONSYWNOSC §2–§3, PREMIUM §4).
+ * ≥ 768: scene beside the choices (≥ 820) or above them (768); the scene shows the
+ * chosen fault's effect, hovering a fault previews its effect, picking moves the camera.
  * < 768: the device grid stays on the page; picking a device opens a full-screen,
- * step-by-step flow (fault → delivery → summary) with a sticky "Dalej".
- * Result: a link to /zgloszenie built by buildWizardHref (KONTRAKT §1.4).
+ * step-by-step flow (fault → delivery → summary) with a sticky "Dalej"; swiping the
+ * scene changes the device. Result: a link to /zgloszenie built by buildWizardHref
+ * (KONTRAKT §1.4).
  */
 export function RepairWizard({ points, courier }: { points: WizardPoint[]; courier: WizardCourier }) {
   const [deviceId, setDeviceId] = useState(wizardDevices[0].id);
   const device = deviceById(deviceId);
   const [faultRaw, setFault] = useState(device.faults[0]);
   const fault = device.faults.includes(faultRaw) ? faultRaw : device.faults[0];
+  const [preview, setPreview] = useState<string | null>(null);
+  const [nonce, setNonce] = useState(0);
   const [delivery, setDelivery] = useState<Delivery>(points[0] ? { kind: "point", point: points[0].key } : { kind: "courier" });
   const [step, setStep] = useState<number | null>(null); // phone flow: 1..3 (index in STEPS), null = closed
+  const devRef = useRef<HTMLDivElement>(null);
+  usePill(devRef, `[data-value="${deviceId}"]`, [deviceId]);
 
   const href = useMemo(() => buildWizardHref({ device: deviceId, fault, delivery }), [deviceId, fault, delivery]);
-  const summary = `${device.label} · ${lowerFirst(fault)} · ${deliveryLabel(delivery, points)}`;
 
-  const pickDevice = (id: string) => {
+  const selectDevice = useCallback((id: string) => {
     setDeviceId(id);
     setFault(deviceById(id).faults[0]);
+    setPreview(null);
+    setNonce(0);
+  }, []);
+  const pickDevice = (id: string) => {
+    selectDevice(id);
     if (window.matchMedia(PHONE_MQ).matches) setStep(1);
   };
   const pickFault = (f: string) => {
     setFault(f);
+    setPreview(null);
+    setNonce((n) => n + 1);
     trackEvent("kreator_usterka", { urzadzenie: device.label, usterka: f });
+  };
+  const swipeDevice = (dir: 1 | -1) => {
+    const i = wizardDevices.findIndex((d) => d.id === deviceId);
+    const next = wizardDevices[(i + dir + wizardDevices.length) % wizardDevices.length];
+    preload(next);
+    selectDevice(next.id);
   };
   const onSubmit = () => trackEvent("zgloszenie_start", { zrodlo: "kreator" });
 
@@ -173,13 +167,27 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
     </>
   );
 
-  const faultChips = (
-    <div className="t-wiz__faults">
-      {device.faults.map((f) => (
-        <button key={f} type="button" className={`t-chp t-chp--fault${f === fault ? " is-on" : ""}`} aria-pressed={f === fault} onClick={() => pickFault(f)}>
-          {f}
-        </button>
-      ))}
+  const faultChips = (labelId: string) => (
+    <div className="t-wiz__faults" role="radiogroup" aria-labelledby={labelId} onKeyDown={(e) => radioKeys(e, device.faults, fault, pickFault)}>
+      {device.faults.map((f) => {
+        const on = f === fault;
+        return (
+          <button
+            key={f}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            tabIndex={on ? 0 : -1}
+            data-value={f}
+            className={`t-chp t-chp--fault${on ? " is-on" : ""}${f === preview ? " is-hot" : ""}${device.scenes[f]?.spot ? " has-spot" : ""}`}
+            onClick={() => pickFault(f)}
+            onMouseEnter={() => setPreview(f)}
+            onMouseLeave={() => setPreview(null)}
+          >
+            {f}
+          </button>
+        );
+      })}
     </div>
   );
 
@@ -201,33 +209,57 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
           </div>
 
           <div className="t-wiz__body">
-            <PhotoStage device={device} fault={fault} onPick={pickFault} />
+            <div className="t-wiz__stagewrap">
+              <Scene device={device} fault={fault} preview={preview} onPick={pickFault} onPreview={setPreview} pickNonce={nonce} />
+            </div>
             <div className="t-wiz__side">
               <div className="t-wiz__groups">
-                <div className="t-wiz__group t-wiz__group--dev" role="group" aria-labelledby="t-wiz-g1">
+                <div className="t-wiz__group t-wiz__group--dev">
                   <span id="t-wiz-g1" className="t-eyb t-eyb--muted">
                     1 · Urządzenie
                   </span>
-                  <div className="t-wiz__devices">
-                    {wizardDevices.map((d) => (
-                      <button
-                        key={d.id}
-                        type="button"
-                        className={`t-chp t-chp--dev${d.id === deviceId ? " is-on" : ""}`}
-                        aria-pressed={d.id === deviceId}
-                        onClick={() => pickDevice(d.id)}
-                      >
-                        <Glyph icon={d.icon} />
-                        {d.label}
-                      </button>
-                    ))}
+                  <div
+                    ref={devRef}
+                    className="t-wiz__devices"
+                    role="radiogroup"
+                    aria-labelledby="t-wiz-g1"
+                    onKeyDown={(e) =>
+                      radioKeys(
+                        e,
+                        wizardDevices.map((d) => d.id),
+                        deviceId,
+                        (id) => selectDevice(id),
+                      )
+                    }
+                  >
+                    <span className="t-wiz__devpill" aria-hidden="true" />
+                    {wizardDevices.map((d) => {
+                      const on = d.id === deviceId;
+                      return (
+                        <button
+                          key={d.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={on}
+                          tabIndex={on ? 0 : -1}
+                          data-value={d.id}
+                          className={`t-chp t-chp--dev${on ? " is-on" : ""}`}
+                          onClick={() => pickDevice(d.id)}
+                          onMouseEnter={() => preload(d)}
+                          onFocus={() => preload(d)}
+                        >
+                          <Glyph icon={d.icon} />
+                          {d.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                <div className="t-wiz__group t-wiz__group--fault" role="group" aria-labelledby="t-wiz-g2">
+                <div className="t-wiz__group t-wiz__group--fault">
                   <span id="t-wiz-g2" className="t-eyb t-eyb--muted">
                     2 · Co się dzieje
                   </span>
-                  {faultChips}
+                  {faultChips("t-wiz-g2")}
                 </div>
               </div>
               <div className="t-wiz__group t-wiz__group--del" role="group" aria-labelledby="t-wiz-g3">
@@ -239,7 +271,13 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
               <div className="t-wiz__bar">
                 <span className="t-wiz__sum">
                   <span>Twoje zgłoszenie</span>
-                  <b data-testid="wizard-summary">{summary}</b>
+                  <b data-testid="wizard-summary">
+                    <Pop k={device.label}>{device.label}</Pop>
+                    {" · "}
+                    <Pop k={fault}>{lowerFirst(fault)}</Pop>
+                    {" · "}
+                    <Pop k={deliveryLabel(delivery, points)}>{deliveryLabel(delivery, points)}</Pop>
+                  </b>
                 </span>
                 <Link href={href} className="t-hbtn t-hbtn--acc t-hbtn--wiz t-shine" onClick={onSubmit} data-testid="wizard-next">
                   Dalej — zgłoś naprawę
@@ -256,9 +294,17 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
           step={step}
           setStep={setStep}
           device={device}
-          fault={fault}
-          onPickFault={pickFault}
-          faultChips={faultChips}
+          scene={
+            <Scene
+              device={device}
+              fault={fault}
+              onPick={pickFault}
+              pickNonce={nonce}
+              layout="phone"
+            />
+          }
+          onSwipe={swipeDevice}
+          faultChips={faultChips("t-wizflow-h")}
           deliveryOptions={deliveryOptions}
           summary={[
             ["Urządzenie", device.label],
@@ -277,19 +323,20 @@ type FlowProps = {
   step: number;
   setStep: (s: number | null) => void;
   device: WizardDevice;
-  fault: string;
-  onPickFault: (f: string) => void;
-  faultChips: React.ReactNode;
-  deliveryOptions: React.ReactNode;
+  scene: ReactNode;
+  onSwipe: (dir: 1 | -1) => void;
+  faultChips: ReactNode;
+  deliveryOptions: ReactNode;
   summary: [string, string][];
   href: string;
   onSubmit: () => void;
 };
 
 /** Phone: full-screen, one step per screen, progress on top, sticky "Dalej" (RESPONSYWNOSC §2). */
-function PhoneFlow({ step, setStep, device, fault, onPickFault, faultChips, deliveryOptions, summary, href, onSubmit }: FlowProps) {
+function PhoneFlow({ step, setStep, device, scene, onSwipe, faultChips, deliveryOptions, summary, href, onSubmit }: FlowProps) {
   const ref = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setStep(null), [setStep]);
+  const swipe = useRef<{ x: number; y: number } | null>(null);
 
   // Focus trap, Esc, background scroll lock; focus returns to the device grid on close.
   useEffect(() => {
@@ -298,7 +345,7 @@ function PhoneFlow({ step, setStep, device, fault, onPickFault, faultChips, deli
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusables = () =>
-      Array.from(panel?.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])") ?? []);
+      Array.from(panel?.querySelectorAll<HTMLElement>("a[href], button:not([disabled]):not([tabindex='-1']), [tabindex]:not([tabindex='-1'])") ?? []);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
@@ -366,10 +413,21 @@ function PhoneFlow({ step, setStep, device, fault, onPickFault, faultChips, deli
         </h2>
         {step === 1 ? (
           <>
-            <p className="t-wizflow__lead">
-              {device.label}: {device.photo ? "dotknij punktu na zdjęciu albo wybierz z listy." : "wybierz z listy. Resztę opiszesz w zgłoszeniu."}
-            </p>
-            {device.photo ? <PhotoStage device={device} fault={fault} onPick={onPickFault} /> : null}
+            <p className="t-wizflow__lead">{device.label}: dotknij punktu na zdjęciu albo wybierz z listy. Przesuń zdjęcie w bok, żeby zmienić urządzenie.</p>
+            <div
+              className="t-wizflow__scene"
+              onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}
+              onPointerUp={(e) => {
+                const s = swipe.current;
+                swipe.current = null;
+                if (!s) return;
+                const dx = e.clientX - s.x;
+                if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(e.clientY - s.y) * 1.5) onSwipe(dx < 0 ? 1 : -1);
+              }}
+              onPointerCancel={() => (swipe.current = null)}
+            >
+              {scene}
+            </div>
             {faultChips}
           </>
         ) : null}
@@ -379,7 +437,9 @@ function PhoneFlow({ step, setStep, device, fault, onPickFault, faultChips, deli
             {summary.map(([k, v]) => (
               <div key={k}>
                 <dt>{k}</dt>
-                <dd>{v}</dd>
+                <dd>
+                  <Pop k={v}>{v}</Pop>
+                </dd>
               </div>
             ))}
           </dl>
