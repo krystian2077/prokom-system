@@ -20,13 +20,8 @@ const region = opts.region || "full";
 const out = path.join(ROOT, "tmp/porownaj");
 fs.mkdirSync(out, { recursive: true });
 
-const REGIONS = {
-  header: { selector: '[data-t-region="header"]', design: (h) => ({ top: 0, height: 126 }) },
-  footer: { selector: '[data-t-region="footer"]', design: (h) => ({ top: h - 760, height: 760 }) },
-  full: { selector: null, design: (h) => ({ top: 0, height: h }) },
-};
-const reg = REGIONS[region];
-if (!reg) throw new Error(`nieznany region: ${region}`);
+const REGIONS = { header: "[data-t-region=\"header\"]", footer: "[data-t-region=\"footer\"]", full: null };
+if (!(region in REGIONS)) throw new Error(`nieznany region: ${region}`);
 
 const browser = await chromium.launch();
 const results = [];
@@ -37,40 +32,24 @@ for (const theme of themes) {
 
   // 1) crop the design with the browser (webp decode + canvas)
   const { ctx: dctx, page: dpage } = await themedPage(browser, { width: 1440, theme });
-  const designData = fs.readFileSync(designFile).toString("base64");
-  const designPng = await dpage.evaluate(
-    async ({ b64, top, height }) => {
+  const b64 = fs.readFileSync(designFile).toString("base64");
+  const designUrl = await dpage.evaluate(
+    async ({ b64, top, height, region }) => {
       const img = new Image();
       img.src = `data:image/webp;base64,${b64}`;
       await img.decode();
-      const t = top ?? 0;
-      const h = Math.min(height ?? img.naturalHeight, img.naturalHeight - t);
+      const H = img.naturalHeight;
+      const crop =
+        top != null ? { t: top, h: height } : region === "header" ? { t: 0, h: 126 } : region === "footer" ? { t: H - 760, h: 760 } : { t: 0, h: H };
+      const h = Math.min(crop.h, H - crop.t);
       const c = document.createElement("canvas");
       c.width = img.naturalWidth;
       c.height = h;
-      c.getContext("2d").drawImage(img, 0, t, img.naturalWidth, h, 0, 0, img.naturalWidth, h);
-      return { url: c.toDataURL("image/png"), w: img.naturalWidth, h: img.naturalHeight };
+      c.getContext("2d").drawImage(img, 0, crop.t, img.naturalWidth, h, 0, 0, img.naturalWidth, h);
+      return c.toDataURL("image/png");
     },
-    { b64: designData, ...(opts.top ? { top: +opts.top, height: +(opts.height || 126) } : {}), ...(opts.top ? {} : reg.design(0)) },
+    { b64, region, top: opts.top != null ? +opts.top : null, height: +(opts.height || 126) },
   );
-  // footer needs the full height first
-  let designUrl = designPng.url;
-  if (region === "footer" && !opts.top) {
-    const { top, height } = reg.design(designPng.h);
-    designUrl = await dpage.evaluate(
-      async ({ b64, top, height }) => {
-        const img = new Image();
-        img.src = `data:image/webp;base64,${b64}`;
-        await img.decode();
-        const c = document.createElement("canvas");
-        c.width = img.naturalWidth;
-        c.height = height;
-        c.getContext("2d").drawImage(img, 0, top, img.naturalWidth, height, 0, 0, img.naturalWidth, height);
-        return c.toDataURL("image/png");
-      },
-      { b64: designData, top, height },
-    );
-  }
   await dctx.close();
 
   // 2) screenshot of the page (region)
@@ -78,8 +57,8 @@ for (const theme of themes) {
   await page.goto(origin + pagePath, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   await scrollLikeUser(page);
-  const buf = reg.selector
-    ? await page.locator(reg.selector).first().screenshot()
+  const buf = REGIONS[region]
+    ? await page.locator(REGIONS[region]).first().screenshot()
     : await page.screenshot({ fullPage: true });
   const pageUrl = `data:image/png;base64,${buf.toString("base64")}`;
 

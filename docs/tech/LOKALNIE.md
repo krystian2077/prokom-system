@@ -92,4 +92,4 @@ npx playwright test               # e2e: panele.spec.ts, responsywnosc.spec.ts
   node scripts/tech/zrzuty.mjs --pages=/ --widths=360,390,768,1024,1440,1920
   node scripts/tech/porownaj.mjs --page=/ --wzorzec=glowna --region=header
   ```
-  Wynik w `tmp/zrzuty/index.html` i `tmp/porownaj/*.html` (poza gitem).
+  Wynik w `tmp/zrzuty/index.html` i `tmp/porownaj/*.html` (poza gitem). W Git Bash poprzedź komendę `MSYS_NO_PATHCONV=1`, inaczej `--page=/` zamieni się w ścieżkę Windows (PowerShell nie ma tego problemu).

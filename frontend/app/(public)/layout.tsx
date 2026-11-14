@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Archivo, Manrope } from "next/font/google";
 import { ConditionalPublicLayout } from "@/components/layout/ConditionalPublicLayout";
+import { ThemeBoot } from "@/components/tech/ThemeBoot";
 import { line, servicePoints } from "@/config/prokom";
 import { jsonLdString, siteJsonLd } from "@/lib/tech/jsonld";
 import { publishedPoints } from "@/lib/tech/points";
@@ -62,6 +63,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd()) }} />
       {umamiId ? <script defer src={umamiSrc} data-website-id={umamiId} data-tech-umami="" /> : null}
+      <ThemeBoot />
       <div className={`tech ${archivo.variable} ${manrope.variable}`}>
         <ConditionalPublicLayout>{children}</ConditionalPublicLayout>
       </div>
