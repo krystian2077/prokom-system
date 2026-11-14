@@ -86,6 +86,10 @@ Zebrane komendami z części C (tylko odczyt) przez `ssh root@62.238.0.240`; DNS
 7. **Bezpieczeństwo starego serwera:** `.env.prod` i `.env.prod.bak-*` mają 644 (czytelne dla każdego użytkownika), logowanie SSH jako root. Do czasu wyłączenia: `chmod 600`; na VPS od razu 600 i bez roota.
 8. Pozostałości w `.env.prod.example`/A2 (`RENDER_EXTERNAL_HOSTNAME`, `DJANGO_ENV`, `SEED_EMAIL_DOMAIN`, `INBOUND_*`) nie są ustawione na produkcji — na VPS ich nie przenosimy.
 
+### B2. Pułapki Hetznera (incydent 14.11.2026)
+- **Każda komenda compose na Hetznerze z `--env-file .env.prod`** (`docker compose --env-file .env.prod -f docker-compose.prod.yml …`). W `/app` nie ma `.env`; bez tego parametru compose podstawia puste `POSTGRES_*`/`REDIS_PASSWORD` i przy `up` odtwarza `db` i `redis` z pustą konfiguracją → backend nie startuje (14.11, ok. 18:16–18:28 UTC: API i panel 502, strona główna działała, danych nie stracono).
+- **Po odtworzeniu albo starcie backendu: `docker compose --env-file .env.prod -f docker-compose.prod.yml exec nginx nginx -s reload`.** Nginx Hetznera (`upstream backend:8000`) rozwiązuje nazwę raz przy starcie; nowy kontener = nowe IP = 502 do przeładowania. Na VPS gateway rozwiązuje nazwy per żądanie (`resolver 127.0.0.11`).
+
 ## C. Komendy do uruchomienia (Krystian)
 Wklejasz wynik w czacie sesji. **Nie wklejaj wartości z `.env.prod` ani haseł** — komendy niżej wypisują tylko nazwy kluczy.
 

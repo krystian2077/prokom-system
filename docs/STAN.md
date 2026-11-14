@@ -4,14 +4,28 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** **TM+**. Etap A: A1–A3 ✔, A4 ✔ 14.11 18:35 (delegacja na `dns1/dns2.microhost.pl` opublikowana, resolwery zgodne, strona bez przerwy). **Etap C, PR 1 `chore/tech-vps` otwarty** (compose, gateway, obrazy GHCR, skrypty `scripts/vps/`, `WDROZENIE.md`) — przetestowany lokalnie end-to-end.
-- **Następny krok:** (1) A5 — transfer domeny do Seohost (najwcześniej kilka godzin po 18:35, np. 15.11). (2) Scalić PR `chore/tech-vps` do `master`, potem `develop ← master`. (3) GitHub → Environments `staging` i `production` z Variables `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (przed pierwszym buildem). (4) Sesja w prokom-web (prompt w opisie PR): vhosty Tech. (5) Na VPS: `/srv/prokom/prokom-tech`, `.env.*`, token GHCR, pierwszy `deploy.sh staging` (`WDROZENIE.md` §4). Równolegle: `chmod 600` `.env.prod` na Hetznerze, `SERWIS_PRINT_HOURS`.
+- **W toku:** **TM+**. Etap A: A1–A4 ✔ (delegacja na Seohost opublikowana 14.11 18:35), A5 (transfer) — 15.11. Etap C: PR #13 (infrastruktura) scalony, obrazy w GHCR (prywatne); **staging na VPS działa od 14.11 18:43** (`dd8e8a3`, `/srv/prokom/prokom-tech`, gateway `127.0.0.1:3301`, smoke 11/11); czeka na vhost w prokom-web (sesja w toku).
+- **Następny krok:** (1) PR prokom-web z vhostami Tech → certyfikat stagingu → `https://staging.prokomserwis.pl` za hasłem. (2) Próba generalna (MIGRACJA §6–§7): kopia `D:\PRO-KOM\kopie\prokom-tech-import-20261114T181620Z.tar` → VPS → `restore.sh --no-start` → `anonimizuj.sql` → start → smoke + test ręczny. (3) A5 transfer domeny (15.11). (4) Etap B — `kontakt@` na SH 1. (5) `.env.prod` i cron kopii na VPS przed niedzielą 29.11.
 
 ## Pilne
 - ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.
 - ✔ 14.11.2026: hasła kont z `seed_initial.py`/`seed_staff_profiles.py` zmienione na produkcji (Krystian). Poprawka seedów → backlog w `WYJATKI.md`.
 - ✔ 14.11.2026: build frontu naprawiony bez zmian w panelach (`frontend/scripts/patch-next-font.js` jako `prebuild`, commit `85b96bf`). Usunąć po aktualizacji Nexta, gdy ten obsłuży adresy Google Fonts bez rozszerzenia.
 - ✖ Brak kopii zapasowych produkcji (0 wpisów `BackupLog`, brak crona) — ręczny `pg_dump` przed TM, na VPS kopie od pierwszego dnia.
+
+## Próba generalna — część automatyczna (14.11.2026, VPS, staging)
+| Krok (MIGRACJA §7) | Wynik | Dowód |
+|---|---|---|
+| Eksport z Hetznera (`eksport-hetzner.sh`, strona działa) | ✔ | `prokom-tech-import-20261114T181620Z.tar`, 430 KB, sha256 `034b69cb…` zgodny: Hetzner → komputer → VPS |
+| Import do stagingu (`restore.sh --no-start`) | ✔ | 3 naprawy, `source_commit=50f926c` |
+| Anonimizacja (`anonimizuj.sql`) | ✔ | 12 kontroli = 0; e-maile `klient-N@example.test` |
+| Start + smoke | ✔ | 5 kontenerów healthy, smoke all ok; dane: 3 naprawy, 8 klientów |
+| Zgłoszenie testowe (`SMOKE_SUBMIT=1`, przed importem) | ✔ | `PROKOM/RMA/1/2026` → `/track` 200 |
+| Pamięć (staging, pusty) | ✔ | backend 178/512 MB, frontend 40/320, db 37/384, gateway 5/64, redis 3/96 |
+| Plik importu usunięty z VPS (`shred -u`) | ✔ | `/srv/prokom/import` pusty; kopia zostaje w `D:\PRO-KOM\kopie` i na Hetznerze |
+| Cron kopii stagingu | ✔ | `30 3 * * *` UTC (`scripts/vps/backup.sh staging`), po prokom-web 02:30/02:45 i Gaming 03:00/03:15; prod Tech — po przełączeniu (MIGRACJA §8 pkt 10); heartbeat Better Stack — do dodania |
+| Część ręczna (panel, lista napraw, PDF, upload 20 MB) | — | po vhoście `staging.prokomserwis.pl` (prokom-web) |
+| Test odtworzenia kopii (`backup.sh` → B2 → `restore.sh`) | ✔ | `.env.backup` (ten sam `age.pub` i bucket co Gaming); kopia 432 KB w `offsite:prokom-backups-r7k2/tech-staging/daily/`; zgłoszenie testowe dodane po kopii (4) → po odtworzeniu z B2: 3 = manifest; smoke core ok; `age.key` usunięty (`shred -u`) |
 
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
 | Sesja | Zakres | Stan |
@@ -47,6 +61,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14.11.2026 18:16–18:28 UTC — **incydent na Hetznerze**: komenda compose bez `--env-file .env.prod` (przy zmianie `SERWIS_PRINT_HOURS`) odtworzyła `db`/`redis` z pustą konfiguracją, a po naprawie Nginx trzymał stare IP backendu → API i panel 502 przez ok. 12 min. Naprawa: `up -d` z `--env-file` + `nginx -s reload`. Danych nie stracono. Wnioski w `INWENTARZ.md` B2 i MIGRACJA §8–§9. Kopia produkcji: `prokom-tech-import-20261114T181620Z.tar` (sha256 `034b69cb…`), `.env.prod` ma już 600.
 - 14.11.2026 — stan DNS „przed” z panelu cyber_Folks w `docs/tech/DNS-PROKOMSERWIS.md` (A przez „Przekierowanie IP”, abonent prywatny).
 - 14.11.2026 — Zakopane od szefa: godziny pn–pt 10:00–16:30, ploter Hammer Glass jest, można oddać w jednym punkcie i odebrać w drugim (KONTRAKT §2: linia „Punkt odbioru”).
 - 14.11.2026 — punkt Zakopane: ul. Stanisława Staszica 8, 34-500 Zakopane, tel. 18 541 20 15 (SPEC §5).

@@ -10,7 +10,7 @@ Wersja 1.0 · 14.11.2026. Wykonuje Krystian z Claude Code. **Każdy krok na serw
 ## 1. Warunki wejścia (blokery — bez nich nie zaczynamy przełączenia)
 1. Gaming działa stabilnie na tym samym VPS co najmniej 5 dni (wspólny Nginx bez incydentów).
 2. **Dostęp do DNS domeny prokomserwis.pl** — ✔ od 14.11.2026 strefa w **Seohost** (`dns1/dns2.microhost.pl`, TM+ etap A), rejestracja: transfer z cyber_Folks do Seohost (TM+ A5). Poczty (MX) nie ma. Stan i dziennik zmian: `docs/tech/DNS-PROKOMSERWIS.md`.
-3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony.
+3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony. — ✔ 14.11.2026 (staging: `backup.sh` → B2 → `restore.sh`, liczba napraw zgodna; prod — cron po przełączeniu, §8 pkt 10).
 4. Staging `staging.prokomserwis.pl` przeszedł próbę generalną (§7) na kopii bazy z produkcji.
 5. Wolne zasoby VPS po Gaming: `free -h` i `df -h`. Potrzeba ok. 2,5 GB RAM (prod + staging, §4) i ok. 5 GB dysku plus rozmiar mediów razy trzy (wolumen, kopia lokalna, zapas).
 6. Krystian ma dostęp SSH do Hetznera i do VPS, a w menedżerze haseł: `.env.prod` z Hetznera, hasło aplikacji Gmail (SMTP), Google OAuth.
@@ -84,7 +84,7 @@ Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 **T−48 h:** TTL rekordów A dla `@` i `www` na 300 s **w strefie Seohost** (AAAA nie ma). Komunikat dla serwisu: „W niedzielę wieczorem przerwa techniczna strony i panelu, w poniedziałek od rana wszystko działa”.
 **T−0 (np. 18:00):**
 1. Stary serwer: strona techniczna 503 dla całego ruchu (tymczasowa konfiguracja Nginx na Hetznerze z prostą stroną „Przerwa techniczna, wracamy wkrótce. Pilne: 883 200 151”). Od tej chwili nie powstają nowe dane.
-2. Stary serwer: `docker compose stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu).
+2. Stary serwer: `docker compose --env-file .env.prod -f docker-compose.prod.yml stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu). **Na Hetznerze zawsze z `--env-file .env.prod`** — bez tego compose podstawia puste hasła i odtwarza `db`/`redis` (incydent 14.11.2026, 12 min bez API).
 3. Zrzut końcowy: `pg_dump -Fc` + `tar` mediów → sumy kontrolne (`sha256sum`) → przeniesienie na VPS → porównanie sum.
 4. VPS: odtworzenie do **pustej** bazy stosu prod (bez anonimizacji), media do wolumenu, start stosu prod z `<sha>` = commit z Hetznera. `migrate` nie powinien mieć nic do zrobienia (ten sam commit). Jeśli ma — **stop i decyzja**.
 5. Test przed DNS: `curl --resolve prokomserwis.pl:443:194.28.50.70 …` i plik `hosts` na komputerze Krystiana: strona, logowanie do panelu, lista napraw, szczegóły naprawy z załącznikami, PDF, panel admina, konto klienta.
@@ -97,7 +97,7 @@ Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 
 ## 9. Powrót (gdy coś nie działa i nie da się naprawić w 30 minut)
 1. DNS z powrotem na IP Hetznera (TTL 300 s, więc szybko) i przywrócenie AAAA, jeśli był.
-2. Na Hetznerze: zdjęcie strony 503, `docker compose start` backend, frontend, celery, celery-beat.
+2. Na Hetznerze: zdjęcie strony 503, `docker compose --env-file .env.prod -f docker-compose.prod.yml start backend frontend celery celery-beat`, potem **`docker compose --env-file .env.prod -f docker-compose.prod.yml exec nginx nginx -s reload`** — Nginx Hetznera pamięta IP kontenerów z chwili startu; po starcie/odtworzeniu backendu bez przeładowania zwraca 502 (incydent 14.11.2026). Sprawdzenie: `curl -s -o /dev/null -w '%{http_code}' https://prokomserwis.pl/api/v1/repairs/track/` = 400.
 3. Dane, które powstały na VPS po przełączeniu (zwykle zero w niedzielę wieczorem), trzeba przenieść ręcznie. Lista z logów i panelu.
 4. Wpis w STAN: co zawiodło. Nowy termin.
 
