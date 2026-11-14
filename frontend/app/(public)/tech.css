@@ -2252,3 +2252,57 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 .tech .t-howto__card h3 { font-size: 21px !important; }
 .tech .t-howto__card p { font-size: 14.5px; line-height: 1.5; color: var(--ink2); }
 .tech .t-loc-hero__text > .t-draft-badge, .tech .t-towngroup__head .t-draft-badge { align-self: flex-start; }
+
+/* === TD5: PWA, offline, poradnik, naprawa kurierem === */
+.tech .t-install { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-top: 12px; padding: 14px 16px; border-radius: 16px; background: var(--bg2); font-size: 13.5px; line-height: 1.45; color: var(--ink2); }
+.tech .t-install b { color: var(--ink); font-size: 14px; }
+.tech .t-install em { font-style: normal; font-weight: 800; color: var(--ink); }
+.tech .t-install .t-btn { min-height: 44px; }
+
+/* Offline */
+.tech .t-offline__points { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .tech .t-offline__points { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tech .t-offline__point { padding: 24px; border-radius: 24px; display: flex; flex-direction: column; gap: 8px; color: var(--ink2); }
+.tech .t-offline__point .t-h3 { color: var(--ink); }
+.tech .t-offline__tel { display: inline-flex; align-items: center; min-height: 44px; font-weight: 800; color: var(--acct); }
+.tech .t-offline__note { font-size: 12.5px; color: var(--ink2); }
+
+/* Preparation guide */
+.tech .t-preptabs__list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
+.tech .t-preptabs__tab { flex-shrink: 0; min-height: 48px; padding: 0 18px; border-radius: 14px; border: 1.5px solid var(--bd); background: var(--card); color: var(--ink); font: 800 14.5px var(--t-font-body); cursor: pointer; white-space: nowrap; }
+.tech .t-preptabs__tab.is-on { border-color: var(--acc); background: var(--soft); color: var(--acct); }
+.tech .t-preptabs__print { display: none; }
+.tech .t-prepsteps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1024px) { .tech .t-prepsteps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tech .t-prepsteps--grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 768px) and (max-width: 1023.98px) { .tech .t-prepsteps--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tech .t-prepsteps__item { display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; border-radius: 22px; }
+.tech .t-prepsteps__item p { margin-top: 6px; font-size: 14.5px; line-height: 1.55; color: var(--ink2); }
+.tech .t-prepsteps__n { flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; background: var(--soft); color: var(--acct); font-family: var(--t-font-head); font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+.tech .t-prepguide__note { margin-top: 24px; font-size: 15px; color: var(--ink2); }
+
+/* Courier page */
+.tech .t-courier__cols { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1024px) { .tech .t-courier__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px; align-items: start; } }
+.tech .t-courier__cols > div { display: flex; flex-direction: column; gap: 12px; }
+.tech .t-ticklist { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.tech .t-ticklist li { position: relative; padding: 14px 16px 14px 46px; border-radius: 16px; background: var(--card); border: 1px solid var(--bd); font-size: 15px; line-height: 1.5; color: var(--ink2); }
+.tech .t-ticklist li::before { content: "✓"; position: absolute; left: 14px; top: 13px; width: 22px; height: 22px; border-radius: 50%; background: var(--okbg); color: var(--ok); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.tech .t-ticklist--warn li::before { content: "!"; background: var(--soft); color: var(--acct); }
+.tech .t-paytable { margin-top: 18px; max-width: 720px; padding: 6px 24px; border-radius: 22px; }
+.tech .t-paytable dl { margin: 0; }
+.tech .t-paytable dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-top: 1px solid var(--bd); font-size: 15.5px; }
+.tech .t-paytable dl > div:first-child { border-top: 0; }
+.tech .t-paytable dt { color: var(--ink2); }
+.tech .t-paytable dd { margin: 0; font-weight: 800; color: var(--ink); }
+.tech .t-courier__addr { margin-top: 16px; max-width: 620px; padding: 22px 24px; border-radius: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--ink2); }
+.tech .t-courier__addr b { font-size: 17px; color: var(--ink); }
+
+/* Print: guide prints all tabs, without the shell */
+@media print {
+  .tech .t-noprint, .tech .t-preptabs__list, .tech [data-t-tabbar], .tech .t-capwrap, .tech .t-brandbar, .tech .t-footer, .tech .t-rail, .tech .t-lines, .tech .t-legal { display: none !important; }
+  .tech .t-preptabs__panel[hidden] { display: block !important; }
+  .tech .t-preptabs__print { display: block; margin: 18px 0 10px; font-size: 20px; }
+  .tech .t-stage { background: none !important; color: #000 !important; }
+  .tech .t-stage * { color: #000 !important; }
+  .tech .t-prepsteps__item { break-inside: avoid; border: 1px solid #bbb; }
+}

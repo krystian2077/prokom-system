@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { servicePoints, type ServicePoint } from "@/config/prokom";
 import { BLOG_POSTS } from "@/lib/blog-posts";
 import { BLOG_CATEGORIES } from "./blog-taxonomy";
+import { courierInSitemap } from "./courier-page";
 import { publishedLocalPages } from "./local-pages";
 import { SITE_URL } from "@/lib/site-config";
 
@@ -59,5 +60,10 @@ export function buildSitemap(now: Date = new Date(), points: ServicePoint[] = se
     changeFrequency: "weekly",
     priority: 0.65,
   }));
-  return [...pages, ...locals, ...blog, ...blogCategories];
+  // TD5 PR 3: preparation guide; courier page only once published (SPEC §12.10).
+  const td5: MetadataRoute.Sitemap = [
+    { url: url("/jak-przygotowac-sprzet"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    ...(courierInSitemap() ? [{ url: url("/naprawa-kurierem"), lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 }] : []),
+  ];
+  return [...pages, ...locals, ...blog, ...blogCategories, ...td5];
 }
