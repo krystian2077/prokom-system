@@ -91,3 +91,10 @@ desktop.ini
 .claire/
 tmp/
 frontend/.env.local
+
+# VPS (scripts/vps/, docs/tech/WDROZENIE.md)
+.env.backup
+eksport/
+import/
+backups/
+!.env.vps.example

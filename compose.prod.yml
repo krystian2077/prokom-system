@@ -1,0 +1,83 @@
+# prokom-tech production — overlay on compose.vps.yml (see the header there).
+#   docker compose --env-file .env.prod -f compose.vps.yml -f compose.prod.yml up -d
+# Adds Celery (worker + beat): only production runs scheduled jobs and sends mail from tasks.
+# Memory limits: docs/tech/MIGRACJA-VPS.md §4 (measured on Hetzner in T0, INWENTARZ.md B1.5).
+
+name: prokom-tech-prod
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
+
+services:
+  db:
+    environment:
+      POSTGRES_DB: prokom_tech_prod
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  backend:
+    env_file: .env.prod
+    environment:
+      # gunicorn.conf.py takes workers from the CPU count (4 vCPU → 9); the env var wins over the
+      # file, so the shared server is not flooded — without touching backend code.
+      GUNICORN_CMD_ARGS: '--workers=3 --threads=2'
+    deploy:
+      resources:
+        limits:
+          memory: 768m
+
+  celery:
+    image: ghcr.io/krystian2077/prokom-tech-backend:${APP_IMAGE_TAG:?set APP_IMAGE_TAG (full commit SHA)}
+    restart: unless-stopped
+    env_file: .env.prod
+    command: ['celery', '-A', 'config.celery', 'worker', '-l', 'info', '--concurrency=2']
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+    logging: *logging
+
+  celery-beat:
+    image: ghcr.io/krystian2077/prokom-tech-backend:${APP_IMAGE_TAG:?set APP_IMAGE_TAG (full commit SHA)}
+    restart: unless-stopped
+    env_file: .env.prod
+    command:
+      ['celery', '-A', 'config.celery', 'beat', '-l', 'info', '--scheduler', 'django_celery_beat.schedulers:DatabaseScheduler']
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 192m
+    logging: *logging
+
+  frontend:
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+
+  gateway:
+    deploy:
+      resources:
+        limits:
+          memory: 64m
