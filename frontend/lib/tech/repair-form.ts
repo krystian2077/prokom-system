@@ -56,7 +56,8 @@ export const DEVICE_HINTS: Partial<Record<DeviceCategory, { brand: string; model
  * "Who pays" lines of the courier option, from config/prokom.ts courierService.
  * A null value = the sentence is not shown (SPEC §12.10). Texts: TODO(krystian) — accept.
  */
-export function courierLines(c: Pick<typeof courierService, "inboundPaidBy" | "returnPaidBy" | "returnIfDeclined"> = courierService): string[] {
+type Payer = "client" | "service" | null;
+export function courierLines(c: { inboundPaidBy: Payer; returnPaidBy: Payer; returnIfDeclined: Payer } = courierService): string[] {
   const out: string[] = [];
   if (c.inboundPaidBy === "client") out.push("Wysyłkę do serwisu opłacasz Ty.");
   else if (c.inboundPaidBy === "service") out.push("Wysyłkę do serwisu opłacamy my.");
