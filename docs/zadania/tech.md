@@ -69,6 +69,53 @@ PR 2 — chore/tech-t0 (do develop):
 DoD: CI zielone, strefa-zakazana działa, żadnych zmian w backend/ ani frontend/ poza .gitignore i CI.
 ```
 
+### TM+ — domena, poczta i przenosiny prokomserwis.pl (14.11.2026)
+Używaj po sesji T0 (pakiet wgrany, `develop` istnieje). Zastępuje uruchamianie promptów TM i TM-PRZELACZENIE niżej (zawiera je i dokłada domenę i pocztę; etap C odwołuje się do promptu TM).
+```
+/zadanie TM+ — domena prokomserwis.pl do Seohost, skrzynka kontakt@prokomserwis.pl na Seohost SH 1, przenosiny strony z Hetznera na VPS webh.pl. Bez zmian w kodzie aplikacji (backend/ i frontend/app, components, lib).
+
+Przeczytaj: CLAUDE.md, docs/STAN.md, docs/tech/MIGRACJA-VPS.md, docs/tech/INWENTARZ.md (z T0), docs/tech/SPEC.md §5.
+
+Fakty:
+- Domena prokomserwis.pl jest dziś zarejestrowana w cyber_Folks i tam jest jej strefa DNS. Mam dostęp do panelu.
+- Pozostałe domeny linii są w Seohost (serwery DNS dns1.microhost.pl i dns2.microhost.pl), skrzynki kontakt@ linii są na osobnym hostingu Seohost SH 1 (DirectAdmin) z SPF, DKIM i DMARC p=none.
+- VPS webh.pl: 194.28.50.70, bez IPv6, wspólny Nginx w prokom-web (sieć prokom-proxy), wzór wdrożenia jak Gaming G16.
+- Aplikacja wysyła dziś maile przez Gmail SMTP (zmienne EMAIL_* w .env.prod na Hetznerze).
+
+Zasady tej sesji:
+- W panelach cyber_Folks, Seohost, DirectAdmin i na serwerach klikam i wpisuję ja. Ty przygotowujesz dokładne wartości, komendy i listy kontrolne, a po moim „zrobione” sprawdzasz wynik (PowerShell: Resolve-DnsName z -Server 1.1.1.1 i 8.8.8.8, curl, ssh — komendy dajesz mi do uruchomienia albo uruchamiasz po mojej zgodzie).
+- Nigdy nie proś o hasła, kody AuthInfo ani wartości z .env. Ja je wpisuję tam, gdzie trzeba. W repo i w PR nie ma żadnych sekretów.
+- Przed każdą zmianą DNS: zapisz stan „przed” w docs/tech/DNS-PROKOMSERWIS.md (wszystkie rekordy, TTL), po zmianie: stan „po” i wynik sprawdzenia.
+- Jedna zmiana naraz. Warunek stop: coś nie działa po 30 minutach → wracamy do stanu „przed” i zapisujemy w STAN.
+- Każdy etap kończy się wpisem w docs/STAN.md. Daty z planu: Etap A i B do 24.11, Etap C — przełączenie w niedzielę 29.11 (zapas 6.12), Etap D od 30.11.
+
+ETAP A — domena do Seohost (do 24.11; strona nadal działa na Hetznerze, zero przestoju):
+1. Inwentaryzacja w cyber_Folks: data wygaśnięcia, abonent (ma być firma PRO-KOM Tadeusz Wójciak z NIP — jeśli nie, zatrzymaj się i napisz mi), czy jest tam hosting lub poczta dla prokomserwis.pl, pełna lista rekordów (A, AAAA, MX, TXT, CNAME, SRV, CAA) z TTL. Dodatkowo Resolve-DnsName dla @, www i typów NS/A/AAAA/MX/TXT z dwóch resolverów. Wynik do docs/tech/DNS-PROKOMSERWIS.md.
+2. Jeśli domena ma działającą pocztę (MX z prawdziwymi skrzynkami): stop — lista skrzynek i plan ich przeniesienia przed jakąkolwiek zmianą MX. Jeśli poczty nie ma albo nikt jej nie używa: idziemy dalej.
+3. Przygotuj tabelę rekordów do wpisania w strefie Seohost 1:1 jak w cyber_Folks (A @ i www nadal na IP Hetznera, MX bez zmian, TTL 3600). Ja zakładam strefę w Seohost i wpisuję. Sprawdź strefę zapytaniem bezpośrednio do dns1.microhost.pl, zanim przełączymy serwery DNS.
+4. Ja zmieniam serwery DNS domeny w cyber_Folks na dns1.microhost.pl i dns2.microhost.pl. Ty sprawdzasz propagację (NS, A, MX z 1.1.1.1, 8.8.8.8 i serwerów Seohost), stronę, panel /panel, logowanie klienta i — jeśli była — pocztę. Odczekaj min. kilka godzin, zanim przejdziesz do pkt 5.
+5. Transfer rejestracji: ja odblokowuję domenę i pobieram AuthInfo w cyber_Folks, zamawiam transfer na koncie firmowym Seohost i potwierdzam maile. Ty po zakończeniu sprawdzasz: serwery DNS nadal Seohost, strona i panel działają, data wygaśnięcia zachowana. Przypomnij mi o włączeniu automatycznego odnawiania i o rezygnacji z usług domeny w cyber_Folks dopiero po zakończonym transferze.
+6. Dopisz prokomserwis.pl do tabeli domen (docs/tech/DNS-PROKOMSERWIS.md; przygotuj też wpis do docs/dns.md w prokom-web — tekst w opisie PR, wkleję go tam w osobnej sesji).
+
+ETAP B — skrzynka kontakt@prokomserwis.pl na Seohost SH 1 (po etapie A, do 24.11):
+1. Ja dodaję domenę pocztową prokomserwis.pl w DirectAdmin SH 1 (bez zmian rekordów A strony) i zakładam skrzynkę kontakt@prokomserwis.pl (limit 1–2 GB, hasło w menedżerze haseł), ewentualne aliasy (np. serwis@ → kontakt@) — tylko aliasy, nie osobne skrzynki.
+2. Przygotuj dokładne rekordy MX, SPF, DKIM (z DirectAdmin) i DMARC p=none dla strefy Seohost, zgodne z tym, jak są ustawione dla prokombiznes.pl. Ja je wpisuję. SPF ma też obejmować obecnego nadawcę aplikacji (Gmail), dopóki aplikacja wysyła przez Gmail — sprawdź i zaproponuj poprawny jeden rekord SPF.
+3. Testy: mail z Gmaila na kontakt@ i odpowiedź, mail-tester ≥ 9/10, nagłówki SPF/DKIM/DMARC = pass. Ustawienia Thunderbirda (IMAP 993 SSL, SMTP 465 SSL albo 587 STARTTLS) do STAN.
+4. Wysyłki z aplikacji jeszcze NIE przełączamy (etap D).
+
+ETAP C — przenosiny strony na VPS webh.pl: dokładnie wg docs/tech/MIGRACJA-VPS.md i promptu TM z docs/zadania/tech.md (PR chore/tech-vps do master, PR z hostami w prokom-web, próba generalna na stagingu z anonimizacją i bez Celery, test odtworzenia kopii), ze zmianami:
+- wszystkie zmiany DNS (staging.prokomserwis.pl, TTL 300 na 48 h przed, A @ i www → 194.28.50.70, usunięcie AAAA) robię w strefie Seohost;
+- popraw w MIGRACJA-VPS.md §1, §2 i §8 informację, gdzie jest DNS (Seohost), w tym samym PR;
+- przełączenie w niedzielę prowadź krok po kroku wg §8: przed każdym krokiem komenda i oczekiwany wynik, po moim „tak” i wklejeniu wyniku — sprawdzenie; plan powrotu z §9 w każdej chwili pod ręką.
+
+ETAP D — po przełączeniu (od 30.11, osobny wieczór, nie w dniu migracji):
+1. Wysyłka z aplikacji przez SH 1: przygotuj listę zmian w .env.prod na VPS (EMAIL_HOST, EMAIL_PORT=587, EMAIL_HOST_USER=kontakt@prokomserwis.pl, EMAIL_HOST_PASSWORD — wpisuję ja, DEFAULT_FROM_EMAIL=kontakt@prokomserwis.pl). Backend ma na stałe EMAIL_USE_TLS=True, więc port 587 ze STARTTLS — sprawdź, że SH 1 to obsługuje. Restart backendu i celery przez deploy.sh, test: reset hasła konta testowego, mail o zmianie statusu naprawy testowej, nagłówki pass, brak spamu w Gmailu.
+2. SPF: usuń Gmail z rekordu dopiero, gdy nic już przez niego nie wysyła.
+3. STAFF_NOTIFICATION_EMAILS zostaje bez zmian, dopóki nie dam znać (decyzja z szefem).
+4. Hetzner: zatrzymany, nieusunięty 14 dni (MIGRACJA §10), przypomnienie w STAN z datą.
+5. docs/STAN.md: podsumowanie wszystkich etapów, dane do Thunderbirda bez haseł, lista rzeczy do zrobienia w cyber_Folks (rezygnacja z usług domeny po transferze).
+```
+
 ### TM — migracja 1:1 na VPS webh.pl
 ```
 /zadanie TM — migracja prokomserwis.pl z Hetznera na VPS webh.pl, 1:1, wg docs/tech/MIGRACJA-VPS.md. Zero zmian w kodzie aplikacji (backend/ i frontend/app, components, lib). Każdy krok na serwerze, w DNS i w bazie tylko po moim „tak”.
