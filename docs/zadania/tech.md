@@ -8,17 +8,20 @@ Dokumenty: `docs/tech/00-INDEKS.md`. Zasady: `CLAUDE.md`. Stan: `docs/STAN.md`.
 |---|---|---|---|---|
 | 1 | **T0** — start, porządki, rozpoznanie, inwentaryzacja | 2 | — | 0,75 |
 | 2 | **TM** — migracja 1:1 na VPS (staging → niedziela) | 1 + 1 w prokom-web | T0, Gaming stabilny | 2 + okno |
-| 3 | **TD1** — fundament i powłoka | 2 | TM | 2,5 |
+| 3 | **TD1** — fundament i powłoka | 2 | TM | 2,75 |
 | 4 | **TD2** — strona główna + kreator | 2 | TD1 | 3 |
-| 5 | **TD3** — kontrakt, zgłoszenie, status | 3 | TD1 | 2,5 |
-| 6 | **TD4** — punkty, kontakt, o firmie, strony lokalne, SEO, 301 | 2 | TD1 (TD3 dla formularzy) | 2,5 |
-| 7 | **TD5** — naprawy, Hammer Glass, FAQ, blog, prawne, 404 | 2 | TD1 | 2 |
+| 5 | **TD3** — kontrakt, zgłoszenie, status | 3 | TD1 | 3 |
+| 6 | **TD4** — punkty, kontakt, o firmie, strony lokalne, SEO, 301 | 2 | TD1 (TD3 dla formularzy) | 2,75 |
+| 7 | **TD5** — naprawy, Hammer Glass, FAQ, blog z kategoriami, prawne, 404, PWA, poradnik, naprawa kurierem | 3 | TD1 | 3,5 |
+| 7b | **TD5b** — strony konkretnych napraw `/naprawy/…` | 1 | TD5, lista napraw od serwisu | 1,5 |
 | 8 | **TD6** — QA, sprzątanie, staging → produkcja | 3 | TD2–TD5 | 2 |
-| | **Razem** | | | **≈ 17,25 + niedziela migracji** |
+| | **Razem** | | | **≈ 21,25 + niedziela migracji** |
 
-Dlaczego więcej niż 12–14 z planu czatu: po przeglądzie kodu doszły izolacja od paneli (wspólny projekt Next), połączenie dwóch formularzy zgłoszenia (1281 + 572 linii), testy kontraktu, siedem stron urządzeń i pełne wymagania dla telefonu i tabletu.
+Dlaczego więcej niż 12–14 z planu czatu: po przeglądzie kodu doszły izolacja od paneli (wspólny projekt Next), połączenie dwóch formularzy zgłoszenia (1281 + 572 linii), testy kontraktu, siedem stron urządzeń i pełne wymagania dla telefonu i tabletu. 14.11 doszły dodatki z SPEC §12 (status godzin przy punktach, PWA, poradnik, strony napraw): +2 wieczory; potem pomiar, „Moje naprawy”, ekran sukcesu z QR, nawigacja, komunikat i sekcja zaufania (§12.5–§12.9): +1 wieczór; naprawa wysyłkowa i kategorie bloga (§12.10–§12.11): +1 wieczór. **Zakres zamknięty 14.11** — kolejne pomysły tylko do kolejki po produkcji.
 
 **Poza kodem, przed TD2 (czat projektu):** plansze telefonu i tabletu dla strony głównej, zgłoszenia i punktów (`docs/design/tech/zrzuty/390-*.webp`, `768-*.webp`). Bez nich TD2 składa telefon według `RESPONSYWNOSC.md`. Da się, ale wynik jest mniej przewidywalny.
+
+**Poza kodem, przed TD5b (Krystian z serwisem):** wybór do 12 napraw z SPEC §12.4 i dla każdej potwierdzony czas, gwarancja, czy na miejscu. Bez tego TD5b robi szablon i strony z `verified: false` (nie publikują się).
 
 ## 2. Kalendarz (rekomendacja; kolejność wobec Biznesu i pro-kom.eu ustala Krystian)
 | Kiedy | Co |
@@ -27,7 +30,7 @@ Dlaczego więcej niż 12–14 z planu czatu: po przeglądzie kodu doszły izolac
 | 21–22.11 | **T0** |
 | 23–27.11 | **TM**: PR infrastruktury, PR w prokom-web (Nginx), próba generalna na stagingu |
 | **ndz 29.11** | **przełączenie** (zapas: 6.12) |
-| od 30.11 | TD1 → TD2/TD3 → TD4 → TD5 → TD6, w wieczory, gdy Biznes nie ma pracy w kodzie (Biznes czeka na materiały szefa) |
+| od 30.11 | TD1 → TD2/TD3 → TD4 → TD5 → TD5b → TD6, w wieczory, gdy Biznes nie ma pracy w kodzie (Biznes czeka na materiały szefa) |
 | przed świętami | staging z całą nową stroną, akceptacja szefa |
 | **ndz 3.01 albo 10.01.2027** | produkcja nowego wyglądu (nie wdrażamy w grudniowym szczycie sprzedaży telefonów) |
 
@@ -35,9 +38,10 @@ Ryzyko: w grudniu jest też nowa pro-kom.eu (plan: do 20.12) i produkcja Biznesu
 
 ## 3. Kolejność cięcia przy braku czasu
 1. Kolejne strony miejscowości (zostają Rabka-Zdrój i Zakopane).
-2. Szyna boczna ≥ 1400 px.
-3. Bogate mega menu (zostaje proste rozwijane menu).
-4. Ruch dekoracyjny (marquee, pływające telefony) — zostaje statycznie.
+2. Strony napraw powyżej pierwszych 6 (reszta po produkcji, ten sam szablon).
+3. Szyna boczna ≥ 1400 px.
+4. Bogate mega menu (zostaje proste rozwijane menu).
+5. Ruch dekoracyjny (marquee, pływające telefony) — zostaje statycznie.
 
 **Bez cięć:** strefa zakazana i panele nietknięte, kontrakt, zgłoszenie, status, powłoka, telefon jak aplikacja, tablet, strona główna z kreatorem, punkty, kontakt, `/serwis-telefonow`, SEO techniczne, 301, tryb ciemny.
 
@@ -63,6 +67,53 @@ PR 2 — chore/tech-t0 (do develop):
 7. scripts/vps/anonimizuj.sql — projekt wg MIGRACJA §6 na podstawie modeli (wszystkie tabele z e-mailem, telefonem, nazwiskiem, adresem, tokenami klientów) + zapytania kontrolne. Uruchom na lokalnej kopii z fikcyjnymi danymi.
 8. STAN: wynik T0, decyzje do podjęcia (repo publiczne/prywatne, rejestrator DNS, termin TM).
 DoD: CI zielone, strefa-zakazana działa, żadnych zmian w backend/ ani frontend/ poza .gitignore i CI.
+```
+
+### TM+ — domena, poczta i przenosiny prokomserwis.pl (14.11.2026)
+Używaj po sesji T0 (pakiet wgrany, `develop` istnieje). Zastępuje uruchamianie promptów TM i TM-PRZELACZENIE niżej (zawiera je i dokłada domenę i pocztę; etap C odwołuje się do promptu TM).
+```
+/zadanie TM+ — domena prokomserwis.pl do Seohost, skrzynka kontakt@prokomserwis.pl na Seohost SH 1, przenosiny strony z Hetznera na VPS webh.pl. Bez zmian w kodzie aplikacji (backend/ i frontend/app, components, lib).
+
+Przeczytaj: CLAUDE.md, docs/STAN.md, docs/tech/MIGRACJA-VPS.md, docs/tech/INWENTARZ.md (z T0), docs/tech/SPEC.md §5.
+
+Fakty:
+- Domena prokomserwis.pl jest dziś zarejestrowana w cyber_Folks i tam jest jej strefa DNS. Mam dostęp do panelu.
+- Pozostałe domeny linii są w Seohost (serwery DNS dns1.microhost.pl i dns2.microhost.pl), skrzynki kontakt@ linii są na osobnym hostingu Seohost SH 1 (DirectAdmin) z SPF, DKIM i DMARC p=none.
+- VPS webh.pl: 194.28.50.70, bez IPv6, wspólny Nginx w prokom-web (sieć prokom-proxy), wzór wdrożenia jak Gaming G16.
+- Aplikacja wysyła dziś maile przez Gmail SMTP (zmienne EMAIL_* w .env.prod na Hetznerze).
+
+Zasady tej sesji:
+- W panelach cyber_Folks, Seohost, DirectAdmin i na serwerach klikam i wpisuję ja. Ty przygotowujesz dokładne wartości, komendy i listy kontrolne, a po moim „zrobione” sprawdzasz wynik (PowerShell: Resolve-DnsName z -Server 1.1.1.1 i 8.8.8.8, curl, ssh — komendy dajesz mi do uruchomienia albo uruchamiasz po mojej zgodzie).
+- Nigdy nie proś o hasła, kody AuthInfo ani wartości z .env. Ja je wpisuję tam, gdzie trzeba. W repo i w PR nie ma żadnych sekretów.
+- Przed każdą zmianą DNS: zapisz stan „przed” w docs/tech/DNS-PROKOMSERWIS.md (wszystkie rekordy, TTL), po zmianie: stan „po” i wynik sprawdzenia.
+- Jedna zmiana naraz. Warunek stop: coś nie działa po 30 minutach → wracamy do stanu „przed” i zapisujemy w STAN.
+- Każdy etap kończy się wpisem w docs/STAN.md. Daty z planu: Etap A i B do 24.11, Etap C — przełączenie w niedzielę 29.11 (zapas 6.12), Etap D od 30.11.
+
+ETAP A — domena do Seohost (do 24.11; strona nadal działa na Hetznerze, zero przestoju):
+1. Inwentaryzacja w cyber_Folks: data wygaśnięcia, abonent (ma być firma PRO-KOM Tadeusz Wójciak z NIP — jeśli nie, zatrzymaj się i napisz mi), czy jest tam hosting lub poczta dla prokomserwis.pl, pełna lista rekordów (A, AAAA, MX, TXT, CNAME, SRV, CAA) z TTL. Dodatkowo Resolve-DnsName dla @, www i typów NS/A/AAAA/MX/TXT z dwóch resolverów. Wynik do docs/tech/DNS-PROKOMSERWIS.md.
+2. Jeśli domena ma działającą pocztę (MX z prawdziwymi skrzynkami): stop — lista skrzynek i plan ich przeniesienia przed jakąkolwiek zmianą MX. Jeśli poczty nie ma albo nikt jej nie używa: idziemy dalej.
+3. Przygotuj tabelę rekordów do wpisania w strefie Seohost 1:1 jak w cyber_Folks (A @ i www nadal na IP Hetznera, MX bez zmian, TTL 3600). Ja zakładam strefę w Seohost i wpisuję. Sprawdź strefę zapytaniem bezpośrednio do dns1.microhost.pl, zanim przełączymy serwery DNS.
+4. Ja zmieniam serwery DNS domeny w cyber_Folks na dns1.microhost.pl i dns2.microhost.pl. Ty sprawdzasz propagację (NS, A, MX z 1.1.1.1, 8.8.8.8 i serwerów Seohost), stronę, panel /panel, logowanie klienta i — jeśli była — pocztę. Odczekaj min. kilka godzin, zanim przejdziesz do pkt 5.
+5. Transfer rejestracji: ja odblokowuję domenę i pobieram AuthInfo w cyber_Folks, zamawiam transfer na koncie firmowym Seohost i potwierdzam maile. Ty po zakończeniu sprawdzasz: serwery DNS nadal Seohost, strona i panel działają, data wygaśnięcia zachowana. Przypomnij mi o włączeniu automatycznego odnawiania i o rezygnacji z usług domeny w cyber_Folks dopiero po zakończonym transferze.
+6. Dopisz prokomserwis.pl do tabeli domen (docs/tech/DNS-PROKOMSERWIS.md; przygotuj też wpis do docs/dns.md w prokom-web — tekst w opisie PR, wkleję go tam w osobnej sesji).
+
+ETAP B — skrzynka kontakt@prokomserwis.pl na Seohost SH 1 (po etapie A, do 24.11):
+1. Ja dodaję domenę pocztową prokomserwis.pl w DirectAdmin SH 1 (bez zmian rekordów A strony) i zakładam skrzynkę kontakt@prokomserwis.pl (limit 1–2 GB, hasło w menedżerze haseł), ewentualne aliasy (np. serwis@ → kontakt@) — tylko aliasy, nie osobne skrzynki.
+2. Przygotuj dokładne rekordy MX, SPF, DKIM (z DirectAdmin) i DMARC p=none dla strefy Seohost, zgodne z tym, jak są ustawione dla prokombiznes.pl. Ja je wpisuję. SPF ma też obejmować obecnego nadawcę aplikacji (Gmail), dopóki aplikacja wysyła przez Gmail — sprawdź i zaproponuj poprawny jeden rekord SPF.
+3. Testy: mail z Gmaila na kontakt@ i odpowiedź, mail-tester ≥ 9/10, nagłówki SPF/DKIM/DMARC = pass. Ustawienia Thunderbirda (IMAP 993 SSL, SMTP 465 SSL albo 587 STARTTLS) do STAN.
+4. Wysyłki z aplikacji jeszcze NIE przełączamy (etap D).
+
+ETAP C — przenosiny strony na VPS webh.pl: dokładnie wg docs/tech/MIGRACJA-VPS.md i promptu TM z docs/zadania/tech.md (PR chore/tech-vps do master, PR z hostami w prokom-web, próba generalna na stagingu z anonimizacją i bez Celery, test odtworzenia kopii), ze zmianami:
+- wszystkie zmiany DNS (staging.prokomserwis.pl, TTL 300 na 48 h przed, A @ i www → 194.28.50.70, usunięcie AAAA) robię w strefie Seohost;
+- popraw w MIGRACJA-VPS.md §1, §2 i §8 informację, gdzie jest DNS (Seohost), w tym samym PR;
+- przełączenie w niedzielę prowadź krok po kroku wg §8: przed każdym krokiem komenda i oczekiwany wynik, po moim „tak” i wklejeniu wyniku — sprawdzenie; plan powrotu z §9 w każdej chwili pod ręką.
+
+ETAP D — po przełączeniu (od 30.11, osobny wieczór, nie w dniu migracji):
+1. Wysyłka z aplikacji przez SH 1: przygotuj listę zmian w .env.prod na VPS (EMAIL_HOST, EMAIL_PORT=587, EMAIL_HOST_USER=kontakt@prokomserwis.pl, EMAIL_HOST_PASSWORD — wpisuję ja, DEFAULT_FROM_EMAIL=kontakt@prokomserwis.pl). Backend ma na stałe EMAIL_USE_TLS=True, więc port 587 ze STARTTLS — sprawdź, że SH 1 to obsługuje. Restart backendu i celery przez deploy.sh, test: reset hasła konta testowego, mail o zmianie statusu naprawy testowej, nagłówki pass, brak spamu w Gmailu.
+2. SPF: usuń Gmail z rekordu dopiero, gdy nic już przez niego nie wysyła.
+3. STAFF_NOTIFICATION_EMAILS zostaje bez zmian, dopóki nie dam znać (decyzja z szefem).
+4. Hetzner: zatrzymany, nieusunięty 14 dni (MIGRACJA §10), przypomnienie w STAN z datą.
+5. docs/STAN.md: podsumowanie wszystkich etapów, dane do Thunderbirda bez haseł, lista rzeczy do zrobienia w cyber_Folks (rezygnacja z usług domeny po transferze).
 ```
 
 ### TM — migracja 1:1 na VPS webh.pl
@@ -97,13 +148,14 @@ Najpierw przeczytaj docs/tech/MAPA-PLIKOW.md. Panele i backend nietknięte (stre
 PR 1 — feat/tech-fundament:
 1. Narzędzia i testy (zanim zmienisz jakikolwiek wygląd): Vitest (jednostkowe) i Playwright (e2e) jako devDependencies frontendu; tests/tech/panele.spec.ts — zrzuty bazowe ekranów: /panel/login, /client/login, /admin-panel (stan po wejściu bez logowania), /panel po zalogowaniu kontem testowym (lokalnie) w motywie jasnym i ciemnym panelu; test „zmiana motywu strony publicznej nie zmienia data-theme ani prokom-theme”. scripts/tech/zrzuty.mjs, scripts/tech/porownaj.mjs, tests/tech/responsywnosc.spec.ts, tests/tech/literaly.test.ts (RESPONSYWNOSC §6, SPEC §11).
 2. Node 22 LTS w frontend/Dockerfile i .github/workflows/frontend-ci.yml (Node 20 bez wsparcia od 30.04.2026); next do najnowszej 14.2.x (bez zmiany wersji głównej), `npm audit` — wynik w PR. Build i panele zielone.
-3. frontend/config/prokom.ts (SPEC §5) + frontend/lib/tech/ (godziny na żywo Europe/Warsaw, punkty opublikowane, flaga NEXT_PUBLIC_TECH_DRAFT) z testami.
+3. frontend/config/prokom.ts (SPEC §5, z polem closures) + frontend/lib/tech/ (hours.ts wg SPEC §12.1: getOpeningStatus, święta ustawowe z Wielkanocą i Wigilią, closures, zmiana czasu; punkty opublikowane; flaga NEXT_PUBLIC_TECH_DRAFT) z testami — m.in. sobota 13:40, niedziela, 24.12, poniedziałek wielkanocny, noc zmiany czasu.
 4. frontend/app/(public)/tech.css: tokeny (SPEC §4) pod .tech i html[data-tech-theme="dark"] .tech, baza typografii (clamp), kontener, siatki zakresów (RESPONSYWNOSC §1). Kroje Archivo (wdth) i Manrope przez next/font w app/(public)/layout.tsx. Skrypt motywu (data-tech-theme, pk-theme, system) jako pierwszy element layoutu publicznego.
-5. JSON-LD z root layoutu → layout publiczny, generowany z prokom.ts (tylko punkty published). Root layout: metadane domyślne „PRO-KOM Tech”, bez zmian dla paneli (sprawdź tytuły stron panelu).
+5. Pomiar (SPEC §12.5): skrypt Umami w layoucie publicznym tylko przy NEXT_PUBLIC_UMAMI_WEBSITE_ID, lib/tech/track-event.ts (nazwy zdarzeń jako typ, no-op bez Umami, zakaz danych osobowych w parametrach — test); test, że panele nie ładują skryptu.
+6. JSON-LD z root layoutu → layout publiczny, generowany z prokom.ts (tylko punkty published). Root layout: metadane domyślne „PRO-KOM Tech”, bez zmian dla paneli (sprawdź tytuły stron panelu).
 DoD: panele.spec zielony (zero różnic), build, testy.
 
 PR 2 — feat/tech-powloka (wzorzec: T.Naglowek, T.Stopka, T.Logo, T.Mapa w prototypie; zrzuty 1440 i telefon-6-ekranow):
-1. components/tech/: TechShell, BrandBar, Capsule (menu SPEC §6, mega menu Naprawy i Punkty z mostkiem i opóźnieniem), SectionRail (≥ 1400), Footer, LinesBand, LegalBar, Logo, ThemeToggle, OpeningStatus, OsmMap; telefon: TabBar (Start · Naprawy · Zgłoś · Punkty · Menu), MenuSheet (arkusz, gest, Esc, focus trap, motyw Jasny/Ciemny/Auto), kapsuła chowana przy przewijaniu. Tablet wg RESPONSYWNOSC §3.
+1. components/tech/: TechShell, BrandBar, Capsule (menu SPEC §6, mega menu Naprawy i Punkty z mostkiem i opóźnieniem), SectionRail (≥ 1400), Footer, LinesBand, LegalBar, Logo, NoticeBar (SPEC §12.9, notices z prokom.ts), ThemeToggle, OpeningStatus (komunikaty dosłownie z SPEC §12.1, klient po hydratacji, szkielet o stałej szerokości), OsmMap; telefon: TabBar (Start · Naprawy · Zgłoś · Punkty · Menu), MenuSheet (arkusz, gest, Esc, focus trap, motyw Jasny/Ciemny/Auto), kapsuła chowana przy przewijaniu. Tablet wg RESPONSYWNOSC §3.
 2. app/(public)/layout.tsx używa TechShell zamiast ConditionalPublicLayout (stare strony renderują się w nowej powłoce — to OK przejściowo; stary plik zostaje do TD6).
 3. Szybka poprawka treści: usuń WhatsApp z sections/MostCommonRepairs.tsx i app/(public)/serwis-drukarek (decyzja 01.11).
 DoD (SPEC §11): porownaj.mjs nagłówka i stopki z wzorcem 1440 w obu motywach, zrzuty 360/390/768/1024/1440/1920, responsywnosc.spec, panele.spec, strefa-zakazana, /przeglad.
@@ -125,8 +177,8 @@ DoD: SPEC §11 + porownaj.mjs całej strony z 1440-glowna-jasny/ciemny + Lightho
 /zadanie TD3 — zgłoszenie naprawy, status i przypisanie naprawy zgodnie z docs/tech/KONTRAKT-BACKEND.md (wygrywa z wzorcem). Wzorzec: #zglos-naprawe, #status-naprawy, telefon-6-ekranow.
 
 PR 1 — feat/tech-kontrakt: frontend/lib/tech/contract.ts (typy + buildSubmitPayload, buildInquiryPayload, mapowanie błędów DRF na pola) + tests/tech/contract.test.ts (KONTRAKT §6) na fixtures z T0. Najpierw testy.
-PR 2 — feat/tech-zgloszenie: JEDEN formularz /zgloszenie (RepairForm, 5 kroków jak we wzorcu: urządzenie i usterka → dostarczenie i zwrot (punkt albo kurier z adresem; bez paczkomatu) → folia Hammer Glass (hammer_glass_interest) i kopia danych → dane kontaktowe (preferred_contact: telefon/SMS/e-mail) → podsumowanie i zgoda). model_name wymagany zawsze, brand_name dla telefonu/tabletu/smartwatcha. Punkt przyjęcia do additional_notes (KONTRAKT §2). Parametry z kreatora (§1.4), dane z /clients/me/ dla zalogowanego. Ekran sukcesu z repair_number (kopiuj) i linkiem do /track. Limit 429 i błędy sieci obsłużone. Stary features/zgloszenie/SubmissionForm.tsx i stary page.tsx przestają być używane (usunięcie w TD6). Telefon: krok na ekran, przyklejone „Dalej”.
-PR 3 — feat/tech-status: /track (TrackForm + RepairTracker: oś 5 etapów, przerwanie, historia z etykietami backendu, szczegóły bez pustych wierszy, blok serwisu z odpowiedzi API, „Zadzwoń”), /claim-repair (nowa skórka, logika bez zmian).
+PR 2 — feat/tech-zgloszenie: JEDEN formularz /zgloszenie (RepairForm, 5 kroków jak we wzorcu: urządzenie i usterka → dostarczenie i zwrot (punkt albo kurier z adresem; bez paczkomatu) → folia Hammer Glass (hammer_glass_interest) i kopia danych → dane kontaktowe (preferred_contact: telefon/SMS/e-mail) → podsumowanie i zgoda). model_name wymagany zawsze, brand_name dla telefonu/tabletu/smartwatcha. Punkt przyjęcia do additional_notes (KONTRAKT §2). Parametry z kreatora (§1.4), dane z /clients/me/ dla zalogowanego. Ekran sukcesu: SuccessCard wg SPEC §12.7 (numer, QR bez cyfr telefonu, Udostępnij, Zapisz jako obraz, punkt z godzinami i nawigacją, PrepChecklist). Zdarzenia zgloszenie_start/krok/wyslane/blad (§12.5). Limit 429 i błędy sieci obsłużone. Stary features/zgloszenie/SubmissionForm.tsx i stary page.tsx przestają być używane (usunięcie w TD6). Telefon: krok na ekran, przyklejone „Dalej”.
+PR 3 — feat/tech-status: /track (TrackForm + RepairTracker: oś 5 etapów, przerwanie, historia z etykietami backendu, szczegóły bez pustych wierszy, blok serwisu z odpowiedzi API, „Zadzwoń”), /claim-repair (nowa skórka, logika bez zmian). „Moje naprawy” wg SPEC §12.6 (zgoda domyślnie wyłączona, maks. 5, usuwanie, try/catch) na /track i w MenuSheet; testy jednostkowe magazynu i e2e: zapamiętaj → wróć → „Odśwież” → „Usuń”.
 e2e: na lokalnym backendzie zgłoszenie → numer → /track pokazuje „Przyjęte”; bez backendu — z fixtures. Ręcznie: zgłoszenie widoczne w panelu pracownika z „Punkt przyjęcia: …” w uwagach.
 DoD: SPEC §11 + contract.test zielony + zero zmian w lib/api.ts.
 ```
@@ -135,7 +187,7 @@ DoD: SPEC §11 + contract.test zielony + zero zmian w lib/api.ts.
 ```
 /zadanie TD4 — Punkty serwisowe, Kontakt, O firmie, strony lokalne i SEO (SPEC §6, §9; wzorzec #punkty-serwisowe, #kontakt, #o-firmie, #serwis-telefonow-zakopane).
 
-PR 1 — feat/tech-punkty-kontakt: /punkty-serwisowe, /kontakt (InquiryForm wg KONTRAKT §4: e-mail i wiadomość wymagane, telefon zalecany, interest = temat + punkt), /o-firmie (liczby z flagą tylko po potwierdzeniu — SPEC §10, bez zdjęć ludzi). Punkty z prokom.ts, Zakopane tylko published (na stagingu z ramką przy NEXT_PUBLIC_TECH_DRAFT=1).
+PR 1 — feat/tech-punkty-kontakt: /punkty-serwisowe, /kontakt (InquiryForm wg KONTRAKT §4: e-mail i wiadomość wymagane, telefon zalecany, interest = temat + punkt), /o-firmie (liczby z flagą tylko po potwierdzeniu — SPEC §10, bez zdjęć ludzi). Punkty z prokom.ts, Zakopane tylko published (na stagingu z ramką przy NEXT_PUBLIC_TECH_DRAFT=1). PointCard ze statusem „Otwarte teraz” per punkt (SPEC §12.1), NavigateButtons i parkingNote (§12.8), openingHoursSpecification w JSON-LD. DataSafety (§12.9) za flagą do czasu akceptacji treści. Zdarzenia telefon_klik, nawigacja_klik, kontakt_wyslany.
 PR 2 — feat/tech-lokalne-seo: szablon strony lokalnej (lib/tech/local-pages.ts: dane miejscowości, bliższy punkt, dojazd, parking, FAQ lokalne — strona bez unikalnej treści nie publikuje się), strony /serwis-telefonow-rabka-zdroj i /serwis-telefonow-zakopane (ta druga tylko przy published Zakopanego), prawdziwa /serwis-telefonow (usuń przekierowanie z next.config.js), /obslugiwane-miejscowosci; metadane każdej strony (tytuł 30–60, opis 120–155, kanoniczny, OG), JSON-LD (LocalBusiness per punkt, Service, FAQPage, BreadcrumbList — sprawdź w validator.schema.org), sitemap.ts z danych; 301: /akcesoria → /hammer-glass, /oferta → / (next.config.js redirects, permanent) i usunięcie tych stron.
 Test: tests/tech/seo.test.ts (każda strona publiczna: 1×H1, tytuł i opis w normie, kanoniczny, JSON-LD parsuje się, sitemap bez stron published:false i bez /akcesoria, /oferta).
 DoD: SPEC §11.
@@ -145,14 +197,23 @@ DoD: SPEC §11.
 ```
 /zadanie TD5 — pozostałe podstrony w nowej skórce (SPEC §6).
 PR 1 — feat/tech-naprawy: /uslugi jako hub „Naprawy” (wszystkie urządzenia), szablon strony urządzenia (hero, typowe naprawy, marki, 4 kroki, FAQ, CTA do /zgloszenie?category=…) i strony: serwis-laptopow, -tabletow, -komputerow, -drukarek, -konsol, -smartwatchy, odzyskiwanie-danych. Treści z obecnych stron przeniesione i poprawione do zasad SPEC §8 (bez cen, WhatsApp, paczkomatu); kategorie = KONTRAKT §1.1.
-PR 2 — feat/tech-hammer-blog: /hammer-glass wg wzorca #hammer-glass (wybór 9 folii z podglądem, kroki, specyfikacja; film plotera ładowany po kliknięciu z posterem, jeden plik mp4), /faq, /blog i /blog/[slug] (treści z lib/blog-posts.ts bez zmian, tylko skórka), /polityka-prywatnosci i /regulamin (skórka; hosting: webh.pl, Polska, jeśli migracja zrobiona — tekst do akceptacji Krystiana/prawnika), własna 404.
-DoD: SPEC §11.
+PR 2 — feat/tech-hammer-blog: /hammer-glass wg wzorca #hammer-glass (wybór 9 folii z podglądem, kroki, specyfikacja; film plotera ładowany po kliknięciu z posterem, jeden plik mp4), /faq, /blog, /blog/[slug] i /blog/kategoria/[slug] wg SPEC §12.11 (treści wpisów bez zmian; usuń drugi obiekt zdublowanego slugu — dowód, że adres i treść zostają; lib/tech/blog-taxonomy.ts z 4 kategoriami, wstępami do mojej akceptacji, zamianą linków /akcesoria i /oferta; pasek kategorii jako linki; okruszki i BlogPosting z articleSection; test taksonomii), /polityka-prywatnosci i /regulamin (skórka; hosting: webh.pl, Polska, jeśli migracja zrobiona — tekst do akceptacji Krystiana/prawnika), własna 404.
+PR 3 — feat/tech-pwa-przygotowanie (SPEC §12.2, §12.3): manifest.ts w layoucie publicznym (skróty, ikony 192/512/maskable, apple-touch-icon, theme-color jasny/ciemny), safe-area dla TabBar, public/sw.js tylko ze stroną /offline — test e2e, że SW nie przechwytuje /api, /panel, /admin-panel, /client i nie keszuje HTML; InstallHint w MenuSheet; procedura wyrejestrowania SW w docs/tech/WDROZENIE.md. Strona /jak-przygotowac-sprzet (zakładki per urządzenie, druk, Article + BreadcrumbList), PrepChecklist w kroku 5 formularza, na ekranie sukcesu i na /track przy „Przyjęte”, link w FAQ i stopce. Teksty kroków do akceptacji Krystiana (lista w PR). Strona /naprawa-kurierem wg SPEC §12.10: courierService w prokom.ts (published:false, pola null = zdanie ukryte), 9 sekcji, krótka wersja „kto płaci” w kroku 2 formularza i kreatora (arkusz „Jak to działa?”), linki z /uslugi, stron urządzeń, FAQ, stopki, /obslugiwane-miejscowosci; Service + FAQPage + BreadcrumbList; test: przy published:false strony nie ma w sitemap ani buildzie prod, brak słowa „paczkomat” poza zdaniem, że go nie obsługujemy (wyjątek w teście treści tylko dla tej strony i FAQ).
+DoD: SPEC §11 + Lighthouse: strona instalowalna (PWA), panele.spec zielony (manifest i SW nie dotykają paneli).
+```
+
+### TD5b — strony konkretnych napraw
+```
+/zadanie TD5b — strony konkretnych napraw /naprawy/[slug] wg SPEC §12.4. Najpierw sprawdź w docs/STAN.md listę napraw potwierdzoną przez serwis; jeśli jej nie ma — zrób szablon i dane z verified:false i zatrzymaj się przed treścią.
+PR 1 — feat/tech-naprawy-szablon: frontend/config/naprawy.ts (typ i dane), app/(public)/naprawy/[slug]/page.tsx (generateStaticParams tylko published && verified; staging z ramką przy NEXT_PUBLIC_TECH_DRAFT=1), RepairPage, metadane, JSON-LD Service + FAQPage + BreadcrumbList, sitemap; linki: /uslugi i strony urządzeń → naprawy urządzenia, kreator „Dowiedz się więcej” przy usterce z istniejącą stroną, blok „Powiązana naprawa” w szablonie wpisu bloga (treść wpisów bez zmian). Test: tests/tech/naprawy.test.ts (unikalny tytuł/opis/H1, kategoria i usterka zgodne z KONTRAKT §1.1 i wizard-data, wspólny tekst między stronami < 30% poza szablonem, brak cen/WhatsApp/paczkomatu, strona bez verified nie trafia do sitemap ani buildu prod).
+PR 2 — content/tech-naprawy: treści dla potwierdzonych napraw (≥ 400 słów własnego tekstu na stronę, objawy, przebieg, czas i gwarancja tylko z danych serwisu, 3–5 unikalnych FAQ). Każdy tekst do mojej akceptacji przed ustawieniem verified:true — lista w PR.
+DoD: SPEC §11 + seo.test i naprawy.test zielone.
 ```
 
 ### TD6 — QA, sprzątanie, produkcja
 ```
 /zadanie TD6 — kontrola jakości, sprzątanie i wdrożenie nowego wyglądu (SPEC §9–§11, RESPONSYWNOSC, MIGRACJA §4 deploy.sh). Produkcja dopiero po akceptacji szefa w Asanie.
-PR 1 — chore/tech-qa: na `npm run build && npm start`: scripts/tech/zrzuty.mjs wszystkich stron na szerokościach z RESPONSYWNOSC §1 w obu motywach (tmp/zrzuty/index.html), responsywnosc.spec, seo.test, contract.test, panele.spec, axe (zero krytycznych), Lighthouse telefon na 10 stronach ≥ 90 (tabela w PR), testy treści (WhatsApp, cennik, paczkomat, sklep, zaślepki, literały). Poprawki P0/P1 w osobnych małych PR-ach, P2 do STAN.
+PR 1 — chore/tech-qa: na `npm run build && npm start`: scripts/tech/zrzuty.mjs wszystkich stron na szerokościach z RESPONSYWNOSC §1 w obu motywach (tmp/zrzuty/index.html), responsywnosc.spec, seo.test, contract.test, panele.spec, axe (zero krytycznych), Lighthouse telefon na 10 stronach ≥ 90 (tabela w PR), PWA: instalowalność na Androidzie i iOS (ręcznie, zrzuty), Umami: zdarzenia z §12.5 widoczne na stagingu (testowa witryna) i bez danych osobowych, SW nie przechwytuje paneli i API, status godzin w dniach testowych (święto, sobota po zamknięciu), testy treści (WhatsApp, cennik, paczkomat, sklep, zaślepki, literały). Poprawki P0/P1 w osobnych małych PR-ach, P2 do STAN.
 PR 2 — chore/tech-sprzatanie: usuń nieużywany kod starej strony wg MAPA-PLIKOW (sections/, components/layout/Public*, ConditionalPublicLayout, ScopeBar, LiveBadge, components/hammer-glass, components/blog, features/zgloszenie, publiczne bloki globals.css, kroje Syne i Plus Jakarta) — każdy plik z dowodem grep, że nic go nie importuje; panele.spec po każdym kroku. Ciężkie pliki z public/ (drugi mp4, zdjęcia z internetu bez prawa, zip-y) — lista do decyzji Krystiana, usuwamy po zgodzie.
 PR 3 — release: develop → master; staging na obrazie z develop przeszedł smoke i przegląd; checklista produkcji w STAN (akceptacja szefa, dane Zakopanego albo published:false, prawa do zdjęć, polityka prywatności, kopia bazy); `deploy.sh prod <sha>` w niedzielę wieczorem, smoke, test zgłoszenia, cofnięcie gotowe (poprzedni sha). Po wdrożeniu: Search Console (sitemap), sprawdzenie 301, lista dla Krystiana: wizytówki Google obu punktów (NAP = prokom.ts), prośby o opinie.
 ```

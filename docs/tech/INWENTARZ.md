@@ -12,7 +12,7 @@ Część A pochodzi z repo (sprawdzona w T0). Część B — wyniki komend z cz�
 | `backend` | build `backend/` (gunicorn) | `staticfiles`, `mediafiles` |
 | `celery` | ten sam obraz, `worker --concurrency=2` | |
 | `celery-beat` | ten sam obraz, `DatabaseScheduler` | harmonogram **w bazie** (`django_celery_beat`), nie w kodzie |
-| `frontend` | build `frontend/` (Next 14) | `NEXT_PUBLIC_*` jako build args; **build dziś nie przechodzi** (krój Unbounded, `WYJATKI.md`) |
+| `frontend` | build `frontend/` (Next 14) | `NEXT_PUBLIC_*` jako build args; build przechodzi od commita `85b96bf` (obejście kroju Unbounded: `frontend/scripts/patch-next-font.js` jako `prebuild`) |
 | `nginx` + `certbot` | `nginx:alpine`, `certbot/certbot` | `certbot_certs`, `certbot_www`; na VPS zastępuje je wspólny Nginx prokom-web |
 
 ### A2. Klucze `.env.prod` (bez wartości)
@@ -31,7 +31,7 @@ Część A pochodzi z repo (sprawdzona w T0). Część B — wyniki komend z cz�
 | `EMAIL_HOST/PORT/HOST_USER/HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT` | nie | Gmail SMTP; przy migracji bez zmian (TM+ etap D przenosi na SH 1) |
 | `STAFF_NOTIFICATION_EMAILS` | nie | **na stagingu pusta albo adres testowy** |
 | `EMAIL_INBOUND_WEBHOOK_SECRET`, `INBOUND_IMAP_HOST/USER/PASSWORD/MAILBOX` | nie | czy używane na produkcji — sprawdzić w B (`poll_inbound_imap`) |
-| `SERWIS_PRINT_*` (7 kluczy) | nie | treść bloku „Twój serwis” w `/track` i na wydrukach |
+| `SERWIS_PRINT_*` (7 kluczy) | nie | treść bloku „Twój serwis” w `/track` i na wydrukach; **`SERWIS_PRINT_HOURS` = `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`** (decyzja 14.11, sprawdzić wartość na Hetznerze i ustawić tak samo na VPS) |
 | `PARCEL_LOCKER_ADDRESS` | nie | paczkomat nie jest oferowany |
 | `RENDER_EXTERNAL_HOSTNAME`, `DJANGO_ENV`, `SEED_EMAIL_DOMAIN` | — | pozostałości (Render, seedy); sprawdzić, czy są ustawione |
 
@@ -57,7 +57,7 @@ Harmonogram jest w bazie (`django_celery_beat_periodictask`), więc pełną list
 
 ### A5. Domena (z ustaleń Krystiana, 14.11.2026)
 - Rejestrator i strefa DNS `prokomserwis.pl`: **cyber_Folks** (Krystian ma dostęp do panelu).
-- Plan (prompt TM+): strefa i rejestracja → Seohost (`dns1/dns2.microhost.pl`), skrzynka `kontakt@prokomserwis.pl` na Seohost SH 1. Stan „przed” każdą zmianą: `docs/tech/DNS-PROKOMSERWIS.md` (powstanie w TM+).
+- Plan (prompt TM+): strefa i rejestracja → Seohost (`dns1/dns2.microhost.pl`), skrzynka `kontakt@prokomserwis.pl` na Seohost SH 1. Stan „przed” każdą zmianą: `docs/tech/DNS-PROKOMSERWIS.md` (stan z 14.11 już zapisany).
 
 ## B. Wyniki z Hetznera i DNS (zebrane 14.11.2026, ok. 14:10 UTC)
 Zebrane komendami z części C (tylko odczyt) przez `ssh root@62.238.0.240`; DNS z 1.1.1.1 i 8.8.8.8 (CAA przez DoH Cloudflare i Google).
@@ -82,7 +82,7 @@ Zebrane komendami z części C (tylko odczyt) przez `ssh root@62.238.0.240`; DNS
 3. **Przypomnienia do klientów nie działają** (`send_smart_reminders` niezaplanowane). Na VPS zachować ten stan (ten sam zrzut bazy przeniesie harmonogram 1:1); włączenie to osobna decyzja biznesowa.
 4. **Brak AAAA i MX** — w kroku DNS migracji nie ma czego usuwać/przywracać; poczta `@prokomserwis.pl` dziś nie istnieje (zgodne z planem TM+ — Seohost). TXT zostawić bez zmian.
 5. **Limity pamięci** z MIGRACJA-VPS (§ `mem_limit`) mają zapas wobec pomiaru: backend 438/768, celery 175/384, beat 89/192, frontend 168/384, db 33/512.
-6. **Certyfikat ważny do 17.01.2027**, więc kopiowanie go na czas przełączenia (MIGRACJA §7) jest wykonalne.
+6. **Certyfikat ważny do 17.01.2027**, więc kopiowanie go na czas przełączenia (MIGRACJA §8, krok 7) jest wykonalne.
 7. **Bezpieczeństwo starego serwera:** `.env.prod` i `.env.prod.bak-*` mają 644 (czytelne dla każdego użytkownika), logowanie SSH jako root. Do czasu wyłączenia: `chmod 600`; na VPS od razu 600 i bez roota.
 8. Pozostałości w `.env.prod.example`/A2 (`RENDER_EXTERNAL_HOSTNAME`, `DJANGO_ENV`, `SEED_EMAIL_DOMAIN`, `INBOUND_*`) nie są ustawione na produkcji — na VPS ich nie przenosimy.
 

@@ -1,0 +1,97 @@
+# Images for the VPS (docs/tech/MIGRACJA-VPS.md §4, WDROZENIE.md): built here, never on the server.
+#   push to develop → backend + frontend-staging   (staging.prokomserwis.pl)
+#   push to master  → backend + frontend           (prokomserwis.pl)
+# Tag = full commit SHA (no `latest`); scripts/vps/deploy.sh <stack> <sha> deploys exactly that.
+# The frontend has one image per environment because NEXT_PUBLIC_* are baked in at build time;
+# their values come from the GitHub Environments `staging` / `production` (Variables, not the repo):
+#   NEXT_PUBLIC_API_URL, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_GOOGLE_CLIENT_ID
+# Packages are private (ghcr.io/krystian2077/prokom-tech-*); the server pulls them with a
+# read:packages token. The existing CI (backend-ci.yml, frontend-ci.yml) is unchanged.
+# Actions pinned by SHA, the same versions as prokom-gaming/.github/workflows/image.yml.
+
+name: Obrazy
+
+on:
+  push:
+    branches: [develop, master]
+  workflow_dispatch: # rebuild the images of the selected branch's HEAD
+
+concurrency:
+  group: obrazy-${{ github.ref }}
+  cancel-in-progress: false # every merged commit gets its images
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  backend:
+    name: backend · push to GHCR
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: backend
+          push: true
+          tags: ghcr.io/krystian2077/prokom-tech-backend:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+  frontend:
+    name: frontend (${{ github.ref_name == 'master' && 'production' || 'staging' }}) · push to GHCR
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+    env:
+      IMAGE: ghcr.io/krystian2077/prokom-tech-frontend${{ github.ref_name == 'master' && '' || '-staging' }}
+    steps:
+      - name: Check build variables
+        env:
+          API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          # An image without the API address would talk to localhost in the browser — fail early.
+          [ -n "$API_URL" ] && [ -n "$SITE_URL" ] || {
+            echo "::error::Set NEXT_PUBLIC_API_URL and NEXT_PUBLIC_SITE_URL in the GitHub Environment '${{ github.ref_name == 'master' && 'production' || 'staging' }}'"
+            exit 1
+          }
+          echo "Building $IMAGE for $SITE_URL"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: frontend
+          push: true
+          tags: ${{ env.IMAGE }}:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=frontend-${{ github.ref_name }}
+          cache-to: type=gha,mode=max,scope=frontend-${{ github.ref_name }}

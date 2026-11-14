@@ -83,6 +83,7 @@ Jeśli w sesji jest token klienta (`frontend/lib/auth-storage.ts`), formularz wy
 ## 2. Dwa punkty — ograniczenie backendu
 Backend **nie ma pojęcia punktu ani oddziału**: brak pola w modelu i w serializerze, a blok `service` w śledzeniu zwraca jeden adres.
 - **Wariant A (obowiązuje):** wybór „Rabka-Zdrój / Zakopane” (tylko punkty z `published: true`) → `delivery_method = in_person` i na początku `additional_notes` linia `Punkt przyjęcia: Zakopane` (albo `Rabka-Zdrój`), potem pusta linia i uwagi klienta. Pracownik widzi to w zgłoszeniu.
+- **Odbiór w innym punkcie (decyzja szefa 14.11.2026: można oddać w jednym punkcie i odebrać w drugim):** formularz pyta o punkt odbioru tylko przy `return_method = in_person` i dwóch opublikowanych punktach (domyślnie = punkt przyjęcia). Gdy jest inny, druga linia `additional_notes` to `Punkt odbioru: Rabka-Zdrój` (albo `Zakopane`), dalej pusta linia i uwagi klienta. Backend dalej nie zna punktów (wariant B), więc to tylko informacja dla pracownika; limit `additional_notes` 2000 znaków liczy się razem z tymi liniami.
 - Skutki A, które akceptujemy: brak filtra po punkcie w panelu, a status naprawy pokazuje adres z backendu (Rabka) także dla zgłoszeń z Zakopanego. Frontend nie ma skąd wiedzieć, który to punkt, więc nie zgadujemy.
 - **Wariant B (później, poza tą przebudową):** pole `service_point` w backendzie. Osobna decyzja Krystiana i szefa.
 
