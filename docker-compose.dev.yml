@@ -1,0 +1,9 @@
+# Local development helpers only (docs/tech/LOKALNIE.md). Not used on any server.
+# Redis is required locally: the public repair form enqueues a Celery task
+# (`.delay()`), which blocks without a broker. Celery worker itself is optional.
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "63792:6379"
+    restart: unless-stopped

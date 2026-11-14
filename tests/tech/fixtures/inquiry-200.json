@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/communications/inquiry/",
+    "body": {
+      "first_name": "Anna",
+      "last_name": "Przykładowa",
+      "phone": "",
+      "email": "anna@example.com",
+      "interest": "Pytanie o naprawę · punkt: Rabka-Zdrój",
+      "message": "Ile trwa wymiana baterii w iPhone 12?"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "detail": "Wiadomosc zostala wyslana."
+    }
+  }
+}

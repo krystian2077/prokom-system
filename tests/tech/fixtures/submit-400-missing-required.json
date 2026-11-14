@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/repairs/submit/",
+    "body": {
+      "client": {},
+      "device": {}
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "client": {
+        "first_name": [
+          "To pole jest wymagane."
+        ],
+        "last_name": [
+          "To pole jest wymagane."
+        ],
+        "email": [
+          "To pole jest wymagane."
+        ],
+        "phone": [
+          "To pole jest wymagane."
+        ]
+      },
+      "device": {
+        "category": [
+          "To pole jest wymagane."
+        ],
+        "problem_description": [
+          "To pole jest wymagane."
+        ]
+      }
+    }
+  }
+}

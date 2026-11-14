@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/repairs/track/?ref=NIE/MA/1/2026&phone_last4=1234",
+    "body": null
+  },
+  "response": {
+    "status": 404,
+    "body": {
+      "detail": "Nie znaleziono zgłoszenia lub nieprawidłowe dane."
+    }
+  }
+}
