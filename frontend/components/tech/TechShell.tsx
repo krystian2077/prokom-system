@@ -5,6 +5,7 @@ import { BrandBar } from "./BrandBar";
 import { Capsule } from "./Capsule";
 import { Footer } from "./Footer";
 import { MenuSheet } from "./MenuSheet";
+import { MotionRoot } from "./MotionRoot";
 import { NoticeBar } from "./NoticeBar";
 import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
@@ -38,6 +39,7 @@ export function TechShell({ children }: { children: ReactNode }) {
           <MenuSheet />
         </div>
         <TrackClicks />
+        <MotionRoot />
       </div>
     </ShellProvider>
   );

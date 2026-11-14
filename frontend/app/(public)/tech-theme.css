@@ -1,0 +1,141 @@
+/*
+ * PRO-KOM Tech — premium themes (TP PR 1, docs/tech/PREMIUM.md §2).
+ * Loaded after tech.css by app/(public)/layout.tsx; same scoping rules: every selector
+ * under `.tech` (dark: `html[data-tech-theme="dark"] .tech`). Overrides tokens and adds
+ * the surface ladder, hairlines, gradient edges, grain, form/autofill, selection.
+ */
+
+/* ---------- Light: tokens added by TP ---------- */
+.tech {
+  --ink3: #5f665f;
+  --raised: #ffffff;
+  --overlay: rgba(255, 255, 255, 0.78);
+  --overlay-solid: #ffffff;
+  --hair: rgba(18, 22, 19, 0.08);
+  --hair-top: rgba(255, 255, 255, 0.9);
+  --edge: linear-gradient(160deg, rgba(196, 54, 43, 0.38), rgba(18, 22, 19, 0.06) 42%, rgba(196, 54, 43, 0.18));
+  /* two-layer shadows: contact + ambient */
+  --sh-1: 0 1px 2px rgba(18, 22, 19, 0.06), 0 6px 16px -10px rgba(18, 22, 19, 0.18);
+  --sh-2: 0 1px 2px rgba(18, 22, 19, 0.06), 0 22px 44px -28px rgba(18, 22, 19, 0.32);
+  --sh-3: 0 2px 4px rgba(18, 22, 19, 0.06), 0 40px 80px -40px rgba(18, 22, 19, 0.42);
+  --sh: var(--sh-2);
+  --sel-bg: rgba(196, 54, 43, 0.18);
+  --theme-color: #f4f5f1;
+  --grain-o: 0;
+  --scroll-thumb: rgba(18, 22, 19, 0.22);
+  color-scheme: light;
+}
+
+/* ---------- Dark: surface ladder (bg → bg2 → card → raised → overlay) ---------- */
+html[data-tech-theme="dark"] .tech {
+  --bg: #0e0a09;
+  --bg2: #15100f;
+  --card: #1c1615;
+  --raised: #241c1b;
+  --overlay: rgba(34, 26, 25, 0.72);
+  --overlay-solid: #221a19;
+  --bd: #322826;
+  --bd2: #4b3d3a;
+  --ink: #f6f1f0;
+  --ink2: #c2b6b3;
+  --ink3: #a39592;
+  --hair: rgba(255, 255, 255, 0.07);
+  --hair-top: rgba(255, 255, 255, 0.11);
+  --capbg: rgba(28, 22, 21, 0.72);
+  --capbd: rgba(255, 255, 255, 0.09);
+  --cap-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --edge: linear-gradient(160deg, rgba(242, 145, 133, 0.55), rgba(255, 255, 255, 0.06) 40%, rgba(226, 72, 58, 0.3));
+  --sh-1: inset 0 1px 0 var(--hair-top), 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px -12px rgba(0, 0, 0, 0.7);
+  --sh-2: inset 0 1px 0 var(--hair-top), 0 1px 2px rgba(0, 0, 0, 0.4), 0 24px 48px -28px rgba(0, 0, 0, 0.85);
+  --sh-3: inset 0 1px 0 var(--hair-top), 0 2px 4px rgba(0, 0, 0, 0.4), 0 44px 90px -40px rgba(0, 0, 0, 0.95);
+  --sh: var(--sh-2);
+  --sel-bg: rgba(242, 145, 133, 0.3);
+  --theme-color: #0e0a09;
+  --grain-o: 0.045;
+  --scroll-thumb: rgba(255, 255, 255, 0.18);
+  color-scheme: dark;
+}
+
+/* Grain: one SVG noise tile, fixed, only visible in dark (opacity token). */
+.tech::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("/tech/grain.svg") repeat;
+  background-size: 180px 180px;
+  opacity: var(--grain-o);
+}
+
+.tech ::selection { background: var(--sel-bg); color: var(--ink); }
+.tech * { scrollbar-color: var(--scroll-thumb) transparent; }
+.tech .t-ui :where(input, textarea, select) { accent-color: var(--acc); }
+
+/* Autofill inside the theme (Chrome paints its own yellow/blue otherwise) */
+.tech input:-webkit-autofill,
+.tech input:-webkit-autofill:hover,
+.tech input:-webkit-autofill:focus,
+.tech textarea:-webkit-autofill,
+.tech select:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  box-shadow: 0 0 0 1000px var(--card) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* ---------- Hairlines with top light (dark) ---------- */
+html[data-tech-theme="dark"] .tech .t-card,
+html[data-tech-theme="dark"] .tech .t-faq__item,
+html[data-tech-theme="dark"] .tech .t-wiz__bar,
+html[data-tech-theme="dark"] .tech .t-sheet__call,
+html[data-tech-theme="dark"] .tech .t-chp,
+html[data-tech-theme="dark"] .tech .t-hero__points {
+  border-color: var(--hair);
+  box-shadow: var(--sh-1);
+}
+html[data-tech-theme="dark"] .tech a.t-card:hover { box-shadow: var(--sh-3); border-color: var(--softbd); }
+html[data-tech-theme="dark"] .tech .t-chp.is-on { border-color: var(--acc); box-shadow: inset 0 1px 0 var(--hair-top), 0 0 0 4px rgba(226, 72, 58, 0.12); }
+html[data-tech-theme="dark"] .tech .t-sheet__panel { background: var(--bg2); box-shadow: inset 0 1px 0 var(--hair-top), 0 -24px 70px -20px rgba(0, 0, 0, 0.8); }
+html[data-tech-theme="dark"] .tech .t-mega__panel { background: var(--raised); border-color: var(--hair); box-shadow: var(--sh-3); }
+html[data-tech-theme="dark"] .tech .t-segmented button.is-on { background: var(--raised); box-shadow: inset 0 1px 0 var(--hair-top), 0 1px 2px rgba(0, 0, 0, 0.5); }
+
+/* Light: two-layer shadows on resting cards */
+.tech .t-faq__item,
+.tech .t-wiz { box-shadow: var(--sh-1); }
+.tech a.t-card:hover { box-shadow: var(--sh-3); }
+.tech .t-wiz { box-shadow: var(--sh-3); }
+
+/* ---------- Gradient edge for featured cards ---------- */
+.tech .t-edge,
+html[data-tech-theme="dark"] .tech .t-wiz,
+html[data-tech-theme="dark"] .tech .t-faqwrap__contact {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    var(--edge) border-box;
+}
+html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: var(--sh-3); }
+
+/* ---------- Glass overlay with a solid fallback ---------- */
+.tech .t-glass { background: var(--overlay-solid); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .tech .t-glass {
+    background: var(--overlay);
+    -webkit-backdrop-filter: saturate(1.5) blur(18px);
+    backdrop-filter: saturate(1.5) blur(18px);
+  }
+}
+
+/* ---------- Dark maps and illustrations on the ladder ---------- */
+html[data-tech-theme="dark"] .tech .t-map {
+  --m-land: #1a1413; --m-street: #342a28; --m-main: #433634; --m-casing: #120d0c; --m-building: #231b1a; --m-park: #1d241a; --m-water: #16272e;
+}
+html[data-tech-theme="dark"] .tech .t-wiz__stage {
+  background: radial-gradient(circle at 50% 40%, #2a201f 0, var(--bg2) 72%);
+  border-color: var(--hair);
+}
+html[data-tech-theme="dark"] .tech .t-wiz__img { filter: drop-shadow(0 34px 34px rgba(0, 0, 0, 0.7)) brightness(1.04); }
+
+/* Fields on the ladder */
+html[data-tech-theme="dark"] .tech .t-field :is(input, textarea, select) { background: var(--bg2); }

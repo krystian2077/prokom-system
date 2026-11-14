@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTechTheme, setTechTheme, type ResolvedTheme, type ThemeChoice } from "@/lib/tech/theme";
+import { getTechTheme, switchTechTheme, type ResolvedTheme, type ThemeChoice } from "@/lib/tech/theme";
 import { IconMoon, IconSun } from "./icons";
 
-function useTechTheme() {
+function centerOf(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+
+export function useTechTheme() {
   const [t, setT] = useState<{ choice: ThemeChoice; theme: ResolvedTheme } | null>(null);
   useEffect(() => {
     setT(getTechTheme());
@@ -25,7 +30,7 @@ export function ThemeToggle() {
       className="t-iconbtn"
       data-tech-theme-toggle=""
       aria-label={dark ? "Włącz jasny motyw" : "Włącz ciemny motyw"}
-      onClick={() => setTechTheme(dark ? "light" : "dark")}
+      onClick={(e) => switchTechTheme(dark ? "light" : "dark", centerOf(e.currentTarget))}
     >
       {dark ? <IconSun /> : <IconMoon />}
     </button>
@@ -50,7 +55,7 @@ export function ThemeSegmented() {
           role="radio"
           aria-checked={t?.choice === c.value}
           className={t?.choice === c.value ? "is-on" : undefined}
-          onClick={() => setTechTheme(c.value)}
+          onClick={(e) => switchTechTheme(c.value, centerOf(e.currentTarget))}
         >
           {c.label}
         </button>
