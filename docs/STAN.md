@@ -32,6 +32,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | Heartbeat kopii stagingu (Better Stack „Kopia Tech staging”, 1 d + 3 h, e-mail) | ✔ | po `backup.sh staging` status Up; prod — w niedzielę |
 | `.env.prod` na VPS | ✔ | z `.env.prod` Hetznera (ten sam `SECRET_KEY`, Gmail, Google, `SERWIS_PRINT_*`), nowe hasła bazy/Redisa, `GATEWAY_PORT=3300`; kopia z Hetznera usunięta (`shred -u`); compose config OK |
 | Część ręczna (14.11 ~21:00, `https://staging.prokomserwis.pl`) | ✔ | basic auth ✔, logowanie do panelu admina kontem pracownika ✔ (konta staff zostają po anonimizacji), lista napraw (2 aktywne) i klientów (8, zanonimizowani) ✔, szczegóły naprawy ✔, PDF protokołu przyjęcia („Podgląd wydruku / druk”) ✔, strona główna i `/zgloszenie` bez błędów w konsoli ✔, `X-Robots-Tag: noindex` ✔; limit 20 MB przez oba Nginxy: 19 MB dochodzi do Django, 21,5 MB → 413 ✔. Uwaga: panel nie ma pola do wgrywania zdjęć (backend przyjmuje plik tylko w `mark-package-received`), więc „upload zdjęcia w panelu” sprawdzono samym limitem |
+| Pomiar (14.11 ~21:15) | ✔ | staging Tech: restarts=0, backend 186/512 MB, frontend 73/320, db 47/384; `/` 0,05 s, `/admin/login/` 0,01 s; serwer: 11,3 GB RAM wolne z 15,9 GB |
+| Stos prod na VPS — próbny start na pustej bazie | ✔ | `deploy.sh prod 61f8f54` (14.11 21:24): obrazy prod, migracje na pustej bazie, collectstatic, smoke prod all ok; DNS nadal na Hetzner, więc ruchu brak. Wcześniej błąd w `obrazy.yml` (front prod szedł do `-staging`) — poprawka #22/#23 |
 | Test odtworzenia kopii (`backup.sh` → B2 → `restore.sh`) | ✔ | `.env.backup` (ten sam `age.pub` i bucket co Gaming); kopia 432 KB w `offsite:prokom-backups-r7k2/tech-staging/daily/`; zgłoszenie testowe dodane po kopii (4) → po odtworzeniu z B2: 3 = manifest; smoke core ok; `age.key` usunięty (`shred -u`) |
 
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
@@ -64,6 +66,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
+- prokom-gaming (nie ten projekt): `prokom-gaming-prod-app-1` używa 916 MB z limitu 1 GB (pomiar 14.11) — sprawdzić w Gaming, czy limit nie jest za ciasny.
 - Staging: `/api/` odpowiada bez basic auth (strona za hasłem, API nie) — rozważyć hasło też na `/api/` albo zostawić świadomie (dane i tak zanonimizowane); `meta robots` na stagingu mówi `index, follow` (chroni nagłówek `X-Robots-Tag` i hasło).
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
