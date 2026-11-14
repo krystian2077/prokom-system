@@ -98,3 +98,9 @@ eksport/
 import/
 backups/
 !.env.vps.example
+
+# PRO-KOM Tech — test tooling (TD1)
+frontend/tests/tech/.panel-test.local.json
+frontend/test-results/
+frontend/playwright-report/
+tmp/
