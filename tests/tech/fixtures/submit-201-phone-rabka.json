@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/repairs/submit/",
+    "body": {
+      "client": {
+        "first_name": "Jan",
+        "last_name": "Testowy",
+        "email": "jan.testowy@example.com",
+        "phone": "+48 500 100 234",
+        "preferred_contact": "phone"
+      },
+      "device": {
+        "category": "phone",
+        "brand_name": "Samsung",
+        "model_name": "Galaxy S23",
+        "problem_description": "Pęknięty ekran po upadku.",
+        "device_turns_on": true
+      },
+      "delivery_method": "in_person",
+      "return_method": "in_person",
+      "hammer_glass_interest": "ask_later",
+      "requires_data_backup": false,
+      "additional_notes": "Punkt przyjęcia: Rabka-Zdrój\n\nProszę o kontakt po 16."
+    }
+  },
+  "response": {
+    "status": 201,
+    "body": {
+      "repair_number": "PROKOM/RMA/2/2026",
+      "message": "Zgłoszenie zostało przyjęte. Skontaktujemy się w celu potwierdzenia lub po diagnozie. Na podany e-mail wysłaliśmy link do śledzenia statusu i przypisania naprawy do konta.",
+      "tracking_url": "/track?ref=PROKOM/RMA/2/2026"
+    }
+  }
+}

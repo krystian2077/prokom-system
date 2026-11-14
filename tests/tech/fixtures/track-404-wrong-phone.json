@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/repairs/track/?ref=PROKOM/RMA/2/2026&phone_last4=9999",
+    "body": null
+  },
+  "response": {
+    "status": 404,
+    "body": {
+      "detail": "Nie znaleziono zgłoszenia lub nieprawidłowe dane."
+    }
+  }
+}
