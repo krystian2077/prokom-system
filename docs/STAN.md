@@ -4,8 +4,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** **TM+** (prompt w `docs/zadania/tech.md`). Etap A: A1–A2 sprawdzone 14.11 (brak MX, DNSSEC wyłączony), A3 — tabela strefy dla Seohost gotowa w `docs/tech/DNS-PROKOMSERWIS.md`, czeka na założenie strefy przez Krystiana.
-- **Następny krok:** Krystian zakłada strefę `prokomserwis.pl` w Seohost wg tabeli A3 → kontrola przez `dns1/dns2.microhost.pl` → zmiana serwerów DNS w cyber_Folks (A4). Równolegle przed etapem C: `chmod 600` dla `.env.prod` na Hetznerze, ręczny `pg_dump`, `SERWIS_PRINT_HOURS` z sobotą do 14:00.
+- **W toku:** **TM+** (prompt w `docs/zadania/tech.md`). Etap A: A1–A2 ✔ (brak MX, DNSSEC wyłączony), A3 ✔ 14.11 — strefa w Seohost założona i sprawdzona na `dns1/dns2.microhost.pl`. Następny: A4 (zmiana serwerów DNS w cyber_Folks).
+- **Następny krok:** A4 — Krystian zmienia serwery DNS w cyber_Folks na `dns1.microhost.pl`, `dns2.microhost.pl` → kontrola propagacji, strony, `/panel`, logowania klienta → po kilku godzinach A5 (transfer). Równolegle przed etapem C: `chmod 600` dla `.env.prod` na Hetznerze, ręczny `pg_dump`, `SERWIS_PRINT_HOURS` z sobotą do 14:00.
 
 ## Pilne
 - ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.

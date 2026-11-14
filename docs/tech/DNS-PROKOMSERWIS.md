@@ -60,4 +60,4 @@ Oczekiwane: SOA i NS z `microhost.pl`, A `62.238.0.240` dla `@` i `www` na obu s
 ## Dziennik zmian
 | Data | Zmiana | Przed | Po | Sprawdzenie |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 14.11.2026 | A3: strefa `prokomserwis.pl` założona w Seohost (serial `2026111400`); usunięte domyślne A z TTL 86400 | brak strefy w Seohost | 2× A `62.238.0.240` TTL 3600, 2× TXT, NS `dns1/dns2.microhost.pl`, bez MX/AAAA/CNAME | `dns1` i `dns2.microhost.pl` zgodne z tabelą A3 ✔. Ruch nadal idzie przez `dns1–3.tld.pl` (cyber_Folks) — serwerów DNS jeszcze nie zmieniono |
