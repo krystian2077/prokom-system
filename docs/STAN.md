@@ -44,7 +44,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | TM+ | domena → Seohost, kontakt@ na SH 1, migracja 1:1 na VPS webh.pl | **w toku** (od 14.11): etap A |
 | TD1 | fundament i powłoka (izolacja, tokeny, dane, nagłówek, stopka, telefon) | **PR 1 scalony (#26), PR 2 w przeglądzie (#27)** — ruszyło 14.11 przed TM (decyzja 14.11) |
 | TD2 | strona główna + kreator | czeka na TD1 |
-| TD3 | zgłoszenie, status, przypisanie naprawy (kontrakt) | czeka na TD1 |
+| TD3 | zgłoszenie, status, przypisanie naprawy (kontrakt) | **scalone (#28, #30, #32)** — zostało: test na żywym backendzie, porównanie z planszami |
 | TD4 | punkty, kontakt, o firmie, strony lokalne, `/serwis-telefonow`, 301 | czeka na TD1 |
 | TD5 | pozostałe podstrony, Hammer Glass, blog, prawne, 404, PWA, poradnik „jak przygotować sprzęt” | czeka na TD1 |
 | TD5b | strony konkretnych napraw `/naprawy/…` (SPEC §12.4) | czeka na TD5 i listę napraw od serwisu |
@@ -74,9 +74,12 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [TD1] `panele.spec` działa tylko lokalnie (zrzuty Windows); w CI do rozważenia zrzuty linuksowe z kontenera Playwright.
 - prokom-gaming (nie ten projekt): `prokom-gaming-prod-app-1` używa 916 MB z limitu 1 GB (pomiar 14.11) — sprawdzić w Gaming, czy limit nie jest za ciasny.
 - Staging: `/api/` odpowiada bez basic auth (strona za hasłem, API nie) — rozważyć hasło też na `/api/` albo zostawić świadomie (dane i tak zanonimizowane); `meta robots` na stagingu mówi `index, follow` (chroni nagłówek `X-Robots-Tag` i hasło).
+- [TD3] `NavigateButtons` i `PrepChecklist` powstały w wersji minimalnej dla ekranu sukcesu — TD4 (nawigacja z arkuszem i `parkingNote`) i TD5 (poradnik, `PREP_GUIDE_READY=true`) je rozbudują.
+- [TD3] Wspólne klasy pomocnicze TD3 (`t-card`, `t-lead`, `t-eyebrow`, `t-btn--ghost`…) są zawężone do `.t-zgl/.t-trk/.t-claim` — po scaleniu TD2 ujednolicić z jego globalnymi wersjami.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14/15.11.2026 — **TD3** scalone do `develop`: #28 kontrakt, #30 formularz zgłoszenia, #32 status i „Moje naprawy”.
 - 14.11.2026 18:16–18:28 UTC — **incydent na Hetznerze**: komenda compose bez `--env-file .env.prod` (przy zmianie `SERWIS_PRINT_HOURS`) odtworzyła `db`/`redis` z pustą konfiguracją, a po naprawie Nginx trzymał stare IP backendu → API i panel 502 przez ok. 12 min. Naprawa: `up -d` z `--env-file` + `nginx -s reload`. Danych nie stracono. Wnioski w `INWENTARZ.md` B2 i MIGRACJA §8–§9. Kopia produkcji: `prokom-tech-import-20261114T181620Z.tar` (sha256 `034b69cb…`), `.env.prod` ma już 600.
 - 14.11.2026 — stan DNS „przed” z panelu cyber_Folks w `docs/tech/DNS-PROKOMSERWIS.md` (A przez „Przekierowanie IP”, abonent prywatny).
 - 14.11.2026 — Zakopane od szefa: godziny pn–pt 10:00–16:30, ploter Hammer Glass jest, można oddać w jednym punkcie i odebrać w drugim (KONTRAKT §2: linia „Punkt odbioru”).
