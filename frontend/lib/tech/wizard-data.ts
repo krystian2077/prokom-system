@@ -235,5 +235,13 @@ export function buildWizardHref(state: WizardState): string {
   return `/zgloszenie?${q.toString()}`;
 }
 
+/** Plain link to the form with a category and, optionally, a fault (KONTRAKT §1.4). */
+export function submitHref(category: CategoryCode, fault?: string, extra: Record<string, string> = {}): string {
+  const q = new URLSearchParams({ category });
+  if (fault) q.set("usterka", fault);
+  for (const [k, v] of Object.entries(extra)) q.set(k, v);
+  return `/zgloszenie?${q.toString()}`;
+}
+
 /** Brands in the marquee (design T.Main `brands`). */
 export const brands = ["Apple", "Samsung", "Xiaomi", "Motorola", "realme", "Huawei", "Lenovo", "HP", "Dell", "ASUS", "Acer", "MSI", "PlayStation", "Xbox", "Nintendo", "Canon", "Epson", "Brother"];
