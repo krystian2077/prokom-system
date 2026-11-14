@@ -3,7 +3,10 @@ import { line, telHref } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
 import { courierPaysText } from "@/lib/tech/courier";
 import type { VisiblePoint } from "@/lib/tech/points";
-import { IconArrow, IconPlus } from "../icons";
+import { jsonLdString } from "@/lib/tech/jsonld";
+import { faqJsonLd } from "@/lib/tech/seo";
+import { Faq } from "../Faq";
+import { IconArrow } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
 
 /**
@@ -59,20 +62,8 @@ export function HomeFaq({ points }: { points: VisiblePoint[] }) {
             <IconArrow size={16} strokeWidth={2.6} />
           </Link>
         </div>
-        <div className="t-faq">
-          {items.map((it, i) => (
-            <details key={it.q} className="t-faq__item" open={i === 0}>
-              <summary>
-                <span className="t-faq__n">{String(i + 1).padStart(2, "0")}</span>
-                <span className="t-faq__q">{it.q}</span>
-                <span className="t-faq__ico" aria-hidden="true">
-                  <IconPlus size={18} strokeWidth={2.6} />
-                </span>
-              </summary>
-              <p>{it.a}</p>
-            </details>
-          ))}
-        </div>
+        <Faq items={items} className="t-faqwrap__list" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(faqJsonLd(items)) }} />
       </div>
     </section>
   );

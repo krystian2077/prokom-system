@@ -1805,23 +1805,11 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 .tech .t-faqwrap__contact { margin-top: 14px; padding: 22px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 .tech .t-faqwrap__tel { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--t-font-head); font-weight: 800; font-size: 30px; }
 .tech .t-faqwrap__mail { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--acct); word-break: break-all; }
-.tech .t-faq { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-.tech .t-faq__item { border-radius: 18px; background: var(--card); border: 1px solid var(--bd); transition: border-color 0.25s; }
-.tech .t-faq__item[open] { border-color: var(--acc); }
-.tech .t-faq__item summary { display: flex; align-items: center; gap: 16px; min-height: 44px; padding: 18px 20px; cursor: pointer; list-style: none; border-radius: 18px; }
-.tech .t-faq__item summary::-webkit-details-marker { display: none; }
-.tech .t-faq__item summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-.tech .t-faq__n { font-family: var(--t-font-head); font-weight: 800; font-size: 14px; color: var(--acct); }
-.tech .t-faq__q { flex: 1; font-size: 16.5px; font-weight: 800; }
-.tech .t-faq__ico { width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; transition: transform 0.25s var(--t-ease), background 0.25s; }
-.tech .t-faq__item[open] .t-faq__ico { transform: rotate(45deg); background: var(--acc); color: var(--onacc); }
-.tech .t-faq__item p { margin: 0 20px 18px 56px; font-size: 15px; line-height: 1.6; color: var(--ink2); }
+.tech .t-faqwrap__list { flex: 1; }
 @media (min-width: 1180px) {
   .tech .t-faqwrap { flex-direction: row; justify-content: space-between; gap: 80px; }
   .tech .t-faqwrap__side { width: 400px; flex-shrink: 0; }
-  .tech .t-faq { max-width: 800px; }
-  .tech .t-faq__item summary { padding: 20px 22px; }
-  .tech .t-faq__item p { margin: 0 70px 20px 58px; }
+  .tech .t-faqwrap__list { max-width: 800px; }
 }
 
 /* ---------- CTA ---------- */
