@@ -22,7 +22,7 @@ staging="docker compose --env-file .env.staging -f compose.vps.yml -f compose.st
 
 ## 1. Jak to działa
 - **Obrazy buduje GitHub Actions** (`.github/workflows/obrazy.yml`): push do `develop` → backend + frontend-staging, push do `master` → backend + frontend. Tag = pełny SHA. Na serwerze nic się nie buduje.
-- **Frontend ma osobny obraz na środowisko**, bo `NEXT_PUBLIC_*` wchodzą do obrazu przy budowie. Wartości są w GitHub → Settings → Environments → `staging` / `production` → Variables: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
+- **Frontend ma osobny obraz na środowisko**, bo `NEXT_PUBLIC_*` wchodzą do obrazu przy budowie. Wartości są w zmiennych repozytorium (GitHub → Settings → Secrets and variables → Actions → Variables): `STAGING_NEXT_PUBLIC_API_URL`, `STAGING_NEXT_PUBLIC_SITE_URL`, `STAGING_NEXT_PUBLIC_GOOGLE_CLIENT_ID` i to samo z prefiksem `PRODUCTION_`. Nie GitHub Environments — repo jest prywatne na planie Free, gdzie Environments nie działają (14.11.2026).
 - **Wdrożenie ręczne** (decyzja 14.11, automatyczny staging i bramka jak w Gaming — później): `scripts/vps/deploy.sh <prod|staging> <sha>` po SSH.
 - **Migracje** robi `deploy.sh` jawnie: na prod po kopii `predeploy` i po wpisaniu `MIGRUJ` (albo `MIGRATE_CONFIRM=1`). Kontener backendu przy starcie uruchamia tylko gunicorna.
 - **Staging bez Celery.** Redis jest, bo formularz zgłoszenia zleca zadanie Celery i bez brokera wisi (`LOKALNIE.md`).
