@@ -4,8 +4,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** **TM+** etap A: A1–A3 ✔, **A4 w toku** (14.11 16:11 rejestr NASK ma `dns1/dns2.microhost.pl`, czekamy na publikację strefy `.pl` i resolwery). Potem kilka godzin obserwacji i A5 (transfer).
-- **Następny krok:** A4 — Krystian zmienia serwery DNS w cyber_Folks na `dns1.microhost.pl`, `dns2.microhost.pl` → kontrola propagacji, strony, `/panel`, logowania klienta → po kilku godzinach A5 (transfer). Równolegle przed etapem C: `chmod 600` dla `.env.prod` na Hetznerze, ręczny `pg_dump`, `SERWIS_PRINT_HOURS` z sobotą do 14:00.
+- **W toku:** **TM+**. Etap A: A1–A3 ✔, A4 w toku (rejestr NASK ma `dns1/dns2.microhost.pl`, czekamy na publikację strefy `.pl`). **Etap C, PR 1 `chore/tech-vps` otwarty** (compose, gateway, obrazy GHCR, skrypty `scripts/vps/`, `WDROZENIE.md`) — przetestowany lokalnie end-to-end.
+- **Następny krok:** (1) A4 — potwierdzić delegację, po kilku godzinach A5 (transfer). (2) Scalić PR `chore/tech-vps` do `master`, potem `develop ← master`. (3) GitHub → Environments `staging` i `production` z Variables `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (przed pierwszym buildem). (4) Sesja w prokom-web (prompt w opisie PR): vhosty Tech. (5) Na VPS: `/srv/prokom/prokom-tech`, `.env.*`, token GHCR, pierwszy `deploy.sh staging` (`WDROZENIE.md` §4). Równolegle: `chmod 600` `.env.prod` na Hetznerze, `SERWIS_PRINT_HOURS`.
 
 ## Pilne
 - ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.

@@ -9,7 +9,7 @@ Wersja 1.0 · 14.11.2026. Wykonuje Krystian z Claude Code. **Każdy krok na serw
 
 ## 1. Warunki wejścia (blokery — bez nich nie zaczynamy przełączenia)
 1. Gaming działa stabilnie na tym samym VPS co najmniej 5 dni (wspólny Nginx bez incydentów).
-2. **Dostęp do DNS domeny prokomserwis.pl** (rejestrator i panel strefy). Kto jest rejestratorem, gdzie jest strefa, czy domena ma pocztę (MX) — ustala T0. Bez dostępu nie ma przełączenia.
+2. **Dostęp do DNS domeny prokomserwis.pl** — ✔ od 14.11.2026 strefa w **Seohost** (`dns1/dns2.microhost.pl`, TM+ etap A), rejestracja: transfer z cyber_Folks do Seohost (TM+ A5). Poczty (MX) nie ma. Stan i dziennik zmian: `docs/tech/DNS-PROKOMSERWIS.md`.
 3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony.
 4. Staging `staging.prokomserwis.pl` przeszedł próbę generalną (§7) na kopii bazy z produkcji.
 5. Wolne zasoby VPS po Gaming: `free -h` i `df -h`. Potrzeba ok. 2,5 GB RAM (prod + staging, §4) i ok. 5 GB dysku plus rozmiar mediów razy trzy (wolumen, kopia lokalna, zapas).
@@ -20,7 +20,7 @@ Wersja 1.0 · 14.11.2026. Wykonuje Krystian z Claude Code. **Każdy krok na serw
 - Baza: rozmiar (`pg_database_size`), liczba zgłoszeń i klientów, wersja serwera.
 - Zadania okresowe Celery beat (`django_celery_beat` w bazie: nazwy, harmonogram, czy wysyłają maile lub SMS do klientów).
 - `.env.prod`: lista kluczy (bez wartości) i które zależą od domeny lub serwera (`ALLOWED_HOSTS`, `FRONTEND_BASE_URL`, `NEXT_PUBLIC_*`, `DATABASE_URL`, `REDIS_URL`, `EMAIL_*`, `STAFF_NOTIFICATION_EMAILS`, `GOOGLE_*`).
-- DNS prokomserwis.pl: `dig +short A/AAAA/MX/TXT/NS prokomserwis.pl` i `www`. **Szczególnie AAAA:** VPS webh.pl nie ma IPv6, więc stary rekord AAAA (jeśli jest) trzeba usunąć przy przełączeniu, inaczej część klientów trafi na stary serwer.
+- DNS prokomserwis.pl: ✔ T0/TM+ (`INWENTARZ.md` §B, `DNS-PROKOMSERWIS.md`): A `@` i `www` → `62.238.0.240`, 2× TXT, **brak AAAA, MX i CAA**, DNSSEC wyłączony. Strefa od 14.11 w Seohost — wszystkie zmiany DNS migracji robimy tam.
 - Poczta: czy `@prokomserwis.pl` ma skrzynki (MX). **MX, SPF, DKIM i DMARC nie ruszamy przy migracji.** Maile aplikacji idą dziś przez Gmail SMTP (`EMAIL_HOST`). To nie zależy od serwera i zostaje bez zmian.
 - Google OAuth: dozwolone adresy w Google Cloud Console (`https://prokomserwis.pl`). Domena się nie zmienia, więc logowanie Google działa po przenosinach. Na stagingu nie zadziała, chyba że Krystian doda adres stagingu (opcjonalne).
 
@@ -39,13 +39,13 @@ Domena i adresy, baza (te same dane), maile (Gmail SMTP), logowanie Google, pane
 - **Dwa stosy (nazwy projektów compose):** `prokom-tech-prod` i `prokom-tech-staging`, obok `prokom-web-*` i `prokom-gaming-*`.
 - **Usługi produkcji:** `db` (postgres:16-alpine), `redis` (redis:7-alpine z hasłem), `backend` (gunicorn), `celery`, `celery-beat`, `frontend` (Next standalone), `gateway` (nginx:alpine).
 - **Usługi stagingu:** `db`, `redis`, `backend`, `frontend`, `gateway`. **Bez `celery` i `celery-beat`**, żeby żadne zadanie okresowe nie wysłało maila do klienta z kopii bazy.
-- **`gateway` to wewnętrzny router stosu (bez portów na hoście, bez TLS):** `/static/` i `/media/` z wolumenów, `/api/` i `/admin/` → `backend:8000`, reszta → `frontend:3000`, `client_max_body_size 20M`. Przenosi reguły z dzisiejszego `nginx/default.conf` bez części TLS. Dzięki temu wspólny Nginx prokom-web ma dla Tech jeden prosty upstream, a routing Tech zostaje w repo Tech.
+- **`gateway` to wewnętrzny router stosu (bez TLS, port tylko na `127.0.0.1`: prod 3300, staging 3301 — dla smoke testu):** `/static/` i `/media/` z wolumenów, `/api/` i `/admin/` → `backend:8000`, reszta → `frontend:3000`, `client_max_body_size 20M`. Przenosi reguły z dzisiejszego `nginx/default.conf` bez części TLS (`gateway/nginx.conf`). Dzięki temu wspólny Nginx prokom-web ma dla Tech jeden prosty upstream, a routing Tech zostaje w repo Tech. `www` nie jest dziś przekierowywane (Hetzner obsługuje obie nazwy tak samo) — zostaje tak (1:1).
 - **Krytyczne:** `gateway` przekazuje dalej nagłówek `X-Forwarded-Proto` **od wspólnego Nginx** (`proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;`), a nie `$scheme`, bo wewnątrz jest `http`. Django ma `SECURE_SSL_REDIRECT = True` i `SECURE_PROXY_SSL_HEADER`, więc bez tego strona wpadnie w pętlę przekierowań. Tak samo `Host` i `X-Forwarded-For`.
-- **Sieci:** każdy stos ma własną sieć wewnętrzną. Do zewnętrznej sieci `prokom-proxy` (wspólny Nginx) podłączony jest **tylko** `gateway`, z aliasem `prokom-tech-prod-gateway` / `prokom-tech-staging-gateway`. Baza i Redis nie mają portów na hoście.
-- **Limity pamięci (`mem_limit`):** prod: db 512m, redis 128m, backend 768m, celery 384m, celery-beat 192m, frontend 384m, gateway 64m (razem ok. 2,4 GB). Staging: db 384m, redis 96m, backend 512m, frontend 320m, gateway 64m. Wartości koryguje T0/TM po pomiarze na Hetznerze (`docker stats`).
+- **Sieci:** każdy stos ma własną sieć wewnętrzną. Do zewnętrznej sieci `prokom-proxy` (wspólny Nginx) podłączony jest **tylko** `gateway`. Wspólny Nginx łączy się po **nazwie kontenera** (`prokom-tech-prod-gateway-1:80`, `prokom-tech-staging-gateway-1:80`, zmienna upstream + `resolver 127.0.0.11`), bez aliasów — tak jak Gaming G16. Baza i Redis nie mają portów na hoście.
+- **Limity pamięci (`deploy.resources.limits.memory`, konwencja VPS):** prod: db 512m, redis 128m, backend 768m, celery 384m, celery-beat 192m, frontend 384m, gateway 64m (razem ok. 2,4 GB). Staging: db 384m, redis 96m, backend 512m, frontend 320m, gateway 64m. Pomiar na Hetznerze (T0, `INWENTARZ.md` B1.5) mieści się z zapasem; VPS ma 16 GB RAM i 4 GB swap.
 - **Gunicorn bez zmiany kodu:** `gunicorn.conf.py` liczy procesy z rdzeni (`cpu_count()*2+1` = 9 na VPS 4 vCPU). Nadpisujemy zmienną środowiskową `GUNICORN_CMD_ARGS="--workers=3 --threads=2"` (prod) i `--workers=2` (staging). Gunicorn stawia ją wyżej niż plik konfiguracyjny. TM sprawdza w logach startu, że działa (liczba „Booting worker”).
 - **Obrazy z GitHub Actions do GHCR** (zasada projektu: nie budujemy na serwerze): `ghcr.io/krystian2077/prokom-tech-backend:<sha>`, `…/prokom-tech-frontend:<sha>` (prod) i `…/prokom-tech-frontend-staging:<sha>`. Frontend jest osobny dla każdego środowiska, bo `NEXT_PUBLIC_API_URL` i `NEXT_PUBLIC_SITE_URL` wchodzą do obrazu przy budowie. Workflow `.github/workflows/obrazy.yml`: push do `develop` buduje backend i frontend-staging, push do `master` buduje backend i frontend prod. Paczki prywatne. Serwer loguje się do GHCR tokenem tylko do odczytu (`read:packages`), zapisanym w pliku z uprawnieniami 600.
-- **Wdrożenie:** `scripts/vps/deploy.sh <prod|staging> <sha>` uruchamiany przez Krystiana po SSH: `pull` obrazów `<sha>` → `up -d` → `migrate` (na prod tylko po kopii bazy) → `collectstatic` → smoke. Cofnięcie = `deploy.sh prod <poprzedni-sha>`. Automatyczny deploy stagingu z Actions — później, jak S10b w prokom-web.
+- **Wdrożenie:** `scripts/vps/deploy.sh <prod|staging> <sha>` uruchamiany przez Krystiana po SSH (decyzja 14.11: ręcznie; bramka i automatyczny staging jak w Gaming — później): (prod) kopia `predeploy` → `pull` obrazów `<sha>` → `migrate` (na prod po kopii i potwierdzeniu `MIGRUJ`) → `collectstatic` → `up -d --wait` → smoke. Cofnięcie = automatycznie, gdy nie było migracji, albo `deploy.sh prod <poprzedni-sha>`. Lock i log wspólne z prokom-web i Gaming (`/srv/prokom/.deploy.lock`, `deploys.log`). Kopie: `age` + `rclone` do `offsite:prokom-backups-r7k2/tech-<stack>/`. Szczegóły: `docs/tech/WDROZENIE.md`.
 - **Wspólny Nginx (PR w prokom-web, wzór jak Gaming G16):** hosty `prokomserwis.pl` i `www.prokomserwis.pl` → `http://prokom-tech-prod-gateway`, `staging.prokomserwis.pl` → staging (hasło, `X-Robots-Tag: noindex`), `client_max_body_size 20M`, nagłówki `X-Forwarded-*`, certyfikat (§8, krok 7). `www` → 301 na wersję bez `www` (tak jak dziś, jeśli dziś tak jest — sprawdź).
 
 ## 5. Zmienne środowiskowe
@@ -81,7 +81,7 @@ Klucze jak w `.env.prod.example`. Różnice między środowiskami:
 Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 
 ## 8. Przełączenie — niedziela (lista do odhaczania)
-**T−48 h:** TTL rekordów A (i AAAA, jeśli jest) dla `@` i `www` na 300 s. Komunikat dla serwisu: „W niedzielę wieczorem przerwa techniczna strony i panelu, w poniedziałek od rana wszystko działa”.
+**T−48 h:** TTL rekordów A dla `@` i `www` na 300 s **w strefie Seohost** (AAAA nie ma). Komunikat dla serwisu: „W niedzielę wieczorem przerwa techniczna strony i panelu, w poniedziałek od rana wszystko działa”.
 **T−0 (np. 18:00):**
 1. Stary serwer: strona techniczna 503 dla całego ruchu (tymczasowa konfiguracja Nginx na Hetznerze z prostą stroną „Przerwa techniczna, wracamy wkrótce. Pilne: 883 200 151”). Od tej chwili nie powstają nowe dane.
 2. Stary serwer: `docker compose stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu).
@@ -90,9 +90,9 @@ Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 5. Test przed DNS: `curl --resolve prokomserwis.pl:443:194.28.50.70 …` i plik `hosts` na komputerze Krystiana: strona, logowanie do panelu, lista napraw, szczegóły naprawy z załącznikami, PDF, panel admina, konto klienta.
 6. Zgłoszenie testowe przez stronę → widoczne w panelu → oznaczyć jako testowe i anulować (procedura z panelu, bez kasowania w bazie).
 7. Certyfikat: na czas przełączenia skopiuj ważny certyfikat z Hetznera (`certbot_certs`) do magazynu certyfikatów wspólnego Nginx (zgodnie z runbookiem prokom-web). Po propagacji DNS wystaw nowy certyfikat przez certbot prokom-web (`--expand` albo osobny, wg runbooka) i przełącz Nginx na niego. Bez tego HTTP-01 nie zadziała przed zmianą DNS.
-8. DNS: A `@` i `www` → `194.28.50.70`. **Usuń AAAA**, jeśli był. MX, TXT i pozostałe bez zmian.
+8. DNS **w strefie Seohost**: A `@` i `www` → `194.28.50.70`. AAAA nie ma (sprawdzone w T0) — nic do usuwania. TXT i pozostałe bez zmian. Wpis „przed/po” w `DNS-PROKOMSERWIS.md`.
 9. Kontrola przez 1–2 h: `dig` z kilku resolverów (1.1.1.1, 8.8.8.8), test z telefonu w sieci komórkowej, logi `gateway`, `backend` i `celery` (beat uruchomiony, zadania przechodzą), certyfikat, maile (np. reset hasła testowego konta).
-10. Kopia zaraz po przełączeniu (`backup.sh prod`) i włączenie crona kopii (codziennie 03:30, 14 dziennych + 8 tygodniowych, cel `rclone` jak prokom-web) oraz monitora dostępności (jak prokom-web: Better Stack / heartbeat kopii).
+10. Kopia zaraz po przełączeniu (`scripts/vps/backup.sh prod`) i włączenie crona kopii (`WDROZENIE.md` §5: prod 03:45 UTC, dzienne 14 dni + miesięczne 93 dni, cel `offsite:prokom-backups-r7k2/tech-prod/`) oraz monitora dostępności i heartbeatu kopii w Better Stack.
 **Poniedziałek 8:30:** Krystian sprawdza z serwisem: logowanie, nowe zgłoszenie, zmiana statusu, wydruk, mail do klienta.
 
 ## 9. Powrót (gdy coś nie działa i nie da się naprawić w 30 minut)
