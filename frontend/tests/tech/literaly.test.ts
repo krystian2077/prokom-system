@@ -39,7 +39,6 @@ const LEGACY_CONTACT = new Set<string>([
   "app/(public)/odzyskiwanie-danych/page.tsx",
   "app/(public)/oferta/OfertaContent.tsx",
   "app/(public)/oferta/page.tsx",
-  "app/(public)/page.tsx",
   "app/(public)/polityka-prywatnosci/page.tsx",
   "app/(public)/regulamin/page.tsx",
   "app/(public)/serwis-drukarek/page.tsx",

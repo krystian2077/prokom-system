@@ -1,0 +1,14 @@
+{
+  "_opis": "Źródło i prawo do użycia każdego zdjęcia w public/tech (SPEC §10, docs/design/tech/README.md). confirmed=false blokuje produkcję, nie budowę. TODO(krystian): uzupełnić źródło (materiały producenta / własne zdjęcie) i ustawić confirmed=true.",
+  "pliki": [
+    { "plik": "public/tech/urzadzenia/iphone.webp", "z": "docs/design/tech/prototyp/img/iphone.png", "wymiary": "433x577", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/urzadzenia/samsung.webp", "z": "docs/design/tech/prototyp/img/samsung.png", "wymiary": "454x549", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/urzadzenia/tablet.webp", "z": "docs/design/tech/prototyp/img/tablet.png", "wymiary": "577x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/urzadzenia/laptop.webp", "z": "docs/design/tech/prototyp/img/laptop.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/urzadzenia/komputer.webp", "z": "docs/design/tech/prototyp/img/komputer.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/urzadzenia/drukarka.webp", "z": "docs/design/tech/prototyp/img/drukarka.png", "wymiary": "640x449", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/urzadzenia/konsola.webp", "z": "docs/design/tech/prototyp/img/konsola.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
+    { "plik": "public/tech/hammer/hg-ciecie.webp", "z": "docs/design/tech/prototyp/img/hg-ciecie.jpg", "wymiary": "1280x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
+    { "plik": "public/tech/hammer/hg-folie.webp", "z": "docs/design/tech/prototyp/img/hg-folie.jpg", "wymiary": "840x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false }
+  ]
+}
