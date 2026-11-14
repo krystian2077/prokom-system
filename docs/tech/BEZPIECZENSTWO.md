@@ -37,7 +37,7 @@ Znalezione ręcznie przy pisaniu `LOKALNIE.md` (gitleaks tego nie łapie: hasła
 
 ## Do zrobienia (Krystian)
 - [ ] Na produkcji sprawdź, że nie ma kont z e-mailem w domenie `example.com` (panel Django `/admin/` → Użytkownicy, filtr po e-mailu). Jeśli są — usuń albo zmień hasła.
-- [ ] Decyzja: repo zostaje publiczne czy prywatne. Po zmianie haseł z sekcji „KRYTYCZNE” nie ma twardego powodu, żeby je zamykać (zamknięcie repo nie cofa tego, co już wyciekło). Argumenty za prywatnym: szczegóły architektury i endpointów panelu są publiczne. Za publicznym: portfolio.
+- [x] Decyzja (14.11.2026): **repo prywatne.** Paczki GHCR mają własną widoczność — `prokom-tech-*` muszą być prywatne (sprawdzenie: anonimowe pobranie manifestu ma zwrócić 401/403). Uwaga: zamknięcie repo nie cofa tego, co było publiczne wcześniej (hasła z seedów zostały zmienione).
 
 Rotacja kluczy i tokenów (SECRET_KEY, SMTP, OAuth) nie jest potrzebna — nie ma ich w historii. Zmiana haseł kont z sekcji „KRYTYCZNE” — tak.
 
