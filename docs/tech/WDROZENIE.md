@@ -80,7 +80,7 @@ Cron użytkownika `krystian` (UTC), obok wpisów prokom-web i Gaming:
 6. Plik importu usunięty wszędzie (`shred -u`).
 
 ## 7. Dzień przełączenia
-Lista z MIGRACJA §8. Pomocne pliki: `scripts/vps/eksport-hetzner.sh prokom_tech_prod` (zrzut końcowy), `scripts/vps/strona-503/default.conf` (strona techniczna na Hetznerze), `restore.sh` do `prokom-tech-prod` **bez** anonimizacji, `deploy.sh prod <sha>` (migracje: oczekiwane „no pending migrations” — inaczej stop i decyzja).
+Lista z MIGRACJA §8, komendy w `docs/tech/NIEDZIELA.md`. Pomocne pliki: `scripts/vps/eksport-hetzner.sh prokom_tech_prod` (zrzut końcowy), `scripts/vps/strona-503/default.conf` (strona techniczna na Hetznerze), `restore.sh` do `prokom-tech-prod` **bez** anonimizacji, `deploy.sh prod <sha>` (migracje: oczekiwane „no pending migrations” — inaczej stop i decyzja).
 
 ## 8. Wyrejestrowanie service workera (od TD5)
 Dopisze TD5 PR 3 (SPEC §12.2).
