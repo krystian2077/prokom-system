@@ -57,7 +57,7 @@ Harmonogram jest w bazie (`django_celery_beat_periodictask`), więc pełną list
 
 ### A5. Domena (z ustaleń Krystiana, 14.11.2026)
 - Rejestrator i strefa DNS `prokomserwis.pl`: **cyber_Folks** (Krystian ma dostęp do panelu).
-- Plan (prompt TM+): strefa i rejestracja → Seohost (`dns1/dns2.microhost.pl`), skrzynka `kontakt@prokomserwis.pl` na Seohost SH 1. Stan „przed” każdą zmianą: `docs/tech/DNS-PROKOMSERWIS.md` (powstanie w TM+).
+- Plan (prompt TM+): strefa i rejestracja → Seohost (`dns1/dns2.microhost.pl`), skrzynka `kontakt@prokomserwis.pl` na Seohost SH 1. Stan „przed” każdą zmianą: `docs/tech/DNS-PROKOMSERWIS.md` (stan z 14.11 już zapisany).
 
 ## B. Wyniki z Hetznera i DNS (zebrane 14.11.2026, ok. 14:10 UTC)
 Zebrane komendami z części C (tylko odczyt) przez `ssh root@62.238.0.240`; DNS z 1.1.1.1 i 8.8.8.8 (CAA przez DoH Cloudflare i Google).
