@@ -113,7 +113,7 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - Wspólne bloki: `PointCard`, `PodhaleMap` (mapa schematyczna z prototypu, SVG), `OsmMap` (mapa adresu: statyczny SVG albo kafel OSM, bez ramki Google), `Faq`, `CtaBand`, `Steps`, `RepairTracker` (5 etapów), `DeviceGrid`, `BrandMarquee`.
 - Kreator: `RepairWizard` z `wizard-data.ts` (urządzenia, usterki per urządzenie, punkty na zdjęciach, sposoby dostarczenia: Rabka-Zdrój, Zakopane (tylko gdy `published`), kurier). Wynik to przejście do `/zgloszenie` z parametrami (KONTRAKT §1.4).
 - Formularze: `RepairForm` (5 kroków), `InquiryForm`, `TrackForm`. Wspólnie: walidacja, zgoda, ekran sukcesu, obsługa błędów API.
-- Dodatki (§12): `PrepChecklist` (lista „przygotuj sprzęt”, także skrót w formularzu i na ekranie sukcesu), `RepairPage` (szablon strony naprawy), `InstallHint` (dyskretna podpowiedź „Dodaj do ekranu głównego” w arkuszu Menu, bez wyskakujących okien).
+- Dodatki (§12): `NoticeBar` (komunikat z `prokom.ts`), `MyRepairs` (zapamiętane naprawy), `SuccessCard` (QR, udostępnij, zapisz), `NavigateButtons` (Mapy Google / Apple / Waze), `DataSafety` (sekcja zaufania), `PrepChecklist` (lista „przygotuj sprzęt”, także skrót w formularzu i na ekranie sukcesu), `RepairPage` (szablon strony naprawy), `InstallHint` (dyskretna podpowiedź „Dodaj do ekranu głównego” w arkuszu Menu, bez wyskakujących okien).
 
 ## 8. Treść i zasady treści (obowiązują w każdej sesji)
 - Bez WhatsAppa, bez zdjęć ludzi, bez cen (do decyzji szefa), **bez paczkomatu** (serwis nie nadaje i nie odbiera, decyzja 14.11), **bez sklepu**.
@@ -135,6 +135,8 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - **[Krystian]** oficjalny SVG znaku PRO-KOM TECH (dziś rysunek zastępczy), DNS/MX dla `kontakt@prokomserwis.pl`.
 - **[prawnik]** polityka prywatności po zmianie hostingu.
 - **[Krystian + serwis]** lista do 12 najczęstszych napraw na strony `/naprawy/…` (§12.4) i dla każdej: realny czas, czy na miejscu w Rabce, gwarancja. Strona bez potwierdzonych danych się nie publikuje.
+- **[Krystian]** identyfikator strony Tech w Umami (wpis w `UMAMI_WEBSITES` w `.env.prod`, wzór prokom-web) i dopisek o statystykach w polityce prywatności (§12.5).
+- **[SZEF/serwis]** treść sekcji „Twoje dane są bezpieczne” zgodna z tym, jak serwis naprawdę postępuje z danymi (§12.9).
 - **[SZEF]** dni zamknięcia poza świętami ustawowymi (np. inwentaryzacja, urlop) — wpisywane w `closures` w `prokom.ts` (§12.1).
 
 ## 11. Definition of Done każdej sesji z UI
@@ -180,3 +182,27 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - Kandydaci (wybiera Krystian z serwisem, start do 12): wymiana ekranu iPhone · wymiana ekranu Samsung · wymiana baterii w telefonie · naprawa gniazda ładowania · telefon po zalaniu · wymiana tylnej szybki iPhone · laptop się przegrzewa (czyszczenie i pasta) · wymiana matrycy w laptopie · wymiana klawiatury w laptopie · laptop się nie włącza · wymiana dysku na SSD / przyspieszenie komputera · czyszczenie konsoli PS5/PS4.
 - Linkowanie: hub `/uslugi` i strony urządzeń (TD5) linkują do napraw swojego urządzenia; kreator po wyborze usterki pokazuje „Dowiedz się więcej” (jeśli strona istnieje); blog — linki z pasujących wpisów (bez zmiany treści wpisów, tylko blok „Powiązana naprawa” w szablonie wpisu po tagu/kategorii).
 - SEO: tytuł np. „Wymiana ekranu iPhone — Rabka-Zdrój i Zakopane | PRO-KOM Tech”, opis 120–155, JSON-LD `Service` (provider = punkty opublikowane, `areaServed` z listy miejscowości) + `FAQPage` + `BreadcrumbList`, sitemap tylko opublikowane.
+
+### 12.5 Pomiar (Umami, wspólny dla linii PRO-KOM) (TD1 skrypt, zdarzenia w sesjach TD2–TD5, kontrola w TD6)
+- Ta sama instancja Umami co strony z prokom-web (bez ciasteczek, bez zapisu na urządzeniu, dane na serwerze PRO-KOM → bez banera zgód). Skrypt tylko w layoucie publicznym, tylko gdy ustawione `NEXT_PUBLIC_UMAMI_WEBSITE_ID` (produkcja), ładowany `defer`, ścieżka przez Nginx jak w prokom-web (`/_s/script.js`). Panele bez skryptu (test).
+- Zdarzenia (nazwy wiążące): `telefon_klik` (miejsce), `zgloszenie_start` (źródło: kreator / przycisk / strona naprawy), `zgloszenie_krok` (nr), `zgloszenie_wyslane` (kategoria, dostawa, punkt), `zgloszenie_blad` (typ: walidacja / 429 / sieć / 5xx — **bez danych osobowych**), `kontakt_wyslany` (temat), `status_sprawdzony` (wynik: znaleziono / nie), `nawigacja_klik` (punkt, aplikacja), `kreator_usterka` (urządzenie, usterka), `pwa_start`, `poradnik_otwarty`.
+- `zgloszenie_blad` jest też alarmem: jeśli w Umami pojawia się wiele błędów 5xx, coś jest nie tak z backendem — sprawdzić w pierwszym tygodniu codziennie.
+- *Uwaga (KONTRAKT §1.3): przy awarii Redisa backend nie zwraca 5xx, tylko nie odpowiada — front kończy żądanie po timeoucie. Zgłaszamy to jako `zgloszenie_blad` z typem `timeout` (dopisany do listy typów), żeby alarm złapał też ten przypadek.*
+- Raport dla szefa raz w miesiącu (lista w STAN): wejścia, zgłoszenia ze strony, telefony z telefonu, najczęstsze usterki z kreatora, punkt (Rabka/Zakopane), źródła wejść.
+
+### 12.6 „Moje naprawy” w przeglądarce (TD3 PR 3)
+- Po sprawdzeniu statusu albo wysłaniu zgłoszenia pole „Zapamiętaj na tym urządzeniu” (domyślnie **wyłączone**, bo telefon może być wspólny). Zapis w `localStorage['pk-tech-naprawy']`: numer, 4 cyfry telefonu, nazwa urządzenia, data, ostatni status. Maks. 5 pozycji, automatyczne usunięcie 90 dni po statusie „Wydane”.
+- Na `/track` i w arkuszu Menu: „Twoje naprawy” — karta z ostatnim znanym statusem i przyciskiem „Odśwież” (zapytanie do API dopiero po kliknięciu albo przy wejściu na `/track`, nie w tle). Przycisk „Usuń z tego urządzenia” przy każdej i „Usuń wszystkie”.
+- Odczyt i zapis w `try/catch` (tryb prywatny), brak danych = brak sekcji. Nic nie trafia do backendu ani do Umami.
+- *Uwaga (zgodność z backendem, 14.11.2026): backend nie ma statusu „Wydane”. Koniec naprawy to `is_finished = true` w odpowiedzi `/track` (statusy `picked_up`, `delivered`, `shipped`; etykiety „Odebrane”, „Wysłane”) — od tego liczymy 90 dni. Sprawy przerwane (`is_interrupted`) liczymy tak samo.*
+
+### 12.7 Ekran po wysłaniu zgłoszenia (TD3 PR 2)
+- `SuccessCard`: numer (kopiuj), kod QR generowany w przeglądarce (biblioteka bez zależności sieciowych, np. `qrcode`) z adresem `https://prokomserwis.pl/track?ref=<numer>` — **bez cyfr telefonu w adresie**; „Udostępnij” (Web Share API, gdy brak — kopiuj link), „Zapisz jako obraz” (PNG karty: logo, numer, QR, punkt i jego godziny). Wybrany punkt z `OpeningStatus` i `NavigateButtons`. `PrepChecklist` (§12.3) i 3 kroki „co dalej”.
+- *Uwaga (KONTRAKT §1.2): numer ma ukośniki (`PROKOM/RMA/4/2026`), więc w adresie QR i linku „Udostępnij” musi być `encodeURIComponent(numer)`.*
+
+### 12.8 „Nawiguj do punktu” (TD4 PR 1)
+- `NavigateButtons` przy każdym opublikowanym punkcie z adresem (karta, strona punktów, strony lokalne, ekran sukcesu): Mapy Google (`https://www.google.com/maps/dir/?api=1&destination=lat,lng`), Mapy Apple (`https://maps.apple.com/?daddr=lat,lng`), Waze (`https://waze.com/ul?ll=lat,lng&navigate=yes`). Na telefonie jeden przycisk „Nawiguj” z arkuszem wyboru, na komputerze link do Map Google. Obok `parkingNote` z `prokom.ts` (pokazywane tylko, gdy wypełnione).
+
+### 12.9 Komunikat i sekcja zaufania (TD1 komunikat, TD2/TD4 sekcja)
+- `prokom.ts` → `notices: { id; text; href?; from: 'YYYY-MM-DD'; to: 'YYYY-MM-DD'; points?: ('rabka'|'zakopane')[] }[]`. `NoticeBar` nad kapsułą pokazuje komunikat aktywny dziś (Europe/Warsaw), z zamknięciem zapamiętanym per `id` (localStorage). Bez aktywnego komunikatu — nic (zero miejsca). Maks. jeden naraz. Zmiana = commit w `prokom.ts` i deploy (bez CMS).
+- `DataSafety`: krótka sekcja „Twoje dane są bezpieczne” (na głównej przy procesie, na `/jak-przygotowac-sprzet`, na stronach napraw telefonów): co serwis robi przy naprawie (np. dostęp tylko do testu po naprawie), czego nie robi, kopia zapasowa po stronie klienta, możliwość oddania bez kodu z ograniczonym testem. **Treść tylko po potwierdzeniu przez serwis/szefa** (§10); do tego czasu sekcja ukryta flagą.
