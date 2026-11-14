@@ -8,6 +8,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - **Następny krok:** (1) scalić PR 1, utworzyć `develop` i przestawić PR 2 na `develop`; (2) na Hetznerze `chmod 600` dla `.env.prod` i `.env.prod.bak-*` (dziś 644); (3) przed TM ręczny `pg_dump` z Hetznera — **nie ma żadnych kopii zapasowych** (`INWENTARZ.md` B1.2); (4) TM+ (domena, poczta, VPS).
 
 ## Pilne
+- ✖ **Sobota w Rabce: 9:00–14:00** (decyzja Krystiana 14.11.2026; SPEC §5 bez zmian). Blok „Twój serwis” w `/track` i wydruki biorą godziny z `SERWIS_PRINT_HOURS` — ustawić w `.env.prod` na Hetznerze (i od razu na VPS w TM) `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`, potem restart `backend` i `celery`. Domyślna wartość w `base.py` (13:00) zostaje — backlog `WYJATKI.md`.
 - ✔ 14.11.2026: hasła kont z `seed_initial.py`/`seed_staff_profiles.py` zmienione na produkcji (Krystian). Poprawka seedów → backlog w `WYJATKI.md`.
 - ✔ 14.11.2026: build frontu naprawiony bez zmian w panelach (`frontend/scripts/patch-next-font.js` jako `prebuild`, commit `85b96bf`). Usunąć po aktualizacji Nexta, gdy ten obsłuży adresy Google Fonts bez rozszerzenia.
 - ✖ Brak kopii zapasowych produkcji (0 wpisów `BackupLog`, brak crona) — ręczny `pg_dump` przed TM, na VPS kopie od pierwszego dnia.
@@ -15,13 +16,14 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 ## Plan (szczegóły i prompty: `docs/zadania/tech.md`)
 | Sesja | Zakres | Stan |
 |---|---|---|
-| T0 | start, porządki, rozpoznanie, inwentaryzacja do migracji | gotowe (14.11): PR #6 + PR #7 do scalenia |
+| T0 | start, porządki, rozpoznanie, inwentaryzacja do migracji | gotowe i scalone (14.11): #6, #7, #8 |
 | TM | migracja 1:1 na VPS webh.pl (staging → przełączenie w niedzielę) | czeka na T0 i start Gaming (20.11) |
 | TD1 | fundament i powłoka (izolacja, tokeny, dane, nagłówek, stopka, telefon) | czeka na TM |
 | TD2 | strona główna + kreator | czeka na TD1 |
 | TD3 | zgłoszenie, status, przypisanie naprawy (kontrakt) | czeka na TD1 |
 | TD4 | punkty, kontakt, o firmie, strony lokalne, `/serwis-telefonow`, 301 | czeka na TD1 |
-| TD5 | pozostałe podstrony, Hammer Glass, blog, prawne, 404 | czeka na TD1 |
+| TD5 | pozostałe podstrony, Hammer Glass, blog, prawne, 404, PWA, poradnik „jak przygotować sprzęt” | czeka na TD1 |
+| TD5b | strony konkretnych napraw `/naprawy/…` (SPEC §12.4) | czeka na TD5 i listę napraw od serwisu |
 | TD6 | QA, wydajność, SEO, sprzątanie, staging → produkcja | czeka na TD2–TD5 |
 
 ## Otwarte (blokują produkcję, nie budowę) — SPEC §10
@@ -31,6 +33,12 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [Krystian] termin TM: plan 23–27.11 (staging), przełączenie ndz 29.11.
 - [Krystian] czy 3 zgłoszenia i 8 klientów na produkcji to dane prawdziwe czy testowe (jeśli testowe — VPS może ruszyć na czystej bazie; `INWENTARZ.md` B1.1).
 - [Krystian/TD6] `PublicNavbar`/`PublicFooter` używa logowanie klienta (`app/client/ClientGate.tsx`) → zostają zamrożone albo wyjątek (`MAPA-PLIKOW.md`, TODO).
+- [Krystian + serwis] lista do 12 napraw na `/naprawy/…` z czasem, gwarancją i „na miejscu” (SPEC §12.4) — przed TD5b.
+- [Krystian] Umami dla Tech: identyfikator strony (`UMAMI_WEBSITES` w `.env.prod` prokom-web) i dopisek w polityce prywatności (SPEC §12.5). Skrypt idzie przez Nginx prokom-web (`/_s/script.js`), więc zadziała dopiero po TM.
+- [SZEF/serwis] treść sekcji „Twoje dane są bezpieczne” (SPEC §12.9) — do tego czasu sekcja ukryta flagą.
+- [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
+- [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
+- [SZEF/Krystian] **Zakopane:** adres znany (ul. Stanisława Staszica 8, 34-500; salon i serwis). Telefon: 18 541 20 15 (14.11). Brakuje: godziny, współrzędne, ploter Hammer Glass, oddanie w jednym punkcie i odbiór w drugim. Do tego czasu `published: false`.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
@@ -38,5 +46,9 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14.11.2026 — punkt Zakopane: ul. Stanisława Staszica 8, 34-500 Zakopane, tel. 18 541 20 15 (SPEC §5).
+- 14.11.2026 — SPEC §12.10 (naprawa wysyłkowa) i §12.11 (kategorie bloga), plan ≈ 21,25 wieczoru, **zakres zamknięty**. Liczby bloga przeliczone: 49 obiektów / 48 wpisów.
+- 14.11.2026 — SPEC §12.5–§12.9 (Umami, „Moje naprawy”, ekran sukcesu z QR, nawigacja, komunikat i sekcja zaufania), plan ≈ 20,25 wieczoru. Sobota w Rabce: 9:00–14:00.
+- 14.11.2026 — SPEC 1.0 z dodatkami §12 (status godzin, PWA, poradnik, strony napraw) i plan sesji z TD5 PR 3 i TD5b (≈ 19,25 wieczoru). W SPEC dopisane uwagi z T0 (ScopeBar/LiveBadge i PublicNavbar/Footer zostają).
 - 14.11.2026 — **T0**: pakiet w repo (PR 1), strażnik strefy zakazanej + CI, skan sekretów (gitleaks czysty, ale hasła kont w seedach → zmienione), `LOKALNIE.md` (sprawdzone zgłoszenie z formularza na 3003), `MAPA-PLIKOW.md`, KONTRAKT poprawiony wg kodu + 17 fixtures, `INWENTARZ.md` (część z repo + komendy), `anonimizuj.sql` (test na Postgres 16: 12 kontroli = 0). Wykryte: build frontu pada przez Google Fonts (Unbounded).
 - 14.11.2026 — pakiet przebudowy i migracji przygotowany w czacie projektu (wizualizacja, specyfikacja, kontrakt, runbook, plan sesji).

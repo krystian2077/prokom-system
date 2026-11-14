@@ -31,7 +31,7 @@ Część A pochodzi z repo (sprawdzona w T0). Część B — wyniki komend z cz�
 | `EMAIL_HOST/PORT/HOST_USER/HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT` | nie | Gmail SMTP; przy migracji bez zmian (TM+ etap D przenosi na SH 1) |
 | `STAFF_NOTIFICATION_EMAILS` | nie | **na stagingu pusta albo adres testowy** |
 | `EMAIL_INBOUND_WEBHOOK_SECRET`, `INBOUND_IMAP_HOST/USER/PASSWORD/MAILBOX` | nie | czy używane na produkcji — sprawdzić w B (`poll_inbound_imap`) |
-| `SERWIS_PRINT_*` (7 kluczy) | nie | treść bloku „Twój serwis” w `/track` i na wydrukach |
+| `SERWIS_PRINT_*` (7 kluczy) | nie | treść bloku „Twój serwis” w `/track` i na wydrukach; **`SERWIS_PRINT_HOURS` = `Pn–Pt 9:00–17:00 · Sob 9:00–14:00`** (decyzja 14.11, sprawdzić wartość na Hetznerze i ustawić tak samo na VPS) |
 | `PARCEL_LOCKER_ADDRESS` | nie | paczkomat nie jest oferowany |
 | `RENDER_EXTERNAL_HOSTNAME`, `DJANGO_ENV`, `SEED_EMAIL_DOMAIN` | — | pozostałości (Render, seedy); sprawdzić, czy są ustawione |
 
