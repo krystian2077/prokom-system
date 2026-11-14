@@ -29,21 +29,16 @@ const CONTACT_LITERALS: [string, RegExp][] = [
 const LEGACY_CONTACT = new Set<string>([
   "app/(public)/akcesoria/layout.tsx",
   "app/(public)/akcesoria/page.tsx",
-  "app/(public)/blog/BlogPageClient.tsx",
-  "app/(public)/blog/[slug]/page.tsx",
-  "app/(public)/faq/page.tsx",
-  "app/(public)/hammer-glass/page.tsx",
   "app/(public)/obslugiwane-miejscowosci/page.tsx",
   "app/(public)/oferta/OfertaContent.tsx",
   "app/(public)/oferta/page.tsx",
-  "app/(public)/polityka-prywatnosci/page.tsx",
-  "app/(public)/regulamin/page.tsx",
   "features/zgloszenie/LegacyZgloszeniePage.tsx",
   "sections/Contact.tsx",
   "components/layout/PublicFooter.tsx",
   "components/hammer-glass/HammerCta.tsx",
   "components/hammer-glass/HammerHero.tsx",
 ]);
+// FAQ (rebuilt in TD5) keeps one allowed sentence: "nie obsługujemy paczkomatów" (SPEC §11 pt 5).
 const LEGACY_PACZKOMAT = new Set<string>(["app/(public)/faq/page.tsx", "app/(public)/obslugiwane-miejscowosci/page.tsx"]);
 
 function walk(dir: string): string[] {

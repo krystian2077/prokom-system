@@ -3034,87 +3034,9 @@ Gdy pojawiają się powtarzalne błędy, pobieranie kilku kartek naraz lub regul
 //  POLEASING I BIZNES
 // ─────────────────────────────────────────────
 
-const BUSINESS_POSTS: BlogPost[] = [
-  {
-    slug: "na-co-uwazac-przy-zakupie-sprzetu-poleasingowego",
-    title: "Na co zwrócić uwagę przy zakupie sprzętu poleasingowego?",
-    description:
-      "Laptop, komputer lub drukarka poleasingowa — to może być świetny zakup lub rozczarowanie. Sprawdź listę rzeczy, które warto sprawdzić przed zakupem używanego sprzętu firmowego.",
-    date: "2026-02-25",
-    readingTime: "5 min",
-    category: "Poleasing",
-    tags: ["sprzęt poleasingowy", "laptop używany", "kupowanie poleasingowego", "certyfikowany refurbished"],
-    relatedServiceHref: "/oferta",
-    relatedServiceLabel: "Oferta sprzętu poleasingowego",
-    areaServed: ["Rabka-Zdrój", "Nowy Targ", "Mszana Dolna", "Jordanów"],
-    relatedSlugs: [
-      "laptop-poleasingowy-czy-nowy",
-      "laptop-biznesowy-jaki-model-do-pracy",
-      "jaki-komputer-biznesowy-do-firmy",
-    ],
-    keyTakeaways: [
-      "Zawsze sprawdź klasę stanu kosmetycznego (A/B/C) i upewnij się, że rozumiesz, co oznacza.",
-      "Dysk powinien być nowy lub bezpiecznie wyczyszczony — stare dane firmy nie mogą pozostać.",
-      "Sprawdź stan baterii — przy laptopach pojemność poniżej 60% to problem.",
-      "Kupuj od certyfikowanego dystrybutora z jasną gwarancją i polityką zwrotów.",
-    ],
-    faq: [
-      {
-        q: "Czym różni się klasa A od klasy B?",
-        a: "Klasa A: brak lub minimalne ślady użytkowania. Klasa B: widoczne ślady użytkowania (zarysowania, drobne wgniecenia), ale sprawny sprzęt. Klasa C: wyraźne uszkodzenia kosmetyczne.",
-      },
-      {
-        q: "Jak sprawdzić, czy dysk jest bezpiecznie wyczyszczony?",
-        a: "Dobry dystrybutor dostarcza certyfikat bezpiecznego kasowania danych (np. DBAN, Blancco). Zapytaj o to przed zakupem.",
-      },
-      {
-        q: "Czy poleasingowy sprzęt ma gwarancję?",
-        a: "Powinien. Dobry dystrybutor daje minimum 6 miesięcy gwarancji, często 12 miesięcy. Sprawdź warunki przed zakupem.",
-      },
-    ],
-    content: `
-Sprzęt poleasingowy może być doskonałą inwestycją — albo rozczarowaniem. Różnica często leży w tym, od kogo kupujesz i co sprawdzasz przed zakupem.
-
-## 1. Klasa stanu kosmetycznego
-
-Certyfikowany sprzęt poleasingowy jest zazwyczaj klasyfikowany:
-- **Klasa A (Grade A):** bardzo dobry stan kosmetyczny, minimalne lub brak śladów użytkowania.
-- **Klasa B:** widoczne ślady użytkowania — zarysowania, drobne wgniecenia. Sprawny sprzęt.
-- **Klasa C:** wyraźne uszkodzenia kosmetyczne. Tańszy, ale wymaga akceptacji wyglądu.
-
-## 2. Stan baterii (przy laptopach)
-
-To jeden z najważniejszych elementów. Sprawdź:
-- Czy bateria jest nowa (wymieniona przez dystrybutora)?
-- Jeśli nie — jaką pojemność ma bateria w stosunku do nowej? Poniżej 60–70% to problem.
-
-Dobry dystrybutor wymienia baterię lub informuje o jej stanie.
-
-## 3. Bezpieczne wyczyszczenie dysku
-
-Wszystkie dane poprzedniego użytkownika (firmy) powinny być bezpiecznie usunięte. Zapytaj o:
-- Certyfikat bezpiecznego kasowania danych.
-- Lub po prostu: czy dysk jest nowy lub wymieniony.
-
-## 4. Gwarancja i polityka zwrotów
-
-- Minimum **6 miesięcy gwarancji** od dystrybutora.
-- Jasna polityka zwrotu w ciągu 14 dni (przy zakupie online — prawo konsumenta).
-- Możliwość zwrotu bez pytań, jeśli sprzęt nie odpowiada opisowi.
-
-## 5. Certyfikowany dystrybutor
-
-Najlepsza gwarancja jakości to zaufany, certyfikowany dystrybutor z historią i opiniami. Unikaj anonimowych sprzedawców na aukcjach bez żadnej gwarancji.
-
-## Gdzie kupić poleasingowy sprzęt w Rabce-Zdroju?
-
-PRO-KOM oferuje laptopy i komputery poleasingowe od certyfikowanego partnera — z gwarancją, sprawdzone i gotowe do pracy.
-
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
-    `.trim(),
-  },
-];
+// Second copy of "na-co-uwazac-przy-zakupie-sprzetu-poleasingowego" removed (SPEC §12.11):
+// the first object (LAPTOP_POSTS) keeps the URL and content.
+const BUSINESS_POSTS: BlogPost[] = [];
 
 // ─────────────────────────────────────────────
 //  EKSPORT

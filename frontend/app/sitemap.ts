@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BLOG_POSTS } from "@/lib/blog-posts";
+import { BLOG_CATEGORIES } from "@/lib/tech/blog-taxonomy";
 import { SITE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -135,5 +136,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...blogRoutes];
+  // Blog categories (SPEC §12.11, TD5).
+  const blogCategoryRoutes: MetadataRoute.Sitemap = BLOG_CATEGORIES.map((c) => ({
+    url: `${SITE_URL}/blog/kategoria/${c.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.65,
+  }));
+
+  return [...staticRoutes, ...blogRoutes, ...blogCategoryRoutes];
 }
