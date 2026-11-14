@@ -84,3 +84,10 @@ dump.rdb
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Claude Code / local tooling (since T0)
+.claude/settings.local.json
+.claude/worktrees/
+.claire/
+tmp/
+frontend/.env.local
