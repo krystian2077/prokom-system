@@ -78,7 +78,8 @@ if [ "${SMOKE_SUBMIT:-}" = 1 ]; then
     echo "SMOKE_SUBMIT works on staging only (never a test repair in production by script)" >&2
     exit 2
   fi
-  payload='{"client":{"first_name":"Test","last_name":"Smoke","email":"smoke@example.test","phone":"500000123","preferred_contact":"email"},"device":{"category":"phone","brand_name":"Test","model_name":"Smoke","problem_description":"Test smoke.sh — do usunięcia."},"delivery_method":"in_person","return_method":"in_person","additional_notes":"Punkt przyjęcia: Rabka-Zdrój\n\nTEST smoke.sh"}'
+  # ASCII only (Polish letters as JSON escapes): the same bytes in any shell or terminal encoding.
+  payload='{"client":{"first_name":"Test","last_name":"Smoke","email":"smoke@example.test","phone":"500000123","preferred_contact":"email"},"device":{"category":"phone","brand_name":"Test","model_name":"Smoke","problem_description":"Test smoke.sh - do usuni\u0119cia."},"delivery_method":"in_person","return_method":"in_person","additional_notes":"Punkt przyj\u0119cia: Rabka-Zdr\u00f3j\n\nTEST smoke.sh"}'
   submit_args=(-s --max-time 60 -H 'Content-Type: application/json' -d "$payload")
   [ -z "${SMOKE_URL:-}" ] && submit_args+=(-H "Host: $host")
   [ -n "${SMOKE_AUTH:-}" ] && submit_args+=(-u "$SMOKE_AUTH")
@@ -89,7 +90,7 @@ if [ "${SMOKE_SUBMIT:-}" = 1 ]; then
     ref="$(printf '%s' "$number" | sed 's#/#%2F#g')"
     check 200 "/api/v1/repairs/track/?ref=$ref&phone_last4=0123"
   else
-    echo "FAIL submit (no repair_number in the response)"
+    echo "FAIL submit (no repair_number in the response): $(printf '%s' "$body" | head -c 300)"
     failures=$((failures + 1))
   fi
 fi

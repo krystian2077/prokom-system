@@ -11,6 +11,7 @@
 # The file holds customers' personal data: move it Hetzner → your computer → VPS only over
 # scp/ssh, compare the sha256 after each copy, and delete it everywhere when done (shred -u).
 set -euo pipefail
+export MSYS_NO_PATHCONV=1 # only matters for a local test in Git Bash
 
 target_db="${1:?usage: bash eksport-hetzner.sh <prokom_tech_staging|prokom_tech_prod>}"
 case "$target_db" in prokom_tech_staging | prokom_tech_prod) ;; *) echo "Unknown target: $target_db" >&2; exit 2 ;; esac
@@ -29,13 +30,12 @@ log "pg_dump (the site keeps running)"
 "${compose[@]}" exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' >"$work/db.dump"
 "${compose[@]}" exec -T db pg_restore --list >/dev/null <"$work/db.dump"
 
-media_volume="$(docker volume ls --format '{{.Name}}' | grep -E '_mediafiles$' | head -1)"
-log "media volume ${media_volume:-<none>}"
-if [ -n "$media_volume" ]; then
-  docker run --rm -v "$media_volume:/media:ro" postgres:16-alpine tar -C /media -cf - . >"$work/media.tar"
-else
-  tar -cf "$work/media.tar" -T /dev/null
-fi
+# Compose project on Hetzner is `app` (INWENTARZ.md §B: app_postgres_data, app_mediafiles, …).
+media_volume="${MEDIA_VOLUME:-app_mediafiles}"
+docker volume inspect "$media_volume" >/dev/null 2>&1 ||
+  { log "volume $media_volume not found (docker volume ls; MEDIA_VOLUME=<name> to override) — nothing written"; exit 1; }
+log "media volume $media_volume"
+docker run --rm -v "$media_volume:/media:ro" postgres:16-alpine tar -C /media -cf - . >"$work/media.tar"
 
 repairs="$("${compose[@]}" exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from repairs_repairrequest"' | tr -d '[:space:]')"
 {
