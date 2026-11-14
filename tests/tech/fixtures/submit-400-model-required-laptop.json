@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/repairs/submit/",
+    "body": {
+      "client": {
+        "first_name": "Jan",
+        "last_name": "Testowy",
+        "email": "jan.testowy@example.com",
+        "phone": "+48 500 100 234",
+        "preferred_contact": "phone"
+      },
+      "device": {
+        "category": "laptop",
+        "brand_name": "Samsung",
+        "model_name": "",
+        "problem_description": "Pęknięty ekran po upadku.",
+        "device_turns_on": true
+      },
+      "delivery_method": "in_person",
+      "return_method": "in_person",
+      "hammer_glass_interest": "ask_later",
+      "requires_data_backup": false,
+      "additional_notes": "Punkt przyjęcia: Rabka-Zdrój\n\nProszę o kontakt po 16."
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "device": [
+        "Podaj nazwę modelu urządzenia lub wybierz model z listy."
+      ]
+    }
+  }
+}

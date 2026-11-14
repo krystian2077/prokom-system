@@ -1,0 +1,71 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/repairs/track/?ref=PROKOM/RMA/2/2026&phone_last4=0234",
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "repair_number": "PROKOM/RMA/2/2026",
+      "status": "Zgłoszenie przyjęte",
+      "status_code": "new",
+      "stage_index": 0,
+      "stages": [
+        {
+          "key": "received",
+          "label": "Przyjęte"
+        },
+        {
+          "key": "diagnostics",
+          "label": "Diagnoza"
+        },
+        {
+          "key": "quote",
+          "label": "Wycena"
+        },
+        {
+          "key": "repair",
+          "label": "Naprawa"
+        },
+        {
+          "key": "done",
+          "label": "Gotowe do odbioru"
+        }
+      ],
+      "is_interrupted": false,
+      "is_finished": false,
+      "device": {
+        "name": "Galaxy S23",
+        "brand": "Samsung",
+        "category": "Telefon"
+      },
+      "problem_description": "Pęknięty ekran po upadku.",
+      "created_at": "2026-11-14T13:47:59.044054+00:00",
+      "accepted_at": null,
+      "estimated_completion_date": null,
+      "estimated_duration": null,
+      "ready_for_pickup_at": null,
+      "picked_up_at": null,
+      "completed_at": null,
+      "delivery_method": "Osobiście w serwisie",
+      "return_method": "Odbiór osobisty",
+      "cost": null,
+      "history": [
+        {
+          "status": "Zgłoszenie przyjęte",
+          "status_code": "new",
+          "at": "2026-11-14T13:47:59.044054+00:00"
+        }
+      ],
+      "service": {
+        "name": "PRO-KOM Tadeusz Wójciak",
+        "address": "34-700 Rabka-Zdrój, ul. Orkana 16B",
+        "phone": "883-200-151",
+        "email": "serwisprokomrabka@gmail.com",
+        "hours": "Pn–Pt 9:00–17:00 · Sob 9:00–13:00",
+        "website": "www.prokomserwis.pl"
+      }
+    }
+  }
+}

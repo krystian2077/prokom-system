@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/repairs/track/?ref=",
+    "body": null
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "detail": "Podaj numer zgłoszenia (ref) i ostatnie 4 cyfry numeru telefonu."
+    }
+  }
+}

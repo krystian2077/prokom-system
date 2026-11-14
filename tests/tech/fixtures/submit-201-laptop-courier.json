@@ -1,0 +1,39 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/repairs/submit/",
+    "body": {
+      "client": {
+        "first_name": "Jan",
+        "last_name": "Testowy",
+        "email": "jan.testowy@example.com",
+        "phone": "+48 500 100 234",
+        "preferred_contact": "phone"
+      },
+      "device": {
+        "category": "laptop",
+        "brand_name": "Lenovo",
+        "model_name": "ThinkPad T14",
+        "problem_description": "Nie ładuje się bateria.",
+        "device_turns_on": null
+      },
+      "delivery_method": "courier",
+      "return_method": "courier",
+      "hammer_glass_interest": "ask_later",
+      "requires_data_backup": false,
+      "additional_notes": "",
+      "delivery_street": "ul. Przykładowa",
+      "delivery_house_number": "1",
+      "delivery_city": "Nowy Targ",
+      "delivery_postal_code": "34-400"
+    }
+  },
+  "response": {
+    "status": 201,
+    "body": {
+      "repair_number": "PROKOM/RMA/3/2026",
+      "message": "Zgłoszenie zostało przyjęte. Skontaktujemy się w celu potwierdzenia lub po diagnozie. Na podany e-mail wysłaliśmy link do śledzenia statusu i przypisania naprawy do konta.",
+      "tracking_url": "/track?ref=PROKOM/RMA/3/2026"
+    }
+  }
+}

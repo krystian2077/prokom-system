@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/communications/inquiry/",
+    "body": {
+      "message": "Pytanie bez e-maila."
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "detail": "Pola e-mail i pytanie sa wymagane."
+    }
+  }
+}
