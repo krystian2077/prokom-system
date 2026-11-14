@@ -4,7 +4,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Teraz
 - **Produkcja:** Hetzner (CX23, Helsinki), `docker-compose.prod.yml` z własnym Nginx i certbotem, obrazy budowane na serwerze. Ostatnia zmiana kodu: 04.10.2026 (ffdcc5f).
-- **W toku:** **TM+** (prompt w `docs/zadania/tech.md`). Etap A: A1–A2 ✔ (brak MX, DNSSEC wyłączony), A3 ✔ 14.11 — strefa w Seohost założona i sprawdzona na `dns1/dns2.microhost.pl`. Następny: A4 (zmiana serwerów DNS w cyber_Folks).
+- **W toku:** **TM+** etap A: A1–A3 ✔, **A4 w toku** (14.11 16:11 rejestr NASK ma `dns1/dns2.microhost.pl`, czekamy na publikację strefy `.pl` i resolwery). Potem kilka godzin obserwacji i A5 (transfer).
 - **Następny krok:** A4 — Krystian zmienia serwery DNS w cyber_Folks na `dns1.microhost.pl`, `dns2.microhost.pl` → kontrola propagacji, strony, `/panel`, logowania klienta → po kilku godzinach A5 (transfer). Równolegle przed etapem C: `chmod 600` dla `.env.prod` na Hetznerze, ręczny `pg_dump`, `SERWIS_PRINT_HOURS` z sobotą do 14:00.
 
 ## Pilne
@@ -40,6 +40,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
 - [Krystian] **Zakopane — została tylko pinezka:** ul. Stanisława Staszica 8 (centrum, przy ul. Weteranów Wojny i parku miejskim; powiat tatrzański), tel. 18 541 20 15, pn–pt 10:00–16:30, sob–nd zamknięte, ploter Hammer Glass jest, odbiór w innym punkcie można. Współrzędne w SPEC są przybliżone (centrum miasta: 49.2990, 19.9489) — przed `published: true` wziąć dokładne z pinezki w Mapach Google. Opis położenia przyda się na stronę lokalną Zakopanego (TD4).
 - [Krystian] **abonent domeny prokomserwis.pl:** decyzja 14.11 — transfer do Seohost jako osoba prywatna, potem w Seohost zmiana abonenta na PRO-KOM Tadeusz Wójciak (NIP). Dopisać do listy kontrolnej TM+ etap A5 (po transferze: zmiana abonenta, auto-odnawianie, rezygnacja z usług w cyber_Folks). Domena wygasa 28.04.2027.
+- [TM, etap C] Backend **nie ma `/api/health/`** (404 na produkcji, 14.11). `smoke.sh` i healthchecki w compose muszą sprawdzać istniejące adresy (np. `/`, `/panel/login`, `/api/v1/repairs/track/` → 400 bez parametrów, `/admin/login/`), a nie `/api/health/`.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
