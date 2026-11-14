@@ -84,7 +84,7 @@ Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 **T−48 h:** TTL rekordów A dla `@` i `www` na 300 s **w strefie Seohost** (AAAA nie ma). Komunikat dla serwisu: „W niedzielę wieczorem przerwa techniczna strony i panelu, w poniedziałek od rana wszystko działa”.
 **T−0 (np. 18:00):**
 1. Stary serwer: strona techniczna 503 dla całego ruchu (tymczasowa konfiguracja Nginx na Hetznerze z prostą stroną „Przerwa techniczna, wracamy wkrótce. Pilne: 883 200 151”). Od tej chwili nie powstają nowe dane.
-2. Stary serwer: `docker compose stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu).
+2. Stary serwer: `docker compose --env-file .env.prod -f docker-compose.prod.yml stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu). **Na Hetznerze zawsze z `--env-file .env.prod`** — bez tego compose podstawia puste hasła i odtwarza `db`/`redis` (incydent 14.11.2026, 12 min bez API).
 3. Zrzut końcowy: `pg_dump -Fc` + `tar` mediów → sumy kontrolne (`sha256sum`) → przeniesienie na VPS → porównanie sum.
 4. VPS: odtworzenie do **pustej** bazy stosu prod (bez anonimizacji), media do wolumenu, start stosu prod z `<sha>` = commit z Hetznera. `migrate` nie powinien mieć nic do zrobienia (ten sam commit). Jeśli ma — **stop i decyzja**.
 5. Test przed DNS: `curl --resolve prokomserwis.pl:443:194.28.50.70 …` i plik `hosts` na komputerze Krystiana: strona, logowanie do panelu, lista napraw, szczegóły naprawy z załącznikami, PDF, panel admina, konto klienta.
@@ -97,7 +97,7 @@ Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 
 ## 9. Powrót (gdy coś nie działa i nie da się naprawić w 30 minut)
 1. DNS z powrotem na IP Hetznera (TTL 300 s, więc szybko) i przywrócenie AAAA, jeśli był.
-2. Na Hetznerze: zdjęcie strony 503, `docker compose start` backend, frontend, celery, celery-beat.
+2. Na Hetznerze: zdjęcie strony 503, `docker compose --env-file .env.prod -f docker-compose.prod.yml start backend frontend celery celery-beat`, potem **`docker compose --env-file .env.prod -f docker-compose.prod.yml exec nginx nginx -s reload`** — Nginx Hetznera pamięta IP kontenerów z chwili startu; po starcie/odtworzeniu backendu bez przeładowania zwraca 502 (incydent 14.11.2026). Sprawdzenie: `curl -s -o /dev/null -w '%{http_code}' https://prokomserwis.pl/api/v1/repairs/track/` = 400.
 3. Dane, które powstały na VPS po przełączeniu (zwykle zero w niedzielę wieczorem), trzeba przenieść ręcznie. Lista z logów i panelu.
 4. Wpis w STAN: co zawiodło. Nowy termin.
 

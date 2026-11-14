@@ -47,6 +47,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14.11.2026 18:16–18:28 UTC — **incydent na Hetznerze**: komenda compose bez `--env-file .env.prod` (przy zmianie `SERWIS_PRINT_HOURS`) odtworzyła `db`/`redis` z pustą konfiguracją, a po naprawie Nginx trzymał stare IP backendu → API i panel 502 przez ok. 12 min. Naprawa: `up -d` z `--env-file` + `nginx -s reload`. Danych nie stracono. Wnioski w `INWENTARZ.md` B2 i MIGRACJA §8–§9. Kopia produkcji: `prokom-tech-import-20261114T181620Z.tar` (sha256 `034b69cb…`), `.env.prod` ma już 600.
 - 14.11.2026 — stan DNS „przed” z panelu cyber_Folks w `docs/tech/DNS-PROKOMSERWIS.md` (A przez „Przekierowanie IP”, abonent prywatny).
 - 14.11.2026 — Zakopane od szefa: godziny pn–pt 10:00–16:30, ploter Hammer Glass jest, można oddać w jednym punkcie i odebrać w drugim (KONTRAKT §2: linia „Punkt odbioru”).
 - 14.11.2026 — punkt Zakopane: ul. Stanisława Staszica 8, 34-500 Zakopane, tel. 18 541 20 15 (SPEC §5).
