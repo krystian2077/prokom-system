@@ -34,7 +34,7 @@ export default function NotFound() {
               </div>
               <p className="t-bhero__lead">
                 Potrzebujesz pomocy? Zadzwoń:{" "}
-                <a href={telHref(line.phone)} className="t-bhero__tel" data-track="telefon_klik" data-track-miejsce="404">
+                <a href={telHref(line.phone)} className="t-bhero__tel" data-t-inline="" data-track="telefon_klik" data-track-miejsce="404">
                   {line.phoneDisplay}
                 </a>
               </p>

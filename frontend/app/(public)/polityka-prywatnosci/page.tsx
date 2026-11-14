@@ -35,10 +35,10 @@ export default function PrivacyPolicyPage() {
           <br />
           woj. małopolskie, Polska
           <br />
-          tel.: <a href={telHref(line.phone)}>{line.phoneDisplay}</a>
+          tel.: <a data-t-inline="" href={telHref(line.phone)}>{line.phoneDisplay}</a>
           <br />
           e-mail:{" "}
-          <a href={`mailto:${line.email}`}>
+          <a data-t-inline="" href={`mailto:${line.email}`}>
             {line.email}
           </a>
         </p>
@@ -269,7 +269,7 @@ export default function PrivacyPolicyPage() {
         </ul>
         <p>
           Aby skorzystać z powyższych praw, skontaktuj się z nami pod adresem{" "}
-          <a href={`mailto:${line.email}`}>
+          <a data-t-inline="" href={`mailto:${line.email}`}>
             {line.email}
           </a>
           . Odpowiemy bez zbędnej zwłoki, nie później niż w ciągu 30 dni.
@@ -277,7 +277,7 @@ export default function PrivacyPolicyPage() {
         <p>
           Masz również prawo wniesienia skargi do organu nadzorczego –{" "}
           <strong>Prezesa Urzędu Ochrony Danych Osobowych</strong> (PUODO), ul.
-          Stawki 2, 00-193 Warszawa, <a href="https://uodo.gov.pl" target="_blank" rel="noopener noreferrer">uodo.gov.pl</a>.
+          Stawki 2, 00-193 Warszawa, <a data-t-inline="" href="https://uodo.gov.pl" target="_blank" rel="noopener noreferrer">uodo.gov.pl</a>.
         </p>
       </Section>
 
@@ -360,7 +360,7 @@ export default function PrivacyPolicyPage() {
           zbieramy świadomie danych osobowych dzieci. Jeśli uważasz, że dane
           dziecka poniżej 16 lat zostały nam przekazane bez zgody rodzica lub
           opiekuna prawnego, prosimy o niezwłoczny kontakt na adres{" "}
-          <a href={`mailto:${line.email}`}>
+          <a data-t-inline="" href={`mailto:${line.email}`}>
             {line.email}
           </a>
           , a dane zostaną usunięte.

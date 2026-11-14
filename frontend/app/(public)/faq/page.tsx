@@ -105,7 +105,7 @@ export default function FaqPage() {
             </h1>
             <p className="t-bhero__lead">
               Nie ma tu Twojego pytania? Zadzwoń:{" "}
-              <a href={telHref(line.phone)} data-track="telefon_klik" data-track-miejsce="faq" className="t-bhero__tel">
+              <a href={telHref(line.phone)} data-track="telefon_klik" data-track-miejsce="faq" className="t-bhero__tel" data-t-inline="">
                 {line.phoneDisplay}
               </a>
             </p>

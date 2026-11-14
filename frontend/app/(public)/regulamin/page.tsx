@@ -28,11 +28,11 @@ export default function TermsPage() {
         <ul>
           <Li>
             <strong>Usługodawca / Serwis</strong> – PRO-KOM Serwis, {company.hq.street}, {company.hq.postal} {company.hq.city}; tel.{" "}
-            <a href={telHref(line.phone)}>
+            <a data-t-inline="" href={telHref(line.phone)}>
               {line.phoneDisplay}
             </a>
             ; e-mail:{" "}
-            <a
+            <a data-t-inline=""
               href={`mailto:${line.email}`}
             >
               {line.email}
@@ -303,7 +303,7 @@ export default function TermsPage() {
           </li>
           <li>
             Reklamacje gwarancyjne należy zgłaszać na adres e-mail{" "}
-            <a
+            <a data-t-inline=""
               href={`mailto:${line.email}`}
             >
               {line.email}
@@ -326,7 +326,7 @@ export default function TermsPage() {
             <ul>
               <Li>
                 elektronicznie na adres{" "}
-                <a
+                <a data-t-inline=""
                   href={`mailto:${line.email}`}
                 >
                   {line.email}
@@ -351,7 +351,7 @@ export default function TermsPage() {
             Konsument może skorzystać z pozasądowych metod rozwiązywania
             sporów, w szczególności z platformy ODR Komisji Europejskiej
             dostępnej pod adresem{" "}
-            <a
+            <a data-t-inline=""
               href="https://ec.europa.eu/consumers/odr"
               target="_blank"
               rel="noopener noreferrer"
@@ -426,7 +426,7 @@ export default function TermsPage() {
           <li>
             Klient może w każdym czasie usunąć swoje konto, wysyłając stosowną
             prośbę na adres{" "}
-            <a
+            <a data-t-inline=""
               href={`mailto:${line.email}`}
             >
               {line.email}
@@ -480,7 +480,7 @@ export default function TermsPage() {
         <p>
           Zasady przetwarzania danych osobowych przez Usługodawcę określa
           Polityka prywatności dostępna pod adresem{" "}
-          <a
+          <a data-t-inline=""
             href="/polityka-prywatnosci"
           >
             pro-kom.eu/polityka-prywatnosci

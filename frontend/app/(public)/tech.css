@@ -1970,7 +1970,7 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 .tech .t-bhero__lead--wide { max-width: 860px; }
 .tech .t-bhero__tel { font-weight: 800; color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .tech .t-bhero__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 13.5px; font-weight: 700; color: #b9aeac; }
-.tech .t-bhero__cat { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 999px; background: rgba(226, 72, 58, 0.18); color: #f29185; font-weight: 800; }
+.tech .t-bhero__cat { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; background: rgba(226, 72, 58, 0.18); color: #f29185; font-weight: 800; }
 
 /* Blog: categories, cards, search */
 .tech .t-bcats ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; }
