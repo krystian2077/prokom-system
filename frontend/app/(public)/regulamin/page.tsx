@@ -1,44 +1,20 @@
-﻿export const metadata = {
-  title: "Regulamin | PRO-KOM Serwis",
-  description:
-    "Regulamin świadczenia usług serwisowych i sprzedaży akcesoriów przez PRO-KOM Serwis w Rabce-Zdroju.",
-};
+import { company, line, telHref } from "@/config/prokom";
+import { LegalDoc, Li, Ol, Section } from "@/components/tech/legal/LegalDoc";
+import { pageMetadata } from "@/lib/tech/seo";
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+// Legal text kept word for word (TD5 PR 2); only the skin and contact data from config/prokom.ts.
+// TODO(krystian): hosting and domain wording after the VPS migration (webh.pl, Polska) —
+// to accept with the lawyer (SPEC §10); see the PR description.
+export const metadata = pageMetadata({
+  title: "Regulamin świadczenia usług serwisowych",
+  description: "Regulamin świadczenia usług serwisowych PRO-KOM Tech: zgłoszenie naprawy, diagnoza i wycena, realizacja, odbiór sprzętu, gwarancja i reklamacje.",
+  path: "/regulamin",
+});
+
+export default function TermsPage() {
   return (
-    <section className="mt-6 rounded-2xl bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:mt-10 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
-      <h2 className="text-base font-bold text-prokom-black lg:text-lg">{title}</h2>
-      <div className="mt-3 space-y-3 text-sm leading-relaxed text-prokom-gray">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function Li({ children }: { children: React.ReactNode }) {
-  return <li className="ml-4 list-disc">{children}</li>;
-}
-
-function Ol({ children }: { children: React.ReactNode }) {
-  return <ol className="ml-4 list-decimal space-y-1.5">{children}</ol>;
-}
-
-export default function RegulaminPage() {
-  return (
-    <div className="mx-auto max-w-3xl px-5 py-8 sm:px-6 lg:px-4 lg:py-12">
-      <h1 className="text-2xl font-bold text-prokom-black lg:text-3xl">
-        Regulamin świadczenia usług
-      </h1>
-      <p className="mt-2 text-sm text-prokom-gray">
-        Wersja obowiązująca od: <strong>25 kwietnia 2026 r.</strong>
-      </p>
-      <p className="mt-4 text-sm leading-relaxed text-prokom-gray">
+    <LegalDoc title="Regulamin świadczenia usług" path="/regulamin" version="25 kwietnia 2026 r.">
+      <p>
         Niniejszy Regulamin określa zasady korzystania z serwisu internetowego
         dostępnego pod adresem <strong>pro-kom.eu</strong> oraz warunki
         świadczenia usług serwisowych i sprzedaży akcesoriów przez PRO-KOM
@@ -49,19 +25,17 @@ export default function RegulaminPage() {
       {/* § 1 */}
       <Section title="§ 1. Definicje">
         <p>Użyte w Regulaminie pojęcia oznaczają:</p>
-        <ul className="space-y-1.5">
+        <ul>
           <Li>
-            <strong>Usługodawca / Serwis</strong> – PRO-KOM Serwis, ul. Orkana
-            16B, 34-700 Rabka-Zdrój; tel.{" "}
-            <a href="tel:883200151" className="text-primary hover:underline">
-              883 200 151
+            <strong>Usługodawca / Serwis</strong> – PRO-KOM Serwis, {company.hq.street}, {company.hq.postal} {company.hq.city}; tel.{" "}
+            <a data-t-inline="" href={telHref(line.phone)}>
+              {line.phoneDisplay}
             </a>
             ; e-mail:{" "}
-            <a
-              href="mailto:sklep@pro-kom.eu"
-              className="text-primary hover:underline"
+            <a data-t-inline=""
+              href={`mailto:${line.email}`}
             >
-              sklep@pro-kom.eu
+              {line.email}
             </a>
             .
           </Li>
@@ -126,7 +100,7 @@ export default function RegulaminPage() {
       {/* § 3 */}
       <Section title="§ 3. Zakres świadczonych usług">
         <p>PRO-KOM Serwis świadczy następujące usługi:</p>
-        <ul className="space-y-1">
+        <ul>
           <Li>naprawa telefonów komórkowych i smartfonów</Li>
           <Li>naprawa laptopów i notebooków</Li>
           <Li>naprawa tabletów</Li>
@@ -162,7 +136,7 @@ export default function RegulaminPage() {
           </li>
           <li>
             Klient zobowiązany jest do:
-            <ul className="mt-1 space-y-1">
+            <ul>
               <Li>podania danych kontaktowych niezbędnych do realizacji usługi</Li>
               <Li>
                 wykonania kopii zapasowej danych przed oddaniem urządzenia –
@@ -256,7 +230,7 @@ export default function RegulaminPage() {
           </li>
           <li>
             Akceptowane formy płatności:
-            <ul className="mt-1 space-y-1">
+            <ul>
               <Li>gotówka (przy odbiorze w siedzibie serwisu)</Li>
               <Li>przelew bankowy na rachunek wskazany w wycenie</Li>
               <Li>płatność kartą (terminal w siedzibie serwisu)</Li>
@@ -315,7 +289,7 @@ export default function RegulaminPage() {
           </li>
           <li>
             Gwarancja nie obejmuje:
-            <ul className="mt-1 space-y-1">
+            <ul>
               <Li>uszkodzeń mechanicznych, zalania lub zwarcia powstałych po naprawie</Li>
               <Li>
                 uszkodzeń wynikłych z nieprawidłowego użytkowania urządzenia po
@@ -329,11 +303,10 @@ export default function RegulaminPage() {
           </li>
           <li>
             Reklamacje gwarancyjne należy zgłaszać na adres e-mail{" "}
-            <a
-              href="mailto:sklep@pro-kom.eu"
-              className="text-primary hover:underline"
+            <a data-t-inline=""
+              href={`mailto:${line.email}`}
             >
-              sklep@pro-kom.eu
+              {line.email}
             </a>{" "}
             lub osobiście w siedzibie serwisu.
           </li>
@@ -350,19 +323,18 @@ export default function RegulaminPage() {
           </li>
           <li>
             Reklamację można złożyć:
-            <ul className="mt-1 space-y-1">
+            <ul>
               <Li>
                 elektronicznie na adres{" "}
-                <a
-                  href="mailto:sklep@pro-kom.eu"
-                  className="text-primary hover:underline"
+                <a data-t-inline=""
+                  href={`mailto:${line.email}`}
                 >
-                  sklep@pro-kom.eu
+                  {line.email}
                 </a>
               </Li>
               <Li>za pomocą formularza reklamacyjnego dostępnego pod adresem pro-kom.eu/claim-repair</Li>
               <Li>osobiście w siedzibie serwisu</Li>
-              <Li>pisemnie na adres: ul. Orkana 16B, 34-700 Rabka-Zdrój</Li>
+              <Li>pisemnie na adres: {company.hq.street}, {company.hq.postal} {company.hq.city}</Li>
             </ul>
           </li>
           <li>
@@ -379,9 +351,8 @@ export default function RegulaminPage() {
             Konsument może skorzystać z pozasądowych metod rozwiązywania
             sporów, w szczególności z platformy ODR Komisji Europejskiej
             dostępnej pod adresem{" "}
-            <a
+            <a data-t-inline=""
               href="https://ec.europa.eu/consumers/odr"
-              className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -455,11 +426,10 @@ export default function RegulaminPage() {
           <li>
             Klient może w każdym czasie usunąć swoje konto, wysyłając stosowną
             prośbę na adres{" "}
-            <a
-              href="mailto:sklep@pro-kom.eu"
-              className="text-primary hover:underline"
+            <a data-t-inline=""
+              href={`mailto:${line.email}`}
             >
-              sklep@pro-kom.eu
+              {line.email}
             </a>
             . Usunięcie konta nie wpływa na przechowywanie danych wymaganych
             przez przepisy prawa (np. dokumentacja napraw, dane podatkowe).
@@ -477,7 +447,7 @@ export default function RegulaminPage() {
           </li>
           <li>
             Usługodawca nie ponosi odpowiedzialności za:
-            <ul className="mt-1 space-y-1">
+            <ul>
               <Li>
                 utratę danych przechowywanych na urządzeniu – Klient
                 zobowiązany jest do wykonania kopii zapasowej przed oddaniem
@@ -510,9 +480,8 @@ export default function RegulaminPage() {
         <p>
           Zasady przetwarzania danych osobowych przez Usługodawcę określa
           Polityka prywatności dostępna pod adresem{" "}
-          <a
+          <a data-t-inline=""
             href="/polityka-prywatnosci"
-            className="text-primary hover:underline"
           >
             pro-kom.eu/polityka-prywatnosci
           </a>
@@ -554,9 +523,7 @@ export default function RegulaminPage() {
         </Ol>
       </Section>
 
-      <div className="mt-8 border-t border-gray-100 pt-5 text-xs text-gray-400 lg:mt-12 lg:pt-6">
-        Data ostatniej aktualizacji: 25 kwietnia 2026 r.
-      </div>
-    </div>
+      <p className="t-legal-doc__updated">Data ostatniej aktualizacji: 25 kwietnia 2026 r.</p>
+    </LegalDoc>
   );
 }

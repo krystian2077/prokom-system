@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { servicePoints, type ServicePoint } from "@/config/prokom";
 import { BLOG_POSTS } from "@/lib/blog-posts";
+import { BLOG_CATEGORIES } from "./blog-taxonomy";
 import { publishedLocalPages } from "./local-pages";
 import { SITE_URL } from "@/lib/site-config";
 
@@ -51,5 +52,12 @@ export function buildSitemap(now: Date = new Date(), points: ServicePoint[] = se
     changeFrequency: "monthly",
     priority: 0.7,
   }));
-  return [...pages, ...locals, ...blog];
+  // Blog categories (SPEC §12.11, TD5 PR 2).
+  const blogCategories: MetadataRoute.Sitemap = BLOG_CATEGORIES.map((c) => ({
+    url: url(`/blog/kategoria/${c.slug}`),
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+  return [...pages, ...locals, ...blog, ...blogCategories];
 }
