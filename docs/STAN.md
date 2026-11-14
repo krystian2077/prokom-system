@@ -38,6 +38,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [SZEF/serwis] treść sekcji „Twoje dane są bezpieczne” (SPEC §12.9) — do tego czasu sekcja ukryta flagą.
 - [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
 - [Krystian] wstępy 4 kategorii bloga i przypisanie wpisów (SPEC §12.11).
+- [SZEF/Krystian] **Zakopane:** adres znany (ul. Stanisława Staszica 8, 34-500; salon i serwis). Brakuje: który telefon jest właściwy (18 541 20 15 czy 18 341 20 15), godziny, współrzędne, ploter Hammer Glass, oddanie w jednym punkcie i odbiór w drugim. Do tego czasu `published: false`.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
@@ -45,6 +46,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 14.11.2026 — adres punktu Zakopane: ul. Stanisława Staszica 8, 34-500 Zakopane (SPEC §5).
 - 14.11.2026 — SPEC §12.10 (naprawa wysyłkowa) i §12.11 (kategorie bloga), plan ≈ 21,25 wieczoru, **zakres zamknięty**. Liczby bloga przeliczone: 49 obiektów / 48 wpisów.
 - 14.11.2026 — SPEC §12.5–§12.9 (Umami, „Moje naprawy”, ekran sukcesu z QR, nawigacja, komunikat i sekcja zaufania), plan ≈ 20,25 wieczoru. Sobota w Rabce: 9:00–14:00.
 - 14.11.2026 — SPEC 1.0 z dodatkami §12 (status godzin, PWA, poradnik, strony napraw) i plan sesji z TD5 PR 3 i TD5b (≈ 19,25 wieczoru). W SPEC dopisane uwagi z T0 (ScopeBar/LiveBadge i PublicNavbar/Footer zostają).
