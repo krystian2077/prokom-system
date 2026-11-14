@@ -13,6 +13,36 @@ import { ThemeSegmented } from "./ThemeToggle";
 
 const TITLES: Record<SheetMode, string> = { menu: "Menu", naprawy: "Naprawy", szukaj: "Szukaj" };
 const CLOSE_DRAG_PX = 110;
+/** A quick flick closes too (px per ms). */
+const CLOSE_FLICK_V = 0.6;
+
+/** iOS card: the page behind shrinks around the middle of the viewport (PREMIUM §3). */
+function shrinkPage(on: boolean) {
+  const root = document.querySelector<HTMLElement>(".tech");
+  if (!root) return;
+  const parts = root.querySelectorAll<HTMLElement>('.t-header, .t-main, [data-t-region="footer"]');
+  if (on) {
+    const mid = window.scrollY + window.innerHeight / 2;
+    parts.forEach((el) => {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      el.style.transformOrigin = `50% ${Math.round(mid - top)}px`;
+    });
+  }
+  root.classList.toggle("t-sheet-open", on);
+}
+
+/** Lock background scroll without the layout jump of a disappearing scrollbar. */
+function lockScroll(): () => void {
+  const body = document.body;
+  const prev = { overflow: body.style.overflow, paddingRight: body.style.paddingRight };
+  const bar = window.innerWidth - document.documentElement.clientWidth;
+  body.style.overflow = "hidden";
+  if (bar > 0) body.style.paddingRight = `${bar}px`;
+  return () => {
+    body.style.overflow = prev.overflow;
+    body.style.paddingRight = prev.paddingRight;
+  };
+}
 
 /** All site links for the search sheet (unique by href). */
 function searchIndex() {
@@ -29,9 +59,9 @@ function searchIndex() {
 const norm = (s: string) => s.toLocaleLowerCase("pl").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
 
 /**
- * Bottom sheet (RESPONSYWNOSC §2): menu, repairs mega menu and search. Handle and drag
- * down to close, Esc, close button, background scroll lock, focus trap, focus returns
- * to the opener.
+ * Bottom sheet (RESPONSYWNOSC §2, PREMIUM §3): menu, repairs mega menu and search.
+ * iOS card (page behind shrinks), drag down or flick to close, Esc, close button,
+ * staggered items, scroll lock without a jump, focus trap, focus returns to the opener.
  */
 export function MenuSheet() {
   const { sheet, closeSheet, opener, points } = useShell();
@@ -39,7 +69,7 @@ export function MenuSheet() {
   const panelRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState(0);
-  const dragStart = useRef<number | null>(null);
+  const dragStart = useRef<{ y: number; t: number } | null>(null);
   const [query, setQuery] = useState("");
   const index = useMemo(searchIndex, []);
   const results = useMemo(() => (query.trim() ? index.filter((x) => norm(x.label).includes(norm(query.trim()))) : index.slice(0, 8)), [index, query]);
@@ -57,8 +87,8 @@ export function MenuSheet() {
   useEffect(() => {
     if (!sheet) return;
     setQuery("");
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlock = lockScroll();
+    shrinkPage(true);
     const panel = panelRef.current;
     const focusables = () =>
       Array.from(panel?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])') ?? []).filter((el) => el.offsetParent !== null);
@@ -86,24 +116,27 @@ export function MenuSheet() {
     };
     document.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = prevOverflow;
+      unlock();
+      shrinkPage(false);
       document.removeEventListener("keydown", onKey);
       opener?.focus?.();
     };
   }, [sheet, closeSheet, opener]);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    dragStart.current = e.clientY;
+    if ((e.target as Element).closest("button")) return;
+    dragStart.current = { y: e.clientY, t: performance.now() };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (dragStart.current === null) return;
-    setDrag(Math.max(0, e.clientY - dragStart.current));
+    setDrag(Math.max(0, e.clientY - dragStart.current.y));
   };
   const onPointerUp = () => {
     if (dragStart.current === null) return;
+    const v = drag / Math.max(1, performance.now() - dragStart.current.t);
     dragStart.current = null;
-    if (drag > CLOSE_DRAG_PX) closeSheet();
+    if (drag > CLOSE_DRAG_PX || (drag > 40 && v > CLOSE_FLICK_V)) closeSheet();
     setDrag(0);
   };
 
@@ -111,7 +144,7 @@ export function MenuSheet() {
   const mode = sheet ?? "menu";
 
   return (
-    <div ref={rootRef} className={`t-sheet${open ? " is-open" : ""}`} aria-hidden={!open}>
+    <div ref={rootRef} className={`t-sheet${open ? " is-open" : ""}${drag ? " is-dragging" : ""}`} aria-hidden={!open}>
       <div className="t-sheet__scrim" onClick={closeSheet} />
       <div
         ref={panelRef}
@@ -119,7 +152,7 @@ export function MenuSheet() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="t-sheet-title"
-        style={drag ? { transform: `translateY(${drag}px)`, transition: "none" } : undefined}
+        style={drag ? { transform: `translateY(${drag}px)` } : undefined}
       >
         <div className="t-sheet__grab" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
           <span className="t-sheet__handle" aria-hidden="true" />

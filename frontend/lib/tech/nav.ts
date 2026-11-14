@@ -95,3 +95,19 @@ export function isActive(item: { match: string[] }, pathname: string): boolean {
 export function directionsUrl(geo: { lat: number; lng: number }): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${geo.lat},${geo.lng}`;
 }
+
+export type Pt = { x: number; y: number };
+const side = (p1: Pt, p2: Pt, p3: Pt) => (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+/**
+ * Mega-menu safe triangle (PREMIUM §3): is `p` inside the triangle a–b–c, where `a` is
+ * where the pointer left the open trigger and b, c are the top corners of the open panel?
+ * Then the pointer is on its way into the panel and must not switch menus.
+ */
+export function inTriangle(p: Pt, a: Pt, b: Pt, c: Pt): boolean {
+  const d1 = side(p, a, b);
+  const d2 = side(p, b, c);
+  const d3 = side(p, c, a);
+  const neg = d1 < 0 || d2 < 0 || d3 < 0;
+  const pos = d1 > 0 || d2 > 0 || d3 > 0;
+  return !(neg && pos);
+}
