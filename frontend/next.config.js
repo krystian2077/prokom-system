@@ -26,7 +26,9 @@ const nextConfig = {
   transpilePackages: ["framer-motion"],
   async redirects() {
     return [
-      { source: "/serwis-telefonow", destination: "/uslugi", permanent: true },
+      // TD4: removed shop pages (SPEC §6). /serwis-telefonow is a real page now.
+      { source: "/akcesoria", destination: "/hammer-glass", permanent: true },
+      { source: "/oferta", destination: "/", permanent: true },
       {
         source: "/panel/podglad/:path*",
         destination: "/panel/naprawy/:path*",
