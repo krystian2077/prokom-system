@@ -1,0 +1,49 @@
+# prokom-tech staging — overlay on compose.vps.yml (see the header there).
+#   docker compose --env-file .env.staging -f compose.vps.yml -f compose.staging.yml up -d
+# Differences from production:
+#   - NO celery / celery-beat: a copy of the production database must never send a scheduled mail
+#     or reminder to a real customer (MIGRACJA-VPS §6); the database is anonymized anyway.
+#   - its own env file, fixed here (!override), so a missing line can never hand staging the
+#     production secrets;
+#   - its own frontend image (NEXT_PUBLIC_* for staging.prokomserwis.pl) and smaller limits.
+# Redis stays: the public repair form enqueues a Celery task and hangs without a broker (LOKALNIE.md);
+# tasks just wait in the queue, nobody runs them.
+
+name: prokom-tech-staging
+
+services:
+  db:
+    environment:
+      POSTGRES_DB: prokom_tech_staging
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          memory: 96m
+
+  backend:
+    env_file: !override .env.staging
+    environment:
+      GUNICORN_CMD_ARGS: '--workers=2 --threads=2'
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  frontend:
+    image: ghcr.io/krystian2077/prokom-tech-frontend-staging:${APP_IMAGE_TAG:?set APP_IMAGE_TAG (full commit SHA)}
+    deploy:
+      resources:
+        limits:
+          memory: 320m
+
+  gateway:
+    deploy:
+      resources:
+        limits:
+          memory: 64m
