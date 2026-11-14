@@ -16,6 +16,7 @@ import {
   emptyRepairForm,
   firstErrorField,
   parseWizardParams,
+  phoneLast4,
   validateRepairForm,
   validateStep,
   type FieldErrors,
@@ -34,6 +35,7 @@ import { DeviceGlyph, IconArrow, IconCheck, IconChevronDown, IconUser } from "./
 import { OpeningStatus } from "./OpeningStatus";
 import { PrepChecklist } from "./PrepChecklist";
 import { useShell } from "./ShellContext";
+import { RememberRepair } from "./RememberRepair";
 import { SuccessCard } from "./SuccessCard";
 
 /** Hammer Glass films exist for these devices (SPEC §6 /hammer-glass). */
@@ -241,7 +243,14 @@ export function RepairForm() {
           point={point}
           courier={f.dropoff === "courier"}
           loggedIn={isClient}
-        />
+        >
+          <RememberRepair
+            repairNumber={done.response.repair_number}
+            last4={phoneLast4(f.phone)}
+            device={[f.brand.trim(), f.model.trim()].filter(Boolean).join(" ") || label || "Urządzenie"}
+            status="Zgłoszenie przyjęte"
+          />
+        </SuccessCard>
       </div>
     );
   }

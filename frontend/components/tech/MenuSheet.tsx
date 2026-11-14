@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { line, lines, telHref } from "@/config/prokom";
 import { ACCOUNT_HREF, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, footerColumns, mainNav, repairLinks } from "@/lib/tech/nav";
 import { DeviceGlyph, IconArrow, IconChevronRight, IconClose, IconSearch } from "./icons";
+import { MyRepairs } from "./MyRepairs";
 import { OpeningStatus } from "./OpeningStatus";
 import { useShell, type SheetMode } from "./ShellContext";
 import { ThemeSegmented } from "./ThemeToggle";
@@ -198,6 +199,7 @@ export function MenuSheet() {
                   Zadzwoń
                 </a>
               </div>
+              <MyRepairs compact />
               <span className="t-label">Linie PRO-KOM</span>
               <div className="t-sheet__lines">
                 {lines.map((l) => (
