@@ -75,3 +75,21 @@ Znany drobiazg starego formularza: w „Podglądzie zgłoszenia” pole „Urzą
 
 ## 6. Fixtures kontraktu
 `tests/tech/fixtures/*.json`: prawdziwe odpowiedzi lokalnego backendu na fikcyjnych danych (żądanie + status + treść), zebrane 14.11.2026 skryptem w Pythonie (httpx). Pokrywają: zgłoszenie 201 (telefon/punkt, laptop/kurier), każdy kształt błędu 400, `track` 200/400/404 i `inquiry` 200/400. Gdy backend się zmieni, zbierz je ponownie.
+
+## 7. Testy frontu i narzędzia wyglądu (od TD1)
+W `frontend/`:
+```bash
+npm run test          # Vitest: lib/tech/*.test.ts, tests/tech/*.test.ts (godziny, dane, literały, pomiar, JSON-LD)
+npm run lint          # ESLint tylko dla nowego kodu (panele w ignorePatterns, bez zmian w nich)
+npm run build
+npx playwright install chromium   # raz
+npx playwright test               # e2e: panele.spec.ts, responsywnosc.spec.ts
+```
+- Playwright sam uruchamia `next start` z **tego** checkoutu na porcie `TECH_PORT` (domyślnie **3002**; CORS w `local.py` przepuszcza 3000–3004). Nie podpina się pod serwer, który już działa na porcie — stary build dawałby fałszywe „zero różnic”. Port zajęty → ustaw inny wolny: `$env:TECH_PORT="3001"; npx playwright test`.
+- `panele.spec.ts` porównuje z bazowymi zrzutami z TD1 (`tests/tech/__zrzuty__/`, Windows — w CI nie działa). Ekran `/panel` po zalogowaniu wymaga backendu na 8000 i konta pracownika w `frontend/tests/tech/.panel-test.local.json` (`{"email": "...", "password": "..."}`, poza gitem; konto zakładasz jak w §4). Bez pliku ten test jest pomijany. Liczniki dashboardu zależą od danych w lokalnej bazie — po ich zmianie zrzuty `panel-dashboard-*` trzeba zrobić na nowo z czystego `develop` (`--update-snapshots`).
+- Zrzuty i porównanie ze wzorcem (z korzenia repo, przy działającym `next start -p 3002`):
+  ```bash
+  node scripts/tech/zrzuty.mjs --pages=/ --widths=360,390,768,1024,1440,1920
+  node scripts/tech/porownaj.mjs --page=/ --wzorzec=glowna --region=header
+  ```
+  Wynik w `tmp/zrzuty/index.html` i `tmp/porownaj/*.html` (poza gitem).

@@ -41,6 +41,16 @@ async function settle(page: Page) {
   await page.waitForTimeout(400);
 }
 
+// Panel tabs inherit the root default title — it must not change (SPEC §2).
+const PANEL_TITLE = "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój";
+
+test("tytuły stron paneli bez zmian", async ({ page }) => {
+  for (const url of ["/panel/login", "/admin-panel", "/client/login"]) {
+    await page.goto(url);
+    await expect(page, url).toHaveTitle(PANEL_TITLE);
+  }
+});
+
 for (const theme of THEMES) {
   test.describe(`panele — motyw ${theme}`, () => {
     test(`/panel/login (${theme})`, async ({ page }) => {

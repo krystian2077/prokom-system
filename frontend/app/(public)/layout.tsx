@@ -1,10 +1,70 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Archivo, Manrope } from "next/font/google";
 import { ConditionalPublicLayout } from "@/components/layout/ConditionalPublicLayout";
+import { line, servicePoints } from "@/config/prokom";
+import { jsonLdString, siteJsonLd } from "@/lib/tech/jsonld";
+import { publishedPoints } from "@/lib/tech/points";
+import { themeScript } from "@/lib/tech/theme";
+import { SITE_URL } from "@/lib/site-config";
+import "./tech.css";
 
-export default function PublicLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  return <ConditionalPublicLayout>{children}</ConditionalPublicLayout>;
+// Public-site fonts only (SPEC §3). Panels keep DM Sans / Unbounded from the root layout.
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+const manrope = Manrope({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const published = publishedPoints(servicePoints);
+const cities = published.map((p) => p.city).join(" i ");
+const defaultTitle = `Serwis telefonów i komputerów — ${cities} | ${line.name}`;
+const description =
+  published.length > 1
+    ? `${line.name} — serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek: ${cities}. Wycena przed naprawą, gwarancja i status naprawy online.`
+    : `${line.name} — serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju. Wycena przed naprawą, gwarancja i status naprawy online.`;
+
+// Public defaults live here, not in the root layout: most panel pages inherit the root
+// title, and the panels must stay unchanged (SPEC §2).
+export const metadata: Metadata = {
+  title: { default: defaultTitle, template: `%s | ${line.name}` },
+  description,
+  applicationName: line.name,
+  authors: [{ name: line.name, url: SITE_URL }],
+  creator: line.name,
+  publisher: line.name,
+  openGraph: {
+    type: "website",
+    locale: "pl_PL",
+    url: SITE_URL,
+    siteName: line.name,
+    title: defaultTitle,
+    description,
+    images: [{ url: "/images/og-prokom.jpg", width: 1200, height: 630, alt: line.name }],
+  },
+  twitter: { card: "summary_large_image", title: defaultTitle, description },
+};
+
+const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+// Served through the shared Nginx like prokom-web (SPEC §12.5).
+const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC || "/_s/script.js";
+
+export default function PublicLayout({ children }: { children: ReactNode }) {
+  return (
+    <>
+      {/* First element: sets data-tech-theme before anything paints (no flash). */}
+      <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd()) }} />
+      {umamiId ? <script defer src={umamiSrc} data-website-id={umamiId} data-tech-umami="" /> : null}
+      <div className={`tech ${archivo.variable} ${manrope.variable}`}>
+        <ConditionalPublicLayout>{children}</ConditionalPublicLayout>
+      </div>
+    </>
+  );
 }
