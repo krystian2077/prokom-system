@@ -58,3 +58,28 @@ export function faqJsonLd(items: FaqItem[]) {
     })),
   };
 }
+
+/** Service (repair pages, SPEC §9): provider = the published points' LocalBusiness nodes from the layout. */
+export function serviceJsonLd({
+  name,
+  serviceType,
+  path,
+  providers,
+  areaServed,
+}: {
+  name: string;
+  serviceType: string;
+  path: string;
+  providers: string[];
+  areaServed: string[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name,
+    serviceType,
+    url: `${SITE_URL}${path}`,
+    provider: providers.map((key) => ({ "@id": `${SITE_URL}/#punkt-${key}` })),
+    areaServed: areaServed.map((n) => ({ "@type": "City", name: n })),
+  };
+}
