@@ -72,7 +72,11 @@ export default function ContactPage() {
                 </span>
                 <span className="t-ct-tile__txt">
                   <span>E-mail</span>
-                  <b>{line.email}</b>
+                  {/* break only after "@" on narrow phones, never inside the domain */}
+                  <b>
+                    {line.email.split("@")[0]}@<wbr />
+                    {line.email.split("@")[1]}
+                  </b>
                 </span>
               </a>
               {points.map((p) => (

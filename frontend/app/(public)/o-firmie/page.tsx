@@ -69,8 +69,10 @@ export default function AboutPage() {
               <Breadcrumbs items={CRUMBS} />
               <span className="t-pill-stage">
                 <i aria-hidden="true" />
-                {company.name} · {company.hq.city}
-                {since ? <span className={draftCls(since)}>, od {since.text}</span> : null}
+                <span>
+                  {company.name} · {company.hq.city}
+                  {since ? <span className={draftCls(since)}>, od {since.text}</span> : null}
+                </span>
               </span>
               <h1 className="t-about-hero__h1">
                 Lokalny serwis.

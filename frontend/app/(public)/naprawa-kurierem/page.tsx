@@ -144,7 +144,7 @@ export default function CourierPage() {
 
       {pays.length ? (
         <section className="t-section t-section--alt t-section--tight" id="kto-placi" data-rail="Kto płaci">
-          <div className="t-container">
+          <div className="t-container t-courier__pay">
             <h2 className="t-h2 t-h2--sm">Kto płaci za przesyłki</h2>
             <div className="t-card t-paytable">
               <dl>
