@@ -150,16 +150,22 @@ export function RepairForm() {
     if (form.dropoff && form.dropoff !== "courier" && !pointKeys.includes(form.dropoff)) set("dropoff", null);
   }, [form.dropoff, pointKeys, set]);
 
+  // Courier drop-off: the salon the parcel goes to (default = first point; asked with two points).
+  useEffect(() => {
+    const want = form.dropoff !== "courier" ? null : form.courierPoint && pointKeys.includes(form.courierPoint) ? form.courierPoint : points[0]?.key ?? null;
+    if (form.courierPoint !== want) setForm((f) => ({ ...f, courierPoint: want }));
+  }, [form.dropoff, form.courierPoint, pointKeys, points]);
+
   // Pick-up point: asked only with two visible points; with one it is that point when needed.
   const askPickup = form.returnMethod === "in_person" && points.length > 1;
   // Until the client picks one, the pick-up point follows the drop-off point.
   const [pickupTouched, setPickupTouched] = useState(false);
   useEffect(() => {
     const needs = form.returnMethod === "in_person";
-    const fallback: PointKey | null = !needs ? null : form.dropoff && form.dropoff !== "courier" ? form.dropoff : form.dropoff === "courier" ? points[0]?.key ?? null : null;
+    const fallback: PointKey | null = !needs ? null : form.dropoff && form.dropoff !== "courier" ? form.dropoff : form.dropoff === "courier" ? form.courierPoint ?? points[0]?.key ?? null : null;
     const want = askPickup && pickupTouched && form.pickupPoint ? form.pickupPoint : fallback;
     if (form.pickupPoint !== want) setForm((f) => ({ ...f, pickupPoint: want }));
-  }, [askPickup, pickupTouched, form.dropoff, form.returnMethod, form.pickupPoint, points]);
+  }, [askPickup, pickupTouched, form.dropoff, form.returnMethod, form.pickupPoint, form.courierPoint, points]);
 
   const scrollToField = (field: FormField) => {
     window.setTimeout(() => {
@@ -241,8 +247,9 @@ export function RepairForm() {
           response={done.response}
           deviceLabel={[label, [f.brand.trim(), f.model.trim()].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}
           category={f.category}
-          point={point}
+          point={f.dropoff === "courier" ? null : point}
           courier={f.dropoff === "courier"}
+          courierPoint={f.dropoff === "courier" && f.courierPoint ? points.find((p) => p.key === f.courierPoint) ?? null : null}
           loggedIn={isClient}
         >
           <RememberRepair
@@ -262,7 +269,7 @@ export function RepairForm() {
   const usesCourier = form.dropoff === "courier" || form.returnMethod === "courier";
   const catLabel = DEVICE_CATEGORIES.find((c) => c.value === cat)?.label;
   const pointName = (k: PointKey | null) => servicePoints.find((p) => p.key === k)?.name ?? "";
-  const dropoffText = form.dropoff === "courier" ? "Kurier" : form.dropoff ? `${pointName(form.dropoff)}, osobiście` : null;
+  const dropoffText = form.dropoff === "courier" ? (form.courierPoint ? `Kurier · na adres: ${pointName(form.courierPoint)}` : "Kurier") : form.dropoff ? `${pointName(form.dropoff)}, osobiście` : null;
   const returnText = form.returnMethod === "courier" ? "Kurier" : form.pickupPoint ? `Odbiór osobisty · ${pointName(form.pickupPoint)}` : "Odbiór osobisty";
   const notesHead = buildAdditionalNotes({ ...form, notes: "" });
   const notesLeft = NOTES_MAX - (notesHead ? notesHead.length + 2 : 0) - form.notes.trim().length;
@@ -385,6 +392,21 @@ export function RepairForm() {
           </div>
           <FieldError field="dropoff" errors={errors} />
         </div>
+        {form.dropoff === "courier" && points.length > 1 ? (
+          <div className="t-field" data-field="courierPoint">
+            <span className="t-field__label" id="zgl-cpoint-label">
+              Na adres którego salonu wyślesz?
+            </span>
+            <div className="t-seg2" role="radiogroup" aria-labelledby="zgl-cpoint-label">
+              {points.map((p) => (
+                <Choice key={p.key} on={form.courierPoint === p.key} onClick={() => set("courierPoint", p.key)}>
+                  {p.name}
+                </Choice>
+              ))}
+            </div>
+            <span className="t-field__hint">Adres i godziny salonu pokażemy po wysłaniu zgłoszenia.</span>
+          </div>
+        ) : null}
         <div className="t-field" data-field="returnMethod">
           <span className="t-field__label" id="zgl-ret-label">
             Zwrot po naprawie

@@ -20,6 +20,8 @@ type Props = {
   category: DeviceCategory | null;
   point: (ServicePoint & { draft?: boolean }) | null;
   courier: boolean;
+  /** Courier drop-off: the salon the client chose in step 2 (null = list every salon). */
+  courierPoint?: ServicePoint | null;
   /** Logged-in client: the backend points to /client/naprawy. */
   loggedIn: boolean;
   /** Slot for "Zapamiętaj na tym urządzeniu" (TD3 PR 3). */
@@ -86,7 +88,7 @@ function drawCard(canvas: HTMLCanvasElement, number: string, qr: QrMatrix, point
 }
 
 /** Success screen after sending (SPEC §12.7, KONTRAKT §1.2). */
-export function SuccessCard({ response, deviceLabel, category, point, courier, loggedIn, children }: Props) {
+export function SuccessCard({ response, deviceLabel, category, point, courier, courierPoint = null, loggedIn, children }: Props) {
   const number = response.repair_number;
   const link = trackHref(number, SITE_URL);
   const qr = useMemo(() => qrMatrix(link), [link]);
@@ -193,14 +195,29 @@ export function SuccessCard({ response, deviceLabel, category, point, courier, l
         ) : courier ? (
           <div className="t-success__point t-dark">
             <span className="t-eyebrow t-eyebrow--dark">Wysyłka kurierem</span>
-            <span>
-              {courierWhereText() ?? "Wyślij sprzęt kurierem na adres naszego salonu."} Numer zgłoszenia <b>{number}</b> włóż do paczki.
-            </span>
-            {courierPoints().map((p) => (
-              <span key={p.key} className="t-success__hours">
-                {line.name} — {p.name}: {pointAddress(p)}
-              </span>
-            ))}
+            {courierPoint ? (
+              <>
+                <span>
+                  Możesz wysłać sprzęt na adres wybranego salonu. Numer zgłoszenia <b>{number}</b> włóż do paczki.
+                </span>
+                <b className="t-success__pname">
+                  {line.name} · {courierPoint.name}
+                </b>
+                <span>{pointAddress(courierPoint)}</span>
+                <span className="t-success__hours">Paczki odbieramy: {hoursSummary(courierPoint)}</span>
+              </>
+            ) : (
+              <>
+                <span>
+                  {courierWhereText() ?? "Wyślij sprzęt kurierem na adres naszego salonu."} Numer zgłoszenia <b>{number}</b> włóż do paczki.
+                </span>
+                {courierPoints().map((p) => (
+                  <span key={p.key} className="t-success__hours">
+                    {line.name} — {p.name}: {pointAddress(p)}
+                  </span>
+                ))}
+              </>
+            )}
             {courierPageHref() ? (
               <Link href={courierPageHref()!} className="t-lnk t-lnk--sm">
                 Jak spakować i wysłać
