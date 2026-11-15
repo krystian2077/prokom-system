@@ -37,7 +37,7 @@ export function BrandLogo({ brand, variant = "mono", hidden, sprite, className }
     "--t-brand": logo.color,
     "--t-brand-dark": logo.colorDark,
   } as CSSProperties;
-  const cls = ["t-logo", variant === "color" ? "t-logo--color" : "", className ?? ""].filter(Boolean).join(" ");
+  const cls = ["t-brandlogo", variant === "color" ? "t-brandlogo--color" : "", className ?? ""].filter(Boolean).join(" ");
   return (
     <svg
       className={cls}
@@ -64,7 +64,7 @@ function LogoPath({ logo }: { logo: BrandLogoData }) {
 /** Hidden sprite with each path once, for <BrandLogo sprite />. Render at most once per page. */
 export function BrandLogoSprite({ logos }: { logos: readonly BrandLogoData[] }) {
   return (
-    <svg className="t-logo-sprite" aria-hidden="true" focusable="false">
+    <svg className="t-brandlogo-sprite" aria-hidden="true" focusable="false">
       {logos.map((l) => (
         <symbol key={l.slug} id={symbolId(l.slug)} viewBox={l.box}>
           <LogoPath logo={l} />

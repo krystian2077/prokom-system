@@ -777,19 +777,19 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-brands__track li { display: flex; align-items: center; padding-inline-end: clamp(36px, 3vw + 14px, 60px); } /* padding, not gap: -50% stays seamless */
 /* Brand marks (BrandLogo.tsx, brand-logos.ts): monochrome at rest, equal optical height
  * (--t-logo-h from the context × the logo's size factor), brand colour on hover */
-.tech .t-logo-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
-.tech .t-logo {
+.tech .t-brandlogo-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.tech .t-brandlogo {
   --t-h: calc(var(--t-logo-h, 20px) * var(--t-logo-size, 1));
   display: block; flex-shrink: 0; height: var(--t-h); width: calc(var(--t-h) * var(--t-logo-ar, 1)); fill: currentColor; transition: color 0.2s ease;
   transform: translateY(calc(var(--t-h) * var(--t-logo-dy, 0)));
 }
-.tech .t-logo--color { color: var(--t-brand); }
-html[data-tech-theme="dark"] .tech .t-logo--color { color: var(--t-brand-dark); }
+.tech .t-brandlogo--color { color: var(--t-brand); }
+html[data-tech-theme="dark"] .tech .t-brandlogo--color { color: var(--t-brand-dark); }
 @media (hover: hover) and (pointer: fine) {
-  .tech .t-brands__track li:hover .t-logo,
-  .tech .t-brandchip:hover .t-logo { color: var(--t-brand, var(--ink)); }
-  html[data-tech-theme="dark"] .tech .t-brands__track li:hover .t-logo,
-  html[data-tech-theme="dark"] .tech .t-brandchip:hover .t-logo { color: var(--t-brand-dark, var(--ink)); }
+  .tech .t-brands__track li:hover .t-brandlogo,
+  .tech .t-brandchip:hover .t-brandlogo { color: var(--t-brand, var(--ink)); }
+  html[data-tech-theme="dark"] .tech .t-brands__track li:hover .t-brandlogo,
+  html[data-tech-theme="dark"] .tech .t-brandchip:hover .t-brandlogo { color: var(--t-brand-dark, var(--ink)); }
 }
 @keyframes t-mq { to { transform: translateX(-50%); } }
 
