@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { line, lines, telHref } from "@/config/prokom";
 import { ACCOUNT_HREF, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, footerColumns, mainNav, repairLinks } from "@/lib/tech/nav";
 import { DeviceGlyph, IconArrow, IconChevronRight, IconClose, IconSearch } from "./icons";
+import { InstallHint } from "./InstallHint";
 import { MyRepairs } from "./MyRepairs";
 import { OpeningStatus } from "./OpeningStatus";
 import { useShell, type SheetMode } from "./ShellContext";
@@ -210,6 +211,7 @@ export function MenuSheet() {
                 ))}
               </div>
               <ThemeSegmented />
+              <InstallHint />
             </>
           ) : null}
         </div>
