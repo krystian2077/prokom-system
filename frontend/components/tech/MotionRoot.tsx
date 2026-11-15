@@ -13,12 +13,19 @@ const AUTO_STAGGER = ".t-ui .t-grid, .t-ui .t-faq";
 /** Tags below-the-fold blocks only: what is already on screen never blinks. */
 function autoTag(root: HTMLElement) {
   const fold = window.innerHeight;
+  // read every position first, then write (one layout, no read/write thrashing)
+  const candidates = Array.from(root.querySelectorAll<HTMLElement>(AUTO_REVEAL)).filter(
+    (el) => !el.hasAttribute("data-t-reveal") && !el.closest(".t-header, .t-sheet, .t-wizflow"),
+  );
+  const below = candidates.filter((el) => el.getBoundingClientRect().top >= fold);
+  const set = new Set(below);
+  // never nest reveals: skip elements inside another tagged block
+  for (const el of below) {
+    let p = el.parentElement;
+    while (p && p !== root && !set.has(p) && !p.hasAttribute("data-t-reveal")) p = p.parentElement;
+    if (!p || p === root) el.setAttribute("data-t-reveal", "");
+  }
   root.querySelectorAll<HTMLElement>(AUTO_STAGGER).forEach((g) => g.setAttribute("data-t-stagger", ""));
-  root.querySelectorAll<HTMLElement>(AUTO_REVEAL).forEach((el) => {
-    if (el.hasAttribute("data-t-reveal") || el.closest("[data-t-reveal]") || el.closest(".t-header, .t-sheet, .t-wizflow")) return;
-    if (el.getBoundingClientRect().top < fold) return;
-    el.setAttribute("data-t-reveal", "");
-  });
 }
 
 const NO_TRANSITION = /^\/(panel|admin-panel|client|api)(\/|$)/;
