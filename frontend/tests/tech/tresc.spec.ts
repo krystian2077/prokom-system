@@ -13,7 +13,9 @@ const EXTRA = ["/zgloszenie", "/track", "/claim-repair", "/offline", "/nie-ma-ta
 const RULES: [string, RegExp, RegExp?][] = [
   ["WhatsApp", /whats\s?app|wa\.me/i],
   ["paczkomat", /paczkomat/i, /nie\s+(obsługujemy|przyjmujemy|wysyłamy)[^.]{0,40}paczkomat|paczkomat[^.]{0,40}nie\s+(obsługujemy|przyjmujemy)/i],
-  ["cena", /\d[\d\s]*(,\d{2})?\s?(zł|pln)\b|cennik/i],
+  // No \b after "zł": "ł" is not a word character in JS regexes without the u flag.
+  // Allowed: the storage fee in /regulamin (legal text, left for the lawyer — STAN).
+  ["cena", /\d[\d\s]*(,\d{2})?\s?(zł(ot[a-zęy]*)?|pln)(?![a-ząćęłńóśźż])|cennik/i, /opłatę za przechowanie/i],
   ["sklep", /\bsklep(u|ie|em|y|ów)?\b/i, /(nie|bez)\s+(prowadzimy\s+)?sklep/i],
   ["zaślepka", /lorem ipsum|\bTODO\b|placeholder|\bxxx\b|\{\{|\}\}|\bundefined\b|\bNaN\b|\[object Object\]/i],
 ];
