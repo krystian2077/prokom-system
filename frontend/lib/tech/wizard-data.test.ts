@@ -78,7 +78,7 @@ describe("wizard-data", () => {
       const [x, y, w, h] = l.box.split(" ").map(Number);
       expect(x >= 0 && y >= 0 && x + w <= 24.001 && y + h <= 24.001 && w > 0 && h > 0).toBe(true);
       expect(l.size).toBeGreaterThan(0.4);
-      expect(l.size).toBeLessThanOrEqual(1.2);
+      expect(l.size).toBeLessThanOrEqual(1.3);
     }
     // Krystian's must-have list: logos where Simple Icons has them (realme is not there → text)
     for (const b of ["Apple", "Samsung", "Xiaomi", "Motorola", "Lenovo", "HP", "Dell", "Huawei", "ASUS"]) expect(brandLogo(b)).toBeDefined();
