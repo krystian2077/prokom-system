@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`request shape unchanged (KONTRAKT §1–§2) > buildSubmitPayload has the same top-level and device keys as before 1`] = `
+[
+  "accessory_choose_for_me",
+  "accessory_interest",
+  "accessory_wishlist",
+  "additional_notes",
+  "client",
+  "delivery_city",
+  "delivery_country",
+  "delivery_house_number",
+  "delivery_method",
+  "delivery_postal_code",
+  "delivery_street",
+  "device",
+  "hammer_glass_interest",
+  "requires_data_backup",
+  "return_method",
+]
+`;
+
+exports[`request shape unchanged (KONTRAKT §1–§2) > buildSubmitPayload has the same top-level and device keys as before 2`] = `
+[
+  "brand_name",
+  "category",
+  "device_turns_on",
+  "imei",
+  "model_name",
+  "problem_description",
+  "visual_condition_description",
+]
+`;

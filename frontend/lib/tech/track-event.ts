@@ -17,6 +17,8 @@ export type TechEvents = {
   kreator_usterka: { urzadzenie: string; usterka: string };
   pwa_start: Record<string, never>;
   poradnik_otwarty: Record<string, never>;
+  /** "Jak sprawdzić model" in /zgloszenie: never the model itself. */
+  pomocnik_modelu: { kategoria: string; pole: "model" | "imei"; propozycja: "uzyta" | "nie" | "brak" };
   kurier_strona: Record<string, never>;
   blog_kategoria: { slug: string };
   blog_powiazana_naprawa_klik: Record<string, never>;

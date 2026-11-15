@@ -5,6 +5,7 @@
 import { courierService, type PointKey } from "@/config/prokom";
 import type { DeviceIcon } from "./nav";
 import type { DeviceCategory, RepairFormState } from "./contract";
+import { lowerFirst, wizardDevices } from "./wizard-data";
 
 export const FORM_STEPS = [
   { n: 1, title: "Urządzenie", long: "Urządzenie i usterka", sub: "Rodzaj, marka, model i opis usterki" },
@@ -31,12 +32,28 @@ export const CATEGORY_ICON: Record<DeviceCategory, DeviceIcon | null> = {
 /** Quick additions to the fault description (design: "+ nie ładuje" …). */
 export const QUICK_FAULTS = ["nie ładuje", "szybko się rozładowuje", "po zalaniu", "nie włącza się", "brak dźwięku"] as const;
 
+/** True when the description already mentions the fault (case-insensitive). */
+export function hasFault(problem: string, fault: string): boolean {
+  return problem.toLocaleLowerCase("pl").includes(fault.toLocaleLowerCase("pl"));
+}
+
 /** Appends a quick fault to the description without duplicating it. */
 export function appendFault(problem: string, fault: string): string {
   const cur = problem.trim();
-  if (cur.toLocaleLowerCase("pl").includes(fault)) return problem;
+  if (hasFault(cur, fault)) return problem;
   if (!cur) return fault.charAt(0).toLocaleUpperCase("pl") + fault.slice(1);
   return `${cur.replace(/[.,;]+$/, "")}, ${fault}`;
+}
+
+/**
+ * Fault suggestions under "Co się dzieje?": the wizard's faults of the chosen device
+ * (lib/tech/wizard-data.ts, same names as on the home page), else the general quick list.
+ * Returned in lower case, ready for appendFault.
+ */
+export function faultSuggestions(category: DeviceCategory | null): string[] {
+  const device = category ? wizardDevices.find((d) => d.category === category) : undefined;
+  if (!device) return [...QUICK_FAULTS];
+  return device.faults.filter((f) => f !== "Inny problem").map((f) => lowerFirst(f));
 }
 
 /** Placeholders for brand / model per category. */
