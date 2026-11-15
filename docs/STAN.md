@@ -61,7 +61,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 | TD3 | zgłoszenie, status, przypisanie naprawy (kontrakt) | **scalone (#28, #30, #32)** — zostało: test na żywym backendzie, porównanie z planszami |
 | TD4 | punkty, kontakt, o firmie, strony lokalne, `/serwis-telefonow`, 301 | **scalone 15.11: #34, #39** |
 | TD5 | pozostałe podstrony, Hammer Glass, blog, prawne, 404, PWA, poradnik „jak przygotować sprzęt” | **scalone (#37, #38, #41)** — zostało: akceptacja tekstów, prawnik, odpowiedzi szefa (kurier) |
-| TD5b | strony konkretnych napraw `/naprawy/…` (SPEC §12.4) | **PR 1 szablon scalony (#42)**; PR 2 (treści) czeka na listę napraw od serwisu |
+| TD5b | strony konkretnych napraw `/naprawy/…` (SPEC §12.4) | **PR 1 szablon scalony (#42)**; **PR 2 `content/tech-naprawy` otwarty 15.11**: 12 tekstów, wszystkie `verified:false` do Twojej akceptacji |
 | TD6 | QA, wydajność, SEO, sprzątanie, staging → produkcja | **PR 1–2: #48–#51 scalone 15.11, #52 czeka na wyjątek**; Lighthouse < 90 (kroje), PR 3 po 29.11 |
 
 ## Otwarte (blokują produkcję, nie budowę) — SPEC §10
@@ -72,7 +72,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [Krystian] termin TM: plan 23–27.11 (staging), przełączenie ndz 29.11.
 - [Krystian] czy 3 zgłoszenia i 8 klientów na produkcji to dane prawdziwe czy testowe (jeśli testowe — VPS może ruszyć na czystej bazie; `INWENTARZ.md` B1.1).
 - [Krystian/TD6] `PublicNavbar`/`PublicFooter` używa logowanie klienta (`app/client/ClientGate.tsx`) → zostają zamrożone albo wyjątek (`MAPA-PLIKOW.md`, TODO).
-- [Krystian + serwis] lista do 12 napraw na `/naprawy/…` z czasem, gwarancją i „na miejscu” (SPEC §12.4) — przed TD5b.
+- ✔ 15.11 lista napraw (Krystian: smartfony, tablety, smartwatche, laptopy, komputery, konsole). [Krystian] akceptacja 12 tekstów TD5b PR 2 → `verified:true` strona po stronie; [serwis] czas, gwarancja i „na miejscu” dla każdej naprawy (do tego czasu pola `null`, zdania ukryte).
 - [Krystian] Umami dla Tech: identyfikator strony (`UMAMI_WEBSITES` w `.env.prod` prokom-web) i dopisek w polityce prywatności (SPEC §12.5). Skrypt idzie przez Nginx prokom-web (`/_s/script.js`), więc zadziała dopiero po TM.
 - [SZEF/serwis] treść sekcji „Twoje dane są bezpieczne” (SPEC §12.9) — do tego czasu sekcja ukryta flagą.
 - [SZEF] naprawa wysyłkowa — 5 odpowiedzi z SPEC §10/§12.10 (promujemy? kto płaci w obie strony, płatność przy wysyłce, rezygnacja po wycenie, zasięg). Do tego czasu `/naprawa-kurierem` ma `published: false`.
@@ -109,6 +109,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - Backend (osobne decyzje, `WYJATKI.md`): hasła w seedach, zawieszanie zgłoszenia bez Redisa, escapowanie HTML w mailu z formularza kontaktowego, atrapa SMS.
 
 ## Historia
+- 15.11.2026 — **TD5b PR 2** (`content/tech-naprawy`): treści 12 stron `/naprawy/…` (≥ 400 słów, objawy, przebieg, 3–5 FAQ, bez miast w tekście), `published:true, verified:false` — na produkcji nic się nie pojawia, na stagingu w ramce przy `NEXT_PUBLIC_TECH_DRAFT=1`. Zamiast klawiatury laptopa i „laptop się nie włącza”: ekran tabletu i smartwatch. Tytuły SEO ≤ 20 znaków (limit 60 z „Rabka-Zdrój i Zakopane”).
 - 15.11.2026 — **TD6 PR 1–2** (QA, sprzątanie): #48–#51 scalone (sesja nadrzędna), #52 czeka na wpis w WYJATKI. Lighthouse telefon 72–82, axe 0 krytycznych, e2e 739 ✓.
 - 15.11.2026 — **TD5** scalone do `develop`: #37 naprawy (hub + strony urządzeń), #38 Hammer Glass/FAQ/blog/prawne/404, #41 PWA/poradnik/kurier, #42 TD5b szablon `/naprawy/[slug]` (bez treści).
 - 14/15.11.2026 — **TD3** scalone do `develop`: #28 kontrakt, #30 formularz zgłoszenia, #32 status i „Moje naprawy”.
