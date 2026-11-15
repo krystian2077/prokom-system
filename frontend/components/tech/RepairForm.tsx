@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { courierService, line, servicePoints, telHref, type PointKey } from "@/config/prokom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -28,16 +28,20 @@ import { hoursSummary } from "@/lib/tech/hours";
 import { ACCOUNT_HREF } from "@/lib/tech/nav";
 import { isDraftMode } from "@/lib/tech/points";
 import { courierWhereText } from "@/lib/tech/courier";
-import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, QUICK_FAULTS, appendFault, chosenPoint, courierLines, type StepNo } from "@/lib/tech/repair-form";
+import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, appendFault, chosenPoint, courierLines, faultSuggestions, hasFault, type StepNo } from "@/lib/tech/repair-form";
+import { EASE, prefersReducedMotion } from "@/lib/tech/motion";
 import { submitRepair } from "@/lib/tech/requests";
 import { trackEvent } from "@/lib/tech/track-event";
 import { DEVICE_CATEGORIES, HAMMER_GLASS_INTEREST } from "@/types/repair";
-import { DeviceGlyph, IconArrow, IconCheck, IconChevronDown, IconUser } from "./icons";
+import { DeviceGlyph, IconArrow, IconCheck, IconPlus, IconUser } from "./icons";
 import { OpeningStatus } from "./OpeningStatus";
 import { PrepChecklist } from "./PrepChecklist";
 import { useShell } from "./ShellContext";
 import { RememberRepair } from "./RememberRepair";
 import { SuccessCard } from "./SuccessCard";
+import { Choice, DotsIcon, FieldError, Segmented, TextField, aria, fieldId, radioKeys } from "./zgloszenie/FormParts";
+import { ModelHelper } from "./zgloszenie/ModelHelper";
+import { usePill } from "./usePill";
 
 /** Hammer Glass films exist for these devices (SPEC §6 /hammer-glass). */
 const FILM_DEVICES = BRAND_REQUIRED;
@@ -52,39 +56,49 @@ const TURNS_ON = [
   { value: "unknown", label: "Nie wiem" },
 ] as const;
 
-const DotsIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true" focusable="false">
-    <path d="M5 12h.01M12 12h.01M19 12h.01" />
-  </svg>
-);
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-const fieldId = (f: FormField) => `zgl-${f}`;
+const RETURN_OPTIONS = [
+  { value: "in_person", label: "Odbiór osobisty" },
+  { value: "courier", label: "Kurier" },
+] as const;
 
-/** Error text under a field + aria wiring. */
-function FieldError({ field, errors }: { field: FormField; errors: FieldErrors }) {
-  const msgs = errors[field];
-  if (!msgs?.length) return null;
-  return (
-    <span className="t-field__error" id={`${fieldId(field)}-err`} role="alert">
-      {msgs.join(" ")}
-    </span>
-  );
+/** "Co dalej" in the aside (design T.Zgloszenie, no unconfirmed time promises — SPEC §8, §10). */
+const NEXT_STEPS = [
+  { t: "Numer zgłoszenia", s: "Dostajesz go od razu po wysłaniu, także e-mailem." },
+  { t: "Diagnoza i wycena", s: "Po przyjęciu sprzętu sprawdzamy usterkę i przesyłamy wycenę." },
+  { t: "Twoja decyzja", s: "Akceptujesz albo rezygnujesz bez konsekwencji." },
+  { t: "Status online", s: "Po numerze zgłoszenia i 4 ostatnich cyfrach telefonu." },
+];
+
+/** Polish plural of "znak". */
+function charWord(n: number): string {
+  if (n === 1) return "znak";
+  const d = n % 10;
+  const t = n % 100;
+  return d >= 2 && d <= 4 && (t < 12 || t > 14) ? "znaki" : "znaków";
 }
-const aria = (field: FormField, errors: FieldErrors) =>
-  errors[field]?.length ? { "aria-invalid": true as const, "aria-describedby": `${fieldId(field)}-err` } : {};
 
-function Choice({ on, onClick, children, className = "" }: { on: boolean; onClick: () => void; children: ReactNode; className?: string }) {
-  return (
-    <button type="button" role="radio" aria-checked={on} className={`t-choice${on ? " is-on" : ""} ${className}`} onClick={onClick}>
-      {children}
-    </button>
-  );
+const SHAKE: Keyframe[] = [
+  { transform: "translateX(0)" },
+  { transform: "translateX(-6px)" },
+  { transform: "translateX(5px)" },
+  { transform: "translateX(-3px)" },
+  { transform: "translateX(0)" },
+];
+
+/** Live hint under the description: more detail = a better diagnosis (no limit in the contract). */
+function problemHint(len: number): string {
+  if (len === 0) return "Napisz własnymi słowami albo wybierz podpowiedź poniżej.";
+  if (len < 25) return "Dopisz, kiedy to się dzieje i od kiedy.";
+  return "Dziękujemy, to pomoże w diagnozie.";
 }
 
 /**
  * The one repair form /zgloszenie (SPEC §6–§7, KONTRAKT §1–§2, design #zglos-naprawe):
- * 5 steps, one step per screen on phones with a sticky "Dalej", accordion of steps with
- * a summary aside on larger screens.
+ * 5 steps in one card (the content slides and fades, the height follows), a stepper with
+ * a sliding pill, a sticky summary aside on larger screens; one step per screen on phones
+ * with a sticky "Dalej". The request is built only by buildSubmitPayload (unchanged).
  */
 export function RepairForm() {
   const sp = useSearchParams();
@@ -96,15 +110,36 @@ export function RepairForm() {
   const [step, setStep] = useState<StepNo>(1);
   const [maxStep, setMaxStep] = useState<StepNo>(1);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<ReadonlySet<FormField>>(() => new Set());
   const [general, setGeneral] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState<{ response: SubmitResponse; form: RepairFormState } | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const cardRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stepsRef = useRef<HTMLDivElement>(null);
   const started = useRef(false);
+  const latest = useRef(form);
+  latest.current = form;
 
+  // Live validation: a field with an error is re-checked on every change (the message
+  // disappears as soon as the value is right, or changes to the next problem).
   const set = useCallback(<K extends keyof RepairFormState>(key: K, value: RepairFormState[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
-    setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e));
+    setErrors((e) => {
+      if (!e[key]) return e;
+      const next = validateRepairForm({ ...latest.current, [key]: value })[key];
+      return { ...e, [key]: next };
+    });
+  }, []);
+
+  /** Leaving a filled field checks its format (e-mail, phone, lengths) right away. */
+  const blurField = useCallback((field: FormField) => {
+    const v = latest.current[field];
+    if (typeof v !== "string" || !v.trim()) return;
+    setTouched((t) => (t.has(field) ? t : new Set(t).add(field)));
+    const msg = validateRepairForm(latest.current)[field];
+    setErrors((e) => (msg ? { ...e, [field]: msg } : e[field] ? { ...e, [field]: undefined } : e));
   }, []);
 
   // Wizard parameters (KONTRAKT §1.4) and the start event.
@@ -167,23 +202,91 @@ export function RepairForm() {
     if (form.pickupPoint !== want) setForm((f) => ({ ...f, pickupPoint: want }));
   }, [askPickup, pickupTouched, form.dropoff, form.returnMethod, form.pickupPoint, form.courierPoint, points]);
 
+  /* ---------- Motion: step change (height follows, content slides + fades) ---------- */
+  const prevStep = useRef<StepNo>(step);
+  const lastHeight = useRef<number | null>(null);
+  const animating = useRef(false);
+  useIsoLayoutEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const from = prevStep.current;
+    prevStep.current = step;
+    const to = stage.offsetHeight;
+    const fromH = lastHeight.current;
+    lastHeight.current = to;
+    if (from === step || fromH === null || prefersReducedMotion() || typeof stage.animate !== "function") return;
+    const dir = step > from ? 1 : -1;
+    animating.current = true;
+    stage.style.overflow = "clip";
+    const h = stage.animate([{ height: `${fromH}px` }, { height: `${to}px` }], { duration: 440, easing: EASE.emph });
+    const end = () => {
+      animating.current = false;
+      stage.style.overflow = "";
+      lastHeight.current = stage.offsetHeight;
+    };
+    h.onfinish = end;
+    h.oncancel = end;
+    const pane = stage.firstElementChild as HTMLElement | null;
+    pane?.animate(
+      [
+        { opacity: 0, transform: `translateX(${dir * 36}px)` },
+        { opacity: 1, transform: "none" },
+      ],
+      { duration: 380, easing: EASE.emph },
+    );
+  }, [step, done]);
+  // Height changes inside a step (courier address, errors) only update the reference.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage || typeof ResizeObserver !== "function") return;
+    const ro = new ResizeObserver(() => {
+      if (!animating.current) lastHeight.current = stage.offsetHeight;
+    });
+    ro.observe(stage);
+    return () => ro.disconnect();
+  }, [done]);
+
+  usePill(stepsRef, ".is-on > button", [step, maxStep, done]);
+
+  const shakeInvalid = () => {
+    if (prefersReducedMotion()) return;
+    formRef.current?.querySelectorAll<HTMLElement>('[aria-invalid="true"]').forEach((el) => {
+      if (typeof el.animate === "function") el.animate(SHAKE, { duration: 380, easing: EASE.out });
+    });
+  };
+
   const scrollToField = (field: FormField) => {
     window.setTimeout(() => {
+      shakeInvalid();
       const el = document.getElementById(fieldId(field)) ?? document.querySelector<HTMLElement>(`[data-field="${field}"]`);
       if (!el) return;
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "center" });
       const focusable = el.matches("input, textarea, select, button") ? el : el.querySelector<HTMLElement>("input, textarea, button");
       focusable?.focus({ preventScroll: true });
     }, 60);
+  };
+
+  /** Brings the top of the card into view when it scrolled away (long steps, phones). */
+  const revealCard = () => {
+    window.setTimeout(() => {
+      const card = cardRef.current;
+      if (!card) return;
+      const phone = window.matchMedia("(max-width: 767.98px)").matches;
+      const target = phone ? document.querySelector<HTMLElement>(".t-zgl__phonebar") ?? card : card;
+      if (target.getBoundingClientRect().top < 72 || phone) target.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+    }, 40);
+  };
+
+  const showStep = (n: StepNo) => {
+    setStep(n);
+    revealCard();
   };
 
   const goTo = (n: StepNo) => {
     setStep(n);
     setMaxStep((m) => (n > m ? n : m));
     trackEvent("zgloszenie_krok", { nr: n });
-    window.setTimeout(() => {
-      document.getElementById(`zgl-step-${n}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 40);
+    revealCard();
   };
 
   const next = () => {
@@ -223,7 +326,7 @@ export function RepairForm() {
       const point = chosenPoint(form);
       trackEvent("zgloszenie_wyslane", { kategoria: form.category ?? "other", dostawa: form.dropoff === "courier" ? "kurier" : "punkt", ...(point ? { punkt: point } : {}) });
       setDone({ response: result.data, form });
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
       return;
     }
     if (result.kind === "validation") {
@@ -268,12 +371,20 @@ export function RepairForm() {
   const brandRequired = !!cat && BRAND_REQUIRED.has(cat);
   const usesCourier = form.dropoff === "courier" || form.returnMethod === "courier";
   const catLabel = DEVICE_CATEGORIES.find((c) => c.value === cat)?.label;
+  const catIcon = cat ? CATEGORY_ICON[cat] : null;
   const pointName = (k: PointKey | null) => servicePoints.find((p) => p.key === k)?.name ?? "";
   const dropoffText = form.dropoff === "courier" ? (form.courierPoint ? `Kurier · na adres: ${pointName(form.courierPoint)}` : "Kurier") : form.dropoff ? `${pointName(form.dropoff)}, osobiście` : null;
   const returnText = form.returnMethod === "courier" ? "Kurier" : form.pickupPoint ? `Odbiór osobisty · ${pointName(form.pickupPoint)}` : "Odbiór osobisty";
   const notesHead = buildAdditionalNotes({ ...form, notes: "" });
   const notesLeft = NOTES_MAX - (notesHead ? notesHead.length + 2 : 0) - form.notes.trim().length;
   const contactLabel = CONTACT_OPTIONS.find((c) => c.value === form.preferredContact)?.label;
+  const live = validateRepairForm(form);
+  const isValid = (f: FormField) => {
+    const v = form[f];
+    return touched.has(f) && typeof v === "string" && v.trim() !== "" && !live[f] && !errors[f]?.length;
+  };
+  const suggestions = faultSuggestions(cat);
+  const problemLen = form.problem.trim().length;
 
   const summary: { k: string; v: string | null; step: StepNo }[] = [
     { k: "Urządzenie", v: catLabel ?? null, step: 1 },
@@ -290,13 +401,16 @@ export function RepairForm() {
           <span className="t-field__label" id="zgl-cat-label">
             Rodzaj urządzenia *
           </span>
-          <div className="t-chips" role="radiogroup" aria-labelledby="zgl-cat-label" {...aria("category", errors)}>
+          <div className="t-dtiles" role="radiogroup" aria-labelledby="zgl-cat-label" onKeyDown={radioKeys} {...aria("category", errors)}>
             {DEVICE_CATEGORIES.map((c) => {
               const icon = CATEGORY_ICON[c.value];
               return (
-                <Choice key={c.value} on={cat === c.value} onClick={() => set("category", c.value)} className="t-chip">
-                  {icon ? <DeviceGlyph icon={icon} size={18} /> : <DotsIcon />}
-                  {c.label}
+                <Choice key={c.value} on={cat === c.value} onClick={() => set("category", c.value)} className="t-dtile">
+                  <span className="t-dtile__ico">{icon ? <DeviceGlyph icon={icon} size={22} /> : <DotsIcon size={22} />}</span>
+                  <span className="t-dtile__t">{c.label}</span>
+                  <span className="t-dtile__ok" aria-hidden="true">
+                    <IconCheck size={12} strokeWidth={3.4} />
+                  </span>
                 </Choice>
               );
             })}
@@ -304,57 +418,104 @@ export function RepairForm() {
           <FieldError field="category" errors={errors} />
         </div>
         <div className="t-fgrid">
-          <label className="t-field" htmlFor={fieldId("brand")}>
-            <span className="t-field__label">
-              Marka {brandRequired ? "*" : <em>opcjonalnie</em>}
-            </span>
-            <input id={fieldId("brand")} type="text" value={form.brand} onChange={(e) => set("brand", e.target.value)} placeholder={hints.brand} maxLength={100} autoComplete="off" {...aria("brand", errors)} />
-            <FieldError field="brand" errors={errors} />
-          </label>
-          <label className="t-field" htmlFor={fieldId("model")}>
-            <span className="t-field__label">Model *</span>
-            <input id={fieldId("model")} type="text" value={form.model} onChange={(e) => set("model", e.target.value)} placeholder={hints.model} maxLength={200} autoComplete="off" {...aria("model", errors)} />
-            <FieldError field="model" errors={errors} />
-          </label>
-          <label className="t-field" htmlFor={fieldId("imei")}>
-            <span className="t-field__label">
-              IMEI albo numer seryjny <em>opcjonalnie</em>
-            </span>
-            <input id={fieldId("imei")} type="text" value={form.imei} onChange={(e) => set("imei", e.target.value)} placeholder={cat === "phone" ? "Wybierz *#06# na klawiaturze telefonu" : "Z naklejki na spodzie albo z pudełka"} maxLength={20} autoComplete="off" {...aria("imei", errors)} />
-            <FieldError field="imei" errors={errors} />
-          </label>
+          <TextField
+            field="brand"
+            label={<>Marka {brandRequired ? "*" : <em>opcjonalnie</em>}</>}
+            value={form.brand}
+            onValue={(v) => set("brand", v)}
+            onBlurField={blurField}
+            errors={errors}
+            valid={isValid("brand")}
+            placeholder={hints.brand}
+            maxLength={100}
+            autoComplete="off"
+          />
+          <TextField
+            field="model"
+            label="Model *"
+            value={form.model}
+            onValue={(v) => set("model", v)}
+            onBlurField={blurField}
+            errors={errors}
+            valid={isValid("model")}
+            placeholder={hints.model}
+            maxLength={200}
+            autoComplete="off"
+            aside={<ModelHelper field="model" category={cat} brand={form.brand} model={form.model} onUseModel={(m) => set("model", m)} />}
+          />
+          <TextField
+            field="imei"
+            label={<>IMEI albo numer seryjny <em>opcjonalnie</em></>}
+            value={form.imei}
+            onValue={(v) => set("imei", v)}
+            onBlurField={blurField}
+            errors={errors}
+            valid={isValid("imei")}
+            placeholder={cat === "phone" ? "Wybierz *#06# na klawiaturze telefonu" : "Z naklejki na spodzie albo z pudełka"}
+            maxLength={20}
+            autoComplete="off"
+            aside={<ModelHelper field="imei" category={cat} brand={form.brand} model={form.model} />}
+          />
           <div className="t-field" data-field="turnsOn">
-            <span className="t-field__label" id="zgl-on-label">
-              Czy urządzenie się włącza?
-            </span>
-            <div className="t-seg3" role="radiogroup" aria-labelledby="zgl-on-label">
-              {TURNS_ON.map((o) => (
-                <Choice key={o.value} on={form.turnsOn === o.value} onClick={() => set("turnsOn", o.value)}>
-                  {o.label}
-                </Choice>
-              ))}
+            <div className="t-field__top">
+              <span className="t-field__label" id="zgl-on-label">
+                Czy urządzenie się włącza?
+              </span>
             </div>
+            <Segmented labelId="zgl-on-label" options={TURNS_ON} value={form.turnsOn} onChange={(v) => set("turnsOn", v)} />
           </div>
         </div>
-        <label className="t-field" htmlFor={fieldId("problem")}>
-          <span className="t-field__label">Co się dzieje? *</span>
-          <textarea id={fieldId("problem")} value={form.problem} onChange={(e) => set("problem", e.target.value)} placeholder="Np. pęknięty ekran, dotyk działa tylko w dolnej części" rows={4} {...aria("problem", errors)} />
+        <div className={`t-field t-area${problemLen ? " has-text" : ""}`}>
+          <div className="t-field__top">
+            <label className="t-field__label" htmlFor={fieldId("problem")}>
+              Co się dzieje? *
+            </label>
+            <span className="t-area__count" aria-hidden="true">
+              {problemLen} {charWord(problemLen)}
+            </span>
+          </div>
+          <div className="t-input t-input--area">
+            <textarea
+              id={fieldId("problem")}
+              value={form.problem}
+              onChange={(e) => set("problem", e.target.value)}
+              placeholder="Np. pęknięty ekran, dotyk działa tylko w dolnej części"
+              rows={4}
+              aria-describedby={errors.problem?.length ? `${fieldId("problem")}-err` : "zgl-problem-hint"}
+              aria-invalid={errors.problem?.length ? true : undefined}
+            />
+            <span className="t-area__meter" aria-hidden="true" style={{ ["--fill" as string]: Math.min(1, problemLen / 60) }} />
+          </div>
           <FieldError field="problem" errors={errors} />
-        </label>
-        <div className="t-quick" aria-label="Dodaj do opisu">
-          {QUICK_FAULTS.map((q) => (
-            <button key={q} type="button" className="t-quick__chip" onClick={() => set("problem", appendFault(form.problem, q))}>
-              + {q}
-            </button>
-          ))}
+          {!errors.problem?.length ? (
+            <span className="t-field__hint" id="zgl-problem-hint">
+              {problemHint(problemLen)}
+            </span>
+          ) : null}
+          <div className="t-quick" role="group" aria-label={catLabel ? `Częste usterki: ${catLabel.toLocaleLowerCase("pl")}` : "Częste usterki"} key={cat ?? "none"}>
+            {suggestions.map((q) => {
+              const on = hasFault(form.problem, q);
+              return (
+                <button key={q} type="button" className={`t-quick__chip${on ? " is-on" : ""}`} aria-pressed={on} onClick={() => !on && set("problem", appendFault(form.problem, q))}>
+                  <span className="t-quick__ico" aria-hidden="true">
+                    {on ? <IconCheck size={12} strokeWidth={3.2} /> : <IconPlus size={12} strokeWidth={3} />}
+                  </span>
+                  {q}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <label className="t-field" htmlFor={fieldId("visualCondition")}>
-          <span className="t-field__label">
-            Stan wizualny <em>opcjonalnie</em>
-          </span>
-          <input id={fieldId("visualCondition")} type="text" value={form.visualCondition} onChange={(e) => set("visualCondition", e.target.value)} placeholder="Rysy, wgniecenia, pęknięcia obudowy" maxLength={2000} {...aria("visualCondition", errors)} />
-          <FieldError field="visualCondition" errors={errors} />
-        </label>
+        <TextField
+          field="visualCondition"
+          label={<>Stan wizualny <em>opcjonalnie</em></>}
+          value={form.visualCondition}
+          onValue={(v) => set("visualCondition", v)}
+          onBlurField={blurField}
+          errors={errors}
+          placeholder="Rysy, wgniecenia, pęknięcia obudowy"
+          maxLength={2000}
+        />
       </>
     ),
     2: (
@@ -363,10 +524,13 @@ export function RepairForm() {
           <span className="t-field__label" id="zgl-drop-label">
             Jak dostarczysz sprzęt? *
           </span>
-          <div className="t-options" role="radiogroup" aria-labelledby="zgl-drop-label" {...aria("dropoff", errors)}>
+          <div className="t-options" role="radiogroup" aria-labelledby="zgl-drop-label" onKeyDown={radioKeys} {...aria("dropoff", errors)}>
             {points.map((p) => (
               <Choice key={p.key} on={form.dropoff === p.key} onClick={() => set("dropoff", p.key)} className={`t-option${p.draft ? " t-draft" : ""}`}>
                 {p.draft ? <span className="t-draft-badge">do uzupełnienia</span> : null}
+                <span className="t-option__ok" aria-hidden="true">
+                  <IconCheck size={12} strokeWidth={3.4} />
+                </span>
                 <b>Osobiście · {p.name}</b>
                 <span>{[p.street, `${p.postal} ${p.city}`].filter(Boolean).join(", ")}</span>
                 <span className="t-option__meta">
@@ -375,6 +539,9 @@ export function RepairForm() {
               </Choice>
             ))}
             <Choice on={form.dropoff === "courier"} onClick={() => set("dropoff", "courier")} className="t-option">
+              <span className="t-option__ok" aria-hidden="true">
+                <IconCheck size={12} strokeWidth={3.4} />
+              </span>
               <b>Kurier</b>
               <span>{courierWhereText() ?? "Wyślesz sprzęt paczką kurierską."}</span>
               {courierLines().map((l) => (
@@ -393,17 +560,11 @@ export function RepairForm() {
           <FieldError field="dropoff" errors={errors} />
         </div>
         {form.dropoff === "courier" && points.length > 1 ? (
-          <div className="t-field" data-field="courierPoint">
+          <div className="t-field t-reveal-in" data-field="courierPoint">
             <span className="t-field__label" id="zgl-cpoint-label">
               Na adres którego salonu wyślesz?
             </span>
-            <div className="t-seg2" role="radiogroup" aria-labelledby="zgl-cpoint-label">
-              {points.map((p) => (
-                <Choice key={p.key} on={form.courierPoint === p.key} onClick={() => set("courierPoint", p.key)}>
-                  {p.name}
-                </Choice>
-              ))}
-            </div>
+            <Segmented labelId="zgl-cpoint-label" options={points.map((p) => ({ value: p.key, label: p.name }))} value={form.courierPoint} onChange={(v) => set("courierPoint", v)} />
             <span className="t-field__hint">Adres i godziny salonu pokażemy po wysłaniu zgłoszenia.</span>
           </div>
         ) : null}
@@ -411,61 +572,33 @@ export function RepairForm() {
           <span className="t-field__label" id="zgl-ret-label">
             Zwrot po naprawie
           </span>
-          <div className="t-seg2" role="radiogroup" aria-labelledby="zgl-ret-label">
-            <Choice on={form.returnMethod === "in_person"} onClick={() => set("returnMethod", "in_person")}>
-              Odbiór osobisty
-            </Choice>
-            <Choice on={form.returnMethod === "courier"} onClick={() => set("returnMethod", "courier")}>
-              Kurier
-            </Choice>
-          </div>
+          <Segmented labelId="zgl-ret-label" options={RETURN_OPTIONS} value={form.returnMethod} onChange={(v) => set("returnMethod", v)} />
         </div>
         {askPickup ? (
-          <div className="t-field" data-field="pickupPoint">
+          <div className="t-field t-reveal-in" data-field="pickupPoint">
             <span className="t-field__label" id="zgl-pick-label">
               Gdzie odbierzesz?
             </span>
-            <div className="t-seg2" role="radiogroup" aria-labelledby="zgl-pick-label">
-              {points.map((p) => (
-                <Choice key={p.key} on={form.pickupPoint === p.key} onClick={() => {
-                    setPickupTouched(true);
-                    set("pickupPoint", p.key);
-                  }}>
-                  {p.name}
-                </Choice>
-              ))}
-            </div>
+            <Segmented
+              labelId="zgl-pick-label"
+              options={points.map((p) => ({ value: p.key, label: p.name }))}
+              value={form.pickupPoint}
+              onChange={(v) => {
+                setPickupTouched(true);
+                set("pickupPoint", v);
+              }}
+            />
             <span className="t-field__hint">Możesz oddać sprzęt w jednym punkcie i odebrać w drugim.</span>
           </div>
         ) : null}
         {usesCourier ? (
-          <fieldset className="t-fieldset">
+          <fieldset className="t-fieldset t-reveal-in">
             <legend className="t-field__label">Adres do wysyłki</legend>
             <div className="t-fgrid t-fgrid--addr">
-              <label className="t-field" htmlFor={fieldId("street")}>
-                <span className="t-field__label">Ulica *</span>
-                <input id={fieldId("street")} type="text" value={form.street} onChange={(e) => set("street", e.target.value)} autoComplete="address-line1" maxLength={200} {...aria("street", errors)} />
-                <FieldError field="street" errors={errors} />
-              </label>
-              <label className="t-field" htmlFor={fieldId("houseNumber")}>
-                <span className="t-field__label">
-                  Nr domu / lokalu <em>opcjonalnie</em>
-                </span>
-                <input id={fieldId("houseNumber")} type="text" value={form.houseNumber} onChange={(e) => set("houseNumber", e.target.value)} autoComplete="address-line2" maxLength={50} {...aria("houseNumber", errors)} />
-                <FieldError field="houseNumber" errors={errors} />
-              </label>
-              <label className="t-field" htmlFor={fieldId("postalCode")}>
-                <span className="t-field__label">
-                  Kod pocztowy <em>opcjonalnie</em>
-                </span>
-                <input id={fieldId("postalCode")} type="text" inputMode="numeric" value={form.postalCode} onChange={(e) => set("postalCode", e.target.value)} autoComplete="postal-code" placeholder="00-000" maxLength={10} {...aria("postalCode", errors)} />
-                <FieldError field="postalCode" errors={errors} />
-              </label>
-              <label className="t-field" htmlFor={fieldId("city")}>
-                <span className="t-field__label">Miasto *</span>
-                <input id={fieldId("city")} type="text" value={form.city} onChange={(e) => set("city", e.target.value)} autoComplete="address-level2" maxLength={100} {...aria("city", errors)} />
-                <FieldError field="city" errors={errors} />
-              </label>
+              <TextField field="street" label="Ulica *" value={form.street} onValue={(v) => set("street", v)} onBlurField={blurField} errors={errors} valid={isValid("street")} autoComplete="address-line1" maxLength={200} />
+              <TextField field="houseNumber" label={<>Nr domu / lokalu <em>opcjonalnie</em></>} value={form.houseNumber} onValue={(v) => set("houseNumber", v)} onBlurField={blurField} errors={errors} autoComplete="address-line2" maxLength={50} />
+              <TextField field="postalCode" label={<>Kod pocztowy <em>opcjonalnie</em></>} value={form.postalCode} onValue={(v) => set("postalCode", v)} onBlurField={blurField} errors={errors} inputMode="numeric" autoComplete="postal-code" placeholder="00-000" maxLength={10} />
+              <TextField field="city" label="Miasto *" value={form.city} onValue={(v) => set("city", v)} onBlurField={blurField} errors={errors} valid={isValid("city")} autoComplete="address-level2" maxLength={100} />
             </div>
           </fieldset>
         ) : null}
@@ -479,17 +612,11 @@ export function RepairForm() {
               Folia Hammer Glass
             </span>
             <span className="t-field__hint">Folia ochronna wycięta pod Twój model, założona przy odbiorze. Opcjonalnie.</span>
-            <div className="t-seg3" role="radiogroup" aria-labelledby="zgl-hg-label" {...aria("hammerGlass", errors)}>
-              {HAMMER_OFFERED.map((h) => (
-                <Choice key={h.value} on={form.hammerGlass === h.value} onClick={() => set("hammerGlass", h.value)}>
-                  {h.label}
-                </Choice>
-              ))}
-            </div>
+            <Segmented labelId="zgl-hg-label" options={HAMMER_OFFERED} value={form.hammerGlass} onChange={(v) => set("hammerGlass", v)} invalid={aria("hammerGlass", errors)} />
             <FieldError field="hammerGlass" errors={errors} />
           </div>
         ) : null}
-        <label className="t-check" data-field="backup">
+        <label className={`t-check t-check--card${form.backup ? " is-on" : ""}`} data-field="backup">
           <input type="checkbox" checked={form.backup} onChange={(e) => set("backup", e.target.checked)} />
           <span>
             <b>Potrzebuję kopii zapasowej danych przed naprawą</b>
@@ -512,38 +639,16 @@ export function RepairForm() {
           </Link>
         ) : null}
         <div className="t-fgrid">
-          <label className="t-field" htmlFor={fieldId("firstName")}>
-            <span className="t-field__label">Imię *</span>
-            <input id={fieldId("firstName")} type="text" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} autoComplete="given-name" maxLength={100} {...aria("firstName", errors)} />
-            <FieldError field="firstName" errors={errors} />
-          </label>
-          <label className="t-field" htmlFor={fieldId("lastName")}>
-            <span className="t-field__label">Nazwisko *</span>
-            <input id={fieldId("lastName")} type="text" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} autoComplete="family-name" maxLength={100} {...aria("lastName", errors)} />
-            <FieldError field="lastName" errors={errors} />
-          </label>
-          <label className="t-field" htmlFor={fieldId("email")}>
-            <span className="t-field__label">E-mail *</span>
-            <input id={fieldId("email")} type="email" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" {...aria("email", errors)} />
-            <FieldError field="email" errors={errors} />
-          </label>
-          <label className="t-field" htmlFor={fieldId("phone")}>
-            <span className="t-field__label">Telefon *</span>
-            <input id={fieldId("phone")} type="tel" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" placeholder="np. 600 100 200" maxLength={20} {...aria("phone", errors)} />
-            <FieldError field="phone" errors={errors} />
-          </label>
+          <TextField field="firstName" label="Imię *" value={form.firstName} onValue={(v) => set("firstName", v)} onBlurField={blurField} errors={errors} valid={isValid("firstName")} autoComplete="given-name" maxLength={100} />
+          <TextField field="lastName" label="Nazwisko *" value={form.lastName} onValue={(v) => set("lastName", v)} onBlurField={blurField} errors={errors} valid={isValid("lastName")} autoComplete="family-name" maxLength={100} />
+          <TextField field="email" label="E-mail *" type="email" inputMode="email" value={form.email} onValue={(v) => set("email", v)} onBlurField={blurField} errors={errors} valid={isValid("email")} autoComplete="email" />
+          <TextField field="phone" label="Telefon *" type="tel" inputMode="tel" value={form.phone} onValue={(v) => set("phone", v)} onBlurField={blurField} errors={errors} valid={isValid("phone")} autoComplete="tel" placeholder="np. 600 100 200" maxLength={20} />
         </div>
         <div className="t-field" data-field="preferredContact">
           <span className="t-field__label" id="zgl-pref-label">
             Wolisz kontakt
           </span>
-          <div className="t-seg3" role="radiogroup" aria-labelledby="zgl-pref-label">
-            {CONTACT_OPTIONS.map((c) => (
-              <Choice key={c.value} on={form.preferredContact === c.value} onClick={() => set("preferredContact", c.value)}>
-                {c.label}
-              </Choice>
-            ))}
-          </div>
+          <Segmented labelId="zgl-pref-label" options={CONTACT_OPTIONS} value={form.preferredContact} onChange={(v) => set("preferredContact", v)} />
         </div>
       </>
     ),
@@ -562,24 +667,38 @@ export function RepairForm() {
               <div key={s.k}>
                 <dt>{s.k}</dt>
                 <dd>
-                  {s.v}{" "}
-                  <button type="button" className="t-linkbtn" onClick={() => setStep(s.step)} aria-label={`Zmień: ${s.k}`}>
+                  <span>{s.v}</span>{" "}
+                  <button type="button" className="t-linkbtn" onClick={() => showStep(s.step)} aria-label={`Zmień: ${s.k}`}>
                     Zmień
                   </button>
                 </dd>
               </div>
             ))}
         </dl>
-        <label className="t-field" htmlFor={fieldId("notes")}>
-          <span className="t-field__label">
-            Uwagi dla serwisu <em>opcjonalnie</em>
-          </span>
-          <textarea id={fieldId("notes")} value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} placeholder="Np. kiedy najlepiej dzwonić, kod do odblokowania podasz przy przyjęciu" {...aria("notes", errors)} />
-          <span className={`t-field__hint${notesLeft < 0 ? " is-bad" : ""}`}>Zostało znaków: {notesLeft}</span>
+        <div className="t-field t-area">
+          <div className="t-field__top">
+            <label className="t-field__label" htmlFor={fieldId("notes")}>
+              Uwagi dla serwisu <em>opcjonalnie</em>
+            </label>
+            <span className={`t-area__count${notesLeft < 0 ? " is-bad" : ""}`} id="zgl-notes-left">
+              Zostało znaków: {notesLeft}
+            </span>
+          </div>
+          <div className="t-input t-input--area">
+            <textarea
+              id={fieldId("notes")}
+              value={form.notes}
+              onChange={(e) => set("notes", e.target.value)}
+              rows={3}
+              placeholder="Np. kiedy najlepiej dzwonić, kod do odblokowania podasz przy przyjęciu"
+              aria-describedby={errors.notes?.length ? `${fieldId("notes")}-err zgl-notes-left` : "zgl-notes-left"}
+              aria-invalid={errors.notes?.length ? true : undefined}
+            />
+          </div>
           <FieldError field="notes" errors={errors} />
-        </label>
+        </div>
         <PrepChecklist category={cat} />
-        <label className="t-check" data-field="consent" id={fieldId("consent")}>
+        <label className={`t-check t-check--card${form.consent ? " is-on" : ""}`} data-field="consent" id={fieldId("consent")}>
           <input type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} {...aria("consent", errors)} />
           <span>
             Akceptuję <Link href="/regulamin">regulamin</Link> i <Link href="/polityka-prywatnosci">politykę prywatności</Link>. Dane podaję, żeby serwis mógł przyjąć i obsłużyć zgłoszenie. *
@@ -614,24 +733,27 @@ export function RepairForm() {
           <p className="t-lead">Bez logowania, około minuty. Wycenę dostajesz po diagnozie, przed naprawą.</p>
         </header>
 
-        <ol className="t-steps" aria-label="Kroki zgłoszenia">
-          {FORM_STEPS.map((s) => {
-            const state = s.n === step ? "is-on" : s.n <= maxStep ? "is-done" : "";
-            const can = s.n <= maxStep;
-            return (
-              <li key={s.n} className={`t-steps__item ${state}${stepHasErrors(s.n as StepNo) ? " has-error" : ""}`} aria-current={s.n === step ? "step" : undefined}>
-                <button type="button" disabled={!can} onClick={() => can && setStep(s.n as StepNo)}>
-                  <span className="t-steps__n">{s.n !== step && s.n < maxStep ? <IconCheck size={13} /> : s.n}</span>
-                  <span className="t-steps__t">{s.title}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+        <div className="t-stepper" ref={stepsRef} style={{ ["--zgl-progress" as string]: (step - 1) / 4 }}>
+          <span className="t-stepper__pill" aria-hidden="true" />
+          <ol className="t-steps" aria-label="Kroki zgłoszenia">
+            {FORM_STEPS.map((s) => {
+              const n = s.n as StepNo;
+              const state = n === step ? "is-on" : n <= maxStep ? "is-done" : "";
+              const can = n <= maxStep;
+              return (
+                <li key={n} className={`t-steps__item ${state}${stepHasErrors(n) ? " has-error" : ""}`} aria-current={n === step ? "step" : undefined}>
+                  <button type="button" disabled={!can} onClick={() => can && showStep(n)}>
+                    <span className="t-steps__n">{n !== step && n < maxStep ? <IconCheck size={13} strokeWidth={3} /> : n}</span>
+                    <span className="t-steps__t">{s.title}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <span className="t-stepper__bar" aria-hidden="true" />
+        </div>
         <div className="t-zgl__phonebar" aria-hidden="true">
-          <span>
-            Zgłoś naprawę · {step} z 5
-          </span>
+          <span>{`Zgłoś naprawę · ${step} z 5`}</span>
           <span className="t-zgl__progress">
             {FORM_STEPS.map((s) => (
               <i key={s.n} className={s.n <= step ? "is-on" : ""} />
@@ -649,65 +771,59 @@ export function RepairForm() {
             else void submit();
           }}
         >
-          {FORM_STEPS.map((s) => {
-            const n = s.n as StepNo;
-            if (n === step) {
-              return (
-                <section key={n} id={`zgl-step-${n}`} className="t-zgl__step t-card is-open" aria-labelledby={`zgl-step-${n}-h`}>
-                  <h2 id={`zgl-step-${n}-h`} className="t-zgl__steph">
-                    <span className="t-zgl__stepn">{n}</span>
+          <section ref={cardRef} id={`zgl-step-${step}`} className="t-zgl__step t-card is-open" aria-labelledby={`zgl-step-${step}-h`}>
+            <div className="t-zgl__stage" ref={stageRef}>
+              <div className="t-zgl__pane" key={step}>
+                <div className="t-zgl__stephead">
+                  <h2 id={`zgl-step-${step}-h`} className="t-zgl__steph">
+                    <span className="t-zgl__stepn">{step}</span>
                     {stepMeta.long}
                   </h2>
-                  <div className="t-zgl__body">{stepBody[n]}</div>
-                  <div className="t-zgl__foot">
-                    <span className="t-zgl__note">{n === 1 ? "* pola wymagane · model zawsze, marka dla telefonu, tabletu i smartwatcha" : n === 5 ? "Wycena przed naprawą. Możesz zrezygnować." : "* pola wymagane"}</span>
-                    <div className="t-zgl__btns">
-                      {n > 1 ? (
-                        <button type="button" className="t-btn t-btn--ghost" onClick={() => setStep((n - 1) as StepNo)}>
-                          Wstecz
-                        </button>
-                      ) : null}
-                      <button type="submit" className="t-btn t-btn--acc" disabled={sending} data-zgl-next="">
-                        <span className="t-zgl__nextlong">{nextLabel}</span>
-                        <span className="t-zgl__nextshort">{step < 5 ? "Dalej" : sending ? "Wysyłanie…" : "Wyślij"}</span>
-                        <IconArrow />
-                      </button>
-                    </div>
-                  </div>
-                </section>
-              );
-            }
-            const reachable = n <= maxStep;
-            return (
-              <button
-                key={n}
-                type="button"
-                id={`zgl-step-${n}`}
-                className={`t-zgl__collapsed t-card${reachable ? " is-reachable" : ""}${stepHasErrors(n) ? " has-error" : ""}`}
-                onClick={() => reachable && setStep(n)}
-                aria-disabled={!reachable}
-                tabIndex={reachable ? 0 : -1}
-              >
-                <span className="t-zgl__stepn">{n < maxStep ? <IconCheck size={14} /> : n}</span>
-                <span className="t-zgl__ctext">
-                  <b>{s.long}</b>
-                  <span>{s.sub}</span>
-                </span>
-                <IconChevronDown size={18} />
-              </button>
-            );
-          })}
+                  <p className="t-zgl__stepsub">{stepMeta.sub}</p>
+                </div>
+                <div className="t-zgl__body">{stepBody[step]}</div>
+              </div>
+            </div>
+            <div className="t-zgl__foot">
+              <span className="t-zgl__note">{step === 1 ? "* pola wymagane · model zawsze, marka dla telefonu, tabletu i smartwatcha" : step === 5 ? "Wycena przed naprawą. Możesz zrezygnować." : "* pola wymagane"}</span>
+              <div className="t-zgl__btns">
+                {step > 1 ? (
+                  <button type="button" className="t-btn t-btn--ghost" onClick={() => showStep((step - 1) as StepNo)}>
+                    Wstecz
+                  </button>
+                ) : null}
+                <button type="submit" className={`t-btn t-btn--acc t-btn--shine${sending ? " is-busy" : ""}`} disabled={sending} data-zgl-next="">
+                  <span className="t-zgl__nextlong">{nextLabel}</span>
+                  <span className="t-zgl__nextshort">{step < 5 ? "Dalej" : sending ? "Wysyłanie…" : "Wyślij"}</span>
+                  {sending ? <span className="t-spin" aria-hidden="true" /> : <IconArrow />}
+                </button>
+              </div>
+            </div>
+          </section>
         </form>
       </div>
 
       <aside className="t-zgl__aside" aria-label="Twoje zgłoszenie">
         <div className="t-card t-zgl__sum">
-          <span className="t-eyebrow">Twoje zgłoszenie</span>
+          <div className="t-zgl__sumhead">
+            <span className="t-eyebrow">Twoje zgłoszenie</span>
+            <span className="t-zgl__sumstep">{`Krok ${step} z 5`}</span>
+          </div>
+          <span className="t-zgl__sumbar" aria-hidden="true" style={{ ["--zgl-progress" as string]: step / 5 }} />
           <dl>
             {summary.map((s) => (
-              <div key={s.k}>
+              <div key={s.k} className={s.v ? "has-v" : undefined}>
                 <dt>{s.k}</dt>
-                <dd>{s.v ?? <span className="t-muted">{s.step === 2 ? "do wyboru w kroku 2" : "—"}</span>}</dd>
+                <dd key={s.v ?? "empty"}>
+                  {s.v ? (
+                    <span className="t-zgl__val">
+                      {s.k === "Urządzenie" ? <span className="t-zgl__vico">{catIcon ? <DeviceGlyph icon={catIcon} size={15} /> : <DotsIcon size={15} />}</span> : null}
+                      {s.v}
+                    </span>
+                  ) : (
+                    <span className="t-muted">{s.step === 2 ? "do wyboru w kroku 2" : "—"}</span>
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
@@ -718,12 +834,7 @@ export function RepairForm() {
         <div className="t-dark t-zgl__next">
           <span className="t-eyebrow t-eyebrow--dark">Co dalej</span>
           <ol>
-            {[
-              { t: "Numer zgłoszenia", s: "Dostajesz go od razu po wysłaniu, także e-mailem." },
-              { t: "Diagnoza i wycena", s: "Po przyjęciu sprzętu sprawdzamy usterkę i przesyłamy wycenę." },
-              { t: "Twoja decyzja", s: "Akceptujesz albo rezygnujesz bez konsekwencji." },
-              { t: "Status online", s: "Po numerze zgłoszenia i 4 ostatnich cyfrach telefonu." },
-            ].map((x, i) => (
+            {NEXT_STEPS.map((x, i) => (
               <li key={x.t}>
                 <span>{i + 1}</span>
                 <p>

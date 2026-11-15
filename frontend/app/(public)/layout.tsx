@@ -18,6 +18,7 @@ import "./tech-wizard.css";
 import "./tech-pages.css";
 import "./tech-about.css";
 import "./tech-visit.css";
+import "./tech-form.css";
 
 // Public-site fonts only (SPEC §3). Panels keep DM Sans / Unbounded from the root layout.
 // Fallback tuned to Archivo at font-stretch 108% (the default Arial fallback is ~20% narrower,

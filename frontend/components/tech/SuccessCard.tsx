@@ -166,7 +166,7 @@ export function SuccessCard({ response, deviceLabel, category, point, courier, c
         </div>
 
         <div className="t-success__actions">
-          <Link href={statusHref} className="t-btn t-btn--acc">
+          <Link href={statusHref} className="t-btn t-btn--acc t-btn--shine">
             {loggedIn ? "Moje naprawy w koncie" : "Sprawdź status"} <IconArrow />
           </Link>
           <button type="button" className="t-btn t-btn--ghost" onClick={share}>
