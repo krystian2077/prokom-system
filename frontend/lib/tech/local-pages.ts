@@ -86,10 +86,10 @@ export const localPages: LocalPage[] = [
       "Naprawa telefonów w Zakopanem: wymiana wyświetlacza, baterii i gniazda ładowania, pomoc po zalaniu. Diagnoza i wycena przed naprawą, gwarancja na usługę i części.",
     area:
       "Punkt w Zakopanem obsługuje też Kościelisko, Poronin, Biały Dunajec, Bukowinę Tatrzańską i Szaflary. Jesteś na urlopie? Naprawiamy także telefony turystów.",
-    // From docs/STAN.md (14.11): centre, by ul. Weteranów Wojny and the town park.
-    // TODO(krystian): check wording and add parking with the service before Zakopane is published.
+    // From the boss (14.11) and Krystian (15.11): town centre, near Krupówki and Równia Krupowa.
+    // The street comes from config/prokom.ts on the page. TODO(krystian): parkingNote once the service confirms it.
     access:
-      "Punkt jest w centrum Zakopanego, przy ulicy Weteranów Wojny i parku miejskim. Przyjdź bez umawiania w godzinach otwarcia.",
+      "Punkt jest w centrum Zakopanego, kilka kroków od Krupówek i Równi Krupowej. Przyjdź bez umawiania w godzinach otwarcia.",
     faq: [
       {
         q: "Ile kosztuje wymiana szybki w telefonie w Zakopanem?",
