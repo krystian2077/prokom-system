@@ -165,6 +165,8 @@ html[data-tech-theme="dark"] .tech {
   }
   .tech .t-snap > * { scroll-snap-align: start; }
   .tech .t-snap::-webkit-scrollbar { display: none; }
+  /* keyboard-scrollable lists without links (axe scrollable-region-focusable) */
+  .tech .t-snap:focus-visible { outline: 3px solid var(--acc); outline-offset: 4px; border-radius: 12px; }
 }
 
 .tech .t-visually-hidden {
