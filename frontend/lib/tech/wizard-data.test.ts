@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEVICE_CATEGORIES } from "@/types/repair";
-import { courierService } from "@/config/prokom";
+import { courierService, servicePoints, type ServicePoint } from "@/config/prokom";
 import { claim } from "./claims";
 import { courierPageHref, courierPaysText } from "./courier";
 import { visiblePoints } from "./points";
@@ -72,9 +72,13 @@ describe("wizard-data", () => {
 });
 
 describe("delivery options and Zakopane (SPEC §5)", () => {
-  it("unpublished Zakopane is not a delivery option in production, only in draft mode", () => {
-    expect(visiblePoints(false).map((p) => p.key)).not.toContain("zakopane");
-    expect(visiblePoints(true).map((p) => p.key)).toContain("zakopane");
+  it("an unpublished point is not a delivery option in production, only in draft mode", () => {
+    const unpublished: ServicePoint[] = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
+    expect(visiblePoints(false, unpublished).map((p) => p.key)).not.toContain("zakopane");
+    expect(visiblePoints(true, unpublished).map((p) => p.key)).toContain("zakopane");
+  });
+  it("real config: Rabka-Zdrój and Zakopane are both delivery options in production", () => {
+    expect(visiblePoints(false).map((p) => p.key)).toEqual(["rabka", "zakopane"]);
   });
 });
 

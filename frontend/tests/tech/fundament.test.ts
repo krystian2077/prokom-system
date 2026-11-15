@@ -64,17 +64,25 @@ describe("Umami only on the public site", () => {
 describe("JSON-LD from prokom.ts", () => {
   const graph = siteJsonLd()["@graph"] as Array<Record<string, unknown>>;
 
-  it("Organization + one LocalBusiness per published point only", () => {
+  it("real config: Organization + LocalBusiness for both points (Zakopane published 15.11.2026)", () => {
     expect(graph[0]["@type"]).toBe("Organization");
     const businesses = graph.filter((n) => n["@type"] === "LocalBusiness");
-    expect(businesses).toHaveLength(servicePoints.filter((p) => p.published).length);
-    expect(JSON.stringify(graph)).not.toMatch(/Staszica|Zakopane"/); // Zakopane is a draft
+    expect(businesses.map((n) => n["@id"])).toEqual([
+      "https://prokomserwis.pl/#punkt-rabka",
+      "https://prokomserwis.pl/#punkt-zakopane",
+    ]);
+    const zakopane = servicePoints.find((p) => p.key === "zakopane")!;
+    const z = businesses[1] as { address: { streetAddress: string }; telephone: string; geo: { latitude: number; longitude: number } };
+    expect(z.address.streetAddress).toBe(zakopane.street);
+    expect(z.telephone).toBe(zakopane.phone!.replace(/\s/g, ""));
+    expect(z.geo).toMatchObject({ latitude: zakopane.geo!.lat, longitude: zakopane.geo!.lng });
   });
 
-  it("includes Zakopane once it is published", () => {
-    const all = servicePoints.map((p) => ({ ...p, published: true }));
-    const g = siteJsonLd(all)["@graph"] as Array<Record<string, unknown>>;
-    expect(g.filter((n) => n["@type"] === "LocalBusiness")).toHaveLength(2);
+  it("an unpublished point gets no LocalBusiness", () => {
+    const draft = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
+    const g = siteJsonLd(draft)["@graph"] as Array<Record<string, unknown>>;
+    expect(g.filter((n) => n["@type"] === "LocalBusiness")).toHaveLength(1);
+    expect(JSON.stringify(g)).not.toMatch(/Staszica|Zakopane"/);
   });
 
   it("opening hours come from the same data", () => {

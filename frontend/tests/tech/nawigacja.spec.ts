@@ -88,10 +88,11 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
     await page.goto("/");
     await page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" }).click();
     const panel = page.locator('.t-mega[data-mega="punkty"]');
-    await expect(panel.locator(".t-mega__point")).toHaveCount(1);
-    await expect(panel.getByRole("link", { name: /Nawiguj/ })).toHaveAttribute("href", /google\.com\/maps\/dir/);
-    await expect(panel.getByRole("link", { name: /Zadzwoń/ })).toHaveAttribute("href", /^tel:/);
-    await expect(panel).not.toContainText(/Zakopane|Staszica/);
+    await expect(panel.locator(".t-mega__point")).toHaveCount(2);
+    await expect(panel.getByRole("link", { name: /Nawiguj/ }).nth(1)).toHaveAttribute("href", /destination=49\.2978,19\.9539$/);
+    await expect(panel.getByRole("link", { name: /Nawiguj/ }).first()).toHaveAttribute("href", /google\.com\/maps\/dir/);
+    await expect(panel.getByRole("link", { name: /Zadzwoń/ }).first()).toHaveAttribute("href", /^tel:/);
+    await expect(panel).toContainText("Zakopane");
   });
 
   test("capsule sticks and narrows on scroll (transform only)", async ({ page }) => {

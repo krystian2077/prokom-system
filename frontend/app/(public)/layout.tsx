@@ -34,7 +34,7 @@ const cities = published.map((p) => p.city).join(" i ");
 const defaultTitle = `Serwis telefonów i komputerów — ${cities} | ${line.name}`;
 const description =
   published.length > 1
-    ? `${line.name} — serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek: ${cities}. Wycena przed naprawą, gwarancja i status naprawy online.`
+    ? `${line.name} — serwis telefonów, laptopów, tabletów, konsol i drukarek: ${cities}. Wycena przed naprawą, gwarancja i status naprawy online.`
     : `${line.name} — serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju. Wycena przed naprawą, gwarancja i status naprawy online.`;
 
 // Public defaults live here, not in the root layout: most panel pages inherit the root

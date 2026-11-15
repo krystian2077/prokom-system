@@ -1,6 +1,6 @@
 /**
  * SEO of rendered public pages (SPEC §9): one H1, title 30–60, description 120–155,
- * canonical, JSON-LD parses; 301s; unpublished local page is 404; sitemap content.
+ * canonical, JSON-LD parses; 301s; both local pages published; sitemap content.
  * Old pages not rebuilt yet (TD5) are in LEGACY_SEO — the list may only shrink.
  */
 import { expect, test } from "@playwright/test";
@@ -8,7 +8,7 @@ import { STATIC_ROUTES } from "../../lib/tech/sitemap";
 
 // TD5 PR 2 rebuilt the last legacy pages — the list is empty and must stay empty.
 const LEGACY_SEO = new Set<string>([]);
-const PAGES = [...STATIC_ROUTES.map((r) => r.path), "/serwis-telefonow-rabka-zdroj"];
+const PAGES = [...STATIC_ROUTES.map((r) => r.path), "/serwis-telefonow-rabka-zdroj", "/serwis-telefonow-zakopane"];
 
 type Seo = { h1: number; title: string; description: string; canonical: string | null; ld: string[] };
 
@@ -26,7 +26,7 @@ for (const path of PAGES) {
     const ok =
       seo.h1 === 1 &&
       seo.title.length >= 30 &&
-      seo.title.length <= 60 &&
+      (path === "/" || seo.title.length <= 60) &&
       seo.description.length >= 120 &&
       seo.description.length <= 155 &&
       !!seo.canonical &&
@@ -38,7 +38,12 @@ for (const path of PAGES) {
     }
     expect(seo.h1, "jeden H1").toBe(1);
     expect(seo.title.length, `tytuł „${seo.title}”`).toBeGreaterThanOrEqual(30);
-    expect(seo.title.length, `tytuł „${seo.title}”`).toBeLessThanOrEqual(60);
+    if (path === "/") {
+      // SPEC §9 gives the home title literally (two points → 69 characters), the only exception to 30–60.
+      expect(seo.title).toBe("Serwis telefonów i komputerów — Rabka-Zdrój i Zakopane | PRO-KOM Tech");
+    } else {
+      expect(seo.title.length, `tytuł „${seo.title}”`).toBeLessThanOrEqual(60);
+    }
     expect(seo.description.length, `opis „${seo.description}”`).toBeGreaterThanOrEqual(120);
     expect(seo.description.length, `opis „${seo.description}”`).toBeLessThanOrEqual(155);
     expect(seo.canonical).toBeTruthy();
@@ -59,15 +64,22 @@ test("301: /akcesoria → /hammer-glass, /oferta → /", async ({ request }) => 
   expect(phones.status()).toBe(200);
 });
 
-test("unpublished Zakopane local page is 404 in production", async ({ request }) => {
-  expect((await request.get("/serwis-telefonow-zakopane")).status()).toBe(404);
+test("Zakopane local page is published (point published 15.11.2026)", async ({ page }) => {
+  const res = await page.goto("/serwis-telefonow-zakopane");
+  expect(res?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Serwis telefonów\s*Zakopane/);
+  await expect(page.locator(".t-pointcard")).toHaveCount(1);
+  await expect(page.locator(".t-pointcard")).toContainText("Staszica");
+  await expect(page.getByText("Czy w Zakopanem wytniecie folię Hammer Glass?")).toHaveCount(1);
+  await expect(page.locator("main .t-draft, main .t-draft-badge")).toHaveCount(0);
 });
 
-test("sitemap.xml: no removed or unpublished pages", async ({ request }) => {
+test("sitemap.xml: no removed pages, both local pages", async ({ request }) => {
   const xml = await (await request.get("/sitemap.xml")).text();
   expect(xml).toContain("/serwis-telefonow-rabka-zdroj</loc>");
   expect(xml).toContain("/punkty-serwisowe</loc>");
-  expect(xml).not.toMatch(/\/(akcesoria|oferta|serwis-telefonow-zakopane)<\/loc>/);
+  expect(xml).toContain("/serwis-telefonow-zakopane</loc>");
+  expect(xml).not.toMatch(/\/(akcesoria|oferta)<\/loc>/);
   expect(xml).not.toMatch(/\/(panel|admin-panel|client)\//);
 });
 
@@ -81,5 +93,6 @@ test("local page: point card, repairs with prefilled report, local FAQ, Service 
   const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
   expect(ld.some((s) => s.includes('"Service"'))).toBe(true);
   expect(ld.some((s) => s.includes('"FAQPage"'))).toBe(true);
-  await expect(page.locator("main").getByText(/Zakopane|Staszica/)).toHaveCount(0);
+  // the Rabka page may name the other point, but never prints its street
+  await expect(page.locator("main").getByText(/Staszica/)).toHaveCount(0);
 });

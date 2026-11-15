@@ -55,17 +55,22 @@ test.describe("desktop 1440", () => {
     expect((await params(page, "wizard-next")).q.category).toBe("data_recovery");
   });
 
-  test("unpublished Zakopane is not offered anywhere (SPEC §5)", async ({ page }) => {
+  // The "unpublished point is hidden" rule runs on injected test data in the unit tests
+  // (lib/tech/points.test.ts, tests/tech/seo.test.ts); the real config has both points (15.11.2026).
+  test("two published points: Rabka-Zdrój and Zakopane everywhere (SPEC §5)", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("#kreator").getByRole("button", { name: /Zakopane/ })).toHaveCount(0);
-    // the town may be listed among served towns, but never as a service point
-    await expect(page.locator(".t-hero__points")).not.toContainText("Zakopane");
-    await expect(page.locator(".t-podhale__pin", { hasText: "Zakopane" })).toHaveCount(0);
-    await expect(page.locator(".t-ptile")).toHaveCount(1);
-    await expect(page.locator(".t-cta-band__point")).toHaveCount(1);
-    await expect(page.locator("main")).not.toContainText("Dwa punkty");
-    await expect(page.locator(".t-near")).toHaveCount(0);
+    await expect(page).toHaveTitle("Serwis telefonów i komputerów — Rabka-Zdrój i Zakopane | PRO-KOM Tech");
+    await expect(page.locator(".t-hero__points")).toContainText("Zakopane");
+    await expect(page.locator(".t-podhale__pin", { hasText: "Zakopane" })).toHaveCount(1);
+    await expect(page.locator(".t-ptile")).toHaveCount(2);
+    await expect(page.locator(".t-cta-band__point")).toHaveCount(2);
+    await expect(page.locator("#punkty")).toContainText("Dwa punkty");
+    await expect(page.locator("#punkty")).toContainText("Oddajesz w jednym punkcie, odbierasz w drugim");
+    await expect(page.locator(".t-near")).toHaveCount(1);
     await expect(page.locator("main")).not.toContainText("paczkomat");
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join("\n");
+    expect(ld).toContain("#punkt-rabka");
+    expect(ld).toContain("#punkt-zakopane");
   });
 
   test("side rail lists the home sections, FAQ works with the keyboard", async ({ page }) => {

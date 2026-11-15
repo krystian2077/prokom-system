@@ -102,6 +102,10 @@ test.describe("desktop 1440", () => {
     await page.goto("/zgloszenie?category=drone&punkt=zakopane&dostawa=paczkomat");
     await expect(page.locator(".t-zgl__form [role=radio][aria-checked=true]")).toHaveCount(0);
     await expect(page.locator(".t-zgl__sum")).toContainText("do wyboru w kroku 2");
+
+    // Zakopane is published (15.11.2026): accepted from a wizard link
+    await page.goto("/zgloszenie?category=phone&punkt=zakopane");
+    await expect(page.locator(".t-zgl__sum")).toContainText("Zakopane, osobiście");
   });
 
   test("courier: address fields, no parcel locker, 'Jak to działa?' links to the published courier page", async ({ page }) => {

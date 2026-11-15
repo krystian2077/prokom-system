@@ -60,7 +60,7 @@ export default function PointsPage() {
             <p className="t-lead t-lead--stage">
               {two
                 ? "Przynieś sprzęt bez umawiania albo zgłoś naprawę online. W obu punktach pracujemy w jednym systemie, więc status sprawdzisz z telefonu."
-                : // TODO(krystian): single-point variant of the design sentence (until Zakopane is published).
+                : // Single-point fallback, used only while a point is unpublished (SPEC §5).
                   "Przynieś sprzęt bez umawiania albo zgłoś naprawę online. Status naprawy sprawdzisz potem z telefonu."}
             </p>
             <div className="t-bigphone">

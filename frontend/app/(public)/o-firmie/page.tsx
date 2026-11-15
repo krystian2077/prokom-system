@@ -17,7 +17,7 @@ const main = published[0];
 
 export const metadata = pageMetadata({
   title: "O firmie — lokalny serwis z Podhala",
-  description: `${line.name} to serwisowa linia firmy ${company.name}. Naprawiamy telefony, laptopy, tablety, komputery, konsole i drukarki: ${joinCities(published)}.`,
+  description: `${line.name} to serwisowa linia ${company.name}. Naprawiamy telefony, laptopy, tablety, komputery, konsole i drukarki: ${joinCities(published)}.`,
   path: "/o-firmie",
 });
 

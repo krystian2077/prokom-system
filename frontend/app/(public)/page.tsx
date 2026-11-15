@@ -18,11 +18,11 @@ import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { SITE_URL } from "@/lib/site-config";
 
 const published = publishedPoints(servicePoints);
-// SPEC §9: "… — Rabka-Zdrój i Zakopane | PRO-KOM Tech", Rabka only until Zakopane is published.
+// SPEC §9: "… — Rabka-Zdrój i Zakopane | PRO-KOM Tech"; one city only if a point is unpublished.
 const title = `Serwis telefonów i komputerów — ${published.map((p) => p.city).join(" i ")}`;
 const description =
   published.length > 1
-    ? `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju i Zakopanem. Najpierw diagnoza i wycena, gwarancja i status naprawy online.`
+    ? `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju i Zakopanem. Wycena przed naprawą, gwarancja i status naprawy online.`
     : `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju. Najpierw diagnoza i wycena, gwarancja i status naprawy online.`;
 
 export const metadata: Metadata = {

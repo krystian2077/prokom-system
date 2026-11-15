@@ -98,7 +98,9 @@ describe("naprawa kurierem — publikacja (SPEC §12.10)", () => {
     expect(courierPayRows({ ...courierService, inboundPaidBy: "client", returnPaidBy: null, returnIfDeclined: null }).map((r) => r.k)).toEqual(["Wysyłka do serwisu"]);
   });
   it("parcels go only to a published point", () => {
-    expect(courierPoint(servicePoints, { ...courierService, address: "zakopane" })).toBeNull();
+    const draft = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
+    expect(courierPoint(draft, { ...courierService, address: "zakopane" })).toBeNull();
+    expect(courierPoint(servicePoints, { ...courierService, address: "zakopane" })?.key).toBe("zakopane");
     expect(courierPoint(servicePoints, { ...courierService, address: "rabka" })?.key).toBe("rabka");
   });
 });

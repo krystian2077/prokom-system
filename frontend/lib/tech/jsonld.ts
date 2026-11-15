@@ -15,8 +15,8 @@ const DAYS: Record<string, string[]> = {
 /** Areas served per point (kept from the previous JSON-LD for Rabka). */
 const AREAS: Record<ServicePoint["key"], string[]> = {
   rabka: ["Rabka-Zdrój", "Mszana Dolna", "Jordanów", "Raba Wyżna", "Nowy Targ", "Czarny Dunajec"],
-  // TODO(krystian): confirm before Zakopane gets published: true (TD4, /obslugiwane-miejscowosci).
-  zakopane: ["Zakopane", "Poronin", "Kościelisko", "Bukowina Tatrzańska", "Biały Dunajec"],
+  // Same towns as lib/tech/towns.ts (nearer point = Zakopane).
+  zakopane: ["Zakopane", "Kościelisko", "Poronin", "Biały Dunajec", "Bukowina Tatrzańska", "Szaflary"],
 };
 
 const phoneE164 = (p: string) => p.replace(/[^\d+]/g, "");
