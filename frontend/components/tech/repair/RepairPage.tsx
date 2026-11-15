@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { line } from "@/config/prokom";
 import type { RepairPageData } from "@/config/naprawy";
-import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
@@ -16,6 +15,9 @@ import { visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, type Crumb } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
 import { submitHref } from "@/lib/tech/wizard-data";
+import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
+import { FaultVisual } from "../subhero/FaultVisual";
+import { SubHero } from "../subhero/SubHero";
 
 /** Placeholder shown only on staging for pages without confirmed content. */
 function Missing({ what }: { what: string }) {
@@ -42,6 +44,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
   const points = visiblePoints();
   const related = page.powiazane.map((s) => repairBySlug(s)).filter((r): r is RepairPageData => !!r && (isLive(r) || !live));
   const phoneScreen = page.device === "phone" && /ekran/i.test(page.h1);
+  const scene = page.device === "other" ? null : HERO_SCENES[page.device];
 
   return (
     <div className={`t-ui t-page t-repair${live ? "" : " t-draft"}`}>
@@ -49,23 +52,21 @@ export function RepairPage({ page }: { page: RepairPageData }) {
       {page.faq.length ? <JsonLd data={faqJsonLd(page.faq)} /> : null}
       <JsonLd data={serviceJsonLd({ name: `${page.title} — ${line.name}`, serviceType: page.title, path: repairPath(page.slug), description: page.description })} />
 
-      <section className="t-section--hero" id="start" data-rail={page.h1}>
-        <div className="t-container">
-          <div className="t-stage t-bhero">
-            <Breadcrumbs items={crumbs} separator="/" />
-            <h1 className="t-bhero__h1">{page.h1}</h1>
-            {page.intro.length ? <p className="t-bhero__lead t-bhero__lead--wide">{page.intro[0]}</p> : <Missing what="Wstęp" />}
-            <div className="t-btnrow">
-              <Link href={submit} className="t-pbtn t-pbtn--stage" data-track="zgloszenie_start" data-track-zrodlo="strona_naprawy">
-                Zgłoś tę naprawę
-              </Link>
-              <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce="naprawa">
-                {line.phoneDisplay}
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SubHero
+        crumbs={crumbs}
+        eyebrow={`${deviceName} · ${line.name}`}
+        title={page.h1}
+        lead={page.intro[0] ?? ""}
+        primary={{ label: "Zgłoś tę naprawę", href: submit }}
+        trackPlace="naprawa"
+        promises={heroPromises({ category: page.device, phoneScreen })}
+        visual={scene ? <FaultVisual device={scene.device} faults={[page.usterka]} /> : null}
+        statusCard
+        points={points}
+        rail={page.h1}
+        variant="repair"
+      />
+      {page.intro.length ? null : <Missing what="Wstęp" />}
 
       <section className="t-section t-section--tight" id="objawy" data-rail="Objawy">
         <div className="t-container t-courier__cols">

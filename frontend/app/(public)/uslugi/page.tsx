@@ -1,7 +1,6 @@
 ﻿import Image from "next/image";
 import Link from "next/link";
 import { line, servicePoints, telHref } from "@/config/prokom";
-import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
@@ -10,10 +9,13 @@ import { RepairSteps } from "@/components/tech/device/RepairSteps";
 import { RepairLinks } from "@/components/tech/repair/RepairLinks";
 import { DeviceGlyph, IconArrow, IconPath } from "@/components/tech/icons";
 import { citiesTitle, hubCards } from "@/lib/tech/devices";
-import { REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
-import { publishedPoints } from "@/lib/tech/points";
+import { REPAIRS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
+import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { submitHref } from "@/lib/tech/wizard-data";
+import { HubCollage } from "@/components/tech/subhero/HubCollage";
+import { SubHero } from "@/components/tech/subhero/SubHero";
+import { heroPromises } from "@/lib/tech/subhero";
 
 const published = publishedPoints(servicePoints);
 const cities = citiesTitle(published);
@@ -59,41 +61,20 @@ export default function RepairsHubPage() {
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(FAQ)} />
 
-      <section className="t-section--hero" id="start" data-rail="Naprawy">
-        <div className="t-container">
-          <div className="t-stage t-dev-hero t-dev-hero--hub">
-            <div className="t-dev-hero__text">
-              <Breadcrumbs items={CRUMBS} separator="/" />
-              <h1 className="t-dev-hero__h1">
-                Naprawy
-                <span>Serwis telefonów, komputerów i elektroniki · {cities}</span>
-              </h1>
-              <p className="t-dev-hero__lead">
-                Jeden serwis na telefon, laptop i resztę elektroniki w domu albo firmie. Wybierz urządzenie, żeby zobaczyć, co naprawiamy — albo od razu zgłoś
-                naprawę online.
-              </p>
-              <div className="t-btnrow">
-                <Link href={SUBMIT_HREF} className="t-pbtn t-pbtn--stage" data-track="zgloszenie_start" data-track-zrodlo="przycisk">
-                  Zgłoś naprawę
-                </Link>
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce="naprawy">
-                  {line.phoneDisplay}
-                </a>
-              </div>
-              <ul className="t-dev-promises t-dev-promises--stage">
-                <li>Wycena przed naprawą</li>
-                <li>Możesz zrezygnować</li>
-                <li>Gwarancja na usługę i części</li>
-                <li>
-                  <Link href={TRACK_HREF} data-t-inline="">
-                    Status naprawy online
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SubHero
+        crumbs={CRUMBS}
+        eyebrow={`${line.name} · naprawy`}
+        title="Serwis telefonów, komputerów i elektroniki"
+        accent={cities}
+        lead="Telefon, laptop, konsola czy drukarka: jeden serwis na całą elektronikę w domu i w firmie. Wybierz urządzenie albo od razu zgłoś naprawę online."
+        primary={{ label: "Zgłoś naprawę", href: SUBMIT_HREF }}
+        trackPlace="naprawy"
+        promises={heroPromises()}
+        visual={<HubCollage />}
+        points={visiblePoints()}
+        rail="Naprawy"
+        variant="hub"
+      />
 
       <section className="t-section t-section--alt" id="urzadzenia" data-rail="Urządzenia">
         <div className="t-container">
