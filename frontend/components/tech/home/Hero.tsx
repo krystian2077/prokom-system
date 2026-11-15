@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { line, telHref } from "@/config/prokom";
 import { POINTS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconArrow, IconCheck, IconPhoneCall, IconPin, IconWrench } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
+import { HeroDevices } from "./HeroDevices";
 import { polishText } from "@/lib/tech/typo";
 
 // Promises that already exist in the service (SPEC §8) — verbatim from the design.
@@ -56,20 +56,7 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
               ))}
             </ul>
           </div>
-          {/* Studio composition (>= 768): laptop behind, two phones in front, each floating on its own
-              rhythm. Crops trimmed to the silhouette (scripts/tech/glowna-kadry.py), never upscaled.
-              The laptop is the largest image above the fold → the only `priority` one (LCP). */}
-          <div className="t-hero__devices" aria-hidden="true">
-            <span className="t-hero__dev t-hero__dev--laptop">
-              <Image src="/tech/urzadzenia/kadr-laptop.webp" alt="" width={608} height={414} priority unoptimized />
-            </span>
-            <span className="t-hero__dev t-hero__dev--iphone">
-              <Image src="/tech/urzadzenia/kadr-iphone.webp" alt="" width={399} height={494} unoptimized />
-            </span>
-            <span className="t-hero__dev t-hero__dev--samsung">
-              <Image src="/tech/urzadzenia/samsung.webp" alt="" width={454} height={549} unoptimized />
-            </span>
-          </div>
+          <HeroDevices />
         </div>
 
         <div className={`t-hero__points${points.length === 1 ? " is-single" : ""}`}>
