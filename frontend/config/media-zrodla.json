@@ -1,16 +1,16 @@
 {
-  "_opis": "Źródło i prawo do użycia każdego zdjęcia w public/tech (SPEC §10, docs/design/tech/README.md). confirmed=false blokuje produkcję, nie budowę. TODO(krystian): uzupełnić źródło (materiały producenta / własne zdjęcie) i ustawić confirmed=true.",
+  "_opis": "Źródło i prawo do użycia każdego zdjęcia w public/tech (SPEC §10, docs/design/tech/README.md). confirmed=false blokuje produkcję, nie budowę. 15.11.2026: Krystian potwierdził, że ma prawa do wszystkich zdjęć i filmu poniżej — wszystkie wpisy confirmed=true (decyzja z 15.11).",
   "pliki": [
-    { "plik": "public/tech/urzadzenia/iphone.webp", "z": "docs/design/tech/prototyp/img/iphone.png", "wymiary": "433x577", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/urzadzenia/samsung.webp", "z": "docs/design/tech/prototyp/img/samsung.png", "wymiary": "454x549", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/urzadzenia/tablet.webp", "z": "docs/design/tech/prototyp/img/tablet.png", "wymiary": "577x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/urzadzenia/laptop.webp", "z": "docs/design/tech/prototyp/img/laptop.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/urzadzenia/komputer.webp", "z": "docs/design/tech/prototyp/img/komputer.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/urzadzenia/drukarka.webp", "z": "docs/design/tech/prototyp/img/drukarka.png", "wymiary": "640x449", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/urzadzenia/konsola.webp", "z": "docs/design/tech/prototyp/img/konsola.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
-    { "plik": "public/tech/hammer/hg-ciecie.webp", "z": "docs/design/tech/prototyp/img/hg-ciecie.jpg", "wymiary": "1280x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
-    { "plik": "public/tech/hammer/hg-folie.webp", "z": "docs/design/tech/prototyp/img/hg-folie.jpg", "wymiary": "840x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
-    { "plik": "public/tech/hammer/hg-ploter.webp", "z": "docs/design/tech/prototyp/img/hg-ploter.jpg", "wymiary": "1160x640", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
-    { "plik": "public/tech/hammer/ploter.mp4", "z": "public/Hammer Glass Cut Ploter - PREZENTACJA - TelconPoland (1080p, h264).mp4", "wymiary": "1920x1080", "zrodlo": "film prezentacyjny plotera (TelconPoland) — potwierdzić prawo do użycia", "confirmed": false }
+    { "plik": "public/tech/urzadzenia/iphone.webp", "z": "docs/design/tech/prototyp/img/iphone.png", "wymiary": "433x577", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/urzadzenia/samsung.webp", "z": "docs/design/tech/prototyp/img/samsung.png", "wymiary": "454x549", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/urzadzenia/tablet.webp", "z": "docs/design/tech/prototyp/img/tablet.png", "wymiary": "577x640", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/urzadzenia/laptop.webp", "z": "docs/design/tech/prototyp/img/laptop.png", "wymiary": "640x640", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/urzadzenia/komputer.webp", "z": "docs/design/tech/prototyp/img/komputer.png", "wymiary": "640x640", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/urzadzenia/drukarka.webp", "z": "docs/design/tech/prototyp/img/drukarka.png", "wymiary": "640x449", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/urzadzenia/konsola.webp", "z": "docs/design/tech/prototyp/img/konsola.png", "wymiary": "640x640", "zrodlo": "zdjęcie z prototypu — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/hammer/hg-ciecie.webp", "z": "docs/design/tech/prototyp/img/hg-ciecie.jpg", "wymiary": "1280x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/hammer/hg-folie.webp", "z": "docs/design/tech/prototyp/img/hg-folie.jpg", "wymiary": "840x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/hammer/hg-ploter.webp", "z": "docs/design/tech/prototyp/img/hg-ploter.jpg", "wymiary": "1160x640", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
+    { "plik": "public/tech/hammer/ploter.mp4", "z": "public/Hammer Glass Cut Ploter - PREZENTACJA - TelconPoland (1080p, h264).mp4", "wymiary": "1920x1080", "zrodlo": "film prezentacyjny plotera (TelconPoland) — prawo do użycia potwierdzone (decyzja Krystiana 15.11.2026)", "confirmed": true }
   ]
 }

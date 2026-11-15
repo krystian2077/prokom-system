@@ -24,6 +24,21 @@ export function courierPoint(points: ServicePoint[] = servicePoints, service: Co
 
 const who = (p: "client" | "service") => (p === "client" ? "Ty" : "serwis");
 
+export const TRANSFER_AFTER_APPROVAL = "przelew po diagnozie i akceptacji naprawy";
+
+/**
+ * How the client pays for a courier repair, as plain Polish; null when `payment` is not set.
+ * Never cash on delivery — the sentence says so whenever payment is known.
+ */
+export function courierPaymentText(service: Courier = courierService): string | null {
+  const methods = service.payment ?? [];
+  if (!methods.length) return null;
+  const how = methods.includes(TRANSFER_AFTER_APPROVAL)
+    ? "Za naprawę płacisz przelewem — po diagnozie urządzenia i dopiero wtedy, gdy zaakceptujesz naprawę."
+    : `Płatność za naprawę: ${methods.join(", ")}.`;
+  return `${how} Nie wysyłamy za pobraniem.`;
+}
+
 /** "Kto płaci" table rows; a null field = no row. */
 export function courierPayRows(service: Courier = courierService): { k: string; v: string }[] {
   const rows: { k: string; v: string }[] = [];

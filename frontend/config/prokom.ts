@@ -41,6 +41,7 @@ export type ServicePoint = {
   /** null = line.phone */
   phone: string | null;
   mapsUrl: string | null;
+  /** Where to park. null = not shown (15.11.2026: parking info left out for now). */
   parkingNote: string | null;
   published: boolean;
 };
@@ -100,17 +101,20 @@ export const notices: Notice[] = [];
 
 /** Courier repair (SPEC §12.10). `null` = the sentence is not shown. */
 export const courierService = {
-  published: false, // true only after the boss answers the 5 questions (SPEC §10)
+  // The boss's answers to SPEC §10/§12.10, passed on by Krystian on 15.11.2026.
+  published: true,
   address: "rabka" as PointKey,
   inboundPaidBy: "client" as const,
   returnPaidBy: "service" as "service" | "client" | null,
-  returnIfDeclined: null as null | "service" | "client",
-  payment: null as null | string[],
-  area: null as null | "polska" | "okolica",
+  returnIfDeclined: "service" as null | "service" | "client",
+  /** Payment methods; „przelew po diagnozie…” renders as a full sentence (lib/tech/courier-page.ts). No cash on delivery. */
+  payment: ["przelew po diagnozie i akceptacji naprawy"] as null | string[],
+  area: "polska" as null | "polska" | "okolica",
 };
 
 /**
- * Numbers and promises from the design that still need the boss's confirmation (SPEC §10).
+ * Numbers and promises from the design (SPEC §10). Confirmed by Krystian on 15.11.2026:
+ * quickRepair, freeDiagnosis, sameDayDiagnosis, hg*, sinceYear, aboutSince.
  * `confirmed: false` → hidden in production (or the sentence goes without the number);
  * with NEXT_PUBLIC_TECH_DRAFT=1 (staging) shown inside the "do potwierdzenia" frame.
  * Flip `confirmed` after confirmation — components read it via lib/tech/claims.ts.
@@ -118,25 +122,25 @@ export const courierService = {
 export type Claim = { text: string; confirmed: boolean };
 export const claims = {
   /** Phone screen replacement time, pill on "Najczęstsze naprawy". */
-  quickRepair: { text: "często ok. 1 h", confirmed: false },
+  quickRepair: { text: "często ok. 1 h", confirmed: true },
   /** Diagnosis is free in most cases (step 2 of "Od zgłoszenia do odbioru"). */
-  freeDiagnosis: { text: "Bezpłatnie w większości przypadków.", confirmed: false },
+  freeDiagnosis: { text: "Bezpłatnie w większości przypadków.", confirmed: true },
   /** Diagnosis usually the same day (step 2). */
-  sameDayDiagnosis: { text: "Zwykle tego samego dnia.", confirmed: false },
+  sameDayDiagnosis: { text: "Zwykle tego samego dnia.", confirmed: true },
   /** Hammer Glass block. */
-  hgModels: { text: "10 000+", confirmed: false },
-  hgFoils: { text: "9", confirmed: false },
-  hgPrecision: { text: "0,1 mm", confirmed: false },
-  hgMinutes: { text: "W około 5 minut.", confirmed: false },
-  hgCutTime: { text: "Cięcie trwa około minuty", confirmed: false },
+  hgModels: { text: "10 000+", confirmed: true },
+  hgFoils: { text: "9", confirmed: true },
+  hgPrecision: { text: "0,1 mm", confirmed: true },
+  hgMinutes: { text: "W około 5 minut.", confirmed: true },
+  hgCutTime: { text: "Cięcie trwa około minuty", confirmed: true },
   /** Google rating card ("Dlaczego"): rating and number of reviews, e.g. "4,9 · 120 opinii". */
   googleRating: { text: "", confirmed: false },
   /** "Na Podhalu od 2004 roku" card ("Dlaczego"); the year itself is company.since. */
-  sinceYear: { text: "2004", confirmed: false },
+  sinceYear: { text: "2004", confirmed: true },
   /** Courier from the whole country (SPEC §10 courier question 5). */
-  courierWholeCountry: { text: "z całej Polski", confirmed: false },
+  courierWholeCountry: { text: "z całej Polski", confirmed: true },
   /** TD4 "O firmie": founding year shown as a number (hero, stat card; SPEC §10 „2004”). */
-  aboutSince: { text: String(company.since), confirmed: false },
+  aboutSince: { text: String(company.since), confirmed: true },
   /** TD4 "O firmie": "4 + 1" — PRO-KOM lines and the Gaming brand. */
   aboutLines: { text: "4 + 1", confirmed: false },
   /** TD4 "O firmie" rules outside SPEC §8 promises: which parts we use… */

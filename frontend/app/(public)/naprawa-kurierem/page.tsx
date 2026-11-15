@@ -7,7 +7,7 @@ import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PrepChecklist } from "@/components/tech/PrepChecklist";
-import { courierPayRows, courierPageVisible, courierPoint } from "@/lib/tech/courier-page";
+import { courierPayRows, courierPageVisible, courierPaymentText, courierPoint } from "@/lib/tech/courier-page";
 import { PREP_GUIDE_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import { hoursLong, pointAddress } from "@/lib/tech/point-format";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb, type FaqItem } from "@/lib/tech/seo";
@@ -27,8 +27,9 @@ const CRUMBS: Crumb[] = [
 
 const SUBMIT_COURIER = "/zgloszenie?dostawa=kurier";
 
-// TODO(krystian): texts to accept + the boss's 5 answers (SPEC §10, §12.10) before published:true.
+// The boss's answers (SPEC §10, §12.10) passed on by Krystian on 15.11.2026 — data in courierService.
 function faqItems(): FaqItem[] {
+  const payment = courierPaymentText();
   const items: FaqItem[] = [
     { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów — nie odbieramy z nich i nie nadajemy do nich paczek. Wyślij sprzęt kurierem pod adres serwisu." },
     { q: "Ile trwa naprawa wysyłkowa?", a: "To czas samej naprawy (zależy od usterki i części) plus dni przesyłki w obie strony. Termin naprawy podamy po diagnozie." },
@@ -39,6 +40,7 @@ function faqItems(): FaqItem[] {
       a: `Odsyłamy sprzęt bez naprawy, a odesłanie jest ${courierService.returnIfDeclined === "service" ? "na nasz koszt" : "na Twój koszt"}.`,
     });
   }
+  if (payment) items.push({ q: "Jak zapłacę za naprawę?", a: payment });
   items.push(
     { q: "Czy sprzęt jest ubezpieczony w drodze?", a: "Ubezpieczenie przesyłki zależy od przewoźnika i zadeklarowanej wartości. Przy droższym sprzęcie warto zadeklarować wartość przy nadaniu." },
     { q: "Jak sprawdzę status naprawy?", a: "Na stronie statusu naprawy, po numerze zgłoszenia i 4 ostatnich cyfrach telefonu podanego w zgłoszeniu." },
@@ -53,15 +55,16 @@ export default function CourierPage() {
   const point = courierPoint(servicePoints);
   const pays = courierPayRows();
   const faq = faqItems();
+  const payment = courierPaymentText();
   const steps = [
     { t: "Zgłoś naprawę online", s: "W formularzu wybierz „Kurier” — jako dostarczenie i jako zwrot." },
     { t: "Dostajesz e-mail", s: "Z numerem zgłoszenia i adresem serwisu, na który wysyłasz sprzęt." },
     { t: "Zapakuj sprzęt", s: "Włóż do paczki kartkę z numerem zgłoszenia i swoim telefonem." },
-    { t: "Nadaj dowolnym kurierem", s: "Pod adres serwisu, nie do paczkomatu. Numer przesyłki możesz dodać w koncie klienta." },
+    { t: "Nadaj dowolnym kurierem", s: "Pod adres serwisu — nie obsługujemy paczkomatów. Numer przesyłki możesz dodać w koncie klienta." },
     { t: "Diagnoza i wycena", s: "Naprawiamy dopiero po Twojej zgodzie." },
     {
       t: "Odsyłamy sprzęt",
-      s: `Na adres ze zgłoszenia.${courierService.payment?.length ? ` Płatność: ${courierService.payment.join(", ")}.` : ""}`,
+      s: `Na adres ze zgłoszenia.${payment ? ` ${payment}` : ""}`,
     },
   ];
 
@@ -199,7 +202,7 @@ export default function CourierPage() {
               </b>
               <span>{pointAddress(point)}</span>
               <span>Paczki odbieramy w godzinach otwarcia punktu: {hoursLong(point)}.</span>
-              <span>Nie do paczkomatu — tylko przesyłka kurierska pod ten adres.</span>
+              <span>Nie obsługujemy paczkomatów — tylko przesyłka kurierska pod ten adres.</span>
             </div>
           </div>
         </section>

@@ -108,7 +108,7 @@ test.describe("desktop 1440", () => {
     await expect(page.locator(".t-zgl__sum")).toContainText("Zakopane, osobiście");
   });
 
-  test("courier: address fields, no parcel locker, no 'Jak to działa?' while unpublished", async ({ page }) => {
+  test("courier: address fields, no parcel locker, 'Jak to działa?' links to the published courier page", async ({ page }) => {
     await page.goto("/zgloszenie?category=laptop&dostawa=kurier");
     await page.getByLabel("Model *").fill("ThinkPad");
     await page.getByLabel("Co się dzieje? *").fill("Nie działa");
@@ -116,7 +116,7 @@ test.describe("desktop 1440", () => {
     await expect(page.getByRole("radio", { name: /^Kurier/ }).first()).toHaveAttribute("aria-checked", "true");
     await expect(page.getByLabel("Ulica *")).toBeVisible();
     await expect(page.getByText(/paczkomat/i)).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Jak to działa?" })).toHaveCount(0);
+    await expect(page.locator('a[href="/naprawa-kurierem"]', { hasText: "Jak to działa?" })).toHaveCount(1);
     await page.locator("[data-zgl-next]").click();
     await expect(page.getByText("Przy wysyłce kurierem podaj adres (ulica i miasto).")).toBeVisible();
   });

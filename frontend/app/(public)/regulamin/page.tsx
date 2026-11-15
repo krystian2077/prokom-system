@@ -3,8 +3,10 @@ import { LegalDoc, Li, Ol, Section } from "@/components/tech/legal/LegalDoc";
 import { pageMetadata } from "@/lib/tech/seo";
 
 // Legal text kept word for word (TD5 PR 2); only the skin and contact data from config/prokom.ts.
-// TODO(krystian): hosting and domain wording after the VPS migration (webh.pl, Polska) —
-// to accept with the lawyer (SPEC §10); see the PR description.
+// TODO(krystian): update before production (open since 15.11.2026 — the text was accepted, but it still has
+// outdated facts): hosting „Render” (Hetzner now, webh.pl from 29.11), domain pro-kom.eu (→ prokomserwis.pl),
+// name „PRO-KOM Serwis”, „sprzedaż akcesoriów”, and no sentence about Umami statistics (SPEC §12.5).
+// To accept with the lawyer (SPEC §10).
 export const metadata = pageMetadata({
   title: "Regulamin świadczenia usług serwisowych",
   description: "Regulamin świadczenia usług serwisowych PRO-KOM Tech: zgłoszenie naprawy, diagnoza i wycena, realizacja, odbiór sprzętu, gwarancja i reklamacje.",

@@ -1,8 +1,6 @@
 /**
  * "Jak przygotować sprzęt do serwisu" (docs/tech/SPEC.md §12.3). Steps with a short "why",
- * per device tab. No prices, no time promises (SPEC §8).
- *
- * TODO(krystian): every step to check with the service before publishing (list in TD5 PR 3).
+ * per device tab. No prices, no time promises (SPEC §8). Steps accepted on 15.11.2026.
  */
 import type { DeviceCategory } from "./contract";
 

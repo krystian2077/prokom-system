@@ -142,7 +142,7 @@ export default function ContactPage() {
             <span className="t-eyebrow">Zanim przyjedziesz</span>
             <h2 className="t-h2">Pytania o wizytę w punkcie</h2>
             <p className="t-lead">
-              Dojazd, parking i to, co warto zabrać ze sobą. Godziny: {published.map((p) => `${p.name} ${hoursLong(p)}`).join("; ")}.
+              Dojazd i to, co warto zabrać ze sobą. Godziny: {published.map((p) => `${p.name} ${hoursLong(p)}`).join("; ")}.
             </p>
           </div>
           <Faq items={visitFaq(published)} />
