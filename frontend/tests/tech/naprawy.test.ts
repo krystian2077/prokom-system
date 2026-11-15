@@ -67,14 +67,30 @@ describe("naprawy — SEO i treść stron z treścią", () => {
       }
     }
   });
-  it("pages with content (and every verified page): ≥ 400 own words, 3–5 FAQ, symptoms and steps", () => {
+  it("pages with content (and every verified page): ≥ 400 own words, 3–8 FAQ, symptoms and steps", () => {
     for (const p of [...withContent, ...repairPages.filter((x) => x.verified)]) {
       expect(p.objawy.length, p.slug).toBeGreaterThanOrEqual(3);
       expect(p.przebieg.length, p.slug).toBeGreaterThanOrEqual(3);
       expect(wordCount(ownText(p)), p.slug).toBeGreaterThanOrEqual(400);
       expect(p.faq.length).toBeGreaterThanOrEqual(3);
-      expect(p.faq.length).toBeLessThanOrEqual(5);
+      expect(p.faq.length).toBeLessThanOrEqual(8);
     }
+  });
+  it("live pages (extended 2026-11): ≥ 800 own words, 5–8 unique FAQ, causes, parts, prep, after, tips", () => {
+    for (const p of liveRepairs()) {
+      expect(wordCount(ownText(p)), p.slug).toBeGreaterThanOrEqual(800);
+      expect(p.faq.length, p.slug).toBeGreaterThanOrEqual(5);
+      expect(p.faq.length, p.slug).toBeLessThanOrEqual(8);
+      expect(new Set(p.faq.map((f) => f.q)).size, p.slug).toBe(p.faq.length);
+      expect(p.przyczyny.length, p.slug).toBeGreaterThanOrEqual(3);
+      expect(p.czesci.length, p.slug).toBeGreaterThanOrEqual(1);
+      expect(p.przygotowanie.length, p.slug).toBeGreaterThanOrEqual(2);
+      expect(p.poNaprawie.length, p.slug).toBeGreaterThanOrEqual(3);
+      expect(p.porady.length, p.slug).toBeGreaterThanOrEqual(3);
+    }
+  });
+  it("no unconfirmed promises in plain text (they go through claim())", () => {
+    expect(JSON.stringify(repairPages)).not.toMatch(/bezpłatn|gratis|tego samego dnia|ok\. 1 h|w 5 minut|sklep/i);
   });
   it("shared text between any two pages < 30% (outside template blocks)", () => {
     for (const a of withContent) for (const b of withContent) if (a !== b) expect(sharedRatio(ownText(a), ownText(b)), `${a.slug} ~ ${b.slug}`).toBeLessThan(0.3);

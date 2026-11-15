@@ -45,7 +45,17 @@ export function repairSeo(p: RepairPageData, points: Pick<ServicePoint, "city">[
 
 /** Own text of a page (without template blocks) — for the "< 30% shared" test. */
 export function ownText(p: RepairPageData): string {
-  return [...p.intro, ...p.objawy, ...p.przebieg, ...p.faq.flatMap((f) => [f.q, f.a])].join(" ");
+  return [
+    ...p.intro,
+    ...p.objawy,
+    ...p.przebieg,
+    ...p.przyczyny.flatMap((x) => [x.t, x.s]),
+    ...p.czesci,
+    ...p.przygotowanie,
+    ...p.poNaprawie,
+    ...p.porady.flatMap((x) => [x.t, x.s]),
+    ...p.faq.flatMap((f) => [f.q, f.a]),
+  ].join(" ");
 }
 
 export function wordCount(text: string): number {

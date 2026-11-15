@@ -11,7 +11,10 @@
  * and `naMiejscu` stay null (sentences hidden) and the texts promise none of them.
  * Cities never appear in the texts — the "Gdzie oddać" block renders points from prokom.ts.
  */
+import type { RepairExtra } from "@/lib/tech/content-types";
 import type { CategoryCode } from "@/lib/tech/wizard-data";
+import { otherRepairExtra } from "./tresci/naprawy-inne";
+import { phoneRepairExtra } from "./tresci/naprawy-telefony";
 
 export type RepairFaq = { q: string; a: string };
 
@@ -42,13 +45,18 @@ export type RepairPageData = {
   powiazane: string[];
   published: boolean;
   verified: boolean;
-};
+} & Omit<RepairExtra, "faq">;
 
-type Content = Omit<RepairPageData, "czas" | "gwarancja" | "naMiejscu" | "published" | "verified">;
+type Content = Omit<RepairPageData, "czas" | "gwarancja" | "naMiejscu" | "published" | "verified" | Exclude<keyof RepairExtra, "faq">>;
+
+/** Extended texts (2026-11, config/tresci): causes, parts, prep, after, tips, more FAQ. */
+const EXTRA: Record<string, RepairExtra> = { ...phoneRepairExtra, ...otherRepairExtra };
+const EMPTY: RepairExtra = { przyczyny: [], czesci: [], przygotowanie: [], poNaprawie: [], porady: [], faq: [] };
 
 /** Accepted text (15.11.2026); time / warranty / on-site not confirmed by the service. */
 function accepted(c: Content): RepairPageData {
-  return { ...c, czas: null, gwarancja: null, naMiejscu: null, published: true, verified: true };
+  const x = EXTRA[c.slug] ?? EMPTY;
+  return { ...c, ...x, faq: [...c.faq, ...x.faq], czas: null, gwarancja: null, naMiejscu: null, published: true, verified: true };
 }
 
 export const repairPages: RepairPageData[] = [
