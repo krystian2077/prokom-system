@@ -25,7 +25,7 @@ export function Layer({ aspect, children, className = "", stretch = false }: { a
 
 /** Where a badge goes (region %) and in which direction it is nudged off the hotspot. */
 export function badgePos(p: EffectProps): CSSProperties {
-  if (!p.at) return { left: "50%", top: "50%" };
+  if (!p.at) return p.badgeAt ? { left: `${p.badgeAt[0]}%`, top: `${p.badgeAt[1]}%` } : { left: "50%", top: "50%" };
   const [dx, dy] = p.nudge ?? [-0.7, -0.7];
   return { left: `${p.at[0]}%`, top: `${p.at[1]}%`, "--bx": dx, "--by": dy } as CSSProperties;
 }
