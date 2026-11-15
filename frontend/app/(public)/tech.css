@@ -93,6 +93,16 @@ html[data-tech-theme="dark"] .tech {
   .tech { --t-container: 1360px; }
 }
 
+/* Metric-matched fallback for Archivo (wdth 108%) while the web font loads: same line breaks,
+   no layout shift. size-adjust = Archivo width / Arial Bold width per weight band (measured on
+   the headings of /, /punkty-serwisowe, /hammer-glass, /o-firmie); ascent/descent = Archivo
+   metrics (0.878 / 0.21) divided by size-adjust. */
+@font-face { font-family: "Archivo Tech Fallback"; src: local("Arial Bold"), local("Arial-BoldMT"), local("Arial"); font-weight: 751 850; size-adjust: 112.3%; ascent-override: 78.2%; descent-override: 18.7%; line-gap-override: 0%; }
+/* 900 at wdth 112%: only the outline numbers ("2004" on /o-firmie, "404") — matched on the digits */
+@font-face { font-family: "Archivo Tech Fallback"; src: local("Arial Bold"), local("Arial-BoldMT"), local("Arial"); font-weight: 851 1000; size-adjust: 135%; ascent-override: 65%; descent-override: 15.6%; line-gap-override: 0%; }
+@font-face { font-family: "Archivo Tech Fallback"; src: local("Arial Bold"), local("Arial-BoldMT"), local("Arial"); font-weight: 600 750; size-adjust: 107.8%; ascent-override: 81.4%; descent-override: 19.5%; line-gap-override: 0%; }
+@font-face { font-family: "Archivo Tech Fallback"; src: local("Arial"), local("ArialMT"); font-weight: 1 599; size-adjust: 104%; ascent-override: 84.4%; descent-override: 20.2%; line-gap-override: 0%; }
+
 /* ---------- Typography base for new UI (.t-ui) ----------
  * Root layout/globals.css set h1–h6 (DM Sans 800, var(--dark)) and strong/b (red, 900)
  * globally for the panels. New components opt in with .t-ui so the old public pages
