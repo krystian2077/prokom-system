@@ -202,7 +202,10 @@ export function Capsule() {
             <Logo size={28} />
           </Link>
 
-          <nav ref={navRef} aria-label="Menu główne" className="t-capsule__nav t-navpills"
+          <nav
+            ref={navRef}
+            aria-label="Menu główne"
+            className="t-capsule__nav t-navpills"
             onKeyDown={onNavKey}
             onMouseEnter={() => setArmed(true)}
             onFocus={() => setArmed(true)}
