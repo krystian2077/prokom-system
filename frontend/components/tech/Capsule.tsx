@@ -44,7 +44,13 @@ export function Capsule() {
   const [armed, setArmed] = useState(false);
   const openTimer = useRef<number | undefined>(undefined);
   const closeTimer = useRef<number | undefined>(undefined);
-  const exitPoint = useRef<Pt | null>(null);
+  /** Pointer position from the last mousemove over the capsule. Boundary events (mouseenter)
+   * fire before the mousemove of the same step, so on entering a trigger this is still the
+   * point the pointer came from: the safe triangle's apex. (The mouseleave coordinates are
+   * already on the next trigger when the two touch, which made the triangle degenerate.) */
+  const lastPt = useRef<Pt | null>(null);
+  /** Where the open panel lands, relative to the capsule (the box slides there over 320 ms). */
+  const megaTarget = useRef<{ x: number; w: number } | null>(null);
   /** Trigger under the pointer right now (the grace timer switches only if it still is). */
   const overMega = useRef<Mega | null>(null);
   const rootRef = useRef<HTMLElement>(null);
@@ -75,9 +81,13 @@ export function Capsule() {
       openTimer.current = window.setTimeout(() => setOpen(mega), OPEN_INTENT_MS);
       return;
     }
-    const box = boxRef.current?.querySelector<HTMLElement>(".t-mega:not([hidden]) .t-mega__panel")?.getBoundingClientRect();
-    const a = exitPoint.current;
-    if (box && a && inTriangle(at, a, { x: box.left, y: box.top }, { x: box.right, y: box.top })) {
+    // aim at the panel's final place, not at the box mid-slide (frame timing must not matter)
+    const panel = boxRef.current?.querySelector<HTMLElement>(".t-mega:not([hidden]) .t-mega__panel")?.getBoundingClientRect();
+    const cap = rootRef.current;
+    const target = megaTarget.current;
+    const a = lastPt.current;
+    const left = cap && target ? cap.getBoundingClientRect().left + cap.clientLeft + target.x : 0;
+    if (panel && target && a && inTriangle(at, a, { x: left, y: panel.top }, { x: left + target.w, y: panel.top })) {
       openTimer.current = window.setTimeout(() => {
         if (overMega.current === mega) setOpen(mega);
       }, TRIANGLE_GRACE_MS);
@@ -144,6 +154,7 @@ export function Capsule() {
     box.style.setProperty("--mega-w", `${w}px`);
     box.style.setProperty("--mega-h", `${panel.offsetHeight}px`);
     box.style.setProperty("--mega-x", `${x}px`);
+    megaTarget.current = { x, w };
   }, [open, points.length]);
 
   const activeKey = mainNav.find((n) => isActive(n, pathname))?.key ?? null;
@@ -194,6 +205,9 @@ export function Capsule() {
           className="t-capsule"
           onMouseLeave={scheduleClose}
           onMouseEnter={() => window.clearTimeout(closeTimer.current)}
+          onMouseMove={(e) => {
+            lastPt.current = { x: e.clientX, y: e.clientY };
+          }}
           onBlur={(e) => {
             if (open && !rootRef.current?.contains(e.relatedTarget as Node)) setOpen(null);
           }}
@@ -253,9 +267,8 @@ export function Capsule() {
                     setHot(item.key);
                     hoverTrigger(mega, { x: e.clientX, y: e.clientY });
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={() => {
                     if (overMega.current === mega) overMega.current = null;
-                    if (open === mega) exitPoint.current = { x: e.clientX, y: e.clientY };
                   }}
                   onFocus={() => setHot(item.key)}
                   onClick={() => {

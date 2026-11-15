@@ -1,5 +1,5 @@
 /** TP PR 2: premium navigation (docs/tech/PREMIUM.md §3). */
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 test.describe("desktop 1440 — capsule and mega menu", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -50,28 +50,58 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
   });
 
-  test("safe triangle: moving diagonally into the panel across another trigger keeps the panel", async ({ page }) => {
+  /**
+   * The menu timers (Capsule.tsx: 80 ms intent, 160 ms triangle grace, 250 ms close) run on a
+   * paused fake clock: they fire only when the test advances time, so the CDP round trips
+   * between mouse moves on a loaded machine cannot turn "crossing" into "resting".
+   */
+  const OPEN_INTENT_MS = 80;
+  const TRIANGLE_GRACE_MS = 160;
+  const CLOSE_DELAY_MS = 250;
+
+  async function openNaprawyWithPausedClock(page: Page) {
     await page.goto("/");
     const naprawy = page.locator(".t-capsule").getByRole("button", { name: "Naprawy" });
     const punkty = page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" });
-    const n = (await naprawy.boundingBox())!;
+    const n = (await naprawy.boundingBox())!; // the button renders after hydration
     const p = (await punkty.boundingBox())!;
+    await page.clock.install();
+    await page.clock.pauseAt(Date.now() + 60_000); // far enough ahead to be in the future on any machine
     await page.mouse.move(n.x + n.width - 6, n.y + n.height / 2);
+    await page.clock.runFor(OPEN_INTENT_MS);
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
-    // cross the lower part of "Punkty" on the way down-right…
+    const panel = page.locator('.t-mega[data-mega="naprawy"] .t-mega__panel');
+    await expect(panel).toBeVisible();
+    // the box slides sideways while opening; its top does not move
+    const top = (await panel.boundingBox())!.y;
+    return { naprawy, punkty, n, p, top };
+  }
+
+  test("safe triangle: moving diagonally into the panel across another trigger keeps the panel", async ({ page }) => {
+    const { naprawy, punkty, n, p, top } = await openNaprawyWithPausedClock(page);
+    // cross the lower part of "Punkty" on the way down-right (a quick pass, under the grace)…
     await page.mouse.move(p.x + 8, p.y + p.height - 3, { steps: 3 });
-    await page.waitForTimeout(60);
+    await page.clock.runFor(60);
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
-    // …and land in the open panel: still "Naprawy"
-    const panel = (await page.locator('.t-mega[data-mega="naprawy"] .t-mega__panel').boundingBox())!;
-    await page.mouse.move(p.x + 30, panel.y + 40, { steps: 3 });
-    await page.waitForTimeout(300);
+    // …and land in the open panel: still "Naprawy", also once the grace and close delays are over
+    await page.mouse.move(p.x + 30, top + 40, { steps: 3 });
+    await page.clock.runFor(TRIANGLE_GRACE_MS + CLOSE_DELAY_MS);
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
     await expect(punkty).toHaveAttribute("aria-expanded", "false");
-    // a plain sideways move along the row switches at once
+    // a plain sideways move along the row switches at once: no time passes on the clock
     await page.mouse.move(n.x + n.width / 2, n.y + n.height / 2, { steps: 4 });
     await page.mouse.move(p.x + p.width / 2, p.y + p.height / 2, { steps: 2 });
     await expect(punkty).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("safe triangle: resting on the crossed trigger past the grace switches to it", async ({ page }) => {
+    const { naprawy, punkty, p } = await openNaprawyWithPausedClock(page);
+    await page.mouse.move(p.x + 8, p.y + p.height - 3, { steps: 3 });
+    await page.clock.runFor(TRIANGLE_GRACE_MS - 1);
+    await expect(naprawy).toHaveAttribute("aria-expanded", "true");
+    await page.clock.runFor(1);
+    await expect(punkty).toHaveAttribute("aria-expanded", "true");
+    await expect(naprawy).toHaveAttribute("aria-expanded", "false");
   });
 
   test("repairs mega menu: devices with top faults and the submit card; page dims", async ({ page }) => {
