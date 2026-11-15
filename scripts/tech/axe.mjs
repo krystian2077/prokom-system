@@ -30,8 +30,8 @@ for (const p of pages) {
       await page.addScriptTag({ content: axeSource });
       const res = await page.evaluate(async (r) => {
         const options = r ? { runOnly: { type: "rule", values: r } } : { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] } };
-        // only the public site, never panel markup
-        const out = await window.axe.run(document.querySelector(".tech") || document, options);
+        // only the public site, never panel markup; decorative text hidden from assistive tech (aria-hidden) is skipped
+        const out = await window.axe.run({ include: [".tech"], exclude: ["[aria-hidden=\"true\"]"] }, options);
         return out.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.slice(0, 5).map((n) => ({ target: n.target.join(" "), summary: n.failureSummary?.split("\n")[1]?.trim() })) , count: v.nodes.length }));
       }, rules);
       const n = res.reduce((s, v) => s + v.count, 0);
