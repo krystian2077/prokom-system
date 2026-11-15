@@ -1,5 +1,7 @@
-import { deviceById, sceneOf, type EffectFamily } from "@/lib/tech/wizard-data";
+import type { EffectFamily } from "@/lib/tech/wizard-data";
 import { HOME_PATHS } from "../icons";
+
+export { faultFamily } from "@/lib/tech/fault-family";
 
 /**
  * Line icon of a wizard effect family (E1–E17, PREMIUM §4) — the same vocabulary as the
@@ -24,16 +26,6 @@ const FAMILY_PATHS: Record<EffectFamily, string> = {
   E16: "M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a15 15 0 0 1 20 0M12 20h.01",
   E17: "M6 11h4M8 9v4M15 12h.01M18 10h.01M17.3 5H6.7a4 4 0 0 0-4 3.6L2 15a3 3 0 0 0 5.3 2.1L9 15h6l1.7 2.1A3 3 0 0 0 22 15l-.7-6.4A4 4 0 0 0 17.3 5z",
 };
-
-/** Effect family of a wizard fault on a wizard device; E14 (generic) when unknown. */
-export function faultFamily(device: string, fault: string | null): EffectFamily {
-  if (!fault) return "E14";
-  try {
-    return sceneOf(deviceById(device), fault).effect;
-  } catch {
-    return "E14";
-  }
-}
 
 export function FaultGlyph({ family, size = 22 }: { family: EffectFamily; size?: number }) {
   return (
