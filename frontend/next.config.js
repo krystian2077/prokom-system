@@ -29,6 +29,8 @@ const nextConfig = {
       // TD4: removed shop pages (SPEC §6). /serwis-telefonow is a real page now.
       { source: "/akcesoria", destination: "/hammer-glass", permanent: true },
       { source: "/oferta", destination: "/", permanent: true },
+      // /naprawy/[slug] has no index page: a trimmed address lands on the repairs hub (REPAIRS_HREF), not on 404.
+      { source: "/naprawy", destination: "/uslugi", permanent: true },
       {
         source: "/panel/podglad/:path*",
         destination: "/panel/naprawy/:path*",

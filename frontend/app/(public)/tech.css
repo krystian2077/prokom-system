@@ -1358,7 +1358,10 @@ html[data-tech-theme="dark"] .tech .t-axis { --done: #3e9b2a; }
 .tech .t-status--stage.t-status--pill { align-self: flex-start; background: rgba(255, 255, 255, 0.07); color: #fff; }
 .tech .t-status--stage.t-status--pill.is-open .t-status__dot { background: #7bd36a; }
 .tech .t-status--stage.is-loading, .tech .t-status--stage-text.is-loading { background: rgba(255, 255, 255, 0.1); }
-.tech .t-status--stage-text { color: #c9bfbd; font-size: 14.5px; white-space: normal; }
+.tech .t-status--stage-text { color: #c9bfbd; font-size: 14.5px; white-space: normal; line-height: 1.35; }
+/* Statuses that may wrap (narrow phones): the dot stays on the first line, not centred on the block */
+.tech :is(.t-status--stage-text, .t-cta-band__point .t-status, .t-status--stage.t-status--pill, .t-pointcard .t-status--pill, .t-ab-salon .t-status--pill, .t-sheet__call .t-status) { align-items: flex-start; line-height: 1.35; }
+.tech :is(.t-status--stage-text, .t-cta-band__point .t-status, .t-status--stage.t-status--pill, .t-pointcard .t-status--pill, .t-ab-salon .t-status--pill, .t-sheet__call .t-status) .t-status__dot { margin-top: calc(0.675em - 3.5px); }
 .tech .t-status--stage-text.is-open .t-status__dot { background: #7bd36a; box-shadow: none; }
 .tech .t-pill-stage { align-self: flex-start; display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 7px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); color: #fff; font-size: 13px; font-weight: 700; }
 .tech .t-pill-stage i { width: 8px; height: 8px; border-radius: 50%; background: #e2483a; flex-shrink: 0; }
@@ -1485,6 +1488,11 @@ html[data-tech-theme="dark"] .tech .t-axis { --done: #3e9b2a; }
 .tech .t-linecard__name { font-family: var(--t-font-head); font-stretch: 108%; font-weight: 800; font-size: 20px; }
 .tech .t-linecard__desc { font-size: 14px; line-height: 1.45; opacity: 0.8; }
 .tech .t-linecard__dom { margin-top: auto; font-size: 13.5px; font-weight: 800; overflow-wrap: anywhere; }
+/* two columns on phones: "prokominstalacje.pl" must fit one line (it broke as "…p / l" at 390) */
+@media (max-width: 479.98px) {
+  .tech .t-linecard { padding: 18px 14px; }
+  .tech .t-linecard__dom { font-size: clamp(11.5px, 1.9vw + 5px, 13px); letter-spacing: -0.01em; }
+}
 
 /* Forms (contact) */
 .tech .t-topics { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1763,7 +1771,8 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 .tech .t-hammer__lead { color: #c9bfbd; max-width: 470px; }
 .tech .t-hammer__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 480px; margin-top: 4px; }
 .tech .t-hammer__stat { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); font-size: 12.5px; color: #c9bfbd; }
-.tech .t-hammer__stat b { font-family: var(--t-font-head); font-stretch: 108%; font-size: 24px; color: #ffffff; }
+.tech .t-hammer__stat b { font-family: var(--t-font-head); font-stretch: 108%; font-size: clamp(16px, 4.4vw + 1px, 24px); color: #ffffff; white-space: nowrap; }
+@media (max-width: 419.98px) { .tech .t-hammer__stat { padding: 12px 10px; } }
 .tech .t-hammer__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .tech .t-hammer__photo { position: relative; height: 260px; margin: 0 12px 12px; border-radius: 22px; overflow: hidden; }
 .tech .t-hammer__photo img { object-fit: cover; }

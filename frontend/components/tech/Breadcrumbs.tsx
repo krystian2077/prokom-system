@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { Crumb } from "@/lib/tech/seo";
 
-/** Breadcrumbs on dark stage heroes ("Start · Kontakt"); the last item is the current page. */
-export function Breadcrumbs({ items, separator = "·" }: { items: Crumb[]; separator?: string }) {
+/** Breadcrumbs on dark stage heroes ("Start / Kontakt"); the last item is the current page.
+ * "/" everywhere (device, repair, blog, search, form pages) — one separator across the site. */
+export function Breadcrumbs({ items, separator = "/" }: { items: Crumb[]; separator?: string }) {
   return (
     <nav aria-label="Okruszki" className="t-crumbs">
       <ol>
