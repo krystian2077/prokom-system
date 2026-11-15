@@ -2,11 +2,9 @@ import { company, line, telHref } from "@/config/prokom";
 import { LegalDoc, Li, Section } from "@/components/tech/legal/LegalDoc";
 import { pageMetadata } from "@/lib/tech/seo";
 
-// Legal text kept word for word (TD5 PR 2); only the skin and contact data from config/prokom.ts.
-// TODO(krystian): update before production (open since 15.11.2026 — the text was accepted, but it still has
-// outdated facts): hosting „Render” (Hetzner now, webh.pl from 29.11), domain pro-kom.eu (→ prokomserwis.pl),
-// name „PRO-KOM Serwis”, „sprzedaż akcesoriów”, and no sentence about Umami statistics (SPEC §12.5).
-// To accept with the lawyer (SPEC §10).
+// Legal text from TD5 PR 2; facts updated on 15.11.2026 (Krystian's decision): domain and name from
+// config/prokom.ts, no shop, Umami statistics, neutral hosting wording. Everything else word for word.
+// TODO(krystian): after the VPS move on 29.11 name the hosting provider: webh.pl (Polska).
 export const metadata = pageMetadata({
   title: "Polityka prywatności i pliki cookies",
   description: "Polityka prywatności PRO-KOM Tech: administrator danych, cele i podstawy przetwarzania, odbiorcy danych, Twoje prawa (RODO) i pliki cookies.",
@@ -15,12 +13,12 @@ export const metadata = pageMetadata({
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalDoc title="Polityka prywatności" path="/polityka-prywatnosci" version="25 kwietnia 2026 r.">
+    <LegalDoc title="Polityka prywatności" path="/polityka-prywatnosci" version="15 listopada 2026 r.">
       <p>
-        Niniejsza Polityka prywatności opisuje, w jaki sposób PRO-KOM Serwis
+        Niniejsza Polityka prywatności opisuje, w jaki sposób {company.name}
         zbiera, przetwarza i chroni dane osobowe Użytkowników korzystających z
-        serwisu internetowego dostępnego pod adresem{" "}
-        <strong>pro-kom.eu</strong> oraz usług świadczonych przez firmę.
+        serwisu internetowego {line.name} dostępnego pod adresem{" "}
+        <strong>{line.domain}</strong> oraz usług świadczonych przez firmę.
         Dokument sporządzono zgodnie z Rozporządzeniem Parlamentu Europejskiego
         i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. (RODO) oraz polską
         ustawą o ochronie danych osobowych.
@@ -30,7 +28,7 @@ export default function PrivacyPolicyPage() {
       <Section title="§ 1. Administrator danych osobowych">
         <p>
           Administratorem Twoich danych osobowych jest przedsiębiorstwo działające
-          pod firmą <strong>PRO-KOM Serwis</strong>, z siedzibą pod adresem:
+          pod firmą <strong>{company.name}</strong> (NIP {company.nip}), z siedzibą pod adresem:
         </p>
         <p className="t-legal-doc__box">
           {company.hq.street}, {company.hq.postal} {company.hq.city}
@@ -126,10 +124,6 @@ export default function PrivacyPolicyPage() {
                   "Art. 6 ust. 1 lit. b – wykonanie umowy o świadczenie usług drogą elektroniczną",
                 ],
                 [
-                  "Sprzedaż akcesoriów (sklep)",
-                  "Art. 6 ust. 1 lit. b – wykonanie umowy sprzedaży",
-                ],
-                [
                   "Wystawianie dokumentów sprzedaży (rachunki, faktury)",
                   "Art. 6 ust. 1 lit. c – obowiązek prawny (przepisy podatkowe)",
                 ],
@@ -200,9 +194,10 @@ export default function PrivacyPolicyPage() {
         </p>
         <ul>
           <Li>
-            <strong>Dostawcy infrastruktury IT:</strong> Render (hosting
-            serwera i bazy danych) – świadczący usługi na podstawie umowy
-            powierzenia danych.
+            <strong>Dostawcy infrastruktury IT:</strong> zewnętrzny dostawca
+            usług hostingowych z siedzibą w Unii Europejskiej / Europejskim
+            Obszarze Gospodarczym (hosting serwera i bazy danych) – świadczący
+            usługi na podstawie umowy powierzenia danych.
           </Li>
           <Li>
             <strong>Google LLC:</strong> w przypadku logowania przez Google
@@ -315,7 +310,7 @@ export default function PrivacyPolicyPage() {
       {/* 8 */}
       <Section title="§ 8. Pliki cookies" id="cookies">
         <p>
-          Serwis pro-kom.eu używa plików cookies (ciasteczek) – małych plików
+          Serwis {line.domain} używa plików cookies (ciasteczek) – małych plików
           tekstowych zapisywanych na Twoim urządzeniu.
         </p>
         <p>
@@ -331,11 +326,15 @@ export default function PrivacyPolicyPage() {
             <strong>Funkcjonalne:</strong> zapamiętywanie preferencji
             użytkownika (np. motyw, język).
           </Li>
-          <Li>
-            <strong>Analityczne:</strong> statystyki odwiedzin w celu
-            doskonalenia serwisu – zbierane wyłącznie po wyrażeniu zgody.
-          </Li>
         </ul>
+        <p>
+          <strong>Statystyki odwiedzin:</strong> korzystamy z narzędzia Umami,
+          które nie używa plików cookies i nie zapisuje niczego na Twoim
+          urządzeniu. Zbiera wyłącznie zagregowane, anonimowe dane o
+          odwiedzinach (np. odwiedzane strony, rodzaj przeglądarki). Dane są
+          przechowywane na serwerze PRO-KOM i nie trafiają do podmiotów
+          trzecich.
+        </p>
         <p>
           Możesz zablokować lub usunąć pliki cookies w ustawieniach
           przeglądarki. Wyłączenie cookies niezbędnych może uniemożliwić
@@ -376,11 +375,11 @@ export default function PrivacyPolicyPage() {
           każdym czasie. O istotnych zmianach poinformujemy Cię przez e-mail
           (jeśli posiadamy Twój adres) lub przez stosowny komunikat w serwisie.
           Aktualną wersję Polityki zawsze znajdziesz pod adresem{" "}
-          <strong>pro-kom.eu/polityka-prywatnosci</strong>.
+          <strong>{line.domain}/polityka-prywatnosci</strong>.
         </p>
       </Section>
 
-      <p className="t-legal-doc__updated">Data ostatniej aktualizacji: 25 kwietnia 2026 r.</p>
+      <p className="t-legal-doc__updated">Data ostatniej aktualizacji: 15 listopada 2026 r.</p>
     </LegalDoc>
   );
 }
