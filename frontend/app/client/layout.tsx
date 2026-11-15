@@ -11,6 +11,7 @@ import "../(public)/tech.css";
 import "../(public)/tech-theme.css";
 import "../(public)/tech-motion.css";
 import "../(public)/tech-nav.css";
+import "../(public)/tech-rail.css";
 import "./client-tech.css";
 import "./client-tech-konto.css";
 
