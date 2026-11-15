@@ -13,7 +13,7 @@ import { PointTile } from "./PointTile";
 export function PointsSection({ points }: { points: VisiblePoint[] }) {
   const multi = points.length > 1;
   const courier = claim("courierWholeCountry");
-  const ticks = multi ? ["Jedno zgłoszenie online", "Jeden status naprawy"] : ["Zgłoszenie online", "Status naprawy online"];
+  const ticks = multi ? ["Jedno zgłoszenie online", "Jeden status naprawy", "Oddajesz w jednym punkcie, odbierasz w drugim"] : ["Zgłoszenie online", "Status naprawy online"];
   return (
     <section id="punkty" data-rail="Punkty serwisowe" className="t-section t-points t-ui" aria-labelledby="t-punkty-h">
       <div className="t-container">
@@ -34,7 +34,7 @@ export function PointsSection({ points }: { points: VisiblePoint[] }) {
               </>
             ) : (
               <>
-                {/* TODO(krystian): single-point heading and lead until Zakopane is published — wording to approve. */}
+                {/* Single-point fallback: only when a point is unpublished again (SPEC §5). */}
                 <h2 id="t-punkty-h" className="t-h2 t-points__h">
                   Punkt serwisowy {pointLocative[points[0]?.key ?? "rabka"]}
                 </h2>

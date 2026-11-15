@@ -7,7 +7,7 @@
  * The backend is not changed (CLAUDE.md rule 1). When the design disagrees with this
  * file, this file wins.
  */
-import { servicePoints, type PointKey } from "@/config/prokom";
+import { servicePoints, type PointKey, type ServicePoint } from "@/config/prokom";
 import { DEVICE_CATEGORIES, HAMMER_GLASS_INTEREST } from "@/types/repair";
 import { visiblePoints } from "./points";
 
@@ -432,7 +432,10 @@ export type WizardPrefill = { category?: DeviceCategory; problem?: string; dropo
  * /zgloszenie?category=<kod>&usterka=<tekst>&punkt=rabka|zakopane&dostawa=punkt|kurier
  * Unknown values are ignored; a point is accepted only if it is visible (published, or draft mode).
  */
-export function parseWizardParams(sp: URLSearchParams, opts: { draft?: boolean } = {}): WizardPrefill {
+export function parseWizardParams(
+  sp: URLSearchParams,
+  opts: { draft?: boolean; points?: ServicePoint[] } = {},
+): WizardPrefill {
   const out: WizardPrefill = {};
   const category = sp.get("category");
   if (isDeviceCategory(category)) out.category = category;
@@ -442,7 +445,7 @@ export function parseWizardParams(sp: URLSearchParams, opts: { draft?: boolean }
   if (dostawa === "kurier") out.dropoff = "courier";
   else if (dostawa === null || dostawa === "punkt") {
     const punkt = sp.get("punkt");
-    const visible = visiblePoints(opts.draft);
+    const visible = visiblePoints(opts.draft, opts.points);
     if (punkt && visible.some((p) => p.key === punkt)) out.dropoff = punkt as PointKey;
   }
   return out;

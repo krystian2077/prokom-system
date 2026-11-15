@@ -3,19 +3,20 @@ import { expect, test, type Page } from "@playwright/test";
 
 const PAGES = ["/punkty-serwisowe", "/kontakt", "/o-firmie"];
 
-async function noZakopane(page: Page) {
-  await expect(page.locator("main").getByText(/Zakopane|Staszica/)).toHaveCount(0);
+async function noDraftPoints(page: Page) {
+  // both points are published (15.11.2026): no "do uzupełnienia" frame on any point
+  await expect(page.locator("main").getByText("do uzupełnienia")).toHaveCount(0);
 }
 
 test.describe("desktop 1440", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   for (const path of PAGES) {
-    test(`${path}: one H1, canonical, no unpublished point, no draft frames`, async ({ page }) => {
+    test(`${path}: one H1, canonical, no draft points or frames`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`${path}$`));
-      await noZakopane(page);
+      await noDraftPoints(page);
       await expect(page.locator("main .t-draft, main .t-draft-badge")).toHaveCount(0);
       const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
       for (const s of ld) expect(() => JSON.parse(s)).not.toThrow();
@@ -25,8 +26,13 @@ test.describe("desktop 1440", () => {
 
   test("points page: card with live status, hours, phone and route to Google Maps", async ({ page }) => {
     await page.goto("/punkty-serwisowe");
-    const card = page.locator(".t-pointcard");
-    await expect(card).toHaveCount(1);
+    await expect(page.locator("h1")).toHaveText(/Dwa punkty serwisowe: Rabka-Zdrój i\s+Zakopane/);
+    await expect(page.locator(".t-pointcard")).toHaveCount(2);
+    const zak = page.locator(".t-pointcard").nth(1);
+    await expect(zak).toContainText("Staszica");
+    await expect(zak.getByRole("link", { name: "Zgłoś naprawę tutaj" })).toHaveAttribute("href", "/zgloszenie?punkt=zakopane");
+    await expect(zak.locator(".t-navto__desktop")).toHaveAttribute("href", /destination=49\.2978,19\.9539$/);
+    const card = page.locator(".t-pointcard").first();
     await expect(card.locator(".t-status")).toHaveText(/^(Otwarte do|Zamykamy za|Otwieramy dziś|Zamknięte)/);
     await expect(card.locator(".t-hours li")).toHaveCount(3);
     await expect(card.locator(".t-hours li.is-today")).toHaveCount(1);
@@ -37,7 +43,7 @@ test.describe("desktop 1440", () => {
     const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(ld.some((s) => s.includes('"FAQPage"'))).toBe(true);
     await expect(page.locator(".t-faq__item").first()).toHaveAttribute("open", "");
-    await expect(page.getByText("Czy sprzęt oddany w jednym punkcie odbiorę w drugim?")).toHaveCount(0);
+    await expect(page.getByText("Czy sprzęt oddany w jednym punkcie odbiorę w drugim?")).toHaveCount(1);
   });
 
   test("about page: unconfirmed numbers hidden in production", async ({ page }) => {
@@ -61,8 +67,10 @@ test.describe("desktop 1440", () => {
     await expect(page.locator('[name="firstName"]')).toBeFocused();
     expect(body).toBeNull();
 
-    // one published point → no point choice
-    await expect(form.getByRole("group", { name: "Punkt" })).toHaveCount(0);
+    // two published points → point choice (KONTRAKT §4: point goes into interest)
+    const pointGroup = form.getByRole("group", { name: "Punkt" });
+    await expect(pointGroup.getByRole("button")).toHaveText(["Rabka-Zdrój", "Zakopane", "Obojętnie"]);
+    await pointGroup.getByRole("button", { name: "Zakopane" }).click();
     await form.getByRole("button", { name: "Folia Hammer Glass" }).click();
     await page.fill('[name="firstName"]', "Anna");
     await page.fill('[name="email"]', "anna@example.test");
@@ -71,7 +79,7 @@ test.describe("desktop 1440", () => {
     await page.check('[name="consent"]');
     await form.getByRole("button", { name: "Wyślij wiadomość" }).click();
     await expect(page.getByRole("heading", { name: "Wiadomość wysłana" })).toBeVisible();
-    expect(body).toEqual({ first_name: "Anna", last_name: "", phone: "600 100 200", email: "anna@example.test", interest: "Folia Hammer Glass", message: "Folia na iPhone 13" });
+    expect(body).toEqual({ first_name: "Anna", last_name: "", phone: "600 100 200", email: "anna@example.test", interest: "Folia Hammer Glass · punkt: Zakopane", message: "Folia na iPhone 13" });
   });
 
   test("contact form: server error shows the phone", async ({ page }) => {
@@ -99,9 +107,9 @@ test.describe("phone 390", () => {
 
   test("points page: 'Nawiguj' opens Google / Apple / Waze", async ({ page }) => {
     await page.goto("/punkty-serwisowe");
-    const btn = page.locator(".t-pointcard").getByRole("button", { name: "Nawiguj" });
-    await btn.click();
-    const list = page.locator(".t-navto__list");
+    const card = page.locator(".t-pointcard").first();
+    await card.getByRole("button", { name: "Nawiguj" }).click();
+    const list = card.locator(".t-navto__list");
     await expect(list).toBeVisible();
     await expect(list.getByRole("link")).toHaveText([/Mapy Google/, /Mapy Apple/, /Waze/]);
     await expect(list.getByRole("link", { name: /Waze/ })).toHaveAttribute("href", /^https:\/\/waze\.com\/ul\?ll=49\.\d+,19\.\d+&navigate=yes$/);

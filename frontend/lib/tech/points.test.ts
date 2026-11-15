@@ -1,16 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { servicePoints } from "@/config/prokom";
+import { servicePoints, type ServicePoint } from "@/config/prokom";
 import { activeNotice, isDraftMode, publishedPoints, visiblePoints } from "./points";
 
+/** Test data: the real config with Zakopane switched back to unpublished. */
+const zakopaneUnpublished: ServicePoint[] = servicePoints.map((p) =>
+  p.key === "zakopane" ? { ...p, published: false } : p,
+);
+
 describe("visiblePoints", () => {
-  it("production: only published points", () => {
-    const keys = visiblePoints(false).map((p) => p.key);
-    expect(keys).toEqual(servicePoints.filter((p) => p.published).map((p) => p.key));
-    expect(keys).not.toContain("zakopane"); // published: false until the exact pin (SPEC §10)
+  it("real config: both points published (Zakopane pin confirmed 15.11.2026)", () => {
+    expect(visiblePoints(false).map((p) => p.key)).toEqual(["rabka", "zakopane"]);
+    expect(visiblePoints(false).every((p) => !p.draft)).toBe(true);
+    expect(publishedPoints().map((p) => p.key)).toEqual(["rabka", "zakopane"]);
+  });
+  it("production: an unpublished point is not rendered", () => {
+    const keys = visiblePoints(false, zakopaneUnpublished).map((p) => p.key);
+    expect(keys).toEqual(["rabka"]);
+    expect(publishedPoints(zakopaneUnpublished).map((p) => p.key)).toEqual(["rabka"]);
   });
   it("staging draft: all points, unpublished flagged", () => {
-    const pts = visiblePoints(true);
-    expect(pts.map((p) => p.key)).toEqual(servicePoints.map((p) => p.key));
+    const pts = visiblePoints(true, zakopaneUnpublished);
+    expect(pts.map((p) => p.key)).toEqual(["rabka", "zakopane"]);
     expect(pts.find((p) => p.key === "zakopane")?.draft).toBe(true);
     expect(pts.find((p) => p.key === "rabka")?.draft).toBe(false);
   });

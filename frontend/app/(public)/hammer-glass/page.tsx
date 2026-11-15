@@ -85,6 +85,8 @@ export default function HammerGlassPage() {
               <p className="t-hg-hero__lead">
                 Telefon, tablet albo smartwatch. Wybierasz rodzaj folii, podajesz model, a ploter Hammer Glass VersaBlade X Pro wycina ją przy Tobie.
                 {minutes ? <span className={d(minutes)}> Zakładamy {lowerFirst(minutes.text)}</span> : null}
+                {/* Krystian, 15.11.2026: the Zakopane point has a Hammer Glass plotter too. */}
+                {published.length > 1 ? ` Ploter jest w obu punktach: ${joinCities(published)}.` : null}
               </p>
               <div className="t-btnrow">
                 <a href="#folie" className="t-pbtn t-pbtn--stage">

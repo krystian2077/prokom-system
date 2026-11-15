@@ -104,6 +104,11 @@ export const localPages: LocalPage[] = [
         a: "Wyłącz go, nie ładuj i nie susz suszarką. Przynieś go do punktu jak najszybciej — po zalaniu liczy się czas.",
       },
       {
+        // Krystian, 15.11.2026: the Zakopane point has a Hammer Glass plotter.
+        q: "Czy w Zakopanem wytniecie folię Hammer Glass?",
+        a: "Tak. W punkcie w Zakopanem jest ploter Hammer Glass. Folię wycinamy pod Twój model i zakładamy na miejscu, także przy odbiorze telefonu z naprawy.",
+      },
+      {
         q: "Czy w Zakopanem jest ta sama gwarancja co w Rabce-Zdroju?",
         a: "Tak. Oba punkty to jeden serwis i jeden system zgłoszeń, więc zasady wyceny i gwarancji są te same.",
       },

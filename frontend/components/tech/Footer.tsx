@@ -81,7 +81,7 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
                 </div>
               ))}
             </div>
-            <span className="t-footer__note">{twoPoints ? "Wycena przed naprawą · ten sam cennik i gwarancja w obu punktach" : "Wycena przed naprawą · gwarancja na usługę i części"}</span>
+            <span className="t-footer__note">{twoPoints ? "Wycena przed naprawą · te same zasady i gwarancja w obu punktach" : "Wycena przed naprawą · gwarancja na usługę i części"}</span>
           </div>
         </div>
         <LinesBand />
