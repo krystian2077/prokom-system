@@ -13,7 +13,6 @@ import { inCity, joinCities } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, serviceJsonLd, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { towns } from "@/lib/tech/towns";
-import { polishText } from "@/lib/tech/typo";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -80,7 +79,7 @@ export default function PhoneServicePage() {
               <Breadcrumbs items={CRUMBS} separator="/" />
               <h1 className="t-loc-hero__h1">
                 Serwis telefonów
-                <span>{polishText(where, true)}</span>
+                <span>{where}</span>
               </h1>
               <p className="t-lead t-lead--stage">
                 Wymieniamy wyświetlacze, baterie i gniazda ładowania, pomagamy po zalaniu. Diagnoza i wycena przed naprawą, gwarancja na usługę i części, status naprawy online.
