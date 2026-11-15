@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { REPAIRS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import {
@@ -9,6 +8,8 @@ import {
   type HomeIcon,
 } from "../icons";
 import type { DeviceIcon } from "@/lib/tech/nav";
+import type { ArtKind } from "@/lib/tech/wizard-data";
+import { StaticArt } from "../wizard/art/StaticArt";
 
 const PHONE_LIST = [
   "Wymiana wyświetlacza i szybki",
@@ -17,38 +18,35 @@ const PHONE_LIST = [
   "Naprawa po zalaniu",
 ];
 
-const PHOTO_CARDS = [
+/** Device cards use the wizard's illustrations (one angle, light and scale; calm screens). */
+const PHOTO_CARDS: { t: string; s: string; href: string; art: ArtKind; crop: [number, number, number, number] }[] = [
   {
     t: "Serwis laptopów",
     s: "Matryca, klawiatura, czyszczenie, dysk SSD, płyta główna.",
     href: "/serwis-laptopow",
-    img: "/tech/urzadzenia/laptop.webp",
-    w: 640,
-    h: 640,
+    art: "laptop",
+    crop: [14, 14, 572, 364],
   },
   {
     t: "Serwis tabletów",
     s: "Ekran i dotyk, bateria, gniazdo, system.",
     href: "/serwis-tabletow",
-    img: "/tech/urzadzenia/tablet.webp",
-    w: 577,
-    h: 640,
+    art: "tablet",
+    crop: [16, 12, 412, 574],
   },
   {
     t: "Serwis komputerów",
     s: "Windows, dysk, RAM, czyszczenie, płyta główna.",
     href: "/serwis-komputerow",
-    img: "/tech/urzadzenia/komputer.webp",
-    w: 640,
-    h: 640,
+    art: "pc",
+    crop: [40, 16, 290, 560],
   },
   {
     t: "Serwis konsol",
     s: "HDMI, napęd, czyszczenie, dryf joysticka w padzie.",
     href: "/serwis-konsol",
-    img: "/tech/urzadzenia/konsola.webp",
-    w: 640,
-    h: 640,
+    art: "console",
+    crop: [86, 24, 514, 524],
   },
 ];
 
@@ -135,22 +133,7 @@ export function DeviceGrid() {
               <IconArrow size={15} strokeWidth={2.6} />
             </span>
             <span className="t-devices__glow" aria-hidden="true" />
-            <Image
-              className="t-devices__ph t-devices__ph--2"
-              src="/tech/urzadzenia/samsung.webp"
-              alt=""
-              width={454}
-              height={549}
-              unoptimized
-            />
-            <Image
-              className="t-devices__ph t-devices__ph--1"
-              src="/tech/urzadzenia/iphone.webp"
-              alt="Smartfony w serwisie PRO-KOM Tech"
-              width={433}
-              height={577}
-              unoptimized
-            />
+            <StaticArt kind="phone" crop={[32, 36, 418, 464]} uid="dgphone" className="t-devices__phart" />
           </Link>
 
           <div className="t-devices__more t-snap">
@@ -166,14 +149,7 @@ export function DeviceGrid() {
                   Naprawy
                   <IconArrow size={14} strokeWidth={2.6} />
                 </span>
-                <Image
-                  className="t-devices__img"
-                  src={c.img}
-                  alt=""
-                  width={c.w}
-                  height={c.h}
-                  unoptimized
-                />
+                <StaticArt kind={c.art} crop={c.crop} uid={`dg${c.art}`} className={`t-devices__art t-devices__art--${c.art}`} />
               </Link>
             ))}
           </div>

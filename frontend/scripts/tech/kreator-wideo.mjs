@@ -29,13 +29,16 @@ async function desktop(theme) {
     await page.mouse.move(2, 2);
     await page.waitForTimeout(wait);
   };
-  await pick("tablet", "Pęknięty ekran");
+  await pick("telefon", "Pęknięty ekran");
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(1200);
-  await pick("telefon", "Aparat");
-  await pick(null, "Po zalaniu");
+  await page.waitForTimeout(1000);
+  await wiz.getByRole("radio", { name: "Bateria", exact: true }).hover();
+  await page.waitForTimeout(1600);
+  await pick("laptop", "Matryca");
+  await pick(null, "Przegrzewa się");
+  await pick("drukarka", "Zacina papier");
   await pick("konsola", "Dryf w padzie");
-  await pick("laptop", "Przegrzewa się");
+  await pick("smartwatch", "Pęknięte szkło");
   const v = page.video();
   await ctx.close();
   fs.renameSync(await v.path(), path.join(out, `kreator-1440-${theme}.webm`));
@@ -48,22 +51,35 @@ async function phone() {
   await page.goto(base + "/", { waitUntil: "networkidle" });
   await page.locator("#kreator").evaluate((el) => el.scrollIntoView({ block: "center" }));
   await page.waitForTimeout(800);
-  await page.locator('#kreator .t-wiz__devices [data-value="tablet"]').click();
-  await page.waitForTimeout(1600);
   const flow = page.getByTestId("wizard-flow");
-  await flow.locator('.t-scene__spot[aria-label="Pęknięty ekran"]').click();
-  await page.waitForTimeout(3400);
-  await flow.getByTestId("scene-whole").click();
-  await page.waitForTimeout(1000);
-  await flow.getByRole("radio", { name: "Nie włącza się" }).click();
-  await page.waitForTimeout(3000);
+  for (const [device, fault] of [
+    ["telefon", "Pęknięty ekran"],
+    ["laptop", "Klawiatura"],
+    ["drukarka", "Zacina papier"],
+    ["konsola", "Dryf w padzie"],
+    ["smartwatch", "Pęknięte szkło"],
+  ]) {
+    await page.locator(`#kreator .t-wiz__devices [data-value="${device}"]`).click();
+    await page.waitForTimeout(1200);
+    await flow.getByRole("radio", { name: fault, exact: true }).click();
+    await flow.locator(".t-scene").evaluate((el) => el.scrollIntoView({ block: "start" }));
+    await page.waitForTimeout(3000);
+    // first Esc leaves the camera zoom, the second closes the full-screen flow
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(500);
+  }
   const v = page.video();
   await ctx.close();
   fs.renameSync(await v.path(), path.join(out, "kreator-390-light.webm"));
 }
 
-await desktop("light");
-await desktop("dark");
-await phone();
+const only = process.env.ONLY;
+if (!only || only === "desktop") {
+  await desktop("light");
+  await desktop("dark");
+}
+if (!only || only === "phone") await phone();
 await browser.close();
 console.log("nagrania →", out);

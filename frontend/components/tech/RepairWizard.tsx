@@ -16,6 +16,7 @@ import {
 } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconClose, IconPath } from "./icons";
 import { usePill } from "./usePill";
+import { preloadArt } from "./wizard/art";
 import { Scene } from "./wizard/Scene";
 
 export type WizardPoint = { key: PointKey; name: string; draft: boolean };
@@ -47,6 +48,7 @@ function deliveryLabel(d: Delivery, points: WizardPoint[]): string {
 /** Warm the photo cache when a device chip is hovered or focused (PREMIUM §4). */
 const preloaded = new Set<string>();
 function preload(d: WizardDevice) {
+  preloadArt(d.photo?.art);
   const src = d.photo?.src;
   if (!src || preloaded.has(src) || typeof window === "undefined") return;
   preloaded.add(src);
@@ -208,8 +210,8 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
   );
 
   const faultChips = (labelId: string) => (
-    <div className="t-wiz__faults" role="radiogroup" aria-labelledby={labelId} onKeyDown={(e) => radioKeys(e, device.faults, fault, pickFault)}>
-      {device.faults.map((f) => {
+    <div key={device.id} className="t-wiz__faults" role="radiogroup" aria-labelledby={labelId} onKeyDown={(e) => radioKeys(e, device.faults, fault, pickFault)}>
+      {device.faults.map((f, i) => {
         const on = f === fault;
         return (
           <button
@@ -220,6 +222,7 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
             tabIndex={on ? 0 : -1}
             data-value={f}
             className={`t-chp t-chp--fault${on ? " is-on" : ""}${f === preview ? " is-hot" : ""}${device.scenes[f]?.spot ? " has-spot" : ""}`}
+            style={{ "--i": i } as React.CSSProperties}
             onClick={() => pickFault(f)}
             onMouseEnter={() => setPreview(f)}
             onMouseLeave={() => setPreview(null)}
@@ -296,8 +299,11 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
                   </div>
                 </div>
                 <div className="t-wiz__group t-wiz__group--fault">
-                  <span id="t-wiz-g2" className="t-eyb t-eyb--muted">
+                  <span id="t-wiz-g2" className="t-eyb t-eyb--muted t-wiz__glabel">
                     2 · Co się dzieje
+                    <span key={device.id} className="t-wiz__count t-pop-in" aria-hidden="true">
+                      {device.faults.length}
+                    </span>
                   </span>
                   {faultChips("t-wiz-g2")}
                 </div>

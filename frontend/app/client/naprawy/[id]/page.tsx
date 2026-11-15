@@ -3,7 +3,7 @@ import { ClientNaprawyDetail } from "@/features/client-naprawy/ClientNaprawyDeta
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return {
-    title: `Naprawa ${id} | PRO-KOM Serwis`,
+    title: `Naprawa ${id}`,
     description: "Szczegóły naprawy.",
   };
 }

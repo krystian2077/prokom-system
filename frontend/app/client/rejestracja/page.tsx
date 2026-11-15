@@ -3,37 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { useAuth } from "@/contexts/AuthContext";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
-
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  weight: ["700", "900"],
-  variable: "--font-unbounded",
-});
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plus-jakarta",
-});
-
-function IconArrow() {
-  return (
-    <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform group-hover:translate-x-[3px]">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  );
-}
-
-function IconChevronLeft() {
-  return (
-    <svg viewBox="0 0 24 24" width={12} height={12} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
+import { AuthScreen } from "@/components/tech/account/AuthScreen";
+import { AuthAlert, AuthField, PasswordField, SubmitButton } from "@/components/tech/account/AuthParts";
 
 export default function ClientRejestracjaPage() {
   const router = useRouter();
@@ -73,146 +45,109 @@ export default function ClientRejestracjaPage() {
   };
 
   return (
-    <div
-      className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
-      style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
+    <AuthScreen
+      eyebrow="Konto klienta"
+      title="Załóż konto"
+      lead="Załóż konto, aby śledzić naprawy i zarządzać profilem."
+      back={{ href: "/", label: "Wróć na stronę główną" }}
     >
-      <div className="card !max-w-[620px] !grid-cols-1 !min-h-0">
-        <div className="login-mobile-brand">
-          <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
-            PRO<span>–</span>KOM
-          </Link>
-          <span className="brand-tagline">Panel Klienta</span>
+      <form onSubmit={handleSubmit} className="t-ck-form">
+        <div className="t-ck-grid2">
+          <AuthField
+            id="reg-fname"
+            label="Imię"
+            placeholder="np. Anna"
+            autoComplete="given-name"
+            value={first_name}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <AuthField
+            id="reg-lname"
+            label="Nazwisko"
+            placeholder="np. Nowak"
+            autoComplete="family-name"
+            value={last_name}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
         </div>
-        <div className="rp">
-          <div className="pnl show">
-            <div className="pnl-head">
-              <h3 className="pnl-title" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900 }}>
-                Utwórz konto
-              </h3>
-              <p className="pnl-sub">Załóż konto, aby śledzić naprawy i zarządzać profilem</p>
-            </div>
-            <form onSubmit={handleSubmit} className="fields">
-              <div className="fg2">
-                <div className="fg">
-                  <label className="lbl" htmlFor="reg-fname">Imię</label>
-                  <input
-                    id="reg-fname"
-                    type="text"
-                    className="fi"
-                    placeholder="Imię"
-                    autoComplete="given-name"
-                    value={first_name}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="fg">
-                  <label className="lbl" htmlFor="reg-lname">Nazwisko</label>
-                  <input
-                    id="reg-lname"
-                    type="text"
-                    className="fi"
-                    placeholder="Nazwisko"
-                    autoComplete="family-name"
-                    value={last_name}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="fg">
-                <label className="lbl" htmlFor="reg-email">E-mail</label>
-                <input
-                  id="reg-email"
-                  type="email"
-                  className="fi"
-                  placeholder="jan@email.pl"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="fg">
-                <label className="lbl" htmlFor="reg-phone">Telefon</label>
-                <input
-                  id="reg-phone"
-                  type="tel"
-                  className="fi"
-                  placeholder="600 123 456"
-                  autoComplete="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="fg">
-                <label className="lbl" htmlFor="reg-password">Hasło (min. 8 znaków)</label>
-                <input
-                  id="reg-password"
-                  type="password"
-                  className="fi"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                />
-              </div>
-              <div className="fg">
-                <label className="lbl" htmlFor="reg-street">Ulica i numer (opcjonalnie)</label>
-                <input
-                  id="reg-street"
-                  type="text"
-                  className="fi"
-                  placeholder="ul. Przykładowa 12"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                />
-              </div>
-              <div className="fg2">
-                <div className="fg">
-                  <label className="lbl" htmlFor="reg-city">Miasto</label>
-                  <input
-                    id="reg-city"
-                    type="text"
-                    className="fi"
-                    placeholder="Miasto"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  />
-                </div>
-                <div className="fg">
-                  <label className="lbl" htmlFor="reg-postal">Kod pocztowy</label>
-                  <input
-                    id="reg-postal"
-                    type="text"
-                    className="fi"
-                    placeholder="00-000"
-                    value={postal_code}
-                    onChange={(e) => setPostalCode(e.target.value)}
-                  />
-                </div>
-              </div>
-              {error && <ErrorMessage message={error} className="mb-3" />}
-              <button type="submit" className="btn-primary group" disabled={submitting}>
-                {submitting ? "Tworzenie konta…" : "Zarejestruj się"}
-                <IconArrow />
-              </button>
-            </form>
-            <p className="pnl-footer">
-              Masz już konto?{" "}
-              <Link href="/client/login">Zaloguj się</Link>
-            </p>
-            <Link href="/" className="back">
-              <IconChevronLeft />
-              Wróć na stronę główną
-            </Link>
+        <AuthField
+          id="reg-email"
+          type="email"
+          label="E-mail"
+          placeholder="np. anna@poczta.pl"
+          autoComplete="email"
+          inputMode="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <AuthField
+          id="reg-phone"
+          type="tel"
+          label="Telefon"
+          placeholder="np. 600 100 200"
+          autoComplete="tel"
+          inputMode="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+        />
+        <PasswordField
+          id="reg-password"
+          label="Hasło"
+          placeholder="Min. 8 znaków"
+          autoComplete="new-password"
+          hint="Co najmniej 8 znaków."
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={8}
+        />
+        <fieldset className="t-ck-fieldset">
+          <legend>
+            Adres <em>— opcjonalnie</em>
+          </legend>
+          <AuthField
+            id="reg-street"
+            label="Ulica i numer"
+            placeholder="np. ul. Słoneczna 12"
+            autoComplete="street-address"
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
+          />
+          <div className="t-ck-grid2">
+            <AuthField
+              id="reg-city"
+              label="Miasto"
+              placeholder="np. Rabka-Zdrój"
+              autoComplete="address-level2"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
+            <AuthField
+              id="reg-postal"
+              label="Kod pocztowy"
+              placeholder="00-000"
+              autoComplete="postal-code"
+              inputMode="numeric"
+              value={postal_code}
+              onChange={(e) => setPostalCode(e.target.value)}
+            />
           </div>
-        </div>
-      </div>
-    </div>
+        </fieldset>
+        {error && <AuthAlert>{error}</AuthAlert>}
+        <SubmitButton busy={submitting} busyLabel="Tworzenie konta…">
+          Zarejestruj się
+        </SubmitButton>
+        <p className="t-ck-switch">
+          Masz już konto?{" "}
+          <Link href="/client/login" className="t-ck-link">
+            Zaloguj się
+          </Link>
+        </p>
+      </form>
+    </AuthScreen>
   );
 }

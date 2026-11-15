@@ -37,7 +37,8 @@ describe("wizard-data", () => {
       const [cx, cy, cw, ch] = d.photo.crop;
       expect(cx + cw).toBeLessThanOrEqual(d.photo.width);
       expect(cy + ch).toBeLessThanOrEqual(d.photo.height);
-      if (d.photo.art) expect(["watch", "data", "other"]).toContain(d.photo.art);
+      // direction B: every device is a vector illustration (components/tech/wizard/art)
+      if (d.photo.art) expect(["phone", "tablet", "watch", "laptop", "pc", "printer", "console", "data", "other"]).toContain(d.photo.art);
       else expect(d.photo.src).toMatch(/^\/tech\/.+\.webp$/);
     }
   });
@@ -71,18 +72,21 @@ describe("wizard-data", () => {
     expect(new Set(brands).size).toBe(brands.length);
   });
 
-  it("marquee logos: every Simple Icons mark belongs to a listed brand and has a sane box", () => {
+  it("marquee: every brand has a logo, and every logo a sane box, size and hover colours", () => {
+    for (const b of brands) expect(brandLogo(b), b).toBeDefined();
+    expect(brandLogos.length).toBe(brands.length);
     for (const l of brandLogos) {
-      expect(brands.map((b) => b.toLowerCase())).toContain(l.title.toLowerCase());
-      expect(l.path).toMatch(/^M/);
-      const [x, y, w, h] = l.box.split(" ").map(Number);
-      expect(x >= 0 && y >= 0 && x + w <= 24.001 && y + h <= 24.001 && w > 0 && h > 0).toBe(true);
+      const [, , w, h] = l.box.split(" ").map(Number);
+      expect(w > 0 && h > 0, l.slug).toBe(true);
+      if (l.source === "simple-icons") expect(l.box.split(" ").map(Number).every((n) => n >= 0 && n <= 24.001)).toBe(true);
+      expect(l.path).toMatch(/^[Mm]/);
       expect(l.size).toBeGreaterThan(0.4);
       expect(l.size).toBeLessThanOrEqual(1.3);
+      expect(l.color).toMatch(/^#[0-9a-f]{6}$/);
+      expect(l.colorDark).toMatch(/^#[0-9a-f]{6}$/);
     }
-    // Krystian's must-have list: logos where Simple Icons has them (realme is not there → text)
-    for (const b of ["Apple", "Samsung", "Xiaomi", "Motorola", "Lenovo", "HP", "Dell", "Huawei", "ASUS"]) expect(brandLogo(b)).toBeDefined();
-    expect(brandLogo("realme")).toBeUndefined();
+    // marks in a frame are replaced by the bare wordmark (traced from Krystian's files)
+    for (const s of ["realme", "lenovo", "xiaomi"]) expect(brandLogos.find((l) => l.slug === s)?.source).toBe("krystian");
   });
 });
 

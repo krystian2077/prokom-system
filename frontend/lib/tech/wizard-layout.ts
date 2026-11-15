@@ -21,6 +21,8 @@ export type LabelInput = {
   label: { w: number; h: number };
   /** Other spots, the "whole device" button… */
   avoid?: Rect[];
+  /** Centres of the other spots: the leader line keeps clear of them too. */
+  spots?: Pt[];
   margin?: number;
   gap?: number;
 };
@@ -35,6 +37,15 @@ function clamp(v: number, lo: number, hi: number) {
   return hi < lo ? lo : Math.max(lo, Math.min(hi, v));
 }
 
+/** Distance from a point to a segment. */
+export function segDist(p: Pt, a: Pt, b: Pt): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const l2 = dx * dx + dy * dy || 1;
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2));
+  return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+}
+
 /** Nearest point of a rect to a point. */
 export function nearestOn(r: Rect, p: Pt): Pt {
   return { x: clamp(p.x, r.x, r.x + r.w), y: clamp(p.y, r.y, r.y + r.h) };
@@ -42,8 +53,11 @@ export function nearestOn(r: Rect, p: Pt): Pt {
 
 function around(box: Rect, i: LabelInput, margin: number, gap: number) {
   const { stage, spot, label } = i;
-  const ys = [spot.y - label.h / 2, spot.y - label.h - 10, spot.y + 10].map((y) => clamp(y, margin, stage.h - label.h - margin));
-  const xs = [spot.x - label.w / 2, spot.x + 10, spot.x - label.w - 10].map((x) => clamp(x, margin, stage.w - label.w - margin));
+  // several slides along each side, so the leader can angle past other spots
+  const ys = [spot.y - label.h / 2, spot.y - label.h - 10, spot.y + 10, spot.y - label.h - 60, spot.y + 60].map((y) => clamp(y, margin, stage.h - label.h - margin));
+  const xs = [spot.x - label.w / 2, spot.x + 10, spot.x - label.w - 10, spot.x + 60, spot.x - label.w - 60, margin, stage.w - label.w - margin].map((x) =>
+    clamp(x, margin, stage.w - label.w - margin),
+  );
   return [
     ...ys.flatMap((y) => [
       { side: "left" as const, x: box.x - gap - label.w, y },
@@ -78,6 +92,9 @@ export function placeLabel(i: LabelInput): LabelPlace {
       const r = { x: c.x, y: c.y, w: label.w, h: label.h };
       if (!inStage(r) || intersects(r, i.region, 6) || avoid.some((a) => intersects(r, a, 4))) continue;
       if (outsideDevice && intersects(r, i.device, 2)) continue;
+      // the leader line never runs over another spot (dot radius 15 + air)
+      const end = nearestOn(r, spot);
+      if ((i.spots ?? []).some((q) => segDist(q, spot, end) < 22)) continue;
       const s = score(r, c.side);
       if (!best || s < best.s) best = { ...c, outsideDevice, s };
     }

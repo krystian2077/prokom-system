@@ -5,6 +5,7 @@ import { claim } from "@/lib/tech/claims";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { PHONE_BRANDS, PHONE_REPAIRS, phoneSteps } from "@/lib/tech/phone-repairs";
 import { PageIconSvg } from "./page-icons";
+import { Timeline } from "./content/Blocks";
 
 const submitHref = (usterka: string, punkt?: PointKey) => {
   const q = new URLSearchParams({ category: "phone", usterka });
@@ -88,9 +89,25 @@ export function PhoneBrandsSection({ title }: { title: string }) {
 }
 
 /** "Cztery kroki do sprawnego telefonu" on a dark band. */
-export function PhoneStepsSection({ eyebrow, cityName }: { eyebrow: string; cityName: string | null }) {
+export function PhoneStepsSection({ eyebrow, cityName, timeline = false }: { eyebrow: string; cityName: string | null; timeline?: boolean }) {
   const sameDay = claim("sameDayDiagnosis");
   const steps = phoneSteps(cityName, sameDay?.text ?? null);
+  if (timeline) {
+    // /serwis-telefonow: same drawn timeline as the other repair pages (content unchanged)
+    return (
+      <section className="t-section t-dsteps" id="jak-to-dziala" data-rail="Jak to działa">
+        <div className="t-container">
+          <div className="t-sechead">
+            <div>
+              <span className="t-eyebrow t-eyebrow--stage">{eyebrow}</span>
+              <h2 className="t-h2">Cztery kroki do sprawnego telefonu</h2>
+            </div>
+          </div>
+          <Timeline steps={steps.map((st, i) => ({ t: st.t, s: st.s, lead: i === 0, draft: i === 1 && !!sameDay?.draft }))} tone="stage" horizontal />
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="t-steps-dark" id="jak-to-dziala" data-rail="Jak to działa">
       <div className="t-container">

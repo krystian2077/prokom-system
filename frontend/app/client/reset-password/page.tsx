@@ -3,37 +3,11 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Unbounded, Plus_Jakarta_Sans } from "next/font/google";
 import { api } from "@/lib/api";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
-
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  weight: ["700", "900"],
-  variable: "--font-unbounded",
-});
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plus-jakarta",
-});
-
-function IconChevronLeft() {
-  return (
-    <svg viewBox="0 0 24 24" width={12} height={12} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
-
-function IconArrow() {
-  return (
-    <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform group-hover:translate-x-[3px]">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  );
-}
+import { AccountStatus } from "@/components/tech/account/AccountStatus";
+import { AuthScreen } from "@/components/tech/account/AuthScreen";
+import { AuthAlert, PasswordField, SubmitButton } from "@/components/tech/account/AuthParts";
+import { IconCheck } from "@/components/tech/icons";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -71,135 +45,80 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div
-        className={`min-h-[60vh] flex flex-col items-center justify-center px-4 ${unbounded.variable} ${plusJakarta.variable}`}
-        style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif" }}
+      <AuthScreen
+        eyebrow="Nowe hasło"
+        title="Brak linku do resetu"
+        lead="Użyj linku z wiadomości e-mail lub poproś o nowy na stronie „Nie pamiętasz hasła?”."
+        back={{ href: "/client/login", label: "Wróć do logowania" }}
+        compact
       >
-        <p className="text-[var(--ink2)] mb-4">Brak linku do resetu. Użyj linku z wiadomości e-mail lub poproś o nowy na stronie „Zapomniałeś hasła?”.</p>
-        <Link href="/client/forgot-password" className="text-[#dc1e1e] font-semibold hover:underline">Wyślij link do resetu hasła</Link>
-        <Link href="/client/login" className="mt-4 text-[var(--ink2)] hover:underline">Logowanie</Link>
-      </div>
+        <Link href="/client/forgot-password" className="t-pbtn t-pbtn--acc t-ck-submit">
+          Wyślij link do resetu hasła
+        </Link>
+      </AuthScreen>
     );
   }
 
   if (success) {
     return (
-      <div
-        className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
-        style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
+      <AuthScreen
+        eyebrow="Nowe hasło"
+        title="Hasło zmienione"
+        lead="Za chwilę zostaniesz przekierowany do logowania."
+        compact
       >
-        <div className="login-mobile-brand">
-          <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
-            PRO<span>–</span>KOM
+        <div role="status" aria-live="polite">
+          <span className="t-ck-done" aria-hidden="true">
+            <IconCheck size={26} strokeWidth={2.6} />
+          </span>
+          <Link href="/client/login" className="t-pbtn t-pbtn--acc t-ck-submit">
+            Przejdź do logowania
           </Link>
-          <span className="brand-tagline">Nowe hasło</span>
         </div>
-        <div className="card">
-          <div className="rp" style={{ maxWidth: "400px", margin: "0 auto" }}>
-            <div className="pnl show">
-              <div className="pnl-head">
-                <h3 className="pnl-title" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900 }}>
-                  Hasło zmienione
-                </h3>
-                <p className="pnl-sub">Za chwilę zostaniesz przekierowany do logowania.</p>
-              </div>
-              <Link href="/client/login" className="btn-primary group">
-                Przejdź do logowania
-                <IconArrow />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      </AuthScreen>
     );
   }
 
   return (
-    <div
-      className={`login-page ${unbounded.variable} ${plusJakarta.variable}`}
-      style={{ fontFamily: "var(--font-plus-jakarta), system-ui, sans-serif", color: "var(--ink)" }}
+    <AuthScreen
+      eyebrow="Nowe hasło"
+      title="Ustaw nowe hasło"
+      lead="Wpisz nowe hasło dwukrotnie. Po zapisaniu zalogujesz się nowym hasłem."
+      back={{ href: "/client/login", label: "Wróć do logowania" }}
+      compact
     >
-      <div className="login-mobile-brand">
-        <Link href="/" className="brand-name" style={{ fontFamily: "var(--font-unbounded)" }}>
-          PRO<span>–</span>KOM
-        </Link>
-        <span className="brand-tagline">Nowe hasło</span>
-      </div>
-      <div className="card">
-        <div className="lp" style={{ minHeight: "320px" }}>
-          <Link href="/" className="lp-logo" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900, fontSize: "15px", letterSpacing: "-0.02em", color: "#fff", textDecoration: "none" }}>
-            PRO<span style={{ color: "#dc1e1e" }}>–</span>KOM
-          </Link>
-          <div className="lp-body">
-            <div className="lp-eyebrow">
-              <span className="lp-dot" />
-              NOWE HASŁO
-            </div>
-            <h2 className="lp-title" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900 }}>
-              Ustaw nowe hasło
-              <span>min. 8 znaków</span>
-            </h2>
-            <p className="lp-desc">
-              Wpisz nowe hasło dwukrotnie. Po zapisaniu będziesz mógł się zalogować.
-            </p>
-          </div>
-        </div>
-
-        <div className="rp">
-          <div className="pnl show">
-            <div className="pnl-head">
-              <h3 className="pnl-title" style={{ fontFamily: "var(--font-unbounded)", fontWeight: 900 }}>
-                Nowe hasło
-              </h3>
-              <p className="pnl-sub">Hasło musi mieć co najmniej 8 znaków</p>
-            </div>
-            <form onSubmit={handleSubmit} className="fields">
-              <div className="fg">
-                <label className="lbl" htmlFor="reset-password">Hasło</label>
-                <input
-                  id="reset-password"
-                  type="password"
-                  className="fi"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={submitting}
-                />
-              </div>
-              <div className="fg">
-                <label className="lbl" htmlFor="reset-confirm">Powtórz hasło</label>
-                <input
-                  id="reset-confirm"
-                  type="password"
-                  className="fi"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  disabled={submitting}
-                />
-              </div>
-              {error && <ErrorMessage message={error} className="mb-3" />}
-              <button type="submit" className="btn-primary group" disabled={submitting}>
-                {submitting ? "Zapisywanie…" : "Zapisz hasło"}
-                <IconArrow />
-              </button>
-            </form>
-            <Link href="/client/login" className="back mt-6">
-              <IconChevronLeft />
-              Wróć do logowania
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+      <form onSubmit={handleSubmit} className="t-ck-form">
+        <PasswordField
+          id="reset-password"
+          label="Nowe hasło"
+          placeholder="Min. 8 znaków"
+          autoComplete="new-password"
+          hint="Co najmniej 8 znaków."
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={submitting}
+        />
+        <PasswordField
+          id="reset-confirm"
+          label="Powtórz hasło"
+          placeholder="Wpisz hasło jeszcze raz"
+          autoComplete="new-password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          disabled={submitting}
+        />
+        {error && <AuthAlert>{error}</AuthAlert>}
+        <SubmitButton busy={submitting} busyLabel="Zapisywanie…">
+          Zapisz hasło
+        </SubmitButton>
+      </form>
+    </AuthScreen>
   );
 }
 
 export default function ClientResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center">Ładowanie…</div>}>
+    <Suspense fallback={<AccountStatus>Ładowanie…</AccountStatus>}>
       <ResetPasswordForm />
     </Suspense>
   );

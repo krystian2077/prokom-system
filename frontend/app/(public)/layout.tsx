@@ -16,6 +16,8 @@ import "./tech-motion.css";
 import "./tech-nav.css";
 import "./tech-wizard.css";
 import "./tech-pages.css";
+import "./tech-about.css";
+import "./tech-visit.css";
 import "./tech-rail.css";
 
 // Public-site fonts only (SPEC §3). Panels keep DM Sans / Unbounded from the root layout.

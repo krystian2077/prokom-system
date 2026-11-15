@@ -86,10 +86,6 @@ describe("strony urządzeń — rozszerzona treść (2026-11)", () => {
     [
       ...x.intro,
       ...x.symptoms.flatMap((s) => [s.t, ...s.signs, s.meaning]),
-      ...x.selfCheck.flatMap((c) => [c.t, c.s]),
-      ...x.worth.yes,
-      ...x.worth.no,
-      x.worth.note,
       x.intake,
       x.warranty,
       ...x.faq.flatMap((f) => [f.q, f.a]),
@@ -98,14 +94,11 @@ describe("strony urządzeń — rozszerzona treść (2026-11)", () => {
     for (const page of devicePages) expect(deviceExtra[page.slug], page.slug).toBeDefined();
     expect(deviceExtra["serwis-telefonow"]).toBeDefined();
   });
-  it("≥ 700 new words, 4–6 symptoms, 4–6 self-checks, worth it both ways", () => {
+  it("≥ 550 new words, 4–6 symptoms, 2 intro paragraphs", () => {
     for (const [slug, x] of all) {
-      expect(wordCount(words(x)), slug).toBeGreaterThanOrEqual(700);
+      expect(wordCount(words(x)), slug).toBeGreaterThanOrEqual(550);
       expect(x.symptoms.length, slug).toBeGreaterThanOrEqual(4);
       expect(x.symptoms.length, slug).toBeLessThanOrEqual(6);
-      expect(x.selfCheck.length, slug).toBeGreaterThanOrEqual(4);
-      expect(x.worth.yes.length, slug).toBeGreaterThanOrEqual(3);
-      expect(x.worth.no.length, slug).toBeGreaterThanOrEqual(2);
       expect(x.intro.length, slug).toBe(2);
     }
   });
