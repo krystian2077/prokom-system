@@ -6,13 +6,8 @@
 import { expect, test } from "@playwright/test";
 import { STATIC_ROUTES } from "../../lib/tech/sitemap";
 
-const LEGACY_SEO = new Set<string>([
-  "/hammer-glass",
-  "/faq",
-  "/blog",
-  "/polityka-prywatnosci",
-  "/regulamin",
-]);
+// TD5 PR 2 rebuilt the last legacy pages — the list is empty and must stay empty.
+const LEGACY_SEO = new Set<string>([]);
 const PAGES = [...STATIC_ROUTES.map((r) => r.path), "/serwis-telefonow-rabka-zdroj"];
 
 type Seo = { h1: number; title: string; description: string; canonical: string | null; ld: string[] };

@@ -6,6 +6,7 @@ import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PhoneBrandsSection, PhoneRepairsSection, PhoneStepsSection } from "@/components/tech/PhoneSections";
 import { PointCard } from "@/components/tech/PointCard";
+import { RepairLinks } from "@/components/tech/repair/RepairLinks";
 import { publishedLocalPages, visibleLocalPages } from "@/lib/tech/local-pages";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { inCity, joinCities } from "@/lib/tech/point-format";
@@ -131,6 +132,7 @@ export default function PhoneServicePage() {
         </div>
       </section>
 
+      <RepairLinks device="phone" title="Konkretne naprawy telefonów" />
       <CtaBand
         eyebrow="Zgłoszenie naprawy"
         title="Pęknięty ekran albo słaba bateria? Zgłoś naprawę online."

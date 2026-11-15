@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Archivo, Manrope } from "next/font/google";
 import { TechShell } from "@/components/tech/TechShell";
+import { SwRegister } from "@/components/tech/SwRegister";
 import { ThemeBoot } from "@/components/tech/ThemeBoot";
 import { line, servicePoints } from "@/config/prokom";
 import { jsonLdString, siteJsonLd } from "@/lib/tech/jsonld";
 import { publishedPoints } from "@/lib/tech/points";
+import { MANIFEST_PATH, THEME_DARK, THEME_LIGHT } from "@/lib/tech/pwa";
 import { themeScript } from "@/lib/tech/theme";
 import { SITE_URL } from "@/lib/site-config";
 import "./tech.css";
@@ -52,6 +54,18 @@ export const metadata: Metadata = {
     images: [{ url: "/images/og-prokom.jpg", width: 1200, height: 630, alt: line.name }],
   },
   twitter: { card: "summary_large_image", title: defaultTitle, description },
+  // PWA only on public pages (SPEC §12.2): manifest, iOS meta, apple-touch-icon.
+  manifest: MANIFEST_PATH,
+  appleWebApp: { capable: true, title: line.name, statusBarStyle: "black-translucent" },
+  icons: { apple: [{ url: "/tech/pwa/apple-touch-icon.png", sizes: "180x180" }] },
+};
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_LIGHT },
+    { media: "(prefers-color-scheme: dark)", color: THEME_DARK },
+  ],
 };
 
 const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
@@ -66,6 +80,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd()) }} />
       {umamiId ? <script defer src={umamiSrc} data-website-id={umamiId} data-tech-umami="" /> : null}
       <ThemeBoot />
+      <SwRegister />
       <div className={`tech ${archivo.variable} ${manrope.variable}`}>
         {/* Old pages render inside the new shell until TD2–TD5 rebuild them (ConditionalPublicLayout stays until TD6). */}
         <TechShell>{children}</TechShell>

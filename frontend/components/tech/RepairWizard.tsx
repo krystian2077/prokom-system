@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { repairForFault, repairPath } from "@/lib/tech/naprawy";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { PointKey } from "@/config/prokom";
 import { trackEvent } from "@/lib/tech/track-event";
@@ -173,6 +174,8 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
     </>
   );
 
+  // "Dowiedz się więcej" — only when a published, verified repair page exists (SPEC §12.4).
+  const learnMore = repairForFault(device.category, fault);
   const faultChips = (
     <div className="t-wiz__faults">
       {device.faults.map((f) => (
@@ -180,6 +183,11 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
           {f}
         </button>
       ))}
+      {learnMore ? (
+        <Link href={repairPath(learnMore.slug)} className="t-lnk t-lnk--sm t-wiz__more">
+          Dowiedz się więcej: {learnMore.h1} →
+        </Link>
+      ) : null}
     </div>
   );
 

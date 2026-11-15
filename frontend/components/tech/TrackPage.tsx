@@ -9,6 +9,8 @@ import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { fetchTrack } from "@/lib/tech/requests";
 import { trackEvent } from "@/lib/tech/track-event";
 import { MyRepairs } from "./MyRepairs";
+import { PrepChecklist } from "./PrepChecklist";
+import { DEVICE_CATEGORIES } from "@/types/repair";
 import { RepairTracker } from "./RepairTracker";
 
 /**
@@ -135,6 +137,10 @@ export function TrackPage() {
         {data && query ? (
           <>
             <RepairTracker data={data} onRefresh={() => void check(query.ref, query.last4)} refreshing={loading} />
+            {/* "Przyjęte" (first stage): what to prepare before handing the device over (SPEC §12.3). */}
+            {data.stages[data.stage_index]?.key === "received" && !data.is_interrupted ? (
+              <PrepChecklist category={DEVICE_CATEGORIES.find((c) => c.label === data.device.category)?.value ?? null} />
+            ) : null}
             {!saved ? (
               <button
                 type="button"
