@@ -41,3 +41,17 @@ test("every live repair page is linked from the hub /uslugi; device pages do not
     await expect(page.locator("#konkretne-naprawy")).toHaveCount(0);
   }
 });
+
+test("repair page: before/after slider works with the keyboard; related repairs are cards", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/naprawy/wymiana-ekranu-iphone");
+  const slider = page.getByRole("slider", { name: /przed naprawą i po naprawie/i });
+  await slider.scrollIntoViewIfNeeded();
+  const before = Number(await slider.inputValue());
+  await slider.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  expect(Number(await slider.inputValue())).toBe(before + 2);
+  await expect(page.locator("#powiazane a.t-rrel__card").first()).toBeVisible();
+  await expect(page.locator("#przed-i-po")).toHaveAttribute("data-rail", "Przed i po");
+});
