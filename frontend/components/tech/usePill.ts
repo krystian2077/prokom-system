@@ -28,10 +28,27 @@ export function usePill(ref: RefObject<HTMLElement>, activeSelector: string, dep
       if (!box.hasAttribute("data-pill-ready")) requestAnimationFrame(() => box.setAttribute("data-pill-ready", ""));
     };
     measure();
-    if (typeof ResizeObserver !== "function") return;
+    // Web fonts swap in after the first paint and shift the items (Blog: 384 → 420 px);
+    // place the pill again without the slide, so it does not glide across the nav on load.
+    let alive = true;
+    // Only while fonts are still loading: later deps changes (hover) must keep the slide.
+    if (document.fonts && document.fonts.status !== "loaded") document.fonts.ready.then(() => {
+      if (!alive || !box.isConnected) return;
+      box.removeAttribute("data-pill-ready");
+      measure();
+      void box.offsetHeight; // commit the new position before the transition is re-enabled
+    });
+    if (typeof ResizeObserver !== "function") {
+      return () => {
+        alive = false;
+      };
+    }
     const ro = new ResizeObserver(measure);
     ro.observe(box);
-    return () => ro.disconnect();
+    return () => {
+      alive = false;
+      ro.disconnect();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deps are passed by the caller
   }, deps);
 }

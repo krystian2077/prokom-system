@@ -16,7 +16,7 @@ export default function TermsPage() {
   return (
     <LegalDoc title="Regulamin świadczenia usług" path="/regulamin" version="15 listopada 2026 r.">
       <p>
-        Niniejszy Regulamin określa zasady korzystania z serwisu internetowego
+        Niniejszy Regulamin określa zasady korzystania z serwisu internetowego{" "}
         {line.name} dostępnego pod adresem <strong>{line.domain}</strong> oraz
         warunki świadczenia usług serwisowych przez {company.name}. Przed skorzystaniem z usług prosimy o uważne zapoznanie się z
         poniższymi postanowieniami.
@@ -49,7 +49,7 @@ export default function TermsPage() {
             działalnością gospodarczą lub zawodową.
           </Li>
           <Li>
-            <strong>Serwis internetowy</strong> – strona dostępna pod adresem
+            <strong>Serwis internetowy</strong> – strona dostępna pod adresem{" "}
             {line.domain} wraz ze wszystkimi podstronami.
           </Li>
           <Li>

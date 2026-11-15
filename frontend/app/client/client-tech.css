@@ -35,7 +35,9 @@ html[data-tech-theme="dark"] .tech .t-ck-card { border-color: var(--hair); }
 
 /* Loading / redirect */
 .tech .t-ck-status {
-  min-height: 46vh; display: flex; align-items: center; justify-content: center; gap: 12px;
+  /* keeps the footer below the fold while the session is checked: the login card that
+   * replaces this state then appears instead of pushing the footer down (CLS 0.13–0.55 → ~0) */
+  min-height: 46vh; min-height: calc(100svh - 120px); display: flex; align-items: center; justify-content: center; gap: 12px;
   font-size: 15px; font-weight: 700; color: var(--ink2);
 }
 .tech .t-ck-status__spin { color: var(--acc); }

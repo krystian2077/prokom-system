@@ -353,7 +353,9 @@ html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3,
 .tech .t-szukaj__result .t-sdlg__name { white-space: normal; font-size: 16px; }
 .tech .t-szukaj__result .t-sdlg__hint { white-space: normal; }
 .tech .t-szukaj__none p { margin: 0; color: var(--ink2); }
-.tech .t-szukaj__popular .t-sdlg__chips { padding: 0 12px; }
+/* no result rows above: align with the container edge (count, „nie znaleźliśmy”), not the row inset */
+.tech .t-szukaj__popular :is(.t-szukaj__title, .t-sdlg__chips) { padding-inline: 0; }
+.tech .t-szukaj__popular .t-szukaj__title { margin-bottom: 12px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tech :is(.t-rail, .t-rail__label, .t-rail__icon, .t-rail__marker, .t-rail__up, .t-rail__chev, .t-rail__progress > *, .t-sdlg__go) { transition: none; }
