@@ -139,3 +139,9 @@ html[data-tech-theme="dark"] .tech .t-wiz__img { filter: drop-shadow(0 34px 34px
 
 /* Fields on the ladder */
 html[data-tech-theme="dark"] .tech .t-field :is(input, textarea, select) { background: var(--bg2); }
+
+/* ---------- Contrast fixes found by scripts/tech/axe.mjs (≥ 4.5:1) ---------- */
+/* intent card on the accent: full-strength text (was 0.85 opacity → 4.1–4.3:1) */
+.tech .t-intent--acc .t-intent__s { opacity: 1; }
+/* line labels in the always-dark footer band: brand colour lifted towards white */
+.tech .t-lines__label { color: color-mix(in srgb, var(--line) 72%, #ffffff); }
