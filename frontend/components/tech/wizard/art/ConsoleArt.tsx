@@ -6,13 +6,18 @@ export default function ConsoleArt({ uid }: { uid: string }) {
   return (
     <svg className="t-art" viewBox="0 0 600 560" aria-hidden="true" focusable="false">
       <Materials id={id} />
-      {/* console: black core with white shells */}
-      <rect x="92" y="30" width="176" height="486" rx="26" style={{ fill: "var(--dv-m4)" }} />
-      <path d="M92 70 Q92 30 132 30 H170 V516 H118 Q92 516 92 490 Z" fill={`url(#${id}-whitex)`} />
-      <path d="M268 70 Q268 30 228 30 H190 V516 H242 Q268 516 268 490 Z" fill={`url(#${id}-whitex)`} />
-      <rect x="92" y="30" width="176" height="486" rx="26" fill="none" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
+      {/* console: a black core between two gently bulging white shells, light strip in the seam */}
+      <path d="M166 26 H194 V520 H166 Z" style={{ fill: "var(--dv-m4)" }} />
+      <path d="M170 30 H130 Q98 30 95 64 Q86 272 96 486 Q99 516 130 516 H170 Z" fill={`url(#${id}-whitex)`} />
+      <path d="M190 30 H230 Q262 30 265 64 Q274 272 264 486 Q261 516 230 516 H190 Z" fill={`url(#${id}-whitex)`} />
+      <path d="M170 30 H130 Q98 30 95 64 Q86 272 96 486 Q99 516 130 516 H170 Z" fill="none" stroke="#000" strokeOpacity="0.1" strokeWidth="1.2" />
+      <path d="M190 30 H230 Q262 30 265 64 Q274 272 264 486 Q261 516 230 516 H190 Z" fill="none" stroke="#000" strokeOpacity="0.1" strokeWidth="1.2" />
+      <path d="M108 70 Q102 270 110 470" fill="none" stroke="#fff" strokeOpacity="0.85" strokeWidth="5" strokeLinecap="round" />
+      <path d="M252 70 Q258 270 250 470" fill="none" stroke="#000" strokeOpacity="0.07" strokeWidth="8" strokeLinecap="round" />
       <rect x="170" y="30" width="20" height="486" style={{ fill: "var(--dv-m4)" }} />
       <rect x="170" y="30" width="20" height="486" fill={`url(#${id}-vol)`} />
+      <rect x="179" y="120" width="2" height="360" rx="1" fill="#4a8cff" opacity="0.75" />
+      <rect x="176" y="120" width="8" height="360" rx="4" fill="#4a8cff" opacity="0.12" />
       {/* vents along the top */}
       {[46, 54, 62, 70, 78, 86].map((y) => (
         <rect key={y} x="173" y={y} width="14" height="3" rx="1.5" fill="#000" opacity="0.6" />
