@@ -54,7 +54,7 @@ export const DEVICE_HINTS: Partial<Record<DeviceCategory, { brand: string; model
 
 /**
  * "Who pays" lines of the courier option, from config/prokom.ts courierService.
- * A null value = the sentence is not shown (SPEC §12.10). Texts: TODO(krystian) — accept.
+ * A null value = the sentence is not shown (SPEC §12.10). Texts accepted on 15.11.2026.
  */
 type Payer = "client" | "service" | null;
 export function courierLines(c: { inboundPaidBy: Payer; returnPaidBy: Payer; returnIfDeclined: Payer } = courierService): string[] {

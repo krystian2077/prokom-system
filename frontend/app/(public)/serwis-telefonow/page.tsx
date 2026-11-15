@@ -30,7 +30,7 @@ const CRUMBS: Crumb[] = [
   { name: "Serwis telefonów", path: "/serwis-telefonow" },
 ];
 
-// TODO(krystian): accept answers with the service (TD4 PR 2 description).
+// FAQ answers accepted by Krystian on 15.11.2026.
 const FAQ: FaqItem[] = [
   {
     q: "Ile kosztuje naprawa telefonu?",

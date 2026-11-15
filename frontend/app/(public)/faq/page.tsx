@@ -26,7 +26,7 @@ const CRUMBS: Crumb[] = [
 
 type Group = { id: string; title: string; items: FaqItem[]; links?: { href: string; label: string }[] };
 
-// TODO(krystian): answers to accept (TD5 PR 2). Old FAQ promised free diagnosis, parcel
+// Answers accepted by Krystian on 15.11.2026. Old FAQ promised free diagnosis, parcel
 // lockers and a shop — removed (SPEC §8, §10).
 function groups(): Group[] {
   const courier = courierPageHref();

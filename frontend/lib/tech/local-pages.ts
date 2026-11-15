@@ -7,6 +7,7 @@
  * unpublished point shows in draft frames; missing content is never invented.
  *
  * Contact data (address, hours, phone) comes from config/prokom.ts via the point.
+ * Texts for Rabka-Zdrój and Zakopane accepted by Krystian on 15.11.2026.
  */
 import { servicePoints, type PointKey, type ServicePoint } from "@/config/prokom";
 import { isDraftMode } from "./points";
