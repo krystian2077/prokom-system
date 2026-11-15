@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getTechTheme, switchTechTheme, type ResolvedTheme, type ThemeChoice } from "@/lib/tech/theme";
 import { IconMoon, IconSun } from "./icons";
+import { usePill } from "./usePill";
 
 function centerOf(el: HTMLElement) {
   const r = el.getBoundingClientRect();
@@ -46,8 +47,11 @@ const CHOICES: { value: ThemeChoice; label: string }[] = [
 /** Menu sheet: Jasny / Ciemny / Auto. */
 export function ThemeSegmented() {
   const t = useTechTheme();
+  const ref = useRef<HTMLDivElement>(null);
+  usePill(ref, "button.is-on", [t?.choice]);
   return (
-    <div className="t-segmented" role="radiogroup" aria-label="Motyw">
+    <div ref={ref} className="t-segmented" role="radiogroup" aria-label="Motyw">
+      <span className="t-pilltabs__pill" aria-hidden="true" />
       {CHOICES.map((c) => (
         <button
           key={c.value}

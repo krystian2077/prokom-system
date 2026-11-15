@@ -2,7 +2,8 @@
 // Full-page screenshots of the public site on every test width and theme
 // (docs/tech/RESPONSYWNOSC.md §6) → tmp/zrzuty/*.png + tmp/zrzuty/index.html.
 //
-//   node scripts/tech/zrzuty.mjs [origin] [--widths=360,390,768,1024,1440,1920] [--themes=light,dark] [--pages=/,/track]
+//   node scripts/tech/zrzuty.mjs [origin] [--widths=360,390,768,1024,1440,1920] [--themes=light,dark] [--pages=/,/track] [--lab] [--out=tmp/zrzuty]
+//   --lab: the /lab pages (needs a build with NEXT_PUBLIC_TECH_DRAFT=1), output in tmp/zrzuty-lab
 //   origin defaults to http://localhost:3002 (npx next start -p 3002 in frontend/)
 import fs from "node:fs";
 import path from "node:path";
@@ -12,8 +13,9 @@ const { opts, pos } = parseArgs(process.argv.slice(2));
 const origin = (pos[0] || "http://localhost:3002").replace(/\/$/, "");
 const widths = list(opts.widths, ["360", "390", "768", "1024", "1440", "1920"]).map(Number);
 const themes = list(opts.themes, ["light", "dark"]);
-const pages = list(opts.pages, ["/"]);
-const out = path.join(ROOT, "tmp/zrzuty");
+const LAB_PAGES = ["/lab", "/lab/kreator", "/lab/menu", "/lab/ruch"];
+const pages = opts.lab ? list(opts.pages, LAB_PAGES) : list(opts.pages, ["/"]);
+const out = path.join(ROOT, opts.out || (opts.lab ? "tmp/zrzuty-lab" : "tmp/zrzuty"));
 fs.mkdirSync(out, { recursive: true });
 
 const browser = await chromium.launch();

@@ -13,6 +13,8 @@ import { SITE_URL } from "@/lib/site-config";
 import "./tech.css";
 import "./tech-theme.css";
 import "./tech-motion.css";
+import "./tech-nav.css";
+import "./tech-wizard.css";
 
 // Public-site fonts only (SPEC §3). Panels keep DM Sans / Unbounded from the root layout.
 const archivo = Archivo({
