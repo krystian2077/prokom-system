@@ -4,6 +4,7 @@ import { line } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
 import { submitHref } from "@/lib/tech/wizard-data";
 import { IconArrow, IconPath, type HomeIcon } from "../icons";
+import { BrandLogo } from "../BrandLogo";
 
 const BRANDS = ["Apple", "Samsung", "Xiaomi", "Motorola", "realme", "Huawei"];
 
@@ -29,10 +30,10 @@ export function CommonRepairs() {
               Najczęstsze naprawy telefonów
             </h2>
           </div>
-          <ul className="t-chips" aria-label="Marki telefonów">
+          <ul className="t-brandchips" aria-label="Marki telefonów">
             {BRANDS.map((b) => (
-              <li key={b} className="t-chip">
-                {b}
+              <li key={b} className="t-brandchip">
+                <BrandLogo brand={b} />
               </li>
             ))}
           </ul>
