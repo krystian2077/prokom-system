@@ -775,18 +775,21 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
   animation: t-mq 46s linear infinite; color: var(--ink2);
 }
 .tech .t-brands__track li { display: flex; align-items: center; padding-inline-end: clamp(36px, 3vw + 14px, 60px); } /* padding, not gap: -50% stays seamless */
-/* Simple Icons marks: monochrome, equal optical height (size factor per logo, brand-logos.ts) */
-.tech .t-brands__logo {
-  --t-h: calc(var(--t-logo-h) * var(--t-logo-size, 1));
+/* Brand marks (BrandLogo.tsx, brand-logos.ts): monochrome at rest, equal optical height
+ * (--t-logo-h from the context × the logo's size factor), brand colour on hover */
+.tech .t-brandlogo-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.tech .t-brandlogo {
+  --t-h: calc(var(--t-logo-h, 20px) * var(--t-logo-size, 1));
   display: block; flex-shrink: 0; height: var(--t-h); width: calc(var(--t-h) * var(--t-logo-ar, 1)); fill: currentColor; transition: color 0.2s ease;
+  transform: translateY(calc(var(--t-h) * var(--t-logo-dy, 0)));
 }
-/* brands without a Simple Icons mark: text in the same tone, sized to sit with the wordmarks */
-.tech .t-brands__word {
-  font-family: var(--t-font-head); font-weight: 700; font-size: calc(var(--t-logo-h) * 0.74); line-height: 1; letter-spacing: -0.01em; transition: color 0.2s ease;
-}
+.tech .t-brandlogo--color { color: var(--t-brand); }
+html[data-tech-theme="dark"] .tech .t-brandlogo--color { color: var(--t-brand-dark); }
 @media (hover: hover) and (pointer: fine) {
-  .tech .t-brands__track li:hover .t-brands__logo,
-  .tech .t-brands__track li:hover .t-brands__word { color: var(--ink); }
+  .tech .t-brands__track li:hover .t-brandlogo,
+  .tech .t-brandchip:hover .t-brandlogo { color: var(--t-brand, var(--ink)); }
+  html[data-tech-theme="dark"] .tech .t-brands__track li:hover .t-brandlogo,
+  html[data-tech-theme="dark"] .tech .t-brandchip:hover .t-brandlogo { color: var(--t-brand-dark, var(--ink)); }
 }
 @keyframes t-mq { to { transform: translateX(-50%); } }
 
@@ -1599,6 +1602,18 @@ html[data-tech-theme="dark"] .tech .t-axis { --done: #3e9b2a; }
 /* ---------- Shared: chips, tags, secondary buttons ---------- */
 .tech .t-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; max-width: 520px; }
 .tech .t-chip { display: inline-flex; align-items: center; padding: 7px 12px; border-radius: 999px; background: var(--bg2); font-size: 13px; font-weight: 700; color: var(--ink); }
+/* brand chips with logos ("Najczęstsze naprawy"): equal pills, logo centred, brand colour on hover */
+.tech .t-brandchips { --t-logo-h: 17px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tech .t-brandchip {
+  display: flex; align-items: center; justify-content: center; height: 44px; box-sizing: border-box; padding: 0 16px; border-radius: 999px;
+  background: var(--bg2); color: var(--ink2);
+}
+@media (min-width: 640px) {
+  .tech .t-brandchips { --t-logo-h: 17px; display: flex; flex-wrap: wrap; justify-content: flex-end; }
+  .tech .t-brandchip { min-width: 88px; height: 40px; padding: 0 14px; }
+}
+/* one row next to the heading once there is room for it */
+@media (min-width: 1280px) { .tech .t-brandchips { flex-shrink: 0; } }
 .tech .t-tag { display: inline-flex; align-items: center; padding: 4px 9px; border-radius: 999px; background: var(--soft); color: var(--acct); font-size: 12px; font-weight: 700; white-space: nowrap; }
 .tech .t-ico--lg { width: 54px; height: 54px; border-radius: 16px; }
 .tech .t-sbtn--lg { height: 58px; padding: 0 26px; border-radius: 16px; font-size: 16px; }
