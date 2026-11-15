@@ -1,18 +1,16 @@
 import Link from "next/link";
-import { claim } from "@/lib/tech/claims";
 import type { DeviceExtra } from "@/lib/tech/content-types";
-import { courierPageHref, courierPaysText } from "@/lib/tech/courier";
-import { POINTS_HREF } from "@/lib/tech/nav";
 import { relatedPosts, blogCategoryHref } from "@/lib/tech/page-links";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { submitHref, type CategoryCode } from "@/lib/tech/wizard-data";
-import { IconArrow, IconCheck, IconClose, IconPath, IconPin } from "../icons";
-import { OpeningStatus } from "../OpeningStatus";
-import { CardGrid, Section } from "./Blocks";
+import { HERO_SCENES } from "@/lib/tech/subhero";
+import { IconArrow, IconPath } from "../icons";
+import { FaultGlyph, faultFamily } from "./FaultGlyph";
+import { SalonCards } from "./SalonCards";
+import { Section } from "./Blocks";
 
 /**
- * Content sections of device pages (2026-11): intro, symptoms, self-check, worth it or
- * not, how to hand over (both salons + courier), warranty, Hammer Glass, blog posts.
+ * Content sections of device pages (2026-11): intro, symptoms, how to hand over (both salons + courier), warranty, Hammer Glass, blog posts.
  * Used by DevicePage and /serwis-telefonow. Server Components.
  */
 
@@ -37,12 +35,18 @@ export function DeviceIntro({ paragraphs, title }: { paragraphs: string[]; title
 }
 
 export function DeviceSymptoms({ extra, short, category }: Base & { category: CategoryCode }) {
+  const device = HERO_SCENES[category as keyof typeof HERO_SCENES]?.device ?? "other";
   return (
     <Section id="objawy" rail="Objawy" eyebrow="Po czym poznać usterkę" title={`${short}: objawy najczęstszych usterek`}>
-      <ul className="t-symptoms">
+      <ul className="t-symptoms" data-t-stagger="">
         {extra.symptoms.map((s) => (
           <li key={s.t} className="t-card t-symptoms__item">
-            <h3 className="t-h3 t-symptoms__t">{s.t}</h3>
+            <div className="t-symptoms__head">
+              <span className="t-symptoms__ico">
+                <FaultGlyph family={faultFamily(device, s.fault)} />
+              </span>
+              <h3 className="t-h3 t-symptoms__t">{s.t}</h3>
+            </div>
             <ul className="t-symptoms__signs">
               {s.signs.map((g) => (
                 <li key={g}>{g}</li>
@@ -61,88 +65,19 @@ export function DeviceSymptoms({ extra, short, category }: Base & { category: Ca
   );
 }
 
-export function DeviceSelfCheck({ extra }: Base) {
-  return (
-    <Section id="sprawdz-sam" rail="Sprawdź sam" eyebrow="Zanim przyjdziesz" title="Co możesz sprawdzić sam" lead="Kilka prostych kroków czasem rozwiązuje problem, a jeśli nie, przyspiesza diagnozę." alt>
-      <CardGrid items={extra.selfCheck} numbered />
-    </Section>
-  );
-}
-
-export function DeviceWorth({ extra }: Base) {
-  return (
-    <Section id="oplacalnosc" rail="Opłacalność" eyebrow="Opłacalność" title="Kiedy naprawa się opłaca, a kiedy nie">
-      <div className="t-worth">
-        <div className="t-card t-worth__col t-worth__col--yes">
-          <h3 className="t-h3 t-cb-sub">Zwykle warto naprawić, gdy…</h3>
-          <ul>
-            {extra.worth.yes.map((y) => (
-              <li key={y}>
-                <span aria-hidden="true">
-                  <IconCheck size={14} />
-                </span>
-                {y}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="t-card t-worth__col t-worth__col--no">
-          <h3 className="t-h3 t-cb-sub">Zastanów się, gdy…</h3>
-          <ul>
-            {extra.worth.no.map((n) => (
-              <li key={n}>
-                <span aria-hidden="true">
-                  <IconClose size={13} />
-                </span>
-                {n}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="t-worth__note">{extra.worth.note}</p>
-      </div>
-    </Section>
-  );
-}
-
-/** How to hand over: each published salon (live status) + courier, then the device note. */
+/** How to hand over: each published salon (live status, navigation, parking) + courier, then the device note. */
 export function DeviceIntake({ note, points, what = "sprzęt" }: { note: string; points: VisiblePoint[]; what?: string }) {
-  const courier = courierPageHref();
-  const pays = courierPaysText();
-  const where = claim("courierWholeCountry");
   return (
-    <Section id="jak-oddac" rail="Jak oddać" eyebrow="Przyjęcie i diagnoza" title={`Jak oddać ${what} do serwisu`} alt>
-      <ul className="t-intake">
-        {points.map((p) => (
-          <li key={p.key} className={`t-card t-intake__item${p.draft ? " t-draft" : ""}`}>
-            <span className="t-ico t-ico--sm" aria-hidden="true">
-              <IconPin size={19} />
-            </span>
-            <h3 className="t-h3 t-intake__t">Salon {p.city}</h3>
-            <p>
-              {p.street}. Przyjdź bez umawiania w godzinach otwarcia — <OpeningStatus points={[p]} className="t-intake__status" skeletonCh={14} />.
-            </p>
-            <Link href={`${POINTS_HREF}#${p.key}`} className="t-lnk t-lnk--sm">
-              Dojazd, godziny i parking <IconArrow size={14} />
-            </Link>
-          </li>
-        ))}
-        {courier ? (
-          <li className="t-card t-intake__item">
-            <span className="t-ico t-ico--sm" aria-hidden="true">
-              <IconPath icon="truck" size={19} />
-            </span>
-            <h3 className="t-h3 t-intake__t">Kurierem{where ? ` ${where.text}` : ""}</h3>
-            <p>{pays ?? "Wyślij sprzęt do serwisu kurierem."} Płacisz przelewem po diagnozie i akceptacji wyceny.</p>
-            <Link href={courier} className="t-lnk t-lnk--sm">
-              Jak wysłać sprzęt <IconArrow size={14} />
-            </Link>
-          </li>
-        ) : null}
-      </ul>
+    <Section id="jak-oddac" rail="Jak oddać" eyebrow="Przyjęcie i diagnoza" title={`Jak oddać ${what} do serwisu`} lead="Bez umawiania: przyjdź do salonu w godzinach otwarcia albo wyślij sprzęt." alt>
+      <SalonCards points={points} trackFrom="urzadzenie" />
       <div className="t-intake__note">
-        <b>Co zabrać i jak spakować</b>
-        <p>{note}</p>
+        <span className="t-intake__noteico" aria-hidden="true">
+          <IconPath icon="list" size={18} />
+        </span>
+        <div>
+          <b>Co zabrać i jak spakować</b>
+          <p>{note}</p>
+        </div>
       </div>
     </Section>
   );

@@ -5,7 +5,6 @@ import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
-import { PointCard } from "@/components/tech/PointCard";
 import { PrepChecklist } from "@/components/tech/PrepChecklist";
 import { IconArrow } from "@/components/tech/icons";
 import { courierPageHref } from "@/lib/tech/courier";
@@ -18,7 +17,9 @@ import { breadcrumbJsonLd, faqJsonLd, type Crumb } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
 import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
 import { submitHref } from "@/lib/tech/wizard-data";
-import { CardGrid, CheckList, LinkTiles, Prose, Section } from "../content/Blocks";
+import { CardGrid, CheckList, LinkTiles, Prose, Section, Timeline } from "../content/Blocks";
+import { FaultGlyph, faultFamily } from "../content/FaultGlyph";
+import { SalonCards } from "../content/SalonCards";
 import { FaultVisual } from "../subhero/FaultVisual";
 import { SubHero } from "../subhero/SubHero";
 
@@ -77,7 +78,12 @@ export function RepairPage({ page }: { page: RepairPageData }) {
 
       <section className="t-section t-section--tight" id="objawy" data-rail="Objawy">
         <div className="t-container t-courier__cols">
-          <div>
+          <div className="t-repair__sym">
+            {scene ? (
+              <span className="t-symptoms__ico t-symptoms__ico--lg" aria-hidden="true">
+                <FaultGlyph family={faultFamily(scene.device, page.usterka)} size={26} />
+              </span>
+            ) : null}
             <span className="t-eyebrow">Objawy</span>
             <h2 className="t-h2 t-h2--sm">{page.h1}: kiedy jest potrzebna</h2>
             {page.intro.slice(1).map((p) => (
@@ -87,7 +93,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
             ))}
           </div>
           {page.objawy.length ? (
-            <ul className="t-ticklist">
+            <ul className="t-ticklist t-repair__ticks">
               {page.objawy.map((o) => (
                 <li key={o}>{o}</li>
               ))}
@@ -105,20 +111,13 @@ export function RepairPage({ page }: { page: RepairPageData }) {
       ) : null}
 
       <section className="t-section t-section--tight" id="przebieg" data-rail="Jak naprawiamy">
-        <div className="t-container">
-          <span className="t-eyebrow">Jak przebiega naprawa</span>
-          <h2 className="t-h2 t-h2--sm">Co robimy krok po kroku</h2>
+        <div className="t-container t-repair__flow">
+          <div className="t-cb-head t-repair__flowhead">
+            <span className="t-eyebrow">Jak przebiega naprawa</span>
+            <h2 className="t-h2 t-h2--sm">Co robimy krok po kroku</h2>
+          </div>
           {page.przebieg.length ? (
-            <ol className="t-prepsteps t-prepsteps--grid t-repair__steps">
-              {page.przebieg.map((s, i) => (
-                <li key={s} className="t-card t-prepsteps__item">
-                  <span className="t-prepsteps__n" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <p>{s}</p>
-                </li>
-              ))}
-            </ol>
+            <Timeline steps={page.przebieg.map((s, i) => ({ s, lead: i === 0 }))} />
           ) : (
             <Missing what="Przebieg naprawy" />
           )}
@@ -168,23 +167,10 @@ export function RepairPage({ page }: { page: RepairPageData }) {
             <h2 className="t-h2 t-h2--sm">{points.length > 1 ? "Oddaj sprzęt w jednym z salonów" : "Oddaj sprzęt w salonie"}</h2>
             <p className="t-lead">
               Nie musisz się umawiać — przyjdź w godzinach otwarcia.
-              {courier ? (
-                <>
-                  {" "}
-                  Z dalszej okolicy wyślesz sprzęt{" "}
-                  <Link href={courier} className="t-inline-link" data-t-inline="">
-                    kurierem
-                  </Link>
-                  .
-                </>
-              ) : null}
+              {courier ? " Z dalszej okolicy wyślesz sprzęt kurierem." : null}
             </p>
           </div>
-          <div className="t-repair__points">
-            {points.map((p) => (
-              <PointCard key={p.key} point={p} layout="stack" as="h3" trackFrom="naprawa" />
-            ))}
-          </div>
+          <SalonCards points={points} trackFrom="naprawa" />
         </div>
       </section>
 

@@ -72,46 +72,6 @@ export const mobileDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Nie włącza się",
       },
     ],
-    selfCheck: [
-      {
-        t: "Inny kabel i ładowarka",
-        s: "Kable psują się częściej niż gniazda. Podłącz telefon innym przewodem do innej ładowarki, najlepiej takiej, która bez problemu ładuje drugi telefon.",
-      },
-      {
-        t: "Wymuszony restart",
-        s: "Zawieszony system wygląda jak martwy telefon. W iPhonie naciśnij i puść głośniej, potem ciszej, a następnie przytrzymaj boczny przycisk do pojawienia się logo. W większości Androidów przytrzymaj zasilanie razem z przyciskiem ciszej przez kilkanaście sekund.",
-      },
-      {
-        t: "Stan baterii",
-        s: "Odczytaj w ustawieniach, ile procent pierwotnej pojemności zostało ogniwu, i wpisz wynik do zgłoszenia. To od razu podpowiada, czy problem leży w baterii.",
-      },
-      {
-        t: "Gniazdo oglądane latarką",
-        s: "Poświeć do portu ładowania. Jeśli widzisz zbite kłaczki, nie dłub w nim szpilką ani spinaczem, bo metal zwiera i wygina styki. Czyszczenie zostaw nam.",
-      },
-      {
-        t: "Tryb awaryjny w Androidzie",
-        s: "Gdy telefon sam się restartuje albo zacina, uruchom go w trybie awaryjnym. Jeśli w nim działa poprawnie, winna jest raczej któraś z zainstalowanych aplikacji niż sprzęt.",
-      },
-      {
-        t: "Aktualizacja i wolna pamięć",
-        s: "Zainstaluj zaległą aktualizację systemu i zwolnij trochę miejsca. Prawie pełna pamięć spowalnia telefon i potrafi psuć działanie aparatu oraz wiadomości.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Telefon ma dwa, trzy lata i poza jedną usterką działa dobrze, więc nowy ekran albo bateria wydłużą jego życie.",
-        "Usterka dotyczy jednej części, na przykład gniazda, a reszta telefonu jest sprawna.",
-        "Zależy Ci na danych i ustawieniach, a przenoszenie wszystkiego na nowy telefon byłoby kłopotliwe.",
-        "Masz telefon z wyższej półki, którego zamiana na podobny model byłaby dużo droższa niż naprawa.",
-      ],
-      no: [
-        "Model jest na tyle stary, że brakuje do niego części, a system nie dostaje już aktualizacji.",
-        "Po zalaniu nie działa kilka podzespołów naraz i ich wymiana przewyższa wartość telefonu.",
-        "Kwota naprawy zbliża się do ceny nowszego telefonu o podobnych możliwościach.",
-      ],
-      note: "Jeśli po diagnozie uznamy, że naprawa się nie opłaca, powiemy to wprost. Decyzja i tak należy do Ciebie.",
-    },
     kinds: [
       { n: "Apple", s: "iPhone: wyświetlacz, bateria, gniazdo, tylna szybka i aparat." },
       { n: "Samsung", s: "Galaxy A, S i M: ekran, bateria, klapka; składane Z po oględzinach." },
@@ -215,46 +175,6 @@ export const mobileDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Głośnik lub mikrofon",
       },
     ],
-    selfCheck: [
-      {
-        t: "Ładowarka o właściwej mocy",
-        s: "Tablet potrzebuje więcej prądu niż telefon. Mała ładowarka od starego telefonu może ładować go bardzo wolno albo wcale. Sprawdź zasilacz dołączony do tabletu lub inny o podobnej mocy i inny kabel.",
-      },
-      {
-        t: "Restart wymuszony",
-        s: "W iPadzie z przyciskiem Początek przytrzymaj go razem z przyciskiem górnym do pojawienia się logo. W iPadzie bez tego przycisku naciśnij i puść głośniej, potem ciszej, a następnie przytrzymaj przycisk górny. W tabletach z Androidem zwykle pomaga długie przytrzymanie zasilania z przyciskiem ciszej.",
-      },
-      {
-        t: "Etui i klawiatura",
-        s: "Magnetyczne etui i klawiatury potrafią usypiać ekran albo blokować przyciski. Zdejmij je i sprawdź, czy problem znika.",
-      },
-      {
-        t: "Rysik",
-        s: "Gdy rysik nie działa, naładuj go i sparuj ponownie, a zużytą końcówkę wymień. Jeśli inny rysik też zawodzi w tym samym miejscu ekranu, winny jest raczej dotyk.",
-      },
-      {
-        t: "Pamięć i aktualizacje",
-        s: "Rodzinne tablety często mają pamięć zapchaną grami i filmami. Zwolnij miejsce, zainstaluj aktualizację systemu i sprawdź, czy tablet przyspieszył.",
-      },
-      {
-        t: "Kopia zdjęć i dokumentów",
-        s: "Jeśli tablet się włącza, skopiuj ważne pliki do chmury albo na komputer, zanim go oddasz.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Pękła sama szybka z dotykiem, a wyświetlacz pod nią jest sprawny.",
-        "Tablet służy do pracy lub nauki, a rysik i klawiatura bez niego leżą bezużyteczne.",
-        "Bateria jest jedyną słabą stroną, a tablet nadal płynnie obsługuje aplikacje, z których korzystasz.",
-        "Masz iPada lub tablet z wyższej serii, którego odpowiednik byłby wyraźnie droższy od naprawy.",
-      ],
-      no: [
-        "Tani tablet ma pęknięty ekran zespolony z panelem, a cały moduł kosztuje prawie tyle, co nowe urządzenie.",
-        "Model nie dostaje już aktualizacji, a aplikacje szkolne lub bankowe przestają na nim działać.",
-        "Obudowa jest mocno wygięta i nowy ekran nie miałby na czym stabilnie leżeć.",
-      ],
-      note: "W tabletach różnica między wariantami naprawy bywa duża, dlatego kwotę podajemy dla konkretnego zakresu. Ty wybierasz, czy naprawiamy, czy odbierasz tablet.",
-    },
     kinds: [
       { n: "Apple", s: "iPad, iPad Air, iPad Pro i iPad mini: szybka, wyświetlacz, bateria, port." },
       { n: "Samsung", s: "Galaxy Tab A, S i FE: ekran, bateria, gniazdo USB-C." },
@@ -354,46 +274,6 @@ export const mobileDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Nie włącza się",
       },
     ],
-    selfCheck: [
-      {
-        t: "Czyste styki",
-        s: "Przetrzyj spód zegarka i ładowarkę suchą, miękką ściereczką. Pot i krem zostawiają na stykach osad, który przerywa ładowanie. Nie używaj metalu ani ostrych narzędzi.",
-      },
-      {
-        t: "Inna ładowarka i zasilacz",
-        s: "Kable magnetyczne łatwo łamią się przy wtyczce. Spróbuj innej stacji albo innego zasilacza USB, a przy Apple Watchu sprawdź, czy zegarek leży na środku ładowarki.",
-      },
-      {
-        t: "Wymuszony restart",
-        s: "W Apple Watchu przytrzymaj jednocześnie koronkę i przycisk boczny, aż pojawi się logo. W innych zegarkach zwykle wystarczy dłuższe przytrzymanie przycisku zasilania, szczegóły znajdziesz w instrukcji producenta.",
-      },
-      {
-        t: "Ustawienia, które zjadają baterię",
-        s: "Wyłącz na próbę ekran zawsze włączony, ciągły pomiar tętna i GPS. Jeśli zegarek od razu wytrzymuje dłużej, problem leży w ustawieniach, a nie w ogniwie.",
-      },
-      {
-        t: "Aktualizacja zegarka i aplikacji",
-        s: "Zaktualizuj aplikację towarzyszącą w telefonie i oprogramowanie zegarka. Błędy parowania i synchronizacji często znikają po aktualizacji.",
-      },
-      {
-        t: "Po wodzie nie ładuj",
-        s: "Jeśli pod szkłem widać parę, nie kładź zegarka na ładowarce i nie podgrzewaj go. Wytrzyj go z zewnątrz i zgłoś naprawę.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Zegarek z wyższej serii, na przykład Apple Watch lub Galaxy Watch, ma pęknięte szkło, a reszta działa.",
-        "Bateria jest zużyta, ale zegarek dostaje aktualizacje i współpracuje z Twoim telefonem.",
-        "Problem dotyczy ładowarki albo zabrudzonych styków, a sam zegarek jest sprawny.",
-        "Zależy Ci na zegarku z LTE lub z funkcjami zdrowotnymi, których nie ma prostszy model.",
-      ],
-      no: [
-        "Prosta opaska sportowa, do której nie ma części albo kosztują one tyle, co nowa opaska.",
-        "Zegarek po zalaniu ma uszkodzony ekran, baterię i płytkę jednocześnie.",
-        "Model nie współpracuje już z aktualnym systemem Twojego telefonu.",
-      ],
-      note: "Po oględzinach mówimy, czy naprawa ma sens w Twoim modelu. To Ty decydujesz, czy ją robimy.",
-    },
     kinds: [
       { n: "Apple Watch", s: "Series, SE i Ultra: szkło, wyświetlacz, bateria." },
       { n: "Samsung", s: "Galaxy Watch i Watch Active: szkło, bateria, ładowanie." },
@@ -492,46 +372,6 @@ export const mobileDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Pad nie ładuje",
       },
     ],
-    selfCheck: [
-      {
-        t: "Inny kabel HDMI i inne wejście",
-        s: "Podłącz konsolę innym kablem HDMI do innego wejścia albo do innego telewizora. Sprawdź też, czy w telewizorze wybrane jest właściwe źródło sygnału.",
-      },
-      {
-        t: "Tryb awaryjny PlayStation",
-        s: "Przy wyłączonej konsoli przytrzymaj przycisk zasilania, aż usłyszysz drugi sygnał, i podłącz pad kablem. Z menu możesz zmienić rozdzielczość lub odbudować bazę danych, co często pomaga przy błędach i braku obrazu.",
-      },
-      {
-        t: "Pełne wyłączenie",
-        s: "Wyłącz konsolę całkowicie, a nie do trybu spoczynku, odłącz zasilanie na minutę i uruchom ją ponownie. W Xboksie przytrzymaj przycisk zasilania przez około 10 sekund.",
-      },
-      {
-        t: "Aktualizacja konsoli i pada",
-        s: "Zainstaluj zaległą aktualizację systemu, a pady zaktualizuj z poziomu ustawień konsoli. Część problemów z łącznością i ładowaniem znika po aktualizacji.",
-      },
-      {
-        t: "Kalibracja gałek w Switchu",
-        s: "W Nintendo Switch wejdź w ustawienia kontrolerów i uruchom kalibrację gałek. Jeśli dryf zostaje po kalibracji, winny jest zużyty mechanizm.",
-      },
-      {
-        t: "Miejsce wokół konsoli",
-        s: "Sprawdź, czy kratki z tyłu i po bokach nie są zarośnięte kurzem i czy konsola nie stoi w zamkniętej szafce. Nie rozkręcaj obudowy sam, jeśli sprzęt ma jeszcze gwarancję producenta.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Uszkodzone jest samo gniazdo HDMI, a konsola poza tym działa.",
-        "Konsola jest głośna lub się grzeje, a czyszczenie zwykle przywraca jej normalną pracę.",
-        "Napęd przestał czytać płyty, a masz kolekcję gier na płytach.",
-        "Pad poza dryfem jest w dobrym stanie, a zależy Ci na tym konkretnym modelu.",
-      ],
-      no: [
-        "Konsola starszej generacji ma uszkodzoną płytę główną, do której trudno o części.",
-        "Po zalaniu nie działa kilka układów naraz.",
-        "Tani pad ma kilka usterek jednocześnie: gałkę, przyciski i baterię.",
-      ],
-      note: "Po diagnozie wiesz, co jest zepsute i ile kosztuje naprawa. Wtedy decydujesz, czy ją robimy.",
-    },
     kinds: [
       { n: "PlayStation 5", s: "PS5 i PS5 Slim: HDMI, napęd, czyszczenie, pady DualSense." },
       { n: "PlayStation 4", s: "PS4, Slim i Pro: chłodzenie, HDMI, napęd, pady DualShock 4." },

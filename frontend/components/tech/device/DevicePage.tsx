@@ -12,7 +12,7 @@ import { submitHref } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconPath } from "../icons";
 import { RepairLinks } from "../repair/RepairLinks";
 import { DataSafety } from "../DataSafety";
-import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSelfCheck, DeviceSymptoms, DeviceWarranty, DeviceWorth, HammerTeaser } from "../content/DeviceSections";
+import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSymptoms, DeviceWarranty, HammerTeaser } from "../content/DeviceSections";
 import { RepairSteps } from "./RepairSteps";
 import { FaultVisual } from "../subhero/FaultVisual";
 import { SubHero } from "../subhero/SubHero";
@@ -104,8 +104,6 @@ export function DevicePage({ page }: { page: DevicePageData }) {
 
       <DeviceSymptoms extra={page.extra} name={page.name} short={page.short} category={page.category} />
       <RepairLinks device={page.category} title={`Konkretne naprawy: ${page.short.toLocaleLowerCase("pl-PL")}`} />
-      <DeviceSelfCheck extra={page.extra} name={page.name} short={page.short} />
-      <DeviceWorth extra={page.extra} name={page.name} short={page.short} />
 
       <section className="t-section" id="marki" data-rail={page.kindsEyebrow}>
         <div className="t-container">
@@ -116,7 +114,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
             </div>
             <p className="t-lead">{page.kindsLead}</p>
           </div>
-          <ul className={`t-kinds t-kinds--${Math.min(page.kinds.length, 6)}`}>
+          <ul className={`t-kinds t-kinds--${Math.min(page.kinds.length, 6)}`} data-t-stagger="">
             {page.kinds.map((k) => (
               <li key={k.n} className="t-card t-kinds__item">
                 <span className="t-h3">{k.n}</span>

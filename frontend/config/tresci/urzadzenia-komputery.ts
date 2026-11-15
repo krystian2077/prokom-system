@@ -74,46 +74,6 @@ export const computerDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Działa wolno",
       },
     ],
-    selfCheck: [
-      {
-        t: "Inny zasilacz i gniazdko",
-        s: "Podłącz laptopa do innego gniazdka, z pominięciem listwy. Jeśli masz drugi zasilacz o tej samej mocy i wtyczce, sprawdź go — zepsuty zasilacz daje te same objawy co uszkodzone gniazdo w laptopie.",
-      },
-      {
-        t: "Dioda ładowania",
-        s: "Zobacz, czy dioda przy gnieździe lub na obudowie zapala się po podłączeniu kabla. Zapisz, czy świeci stale, miga, czy wcale — to cenna wskazówka przy diagnozie.",
-      },
-      {
-        t: "Praca bez baterii",
-        s: "Jeśli baterię da się wyjąć bez narzędzi, wyjmij ją i uruchom laptopa na samym zasilaczu. Gdy wtedy startuje, podejrzana jest bateria. Baterii wbudowanej w obudowę nie wyjmuj sam.",
-      },
-      {
-        t: "Zewnętrzny monitor",
-        s: "Przy kłopotach z obrazem podłącz laptopa do monitora lub telewizora. Czysty obraz na zewnątrz wskazuje na matrycę lub taśmę, brak obrazu — raczej na grafikę lub płytę.",
-      },
-      {
-        t: "Twardy reset",
-        s: "Odłącz zasilacz, przytrzymaj przycisk zasilania przez kilkanaście sekund i spróbuj włączyć laptopa ponownie. Czasem to wystarcza, gdy zawiesił się w uśpieniu.",
-      },
-      {
-        t: "Kopia plików",
-        s: "Jeśli laptop jeszcze działa, skopiuj dokumenty i zdjęcia na dysk zewnętrzny albo do chmury, zanim go oddasz.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Laptop ma kilka lat, a zawodzi jedna rzecz: matryca, klawiatura, bateria albo gniazdo.",
-        "Sprzęt ma przyzwoity procesor, tylko zwolnił — czyszczenie i dysk SSD często przywracają mu sprawność.",
-        "Na laptopie masz ustawione programy do pracy, których przenoszenie na nowy sprzęt byłoby kłopotliwe.",
-        "To laptop biznesowy lub do gier, w którym części są wymienne i łatwo dostępne.",
-      ],
-      no: [
-        "Bardzo stary laptop z kilkoma usterkami naraz, np. pękniętą matrycą, zużytą baterią i słabym procesorem, gdy suma napraw zbliża się do wartości nowszego sprzętu.",
-        "Model, do którego nie da się już kupić potrzebnej części albo jej koszt jest nieproporcjonalny do wartości laptopa.",
-        "Laptop po zalaniu, który długo leżał wilgotny i ma korozję w wielu miejscach płyty.",
-      ],
-      note: "Po diagnozie powiemy wprost, czy naprawa ma sens. Jeśli nie, odbierasz laptopa i sam decydujesz, co dalej.",
-    },
     kinds: [
       { n: "Lenovo", s: "IdeaPad, ThinkPad, Legion, Yoga: zawiasy i gniazda zasilania, matryce, klawiatury, chłodzenie w modelach do gier." },
       { n: "HP", s: "Pavilion, ProBook, EliteBook, Victus i Omen: bateria, matryca, gniazdo ładowania, przegrzewanie." },
@@ -219,45 +179,6 @@ export const computerDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Porty USB i audio",
       },
     ],
-    selfCheck: [
-      {
-        t: "Kabel i wejście monitora",
-        s: "Sprawdź, czy kabel siedzi pewnie w obu gniazdach i czy w menu monitora wybrane jest właściwe wejście. Jeśli masz osobną kartę graficzną, podłącz monitor do niej, a nie do złącza na płycie.",
-      },
-      {
-        t: "Czy wentylatory ruszają",
-        s: "Zajrzyj przez szybę obudowy albo zdejmij boczną ściankę i włącz komputer. Zapisz, czy kręcą się wentylatory procesora, karty i zasilacza oraz czy na płycie świecą diody.",
-      },
-      {
-        t: "Sygnały dźwiękowe",
-        s: "Jeśli płyta ma głośniczek, posłuchaj, czy pika po włączeniu. Zapisz rytm, np. jeden długi i dwa krótkie — to wskazówka, który podzespół nie przeszedł testu startowego.",
-      },
-      {
-        t: "Wyłącznik zasilacza i listwa",
-        s: "Z tyłu zasilacza jest przełącznik — sprawdź, czy stoi w pozycji „I”. Podłącz komputer prosto do gniazdka, bez listwy i przedłużacza.",
-      },
-      {
-        t: "Bez dodatkowych urządzeń",
-        s: "Odłącz pendrive’y, drukarkę, pady i inne urządzenia USB. Spróbuj uruchomić komputer tylko z klawiaturą, myszą i monitorem.",
-      },
-      {
-        t: "Co działo się przed awarią",
-        s: "Przypomnij sobie, co poprzedziło usterkę: burza, nowa karta, aktualizacja systemu, przestawienie komputera. Opisz to w zgłoszeniu — taka informacja zawęża szukanie przyczyny.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Zepsuł się jeden podzespół — zasilacz, dysk albo pamięć — a reszta zestawu nadal wystarcza do Twojej pracy.",
-        "Komputer jest głośny i gorący, ale poza tym sprawny, więc czyszczenie zwykle przywraca normalną pracę.",
-        "Masz mocną kartę graficzną lub procesor, a wąskim gardłem jest dysk albo ilość pamięci.",
-        "Chcesz rozbudowywać komputer etapami i rozłożyć modernizację na kilka kroków.",
-      ],
-      no: [
-        "Bardzo stara platforma z kilkoma uszkodzonymi częściami naraz, np. płytą, procesorem i pamięcią, do której nowe podzespoły i tak by nie pasowały.",
-        "Komputer nie spełnia już wymagań potrzebnego Ci systemu lub programów, a modernizacja oznaczałaby wymianę prawie wszystkiego.",
-      ],
-      note: "W komputerze stacjonarnym części wymienia się pojedynczo, więc nawet przy starszym sprzęcie często jest rozsądny wariant. Przy wycenie powiemy, co warto zostawić, a co wymienić.",
-    },
     intake:
       "Zwykle wystarczy sama jednostka, bez monitora, klawiatury i myszy. Monitor przynieś tylko wtedy, gdy kłopot dotyczy obrazu i podejrzewasz właśnie jego. Przy rozbudowie zapisz, do czego komputer ma służyć — do jakich gier, programów czy pracy biurowej. Do wysyłki kurierem owiń obudowę folią bąbelkową i włóż ją do kartonu z grubą warstwą wypełnienia z każdej strony. Ciężka karta graficzna i duże chłodzenie procesora mogą się urwać przy wstrząsie, więc wypełnij przestrzeń wokół nich w obudowie albo wyjmij kartę i zapakuj ją osobno, jeśli wiesz, jak to zrobić.",
     warranty:
@@ -355,46 +276,6 @@ export const computerDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Skaner",
       },
     ],
-    selfCheck: [
-      {
-        t: "Test dysz",
-        s: "Wydrukuj test dysz z menu drukarki albo programu producenta i zrób zdjęcie kartki. Od razu widać, który kolor i w jakim stopniu nie drukuje.",
-      },
-      {
-        t: "Wkłady",
-        s: "Sprawdź, czy tusze lub toner są oryginalne albo dobrej jakości zgodne i czy nie minęła ich data przydatności. Przy nowym wkładzie upewnij się, że zdjęta jest folia zabezpieczająca.",
-      },
-      {
-        t: "Zacięta kartka",
-        s: "Wyłącz drukarkę i wyciągaj papier powoli, zgodnie z kierunkiem jego przesuwu. Szarpanie pod prąd urywa kawałki kartki w środku i może uszkodzić rolki.",
-      },
-      {
-        t: "Ciało obce w środku",
-        s: "Zajrzyj z latarką do podajnika i pod klapę wkładów. Spinacz, zszywka albo karteczka samoprzylepna potrafią zablokować tor papieru.",
-      },
-      {
-        t: "Ponowne połączenie z siecią",
-        s: "Przy kłopotach z Wi-Fi uruchom ponownie router i drukarkę, a potem połącz ją na nowo kreatorem z panelu. Sprawdź, czy komputer lub telefon są w tej samej sieci.",
-      },
-      {
-        t: "Zdjęcie komunikatu",
-        s: "Jeśli panel pokazuje błąd albo diody migają w określony sposób, sfotografuj to i opisz w zgłoszeniu online.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Drukarka laserowa lub biurowe urządzenie wielofunkcyjne — wymiana rolek, bębna czy utrwalacza zwykle się opłaca.",
-        "Drukarka atramentowa z pojemnikami na tusz, np. EcoTank, w której głowicę udaje się udrożnić.",
-        "Usterka dotyczy konfiguracji, sieci albo pojedynczego czujnika.",
-        "Drukarka ma kilka lat, ale drukuje dużo i dobrze sprawdza się w Twojej pracy.",
-      ],
-      no: [
-        "Tania drukarka atramentowa z uszkodzoną głowicą — nowa głowica często kosztuje tyle, co całe urządzenie.",
-        "Model, do którego nie ma już części ani sterowników do aktualnego systemu.",
-        "Drukarka z kilkoma usterkami naraz: zacinaniem papieru, błędami panelu i zaschniętymi tuszami.",
-      ],
-      note: "Przy drukarkach różnica między naprawą, która się opłaca, a taką, która nie ma sensu, bywa duża. Dlatego najpierw ustalamy przyczynę, a jeśli naprawa się nie opłaca, odbierasz drukarkę.",
-    },
     kinds: [
       { n: "Atramentowe z wkładami", s: "HP DeskJet, Canon PIXMA i podobne, w których głowica jest częścią wkładu: zaschnięte dysze, styki wkładów, podawanie papieru." },
       { n: "Atramentowe z pojemnikami na tusz", s: "Epson EcoTank, Canon MegaTank, HP Smart Tank: głowica wbudowana w drukarkę, czyszczenie, błędy pochłaniacza tuszu." },
@@ -495,46 +376,6 @@ export const computerDeviceExtra: Record<string, DeviceExtra> = {
         fault: "Sprzęt po zalaniu",
       },
     ],
-    selfCheck: [
-      {
-        t: "Nie uruchamiaj stukającego dysku",
-        s: "Jeśli dysk stuka, piszczy albo buczy, odłącz go i nie podłączaj ponownie „na próbę”. Każde rozkręcenie talerzy grozi porysowaniem powierzchni z danymi.",
-      },
-      {
-        t: "Żadnych programów na tym nośniku",
-        s: "Nie instaluj programów do odzysku ani niczego innego na dysku, z którego zniknęły pliki. Instalacja może nadpisać właśnie te miejsca, w których leżą Twoje dane.",
-      },
-      {
-        t: "Nie formatuj i nie naprawiaj",
-        s: "Gdy system proponuje sformatowanie karty lub pendrive’a, wybierz „Anuluj”. Nie uruchamiaj też sprawdzania i naprawy błędów dysku, bo potrafi przebudować strukturę plików.",
-      },
-      {
-        t: "Telefon bez resetu",
-        s: "Nie oddawaj telefonu do przywrócenia ustawień fabrycznych ani aktualizacji, która go wymusza. Reset usuwa klucze szyfrowania i dane przepadają na stałe.",
-      },
-      {
-        t: "Sprawdź kopie",
-        s: "Zajrzyj do chmury (Google, iCloud, OneDrive), na stary telefon i do poczty. Część plików mogła się już zsynchronizować i odzysk okaże się zbędny.",
-      },
-      {
-        t: "Spisz, co jest najważniejsze",
-        s: "Zanotuj, które pliki i foldery są kluczowe, np. zdjęcia z konkretnego roku albo dokumenty firmy. Dzięki temu zaczniemy od tego, co najcenniejsze.",
-      },
-    ],
-    worth: {
-      yes: [
-        "Na nośniku są zdjęcia, dokumenty lub projekty, których nie ma nigdzie indziej.",
-        "Dysk przestał działać nagle, a od awarii nikt go nie uruchamiał ani nie naprawiał na własną rękę.",
-        "Pliki skasowano lub sformatowano przez pomyłkę i od tamtej pory na nośniku nic nie zapisywano.",
-        "Chodzi o dane firmowe lub księgowe, których odtworzenie zajęłoby dużo pracy.",
-      ],
-      no: [
-        "Dane mają aktualną kopię w chmurze, na drugim dysku albo w starym telefonie.",
-        "Nośnik był zaszyfrowany, a nie znasz hasła ani klucza odzyskiwania.",
-        "Po skasowaniu nośnik był długo używany, zapisywany od nowa albo wielokrotnie formatowany — szansa spada wtedy prawie do zera.",
-      ],
-      note: "Po wstępnej diagnozie mówimy otwarcie, na co można liczyć. Jeśli odzysk nie ma sensu, nie namawiamy na niego i odbierasz nośnik.",
-    },
     intake:
       "Przynieś sam nośnik albo całe urządzenie, jeśli dysku nie da się łatwo wyjąć — np. laptop z pamięcią wlutowaną w płytę albo telefon. Do telefonu przygotuj kod odblokowania, bo bez niego zaszyfrowanej pamięci zwykle nie da się odczytać. Spisz krótko, co jest najważniejsze, gdzie leżały pliki i co działo się przed awarią. Jeśli masz własny nośnik na odzyskane dane, przynieś go — powinien mieć więcej miejsca niż dane do odzysku. Do wysyłki kurierem włóż dysk do woreczka antystatycznego, owiń go grubo folią bąbelkową i zapakuj w karton tak, żeby się nie przesuwał, bo dyski talerzowe źle znoszą wstrząsy.",
     warranty:

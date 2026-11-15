@@ -60,7 +60,7 @@ export type DevicePage = {
   /** Highlighted note before FAQ (e.g. data recovery: stop using the drive). */
   note?: { title: string; text: string };
   faq: FaqItem[];
-  /** Extended content (2026-11, config/tresci): intro, symptoms, self-check, worth it, intake, warranty. */
+  /** Extended content (2026-11, config/tresci): intro, symptoms, intake, warranty. */
   extra: DeviceExtra;
 };
 
