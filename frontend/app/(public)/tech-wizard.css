@@ -214,7 +214,9 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 /* full layout: fixed card height — a longer text on hover never resizes the stage (no jumping device) */
 /* full layout: the card is as tall as its text, but never shorter than the longest text at this width,
    so a different fault (or a hover preview) never resizes the stage — the device never jumps */
-.tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; justify-content: center; box-sizing: border-box; }
+@media (min-width: 820px) {
+  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; justify-content: center; box-sizing: border-box; }
+}
 @media (min-width: 1180px) {
   .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 8.5rem; }
 }
@@ -239,7 +241,8 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 .tech .t-scene.is-static .t-scene__stage { flex: none; aspect-ratio: 1 / 1.02; min-height: 0; }
 
 /* placement in the wizard */
-.tech .t-wiz__stagewrap { display: flex; min-height: 520px; }
+.tech .t-wiz__stagewrap { display: flex; min-height: 600px; }
+.tech .t-wiz__stagewrap .t-scene { min-height: 600px; }
 /* right column: compact rhythm, no stretched gaps (the summary bar sits at the bottom) */
 @media (min-width: 820px) {
   .tech .t-wiz__side { justify-content: flex-start; gap: 26px; }
