@@ -13,7 +13,7 @@ import { breadcrumbJsonLd, faqJsonLd, pageMetadata, serviceJsonLd, type Crumb, t
 import { towns } from "@/lib/tech/towns";
 import { mobileDeviceExtra } from "@/config/tresci/urzadzenia-mobilne";
 import { DataSafety } from "@/components/tech/DataSafety";
-import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSelfCheck, DeviceSymptoms, DeviceWarranty, DeviceWorth, HammerTeaser } from "@/components/tech/content/DeviceSections";
+import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSymptoms, DeviceWarranty, HammerTeaser } from "@/components/tech/content/DeviceSections";
 import { FaultVisual } from "@/components/tech/subhero/FaultVisual";
 import { SubHero } from "@/components/tech/subhero/SubHero";
 import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
@@ -117,8 +117,6 @@ export default function PhoneServicePage() {
       <PhoneRepairsSection />
       <DeviceSymptoms extra={EXTRA} name="Serwis telefonów" short="Telefony" category="phone" />
       <RepairLinks device="phone" title="Konkretne naprawy telefonów" />
-      <DeviceSelfCheck extra={EXTRA} name="Serwis telefonów" short="Telefony" />
-      <DeviceWorth extra={EXTRA} name="Serwis telefonów" short="Telefony" />
       <PhoneBrandsSection title="Jakie telefony naprawiamy" />
       <DeviceIntake note={EXTRA.intake} points={points} what="telefon" />
       <PhoneStepsSection eyebrow="Jak to działa" cityName={null} />

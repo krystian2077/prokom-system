@@ -26,10 +26,6 @@ export type DeviceExtra = {
   intro: string[];
   /** 4–6 most common faults with symptoms. */
   symptoms: Symptom[];
-  /** 4–6 things to check yourself before coming. */
-  selfCheck: Titled[];
-  /** When the repair pays off and when it does not. */
-  worth: { yes: string[]; no: string[]; note: string };
   /** Optional replacement of `kinds` (brands and model families). */
   kinds?: { n: string; s: string }[];
   /** Device-specific paragraph for "Jak oddać sprzęt" (what to bring, how to pack). */

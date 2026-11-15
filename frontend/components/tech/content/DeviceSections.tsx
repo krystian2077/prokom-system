@@ -6,13 +6,12 @@ import { POINTS_HREF } from "@/lib/tech/nav";
 import { relatedPosts, blogCategoryHref } from "@/lib/tech/page-links";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { submitHref, type CategoryCode } from "@/lib/tech/wizard-data";
-import { IconArrow, IconCheck, IconClose, IconPath, IconPin } from "../icons";
+import { IconArrow, IconPath, IconPin } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
-import { CardGrid, Section } from "./Blocks";
+import { Section } from "./Blocks";
 
 /**
- * Content sections of device pages (2026-11): intro, symptoms, self-check, worth it or
- * not, how to hand over (both salons + courier), warranty, Hammer Glass, blog posts.
+ * Content sections of device pages (2026-11): intro, symptoms, how to hand over (both salons + courier), warranty, Hammer Glass, blog posts.
  * Used by DevicePage and /serwis-telefonow. Server Components.
  */
 
@@ -57,50 +56,6 @@ export function DeviceSymptoms({ extra, short, category }: Base & { category: Ca
           </li>
         ))}
       </ul>
-    </Section>
-  );
-}
-
-export function DeviceSelfCheck({ extra }: Base) {
-  return (
-    <Section id="sprawdz-sam" rail="Sprawdź sam" eyebrow="Zanim przyjdziesz" title="Co możesz sprawdzić sam" lead="Kilka prostych kroków czasem rozwiązuje problem, a jeśli nie, przyspiesza diagnozę." alt>
-      <CardGrid items={extra.selfCheck} numbered />
-    </Section>
-  );
-}
-
-export function DeviceWorth({ extra }: Base) {
-  return (
-    <Section id="oplacalnosc" rail="Opłacalność" eyebrow="Opłacalność" title="Kiedy naprawa się opłaca, a kiedy nie">
-      <div className="t-worth">
-        <div className="t-card t-worth__col t-worth__col--yes">
-          <h3 className="t-h3 t-cb-sub">Zwykle warto naprawić, gdy…</h3>
-          <ul>
-            {extra.worth.yes.map((y) => (
-              <li key={y}>
-                <span aria-hidden="true">
-                  <IconCheck size={14} />
-                </span>
-                {y}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="t-card t-worth__col t-worth__col--no">
-          <h3 className="t-h3 t-cb-sub">Zastanów się, gdy…</h3>
-          <ul>
-            {extra.worth.no.map((n) => (
-              <li key={n}>
-                <span aria-hidden="true">
-                  <IconClose size={13} />
-                </span>
-                {n}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="t-worth__note">{extra.worth.note}</p>
-      </div>
     </Section>
   );
 }
