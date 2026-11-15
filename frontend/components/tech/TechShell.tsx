@@ -7,6 +7,7 @@ import { Footer } from "./Footer";
 import { MenuSheet } from "./MenuSheet";
 import { MotionRoot } from "./MotionRoot";
 import { NoticeBar } from "./NoticeBar";
+import { SearchDialog } from "./search/SearchDialog";
 import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
 import { TabBar } from "./TabBar";
@@ -15,7 +16,7 @@ import { Typeset } from "./Typeset";
 
 /**
  * Public-site shell (SPEC §7, RESPONSYWNOSC): notice, brand bar and capsule on top,
- * side rail ≥ 1424, footer; on phones and tablet portrait the bottom tab bar and sheets.
+ * side rail ≥ 1424, footer, search window (Ctrl/⌘ K, „/”); on phones and tablet portrait the bottom tab bar and sheets.
  */
 export function TechShell({ children }: { children: ReactNode }) {
   const points = visiblePoints();
@@ -38,6 +39,7 @@ export function TechShell({ children }: { children: ReactNode }) {
         <div className="t-ui">
           <TabBar />
           <MenuSheet />
+          <SearchDialog />
         </div>
         <TrackClicks />
         <MotionRoot />

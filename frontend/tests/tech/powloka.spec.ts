@@ -102,16 +102,16 @@ test.describe("phone 390", () => {
     await expect(page.getByRole("dialog").locator('a[href^="tel:"]')).toBeVisible();
   });
 
-  test("Naprawy tab opens the repairs sheet; search filters links", async ({ page }) => {
+  test("Naprawy tab opens the repairs sheet; the capsule loupe opens the search window", async ({ page }) => {
     await page.goto("/");
     await page.locator("[data-t-tabbar]").getByRole("button", { name: "Naprawy" }).click();
     await expect(page.getByRole("dialog", { name: "Naprawy" }).getByRole("link", { name: "Laptopów" })).toBeVisible();
     await page.keyboard.press("Escape");
     await page.locator(".t-capsule").getByRole("button", { name: "Szukaj" }).click();
-    const dialog = page.getByRole("dialog", { name: "Szukaj" });
-    await dialog.getByRole("searchbox").fill("drukar");
-    await expect(dialog.getByRole("link", { name: "Serwis drukarek" })).toBeVisible();
-    await expect(dialog.getByRole("link", { name: "Blog" })).toHaveCount(0);
+    const dialog = page.getByRole("dialog", { name: "Szukaj na stronie" });
+    await dialog.getByRole("combobox").fill("drukar");
+    await expect(dialog.getByRole("option", { name: /Serwis drukarek/ }).first()).toBeVisible();
+    await expect(dialog.getByRole("option", { name: /^Blog$/ })).toHaveCount(0);
   });
 
   test("capsule hides on scroll down and returns on scroll up", async ({ page }) => {
