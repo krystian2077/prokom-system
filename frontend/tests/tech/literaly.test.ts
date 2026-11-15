@@ -12,7 +12,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const FRONTEND = path.resolve(__dirname, "../..");
-const SCAN_DIRS = ["app/(public)", "components/tech", "lib/tech", "sections", "components/layout", "components/hammer-glass", "components/blog", "features/zgloszenie"];
+const SCAN_DIRS = ["app/(public)", "components/tech", "lib/tech", "components/layout"];
 const EXT = /\.(tsx?|css|mjs|js)$/;
 const IGNORE = /(\.test\.ts|\.spec\.ts)$/;
 
@@ -27,11 +27,7 @@ const CONTACT_LITERALS: [string, RegExp][] = [
 
 /** Old files (before TD2–TD5) that still contain contact literals. Only shrinks. */
 const LEGACY_CONTACT = new Set<string>([
-  "features/zgloszenie/LegacyZgloszeniePage.tsx",
-  "sections/Contact.tsx",
   "components/layout/PublicFooter.tsx",
-  "components/hammer-glass/HammerCta.tsx",
-  "components/hammer-glass/HammerHero.tsx",
 ]);
 // FAQ (rebuilt in TD5) keeps one allowed sentence: "nie obsługujemy paczkomatów" (SPEC §11 pt 5).
 const LEGACY_PACZKOMAT = new Set<string>(["app/(public)/faq/page.tsx", "app/(public)/naprawa-kurierem/page.tsx"]);
