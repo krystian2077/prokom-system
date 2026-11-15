@@ -5,7 +5,7 @@ import { claim } from "./claims";
 import { courierPageHref, courierPaysText } from "./courier";
 import { visiblePoints } from "./points";
 import { brandLogo, brandLogos } from "@/components/tech/brand-logos";
-import { EFFECT_FAMILIES, FRAME_BOX, SPOT_TARGET, brands, buildWizardHref, deviceById, faultMeaning, frameSize, lowerFirst, sceneOf, wizardDevices } from "./wizard-data";
+import { EFFECT_FAMILIES, FRAME_BOX, SPOT_GAP, brands, buildWizardHref, deviceById, faultMeaning, frameSize, lowerFirst, sceneOf, wizardDevices } from "./wizard-data";
 
 const backendCodes = DEVICE_CATEGORIES.map((c) => c.value as string);
 
@@ -163,16 +163,16 @@ describe("scenes (PREMIUM §4): every fault of every device", () => {
   });
 
   it.each([
-    ["1440", FRAME_BOX.desktop],
-    ["390", FRAME_BOX.phone],
-  ] as const)("spots never collide at %s (centres ≥ 44 px apart)", (_w, box) => {
+    ["1440", FRAME_BOX.desktop, SPOT_GAP.desktop],
+    ["390", FRAME_BOX.phone, SPOT_GAP.phone],
+  ] as const)("spots never collide at %s (centres ≥ 48 / 44 px apart)", (_w, box, gap) => {
     for (const d of wizardDevices) {
       const [fw, fh] = frameSize(d.photo!.crop, box);
       const pts = d.photo!.spots.map(([f, x, y]) => [f, (x / 100) * fw, (y / 100) * fh] as const);
       for (let i = 0; i < pts.length; i++)
         for (let j = i + 1; j < pts.length; j++) {
           const dist = Math.hypot(pts[i][1] - pts[j][1], pts[i][2] - pts[j][2]);
-          expect(dist, `${d.label}: ${pts[i][0]} ↔ ${pts[j][0]} = ${dist.toFixed(1)} px`).toBeGreaterThanOrEqual(SPOT_TARGET);
+          expect(dist, `${d.label}: ${pts[i][0]} ↔ ${pts[j][0]} = ${dist.toFixed(1)} px`).toBeGreaterThanOrEqual(gap);
         }
     }
   });

@@ -86,7 +86,7 @@
 .tech .t-fault {
   --fw: 230px; --fh: 250px;
   /* the stage is dark: effects use the dark tokens in both themes */
-  --fx-a: #e2483a; --fx-ink: #f6f1f0; --fx-chip: rgba(36, 28, 27, 0.92);
+  --fx-a: #e2483a; --fx-ink: #f6f1f0; --fx-chip: rgba(36, 28, 27, 0.92); --fx-glass: rgba(28, 22, 21, 0.72); --fx-glass-bd: rgba(255, 255, 255, 0.1);
   --card: #241b1a; --bg2: #1b1413; --ink: #f6f1f0; --ink2: #bdb1ae; --bd: #3a2e2c; --acc: #e2483a; --soft: rgba(226, 72, 58, 0.16);
   position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%;
 }
@@ -101,7 +101,8 @@
 }
 .tech .t-fault__art { position: absolute; inset: 0; }
 .tech .t-fault__art svg { display: block; width: 100%; height: 100%; }
-.tech .t-fault__fx { position: absolute; z-index: 1; overflow: hidden; pointer-events: none; animation: t-shero-fx 420ms var(--m-ease-out, ease-out) both; }
+/* layers clip themselves to the region (.t-fx__masked); badges float free */
+.tech .t-fault__fx { position: absolute; z-index: 1; pointer-events: none; animation: t-shero-fx 420ms var(--m-ease-out, ease-out) both; }
 .tech .t-fault__fx > svg,
 .tech .t-fault__fx > div.t-fx { display: block; width: 100%; height: 100%; }
 @keyframes t-shero-fx { from { opacity: 0; } to { opacity: 1; } }
@@ -118,11 +119,13 @@
 .tech .t-fault__tag.is-on i { background: #f0584a; opacity: 1; }
 .tech .t-fault.is-paused .t-fx,
 .tech .t-fault.is-paused .t-fx *,
+.tech .t-fault.is-paused .t-fx *::after,
 .tech .t-fault.is-paused .t-fault__ping::after { animation-play-state: paused; }
 .tech .t-fault.is-poster .t-fault__fx,
 .tech .t-fault.is-poster .t-fault__ping::after,
 .tech .t-fault.is-poster .t-fx,
-.tech .t-fault.is-poster .t-fx * { animation: none !important; }
+.tech .t-fault.is-poster .t-fx *,
+.tech .t-fault.is-poster .t-fx *::after { animation: none !important; }
 
 /* status card (decorative, ≥ 1024) */
 .tech .t-shero__status { display: none; }

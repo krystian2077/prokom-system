@@ -58,6 +58,14 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
   const ra = (rw / rh) * frameAspect;
   const radius = ra > 1 ? { rx: scene.radius / ra, ry: scene.radius } : { rx: scene.radius, ry: scene.radius * ra };
   const at: [number, number] | null = scene.spot ? [((scene.spot[0] - rx0) / rw) * 100, ((scene.spot[1] - ry0) / rh) * 100] : null;
+  // badge offset from the hotspot towards the device's centre (same rule as the wizard scene)
+  let nudge: [number, number] | undefined;
+  if (scene.spot) {
+    const dx = (50 - scene.spot[0]) * frameAspect;
+    const dy = 50 - scene.spot[1];
+    const len = Math.hypot(dx, dy);
+    nudge = len < 6 ? [-0.7, -0.7] : [dx / len, dy / len];
+  }
   const Effect = EFFECTS[scene.effect];
   const vars = { "--ar": `${cw} / ${ch}`, "--arn": frameAspect, "--fx-n": cycle ? 1 : 3 } as CSSProperties;
 
@@ -91,9 +99,18 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
             key={shown}
             className="t-fault__fx"
             data-testid="hero-effect"
-            style={{ left: `${rx0}%`, top: `${ry0}%`, width: `${rw}%`, height: `${rh}%`, borderRadius: `${radius.rx}% / ${radius.ry}%` }}
+            style={
+              {
+                left: `${rx0}%`,
+                top: `${ry0}%`,
+                width: `${rw}%`,
+                height: `${rh}%`,
+                borderRadius: scene.clip ? undefined : `${radius.rx}% / ${radius.ry}%`,
+                ...(scene.clip ? { "--fx-clip": scene.clip } : {}),
+              } as CSSProperties
+            }
           >
-            <Effect variant={scene.variant} at={at} aspect={ra} />
+            <Effect variant={scene.variant} at={at} aspect={ra} nudge={nudge} uid={`hero-${device.id}-${index}`} />
           </div>
         ) : null}
         {scene.spot ? <span key={`p:${shown}`} className="t-fault__ping" style={{ left: `${scene.spot[0]}%`, top: `${scene.spot[1]}%` }} /> : null}

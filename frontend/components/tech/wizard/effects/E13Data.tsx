@@ -1,47 +1,57 @@
-import { IconStage } from "./parts";
+import { Badge, Fx } from "./parts";
 import type { EffectProps } from "./types";
 
-function Glyph({ variant }: { variant?: string }) {
+function Source({ variant }: { variant?: string }) {
   switch (variant) {
     case "phone":
-      return <rect className="t-fx__line t-fx__fill-ink" x="34" y="18" width="32" height="56" rx="7" />;
+      return (
+        <g>
+          <rect className="t-fx__stroke" x="37" y="24" width="26" height="48" rx="6" />
+          <path className="t-fx__stroke" d="M46 30 L54 30" />
+        </g>
+      );
     case "card":
-      return <path className="t-fx__line t-fx__fill-ink" d="M36 20 L58 20 L66 28 L66 74 L36 74 Z M44 26 L44 34 M50 26 L50 34 M56 26 L56 34" />;
+      return <path className="t-fx__stroke" d="M38 26 L56 26 L64 34 L64 72 L38 72 Z M45 31 L45 38 M51 31 L51 38 M57 34 L57 38" />;
     case "files":
-      return <path className="t-fx__line t-fx__fill-ink" d="M20 30 L40 30 L46 36 L80 36 L80 74 L20 74 Z" />;
+      return <path className="t-fx__stroke" d="M26 36 L42 36 L47 41 L74 41 L74 70 L26 70 Z" />;
     default:
       return (
         <g>
-          <rect className="t-fx__line t-fx__fill-ink" x="24" y="22" width="52" height="52" rx="8" />
-          <circle className="t-fx__line" cx="50" cy="44" r="13" />
-          <path className="t-fx__line" d="M50 44 L62 62" />
+          <rect className="t-fx__stroke" x="28" y="26" width="44" height="46" rx="7" />
+          <circle className="t-fx__stroke" cx="50" cy="45" r="11" />
+          <path className="t-fx__stroke" d="M50 45 L60 60" />
         </g>
       );
   }
 }
 
-/** E13 Dane: a disc spins and stops; files float away from the source and come back. */
-export default function E13Data({ variant }: EffectProps) {
-  if (variant === "disc") {
+/** E13 Dane: the disc spins, slows and stops; files float away from the source and come back (recovery). */
+export default function E13Data(p: EffectProps) {
+  if (p.variant === "disc") {
     return (
-      <IconStage family="e13" size={70}>
-        <g className="t-fx__disc">
-          <circle className="t-fx__line t-fx__fill-ink" cx="50" cy="50" r="32" />
-          <circle className="t-fx__line" cx="50" cy="50" r="8" />
-          <path className="t-fx__shine" d="M50 18 A32 32 0 0 1 80 40" />
-        </g>
-        <path className="t-fx__x" d="M70 70 L86 86 M86 70 L70 86" />
-      </IconStage>
+      <Fx family="e13">
+        <Badge p={p}>
+          <g className="t-fx__disc">
+            <circle className="t-fx__discface" cx="50" cy="50" r="30" />
+            <circle className="t-fx__stroke" cx="50" cy="50" r="30" />
+            <circle className="t-fx__stroke" cx="50" cy="50" r="7" />
+            <path className="t-fx__shine" d="M50 24 A26 26 0 0 1 74 40" />
+          </g>
+          <path className="t-fx__x" d="M70 70 L84 84 M84 70 L70 84" />
+        </Badge>
+      </Fx>
     );
   }
   return (
-    <IconStage family="e13" size={70}>
-      <Glyph variant={variant} />
-      <g className="t-fx__files">
-        <path d="M70 14 L80 14 L84 18 L84 30 L70 30 Z" />
-        <path d="M80 44 L90 44 L94 48 L94 60 L80 60 Z" />
-        <path d="M8 12 L18 12 L22 16 L22 28 L8 28 Z" />
-      </g>
-    </IconStage>
+    <Fx family="e13">
+      <Badge p={p}>
+        <Source variant={p.variant} />
+        <g className="t-fx__files">
+          <path d="M70 14 L79 14 L83 18 L83 29 L70 29 Z" />
+          <path d="M80 46 L89 46 L93 50 L93 61 L80 61 Z" />
+          <path d="M9 16 L18 16 L22 20 L22 31 L9 31 Z" />
+        </g>
+      </Badge>
+    </Fx>
   );
 }
