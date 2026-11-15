@@ -55,17 +55,22 @@ function around(box: Rect, i: LabelInput, margin: number, gap: number) {
   const { stage, spot, label } = i;
   // several slides along each side, so the leader can angle past other spots
   const ys = [spot.y - label.h / 2, spot.y - label.h - 10, spot.y + 10, spot.y - label.h - 60, spot.y + 60].map((y) => clamp(y, margin, stage.h - label.h - margin));
-  const xs = [spot.x - label.w / 2, spot.x + 10, spot.x - label.w - 10, spot.x + 60, spot.x - label.w - 60, margin, stage.w - label.w - margin].map((x) =>
+  // …and just beside each reserved box ("Pokaż całe urządzenie", other spots), so a label can tuck in next to it
+  const beside = (i.avoid ?? []).flatMap((a) => [a.x + a.w + 8, a.x - label.w - 8]);
+  const xs = [spot.x - label.w / 2, spot.x + 10, spot.x - label.w - 10, spot.x + 60, spot.x - label.w - 60, margin, stage.w - label.w - margin, ...beside].map((x) =>
     clamp(x, margin, stage.w - label.w - margin),
   );
+  // above/below: right next to the device, or against the stage edge when that row is taken
+  const tops = Array.from(new Set([box.y - gap - label.h, Math.min(box.y - gap - label.h, margin)]));
+  const bottoms = Array.from(new Set([box.y + box.h + gap, Math.max(box.y + box.h + gap, stage.h - label.h - margin)]));
   return [
     ...ys.flatMap((y) => [
       { side: "left" as const, x: box.x - gap - label.w, y },
       { side: "right" as const, x: box.x + box.w + gap, y },
     ]),
     ...xs.flatMap((x) => [
-      { side: "top" as const, x, y: box.y - gap - label.h },
-      { side: "bottom" as const, x, y: box.y + box.h + gap },
+      ...tops.map((y) => ({ side: "top" as const, x, y })),
+      ...bottoms.map((y) => ({ side: "bottom" as const, x, y })),
     ]),
   ];
 }

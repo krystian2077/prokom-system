@@ -1,13 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { REPAIRS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
-import {
-  IconArrow,
-  IconCheck,
-  IconPath,
-  DeviceGlyph,
-  type HomeIcon,
-} from "../icons";
-import type { DeviceIcon } from "@/lib/tech/nav";
+import { IconArrow, IconCheck, IconPath } from "../icons";
 import type { ArtKind } from "@/lib/tech/wizard-data";
 import { StaticArt } from "../wizard/art/StaticArt";
 
@@ -18,72 +12,53 @@ const PHONE_LIST = [
   "Naprawa po zalaniu",
 ];
 
-/** Device cards use the wizard's illustrations (one angle, light and scale; calm screens). */
-const PHOTO_CARDS: { t: string; s: string; href: string; art: ArtKind; crop: [number, number, number, number] }[] = [
-  {
-    t: "Serwis laptopów",
-    s: "Matryca, klawiatura, czyszczenie, dysk SSD, płyta główna.",
-    href: "/serwis-laptopow",
-    art: "laptop",
-    crop: [14, 14, 572, 364],
-  },
-  {
-    t: "Serwis tabletów",
-    s: "Ekran i dotyk, bateria, gniazdo, system.",
-    href: "/serwis-tabletow",
-    art: "tablet",
-    crop: [16, 12, 412, 574],
-  },
-  {
-    t: "Serwis komputerów",
-    s: "Windows, dysk, RAM, czyszczenie, płyta główna.",
-    href: "/serwis-komputerow",
-    art: "pc",
-    crop: [40, 16, 290, 560],
-  },
-  {
-    t: "Serwis konsol",
-    s: "HDMI, napęd, czyszczenie, dryf joysticka w padzie.",
-    href: "/serwis-konsol",
-    art: "console",
-    crop: [86, 24, 514, 524],
-  },
+/**
+ * Real device photos (prototype, rights: PRO-KOM — config/media-zrodla.json), each trimmed to its
+ * silhouette (scripts/tech/glowna-kadry.py, never upscaled) and anchored bottom-right in its card.
+ */
+type Photo = { src: string; w: number; h: number };
+const PHOTOS = {
+  iphone: { src: "/tech/urzadzenia/kadr-iphone.webp", w: 399, h: 494 },
+  laptop: { src: "/tech/urzadzenia/kadr-laptop.webp", w: 608, h: 414 },
+  tablet: { src: "/tech/urzadzenia/kadr-tablet.webp", w: 519, h: 592 },
+  pc: { src: "/tech/urzadzenia/kadr-komputer.webp", w: 350, h: 640 },
+  console: { src: "/tech/urzadzenia/kadr-konsola.webp", w: 548, h: 640 },
+  printer: { src: "/tech/urzadzenia/kadr-drukarka.webp", w: 551, h: 279 },
+} satisfies Record<string, Photo>;
+
+const PHOTO_CARDS: { t: string; s: string; href: string; key: "laptop" | "tablet" | "pc" | "console" }[] = [
+  { t: "Serwis laptopów", s: "Matryca, klawiatura, czyszczenie, dysk SSD, płyta główna.", href: "/serwis-laptopow", key: "laptop" },
+  { t: "Serwis tabletów", s: "Ekran i dotyk, bateria, gniazdo, system.", href: "/serwis-tabletow", key: "tablet" },
+  { t: "Serwis komputerów", s: "Windows, dysk, RAM, czyszczenie, płyta główna.", href: "/serwis-komputerow", key: "pc" },
+  { t: "Serwis konsol", s: "HDMI, napęd, czyszczenie, dryf joysticka w padzie.", href: "/serwis-konsol", key: "console" },
 ];
 
-const ICON_CARDS: {
+/**
+ * Smaller cards: a photo where we have one (printer); smartwatch and data recovery have no photo,
+ * so they keep the wizard illustration, lit and shadowed like the photos (`.t-devices__media`).
+ */
+const SMALL_CARDS: {
   t: string;
   s: string;
   href: string;
-  device?: DeviceIcon;
-  icon?: HomeIcon;
+  key: string;
+  photo?: Photo;
+  art?: { kind: ArtKind; crop: [number, number, number, number] };
   soft?: boolean;
 }[] = [
-  {
-    t: "Drukarki",
-    s: "Głowice, podajnik papieru, sieć Wi-Fi.",
-    href: "/serwis-drukarek",
-    device: "printer",
-  },
-  {
-    t: "Smartwatche",
-    s: "Szkło, bateria, folia ochronna na wymiar.",
-    href: "/serwis-smartwatchy",
-    device: "watch",
-  },
-  {
-    t: "Odzyskiwanie danych",
-    s: "Z telefonu, dysku i pendrive’a.",
-    href: "/odzyskiwanie-danych",
-    device: "data",
-  },
-  {
-    t: "Nie ma na liście?",
-    s: "Zadzwoń albo opisz sprzęt w zgłoszeniu.",
-    href: `${SUBMIT_HREF}?category=other`,
-    icon: "help",
-    soft: true,
-  },
+  { t: "Drukarki", s: "Głowice, podajnik papieru, sieć Wi-Fi.", href: "/serwis-drukarek", key: "printer", photo: PHOTOS.printer },
+  { t: "Smartwatche", s: "Szkło, bateria, folia ochronna na wymiar.", href: "/serwis-smartwatchy", key: "watch", art: { kind: "watch", crop: [88, 0, 236, 480] } },
+  { t: "Odzyskiwanie danych", s: "Z telefonu, dysku i pendrive’a.", href: "/odzyskiwanie-danych", key: "data", art: { kind: "data", crop: [34, 32, 430, 320] } },
+  { t: "Nie ma na liście?", s: "Zadzwoń albo opisz sprzęt w zgłoszeniu.", href: `${SUBMIT_HREF}?category=other`, key: "other", soft: true },
 ];
+
+function DevicePhoto({ photo, className }: { photo: Photo; className: string }) {
+  return (
+    <span className={`t-devices__media ${className}`} aria-hidden="true">
+      <Image src={photo.src} alt="" width={photo.w} height={photo.h} unoptimized />
+    </span>
+  );
+}
 
 /** "Co naprawiamy" (design T.Main `#naprawy`). */
 export function DeviceGrid() {
@@ -133,44 +108,40 @@ export function DeviceGrid() {
               <IconArrow size={15} strokeWidth={2.6} />
             </span>
             <span className="t-devices__glow" aria-hidden="true" />
-            <StaticArt kind="phone" crop={[32, 36, 418, 464]} uid="dgphone" className="t-devices__phart" />
+            <DevicePhoto photo={PHOTOS.iphone} className="t-devices__phart" />
           </Link>
 
           <div className="t-devices__more t-snap">
             {PHOTO_CARDS.map((c) => (
-              <Link
-                key={c.href}
-                href={c.href}
-                className="t-card t-devices__photo"
-              >
+              <Link key={c.href} href={c.href} className={`t-card t-devices__photo t-devices__photo--${c.key}`}>
                 <span className="t-h3">{c.t}</span>
                 <span className="t-devices__desc">{c.s}</span>
                 <span className="t-lnk t-lnk--sm">
                   Naprawy
                   <IconArrow size={14} strokeWidth={2.6} />
                 </span>
-                <StaticArt kind={c.art} crop={c.crop} uid={`dg${c.art}`} className={`t-devices__art t-devices__art--${c.art}`} />
+                <DevicePhoto photo={PHOTOS[c.key]} className={`t-devices__art t-devices__art--${c.key}`} />
               </Link>
             ))}
           </div>
 
-          {ICON_CARDS.map((c) => (
-            <Link
-              key={c.t}
-              href={c.href}
-              className={`t-card t-devices__icon${c.soft ? " is-soft" : ""}`}
-            >
-              <span className="t-ico">
-                {c.device ? (
-                  <DeviceGlyph icon={c.device} size={22} />
-                ) : (
-                  <IconPath icon={c.icon ?? "help"} size={22} />
-                )}
-              </span>
+          {SMALL_CARDS.map((c) => (
+            <Link key={c.key} href={c.href} className={`t-card t-devices__icon t-devices__icon--${c.key}${c.soft ? " is-soft" : ""}`}>
+              {c.soft ? (
+                <span className="t-ico">
+                  <IconPath icon="help" size={22} />
+                </span>
+              ) : null}
               <span className="t-devices__itext">
                 <span className="t-h3 t-h3--sm">{c.t}</span>
                 <span className="t-devices__desc">{c.s}</span>
               </span>
+              {c.photo ? <DevicePhoto photo={c.photo} className="t-devices__thumb" /> : null}
+              {c.art ? (
+                <span className="t-devices__media t-devices__thumb t-devices__thumb--art" aria-hidden="true">
+                  <StaticArt kind={c.art.kind} crop={c.art.crop} uid={`dg${c.key}`} className="t-devices__sart" />
+                </span>
+              ) : null}
             </Link>
           ))}
         </div>

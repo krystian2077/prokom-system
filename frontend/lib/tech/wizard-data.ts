@@ -96,9 +96,11 @@ export type WizardDevice = {
 /**
  * Largest box the photo frame may take (px), per layout — single source for the CSS
  * (Scene sets them as custom properties) and for the collision test.
- * desktop: the stage beside the choices at 1180+; phone: the full-screen flow (390).
+ * desktop: the stage beside the choices at 1180+; tablet: 768–1179 (above the choices up to 959,
+ * beside them from 960); phone: the full-screen flow (390). The stage itself caps the frame further
+ * (`.t-scene__frame` --w: room for the camera zoom and a label row), feat/tech-glowna-zdjecia.
  */
-export const FRAME_BOX = { desktop: [380, 310], tablet: [440, 330], phone: [300, 320] } as const;
+export const FRAME_BOX = { desktop: [480, 360], tablet: [560, 400], phone: [300, 320] } as const;
 /** Minimum distance between hotspot centres (px): 48 on desktop (1440), 44 on phones (390). */
 export const SPOT_GAP = { desktop: 48, phone: 44 } as const;
 /** Camera zoom on a local fault (mirrors `.t-scene.is-zoom .t-scene__cam` in tech-wizard.css). */

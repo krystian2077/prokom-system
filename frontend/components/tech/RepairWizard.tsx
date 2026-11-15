@@ -115,7 +115,7 @@ function Pop({ children, k }: { children: ReactNode; k: string }) {
 
 /**
  * "Co się zepsuło?" (design T.Main `#kreator`, SPEC §7, RESPONSYWNOSC §2–§3, PREMIUM §4).
- * ≥ 768: scene beside the choices (≥ 820) or above them (768); the scene shows the
+ * ≥ 768: scene beside the choices (≥ 960) or above them (768–959); the scene shows the
  * chosen fault's effect, hovering a fault previews its effect, picking moves the camera.
  * < 768: the device grid stays on the page; picking a device opens a full-screen,
  * step-by-step flow (fault → delivery → summary) with a sticky "Dalej"; swiping the

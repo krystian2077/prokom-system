@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { line, telHref } from "@/config/prokom";
 import { POINTS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconArrow, IconCheck, IconPhoneCall, IconPin, IconWrench } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
+import { HeroDevices } from "./HeroDevices";
 import { polishText } from "@/lib/tech/typo";
 
 // Promises that already exist in the service (SPEC §8) — verbatim from the design.
@@ -56,17 +56,7 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
               ))}
             </ul>
           </div>
-          <div className="t-hero__phones" aria-hidden="true">
-            <Image className="t-hero__ph t-hero__ph--2" src="/tech/urzadzenia/samsung.webp" alt="" width={454} height={549} unoptimized />
-            <Image
-              className="t-hero__ph t-hero__ph--1"
-              src="/tech/urzadzenia/iphone.webp"
-              alt="Smartfony naprawiane w PRO-KOM Tech"
-              width={433}
-              height={577}
-              unoptimized
-            />
-          </div>
+          <HeroDevices />
         </div>
 
         <div className={`t-hero__points${points.length === 1 ? " is-single" : ""}`}>

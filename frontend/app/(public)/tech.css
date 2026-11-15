@@ -665,7 +665,7 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-hero__actions .t-hero__submit svg { display: none; }
 .tech .t-hero__actions .t-hbtn--ghost svg { display: none; }
 .tech .t-hero__promises { display: none; }
-.tech .t-hero__phones { display: none; }
+.tech .t-hero__devices { display: none; }
 
 .tech .t-hero__points { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
 .tech .t-hero__pointwrap { display: flex; align-items: center; gap: 28px; flex: 1; min-width: 0; }
@@ -708,10 +708,67 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
   .tech .t-hero__promises { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: clamp(40px, 4vw, 62px) 0 0; padding: 0; list-style: none; width: max-content; max-width: 100%; }
   .tech .t-hero__promises li { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #c9bfbd; white-space: nowrap; }
   .tech .t-hero__promises svg { color: #f29185; }
-  .tech .t-hero__phones { display: block; position: absolute; inset: 0; pointer-events: none; }
-  .tech .t-hero__ph { position: absolute; height: auto; width: clamp(170px, 20vw, 290px); filter: drop-shadow(0 50px 60px rgba(0, 0, 0, 0.6)); }
-  .tech .t-hero__ph--1 { --r: -7deg; right: clamp(150px, 17.5vw, 252px); top: 64px; animation: t-fl 5.5s ease-in-out infinite alternate; }
-  .tech .t-hero__ph--2 { --r: 9deg; right: clamp(16px, 3vw, 44px); top: 138px; animation: t-fl 6.5s ease-in-out infinite alternate-reverse; }
+  /* product scene: one 6:5 box, every device placed in % of it, so the composition scales as a unit */
+  .tech .t-hero__devices {
+    display: block; position: absolute; z-index: 0; pointer-events: none; aspect-ratio: 6 / 5;
+    width: var(--hd-w); right: var(--hd-r); top: var(--hd-t);
+    --hd-w: clamp(360px, 37vw + 12px, 580px); --hd-r: clamp(20px, 3.4vw, 64px); --hd-t: clamp(48px, 4.6vw, 84px);
+    --px: 0; --py: 0;
+  }
+  /* key light: a warm pool behind the laptop and a soft spot from above */
+  .tech .t-hero__devices::before {
+    content: ""; position: absolute; inset: -14% -12% 2% -10%; z-index: -1; border-radius: 50%;
+    background:
+      radial-gradient(34% 30% at 54% 34%, rgba(255, 214, 204, 0.16), transparent 72%),
+      radial-gradient(58% 50% at 52% 52%, rgba(226, 72, 58, 0.26), transparent 74%);
+  }
+  /* floor: a lit ellipse with a faint horizon line, the devices stand on it */
+  .tech .t-hero__floor {
+    position: absolute; left: -8%; right: -8%; top: 70%; height: 34%; border-radius: 50%; z-index: 0;
+    background:
+      radial-gradient(50% 50% at 50% 50%, rgba(255, 196, 182, 0.12), rgba(255, 196, 182, 0.04) 55%, transparent 72%);
+    animation: t-hero-fade 1200ms var(--m-ease-out) both;
+  }
+  /* contact shadows: tight core + soft spread, breathing with the float above them */
+  .tech .t-hero__shadow {
+    position: absolute; z-index: 1; height: 7%; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4) 55%, transparent);
+    filter: blur(5px); transform-origin: 50% 50%;
+    animation: t-hero-fade 900ms var(--m-ease-out) both, t-hero-breathe var(--hs, 7s) ease-in-out var(--hdl, 1s) infinite alternate;
+  }
+  .tech .t-hero__shadow--laptop { left: 20%; width: 66%; top: 68%; --hs: 9s; --hdl: 900ms; height: 6%; opacity: 0.8; }
+  .tech .t-hero__shadow--samsung { left: 64%; width: 26%; top: 86.5%; --hs: 7s; --hdl: 1.1s; }
+  .tech .t-hero__shadow--iphone { left: 6%; width: 30%; top: 90.5%; --hs: 6s; --hdl: 1s; }
+  .tech .t-hero__dev {
+    position: absolute; display: block; z-index: 2;
+    transform: translate3d(calc(var(--px) * var(--d, 6) * 1px), calc(var(--py) * var(--d, 6) * 0.6px), 0);
+    transition: transform 900ms var(--m-ease-out);
+    animation: t-hero-in 1000ms var(--m-ease-emph) var(--hin, 0ms) both;
+  }
+  .tech .t-hero__float { display: block; animation: t-hero-float var(--hs, 7s) ease-in-out var(--hdl, 1s) infinite alternate; }
+  .tech .t-hero__dev img { display: block; width: 100%; height: auto; user-select: none; }
+  /* glass on the phones: a soft diagonal reflection masked to the phone's own silhouette; one slow
+     sweep when the scene comes in, then it rests */
+  .tech .t-hero__dev--iphone .t-hero__float,
+  .tech .t-hero__dev--samsung .t-hero__float { position: relative; }
+  .tech .t-hero__dev--iphone .t-hero__float::after,
+  .tech .t-hero__dev--samsung .t-hero__float::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(118deg, transparent 30%, rgba(255, 255, 255, 0.16) 42%, rgba(255, 255, 255, 0.04) 50%, transparent 58%) no-repeat;
+    background-size: 260% 100%; background-position: 8% 0;
+    -webkit-mask: var(--hm) center / 100% 100% no-repeat; mask: var(--hm) center / 100% 100% no-repeat;
+    animation: t-hero-glare 2200ms var(--m-ease-out) calc(var(--hin, 0ms) + 500ms) both;
+  }
+  .tech .t-hero__dev--iphone { --hm: url(/tech/urzadzenia/hero-iphone.webp); }
+  .tech .t-hero__dev--samsung { --hm: url(/tech/urzadzenia/hero-samsung.webp); }
+  .tech .t-hero__dev--laptop { left: 16%; top: 7%; width: 74%; z-index: 1; --d: 4; --hs: 9s; --hdl: 900ms; --hf: -6px; }
+  .tech .t-hero__dev--laptop img {
+    filter: brightness(0.94) drop-shadow(0 0 0.6px rgba(255, 236, 230, 0.6)) drop-shadow(0 -2px 14px rgba(255, 210, 200, 0.14)) drop-shadow(0 30px 34px rgba(0, 0, 0, 0.5));
+  }
+  .tech .t-hero__dev--samsung { left: 66%; top: 33%; width: 22%; rotate: 5deg; --d: 9; --hs: 7s; --hdl: 1.1s; --hf: -10px; --hin: 140ms; }
+  .tech .t-hero__dev--iphone { left: 9%; top: 31%; width: 24.5%; z-index: 3; rotate: -5deg; --d: 14; --hs: 6s; --hdl: 1s; --hf: -12px; --hin: 260ms; }
+  .tech .t-hero__dev--samsung img { filter: brightness(0.9) saturate(0.92) drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.45)) drop-shadow(0 26px 30px rgba(0, 0, 0, 0.55)); }
+  .tech .t-hero__dev--iphone img { filter: drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.5)) drop-shadow(0 -4px 18px rgba(255, 200, 190, 0.1)) drop-shadow(0 30px 34px rgba(0, 0, 0, 0.6)); }
 
   .tech .t-hero__points {
     position: relative; z-index: 2; flex-direction: row; align-items: center; gap: 28px;
@@ -725,15 +782,30 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
   .tech .t-hero__pinfo b { font-size: 18px; }
   .tech .t-hero__paddr { font-size: 13.5px; }
 }
+/* tablet: a smaller group in the free corner under the lead, beside the buttons (never under the text) */
 @media (min-width: 768px) and (max-width: 1023.98px) {
-  .tech .t-hero__ph { opacity: 0.45; }
+  .tech .t-hero__devices { --hd-w: clamp(230px, calc(100% - 470px), 330px); --hd-r: 16px; top: auto; bottom: 66px; }
 }
 @media (min-width: 1024px) {
   .tech .t-ui .t-hero__h1 { white-space: nowrap; }
   .tech .t-hero__plink { font-size: 14px; gap: 7px; }
   .tech .t-hero__plink svg { width: 16px; height: 16px; }
 }
-@keyframes t-fl { from { transform: translateY(0) rotate(var(--r)); } to { transform: translateY(-16px) rotate(var(--r)); } }
+/* tilt lives in `rotate`, parallax in `transform`, float in the inner span's `translate`:
+   none of them overwrites another, and reduced motion keeps the tilt */
+@keyframes t-hero-float { from { translate: 0 0; } to { translate: 0 var(--hf, -10px); } }
+@keyframes t-hero-breathe { from { scale: 1; opacity: 1; } to { scale: 0.86; opacity: 0.62; } }
+@keyframes t-hero-in { from { opacity: 0; translate: 0 26px; scale: 0.97; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes t-hero-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-hero-glare { from { background-position: 100% 0; } to { background-position: 8% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-hero__dev,
+  .tech .t-hero__float,
+  .tech .t-hero__shadow,
+  .tech .t-hero__floor,
+  .tech .t-hero__float::after { animation: none; }
+  .tech .t-hero__dev { transition: none; }
+}
 
 /* ---------- Brand marquee ---------- */
 .tech .t-brands { --t-logo-h: 20px; height: clamp(64px, 6vw, 84px); margin-top: clamp(28px, 4vw, 72px); overflow: hidden; display: flex; align-items: center; border-block: 1px solid var(--bd); }
@@ -842,7 +914,7 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
   .tech .t-hbtn--wiz { flex-shrink: 0; min-width: 250px; }
   .tech .t-wiz__stage { min-height: 400px; --fw: 340px; --fh: 330px; }
 }
-@media (min-width: 820px) {
+@media (min-width: 960px) {
   .tech .t-wiz__body { flex-direction: row; gap: clamp(24px, 2.5vw, 36px); }
   .tech .t-wiz__stage { width: clamp(300px, 34vw, 440px); flex-shrink: 0; min-height: 484px; align-self: stretch; }
   .tech .t-wiz__side { justify-content: space-between; }
@@ -894,17 +966,33 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
 .tech .t-devices__phone li svg { color: #f29185; flex-shrink: 0; }
 .tech .t-devices__phone .t-sbtn { margin-top: auto; align-self: flex-start; position: relative; z-index: 2; }
 .tech .t-devices__glow { position: absolute; right: 150px; bottom: -40px; width: 300px; height: 300px; border-radius: 50%; background: #e2483a; opacity: 0.16; }
-/* device illustrations (wizard art, StaticArt): one angle, light and scale; lift on hover */
-/* phones: under the button, centred, cropped by the card's bottom edge on purpose */
-.tech .t-devices__phone { padding-bottom: 190px; }
-.tech .t-devices__phart { position: absolute; left: 50%; bottom: -74px; width: 210px; height: 250px; transform: translateX(-50%) rotate(-4deg); transition: transform var(--m-panel) var(--m-ease-out); }
-.tech .t-devices__phone:hover .t-devices__phart { transform: translateX(-50%) rotate(-4deg) translateY(-8px); }
+/* device media (feat/tech-glowna-zdjecia): real photos, plus the smartwatch / data illustrations lit the
+   same way — one key light from above: a soft contact shadow and an ambient one; lift on hover */
+.tech .t-devices__media { position: absolute; display: block; pointer-events: none; transition: transform var(--m-panel) var(--m-ease-out); }
+.tech .t-devices__media img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: right bottom; }
+.tech .t-devices__media img,
+.tech .t-devices__thumb--art .t-sart__art { filter: drop-shadow(0 16px 18px rgba(18, 22, 19, 0.2)) drop-shadow(0 3px 4px rgba(18, 22, 19, 0.14)); }
+html[data-tech-theme="dark"] .tech .t-devices__media img,
+html[data-tech-theme="dark"] .tech .t-devices__thumb--art .t-sart__art { filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.14)); }
+
+/* phones: the iPhone photo under the button, centred, cropped by the card's bottom edge on purpose */
+.tech .t-devices__phone { padding-bottom: 196px; }
+.tech .t-devices__phart { left: 50%; bottom: -78px; width: 220px; aspect-ratio: 399 / 494; translate: -50% 0; rotate: -5deg; }
+.tech .t-devices__phart img { object-position: center bottom; }
+.tech .t-devices__phone .t-devices__phart img { filter: drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.4)) drop-shadow(0 -8px 30px rgba(226, 72, 58, 0.18)) drop-shadow(0 40px 46px rgba(0, 0, 0, 0.6)); }
+.tech .t-devices__phone:hover .t-devices__phart,
+.tech .t-devices__phone:focus-visible .t-devices__phart { transform: translateY(-8px); }
+
 .tech .t-devices__photo { position: relative; overflow: hidden; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
 .tech .t-devices__desc { font-size: 14px; line-height: 1.5; color: var(--ink2); max-width: 190px; }
-.tech .t-devices__photo .t-lnk { margin-top: auto; }
-.tech .t-devices__art { position: absolute; right: 22px; bottom: 22px; width: 42%; height: 52%; transition: transform var(--m-panel) var(--m-ease-out); }
-.tech .t-devices__art--laptop,
-.tech .t-devices__art--console { width: 54%; }
+.tech .t-devices__photo .t-lnk { margin-top: auto; position: relative; z-index: 1; }
+/* each photo in a box sized to its silhouette, anchored bottom-right */
+.tech .t-devices__art { right: 20px; bottom: 20px; width: 42%; height: 54%; }
+.tech .t-devices__art--laptop { width: 58%; height: 46%; right: 14px; }
+.tech .t-devices__art--tablet { width: 38%; height: 58%; }
+.tech .t-devices__art--pc { width: 30%; height: 56%; right: 26px; }
+.tech .t-devices__photo--pc .t-devices__desc { max-width: 165px; }
+.tech .t-devices__art--console { width: 46%; height: 52%; right: 16px; }
 .tech .t-devices__photo:hover .t-devices__art,
 .tech .t-devices__photo:focus-visible .t-devices__art { transform: translateY(-6px); }
 @media (max-width: 767.98px) {
@@ -914,28 +1002,31 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
 @media (min-width: 768px) {
   .tech .t-devices__more { display: contents; }
 }
-.tech .t-devices__icon { border-radius: 24px; padding: 22px; display: flex; align-items: flex-start; gap: 14px; }
+.tech .t-devices__icon { position: relative; overflow: hidden; border-radius: 24px; padding: 22px; display: flex; align-items: flex-start; gap: 14px; min-height: 128px; box-sizing: border-box; }
 .tech .t-devices__icon.is-soft { background: var(--soft); border-color: var(--softbd); }
 .tech .t-devices__icon.is-soft .t-ico { background: var(--card); }
-.tech .t-devices__itext { display: flex; flex-direction: column; gap: 5px; }
+.tech .t-devices__itext { display: flex; flex-direction: column; gap: 5px; max-width: 62%; }
+.tech .t-devices__icon.is-soft .t-devices__itext { max-width: none; }
 .tech .t-devices__itext .t-devices__desc { font-size: 13.5px; line-height: 1.45; max-width: none; }
+/* small cards: the device sits in the bottom-right corner, never under the text */
+.tech .t-devices__thumb { right: 16px; bottom: 16px; width: 32%; height: 62%; }
+.tech .t-devices__icon--printer .t-devices__thumb { width: 36%; height: 44%; right: 14px; }
+.tech .t-devices__thumb--art .t-devices__sart { position: absolute; inset: 0; }
+.tech .t-devices__icon:hover .t-devices__thumb,
+.tech .t-devices__icon:focus-visible .t-devices__thumb { transform: translateY(-5px); }
 
 @media (min-width: 768px) {
   .tech .t-devices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .tech .t-devices__phone { grid-column: 1 / -1; padding: 34px; min-height: 420px; }
   .tech .t-devices__phone { padding-bottom: 34px; }
-  .tech .t-devices__phart { left: auto; right: 56px; bottom: -96px; width: 270px; height: 330px; transform: rotate(-4deg); }
-  .tech .t-devices__phone:hover .t-devices__phart { transform: rotate(-4deg) translateY(-8px); }
+  .tech .t-devices__phart { left: auto; right: 64px; bottom: -104px; width: 280px; translate: none; }
   .tech .t-devices__photo { min-height: 270px; }
-  .tech .t-devices__art { width: 44%; height: 56%; }
-  .tech .t-devices__art--laptop,
-  .tech .t-devices__art--console { width: 56%; }
+  .tech .t-devices__icon { min-height: 150px; }
 }
 @media (min-width: 1180px) {
   .tech .t-devices { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 270px 270px auto; }
   .tech .t-devices__phone { grid-column: span 2; grid-row: span 2; min-height: 0; }
-  .tech .t-devices__ph--2 { width: 215px; }
-  .tech .t-devices__ph--1 { width: 200px; }
+  .tech .t-devices__phart { right: 40px; bottom: -96px; width: 244px; }
   .tech .t-devices__photo { min-height: 0; }
   .tech .t-devices__icon { min-height: 150px; }
 }

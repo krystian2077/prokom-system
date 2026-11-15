@@ -31,8 +31,7 @@ html[data-tech-theme="dark"] .tech .t-artvars {
 html[data-tech-theme="dark"] .tech .t-sart__art { filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.55)); }
 .tech .t-sart__art .t-art { display: block; width: 100%; height: 100%; }
 @media (prefers-reduced-motion: reduce) {
-  .tech .t-devices__art,
-  .tech .t-devices__phart { transition: none; }
+  .tech .t-devices__media { transition: none; }
 }
 
 /* ---------- Scene ---------- */
@@ -99,9 +98,12 @@ html[data-tech-theme="dark"] .tech .t-scene::before { box-shadow: inset 0 0 90px
   transform: translate3d(calc(var(--px) * 7px), calc(var(--py) * 5px), 0);
   transition: transform 600ms var(--m-ease-out);
 }
-/* frame = the device's crop box, centred, never larger than the stage minus room for the label */
+/* frame = the device's crop box, centred. Sized for the camera zoom (SCENE_ZOOM 1.12): zoomed on a
+   fault at the very edge it still fits the stage (width / 1.24 — 12 % may grow on one side), and a
+   label row (--resv, top + bottom) stays free around the zoomed device, so the label never has to
+   sit on the device and nothing is clipped (audited for 9 devices × every fault, 768–1920). */
 .tech .t-scene__frame {
-  --w: min(var(--fw), calc(var(--fh) * var(--arn)), calc(100cqw - 48px), calc((100cqh - var(--resv, 136px)) * var(--arn)));
+  --w: min(var(--fw), calc(var(--fh) * var(--arn)), calc((100cqw - 8px) / 1.24), calc((100cqh - var(--resv, 100px)) / 1.12 * var(--arn)));
   position: absolute; left: 50%; top: 50%; z-index: 1;
   width: var(--w); height: calc(var(--w) / var(--arn));
   margin: calc(var(--w) / var(--arn) / -2) 0 0 calc(var(--w) / -2);
@@ -225,7 +227,7 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 /* full layout: fixed card height — a longer text on hover never resizes the stage (no jumping device) */
 /* full layout: the card is as tall as its text, but never shorter than the longest text at this width,
    so a different fault (or a hover preview) never resizes the stage — the device never jumps */
-@media (min-width: 820px) {
+@media (min-width: 960px) {
   .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; justify-content: center; box-sizing: border-box; }
 }
 @media (min-width: 1180px) {
@@ -244,6 +246,8 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 /* phone / full-screen flow: label card under the photo */
 .tech .t-scene--phone { --fw: var(--fw-p, 300px); --fh: var(--fh-p, 320px); min-height: 0; padding: 10px; border-radius: 24px; }
 .tech .t-scene--phone { --resv: 56px; }
+/* phone flow: the label lives in the card, so only the device itself has to fit */
+.tech .t-scene--phone .t-scene__frame { --w: min(var(--fw), calc(var(--fh) * var(--arn)), calc(100cqw - 48px), calc((100cqh - var(--resv)) * var(--arn))); }
 /* phone: the stage is as tall as the device needs (+ room), so wide devices leave no empty band */
 .tech .t-scene--phone .t-scene__stage { flex: none; min-height: 0; height: calc(min(var(--fh), min(var(--fw), 100vw - 84px) / var(--arn)) + var(--resv)); max-height: 54svh; transition: height var(--m-panel) var(--m-ease-in-out); }
 .tech .t-wizflow__scene { touch-action: pan-y; }
@@ -252,23 +256,31 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 .tech .t-scene.is-static .t-scene__stage { flex: none; aspect-ratio: 1 / 1.02; min-height: 0; }
 
 /* placement in the wizard */
-.tech .t-wiz__stagewrap { display: flex; min-height: 600px; }
-.tech .t-wiz__stagewrap .t-scene { min-height: 600px; }
+.tech .t-wiz__stagewrap { display: flex; min-height: 700px; }
+.tech .t-wiz__stagewrap .t-scene { min-height: 700px; }
 /* right column: compact rhythm, no stretched gaps (the summary bar sits at the bottom) */
-@media (min-width: 820px) {
+@media (min-width: 960px) {
   .tech .t-wiz__side { justify-content: flex-start; gap: 26px; }
+  /* the taller stage leaves free height in the column: split it before and after "Jak oddasz" */
+  .tech .t-wiz__side > .t-wiz__group--del,
   .tech .t-wiz__side > .t-wiz__bar { margin-top: auto; }
 }
 @media (max-width: 767.98px) {
   .tech .t-wiz__body > .t-wiz__stagewrap { display: none; }
 }
-@media (min-width: 820px) {
-  .tech .t-wiz__stagewrap { width: clamp(320px, 36vw, 440px); flex-shrink: 0; align-self: stretch; min-height: 540px; }
+@media (min-width: 960px) {
+  .tech .t-wiz__stagewrap { width: clamp(330px, 42vw, 470px); flex-shrink: 0; align-self: stretch; min-height: 540px; }
   .tech .t-wiz__stagewrap .t-scene { min-height: 540px; }
 }
+@media (min-width: 960px) and (max-width: 1179.98px) {
+  .tech .t-wiz__delivery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .tech .t-wiz__delivery .t-chp--opt { height: auto; min-height: 66px; padding: 10px 12px; white-space: normal; }
+  .tech .t-wiz__bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+  .tech .t-wiz__bar .t-hbtn--wiz { min-width: 0; width: 100%; }
+}
 @media (min-width: 1180px) {
-  .tech .t-wiz__stagewrap { width: clamp(420px, 36vw, 520px); min-height: 560px; }
-  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 380px); --fh: var(--fh-d, 310px); min-height: 560px; }
+  .tech .t-wiz__stagewrap { width: clamp(424px, 50vw - 166px, 580px); min-height: 660px; }
+  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 480px); --fh: var(--fh-d, 360px); min-height: 660px; }
 }
 
 /* device chips: radiogroup with a sliding pill; faults preview on hover */
