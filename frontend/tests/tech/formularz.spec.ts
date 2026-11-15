@@ -132,6 +132,31 @@ test.describe("desktop 1440", () => {
   });
 });
 
+test("dark theme: axe on step 1, the helper and the success screen", async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "dark", reducedMotion: "reduce" });
+  await ctx.addInitScript(() => localStorage.setItem("pk-theme", "dark"));
+  const page = await ctx.newPage();
+  await page.route("**/api/v1/repairs/submit/", (r) => r.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify({ repair_number: "PROKOM/RMA/2/2026", message: "", tracking_url: "/track?ref=PROKOM%2FRMA%2F2%2F2026" }) }));
+  await page.goto("/zgloszenie?category=laptop&dostawa=punkt&punkt=rabka");
+  await page.locator('[data-help-trigger="model"]').click();
+  expect(await axeSerious(page)).toEqual([]);
+  await page.keyboard.press("Escape");
+  await page.getByLabel("Model *").fill("ThinkPad");
+  await page.getByLabel("Co się dzieje? *").fill("Nie działa");
+  for (let i = 0; i < 3; i++) await page.locator("[data-zgl-next]").click();
+  await page.getByLabel("Imię *").fill("Jan");
+  await page.getByLabel("Nazwisko *").fill("Testowy");
+  await page.getByLabel("E-mail *").fill("jan.testowy@example.com");
+  await page.getByLabel("Telefon *").fill("500 100 234");
+  await page.locator("[data-zgl-next]").click();
+  await page.locator("label.t-check", { hasText: "regulamin" }).locator("input").check();
+  expect(await axeSerious(page)).toEqual([]);
+  await page.locator("[data-zgl-next]").click();
+  await expect(page.getByRole("heading", { name: "Zgłoszenie przyjęte" })).toBeVisible();
+  expect(await axeSerious(page)).toEqual([]);
+  await ctx.close();
+});
+
 test("reduced motion: step change runs no animation, the form still works", async ({ browser }) => {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
   const page = await ctx.newPage();

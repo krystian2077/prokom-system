@@ -411,6 +411,8 @@ html[data-tech-theme="dark"] .tech .t-zgl .t-dtile.is-on { background: color-mix
 html[data-tech-theme="dark"] .tech .t-zgl .t-seg__pill { background: var(--raised); }
 html[data-tech-theme="dark"] .tech .t-zgl .t-quick__ico { background: var(--raised); }
 html[data-tech-theme="dark"] .tech .t-zgl .t-quick__chip.is-on .t-quick__ico { background: var(--ok); color: #10200c; }
+/* dark: --onacc is dark, so the light-theme CTA gradient (white text) would fail contrast */
+html[data-tech-theme="dark"] .tech .t-zgl .t-btn--shine { background: linear-gradient(180deg, #ea5a4c, var(--acc)); }
 html[data-tech-theme="dark"] .tech .t-zgl .t-btn--shine::after { background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .22), transparent); }
 html[data-tech-theme="dark"] .tech .t-help { background: var(--raised); border-color: var(--hair-top); }
 html[data-tech-theme="dark"] .tech .t-help--pop::before { background: var(--raised); border-color: var(--hair-top); }

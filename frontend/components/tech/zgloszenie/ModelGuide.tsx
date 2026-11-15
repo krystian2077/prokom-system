@@ -24,12 +24,11 @@ export function ModelGuide() {
         <p>Model wpisujesz w zgłoszeniu, IMEI albo numer seryjny jest opcjonalny. Tu znajdziesz, gdzie ich szukać.</p>
       </div>
       <div className="t-mguide__grid">
-        {GROUPS.flatMap((g) =>
-          helperGuides(g.field, g.category).map((guide) => (
+        {GROUPS.flatMap((g) => {
+          const guides = helperGuides(g.field, g.category);
+          return guides.map((guide) => (
             <article key={`${g.title}-${guide.id}`} className="t-mguide__card">
-              <h3>
-                {g.title}: {guide.tab}
-              </h3>
+              <h3>{guides.length > 1 ? `${g.title}: ${guide.tab}` : g.title}</h3>
               <HelperArt art={guide.art} steps={guide.path?.length ?? guide.variants?.[1]?.path.length ?? 0} />
               {guide.path ? (
                 <ol className="t-help__path" aria-label="Ścieżka">
@@ -59,8 +58,8 @@ export function ModelGuide() {
                 </>
               ) : null}
             </article>
-          )),
-        )}
+          ));
+        })}
       </div>
     </div>
   );
