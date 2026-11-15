@@ -6,15 +6,15 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 | Data | Plik | Zmiana i powód | Zgoda | PR |
 |---|---|---|---|---|
 | 15.11.2026 | `frontend/app/globals.css` | Usunięcie publicznych bloków starej strony (TD6 PR 2b, −1056 linii); reguły używane przez panele zostają, `panele.spec` bez różnic | Krystian (czat, 15.11) | #52 |
-| 15.11.2026 | `frontend/app/client/layout.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/ClientFrame.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/ClientGate.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/client-tech.css` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/login/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/rejestracja/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/forgot-password/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/reset-password/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
-| 15.11.2026 | `frontend/app/client/verify-email/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | feat/tech-konto-logowanie |
+| 15.11.2026 | `frontend/app/client/layout.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/ClientFrame.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/ClientGate.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/client-tech.css` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/login/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/rejestracja/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/forgot-password/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/reset-password/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/verify-email/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **Punkt przyjęcia (`service_point`)** w zgłoszeniu i w śledzeniu (wariant B z KONTRAKT §2): filtr w panelu, właściwy adres punktu w statusie naprawy.
