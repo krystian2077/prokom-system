@@ -90,10 +90,13 @@ describe("claims (SPEC §10)", () => {
 
 describe("courier (SPEC §12.10)", () => {
   it("builds the 'who pays' sentence only from courierService", () => {
-    expect(courierPaysText({ ...courierService, inboundPaidBy: "client", returnPaidBy: "service" })).toBe(
+    const base = { ...courierService, returnIfDeclined: null };
+    expect(courierPaysText({ ...base, inboundPaidBy: "client", returnPaidBy: "service" })).toBe(
       "Wysyłka do serwisu na Twój koszt, odesłanie po naprawie na nasz koszt.",
     );
-    expect(courierPaysText({ ...courierService, returnPaidBy: null })).toBe("Wysyłka do serwisu na Twój koszt.");
+    expect(courierPaysText({ ...base, returnPaidBy: null })).toBe("Wysyłka do serwisu na Twój koszt.");
+    // current config (boss's answers 15.11): the return after declining is also on us
+    expect(courierPaysText()).toBe("Wysyłka do serwisu na Twój koszt, odesłanie po naprawie na nasz koszt, odesłanie po rezygnacji na nasz koszt.");
   });
   it("links the courier page only when published", () => {
     expect(courierPageHref({ ...courierService, published: false })).toBeNull();

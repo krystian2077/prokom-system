@@ -83,12 +83,10 @@ test.describe("desktop 1440", () => {
   test("numbers confirmed on 15.11 are shown, still unconfirmed ones are not (SPEC §10)", async ({ page }) => {
     await page.goto("/");
     const main = page.locator("main");
-    for (const t of ["często ok. 1 h", "10 000+", "0,1 mm", "około 5", "od 2004"]) {
+    for (const t of ["często ok. 1 h", "10 000+", "0,1 mm", "około 5", "od 2004", "z całej Polski"]) {
       await expect(main).toContainText(t);
     }
-    for (const t of ["z całej Polski", "Opinie Google"]) {
-      await expect(main).not.toContainText(t);
-    }
+    await expect(main).not.toContainText("Opinie Google");
   });
 
   test("Dalej navigates to the form", async ({ page }) => {

@@ -65,3 +65,24 @@ test("offline: public page → /offline, panel and client → no fallback", asyn
   }
   await context.setOffline(false);
 });
+
+test("courier repair page is published (boss's answers 15.11): no draft frame, payment, sitemap, areaServed Polska", async ({ page, request }) => {
+  const res = await page.goto("/naprawa-kurierem");
+  expect(res?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Naprawa wysyłkowa");
+  await expect(page.locator(".t-courier.t-draft")).toHaveCount(0);
+  await expect(page.locator("main")).toContainText("Nie wysyłamy za pobraniem.");
+  await expect(page.locator("#kto-placi dd")).toHaveText(["Ty", "serwis", "serwis"]);
+  const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
+  expect(ld.some((s) => s.includes('"Country"') && s.includes('"Polska"'))).toBe(true);
+  const xml = await (await request.get("/sitemap.xml")).text();
+  expect(xml).toContain("/naprawa-kurierem");
+});
+
+test("courier page is linked from /uslugi, device pages, FAQ, footer and /obslugiwane-miejscowosci", async ({ page }) => {
+  for (const path of ["/uslugi", "/serwis-laptopow", "/faq", "/obslugiwane-miejscowosci"]) {
+    await page.goto(path);
+    await expect(page.locator('main a[href="/naprawa-kurierem"]').first(), path).toBeAttached();
+  }
+  await expect(page.locator('footer a[href="/naprawa-kurierem"]').first()).toBeAttached();
+});

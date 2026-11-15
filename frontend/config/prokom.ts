@@ -101,13 +101,15 @@ export const notices: Notice[] = [];
 
 /** Courier repair (SPEC §12.10). `null` = the sentence is not shown. */
 export const courierService = {
-  published: false, // true only after the boss answers the 5 questions (SPEC §10)
+  // The boss's answers to SPEC §10/§12.10, passed on by Krystian on 15.11.2026.
+  published: true,
   address: "rabka" as PointKey,
   inboundPaidBy: "client" as const,
   returnPaidBy: "service" as "service" | "client" | null,
-  returnIfDeclined: null as null | "service" | "client",
-  payment: null as null | string[],
-  area: null as null | "polska" | "okolica",
+  returnIfDeclined: "service" as null | "service" | "client",
+  /** Payment methods; „przelew po diagnozie…” renders as a full sentence (lib/tech/courier-page.ts). No cash on delivery. */
+  payment: ["przelew po diagnozie i akceptacji naprawy"] as null | string[],
+  area: "polska" as null | "polska" | "okolica",
 };
 
 /**
@@ -136,7 +138,7 @@ export const claims = {
   /** "Na Podhalu od 2004 roku" card ("Dlaczego"); the year itself is company.since. */
   sinceYear: { text: "2004", confirmed: true },
   /** Courier from the whole country (SPEC §10 courier question 5). */
-  courierWholeCountry: { text: "z całej Polski", confirmed: false },
+  courierWholeCountry: { text: "z całej Polski", confirmed: true },
   /** TD4 "O firmie": founding year shown as a number (hero, stat card; SPEC §10 „2004”). */
   aboutSince: { text: String(company.since), confirmed: true },
   /** TD4 "O firmie": "4 + 1" — PRO-KOM lines and the Gaming brand. */

@@ -7,7 +7,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { courierService, servicePoints } from "@/config/prokom";
 import sitemap from "@/app/sitemap";
-import { courierInSitemap, courierPageVisible, courierPayRows, courierPoint } from "@/lib/tech/courier-page";
+import { courierInSitemap, courierPageVisible, courierPaymentText, courierPayRows, courierPoint } from "@/lib/tech/courier-page";
 import { footerColumns } from "@/lib/tech/nav";
 import { PREP_TABS, tabForCategory } from "@/lib/tech/prep-guide";
 import { SW_EXCLUDED_PREFIXES, webManifest } from "@/lib/tech/pwa";
@@ -71,13 +71,28 @@ describe("naprawa kurierem — publikacja (SPEC §12.10)", () => {
     expect(courierInSitemap(off)).toBe(false);
     expect(courierInSitemap({ ...off, published: true })).toBe(true);
   });
-  it("current config: sitemap and footer follow courierService.published", () => {
+  it("current config (published 15.11): page in production, sitemap and footer", () => {
+    expect(courierService.published).toBe(true);
+    expect(courierPageVisible(courierService, false)).toBe(true);
     const urls = sitemap().map((u) => u.url);
-    expect(urls.some((u) => u.endsWith("/naprawa-kurierem"))).toBe(courierService.published);
+    expect(urls.some((u) => u.endsWith("/naprawa-kurierem"))).toBe(true);
     expect(urls.some((u) => u.endsWith("/jak-przygotowac-sprzet"))).toBe(true);
     const footer = footerColumns.flatMap((c) => c.items.map((i) => i.href));
-    expect(footer.includes("/naprawa-kurierem")).toBe(courierService.published);
+    expect(footer).toContain("/naprawa-kurierem");
     expect(footer).toContain("/jak-przygotowac-sprzet");
+  });
+  it("boss's answers (15.11): client pays inbound, service pays return and return after declining, transfer, whole country", () => {
+    expect(courierPayRows().map((r) => `${r.k}: ${r.v}`)).toEqual([
+      "Wysyłka do serwisu: Ty",
+      "Odesłanie po naprawie: serwis",
+      "Odesłanie po rezygnacji z naprawy: serwis",
+    ]);
+    expect(courierService.area).toBe("polska");
+    expect(courierPaymentText()).toBe(
+      "Za naprawę płacisz przelewem — po diagnozie urządzenia i dopiero wtedy, gdy zaakceptujesz naprawę. Nie wysyłamy za pobraniem.",
+    );
+    expect(courierPaymentText({ ...courierService, payment: null })).toBeNull();
+    expect(courierPaymentText({ ...courierService, payment: ["gotówka przy odbiorze"] })).toBe("Płatność za naprawę: gotówka przy odbiorze. Nie wysyłamy za pobraniem.");
   });
   it("null fields hide their rows", () => {
     expect(courierPayRows({ ...courierService, inboundPaidBy: "client", returnPaidBy: null, returnIfDeclined: null }).map((r) => r.k)).toEqual(["Wysyłka do serwisu"]);
