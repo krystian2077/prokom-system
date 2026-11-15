@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { company, line, servicePoints, telHref } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { Faq } from "@/components/tech/Faq";
@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/tech/JsonLd";
 import { LineCards } from "@/components/tech/LineCards";
 import { OpeningStatus } from "@/components/tech/OpeningStatus";
 import { PageIconSvg } from "@/components/tech/page-icons";
+import { AboutIconSvg } from "@/components/tech/about/about-icons";
 import { hoursLong, inCity, isMainPoint } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
@@ -40,65 +41,68 @@ const NEXT = [
 export default function ContactPage() {
   const points = visiblePoints();
   return (
-    <div className="t-ui t-page">
+    <div className="t-ui t-page t-visit t-contact">
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
 
       <section className="t-section--hero" id="kontakt" data-rail="Kontakt">
         <div className="t-container">
-          <div className="t-stage t-ct-hero">
-            <div className="t-ct-hero__text">
+          <div className="t-ab-hero t-ct2-hero">
+            <div className="t-ab-hero__text">
               <Breadcrumbs items={CRUMBS} />
-              <h1 className="t-ct-hero__h1">
+              <h1 className="t-ab-hero__h1 t-ct2-hero__h1">
                 Zadzwoń albo napisz.
                 <span>{two ? "Odpowiadamy w godzinach pracy punktów." : "Odpowiadamy w godzinach pracy punktu."}</span>
               </h1>
-              <a href={telHref(line.phone)} className="t-ct-hero__phone" data-track="telefon_klik" data-track-miejsce="kontakt_hero">
+              <a href={telHref(line.phone)} className="t-ct2-hero__phone" data-track="telefon_klik" data-track-miejsce="kontakt_hero">
                 {line.phoneDisplay}
               </a>
-              <OpeningStatus points={published} withName className="t-status--stage-text" skeletonCh={30} />
-              <div className="t-btnrow">
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--stage" data-track="telefon_klik" data-track-miejsce="kontakt_hero_przycisk">
+              <OpeningStatus points={published} withName className="t-status--stage-text t-ct2-hero__status" skeletonCh={30} />
+              <div className="t-ab-hero__actions">
+                <a href={telHref(line.phone)} className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit" data-track="telefon_klik" data-track-miejsce="kontakt_hero_przycisk">
+                  <AboutIconSvg icon="phone" size={18} />
                   Zadzwoń teraz
                 </a>
-                <a href="#formularz" className="t-pbtn t-pbtn--ghost-dark">
+                <a href="#formularz" className="t-hbtn t-hbtn--ghost t-ab-hero__ghost">
                   Napisz wiadomość
                 </a>
               </div>
             </div>
-            <div className="t-ct-hero__side">
-              <a href={`mailto:${line.email}`} className="t-ct-tile">
-                <span className="t-ct-tile__ico">
+            <div className="t-ct2-hero__side">
+              <a href={`mailto:${line.email}`} className="t-ct2-tile t-ct2-tile--mail">
+                <span className="t-ct2-tile__ico" aria-hidden="true">
                   <PageIconSvg icon="mail" />
                 </span>
-                <span className="t-ct-tile__txt">
-                  <span>E-mail</span>
+                <span className="t-ct2-tile__txt">
+                  <span className="t-ct2-tile__kick">E-mail</span>
                   {/* break only after "@" on narrow phones, never inside the domain */}
                   <b>
                     {line.email.split("@")[0]}@<wbr />
                     {line.email.split("@")[1]}
                   </b>
                 </span>
+                <IconChevronRight className="t-ct2-tile__arrow" />
               </a>
               {points.map((p) => (
-                <Link key={p.key} href={POINTS_HREF} className={`t-ct-tile${p.draft ? " t-draft" : ""}`}>
-                  <span className="t-ct-tile__ico">
+                <Link key={p.key} href={POINTS_HREF} className={`t-ct2-tile${p.draft ? " t-draft" : ""}`}>
+                  <span className="t-ct2-tile__ico" aria-hidden="true">
                     <PageIconSvg icon="pin" />
                   </span>
-                  <span className="t-ct-tile__txt">
-                    <span>
+                  <span className="t-ct2-tile__txt">
+                    <span className="t-ct2-tile__kick">
                       {isMainPoint(p) ? "Punkt główny" : `Punkt ${inCity(p.city)}`}
                       {p.draft ? <span className="t-draft-badge">do uzupełnienia</span> : null}
                     </span>
-                    <b className="t-ct-tile__city">{p.name}</b>
-                    <span className="t-ct-tile__sub">
+                    <b className="t-ct2-tile__city">{p.name}</b>
+                    <span className="t-ct2-tile__sub">
                       {p.street ? `${p.street} · ` : ""}
                       {hoursLong(p)}
                     </span>
+                    <OpeningStatus points={[p]} className="t-status--stage-text t-ct2-tile__status" skeletonCh={18} />
                   </span>
-                  <IconChevronRight />
+                  <IconChevronRight className="t-ct2-tile__arrow" />
                 </Link>
               ))}
-              <p className="t-ct-hero__note">
+              <p className="t-ct2-hero__note">
                 {company.name} · NIP {company.nip}
                 {two ? " · w obu punktach ten sam system zgłoszeń." : "."}
               </p>
@@ -111,7 +115,7 @@ export default function ContactPage() {
 
       <section className="t-section t-section--flush-top" id="formularz" data-rail="Formularz">
         <div className="t-container">
-          <div className="t-ct-form">
+          <div className="t-ct-form t-ct2-form">
             <div className="t-ct-form__aside">
               <span className="t-eyebrow t-eyebrow--stage">Formularz</span>
               <h2 className="t-h2 t-h2--sm">Napisz. Odpowiemy w godzinach pracy.</h2>

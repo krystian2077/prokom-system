@@ -10,8 +10,8 @@ import { OsmMap } from "./OsmMap";
 
 type Props = {
   point: VisiblePoint;
-  /** "wide": map on the left (points page hero, design #punkty-serwisowe); "stack": map on top. */
-  layout?: "wide" | "stack";
+  /** "wide": map on the left; "stack": map on top; "feature": large card of the points page (map on top, parking as a chip). */
+  layout?: "wide" | "stack" | "feature";
   /** Heading level of the point name (h2 on the points page, h3 inside sections). */
   as?: "h2" | "h3";
   /** Where the phone click is measured from (telefon_klik.miejsce). */
@@ -29,6 +29,7 @@ type Props = {
  */
 export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "punkt", secondary = "submit", className }: Props) {
   const main = isMainPoint(point);
+  const feature = layout === "feature";
   const second =
     secondary === "submit"
       ? { label: "Zgłoś naprawę tutaj", href: `${SUBMIT_HREF}?punkt=${point.key}` }
@@ -39,7 +40,7 @@ export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "p
       aria-label={`Punkt serwisowy ${point.name}`}
     >
       <div className="t-pointcard__map">
-        <OsmMap sub={pointAddress(point)} label={false} height={layout === "wide" ? 270 : 200} radius={18} />
+        <OsmMap sub={pointAddress(point)} label={false} height={layout === "wide" ? 270 : feature ? 260 : 200} radius={18} />
       </div>
       <div className="t-pointcard__body">
         <div className="t-pointcard__top">
@@ -52,8 +53,14 @@ export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "p
         <H className="t-pointcard__name">{point.name}</H>
         <p className="t-pointcard__addr">{pointAddress(point)}</p>
         <HoursChips point={point} />
+        {feature && point.parkingNote ? (
+          <p className="t-pointcard__park">
+            <b aria-hidden="true">P</b>
+            {point.parkingNote}
+          </p>
+        ) : null}
         <div className="t-pointcard__actions">
-          <NavigateButtons point={point} />
+          <NavigateButtons point={feature ? { ...point, parkingNote: null } : point} />
           {second ? (
             <Link href={second.href} className="t-pbtn t-pbtn--outline t-pbtn--m">
               {second.label}
