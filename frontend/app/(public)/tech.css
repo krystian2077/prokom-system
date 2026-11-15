@@ -676,7 +676,8 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 }
 .tech .t-hero__pinfo { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .tech .t-hero__pinfo b { font-family: var(--t-font-head); font-stretch: 108%; font-size: 17px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.tech .t-hero__paddr { font-size: 13px; font-weight: 600; color: var(--ink2); }
+.tech .t-hero__paddr { display: flex; flex-direction: column; gap: 1px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.tech .t-hero__pstreet { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tech .t-hero__pstatus { font-size: 13px; }
 .tech .t-hero__pstatus.is-open { color: var(--ok); font-weight: 800; }
 .tech .t-hero__pstatus .t-status__dot { display: none; }

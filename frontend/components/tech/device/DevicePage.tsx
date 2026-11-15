@@ -4,7 +4,7 @@ import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { BrandLogo } from "@/components/tech/BrandLogo";
-import { cardBrandLogos } from "@/components/tech/brand-logos";
+import { cardBrandLogos, logoSpellsName } from "@/components/tech/brand-logos";
 import { deviceSeo, hubCards, type DevicePage as DevicePageData } from "@/lib/tech/devices";
 import { REPAIRS_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
@@ -123,7 +123,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
                     <BrandLogo brand={kindLogos[i]} hidden />
                   </span>
                 ) : null}
-                <span className="t-h3">{k.n}</span>
+                <span className={kindLogos && logoSpellsName(kindLogos[i], k.n) ? "t-h3 t-visually-hidden" : "t-h3"}>{k.n}</span>
                 <span>{k.s}</span>
               </li>
             ))}
