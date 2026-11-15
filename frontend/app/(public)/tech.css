@@ -1649,7 +1649,9 @@ html[data-tech-theme="dark"] .tech .t-axis { --done: #3e9b2a; }
 .tech .t-near__result { display: flex; align-items: center; gap: 9px; font-size: 14.5px; font-weight: 700; min-height: 22px; }
 .tech .t-near__result svg { color: #7bd36a; flex-shrink: 0; }
 
-.tech .t-podhale { position: relative; width: 100%; aspect-ratio: 640 / 560; border-radius: 28px; background: #221a19; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; font-size: clamp(10px, 1.6vw, 13px); }
+.tech .t-podhale { position: relative; width: 100%; aspect-ratio: 640 / 560; border-radius: 28px; background: #221a19; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; container-type: inline-size; }
+/* labels scale with the map (13 px at the 640 px design width), so they keep their places and never overlap */
+.tech .t-podhale__town, .tech .t-podhale__pin { font-size: clamp(8px, 2.03cqw, 13px); }
 .tech .t-podhale__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .tech .t-podhale__dash { animation: t-dash 1.6s linear infinite; }
 @keyframes t-dash { to { stroke-dashoffset: -20; } }
