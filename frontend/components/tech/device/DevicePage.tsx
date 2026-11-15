@@ -10,7 +10,6 @@ import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tec
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
 import { submitHref } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconPath } from "../icons";
-import { RepairLinks } from "../repair/RepairLinks";
 import { DataSafety } from "../DataSafety";
 import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSymptoms, DeviceWarranty, HammerTeaser } from "../content/DeviceSections";
 import { RepairSteps } from "./RepairSteps";
@@ -103,7 +102,6 @@ export function DevicePage({ page }: { page: DevicePageData }) {
       </section>
 
       <DeviceSymptoms extra={page.extra} name={page.name} short={page.short} category={page.category} />
-      <RepairLinks device={page.category} title={`Konkretne naprawy: ${page.short.toLocaleLowerCase("pl-PL")}`} />
 
       <section className="t-section" id="marki" data-rail={page.kindsEyebrow}>
         <div className="t-container">
