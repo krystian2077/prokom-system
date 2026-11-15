@@ -86,14 +86,19 @@ export function Capsule() {
     const cap = rootRef.current;
     const target = megaTarget.current;
     const a = lastPt.current;
-    const left = cap && target ? cap.getBoundingClientRect().left + cap.clientLeft + target.x : 0;
-    if (panel && target && a && inTriangle(at, a, { x: left, y: panel.top }, { x: left + target.w, y: panel.top })) {
-      openTimer.current = window.setTimeout(() => {
-        if (overMega.current === mega) setOpen(mega);
-      }, TRIANGLE_GRACE_MS);
-    } else {
-      setOpen(mega);
+    if (panel && cap && target && a) {
+      // target is in layout px; the compact capsule is scaled (transform), so scale it like the panel
+      const r = cap.getBoundingClientRect();
+      const s = cap.offsetWidth ? r.width / cap.offsetWidth : 1;
+      const left = r.left + (cap.clientLeft + target.x) * s;
+      if (inTriangle(at, a, { x: left, y: panel.top }, { x: left + target.w * s, y: panel.top })) {
+        openTimer.current = window.setTimeout(() => {
+          if (overMega.current === mega) setOpen(mega);
+        }, TRIANGLE_GRACE_MS);
+        return;
+      }
     }
+    setOpen(mega);
   };
 
   // close on route change, Esc (focus back to the trigger) and click outside
@@ -203,7 +208,10 @@ export function Capsule() {
         <header
           ref={rootRef}
           className="t-capsule"
-          onMouseLeave={scheduleClose}
+          onMouseLeave={() => {
+            lastPt.current = null; // coming back from outside must not reuse an old apex
+            scheduleClose();
+          }}
           onMouseEnter={() => window.clearTimeout(closeTimer.current)}
           onMouseMove={(e) => {
             lastPt.current = { x: e.clientX, y: e.clientY };
