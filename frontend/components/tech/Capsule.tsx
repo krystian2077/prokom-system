@@ -43,6 +43,8 @@ export function Capsule() {
   const openTimer = useRef<number | undefined>(undefined);
   const closeTimer = useRef<number | undefined>(undefined);
   const exitPoint = useRef<Pt | null>(null);
+  /** Trigger under the pointer right now (the grace timer switches only if it still is). */
+  const overMega = useRef<Mega | null>(null);
   const rootRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -74,7 +76,9 @@ export function Capsule() {
     const box = boxRef.current?.querySelector<HTMLElement>(".t-mega:not([hidden]) .t-mega__panel")?.getBoundingClientRect();
     const a = exitPoint.current;
     if (box && a && inTriangle(at, a, { x: box.left, y: box.top }, { x: box.right, y: box.top })) {
-      openTimer.current = window.setTimeout(() => setOpen(mega), TRIANGLE_GRACE_MS);
+      openTimer.current = window.setTimeout(() => {
+        if (overMega.current === mega) setOpen(mega);
+      }, TRIANGLE_GRACE_MS);
     } else {
       setOpen(mega);
     }
@@ -235,10 +239,12 @@ export function Capsule() {
                   data-nav={item.key}
                   data-mega={mega}
                   onMouseEnter={(e) => {
+                    overMega.current = mega;
                     setHot(item.key);
                     hoverTrigger(mega, { x: e.clientX, y: e.clientY });
                   }}
                   onMouseLeave={(e) => {
+                    if (overMega.current === mega) overMega.current = null;
                     if (open === mega) exitPoint.current = { x: e.clientX, y: e.clientY };
                   }}
                   onFocus={() => setHot(item.key)}
