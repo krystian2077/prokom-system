@@ -19,6 +19,11 @@
   }
 }
 
+/* anchors land below the sticky capsule */
+@media (min-width: 1024px) {
+  .tech .t-main [id] { scroll-margin-top: 104px; }
+}
+
 /* sliding pill under the hot / open / active top-level item */
 .tech .t-navpills { position: relative; isolation: isolate; }
 .tech .t-navpills > .t-navlink { position: relative; z-index: 1; }
