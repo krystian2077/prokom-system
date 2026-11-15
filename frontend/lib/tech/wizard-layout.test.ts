@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FRAME_BOX, SCENE_ZOOM, wizardDevices } from "./wizard-data";
-import { intersects, leader, nearestOn, placeLabel, segDist, zoomPt, zoomRect, type Rect } from "./wizard-layout";
+import { badgeDir, badgeSpot, intersects, leader, nearestOn, placeLabel, segDist, zoomPt, zoomRect, type Rect } from "./wizard-layout";
 
 /** Desktop stage at 1440 (tech-wizard.css: 554 px column, 660 px scene, card ≈ 140 px; feat/tech-glowna-zdjecia). */
 const STAGE = { w: 528, h: 482 };
@@ -83,5 +83,32 @@ describe("label placement (PREMIUM §4, feat/tech-kreator-wizual)", () => {
     const l = leader({ x: 100, y: 100 }, { x: 200, y: 90, w: 80, h: 30 }, 19);
     expect(l.a.x).toBeCloseTo(119, 0);
     expect(l.b).toEqual({ x: 200, y: 100 });
+  });
+});
+
+describe("effect badges keep off the spots (feat/tech-glowna-zdjecia)", () => {
+  const frame = { w: 300, h: 340 };
+  it("badgeDir: the badge never lands on another spot and prefers the device's centre", () => {
+    const spot = { x: 80, y: 250 };
+    const others = [{ x: 150, y: 170 }, { x: 90, y: 60 }];
+    const [dx, dy] = badgeDir({ spot, others, frame, r: 29, dist: 52 });
+    const c = { x: spot.x + dx * 52, y: spot.y + dy * 52 };
+    for (const o of others) expect(Math.hypot(o.x - c.x, o.y - c.y)).toBeGreaterThanOrEqual(29 + 22);
+    expect(c.x).toBeGreaterThanOrEqual(29);
+    expect(c.y + 29).toBeLessThanOrEqual(frame.h);
+  });
+  it("badgeDir: never towards the label's side", () => {
+    const [dx] = badgeDir({ spot: { x: 150, y: 170 }, others: [], frame, r: 29, dist: 52, labelSide: "right" });
+    expect(dx).toBeLessThan(0.5);
+  });
+  it("badgeSpot: the centre when free, else the nearest free point (round and wide badges)", () => {
+    const bounds = { x: 0, y: 0, w: 300, h: 340 };
+    expect(badgeSpot({ centre: { x: 150, y: 170 }, spots: [], w: 58, h: 58, bounds })).toEqual({ x: 150, y: 170 });
+    const spots = [{ x: 150, y: 170 }];
+    for (const [w, h] of [[58, 58], [112, 70]]) {
+      const c = badgeSpot({ centre: { x: 150, y: 170 }, spots, w, h, bounds });
+      const gap = Math.hypot(Math.max(0, Math.abs(150 - c.x) - (w / 2 - Math.min(w, h) / 2)), Math.max(0, Math.abs(170 - c.y) - (h / 2 - Math.min(w, h) / 2))) - Math.min(w, h) / 2;
+      expect(gap).toBeGreaterThanOrEqual(26);
+    }
   });
 });

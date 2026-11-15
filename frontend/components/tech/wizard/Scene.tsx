@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { onVisible, prefersReducedMotion } from "@/lib/tech/motion";
 import { FRAME_BOX, SCENE_ZOOM, faultMeaning, sceneOf, type Box, type WizardDevice, type WizardPhoto } from "@/lib/tech/wizard-data";
-import { leader, placeLabel, zoomPt, zoomRect, type LabelSide, type Pt, type Rect } from "@/lib/tech/wizard-layout";
+import { badgeDir, badgeSpot, leader, placeLabel, zoomPt, zoomRect, type LabelSide, type Pt, type Rect } from "@/lib/tech/wizard-layout";
+import { FaultGlyph } from "../content/FaultGlyph";
 import { DeviceArt } from "./art";
 import { EFFECTS } from "./effects";
 
@@ -87,6 +88,7 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
   const [reduced, setReduced] = useState(false);
   const [intro, setIntro] = useState(false);
   const [geo, setGeo] = useState<Geo | null>(null);
+  const [fdim, setFdim] = useState<{ w: number; h: number } | null>(null);
   const [tick, setTick] = useState(0);
   const [ghost, setGhost] = useState<WizardDevice | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -95,7 +97,6 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
   const labelRef = useRef<HTMLSpanElement>(null);
   const parRef = useRef<HTMLDivElement>(null);
   const parFrame = useRef(0);
-  const wholeRef = useRef<HTMLButtonElement>(null);
   const introDone = useRef(false);
   const lastDevice = useRef(device);
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -175,6 +176,13 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
     rootRef.current?.style.setProperty("--py", "0");
   };
 
+  // frame size in px (badge placement works in frame px, before the camera)
+  useIsoLayoutEffect(() => {
+    const fr = frameRef.current;
+    if (!fr || !fr.offsetWidth) return;
+    setFdim((d) => (d && d.w === fr.offsetWidth && d.h === fr.offsetHeight ? d : { w: fr.offsetWidth, h: fr.offsetHeight }));
+  }, [device.id, tick]);
+
   // label placement in stage px (after the camera transform), see lib/tech/wizard-layout.ts
   useIsoLayoutEffect(() => {
     const st = stageRef.current;
@@ -198,8 +206,6 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
     const spot = pt(scene.spot);
     const others = photo.spots.filter(([t]) => t !== shown).map(([, x, y]) => pt([x, y]));
     const avoid: Rect[] = others.map((p) => ({ x: p.x - 17, y: p.y - 17, w: 34, h: 34 }));
-    const wb = wholeRef.current;
-    if (wb) avoid.push({ x: wb.offsetLeft, y: wb.offsetTop, w: wb.offsetWidth, h: wb.offsetHeight });
     const label = { w: lb.offsetWidth, h: lb.offsetHeight };
     const place = placeLabel({ stage: { w: W, h: H }, device, region, spot, label, avoid, spots: others });
     const line = leader(spot, { x: place.x, y: place.y, w: label.w, h: label.h }, 19 * s);
@@ -211,13 +217,44 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
   const [rx0, ry0, rw, rh] = scene.region;
   const r = radii(scene.region, frameAspect, scene.radius);
   const at: [number, number] | null = scene.spot ? [((scene.spot[0] - rx0) / rw) * 100, ((scene.spot[1] - ry0) / rh) * 100] : null;
-  // badge offset: from the hotspot towards the device's centre (px-proportional)
+  // badge offset: off the hotspot, never on another spot, the label's side or off the device
+  // (lib/tech/wizard-layout.ts badgeDir; frame px before the camera — the badge zooms with it)
   let nudge: [number, number] | undefined;
   if (scene.spot) {
-    const dx = (50 - scene.spot[0]) * frameAspect;
-    const dy = 50 - scene.spot[1];
-    const len = Math.hypot(dx, dy);
-    nudge = len < 6 ? [-0.7, -0.7] : [dx / len, dy / len];
+    if (fdim) {
+      const px = ([x, y]: [number, number]) => ({ x: (x / 100) * fdim.w, y: (y / 100) * fdim.h });
+      nudge = badgeDir({
+        spot: px(scene.spot),
+        others: photo.spots.filter(([t]) => t !== shown).map(([, x, y]) => px([x, y])),
+        frame: fdim,
+        r: layout === "phone" ? 26 : 29,
+        dist: 52,
+        labelSide: geo?.side ?? null,
+      });
+    } else {
+      const dx = (50 - scene.spot[0]) * frameAspect;
+      const dy = 50 - scene.spot[1];
+      const len = Math.hypot(dx, dy);
+      nudge = len < 6 ? [-0.7, -0.7] : [dx / len, dy / len];
+    }
+  }
+  // whole-device fault: the badge keeps off every spot (centre of the region when it is free)
+  let badgeAt: [number, number] | undefined;
+  if (!scene.spot && fdim) {
+    const bx = (rx0 / 100) * fdim.w;
+    const by = (ry0 / 100) * fdim.h;
+    const bw = (rw / 100) * fdim.w;
+    const bh = (rh / 100) * fdim.h;
+    const c = badgeSpot({
+      centre: { x: bx + bw / 2, y: by + bh / 2 },
+      spots: photo.spots.map(([, x, y]) => ({ x: (x / 100) * fdim.w, y: (y / 100) * fdim.h })),
+      // badge size from tech-wizard.css (.t-fx__badge; E9 / E14 draw the wide one)
+      ...(scene.effect === "E9" || scene.effect === "E14"
+        ? { w: layout === "phone" ? 94 : 112, h: layout === "phone" ? 52 : 70 }
+        : { w: layout === "phone" ? 52 : 58, h: layout === "phone" ? 52 : 58 }),
+      bounds: { x: 0, y: 0, w: fdim.w, h: fdim.h },
+    });
+    badgeAt = [((c.x - bx) / bw) * 100, ((c.y - by) / bh) * 100];
   }
   const isPoster = poster || reduced;
   const meaning = faultMeaning(device.id, shown);
@@ -267,7 +304,7 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
                 ...(scene.clip ? { "--fx-clip": scene.clip } : {}),
               }}
             >
-              <Effect variant={scene.variant} at={at} aspect={r.ra} nudge={nudge} uid={`${uid}${scene.effect}`} />
+              <Effect variant={scene.variant} at={at} aspect={r.ra} nudge={nudge} badgeAt={badgeAt} uid={`${uid}${scene.effect}`} />
             </div>
 
             {photo.spots.map(([t, x, y], i) => {
@@ -321,25 +358,31 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
         ) : null}
 
         </div>
-        {layout === "full" && interactive && zoom ? (
-          <button ref={wholeRef} type="button" className="t-scene__whole" onClick={() => setZoom(false)} data-testid="scene-whole">
-            Pokaż całe urządzenie
-            <kbd aria-hidden="true">Esc</kbd>
-          </button>
-        ) : null}
       </div>
 
       {interactive ? (
         <div className="t-scene__card" data-testid="scene-card">
-          {layout === "phone" && interactive && zoom ? (
-            <button type="button" className="t-scene__whole" onClick={() => setZoom(false)} data-testid="scene-whole">
-              Pokaż całe urządzenie
-            </button>
-          ) : null}
-          <b key={shown} className="t-scene__cardtitle">
-            <i aria-hidden="true" />
-            {shown}
-          </b>
+          <div className="t-scene__cardhead">
+            <span key={`i:${shown}`} className="t-scene__cardico" aria-hidden="true">
+              <FaultGlyph family={scene.effect} size={22} />
+            </span>
+            <span className="t-scene__cardtitles">
+              <span className="t-scene__cardeyb">{preview && preview !== fault ? "Podgląd" : device.label}</span>
+              <b key={shown} className="t-scene__cardtitle">
+                {shown}
+              </b>
+            </span>
+            {interactive && zoom ? (
+              // the camera's way back lives in the card, never over the device
+              <button type="button" className="t-scene__whole" onClick={() => setZoom(false)} data-testid="scene-whole" aria-label="Pokaż całe urządzenie">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+                </svg>
+                <span className="t-scene__wholet">Całe urządzenie</span>
+                {layout === "full" ? <kbd aria-hidden="true">Esc</kbd> : null}
+              </button>
+            ) : null}
+          </div>
           <span key={`m:${shown}`} className="t-scene__cardtext">
             {meaning}
           </span>

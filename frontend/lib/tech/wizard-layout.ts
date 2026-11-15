@@ -130,3 +130,79 @@ export function zoomRect(r: Rect, origin: Pt, s: number): Rect {
   const a = zoomPt({ x: r.x, y: r.y }, origin, s);
   return { x: a.x, y: a.y, w: r.w * s, h: r.h * s };
 }
+
+/**
+ * Direction of an effect badge off its hotspot (frame px, before the camera): the badge sits
+ * `dist` px from the spot, never on another spot, the label's side or outside the device frame;
+ * among the free directions the one closest to the device's centre wins (feat/tech-glowna-zdjecia).
+ * Returns a unit vector (the `nudge` of the effects).
+ */
+export function badgeDir(i: {
+  spot: Pt;
+  others: Pt[];
+  frame: { w: number; h: number };
+  /** Badge radius (px) and the spot's own radius + air. */
+  r: number;
+  dist: number;
+  /** Side the label sits on (its leader leaves the spot that way). */
+  labelSide?: LabelSide | null;
+}): [number, number] {
+  const { spot, others, frame, r, dist } = i;
+  const cx = frame.w / 2 - spot.x;
+  const cy = frame.h / 2 - spot.y;
+  const cl = Math.hypot(cx, cy) || 1;
+  const toward = { x: cx / cl, y: cy / cl };
+  const away: Record<LabelSide, Pt> = { left: { x: -1, y: 0 }, right: { x: 1, y: 0 }, top: { x: 0, y: -1 }, bottom: { x: 0, y: 1 } };
+  let best: { d: [number, number]; s: number } | null = null;
+  for (let k = 0; k < 24; k++) {
+    const a = (k / 24) * Math.PI * 2;
+    const d = { x: Math.cos(a), y: Math.sin(a) };
+    const c = { x: spot.x + d.x * dist, y: spot.y + d.y * dist };
+    let s = (1 - (d.x * toward.x + d.y * toward.y)) * 10; // prefer the centre
+    for (const o of others) {
+      const gap = Math.hypot(o.x - c.x, o.y - c.y) - (r + 22);
+      if (gap < 0) s += 400 + -gap * 10;
+      else if (gap < 14) s += (14 - gap) * 3;
+    }
+    const out = Math.max(0, r - c.x, c.x + r - frame.w, r - c.y, c.y + r - frame.h);
+    s += out * 6;
+    if (i.labelSide) {
+      const v = away[i.labelSide];
+      const dot = d.x * v.x + d.y * v.y;
+      if (dot > 0.5) s += 60 * dot;
+    }
+    if (!best || s < best.s) best = { d: [Math.round(d.x * 1000) / 1000, Math.round(d.y * 1000) / 1000], s };
+  }
+  return best!.d;
+}
+
+/**
+ * Badge of a whole-device fault (no hotspot): the point nearest to `centre` (frame px) where a
+ * badge of `w` × `h` px (round when equal, a pill when wide) touches no spot (dot radius + air =
+ * 26 px) and stays inside `bounds` (feat/tech-glowna-zdjecia).
+ */
+export function badgeSpot(i: { centre: Pt; spots: Pt[]; w: number; h: number; bounds: Rect }): Pt {
+  const { centre, spots, bounds } = i;
+  const hw = i.w / 2;
+  const hh = i.h / 2;
+  const rr = Math.min(hw, hh);
+  // distance from a point to the badge outline (rounded rect with radius rr)
+  const gap = (s: Pt, c: Pt) => Math.hypot(Math.max(0, Math.abs(s.x - c.x) - (hw - rr)), Math.max(0, Math.abs(s.y - c.y) - (hh - rr))) - rr;
+  const free = (c: Pt) =>
+    c.x - hw >= bounds.x &&
+    c.y - hh >= bounds.y &&
+    c.x + hw <= bounds.x + bounds.w &&
+    c.y + hh <= bounds.y + bounds.h &&
+    spots.every((s) => gap(s, c) >= 26);
+  if (free(centre)) return centre;
+  for (let d = 8; d <= Math.max(bounds.w, bounds.h); d += 8) {
+    let best: Pt | null = null;
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2;
+      const c = { x: centre.x + Math.cos(a) * d, y: centre.y + Math.sin(a) * d };
+      if (free(c) && (!best || Math.abs(c.y - centre.y) < Math.abs(best.y - centre.y))) best = c;
+    }
+    if (best) return best;
+  }
+  return centre;
+}
