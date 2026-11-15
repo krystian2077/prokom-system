@@ -22,12 +22,13 @@ export function Logo({ size = 28, dark = false, className }: Props) {
       style={style}
       focusable="false"
     >
+      {/* As in the official file: only the wordmark is shifted; dash, bar and "TECH" are not. */}
       <g transform="translate(-11.94 0)">
         <path d={WORD} fill="var(--l-ink)" />
-        <rect x="373.65" y="52.58" width="58.22" height="15.08" rx="3" fill="var(--l-acc)" />
-        <rect x="0" y="142" width="617.6" height="9" rx="4.5" fill="var(--l-acc)" />
-        <path d={TECH} fill="var(--l-acc)" transform="translate(644.4 130) scale(0.33)" />
       </g>
+      <rect x="373.65" y="52.58" width="58.22" height="15.08" rx="3" fill="var(--l-acc)" />
+      <rect x="0" y="142" width="617.6" height="9" rx="4.5" fill="var(--l-acc)" />
+      <path d={TECH} fill="var(--l-acc)" transform="translate(644.4 130) scale(0.33)" />
     </svg>
   );
 }
