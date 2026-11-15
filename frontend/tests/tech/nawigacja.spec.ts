@@ -108,8 +108,16 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
     await page.goto("/");
     await page.locator(".t-capsule").getByRole("button", { name: "Naprawy" }).click();
     const panel = page.locator('.t-mega[data-mega="naprawy"]');
-    await expect(panel.getByText("Pęknięty ekran · Bateria · Nie ładuje").first()).toBeVisible();
+    // the three most common faults are links: a live repair page, else the form with the fault filled in
+    const phone = panel.getByRole("list", { name: "Najczęstsze usterki: telefonów" });
+    await expect(phone.getByRole("link")).toHaveText(["Pęknięty ekran", "Bateria", "Nie ładuje"]);
+    for (const href of await phone.getByRole("link").evaluateAll((a) => a.map((x) => x.getAttribute("href") ?? ""))) expect(href).toMatch(/^\/(naprawy\/|zgloszenie\?category=phone&usterka=)/);
     await expect(panel.getByRole("link", { name: "Zgłoś naprawę", exact: true })).toHaveAttribute("href", "/zgloszenie");
+    await expect(panel.getByRole("navigation", { name: "Więcej o naprawach" }).getByRole("link", { name: "Status naprawy" })).toHaveAttribute("href", "/track");
+    // the panel spans the capsule
+    const cap = (await page.locator(".t-capsule").boundingBox())!;
+    const box = (await panel.locator(".t-mega__panel").boundingBox())!;
+    expect(box.width).toBeGreaterThan(cap.width - 8);
     await expect(page.locator(".t-capwrap")).toHaveClass(/is-mega/);
     await expect(page.locator(".t-megascrim")).toHaveCSS("opacity", "1");
   });

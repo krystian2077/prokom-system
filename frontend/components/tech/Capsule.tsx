@@ -7,7 +7,8 @@ import { pointPhone, telHref } from "@/config/prokom";
 import { hoursSummary } from "@/lib/tech/hours";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { prefersReducedMotion } from "@/lib/tech/motion";
-import { ACCOUNT_HREF, POINTS_HREF, REPAIRS_HREF, SUBMIT_HREF, directionsUrl, inTriangle, isActive, mainNav, repairLinks, type NavItem, type Pt } from "@/lib/tech/nav";
+import { courierPageHref } from "@/lib/tech/courier";
+import { ACCOUNT_HREF, POINTS_HREF, PREP_GUIDE_HREF, PREP_GUIDE_READY, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, directionsUrl, inTriangle, isActive, mainNav, repairLinks, type NavItem, type Pt } from "@/lib/tech/nav";
 import { requestSearch } from "@/lib/tech/search/open";
 import { submitHref, wizardDevices } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconChevronDown, IconPin, IconSearch, IconUser, IconWrench } from "./icons";
@@ -155,15 +156,19 @@ export function Capsule() {
     const panel = box.querySelector<HTMLElement>(`[data-mega="${open}"] .t-mega__panel`);
     const trigger = triggerRefs.current[open];
     if (!panel || !trigger) return;
-    const cap = rootRef.current!.getBoundingClientRect();
-    const t = trigger.getBoundingClientRect();
-    const w = panel.offsetWidth;
-    // under the trigger, kept inside the capsule's width
-    const x = Math.max(0, Math.min(cap.width - w, t.left - cap.left - 24));
-    box.style.setProperty("--mega-w", `${w}px`);
-    box.style.setProperty("--mega-h", `${panel.offsetHeight}px`);
-    box.style.setProperty("--mega-x", `${x}px`);
-    megaTarget.current = { x, w };
+    // The panels take the capsule's full width (layout px: the compact capsule is only scaled)
+    // and the box grows to the open panel's height, so Naprawy ↔ Punkty animates the height only.
+    const measure = () => {
+      const w = rootRef.current!.clientWidth;
+      box.style.setProperty("--mega-panel-w", `${w}px`);
+      box.style.setProperty("--mega-w", `${w}px`);
+      box.style.setProperty("--mega-h", `${panel.offsetHeight}px`);
+      box.style.setProperty("--mega-x", "0px");
+      megaTarget.current = { x: 0, w };
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, [open, points.length]);
 
   const activeKey = mainNav.find((n) => isActive(n, pathname))?.key ?? null;
@@ -191,15 +196,18 @@ export function Capsule() {
   };
   const focusPanel = (m: Mega, index: number) => {
     window.setTimeout(() => {
-      const links = Array.from(boxRef.current?.querySelectorAll<HTMLElement>(`[data-mega="${m}"] a[href]`) ?? []);
+      const links = Array.from(boxRef.current?.querySelectorAll<HTMLElement>(`[data-mega="${m}"] a[data-mega-nav]`) ?? []);
       links.at(index)?.focus();
     }, prefersReducedMotion() ? 0 : 30);
   };
   /** ↑/↓ inside the open panel; ↑ from the first link returns to the trigger. */
   const onPanelKey = (e: ReactKeyboardEvent<HTMLElement>, m: Mega) => {
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-    const links = Array.from(e.currentTarget.querySelectorAll<HTMLElement>("a[href]"));
-    const i = links.indexOf(document.activeElement as HTMLElement);
+    // main entries only (device tiles, cards, the bottom bar); from a fault link the step starts at its tile
+    const links = Array.from(e.currentTarget.querySelectorAll<HTMLElement>("a[data-mega-nav]"));
+    const active = document.activeElement as HTMLElement | null;
+    const from = active?.closest<HTMLElement>("[data-mega-tile]")?.querySelector<HTMLElement>("a[data-mega-nav]") ?? active;
+    const i = links.indexOf(from as HTMLElement);
     e.preventDefault();
     if (e.key === "ArrowUp" && i <= 0) triggerRefs.current[m]?.focus();
     else links[Math.max(0, Math.min(links.length - 1, i + (e.key === "ArrowDown" ? 1 : -1)))]?.focus();
@@ -356,75 +364,109 @@ export function Capsule() {
   );
 }
 
-/** Devices with their three most common faults (wizard-data) + "Zgłoś naprawę online". */
+/**
+ * „Naprawy” on the capsule's full width (PREMIUM §3.2): a grid of device tiles — a large icon,
+ * the name and the three most common faults as links (a live repair page, else the form with the
+ * fault filled in) — the „Zgłoś naprawę online” card with a glow, the courier card once published,
+ * and a bar of links at the bottom. ↑/↓ walk the tiles, cards and bar; Tab reaches the faults.
+ */
 function MegaRepairs() {
+  const { faultPages } = useShell();
+  const courier = courierPageHref();
+  let n = 0;
   return (
     <div className="t-mega__repairs">
       <ul className="t-mega__grid">
-        {repairLinks.map((r, i) => {
+        {repairLinks.map((r) => {
           const dev = wizardDevices.find((d) => d.icon === r.icon);
           return (
-            <li key={r.href} style={{ "--i": i } as CSSProperties}>
-              <Link href={r.href} className="t-mega__device">
+            <li key={r.href} className="t-mega__tile" data-mega-tile="" style={{ "--i": n++ } as CSSProperties}>
+              <Link href={r.href} className="t-mega__device" data-mega-nav="">
                 <span className="t-mega__ico">
-                  <DeviceGlyph icon={r.icon} />
+                  <DeviceGlyph icon={r.icon} size={26} strokeWidth={1.9} />
                 </span>
-                <span className="t-mega__dtext">
-                  <b>{r.label}</b>
-                  {dev ? <span className="t-mega__faults">{dev.faults.slice(0, 3).join(" · ")}</span> : null}
-                </span>
+                <b>{r.label}</b>
+                <IconArrow size={14} className="t-mega__go" />
               </Link>
+              {dev ? (
+                <ul className="t-mega__faults" aria-label={`Najczęstsze usterki: ${r.label.replace(/^Serwis /, "")}`}>
+                  {dev.faults.slice(0, 3).map((f) => (
+                    <li key={f}>
+                      <Link href={faultPages[`${dev.category}:${f}`] ?? submitHref(dev.category, f)}>{f}</Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </li>
           );
         })}
       </ul>
-      <div className="t-mega__aside" style={{ "--i": 8 } as CSSProperties}>
-        <div className="t-mega__submit">
-          <span className="t-eyb">Bez logowania</span>
+      <div className="t-mega__aside">
+        <div className="t-mega__submit" style={{ "--i": n++ } as CSSProperties}>
+          <span className="t-eyb">Bez logowania · kilka minut</span>
           <b>Zgłoś naprawę online</b>
-          <span>Wybierz urządzenie i usterkę — resztę ustalimy po diagnozie.</span>
-          <Link href={SUBMIT_HREF} className="t-hbtn t-hbtn--acc t-mega__cta">
+          <span>Wybierz urządzenie i usterkę. Wycenę dostaniesz po diagnozie, przed naprawą.</span>
+          <Link href={SUBMIT_HREF} className="t-hbtn t-hbtn--acc t-mega__cta" data-mega-nav="">
             Zgłoś naprawę <IconArrow />
           </Link>
         </div>
-        <div className="t-mega__quick">
-          {wizardDevices.slice(0, 2).map((d) => (
-            <Link key={d.id} href={submitHref(d.category, d.faults[0])} className="t-mega__qlink">
-              {d.label}: {d.faults[0].toLocaleLowerCase("pl-PL")}
-              <IconArrow size={14} />
-            </Link>
-          ))}
-          <Link href={REPAIRS_HREF} className="t-mega__more">
-            Wszystkie naprawy <IconArrow />
+        {courier ? (
+          <Link href={courier} className="t-mega__card" data-mega-nav="" style={{ "--i": n++ } as CSSProperties}>
+            <span className="t-mega__cico">
+              <IconTruck />
+            </span>
+            <span className="t-mega__ctext">
+              <b>Naprawa wysyłkowa</b>
+              <span>Nie możesz przyjechać? Wyślij sprzęt kurierem do salonu.</span>
+            </span>
+            <IconArrow size={14} className="t-mega__go" />
           </Link>
-        </div>
+        ) : null}
       </div>
+      <nav className="t-mega__bar" aria-label="Więcej o naprawach" style={{ "--i": n++ } as CSSProperties}>
+        <Link href={REPAIRS_HREF} className="t-mega__more" data-mega-nav="">
+          Wszystkie naprawy <IconArrow />
+        </Link>
+        <Link href={TRACK_HREF} className="t-mega__barlink" data-mega-nav="">
+          Status naprawy
+        </Link>
+        {PREP_GUIDE_READY ? (
+          <Link href={PREP_GUIDE_HREF} className="t-mega__barlink" data-mega-nav="">
+            Jak przygotować sprzęt
+          </Link>
+        ) : null}
+      </nav>
     </div>
   );
 }
 
-/** Published points only (SPEC §5): live status, Nawiguj, Zadzwoń, mini map. */
+/** „Punkty serwisowe” in the same width: two large salon cards (published only, SPEC §5). */
 function MegaPoints({ points }: { points: VisiblePoint[] }) {
   return (
-    <>
+    <div className="t-mega__pointsw">
       <ul className={`t-mega__points${points.length === 1 ? " is-single" : ""}`}>
         {points.map((p, i) => (
           <li key={p.key} className="t-mega__point" style={{ "--i": i } as CSSProperties}>
-            <OsmMap sub={p.city} label={false} height={112} radius={14} className="t-mega__map" />
+            <OsmMap sub={p.city} label={false} height={210} radius={0} className="t-mega__map" />
             <div className="t-mega__pbody">
+              <span className="t-eyb">Salon</span>
               <b>{p.name}</b>
-              <span>
-                {p.street}, {p.postal} {p.city}
-              </span>
               <OpeningStatus points={[p]} variant="pill" skeletonCh={18} />
+              <span className="t-mega__addr">
+                {p.street},{" "}
+                <span>
+                  {p.postal} {p.city}
+                </span>
+              </span>
               <span className="t-mega__hours">{hoursSummary(p)}</span>
+              {p.parkingNote ? <span className="t-mega__park">{p.parkingNote}</span> : null}
               <div className="t-mega__pact">
                 {p.geo ? (
-                  <a href={directionsUrl(p.geo)} className="t-mega__pbtn" target="_blank" rel="noopener noreferrer" data-track="nawigacja_klik" data-track-punkt={p.key} data-track-aplikacja="google">
+                  <a href={directionsUrl(p.geo)} className="t-mega__pbtn" target="_blank" rel="noopener noreferrer" data-mega-nav="" data-track="nawigacja_klik" data-track-punkt={p.key} data-track-aplikacja="google">
                     <IconPin size={15} /> Nawiguj
                   </a>
                 ) : null}
-                <a href={telHref(pointPhone(p))} className="t-mega__pbtn t-mega__tel" data-track="telefon_klik" data-track-miejsce="mega">
+                <a href={telHref(pointPhone(p))} className="t-mega__pbtn t-mega__tel" data-mega-nav="" data-track="telefon_klik" data-track-miejsce="mega">
                   Zadzwoń {pointPhone(p).replace(/^\+48\s?/, "")}
                 </a>
               </div>
@@ -432,11 +474,25 @@ function MegaPoints({ points }: { points: VisiblePoint[] }) {
           </li>
         ))}
       </ul>
-      <div className="t-mega__foot" style={{ "--i": points.length } as CSSProperties}>
-        <Link href={POINTS_HREF} className="t-mega__more">
+      <nav className="t-mega__bar" aria-label="Więcej o punktach" style={{ "--i": points.length } as CSSProperties}>
+        <Link href={POINTS_HREF} className="t-mega__more" data-mega-nav="">
           Punkty serwisowe — godziny i dojazd <IconArrow />
         </Link>
-      </div>
-    </>
+        <Link href="/obslugiwane-miejscowosci" className="t-mega__barlink" data-mega-nav="">
+          Obsługiwane miejscowości
+        </Link>
+        <Link href="/kontakt" className="t-mega__barlink" data-mega-nav="">
+          Kontakt
+        </Link>
+      </nav>
+    </div>
+  );
+}
+
+function IconTruck() {
+  return (
+    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M3 6h11v10H3zM14 9h4l3 3v4h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+    </svg>
   );
 }

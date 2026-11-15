@@ -7,6 +7,8 @@ export type SheetMode = "menu" | "naprawy";
 
 type ShellState = {
   points: VisiblePoint[];
+  /** Live repair pages by `category:fault` (built on the server, so the client skips the texts). */
+  faultPages: Record<string, string>;
   sheet: SheetMode | null;
   openSheet: (mode: SheetMode, opener?: HTMLElement | null) => void;
   closeSheet: () => void;
@@ -15,7 +17,7 @@ type ShellState = {
 
 const Ctx = createContext<ShellState | null>(null);
 
-export function ShellProvider({ points, children }: { points: VisiblePoint[]; children: ReactNode }) {
+export function ShellProvider({ points, faultPages = {}, children }: { points: VisiblePoint[]; faultPages?: Record<string, string>; children: ReactNode }) {
   const [sheet, setSheet] = useState<SheetMode | null>(null);
   const [opener, setOpener] = useState<HTMLElement | null>(null);
   const openSheet = useCallback((mode: SheetMode, el?: HTMLElement | null) => {
@@ -23,7 +25,7 @@ export function ShellProvider({ points, children }: { points: VisiblePoint[]; ch
     setSheet(mode);
   }, []);
   const closeSheet = useCallback(() => setSheet(null), []);
-  const value = useMemo(() => ({ points, sheet, openSheet, closeSheet, opener }), [points, sheet, openSheet, closeSheet, opener]);
+  const value = useMemo(() => ({ points, faultPages, sheet, openSheet, closeSheet, opener }), [points, faultPages, sheet, openSheet, closeSheet, opener]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
