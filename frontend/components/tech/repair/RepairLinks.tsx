@@ -1,17 +1,17 @@
 import Link from "next/link";
 import type { RepairPageData } from "@/config/naprawy";
-import { liveRepairs, repairPath, repairsForDevice } from "@/lib/tech/naprawy";
-import type { CategoryCode } from "@/lib/tech/wizard-data";
+import { liveRepairs, repairPath } from "@/lib/tech/naprawy";
 import { HERO_SCENES } from "@/lib/tech/subhero";
 import { FaultGlyph, faultFamily } from "../content/FaultGlyph";
 import { IconArrow } from "../icons";
 
 /**
- * Links to repair pages (SPEC §12.4): only `published && verified` pages, so the block
- * renders nothing until the service confirms the list (TD5b PR 2).
+ * Links to every live repair page (SPEC §12.4) on the hub /uslugi: only `published &&
+ * verified` pages. Device pages no longer list them (2026-11) — repair pages are reached
+ * from the hub, the sitemap, related repairs, the wizard and blog posts.
  */
-export function RepairLinks({ device, title = "Konkretne naprawy", className }: { device?: CategoryCode; title?: string; className?: string }) {
-  const list: RepairPageData[] = device ? repairsForDevice(device) : liveRepairs();
+export function RepairLinks({ title = "Konkretne naprawy", className }: { title?: string; className?: string }) {
+  const list: RepairPageData[] = liveRepairs();
   if (!list.length) return null;
   return (
     <nav className={`t-section t-section--tight t-repairlinks${className ? ` ${className}` : ""}`} aria-label={title} data-rail="Konkretne naprawy" id="konkretne-naprawy">

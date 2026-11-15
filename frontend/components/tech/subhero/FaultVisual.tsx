@@ -14,6 +14,12 @@ type Props = {
   device: string;
   /** 1 fault = repair page (effect loops up to 3×); 2–3 = device page (one pass, back to the first). */
   faults: string[];
+  /** "live" (hero, default): entrance + cycles; "poster": still frame of the effect; "fixed": the device without the fault (repaired). */
+  mode?: "live" | "poster" | "fixed";
+  /** Fault name chips under the frame (hero). */
+  tags?: boolean;
+  /** Below the fold (before/after, related cards): lazy photo, no high priority. */
+  lazy?: boolean;
 };
 
 /**
@@ -26,7 +32,7 @@ type Props = {
  * Reduced motion → poster frame of the first fault, no cycling. Off screen → paused.
  * Decorative: the fault names are in the page text.
  */
-export function FaultVisual({ device: deviceId, faults }: Props) {
+export function FaultVisual({ device: deviceId, faults, mode = "live", tags = true, lazy = false }: Props) {
   const device = deviceById(deviceId);
   const photo = device.photo!;
   const [index, setIndex] = useState(0);
@@ -34,12 +40,13 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
   const [ready, setReady] = useState(false);
   const [paused, setPaused] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const cycle = faults.length > 1;
+  const cycle = faults.length > 1 && mode === "live";
+  const fixed = mode === "fixed";
 
   useEffect(() => {
-    setPoster(prefersReducedMotion() || document.documentElement.hasAttribute("data-tech-reduced"));
+    setPoster(mode === "poster" || prefersReducedMotion() || document.documentElement.hasAttribute("data-tech-reduced"));
     setReady(true);
-  }, []);
+  }, [mode]);
 
   useEffect(() => onVisible(ref.current, (v) => setPaused(!v)), []);
 
@@ -72,7 +79,7 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
   return (
     <div
       ref={ref}
-      className={`t-fault${poster ? " is-poster" : ""}${paused ? " is-paused" : ""}${cycle ? " is-cycle" : ""}`}
+      className={`t-fault${poster ? " is-poster" : ""}${fixed ? " is-fixed" : ""}${paused ? " is-paused" : ""}${cycle ? " is-cycle" : ""}`}
       data-device={device.id}
       data-fault={shown}
       style={vars}
@@ -87,7 +94,8 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
             alt=""
             width={photo.width}
             height={photo.height}
-            fetchPriority="high"
+            fetchPriority={lazy ? "auto" : "high"}
+            loading={lazy ? "lazy" : "eager"}
             decoding="async"
             style={{ left: `${(-cx / cw) * 100}%`, top: `${(-cy / ch) * 100}%`, width: `${(photo.width / cw) * 100}%` }}
           />
@@ -96,7 +104,7 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
             <DeviceArt kind={photo.art ?? "other"} uid={`hero${device.id.replace(/\W/g, "")}`} />
           </div>
         )}
-        {ready ? (
+        {ready && !fixed ? (
           <div
             key={shown}
             className="t-fault__fx"
@@ -115,16 +123,18 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
             <Effect variant={scene.variant} at={at} aspect={ra} nudge={nudge} uid={`hero-${device.id}-${index}`} />
           </div>
         ) : null}
-        {scene.spot ? <span key={`p:${shown}`} className="t-fault__ping" style={{ left: `${scene.spot[0]}%`, top: `${scene.spot[1]}%` }} /> : null}
+        {scene.spot && !fixed ? <span key={`p:${shown}`} className="t-fault__ping" style={{ left: `${scene.spot[0]}%`, top: `${scene.spot[1]}%` }} /> : null}
       </div>
-      <div className="t-fault__tags">
-        {faults.map((f, i) => (
-          <span key={f} className={`t-fault__tag${f === shown ? " is-on" : ""}`} style={{ "--i": i } as CSSProperties}>
-            <i />
-            {f}
-          </span>
-        ))}
-      </div>
+      {tags ? (
+        <div className="t-fault__tags">
+          {faults.map((f, i) => (
+            <span key={f} className={`t-fault__tag${f === shown ? " is-on" : ""}`} style={{ "--i": i } as CSSProperties}>
+              <i />
+              {f}
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

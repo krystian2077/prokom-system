@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { line } from "@/config/prokom";
+import { line, telHref } from "@/config/prokom";
 import type { RepairPageData } from "@/config/naprawy";
-import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PrepChecklist } from "@/components/tech/PrepChecklist";
-import { IconArrow } from "@/components/tech/icons";
+import { IconArrow, IconCheck, IconPhoneCall } from "@/components/tech/icons";
 import { courierPageHref } from "@/lib/tech/courier";
 import { devicePages } from "@/lib/tech/devices";
 import { isLive, repairBySlug, repairPath } from "@/lib/tech/naprawy";
@@ -22,6 +21,7 @@ import { FaultGlyph, faultFamily } from "../content/FaultGlyph";
 import { SalonCards } from "../content/SalonCards";
 import { FaultVisual } from "../subhero/FaultVisual";
 import { SubHero } from "../subhero/SubHero";
+import { BeforeAfter } from "./BeforeAfter";
 
 /** Placeholder shown only on staging for pages without confirmed content. */
 function Missing({ what }: { what: string }) {
@@ -77,7 +77,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
       {page.intro.length ? null : <Missing what="Wstęp" />}
 
       <section className="t-section t-section--tight" id="objawy" data-rail="Objawy">
-        <div className="t-container t-courier__cols">
+        <div className="t-container t-rsym">
           <div className="t-repair__sym">
             {scene ? (
               <span className="t-symptoms__ico t-symptoms__ico--lg" aria-hidden="true">
@@ -93,9 +93,20 @@ export function RepairPage({ page }: { page: RepairPageData }) {
             ))}
           </div>
           {page.objawy.length ? (
-            <ul className="t-ticklist t-repair__ticks">
-              {page.objawy.map((o) => (
-                <li key={o}>{o}</li>
+            <ul className="t-rsym__grid" data-t-stagger="">
+              {page.objawy.map((o, i) => (
+                <li key={o} className="t-card t-rsym__card">
+                  <span className="t-rsym__n" aria-hidden="true">
+                    <i />
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p>{o}</p>
+                  {scene ? (
+                    <span className="t-rsym__mark" aria-hidden="true">
+                      <FaultGlyph family={faultFamily(scene.device, page.usterka)} size={64} />
+                    </span>
+                  ) : null}
+                </li>
               ))}
             </ul>
           ) : (
@@ -145,6 +156,29 @@ export function RepairPage({ page }: { page: RepairPageData }) {
           ) : null}
         </div>
       </section>
+
+      {scene ? (
+        <section className="t-section t-section--tight t-section--alt t-rba" id="przed-i-po" data-rail="Przed i po">
+          <div className="t-container t-rba__in">
+            <div className="t-cb-head t-rba__head">
+              <span className="t-eyebrow">Przed i po</span>
+              <h2 className="t-h2 t-h2--sm">{page.usterka}: przed naprawą i po niej</h2>
+              <p className="t-lead">Przesuń suwak, żeby porównać.</p>
+              <ul className="t-rba__points">
+                {["Wycena przed naprawą", "Gwarancja na usługę i części", "Status naprawy online"].map((t) => (
+                  <li key={t}>
+                    <span aria-hidden="true">
+                      <IconCheck size={13} />
+                    </span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <BeforeAfter device={scene.device} fault={page.usterka} />
+          </div>
+        </section>
+      ) : null}
 
       {page.czesci.length ? (
         <Section id="czesci" rail="Części" eyebrow="Części" title="Oryginał czy zamiennik?" alt>
@@ -223,32 +257,63 @@ export function RepairPage({ page }: { page: RepairPageData }) {
       ) : null}
       {page.device === "phone" ? <DataSafety /> : null}
 
-      <section className="t-section t-section--tight" id="pytania" data-rail="Pytania">
+      <section className="t-section t-section--tight t-rfaq" id="pytania" data-rail="Pytania">
         <div className="t-container t-faqsplit">
           <div className="t-faqsplit__head">
             <span className="t-eyebrow">Pytania</span>
             <h2 className="t-h2">{page.h1}: pytania</h2>
-            <p className="t-lead">Nie ma tu Twojego pytania? Zadzwoń albo opisz problem w zgłoszeniu.</p>
+            <div className="t-rfaq__ask">
+              <b>Nie ma tu Twojego pytania?</b>
+              <p>Zadzwoń albo opisz problem w zgłoszeniu.</p>
+              <div className="t-rfaq__btns">
+                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--stage t-pbtn--m" data-track="telefon_klik" data-track-miejsce="naprawa_faq">
+                  <IconPhoneCall size={16} /> {line.phoneDisplay}
+                </a>
+                <Link href={submit} className="t-pbtn t-pbtn--ghost-dark t-pbtn--m">
+                  Opisz problem
+                </Link>
+              </div>
+            </div>
           </div>
           {page.faq.length ? <Faq items={page.faq} /> : <Missing what="FAQ" />}
         </div>
       </section>
 
+      {related.length ? (
+        <nav className="t-section t-section--tight t-section--alt t-rrel" aria-label="Powiązane naprawy" id="powiazane" data-rail="Powiązane">
+          <div className="t-container">
+            <div className="t-cb-head">
+              <span className="t-eyebrow">Powiązane naprawy</span>
+              <h2 className="t-h2 t-h2--sm">Inne naprawy, które często idą w parze</h2>
+            </div>
+            <ul className={`t-rrel__list t-rrel__list--${Math.min(related.length, 3)}`} data-t-stagger="">
+              {related.map((r) => {
+                const rs = r.device === "other" ? null : HERO_SCENES[r.device];
+                return (
+                  <li key={r.slug}>
+                    <Link href={repairPath(r.slug)} className="t-card t-rrel__card">
+                      <span className="t-rrel__art" aria-hidden="true">
+                        {rs ? <FaultVisual device={rs.device} faults={[r.usterka]} mode="poster" tags={false} lazy /> : null}
+                      </span>
+                      <span className="t-rrel__txt">
+                        <span className="t-rrel__kicker">{r.usterka}</span>
+                        <b>{r.h1}</b>
+                        <span className="t-rrel__go">
+                          Zobacz naprawę <IconArrow size={14} />
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </nav>
+      ) : null}
+
       <nav className="t-section t-section--tight t-cb-more" aria-label="Powiązane strony" id="wiecej" data-rail="Więcej">
         <div className="t-container">
           <h2 className="t-h2 t-h2--sm">Więcej o naprawie {genitive}</h2>
-          {related.length ? (
-            <ul className="t-dev-more__list">
-              {related.map((r) => (
-                <li key={r.slug}>
-                  <Link href={repairPath(r.slug)} className="t-chiplink">
-                    {r.h1}
-                    <IconArrow size={14} />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
           <LinkTiles
             items={[
               { href: devicePath, t: deviceName, s: "Wszystkie naprawy, marki i najczęstsze pytania" },
@@ -274,12 +339,39 @@ export function RepairPage({ page }: { page: RepairPageData }) {
         </div>
       </nav>
 
-      <CtaBand
-        eyebrow="Następny krok"
-        title={`${page.h1}? Zgłoś naprawę online — wycenę dostaniesz przed rozpoczęciem pracy.`}
-        primary={{ label: "Zgłoś tę naprawę", href: submit }}
-        secondary={{ label: deviceName, href: devicePath }}
-      />
+      <section className="t-rcta-wrap" aria-label="Zgłoś naprawę">
+        <div className="t-container">
+          <div className="t-rcta">
+            <div className="t-rcta__txt">
+              <span className="t-eyebrow t-eyebrow--stage">Następny krok</span>
+              <p className="t-rcta__title">{`${page.h1}? Zgłoś naprawę online — wycenę dostaniesz przed rozpoczęciem pracy.`}</p>
+              <ul className="t-rcta__promises">
+                {heroPromises({ category: page.device, phoneScreen }).map((p) => (
+                  <li key={p.text} className={p.draft ? "t-draft" : undefined}>
+                    <IconCheck size={14} /> {p.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="t-rcta__actions">
+              <Link href={submit} className="t-hbtn t-hbtn--acc t-shine t-rcta__go">
+                Zgłoś tę naprawę <IconArrow size={16} strokeWidth={2.6} />
+              </Link>
+              <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark t-rcta__tel" data-track="telefon_klik" data-track-miejsce="naprawa_cta">
+                <IconPhoneCall size={17} /> {line.phoneDisplay}
+              </a>
+              <Link href={devicePath} className="t-rcta__more">
+                {deviceName} <IconArrow size={14} />
+              </Link>
+            </div>
+            {scene ? (
+              <div className="t-rcta__art" aria-hidden="true">
+                <FaultVisual device={scene.device} faults={[page.usterka]} mode="fixed" tags={false} lazy />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
