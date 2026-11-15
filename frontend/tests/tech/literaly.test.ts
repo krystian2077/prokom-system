@@ -30,9 +30,9 @@ const LEGACY_CONTACT = new Set<string>([
   "components/layout/PublicFooter.tsx",
 ]);
 // FAQ (rebuilt in TD5) keeps one allowed sentence: "nie obsługujemy paczkomatów" (SPEC §11 pt 5).
-const LEGACY_PACZKOMAT = new Set<string>(["app/(public)/faq/page.tsx", "app/(public)/naprawa-kurierem/page.tsx"]);
+const LEGACY_PACZKOMAT = new Set<string>(["lib/tech/faq-data.ts", "app/(public)/naprawa-kurierem/page.tsx"]);
 /** Rebuilt pages allowed to say only that we do NOT handle parcel lockers. */
-const PACZKOMAT_NEGATIVE_ONLY = ["app/(public)/faq/page.tsx", "app/(public)/naprawa-kurierem/page.tsx"];
+const PACZKOMAT_NEGATIVE_ONLY = ["lib/tech/faq-data.ts", "app/(public)/naprawa-kurierem/page.tsx"];
 
 function walk(dir: string): string[] {
   const abs = path.join(FRONTEND, dir);
