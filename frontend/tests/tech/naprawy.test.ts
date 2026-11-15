@@ -67,8 +67,10 @@ describe("naprawy — SEO i treść stron z treścią", () => {
       }
     }
   });
-  it("verified pages: ≥ 400 own words, 3–5 FAQ", () => {
-    for (const p of repairPages.filter((x) => x.verified)) {
+  it("pages with content (and every verified page): ≥ 400 own words, 3–5 FAQ, symptoms and steps", () => {
+    for (const p of [...withContent, ...repairPages.filter((x) => x.verified)]) {
+      expect(p.objawy.length, p.slug).toBeGreaterThanOrEqual(3);
+      expect(p.przebieg.length, p.slug).toBeGreaterThanOrEqual(3);
       expect(wordCount(ownText(p)), p.slug).toBeGreaterThanOrEqual(400);
       expect(p.faq.length).toBeGreaterThanOrEqual(3);
       expect(p.faq.length).toBeLessThanOrEqual(5);
@@ -81,6 +83,12 @@ describe("naprawy — SEO i treść stron z treścią", () => {
     const t = "Wymiana ekranu w telefonie zaczyna się od diagnozy i sprawdzenia, czy uszkodzony jest tylko wyświetlacz";
     expect(sharedRatio(t, t)).toBe(1);
     expect(sharedRatio(t, "Zupełnie inny tekst o bateriach laptopów i ich ładowaniu w zimie")).toBe(0);
+  });
+  it("unconfirmed time / warranty / on-site stay null on unverified pages (service did not confirm)", () => {
+    for (const p of repairPages.filter((x) => !x.verified)) expect([p.czas, p.gwarancja, p.naMiejscu], p.slug).toEqual([null, null, null]);
+  });
+  it("texts never hard-code a city (points come from prokom.ts)", () => {
+    for (const p of withContent) expect(ownText(p) + p.description, p.slug).not.toMatch(/rabk|zakopan/i);
   });
   it("no prices, WhatsApp, parcel lockers; no city variants", () => {
     const text = JSON.stringify(repairPages);
