@@ -16,8 +16,9 @@ test.describe("desktop 1440", () => {
     await page.mouse.move(box.x + 60, box.y + box.height + 60, { steps: 4 });
     await expect(panel).toBeVisible();
     await expect(panel.getByRole("link", { name: "Serwis laptopów" })).toBeVisible();
-    // leave → closes after the delay, not immediately
-    await page.mouse.move(700, 600);
+    // leave (under the full-width panel) → closes after the delay, not immediately
+    const below = (await panel.locator(".t-mega__panel").boundingBox())!;
+    await page.mouse.move(700, Math.min(890, below.y + below.height + 60));
     await expect(panel).toBeVisible();
     await expect(panel).toBeHidden({ timeout: 1500 });
     // click + Esc

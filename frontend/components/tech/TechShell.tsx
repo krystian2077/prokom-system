@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { notices, servicePoints } from "@/config/prokom";
+import { liveRepairs, repairPath } from "@/lib/tech/naprawy";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { BrandBar } from "./BrandBar";
 import { Capsule } from "./Capsule";
@@ -20,8 +21,10 @@ import { Typeset } from "./Typeset";
  */
 export function TechShell({ children }: { children: ReactNode }) {
   const points = visiblePoints();
+  // Mega menu „Naprawy”: a fault with its own live page links there, the rest to the form.
+  const faultPages = Object.fromEntries(liveRepairs().map((r) => [`${r.device}:${r.usterka}`, repairPath(r.slug)]));
   return (
-    <ShellProvider points={points}>
+    <ShellProvider points={points} faultPages={faultPages}>
       <div className="t-shell" id="top">
         <a href="#tresc" className="t-skip t-ui">
           Przejdź do treści
