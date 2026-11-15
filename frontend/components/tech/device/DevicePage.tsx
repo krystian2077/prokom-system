@@ -12,6 +12,7 @@ import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tec
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
 import { submitHref } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconPath } from "../icons";
+import { RepairLinks } from "../repair/RepairLinks";
 import { CourierTeaser } from "./CourierTeaser";
 import { RepairSteps } from "./RepairSteps";
 
@@ -175,6 +176,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
         </div>
       </section>
 
+      <RepairLinks device={page.category} title={`Konkretne naprawy: ${page.short.toLocaleLowerCase("pl-PL")}`} />
       <MoreDevices current={page.path} />
       <CtaBand
         eyebrow="Następny krok"

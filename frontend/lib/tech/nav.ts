@@ -3,6 +3,7 @@
  * Some targets are created in later sessions (TD4: /punkty-serwisowe, /o-firmie,
  * /serwis-telefonow; TD5: legal pages) — the URLs are final.
  */
+import { courierService } from "@/config/prokom";
 
 export type NavKey = "naprawy" | "punkty" | "hammer" | "blog" | "ofirmie" | "kontakt";
 export type NavItem = { key: NavKey; label: string; href: string; mega?: "naprawy" | "punkty"; match: string[] };
@@ -65,6 +66,9 @@ export const footerColumns: { title: string; items: { label: string; href: strin
       { label: "Kontakt", href: "/kontakt" },
       { label: "Blog", href: "/blog" },
       { label: "Obsługiwane miejscowości", href: "/obslugiwane-miejscowosci" },
+      { label: "Jak przygotować sprzęt", href: "/jak-przygotowac-sprzet" },
+      // Courier page only once published (SPEC §12.10) — no dead link before that.
+      ...(courierService.published ? [{ label: "Naprawa wysyłkowa", href: "/naprawa-kurierem" }] : []),
       { label: "Status naprawy", href: "/track" },
       { label: "Konto klienta", href: "/client/login" },
     ],
@@ -83,9 +87,9 @@ export const SUBMIT_HREF = "/zgloszenie";
 export const TRACK_HREF = "/track";
 export const POINTS_HREF = "/punkty-serwisowe";
 export const REPAIRS_HREF = "/uslugi";
-/** Preparation guide (SPEC §12.3) — the page arrives in TD5; until then no link to it. */
+/** Preparation guide (SPEC §12.3, TD5 PR 3). */
 export const PREP_GUIDE_HREF = "/jak-przygotowac-sprzet";
-export const PREP_GUIDE_READY = false;
+export const PREP_GUIDE_READY = true;
 
 export function isActive(item: { match: string[] }, pathname: string): boolean {
   return item.match.some((m) => (m.endsWith("-") ? pathname.startsWith(m) : pathname === m || pathname.startsWith(`${m}/`)));
