@@ -40,6 +40,8 @@ export function Capsule() {
   const [hidden, setHidden] = useState(false);
   const [compact, setCompact] = useState(false);
   const [js, setJs] = useState(false);
+  /** Mega panels mount on the first pointer/focus visit to the menu (not on page load, not on phones). */
+  const [armed, setArmed] = useState(false);
   const openTimer = useRef<number | undefined>(undefined);
   const closeTimer = useRef<number | undefined>(undefined);
   const exitPoint = useRef<Pt | null>(null);
@@ -200,7 +202,12 @@ export function Capsule() {
             <Logo size={28} />
           </Link>
 
-          <nav ref={navRef} aria-label="Menu główne" className="t-capsule__nav t-navpills" onKeyDown={onNavKey} onMouseLeave={() => setHot(null)}>
+          <nav ref={navRef} aria-label="Menu główne" className="t-capsule__nav t-navpills"
+            onKeyDown={onNavKey}
+            onMouseEnter={() => setArmed(true)}
+            onFocus={() => setArmed(true)}
+            onMouseLeave={() => setHot(null)}
+          >
             <span className="t-pilltabs__pill t-navpill" aria-hidden="true" />
             {mainNav.map((item) => {
               const active = isActive(item, pathname);
@@ -289,7 +296,7 @@ export function Capsule() {
             </button>
           </div>
 
-          {js ? (
+          {js && (armed || open) ? (
             <div ref={boxRef} className={`t-megabox${open ? " is-open" : ""}`} data-open={open ?? undefined}>
               <div className="t-megabox__bg" aria-hidden="true" />
               {(["naprawy", "punkty"] as Mega[]).map((m) => (
