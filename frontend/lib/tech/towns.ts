@@ -26,7 +26,7 @@ export const towns: Town[] = [
   { name: "Kościelisko", slug: "koscielisko", point: "zakopane", map: pct(185, 461, true) },
   { name: "Poronin", slug: "poronin", point: "zakopane", map: pct(375, 413) },
   { name: "Biały Dunajec", slug: "bialy-dunajec", point: "zakopane", map: pct(335, 373) },
-  { name: "Bukowina Tatrzańska", slug: "bukowina-tatrzanska", point: "zakopane", map: pct(495, 434, true) },
+  { name: "Bukowina Tatrzańska", slug: "bukowina-tatrzanska", point: "zakopane", map: pct(455, 395) },
   { name: "Szaflary", slug: "szaflary", point: "zakopane", map: pct(355, 317) },
 ];
 

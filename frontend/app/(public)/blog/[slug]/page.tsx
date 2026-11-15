@@ -97,7 +97,7 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </section>
 
-      <section className="t-section t-section--tight" data-rail="Treść" id="tresc">
+      <section className="t-section t-section--tight" data-rail="Treść" id="tresc-wpisu">
         <div className="t-container t-post">
           <article className="t-post__main">
             {post.keyTakeaways?.length ? (

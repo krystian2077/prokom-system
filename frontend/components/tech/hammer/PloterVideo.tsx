@@ -24,7 +24,8 @@ export function PloterVideo() {
             height={PLOTER_VIDEO.height}
             alt="Ploter Hammer Glass VersaBlade X Pro i laminator UV"
             priority
-            sizes="(min-width: 1180px) 540px, 100vw"
+            // object-fit: cover in a 540:420 box → the image is ~1.41× wider than the box
+            sizes="(min-width: 1180px) 762px, 141vw"
             className="t-hg-video__media"
           />
           <button type="button" className="t-hg-video__play" onClick={() => setPlay(true)} aria-label="Odtwórz film: prezentacja plotera">

@@ -11,6 +11,7 @@ import { inCity, joinCities, saturdayHours } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { visitFaq, visitLead } from "@/lib/tech/visit-faq";
+import { polishText } from "@/lib/tech/typo";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -52,7 +53,7 @@ export default function PointsPage() {
             <OpeningStatus points={published} withName variant="pill" className="t-status--stage" skeletonCh={26} />
             <h1 className="t-pts-hero__h1">
               {two ? (
-                <>Dwa punkty serwisowe: {published[0].city} i&nbsp;{published[1].city}</>
+                <>Dwa punkty serwisowe: {polishText(published[0].city, true)} i&nbsp;{polishText(published[1].city, true)}</>
               ) : (
                 <>Punkt serwisowy {inCity(main.city)}</>
               )}
