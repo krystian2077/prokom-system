@@ -5,6 +5,7 @@ import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PrepTabs, PrintButton } from "@/components/tech/prep/PrepTabs";
+import { ModelGuide } from "@/components/tech/zgloszenie/ModelGuide";
 import { PREP_GUIDE_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { PREP_TABS } from "@/lib/tech/prep-guide";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
@@ -70,6 +71,13 @@ export default function PrepGuidePage() {
               {line.phoneDisplay}
             </a>
           </p>
+        </div>
+      </section>
+
+      {/* Target of "Jak sprawdzić model?" in /zgloszenie (HELPER_FALLBACK_HREF). */}
+      <section className="t-section t-section--tight" id="model" data-rail="Model">
+        <div className="t-container">
+          <ModelGuide />
         </div>
       </section>
 
