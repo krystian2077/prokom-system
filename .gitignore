@@ -104,3 +104,4 @@ frontend/tests/tech/.panel-test.local.json
 frontend/test-results/
 frontend/playwright-report/
 tmp/
+frontend/tests/tech/.client-test.local.json
