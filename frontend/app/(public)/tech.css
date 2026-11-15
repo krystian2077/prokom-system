@@ -1572,57 +1572,12 @@ html[data-tech-theme="dark"] .tech .t-axis { --done: #3e9b2a; }
 .tech .t-inq__done-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--okbg); color: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; }
 .tech .t-inq__done p { color: var(--ink2); max-width: 520px; }
 
-/* About page */
-.tech .t-about-hero { min-height: clamp(460px, 40vw, 578px); }
-.tech .t-about-hero__year { position: absolute; right: -30px; bottom: -0.2em; font-family: var(--t-font-head); font-stretch: 112%; font-weight: 900; font-size: clamp(160px, 26vw, 420px); line-height: 1; letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 2px rgba(240, 88, 74, 0.55); pointer-events: none; }
-.tech .t-about-hero__text { position: relative; max-width: 760px; box-sizing: border-box; padding: clamp(28px, 5vw, 64px) clamp(20px, 5vw, 72px) clamp(32px, 5vw, 64px); display: flex; flex-direction: column; gap: 22px; }
-/* phones: the outline year sits behind the buttons — keep it as a quiet texture there */
-@media (max-width: 767.98px) { .tech .t-about-hero__year, .tech .t-404__code { opacity: 0.4; } }
-.tech .t-about-hero__h1 { font-size: clamp(40px, 2.4vw + 28px, 60px) !important; line-height: 1.02 !important; letter-spacing: -0.035em !important; }
-.tech .t-about-hero__h1 span { color: #f0584a; }
-.tech .t-about-hero__lead { font-size: clamp(17px, 0.3vw + 15.5px, 19px); line-height: 1.55; color: #d6ccca; max-width: 560px; }
-.tech .t-about-hero .t-btnrow { margin-top: 10px; }
-.tech .t-about-card { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 1024px) {
-  .tech .t-about-card:not(.is-solo) { grid-template-columns: 520px minmax(0, 1fr); }
-  .tech .t-about-card.is-solo { grid-template-columns: minmax(0, 720px); }
-}
-.tech .t-about-card__vcard { padding: 26px 28px; border-radius: 28px; display: flex; flex-direction: column; box-shadow: var(--sh); }
-.tech .t-about-card__name { margin: 8px 0 12px !important; font-size: clamp(22px, 0.6vw + 18px, 26px) !important; }
+/* About page: styles in tech-about.css (premium pass). Business-card rows are shared with /offline. */
+@media (max-width: 767.98px) { .tech .t-404__code { opacity: 0.4; } }
 .tech .t-vkv { margin: 0; }
 .tech .t-vkv > div { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-top: 1px solid var(--bd); font-size: 15px; }
 .tech .t-vkv dt { color: var(--ink2); }
 .tech .t-vkv dd { margin: 0; text-align: right; font-weight: 800; overflow-wrap: anywhere; }
-.tech .t-about-card__ceidg { margin-top: 18px; font-size: 14.5px; font-weight: 800; color: var(--acct); }
-.tech .t-about-card__stats { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.tech .t-about-card__stats > :last-child:nth-child(odd) { grid-column: 1 / -1; }
-.tech .t-stat { min-height: 150px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; padding: 22px 24px; border-radius: 24px; background: var(--card); border: 1px solid var(--bd); }
-.tech .t-stat b { font-family: var(--t-font-head); font-stretch: 108%; font-weight: 800; font-size: clamp(38px, 2vw + 26px, 54px); line-height: 1; letter-spacing: -0.03em; color: var(--acct); }
-.tech .t-stat span { font-size: 14.5px; line-height: 1.45; font-weight: 700; color: var(--ink2); }
-.tech .t-rules { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 768px) { .tech .t-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1180px) { .tech .t-rules { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1180px) { .tech .t-rules--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-/* no holes in the last row (przegląd wizualny): 2 columns → a lone last card spans both; 3 columns on a
-   6-track grid → a last row of two cards shares the width, a lone card takes it all */
-@media (min-width: 768px) and (max-width: 1179.98px) { .tech .t-rules > :last-child:nth-child(odd) { grid-column: 1 / -1; } }
-@media (min-width: 1180px) {
-  .tech .t-rules:not(.t-rules--4) { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .tech .t-rules:not(.t-rules--4) > * { grid-column: span 2; }
-  .tech .t-rules:not(.t-rules--4) > :nth-last-child(2):nth-child(3n + 1), .tech .t-rules:not(.t-rules--4) > :last-child:nth-child(3n + 2) { grid-column: span 3; }
-  .tech .t-rules:not(.t-rules--4) > :last-child:nth-child(3n + 1) { grid-column: 1 / -1; }
-}
-.tech .t-rule { position: relative; min-height: 196px; box-sizing: border-box; padding: 26px; border-radius: 24px; background: var(--card); border: 1px solid var(--bd); display: flex; flex-direction: column; gap: 10px; overflow: hidden; transition: transform 0.25s var(--t-ease), border-color 0.25s; }
-.tech .t-rule:hover { transform: translateY(-5px); border-color: var(--softbd); }
-.tech .t-rule i { position: absolute; right: 18px; top: 6px; font-style: normal; font-family: var(--t-font-head); font-stretch: 108%; font-weight: 800; font-size: 76px; line-height: 1; color: var(--bg2); }
-.tech .t-rule h3 { position: relative; margin-top: 44px !important; font-size: 22px !important; }
-.tech .t-rule p { position: relative; font-size: 15px; line-height: 1.55; color: var(--ink2); }
-.tech .t-proof { margin-top: 28px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 768px) { .tech .t-proof { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.tech .t-proof__card { min-height: 160px; padding: 24px; display: flex; flex-direction: column; gap: 8px; }
-.tech .t-proof__card h3 { font-size: 21px !important; }
-.tech .t-proof__card p { font-size: 14.5px; line-height: 1.5; color: var(--ink2); }
-.tech .t-proof__more { margin-top: auto; font-size: 14px; font-weight: 800; color: var(--acct); }
 .tech .t-datasafety { padding: clamp(24px, 3vw, 40px); border-radius: 28px; background: var(--card); border: 1px solid var(--bd); display: grid; gap: 24px; }
 .tech .t-datasafety__head { display: flex; flex-direction: column; gap: 12px; }
 .tech .t-datasafety__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
@@ -1630,7 +1585,6 @@ html[data-tech-theme="dark"] .tech .t-axis { --done: #3e9b2a; }
 .tech .t-datasafety__list li { display: flex; gap: 12px; }
 .tech .t-datasafety__ico { width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; background: var(--okbg); color: var(--ok); display: flex; align-items: center; justify-content: center; }
 .tech .t-datasafety__list p { font-size: 14.5px; line-height: 1.5; color: var(--ink2); }
-@media (max-width: 767.98px) { .tech .t-about-card__ceidg, .tech .t-proof__more { display: inline-flex; align-items: center; min-height: 44px; } }
 .tech .t-status--stage.t-status--pill, .tech .t-pointcard .t-status--pill { white-space: normal; line-height: 1.3; max-width: 100%; }
 
 /* ---------- Shared: chips, tags, secondary buttons ---------- */
