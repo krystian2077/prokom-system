@@ -4,7 +4,9 @@ import { line, servicePoints, telHref } from "@/config/prokom";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
-import { CourierTeaser } from "@/components/tech/device/CourierTeaser";
+import { hubExtra } from "@/config/tresci/uslugi";
+import { CardGrid, Section } from "@/components/tech/content/Blocks";
+import { DeviceIntake, DeviceIntro, DeviceWarranty } from "@/components/tech/content/DeviceSections";
 import { RepairSteps } from "@/components/tech/device/RepairSteps";
 import { RepairLinks } from "@/components/tech/repair/RepairLinks";
 import { DeviceGlyph, IconArrow, IconPath } from "@/components/tech/icons";
@@ -55,11 +57,13 @@ const FAQ: FaqItem[] = [
   },
 ];
 
+const ALL_FAQ: FaqItem[] = [...FAQ, ...hubExtra.faq];
+
 export default function RepairsHubPage() {
   return (
     <div className="t-ui t-page t-dev">
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
-      <JsonLd data={faqJsonLd(FAQ)} />
+      <JsonLd data={faqJsonLd(ALL_FAQ)} />
 
       <SubHero
         crumbs={CRUMBS}
@@ -75,6 +79,8 @@ export default function RepairsHubPage() {
         rail="Naprawy"
         variant="hub"
       />
+
+      <DeviceIntro paragraphs={hubExtra.intro} title="Serwis elektroniki: jeden adres na telefon, laptop i konsolę" />
 
       <section className="t-section t-section--alt" id="urzadzenia" data-rail="Urządzenia">
         <div className="t-container">
@@ -125,13 +131,17 @@ export default function RepairsHubPage() {
               </Link>
             </li>
           </ul>
-          <CourierTeaser className="t-dev-courier" />
         </div>
       </section>
 
+      <Section id="od-czego-zaczac" rail="Od czego zacząć" eyebrow="Od czego zacząć" title="Trzy sposoby na zgłoszenie naprawy">
+        <CardGrid items={hubExtra.start} numbered />
+      </Section>
       <RepairLinks />
+      <DeviceIntake note={hubExtra.intake} points={visiblePoints()} />
 
       <RepairSteps title="Cztery kroki do sprawnego sprzętu" />
+      <DeviceWarranty text={hubExtra.warranty} />
 
       <section className="t-section" id="pytania" data-rail="Pytania">
         <div className="t-container t-faqsplit">
@@ -142,7 +152,7 @@ export default function RepairsHubPage() {
               Więcej odpowiedzi znajdziesz w <Link href="/faq" className="t-inline-link" data-t-inline="">najczęstszych pytaniach</Link>.
             </p>
           </div>
-          <Faq items={FAQ} />
+          <Faq items={ALL_FAQ} />
         </div>
       </section>
 
