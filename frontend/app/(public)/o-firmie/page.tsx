@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { company, line, servicePoints, telHref } from "@/config/prokom";
+import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
+import { AboutIconSvg, type AboutIcon } from "@/components/tech/about/about-icons";
+import { AboutRules, type AboutRule } from "@/components/tech/about/AboutRules";
+import { AboutSalon } from "@/components/tech/about/AboutSalon";
+import { Spotlight } from "@/components/tech/about/Spotlight";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
@@ -7,13 +12,15 @@ import { JsonLd } from "@/components/tech/JsonLd";
 import { LineCards } from "@/components/tech/LineCards";
 import { claim, type VisibleClaim } from "@/lib/tech/claims";
 import { CEIDG_URL, hoursLong, inCity, joinCities } from "@/lib/tech/point-format";
-import { publishedPoints } from "@/lib/tech/points";
+import { publishedPoints, type VisiblePoint } from "@/lib/tech/points";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
 const main = published[0];
+/** Only published points reach this page (no draft frame), as cards and hero pins. */
+const salons: VisiblePoint[] = published.map((p) => ({ ...p, draft: false }));
 
 export const metadata = pageMetadata({
   title: "O firmie — lokalny serwis z Podhala",
@@ -28,6 +35,8 @@ const CRUMBS: Crumb[] = [
 
 const draftCls = (c: VisibleClaim | null) => (c?.draft ? " t-draft" : "");
 
+type Stat = { key: string; icon: AboutIcon; b: string; s: string; c: VisibleClaim | null };
+
 export default function AboutPage() {
   const since = claim("aboutSince");
   const linesClaim = claim("aboutLines");
@@ -38,70 +47,73 @@ export default function AboutPage() {
   const ruleData = claim("ruleData");
 
   const stats = [
-    since ? { b: since.text, s: `Rok założenia firmy ${inCity(company.hq.city)}`, c: since } : null,
-    two ? { b: String(published.length), s: `Punkty serwisowe: ${joinCities(published)}`, c: null } : null,
-    foils ? { b: foils.text, s: "Rodzajów folii Hammer Glass wycinanych na miejscu", c: foils } : null,
-    linesClaim ? { b: linesClaim.text, s: "Linie PRO-KOM i marka PRO-KOM Gaming", c: linesClaim } : null,
-  ].filter((x): x is { b: string; s: string; c: VisibleClaim | null } => x !== null);
+    since ? { key: "since", icon: "clock", b: since.text, s: `Rok założenia firmy ${inCity(company.hq.city)}`, c: since } : null,
+    two ? { key: "points", icon: "pin", b: String(published.length), s: `Punkty serwisowe: ${joinCities(published)}`, c: null } : null,
+    foils ? { key: "foils", icon: "layers", b: foils.text, s: "Rodzajów folii Hammer Glass wycinanych na miejscu", c: foils } : null,
+    linesClaim ? { key: "lines", icon: "grid", b: linesClaim.text, s: "Linie PRO-KOM i marka PRO-KOM Gaming", c: linesClaim } : null,
+  ].filter((x): x is Stat => x !== null);
 
   const rules = [
-    { t: "Wycena przed naprawą", s: "Najpierw diagnoza, potem kwota. Naprawiamy dopiero wtedy, gdy się zgodzisz.", c: null },
-    { t: "Możesz zrezygnować", s: "Wycena Ci nie odpowiada? Odbierasz sprzęt bez konsekwencji.", c: null },
-    ruleParts ? { t: "Mówimy, jakie części", s: ruleParts.text, c: ruleParts } : null,
-    { t: "Gwarancja", s: "Na wykonaną usługę i na wymienione części.", c: null },
-    { t: "Status online", s: "Sprawdzasz go sam po numerze zgłoszenia i 4 ostatnich cyfrach telefonu.", c: null },
-    ruleData ? { t: "Twoje dane", s: ruleData.text, c: ruleData } : null,
-  ].filter((x): x is { t: string; s: string; c: VisibleClaim | null } => x !== null);
+    { key: "quote", icon: "quote", t: "Wycena przed naprawą", s: "Najpierw diagnoza, potem kwota. Naprawiamy dopiero wtedy, gdy się zgodzisz.", draft: false },
+    { key: "resign", icon: "undo", t: "Możesz zrezygnować", s: "Wycena Ci nie odpowiada? Odbierasz sprzęt bez konsekwencji.", draft: false },
+    ruleParts ? { key: "parts", icon: "chip", t: "Mówimy, jakie części", s: ruleParts.text, draft: ruleParts.draft } : null,
+    { key: "warranty", icon: "shield", t: "Gwarancja", s: "Na wykonaną usługę i na wymienione części.", draft: false },
+    { key: "status", icon: "pulse", t: "Status online", s: "Sprawdzasz go sam po numerze zgłoszenia i 4 ostatnich cyfrach telefonu.", draft: false },
+    ruleData ? { key: "data", icon: "lock", t: "Twoje dane", s: ruleData.text, draft: ruleData.draft } : null,
+  ].filter((x): x is AboutRule => x !== null);
 
   return (
-    <div className="t-ui t-page">
+    <div className="t-ui t-page t-about">
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
 
       <section className="t-section--hero" id="o-firmie" data-rail="O firmie">
         <div className="t-container">
-          <div className="t-stage t-about-hero">
-            {since ? (
-              <span className={`t-about-hero__year${draftCls(since)}`} aria-hidden="true">
-                {since.text}
-              </span>
-            ) : null}
-            <div className="t-about-hero__text">
+          <div className="t-ab-hero">
+            <div className="t-ab-hero__text">
               <Breadcrumbs items={CRUMBS} />
-              <span className="t-pill-stage">
+              <span className="t-ab-hero__eyebrow">
                 <i aria-hidden="true" />
                 <span>
                   {company.name} · {company.hq.city}
                   {since ? <span className={draftCls(since)}>, od {since.text}</span> : null}
                 </span>
               </span>
-              <h1 className="t-about-hero__h1">
+              <h1 className="t-ab-hero__h1">
                 Lokalny serwis.
                 <br />
                 <span className={draftCls(since)}>{since ? `Na Podhalu od ${since.text} roku.` : "Prosto z Podhala."}</span>
               </h1>
-              <p className="t-about-hero__lead">
+              <p className="t-ab-hero__lead">
                 {line.name} to serwisowa linia firmy PRO-KOM. Naprawiamy telefony, laptopy, tablety, komputery, konsole i drukarki{" "}
                 {two ? `w dwóch punktach: ${published.map((p) => inCity(p.city)).join(" i ")}` : inCity(main.city)}.
               </p>
-              <div className="t-btnrow">
-                <Link href={SUBMIT_HREF} className="t-pbtn t-pbtn--stage">
+              <div className="t-ab-hero__actions">
+                <Link href={SUBMIT_HREF} className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit">
                   Zgłoś naprawę
                 </Link>
-                <Link href={POINTS_HREF} className="t-pbtn t-pbtn--ghost-dark">
+                <Link href={POINTS_HREF} className="t-hbtn t-hbtn--ghost t-ab-hero__ghost">
                   {two ? "Punkty serwisowe" : "Punkt serwisowy"}
                 </Link>
               </div>
+            </div>
+            <div className="t-ab-hero__visual">
+              <AboutHeroArt year={since?.text ?? null} yearDraft={since?.draft} points={salons} />
             </div>
           </div>
         </div>
       </section>
 
       <section className="t-section t-section--tight" id="wizytowka" data-rail="Wizytówka">
-        <div className={`t-container t-about-card${stats.length ? "" : " is-solo"}`}>
-          <div className="t-card t-about-card__vcard">
-            <span className="t-eyebrow">Wizytówka</span>
-            <h2 className="t-about-card__name">{company.name}</h2>
-            <dl className="t-vkv">
+        <div className={`t-container t-ab-intro${stats.length ? "" : " is-solo"}`}>
+          <div className="t-card t-ab-vcard">
+            <div className="t-ab-vcard__head">
+              <span className="t-eyebrow">Wizytówka</span>
+              <span className="t-ab-vcard__seal" aria-hidden="true">
+                <AboutIconSvg icon="registry" size={20} />
+              </span>
+            </div>
+            <h2 className="t-ab-vcard__name">{company.name}</h2>
+            <dl className="t-ab-vkv">
               <div>
                 <dt>Adres</dt>
                 <dd>
@@ -126,26 +138,30 @@ export default function AboutPage() {
                 <dd>{hoursLong(main)}</dd>
               </div>
             </dl>
-            <a href={CEIDG_URL} target="_blank" rel="noopener noreferrer" className="t-about-card__ceidg">
+            <a href={CEIDG_URL} target="_blank" rel="noopener noreferrer" className="t-ab-vcard__ceidg">
               Dane sprawdzisz w CEIDG po numerze NIP ↗
             </a>
           </div>
           {stats.length ? (
-            <div className="t-about-card__stats">
+            <Spotlight className={`t-ab-stats t-ab-stats--${stats.length}`} data-t-stagger="">
               {stats.map((s) => (
-                <div key={s.s} className={`t-stat${draftCls(s.c)}`}>
+                <div key={s.key} className={`t-card t-ab-stat t-ab-stat--${s.key}${draftCls(s.c)}`} data-spot="">
+                  <span className="t-ab-stat__ico" aria-hidden="true">
+                    <AboutIconSvg icon={s.icon} size={20} />
+                  </span>
                   <b>{s.b}</b>
-                  <span>{s.s}</span>
+                  <span className="t-ab-stat__label">{s.s}</span>
+                  {s.key === "since" ? <span className="t-ab-stat__ticks" aria-hidden="true" /> : null}
                 </div>
               ))}
-            </div>
+            </Spotlight>
           ) : null}
         </div>
       </section>
 
-      <section className="t-section t-section--alt" id="zasady" data-rail="Zasady">
+      <section className="t-section t-section--alt t-ab-rules-sec" id="zasady" data-rail="Zasady">
         <div className="t-container">
-          <div className="t-sechead">
+          <div className="t-sechead t-ab-sechead">
             <div>
               <span className="t-eyebrow">Zasady</span>
               <h2 className="t-h2">Czego możesz od nas oczekiwać</h2>
@@ -154,15 +170,7 @@ export default function AboutPage() {
               {rules.length === 6 ? "Sześć rzeczy" : "Zasady"}, które obowiązują {two ? "w obu punktach" : "w punkcie"}, przy każdej naprawie.
             </p>
           </div>
-          <div className={`t-rules${rules.length === 4 ? " t-rules--4" : ""}`}>
-            {rules.map((r, i) => (
-              <div key={r.t} className={`t-rule${draftCls(r.c)}`}>
-                <i aria-hidden="true">{String(i + 1).padStart(2, "0")}</i>
-                <h3>{r.t}</h3>
-                <p>{r.s}</p>
-              </div>
-            ))}
-          </div>
+          <AboutRules rules={rules} />
         </div>
       </section>
 
@@ -173,25 +181,53 @@ export default function AboutPage() {
       <section className="t-section t-section--tight" id="sprawdz" data-rail="Sprawdź nas">
         <div className="t-container">
           <h2 className="t-h2 t-h2--sm">Nie musisz wierzyć nam na słowo</h2>
-          <div className="t-proof">
-            <a href={CEIDG_URL} target="_blank" rel="noopener noreferrer" className="t-card t-proof__card">
-              <h3>Rejestr CEIDG</h3>
-              <p>Firmę sprawdzisz po numerze NIP {company.nip}.</p>
-              <span className="t-proof__more">Otwórz CEIDG ↗</span>
-            </a>
-            {rating && profiles ? (
-              <a href={profiles.text} target="_blank" rel="noopener noreferrer" className={`t-card t-proof__card${draftCls(rating)}`}>
-                <h3>Opinie Google</h3>
-                <p>{rating.text}</p>
-                <span className="t-proof__more">{two ? "Wizytówki obu punktów ↗" : "Wizytówka punktu ↗"}</span>
+          <Spotlight className={`t-ab-proof${rating && profiles ? " has-rating" : ""}`}>
+            <div className="t-ab-proof__side">
+              <a href={CEIDG_URL} target="_blank" rel="noopener noreferrer" className="t-card t-ab-proof__card" data-spot="">
+                <span className="t-ab-proof__ico" aria-hidden="true">
+                  <AboutIconSvg icon="registry" size={22} />
+                </span>
+                <h3>Rejestr CEIDG</h3>
+                <p>Firmę sprawdzisz po numerze NIP {company.nip}.</p>
+                <span className="t-ab-doc" aria-hidden="true">
+                  <span className="t-ab-doc__sheet">
+                    <b />
+                    <b style={{ width: "88%" }} />
+                    <b style={{ width: "72%" }} />
+                    <span className="t-ab-doc__nip">NIP {company.nip}</span>
+                    <span className="t-ab-doc__seal">
+                      <AboutIconSvg icon="check" size={22} strokeWidth={2.8} />
+                    </span>
+                  </span>
+                </span>
+                <span className="t-ab-proof__more">Otwórz CEIDG ↗</span>
               </a>
-            ) : null}
-            <Link href={POINTS_HREF} className="t-card t-proof__card">
-              <h3>Przyjdź i zobacz</h3>
-              <p>{two ? "Dwa punkty na Podhalu. Bez umawiania, w godzinach otwarcia." : `Punkt ${inCity(main.city)}. Bez umawiania, w godzinach otwarcia.`}</p>
-              <span className="t-proof__more">Dojazd i godziny →</span>
-            </Link>
-          </div>
+              {rating && profiles ? (
+                <a href={profiles.text} target="_blank" rel="noopener noreferrer" className={`t-card t-ab-proof__card${draftCls(rating)}`} data-spot="">
+                  <span className="t-ab-proof__ico" aria-hidden="true">
+                    <AboutIconSvg icon="star" size={22} />
+                  </span>
+                  <h3>Opinie Google</h3>
+                  <p>{rating.text}</p>
+                  <span className="t-ab-proof__more">{two ? "Wizytówki obu punktów ↗" : "Wizytówka punktu ↗"}</span>
+                </a>
+              ) : null}
+            </div>
+            <div className="t-ab-visit">
+              <div className="t-ab-visit__head">
+                <h3>Przyjdź i zobacz</h3>
+                <p>{two ? "Dwa punkty na Podhalu. Bez umawiania, w godzinach otwarcia." : `Punkt ${inCity(main.city)}. Bez umawiania, w godzinach otwarcia.`}</p>
+                <Link href={POINTS_HREF} className="t-ab-proof__more t-ab-visit__more">
+                  Dojazd i godziny →
+                </Link>
+              </div>
+              <div className={`t-ab-visit__grid${two ? "" : " is-solo"}`}>
+                {salons.map((p) => (
+                  <AboutSalon key={p.key} point={p} />
+                ))}
+              </div>
+            </div>
+          </Spotlight>
         </div>
       </section>
 
