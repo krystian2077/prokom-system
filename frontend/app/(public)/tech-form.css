@@ -11,7 +11,8 @@
   position: relative; isolation: isolate; padding: 6px; border-radius: 20px; background: var(--bg2);
   box-shadow: inset 0 0 0 1px var(--hair);
 }
-.tech .t-zgl .t-stepper .t-steps { position: relative; z-index: 1; padding: 0; background: transparent; border-radius: 0; }
+/* the list stays unpositioned: the pill is measured against .t-stepper (usePill offsetLeft/Top) */
+.tech .t-zgl .t-stepper .t-steps { padding: 0; background: transparent; border-radius: 0; }
 .tech .t-zgl .t-stepper__pill {
   position: absolute; z-index: 0; left: 0; top: 0; width: var(--pill-w, 0px); height: var(--pill-h, 0px);
   transform: translate(var(--pill-x, 0px), var(--pill-y, 0px)); border-radius: 14px; background: var(--card); box-shadow: var(--sh-1);
@@ -25,7 +26,7 @@
   transition: transform var(--m-scene) var(--m-ease-emph);
 }
 .tech .t-zgl .t-steps__item.is-on button { background: transparent; box-shadow: none; }
-.tech .t-zgl .t-steps button { position: relative; border-radius: 14px; transition: color var(--m-small) var(--m-ease-out); }
+.tech .t-zgl .t-steps button { position: relative; z-index: 1; border-radius: 14px; transition: color var(--m-small) var(--m-ease-out); }
 .tech .t-zgl .t-steps button:not(:disabled):hover { color: var(--ink); }
 .tech .t-zgl .t-steps button:focus-visible { outline: 3px solid var(--acc); outline-offset: -3px; }
 .tech .t-zgl .t-steps__n { transition: background-color var(--m-small), color var(--m-small), transform var(--m-panel) var(--m-ease-spring); }
@@ -271,7 +272,7 @@
 .tech .t-help--sheet[data-state="closing"] { animation: t-zgl-sheet-out var(--m-small) var(--m-ease-in-out) both; }
 .tech .t-help__grab { align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--bd2); margin-bottom: 2px; }
 .tech .t-help__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.tech .t-help__head h3 { margin: 0; font-family: var(--t-font-head); font-stretch: 108%; font-size: 18px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
+.tech .t-help__head h3 { color: var(--ink); margin: 0; font-family: var(--t-font-head); font-stretch: 108%; font-size: 18px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
 .tech .t-help__close {
   width: 40px; height: 40px; flex-shrink: 0; margin: -6px -6px -6px 0; border: 0; border-radius: 12px; background: var(--bg2); color: var(--ink);
   display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color var(--m-small), transform var(--m-micro);
@@ -380,8 +381,12 @@
   .tech .t-zgl .t-zgl__aside { padding-top: 0; margin-top: 146px; }
 }
 @media (max-width: 1179.98px) {
-  .tech .t-zgl .t-stepper .t-steps { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .tech .t-zgl .t-steps button { padding: 0 8px; gap: 7px; }
+  /* narrow column: other steps show the number only, the current one its full title */
+  .tech .t-zgl .t-stepper .t-steps { display: flex; }
+  .tech .t-zgl .t-stepper .t-steps__item { flex: 0 0 auto; }
+  .tech .t-zgl .t-stepper .t-steps__item.is-on { flex: 1 1 auto; }
+  .tech .t-zgl .t-stepper .t-steps__item:not(.is-on) .t-steps__t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .tech .t-zgl .t-steps button { padding: 0 12px; }
 }
 @media (max-width: 767.98px) {
   .tech .t-zgl .t-stepper { display: none; }
@@ -394,6 +399,8 @@
   .tech .t-zgl .t-seg .t-seg__opt { min-height: 46px; font-size: 14px; }
   .tech .t-zgl .t-quick__chip { min-height: 44px; }
   .tech .t-help__trigger { min-height: 44px; margin: -10px 0 -10px -8px; }
+  .tech .t-help--sheet .t-help__path { flex-direction: column; align-items: flex-start; row-gap: 6px; }
+  .tech .t-help--sheet .t-help__path li + li::before { content: none; }
   .tech .t-help__tabs > button { min-height: 44px; }
   .tech .t-help__variant { min-height: 44px; }
   .tech .t-help__use { min-height: 44px; }
