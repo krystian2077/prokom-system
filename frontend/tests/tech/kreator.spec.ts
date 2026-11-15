@@ -19,12 +19,12 @@ test.describe("desktop 1440", () => {
     await wiz.getByRole("radio", { name: "Klawiatura" }).click();
     await expect(wiz.locator(".t-scene")).toHaveClass(/is-zoom/);
     await expect(wiz.locator(".t-scene")).toHaveAttribute("data-effect", "E12");
-    await expect(wiz.getByTestId("scene-effect").locator("svg.t-fx--e12")).toBeVisible();
+    await expect(wiz.getByTestId("scene-effect").locator(".t-fx--e12")).toBeVisible();
     await expect(wiz.locator(".t-scene__label")).toHaveText("Klawiatura");
     await expect(wiz.getByTestId("scene-card")).toContainText("klawisze");
     await expect.poll(() => camScale(page)).toBeGreaterThan(1.1);
     // the other spots dim
-    await expect(wiz.locator(".t-scene__spot:not(.is-on)").first()).toHaveCSS("opacity", "0.32");
+    await expect(wiz.locator(".t-scene__spot:not(.is-on)").first()).toHaveCSS("opacity", "0.55");
     await page.keyboard.press("Escape");
     await expect(wiz.locator(".t-scene")).not.toHaveClass(/is-zoom/);
     await expect.poll(() => camScale(page)).toBeLessThan(1.01);

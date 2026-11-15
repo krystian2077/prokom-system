@@ -227,7 +227,7 @@ const printer = build(PRINTER_CROP, PRINTER_FAULTS, {
   "Paski na wydruku": { e: "E15", v: "streaks", r: [195, 258, 290, 82] },
   "Zacina papier": { e: "E15", v: "jam", r: [195, 258, 290, 82], s: [344, 296] },
   "Tusz i głowica": { e: "E15", v: "ink", r: [70, 270, 116, 60], s: [128, 300] },
-  Skaner: { e: "E4", v: "scan", r: [126, 74, 456, 76], s: [380, 112], radius: 4 },
+  Skaner: { e: "E4", v: "scan", r: [128, 76, 448, 72], s: [380, 112], radius: 4 },
   "Brak Wi-Fi": { e: "E16", v: "wifi", r: [50, 72, 542, 270], clip: PRINTER_BODY },
   "Błąd na panelu": { e: "E14", v: "panel", r: [70, 104, 66, 46], s: [100, 124] },
   "Nie włącza się": { e: "E8", v: "body", r: [50, 72, 542, 270], clip: PRINTER_BODY },
