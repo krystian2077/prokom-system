@@ -1,4 +1,5 @@
 import { claim } from "@/lib/tech/claims";
+import { Timeline } from "../content/Blocks";
 
 /**
  * "Cztery kroki" on a dark band (design T.Usluga steps). The same-day diagnosis line is
@@ -21,17 +22,7 @@ export function RepairSteps({ eyebrow = "Jak to działa", title, id = "jak-to-dz
             <h2 className="t-h2">{title}</h2>
           </div>
         </div>
-        <ol className="t-dsteps__grid">
-          {steps.map((s, i) => (
-            <li key={s.t} className={`t-dsteps__item${s.draft ? " t-draft" : ""}`}>
-              <span className={`t-dsteps__n${i === 0 ? " is-first" : ""}`} aria-hidden="true">
-                {i + 1}
-              </span>
-              <h3 className="t-h3">{s.t}</h3>
-              <p>{s.s}</p>
-            </li>
-          ))}
-        </ol>
+        <Timeline steps={steps.map((s, i) => ({ ...s, lead: i === 0 }))} tone="stage" horizontal />
       </div>
     </section>
   );

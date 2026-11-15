@@ -68,7 +68,7 @@ export default function PhoneServicePage() {
   const locals = visibleLocalPages();
   const pub = new Set(publishedLocalPages().map((p) => p.slug));
   return (
-    <div className="t-ui t-page">
+    <div className="t-ui t-page t-dev t-dev--phone">
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(ALL_FAQ)} />
       <JsonLd
@@ -119,7 +119,7 @@ export default function PhoneServicePage() {
       <RepairLinks device="phone" title="Konkretne naprawy telefonów" />
       <PhoneBrandsSection title="Jakie telefony naprawiamy" />
       <DeviceIntake note={EXTRA.intake} points={points} what="telefon" />
-      <PhoneStepsSection eyebrow="Jak to działa" cityName={null} />
+      <PhoneStepsSection eyebrow="Jak to działa" cityName={null} timeline />
       <DeviceWarranty text={EXTRA.warranty} />
       <DataSafety />
       <HammerTeaser what="do Twojego telefonu" />

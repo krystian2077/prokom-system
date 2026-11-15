@@ -114,7 +114,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
             </div>
             <p className="t-lead">{page.kindsLead}</p>
           </div>
-          <ul className={`t-kinds t-kinds--${Math.min(page.kinds.length, 6)}`}>
+          <ul className={`t-kinds t-kinds--${Math.min(page.kinds.length, 6)}`} data-t-stagger="">
             {page.kinds.map((k) => (
               <li key={k.n} className="t-card t-kinds__item">
                 <span className="t-h3">{k.n}</span>
