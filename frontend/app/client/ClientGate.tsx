@@ -6,9 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PanelNav } from "@/components/panel/PanelNav";
 import { UnverifiedBanner } from "@/components/panel/UnverifiedBanner";
 import { useClientProfile } from "@/hooks/useClientProfile";
-import { PublicNavbar } from "@/components/layout/PublicNavbar";
-import { PublicFooter } from "@/components/layout/PublicFooter";
 import { useClientPanelTheme } from "@/contexts/ClientPanelThemeContext";
+import { AccountStatus } from "@/components/tech/account/AccountStatus";
 
 export function ClientGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -70,6 +69,11 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
     router,
   ]);
 
+  // Sign-in screens render inside the Tech shell (ClientFrame) — Tech look for every state.
+  if (loading && isPublicClientPage) {
+    return <AccountStatus>Ładowanie…</AccountStatus>;
+  }
+
   if (loading) {
     return (
       <div className={`${panelClass} flex min-h-[40vh] items-center justify-center`}>
@@ -82,13 +86,7 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
     isPublicClientPage && (!token || (user != null && user.role !== "client"));
 
   if (showPublicClientAuthShell) {
-    return (
-      <>
-        <PublicNavbar />
-        <main className="min-h-[calc(100vh-8rem)]">{children}</main>
-        <PublicFooter />
-      </>
-    );
+    return <>{children}</>;
   }
 
   if (!token) {
@@ -96,11 +94,7 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
   }
 
   if (user?.role === "client" && isClientAuthFunnelPage) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <p className="text-prokom-gray">Przekierowanie…</p>
-      </div>
-    );
+    return <AccountStatus>Przekierowanie…</AccountStatus>;
   }
 
   if (user?.role === "client") {
@@ -112,6 +106,10 @@ export function ClientGate({ children }: { children: React.ReactNode }) {
         <main className="relative z-10 min-h-[calc(100dvh-68px)] overflow-x-hidden pb-[calc(env(safe-area-inset-bottom,0px)+100px)] sm:pb-8">{children}</main>
       </div>
     );
+  }
+
+  if (isPublicClientPage) {
+    return <AccountStatus>Przekierowanie…</AccountStatus>;
   }
 
   return (
