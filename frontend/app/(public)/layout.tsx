@@ -57,9 +57,16 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: defaultTitle, description },
   // PWA only on public pages (SPEC §12.2): manifest, iOS meta, apple-touch-icon.
+  // Favicon and icons from the PRO-KOM TECH brand book (03_ikony/tech); panels keep app/icon.svg.
   manifest: MANIFEST_PATH,
   appleWebApp: { capable: true, title: line.name, statusBarStyle: "black-translucent" },
-  icons: { apple: [{ url: "/tech/pwa/apple-touch-icon.png", sizes: "180x180" }] },
+  icons: {
+    icon: [
+      { url: "/tech/pwa/favicon.svg", type: "image/svg+xml" },
+      { url: "/tech/pwa/favicon.ico", sizes: "16x16 32x32 48x48" },
+    ],
+    apple: [{ url: "/tech/pwa/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export const viewport: Viewport = {

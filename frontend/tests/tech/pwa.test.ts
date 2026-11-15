@@ -27,6 +27,7 @@ describe("PWA — manifest", () => {
     expect(m.icons.map((i) => `${i.sizes}:${i.purpose}`)).toEqual(["192x192:any", "512x512:any", "512x512:maskable"]);
     for (const i of m.icons) expect(fs.existsSync(path.join(FRONTEND, "public", i.src))).toBe(true);
     expect(fs.existsSync(path.join(FRONTEND, "public/tech/pwa/apple-touch-icon.png"))).toBe(true);
+    for (const f of ["favicon.svg", "favicon.ico"]) expect(fs.existsSync(path.join(FRONTEND, "public/tech/pwa", f)), f).toBe(true);
   });
   it("shortcuts: Zgłoś naprawę, Status naprawy, Punkty", () => {
     expect(m.shortcuts.map((s) => [s.name, s.url.split("?")[0]])).toEqual([

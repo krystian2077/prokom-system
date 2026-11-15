@@ -26,6 +26,7 @@
   --capbg: rgba(255, 255, 255, 0.8);
   --capbd: rgba(18, 22, 19, 0.09);
   --logo-acc: #d13a2e;
+  --logo-ink: #121613;
   --sh: 0 1px 2px rgba(0, 0, 0, 0.05), 0 22px 44px -30px rgba(18, 22, 19, 0.3);
   --cap-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
@@ -75,6 +76,7 @@ html[data-tech-theme="dark"] .tech {
   --capbg: rgba(36, 27, 26, 0.8);
   --capbd: rgba(255, 255, 255, 0.1);
   --logo-acc: #e2483a;
+  --logo-ink: #ffffff;
   --sh: 0 1px 2px rgba(0, 0, 0, 0.3), 0 22px 44px -30px rgba(0, 0, 0, 0.7);
   --cap-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --dot-open: #7bd36a;
@@ -232,20 +234,13 @@ html[data-tech-theme="dark"] .tech {
 .tech .t-label { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink2); }
 
 /* ---------- Logo ---------- */
+/* Official mark (components/tech/Logo.tsx, inline SVG 835.73 × 167). Height = 1.3 × --l-size, width from the
+   viewBox ratio (explicit, so flex parents that stretch do not widen the box). */
 .tech .t-logo {
-  display: inline-flex; flex-direction: column; gap: var(--l-gap);
-  font-family: var(--t-font-head); color: var(--ink); line-height: 1;
-  --l-acc: var(--logo-acc);
+  display: block; flex-shrink: 0; height: calc(var(--l-size) * 1.3); width: calc(var(--l-size) * 1.3 * 5.0044); overflow: visible;
+  --l-ink: var(--logo-ink); --l-acc: var(--logo-acc);
 }
-.tech .t-logo--dark { color: #ffffff; --l-acc: #e2483a; }
-.tech .t-logo__word {
-  display: flex; align-items: center; font-stretch: 118%; font-weight: 800;
-  font-size: var(--l-size); line-height: 0.78; letter-spacing: -0.01em; white-space: nowrap;
-}
-.tech .t-logo__dash { display: inline-block; width: var(--l-dash-w); height: var(--l-dash-h); margin: 0 var(--l-dash-m); border-radius: 1px; background: var(--l-acc); }
-.tech .t-logo__line { display: flex; align-items: center; gap: var(--l-bar-gap); }
-.tech .t-logo__bar { flex-grow: 1; height: var(--l-bar-h); border-radius: 1px; background: var(--l-acc); }
-.tech .t-logo__label { font-stretch: 112%; font-weight: 800; font-size: var(--l-label); letter-spacing: 0.3em; margin-right: -0.3em; line-height: 1; }
+.tech .t-logo--dark { --l-ink: #ffffff; --l-acc: #e2483a; }
 
 /* ---------- Opening status ---------- */
 .tech .t-status { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; white-space: nowrap; }
@@ -314,7 +309,7 @@ html[data-tech-theme="dark"] .tech {
   -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px);
 }
 .tech .t-capsule__logo { display: flex; align-items: center; min-height: 44px; flex-shrink: 0; }
-.tech .t-capsule__logo .t-logo { --l-size: 21px !important; --l-gap: 5px !important; --l-dash-w: 8px !important; --l-dash-h: 3px !important; --l-dash-m: 2px !important; --l-bar-h: 2px !important; --l-bar-gap: 5px !important; --l-label: 8px !important; }
+.tech .t-capsule__logo .t-logo { --l-size: 21px !important; }
 .tech .t-capsule__nav, .tech .t-capsule__account, .tech .t-capsule__theme { display: none; }
 .tech .t-capsule__actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .tech .t-capsule .t-cta { height: 44px; padding: 0 15px; border-radius: 13px; font-size: 14px; box-shadow: none; }
@@ -325,7 +320,7 @@ html[data-tech-theme="dark"] .tech {
 @media (min-width: 1024px) {
   .tech .t-capwrap { position: relative; padding-top: 4px; transform: none !important; }
   .tech .t-capsule { height: 72px; padding: 0 12px 0 26px; border-radius: 22px; box-shadow: var(--cap-inset), var(--sh); }
-  .tech .t-capsule__logo .t-logo { --l-size: 28px !important; --l-gap: 7px !important; --l-dash-w: 11px !important; --l-dash-h: 4px !important; --l-dash-m: 3px !important; --l-bar-h: 3px !important; --l-bar-gap: 6px !important; --l-label: 10px !important; }
+  .tech .t-capsule__logo .t-logo { --l-size: 28px !important; }
   .tech .t-capsule__nav { display: flex; align-items: center; gap: 2px; }
   .tech .t-capsule__account { display: inline-flex; }
   .tech .t-capsule__theme { display: inline-flex; }
@@ -348,7 +343,7 @@ html[data-tech-theme="dark"] .tech {
   .tech .t-capsule .t-cta__short { display: inline; }
 }
 @media (min-width: 1024px) and (max-width: 1099.98px) {
-  .tech .t-capsule__logo .t-logo { --l-size: 24px !important; --l-dash-w: 10px !important; --l-label: 9px !important; }
+  .tech .t-capsule__logo .t-logo { --l-size: 24px !important; }
 }
 
 .tech .t-navitem { position: relative; }
