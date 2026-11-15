@@ -559,7 +559,6 @@ export function RepairForm() {
         <label className="t-check" data-field="consent" id={fieldId("consent")}>
           <input type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} {...aria("consent", errors)} />
           <span>
-            {/* TODO(krystian): consent wording to accept (lawyer / privacy policy, TD5). */}
             Akceptuję <Link href="/regulamin">regulamin</Link> i <Link href="/polityka-prywatnosci">politykę prywatności</Link>. Dane podaję, żeby serwis mógł przyjąć i obsłużyć zgłoszenie. *
           </span>
         </label>

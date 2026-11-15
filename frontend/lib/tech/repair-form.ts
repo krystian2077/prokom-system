@@ -76,8 +76,7 @@ export function chosenPoint(f: Pick<RepairFormState, "dropoff" | "returnMethod" 
 }
 
 /**
- * "Before you come" (SPEC §12.3, 4 most important points per device).
- * TODO(krystian): each step to be checked with the service before publishing (SPEC §12.3).
+ * "Before you come" (SPEC §12.3, 4 most important points per device). Accepted on 15.11.2026.
  */
 export function prepChecklist(category: DeviceCategory | null): string[] {
   switch (category) {

@@ -2,9 +2,7 @@
  * Blog taxonomy (docs/tech/SPEC.md §12.11): 4 public categories on top of lib/blog-posts.ts.
  * Post content is never edited — this layer maps old categories to new ones, replaces
  * service links to removed pages (/akcesoria, /oferta) at render time and holds the
- * category intros.
- *
- * TODO(krystian): accept the intros and the post assignment (SPEC §10).
+ * category intros. Intros and post assignment accepted on 15.11.2026.
  */
 import { servicePoints } from "@/config/prokom";
 import { BLOG_POSTS, type BlogPost } from "@/lib/blog-posts";

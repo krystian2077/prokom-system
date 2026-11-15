@@ -4,9 +4,8 @@ import { PageIconSvg } from "./page-icons";
 
 /**
  * „Twoje dane są bezpieczne” (SPEC §12.9). The text must match what the service really
- * does with data, so it stays hidden until the boss/service accepts it (SPEC §10).
- * TODO(krystian): accept the four points below with the service, then flip DATA_SAFETY_APPROVED (lib/tech/content-flags.ts).
- * On staging (NEXT_PUBLIC_TECH_DRAFT=1) the draft shows in the "do uzupełnienia" frame.
+ * does with data. The four points below were accepted on 15.11.2026 (DATA_SAFETY_APPROVED in
+ * lib/tech/content-flags.ts); if the flag is ever set back to false, the block hides in production.
  */
 const ITEMS = [
   { t: "Dostęp tylko do testu", s: "Kod blokady służy wyłącznie do sprawdzenia sprzętu po naprawie." },

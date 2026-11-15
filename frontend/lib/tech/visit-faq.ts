@@ -1,7 +1,7 @@
 /**
  * "Pytania o wizytę w punkcie" (design #punkty-serwisowe, #kontakt). Only question 01 has
- * an answer in the design; the others are written from SPEC §12.3 and KONTRAKT §2.
- * TODO(krystian): accept answers 02–05 with the service (list in the TD4 PR description).
+ * an answer in the design; the others are written from SPEC §12.3 and KONTRAKT §2
+ * (answers accepted on 15.11.2026).
  * Questions depend on data: parking only when a point has `parkingNote`, the other point
  * only when two points are published.
  */

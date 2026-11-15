@@ -44,7 +44,7 @@ test.describe("desktop 1440", () => {
     await page.goto("/o-firmie");
     await expect(page.locator("main")).toContainText("Na Podhalu od 2004 roku.");
     await expect(page.locator("main").getByText("4 + 1")).toHaveCount(0);
-    await expect(page.getByText("Twoje dane są bezpieczne")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Twoje dane są bezpieczne" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Wycena przed naprawą" })).toBeVisible();
   });
 

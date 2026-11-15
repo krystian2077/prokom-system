@@ -106,9 +106,13 @@ describe("unconfirmed numbers on 'O firmie' (SPEC §10)", () => {
     expect(claim("aboutSince", false)).toEqual({ text: "2004", draft: false });
     expect(claim("sinceYear", false)).toEqual({ text: "2004", draft: false });
   });
-  it("DataSafety hidden until the content is accepted", () => {
-    expect(DATA_SAFETY_APPROVED).toBe(false);
-    expect(showFlagged(DATA_SAFETY_APPROVED, false)).toBe(false);
-    expect(showFlagged(DATA_SAFETY_APPROVED, true)).toBe(true);
+  it("flagged content: hidden in production until accepted, draft on staging", () => {
+    expect(showFlagged(false, false)).toBe(false);
+    expect(showFlagged(false, true)).toBe(true);
+    expect(showFlagged(true, false)).toBe(true);
+  });
+  it("DataSafety accepted on 15.11: shown in production", () => {
+    expect(DATA_SAFETY_APPROVED).toBe(true);
+    expect(showFlagged(DATA_SAFETY_APPROVED, false)).toBe(true);
   });
 });
