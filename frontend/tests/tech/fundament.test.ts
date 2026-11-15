@@ -103,10 +103,11 @@ describe("theme isolation", () => {
 
   const publicCss = fs.readdirSync(path.join(FRONTEND, "app/(public)")).filter((f) => /^tech.*\.css$/.test(f));
 
-  it("public CSS: tech.css plus the TP layers, each imported by the public layout", () => {
+  it("public CSS: tech.css plus the TP layers, each imported by a public layout", () => {
     expect(publicCss).toEqual(expect.arrayContaining(["tech.css", "tech-theme.css", "tech-motion.css"]));
     const layout = read("app/(public)/layout.tsx");
-    for (const f of publicCss) expect(layout, f).toContain(`import "./${f}";`);
+    const lab = fs.existsSync(path.join(FRONTEND, "app/(public)/lab/layout.tsx")) ? read("app/(public)/lab/layout.tsx") : "";
+    for (const f of publicCss) expect(layout.includes(`import "./${f}";`) || lab.includes(`import "../${f}";`), f).toBe(true);
   });
 
   it.each(publicCss)("%s: every rule is scoped under .tech, no data-theme", (file) => {

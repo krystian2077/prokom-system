@@ -1,0 +1,29 @@
+/*
+ * PRO-KOM Tech — /lab pages (TP PR 4, docs/tech/PREMIUM.md §6). Staging only.
+ * Every selector under `.tech`.
+ */
+.tech .t-lab__wrap { display: flex; flex-direction: column; gap: 18px; }
+.tech .t-lab__cards { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.tech .t-lab__card { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; }
+.tech .t-lab__card b { font-family: var(--t-font-head); font-stretch: 108%; font-size: 18px; }
+.tech .t-lab__card span { font-size: 14px; color: var(--ink2); line-height: 1.5; }
+.tech .t-lab__bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; padding: 16px; border-radius: 20px; background: var(--bg2); position: sticky; top: 92px; z-index: 20; }
+.tech .t-lab__ctl { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+.tech .t-lab__select { height: 44px; padding: 0 12px; border-radius: 12px; border: 1.5px solid var(--bd2); background: var(--card); color: var(--ink); font: 700 14px var(--t-font-body); }
+.tech .t-lab__all { height: 44px; padding: 0 16px; font-size: 14px; }
+.tech .t-lab__group { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.tech .t-lab__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(var(--lab-w, 320px), 1fr)); }
+.tech .t-lab__item { display: flex; flex-direction: column; gap: 10px; padding: 10px; border-radius: 24px; background: var(--card); border: 1px solid var(--bd); }
+.tech .t-lab__item .t-scene { min-height: 0; padding: 30px 18px; border-radius: 18px; --fw: calc(var(--lab-w, 320px) - 60px); --fh: calc(var(--lab-w, 320px) - 30px); }
+.tech .t-lab__meta { display: flex; flex-direction: column; gap: 4px; padding: 0 6px 6px; }
+.tech .t-lab__meta b { font-size: 15px; }
+.tech .t-lab__meta span { font-size: 12.5px; font-weight: 700; color: var(--acct); }
+.tech .t-lab__meta small { font-size: 12.5px; line-height: 1.45; color: var(--ink2); }
+.tech .t-lab__play { align-self: flex-start; margin-top: 6px; min-height: 40px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--bd2); background: var(--bg2); color: var(--ink); font: 800 13px var(--t-font-body); cursor: pointer; }
+.tech .t-lab__actions { display: flex; flex-direction: column; gap: 14px; }
+.tech .t-lab__row { display: flex; flex-wrap: wrap; gap: 10px; }
+.tech .t-lab__row .t-hbtn { height: 48px; padding: 0 18px; font-size: 15px; }
+.tech .t-lab__tall { min-height: 140vh; padding-top: 40px; color: var(--ink3); font-weight: 700; }
+.tech .t-lab__motion { display: flex; flex-direction: column; gap: 16px; }
+.tech .t-lab__motion .t-h3 { margin-top: 18px; }
+.tech .t-lab__skel { display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 18px; background: var(--card); border: 1px solid var(--bd); }
