@@ -31,8 +31,9 @@ export function polishText(text: string, noBreakHyphens = false): string {
   return noBreakHyphens ? out.replace(HYPHEN, `$1-${WJ}`) : out;
 }
 
-/** Skipped: form fields, code, editable text and the repair wizard (its own session). */
-export const TYPO_SKIP = "input, textarea, select, option, code, pre, script, style, [contenteditable], [data-no-typo], .t-wiz, .t-wizflow";
+/** Skipped: form fields, code, editable text, the live opening status (re-rendered every minute,
+ * matched literally by the hours tests) and the repair wizard (its own session). */
+export const TYPO_SKIP = "input, textarea, select, option, code, pre, script, style, [contenteditable], [data-no-typo], .t-status, .t-wiz, .t-wizflow";
 /** Where hyphenated words must not break: headings and short display lines. */
 export const NOBREAK_IN = "h1, h2, h3, .t-lead, .t-eyb, .t-hero__sub";
 
