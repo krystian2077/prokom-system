@@ -920,13 +920,19 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
 .tech .t-devices__phone li svg { color: #f29185; flex-shrink: 0; }
 .tech .t-devices__phone .t-sbtn { margin-top: auto; align-self: flex-start; position: relative; z-index: 2; }
 .tech .t-devices__glow { position: absolute; right: 150px; bottom: -40px; width: 300px; height: 300px; border-radius: 50%; background: #e2483a; opacity: 0.16; }
-.tech .t-devices__ph { position: absolute; height: auto; }
-.tech .t-devices__ph--2 { right: -20px; bottom: -60px; width: 150px; transform: rotate(8deg); }
-.tech .t-devices__ph--1 { right: 80px; bottom: -80px; width: 140px; transform: rotate(-6deg); }
+/* device illustrations (wizard art, StaticArt): one angle, light and scale; lift on hover */
+/* phones: under the button, centred, cropped by the card's bottom edge on purpose */
+.tech .t-devices__phone { padding-bottom: 190px; }
+.tech .t-devices__phart { position: absolute; left: 50%; bottom: -74px; width: 210px; height: 250px; transform: translateX(-50%) rotate(-4deg); transition: transform var(--m-panel) var(--m-ease-out); }
+.tech .t-devices__phone:hover .t-devices__phart { transform: translateX(-50%) rotate(-4deg) translateY(-8px); }
 .tech .t-devices__photo { position: relative; overflow: hidden; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
 .tech .t-devices__desc { font-size: 14px; line-height: 1.5; color: var(--ink2); max-width: 190px; }
 .tech .t-devices__photo .t-lnk { margin-top: auto; }
-.tech .t-devices__img { position: absolute; right: -24px; bottom: -22px; width: 150px; height: 150px; object-fit: contain; }
+.tech .t-devices__art { position: absolute; right: 22px; bottom: 22px; width: 42%; height: 52%; transition: transform var(--m-panel) var(--m-ease-out); }
+.tech .t-devices__art--laptop,
+.tech .t-devices__art--console { width: 54%; }
+.tech .t-devices__photo:hover .t-devices__art,
+.tech .t-devices__photo:focus-visible .t-devices__art { transform: translateY(-6px); }
 @media (max-width: 767.98px) {
   .tech .t-devices__more { grid-auto-columns: 78%; }
   .tech .t-devices__more .t-devices__photo { min-height: 230px; }
@@ -943,10 +949,13 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
 @media (min-width: 768px) {
   .tech .t-devices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .tech .t-devices__phone { grid-column: 1 / -1; padding: 34px; min-height: 420px; }
-  .tech .t-devices__ph--2 { right: 14px; bottom: -50px; width: 200px; }
-  .tech .t-devices__ph--1 { right: 150px; bottom: -70px; width: 190px; }
+  .tech .t-devices__phone { padding-bottom: 34px; }
+  .tech .t-devices__phart { left: auto; right: 56px; bottom: -96px; width: 270px; height: 330px; transform: rotate(-4deg); }
+  .tech .t-devices__phone:hover .t-devices__phart { transform: rotate(-4deg) translateY(-8px); }
   .tech .t-devices__photo { min-height: 270px; }
-  .tech .t-devices__img { width: 170px; height: 170px; }
+  .tech .t-devices__art { width: 44%; height: 56%; }
+  .tech .t-devices__art--laptop,
+  .tech .t-devices__art--console { width: 56%; }
 }
 @media (min-width: 1180px) {
   .tech .t-devices { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 270px 270px auto; }

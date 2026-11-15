@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { onVisible, prefersReducedMotion } from "@/lib/tech/motion";
 import { deviceById, sceneOf } from "@/lib/tech/wizard-data";
-import { DataArt, OtherArt, WatchArt } from "../wizard/art/SceneArt";
+import { DeviceArt } from "../wizard/art";
 import { EFFECTS } from "../wizard/effects";
 
 /** One fault on screen: entrance + one effect cycle, then the next fault. */
@@ -92,7 +92,9 @@ export function FaultVisual({ device: deviceId, faults }: Props) {
             style={{ left: `${(-cx / cw) * 100}%`, top: `${(-cy / ch) * 100}%`, width: `${(photo.width / cw) * 100}%` }}
           />
         ) : (
-          <div className="t-fault__art">{photo.art === "watch" ? <WatchArt /> : photo.art === "data" ? <DataArt /> : <OtherArt />}</div>
+          <div className="t-fault__art" style={{ left: `${(-cx / cw) * 100}%`, top: `${(-cy / ch) * 100}%`, width: `${(photo.width / cw) * 100}%`, height: `${(photo.height / ch) * 100}%` }}>
+            <DeviceArt kind={photo.art ?? "other"} uid={`hero${device.id.replace(/\W/g, "")}`} />
+          </div>
         )}
         {ready ? (
           <div
