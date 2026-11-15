@@ -24,7 +24,7 @@ test.describe("desktop 1440", () => {
     await expect(wiz.getByTestId("scene-card")).toContainText("klawisze");
     await expect.poll(() => camScale(page)).toBeGreaterThan(1.1);
     // the other spots dim
-    await expect(wiz.locator(".t-scene__spot:not(.is-on)").first()).toHaveCSS("opacity", "0.55");
+    await expect(wiz.locator(".t-scene__spot:not(.is-on)").first()).toHaveCSS("opacity", "0.82");
     await page.keyboard.press("Escape");
     await expect(wiz.locator(".t-scene")).not.toHaveClass(/is-zoom/);
     await expect.poll(() => camScale(page)).toBeLessThan(1.01);

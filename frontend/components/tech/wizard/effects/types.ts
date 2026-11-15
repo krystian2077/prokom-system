@@ -14,6 +14,8 @@ export type EffectProps = {
   aspect: number;
   /** Unit vector from the hotspot towards the device's centre (badge offset). */
   nudge?: [number, number];
+  /** Whole-device faults (no hotspot): where the badge sits, % of the region (off every spot). */
+  badgeAt?: [number, number];
   /** Unique id prefix for SVG defs (several scenes on one page, /lab). */
   uid?: string;
 };

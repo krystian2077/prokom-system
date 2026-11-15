@@ -157,30 +157,48 @@ html[data-tech-theme="dark"] .tech .t-scene__art { filter: drop-shadow(0 18px 28
 }
 .tech .t-scene__dot { width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--card); box-shadow: 0 0 0 2px var(--softbd), 0 2px 6px rgba(0, 0, 0, 0.3); cursor: default; }
 .tech .t-scene__dot.is-on { background: var(--acc); box-shadow: 0 0 0 4px var(--soft); }
+/* spot: a solid light disc in BOTH themes (a translucent one vanished on dark screens), an accent
+   ring that reads on white devices too, a slow halo (3 cycles, then it rests) */
 .tech .t-scene__spotdot {
-  width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; display: grid; place-items: center;
-  background: var(--card); border: 1.5px solid var(--softbd); color: var(--acct);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--card) 35%, transparent), 0 8px 18px -8px rgba(18, 22, 19, 0.6);
-  transition: transform var(--m-panel) var(--m-ease-spring), background-color var(--m-small), border-color var(--m-small), color var(--m-small), box-shadow var(--m-panel);
+  --sp-bg: #ffffff; --sp-ink: #c4362b; --sp-ring: rgba(226, 72, 58, 0.42);
+  position: relative; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; display: grid; place-items: center;
+  background: var(--sp-bg); color: var(--sp-ink); border: 0;
+  box-shadow: 0 0 0 1.5px var(--sp-ring), 0 0 0 4px rgba(255, 255, 255, 0.22), 0 8px 18px -6px rgba(0, 0, 0, 0.55);
+  transition: transform var(--m-panel) var(--m-ease-spring), background-color var(--m-small), color var(--m-small), box-shadow var(--m-panel);
 }
-.tech .t-scene__spotdot svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
-.tech .t-scene__plus { transition: opacity var(--m-small); }
+.tech .t-scene__spotdot::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(226, 72, 58, 0.45);
+  animation: t-spot-halo 2.6s var(--m-ease-out) calc(var(--i, 0) * 240ms + 1.2s) var(--fx-n, 3);
+}
+@keyframes t-spot-halo {
+  0% { box-shadow: 0 0 0 0 rgba(226, 72, 58, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(226, 72, 58, 0); }
+  100% { box-shadow: 0 0 0 12px rgba(226, 72, 58, 0); }
+}
+.tech .t-scene__spotdot svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.tech .t-scene__plus { transition: opacity var(--m-small), transform var(--m-panel) var(--m-ease-spring); transform-origin: 12px 12px; }
 .tech .t-scene__check { stroke-dasharray: 1; stroke-dashoffset: 1; }
 .tech .t-scene__spot:hover .t-scene__spotdot,
 .tech .t-scene__spot.is-hot .t-scene__spotdot,
-.tech .t-scene__spot:focus-visible .t-scene__spotdot { transform: scale(1.14); border-color: var(--acc); }
+.tech .t-scene__spot:focus-visible .t-scene__spotdot { transform: scale(1.16); box-shadow: 0 0 0 2px var(--acc), 0 0 0 6px rgba(226, 72, 58, 0.18), 0 10px 22px -6px rgba(0, 0, 0, 0.55); }
+.tech .t-scene__spot:hover .t-scene__plus,
+.tech .t-scene__spot.is-hot .t-scene__plus { transform: rotate(90deg); }
 .tech .t-scene__spot:focus-visible { outline: none; }
-.tech .t-scene__spot:focus-visible .t-scene__spotdot { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--acc); }
-.tech .t-scene__spot.is-on .t-scene__spotdot { background: var(--acc); border-color: var(--acc); color: var(--onacc); transform: scale(1.16); box-shadow: 0 0 0 5px var(--soft), 0 10px 22px -8px rgba(196, 54, 43, 0.8); }
+.tech .t-scene__spot:focus-visible .t-scene__spotdot { box-shadow: 0 0 0 3px var(--card), 0 0 0 5.5px var(--acc), 0 10px 22px -6px rgba(0, 0, 0, 0.55); }
+.tech .t-scene__spot.is-on .t-scene__spotdot { --sp-bg: var(--acc); --sp-ink: #ffffff; transform: scale(1.2); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9), 0 0 0 9px rgba(226, 72, 58, 0.24), 0 12px 26px -8px rgba(196, 54, 43, 0.9); }
+.tech .t-scene__spot.is-on .t-scene__spotdot::after { animation: none; }
 .tech .t-scene__spot.is-on .t-scene__plus { opacity: 0; }
 .tech .t-scene__spot.is-on .t-scene__check { stroke-dashoffset: 0; transition: stroke-dashoffset var(--m-panel) var(--m-ease-out) 120ms; }
-.tech .t-scene.is-zoom .t-scene__spot:not(.is-on) { opacity: 0.55; }
-.tech .t-scene.is-zoom .t-scene__spot:not(.is-on):not(:hover):not(:focus-visible) .t-scene__spotdot { transform: scale(0.78); box-shadow: 0 6px 14px -8px rgba(18, 22, 19, 0.6); }
+/* camera on a fault: the other spots step back (smaller, calmer) but stay solid and clickable */
+.tech .t-scene.is-zoom .t-scene__spot:not(.is-on) { opacity: 0.82; }
+.tech .t-scene.is-zoom .t-scene__spot:not(.is-on):not(:hover):not(:focus-visible) .t-scene__spotdot { transform: scale(0.74); }
+.tech .t-scene.is-zoom .t-scene__spot:not(.is-on) .t-scene__spotdot::after { animation: none; }
 .tech .t-scene.is-intro .t-scene__spotdot { animation: t-spot-pulse 700ms var(--m-ease-out) both; animation-delay: calc(var(--i, 0) * 220ms + 300ms); }
 @keyframes t-spot-pulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(226, 72, 58, 0.45); }
-  40% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(226, 72, 58, 0.16); }
-  100% { transform: scale(1); box-shadow: 0 0 0 16px rgba(226, 72, 58, 0); }
+  0% { transform: scale(0.6); opacity: 0; }
+  55% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* label outside the device + straight leader line (stage px, lib/tech/wizard-layout.ts) */
@@ -204,48 +222,78 @@ html[data-tech-theme="dark"] .tech .t-scene__art { filter: drop-shadow(0 18px 28
   100% { opacity: 1; transform: none; }
 }
 
-/* "Pokaż całe urządzenie" */
-.tech .t-scene__whole {
-  position: absolute; top: 4px; left: 4px; z-index: 6;
-  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 6px 0 12px; border-radius: 999px;
-  border: 1px solid var(--bd); background: var(--card); color: var(--ink); font: 800 12.5px var(--t-font-body); cursor: pointer; white-space: nowrap;
-  box-shadow: var(--sh-1); animation: t-pop-in var(--m-panel) var(--m-ease-spring) both;
-}
-.tech .t-scene__whole kbd { font: 700 11px var(--t-font-body); padding: 3px 7px; border-radius: 7px; background: var(--bg2); color: var(--ink2); }
-
-/* card under the stage (never over the photo) */
+/* card under the stage (never over the device): fault glyph tile, device eyebrow, display title,
+   the "what it usually means" text and the repair link; the camera's way back sits in its head */
 .tech .t-scene__card {
-  position: relative; z-index: 5; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;
-  padding: 13px 16px 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--bd); box-shadow: var(--sh-1);
+  position: relative; z-index: 5; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; box-sizing: border-box;
+  padding: 16px 18px; border-radius: 20px; background: var(--card); border: 1px solid var(--bd);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 40px -26px rgba(18, 22, 19, 0.45);
+  overflow: hidden;
 }
-html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); background: color-mix(in srgb, var(--card) 88%, transparent); }
-.tech .t-scene__card b { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; color: var(--ink); }
-.tech .t-scene__card b i { width: 8px; height: 8px; border-radius: 50%; background: var(--acc); flex-shrink: 0; box-shadow: 0 0 0 3px var(--soft); }
-.tech .t-scene__card span { font-size: 13px; line-height: 1.45; color: var(--ink2); }
+/* a thin accent line along the top, drawn in on every new fault */
+.tech .t-scene__card::before {
+  content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 0%, transparent));
+  transform-origin: 0 50%;
+}
+html[data-tech-theme="dark"] .tech .t-scene__card {
+  border-color: var(--hair); background: color-mix(in srgb, var(--card) 90%, transparent);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 20px 44px -26px rgba(0, 0, 0, 0.8);
+}
+.tech .t-scene__cardhead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.tech .t-scene__cardico {
+  flex-shrink: 0; width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+  background: var(--soft); color: var(--acct); box-shadow: inset 0 0 0 1px var(--softbd);
+  animation: t-card-ico var(--m-panel) var(--m-ease-spring) both;
+}
+.tech .t-scene__cardico svg { width: 22px; height: 22px; }
+.tech .t-scene__cardtitles { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.tech .t-scene__card .t-scene__cardeyb { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink2); line-height: 1.2; }
+.tech .t-scene__card .t-scene__cardtitle {
+  display: block; font-family: var(--t-font-head); font-stretch: 108%; font-weight: 800; font-size: clamp(18px, 0.5vw + 14px, 21px);
+  line-height: 1.15; letter-spacing: -0.015em; color: var(--ink);
+}
+.tech .t-scene__card .t-scene__cardtext { font-size: 14px; line-height: 1.5; color: var(--ink2); text-wrap: pretty; }
 .tech .t-scene__card .t-wiz__more { white-space: normal; text-wrap: pretty; }
 .tech .t-scene__nolink { visibility: hidden; }
-/* full layout: fixed card height — a longer text on hover never resizes the stage (no jumping device) */
-/* full layout: the card is as tall as its text, but never shorter than the longest text at this width,
-   so a different fault (or a hover preview) never resizes the stage — the device never jumps */
+/* full layout: the card is never shorter than the longest text at this width, so a different fault
+   (or a hover preview) never resizes the stage — the device never jumps */
 @media (min-width: 960px) {
-  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; justify-content: center; box-sizing: border-box; }
+  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 11.5rem; justify-content: flex-start; }
 }
 @media (min-width: 1180px) {
-  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 8.5rem; }
+  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; }
 }
-/* phone: "Pokaż całe urządzenie" lives in the card (never over the device) */
-.tech .t-scene__card .t-scene__whole { position: static; align-self: flex-start; order: 9; margin-top: 6px; min-height: 34px; padding: 0 14px; background: var(--bg2); box-shadow: none; animation: t-card-in var(--m-panel) var(--m-ease-emph) both; }
+/* "Całe urządzenie": a quiet pill in the card's head (never over the device) */
+.tech .t-scene__whole {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 6px 0 11px; border-radius: 999px;
+  border: 1px solid var(--bd); background: var(--bg2); color: var(--ink); font: 800 12.5px var(--t-font-body); cursor: pointer; white-space: nowrap;
+  animation: t-pop-in var(--m-panel) var(--m-ease-spring) both; transition: border-color var(--m-small), background-color var(--m-small);
+}
+.tech .t-scene__whole:hover { border-color: var(--acc); }
+.tech .t-scene__whole:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.tech .t-scene__whole svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.tech .t-scene__whole kbd { font: 700 11px var(--t-font-body); padding: 3px 7px; border-radius: 7px; background: var(--card); color: var(--ink2); }
+.tech .t-scene--phone .t-scene__whole { padding-right: 12px; }
+/* phone: the title keeps the whole row, "Całe urządzenie" drops under it (aligned with the text) */
+.tech .t-scene--phone .t-scene__cardhead { flex-wrap: wrap; row-gap: 10px; }
+.tech .t-scene--phone .t-scene__cardtitles { flex: 1 1 calc(100% - 54px); }
+.tech .t-scene--phone .t-scene__whole { margin-left: 54px; }
 .tech .t-scene__cardtitle,
 .tech .t-scene__cardtext { animation: t-card-in var(--m-panel) var(--m-ease-emph) both; }
-.tech .t-scene__cardtext { animation-delay: 40ms; }
+.tech .t-scene__cardtext { animation-delay: 50ms; }
 @keyframes t-card-in {
-  0% { opacity: 0; transform: translateY(4px); }
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes t-card-ico {
+  0% { opacity: 0; transform: scale(0.7) rotate(-8deg); }
   100% { opacity: 1; transform: none; }
 }
 
 /* phone / full-screen flow: label card under the photo */
 .tech .t-scene--phone { --fw: var(--fw-p, 300px); --fh: var(--fh-p, 320px); min-height: 0; padding: 10px; border-radius: 24px; }
-.tech .t-scene--phone { --resv: 56px; }
+.tech .t-scene--phone { --resv: 84px; } /* room for the camera zoom (+12 %) top and bottom */
 /* phone flow: the label lives in the card, so only the device itself has to fit */
 .tech .t-scene--phone .t-scene__frame { --w: min(var(--fw), calc(var(--fh) * var(--arn)), calc(100cqw - 48px), calc((100cqh - var(--resv)) * var(--arn))); }
 /* phone: the stage is as tall as the device needs (+ room), so wide devices leave no empty band */
@@ -256,8 +304,8 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 .tech .t-scene.is-static .t-scene__stage { flex: none; aspect-ratio: 1 / 1.02; min-height: 0; }
 
 /* placement in the wizard */
-.tech .t-wiz__stagewrap { display: flex; min-height: 700px; }
-.tech .t-wiz__stagewrap .t-scene { min-height: 700px; }
+.tech .t-wiz__stagewrap { display: flex; min-height: 780px; }
+.tech .t-wiz__stagewrap .t-scene { min-height: 780px; }
 /* right column: compact rhythm, no stretched gaps (the summary bar sits at the bottom) */
 @media (min-width: 960px) {
   .tech .t-wiz__side { justify-content: flex-start; gap: 26px; }
@@ -279,8 +327,8 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
   .tech .t-wiz__bar .t-hbtn--wiz { min-width: 0; width: 100%; }
 }
 @media (min-width: 1180px) {
-  .tech .t-wiz__stagewrap { width: clamp(424px, 50vw - 166px, 580px); min-height: 660px; }
-  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 480px); --fh: var(--fh-d, 360px); min-height: 660px; }
+  .tech .t-wiz__stagewrap { width: clamp(424px, 50vw - 166px, 580px); min-height: 700px; }
+  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 480px); --fh: var(--fh-d, 360px); min-height: 700px; }
 }
 
 /* device chips: radiogroup with a sliding pill; faults preview on hover */
