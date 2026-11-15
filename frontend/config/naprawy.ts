@@ -6,11 +6,10 @@
  *
  * Status 15.11.2026: list chosen by Krystian (phones, tablets, smartwatches, laptops,
  * computers, consoles — no printers, no data recovery). Texts written in TD5b PR 2 and
- * waiting for Krystian's acceptance: every page stays `verified: false` until he approves it.
+ * accepted by Krystian on 15.11.2026, so every page is `verified: true`.
  * The service has NOT confirmed time, warranty or on-site repair, so `czas`, `gwarancja`
- * and `naMiejscu` are null (sentences hidden) and the texts promise none of them.
+ * and `naMiejscu` stay null (sentences hidden) and the texts promise none of them.
  * Cities never appear in the texts — the "Gdzie oddać" block renders points from prokom.ts.
- * TODO(krystian): read each text, then flip `verified` to true page by page.
  */
 import type { CategoryCode } from "@/lib/tech/wizard-data";
 
@@ -47,13 +46,13 @@ export type RepairPageData = {
 
 type Content = Omit<RepairPageData, "czas" | "gwarancja" | "naMiejscu" | "published" | "verified">;
 
-/** Written, waiting for acceptance: time / warranty / on-site not confirmed by the service. */
-function awaiting(c: Content): RepairPageData {
-  return { ...c, czas: null, gwarancja: null, naMiejscu: null, published: true, verified: false };
+/** Accepted text (15.11.2026); time / warranty / on-site not confirmed by the service. */
+function accepted(c: Content): RepairPageData {
+  return { ...c, czas: null, gwarancja: null, naMiejscu: null, published: true, verified: true };
 }
 
 export const repairPages: RepairPageData[] = [
-  awaiting({
+  accepted({
     slug: "wymiana-ekranu-iphone",
     title: "Serwis ekranu iPhone",
     h1: "Wymiana ekranu iPhone",
@@ -101,7 +100,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["wymiana-tylnej-szybki-iphone", "wymiana-baterii-w-telefonie"],
   }),
 
-  awaiting({
+  accepted({
     slug: "wymiana-ekranu-samsung",
     title: "Ekran Samsung Galaxy",
     h1: "Wymiana ekranu Samsung",
@@ -153,7 +152,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["wymiana-baterii-w-telefonie", "naprawa-gniazda-ladowania"],
   }),
 
-  awaiting({
+  accepted({
     slug: "wymiana-baterii-w-telefonie",
     title: "Bateria w telefonie",
     h1: "Wymiana baterii w telefonie",
@@ -205,7 +204,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["naprawa-gniazda-ladowania", "wymiana-ekranu-iphone"],
   }),
 
-  awaiting({
+  accepted({
     slug: "naprawa-gniazda-ladowania",
     title: "Gniazdo ładowania",
     h1: "Naprawa gniazda ładowania",
@@ -253,7 +252,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["wymiana-baterii-w-telefonie", "telefon-po-zalaniu"],
   }),
 
-  awaiting({
+  accepted({
     slug: "telefon-po-zalaniu",
     title: "Telefon po zalaniu",
     h1: "Telefon po zalaniu",
@@ -301,7 +300,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["naprawa-gniazda-ladowania", "wymiana-baterii-w-telefonie"],
   }),
 
-  awaiting({
+  accepted({
     slug: "wymiana-tylnej-szybki-iphone",
     title: "Tylna szybka iPhone",
     h1: "Wymiana tylnej szybki iPhone",
@@ -352,7 +351,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["wymiana-ekranu-iphone", "wymiana-baterii-w-telefonie"],
   }),
 
-  awaiting({
+  accepted({
     slug: "wymiana-ekranu-w-tablecie",
     title: "Ekran w tablecie",
     h1: "Wymiana szybki i ekranu w tablecie",
@@ -404,7 +403,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["naprawa-smartwatcha", "wymiana-baterii-w-telefonie"],
   }),
 
-  awaiting({
+  accepted({
     slug: "naprawa-smartwatcha",
     title: "Naprawa smartwatcha",
     h1: "Wymiana szkła i baterii w smartwatchu",
@@ -456,7 +455,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["wymiana-ekranu-w-tablecie", "wymiana-baterii-w-telefonie"],
   }),
 
-  awaiting({
+  accepted({
     slug: "laptop-sie-przegrzewa",
     title: "Laptop się grzeje",
     h1: "Laptop się przegrzewa",
@@ -508,7 +507,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["wymiana-matrycy-w-laptopie", "wymiana-dysku-na-ssd"],
   }),
 
-  awaiting({
+  accepted({
     slug: "wymiana-matrycy-w-laptopie",
     title: "Matryca w laptopie",
     h1: "Wymiana matrycy w laptopie",
@@ -560,7 +559,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["laptop-sie-przegrzewa", "wymiana-dysku-na-ssd"],
   }),
 
-  awaiting({
+  accepted({
     slug: "wymiana-dysku-na-ssd",
     title: "Wymiana dysku na SSD",
     h1: "Wymiana dysku na SSD w komputerze",
@@ -612,7 +611,7 @@ export const repairPages: RepairPageData[] = [
     powiazane: ["laptop-sie-przegrzewa", "czyszczenie-konsoli-ps5-ps4"],
   }),
 
-  awaiting({
+  accepted({
     slug: "czyszczenie-konsoli-ps5-ps4",
     title: "Czyszczenie konsoli",
     h1: "Czyszczenie konsoli PS5 i PS4",

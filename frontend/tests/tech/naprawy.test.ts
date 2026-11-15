@@ -84,8 +84,14 @@ describe("naprawy — SEO i treść stron z treścią", () => {
     expect(sharedRatio(t, t)).toBe(1);
     expect(sharedRatio(t, "Zupełnie inny tekst o bateriach laptopów i ich ładowaniu w zimie")).toBe(0);
   });
-  it("unconfirmed time / warranty / on-site stay null on unverified pages (service did not confirm)", () => {
-    for (const p of repairPages.filter((x) => !x.verified)) expect([p.czas, p.gwarancja, p.naMiejscu], p.slug).toEqual([null, null, null]);
+  it("time / warranty / on-site stay null (service did not confirm them, 15.11.2026)", () => {
+    for (const p of repairPages) expect([p.czas, p.gwarancja, p.naMiejscu], p.slug).toEqual([null, null, null]);
+  });
+  it("all 12 accepted pages are live: built in production and listed in the sitemap", () => {
+    expect(repairPages.every((p) => p.verified && p.published)).toBe(true);
+    expect(buildableRepairs(false).map((p) => p.slug).sort()).toEqual(repairPages.map((p) => p.slug).sort());
+    const urls = sitemap().map((u) => u.url).filter((u) => u.includes("/naprawy/"));
+    expect(urls).toHaveLength(repairPages.length);
   });
   it("texts never hard-code a city (points come from prokom.ts)", () => {
     for (const p of withContent) expect(ownText(p) + p.description, p.slug).not.toMatch(/rabk|zakopan/i);
