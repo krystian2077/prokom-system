@@ -1,6 +1,7 @@
 import { company, line, telHref } from "@/config/prokom";
 import { LegalDoc, Li, Ol, Section } from "@/components/tech/legal/LegalDoc";
 import { pageMetadata } from "@/lib/tech/seo";
+import { polishText } from "@/lib/tech/typo";
 
 // Legal text from TD5 PR 2; facts updated on 15.11.2026 (Krystian's decision): domain and name from
 // config/prokom.ts, no shop (old § 11 „Sprzedaż akcesoriów i produktów” removed, later sections renumbered).
@@ -26,7 +27,7 @@ export default function TermsPage() {
         <p>Użyte w Regulaminie pojęcia oznaczają:</p>
         <ul>
           <Li>
-            <strong>Usługodawca / Serwis</strong> – {company.name} ({line.name}), NIP {company.nip}, {company.hq.street}, {company.hq.postal} {company.hq.city}; tel.{" "}
+            <strong>Usługodawca / Serwis</strong> – {company.name} ({line.name}), NIP {company.nip}, {polishText(company.hq.street)}, {company.hq.postal} {company.hq.city}; tel.{" "}
             <a data-t-inline="" href={telHref(line.phone)}>
               {line.phoneDisplay}
             </a>
@@ -332,7 +333,7 @@ export default function TermsPage() {
               </Li>
               <Li>za pomocą formularza reklamacyjnego dostępnego pod adresem {line.domain}/claim-repair</Li>
               <Li>osobiście w siedzibie serwisu</Li>
-              <Li>pisemnie na adres: {company.hq.street}, {company.hq.postal} {company.hq.city}</Li>
+              <Li>pisemnie na adres: {polishText(company.hq.street)}, {company.hq.postal} {company.hq.city}</Li>
             </ul>
           </li>
           <li>

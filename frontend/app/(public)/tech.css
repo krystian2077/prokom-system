@@ -125,6 +125,10 @@ html[data-tech-theme="dark"] .tech {
   letter-spacing: -0.015em;
   color: inherit;
 }
+/* Balanced headings, no lone last word in paragraphs (przegląd wizualny; Polish one-letter
+   words and hyphenated names are handled by components/tech/Typeset.tsx) */
+.tech .t-ui :where(h1, h2, h3, h4) { text-wrap: balance; }
+.tech .t-ui :where(p, li, dd, figcaption, summary) { text-wrap: pretty; }
 .tech .t-ui :where(h1) { font-size: clamp(40px, 2.2vw + 32px, 68px); }
 .tech .t-ui :where(h2) { font-size: clamp(30px, 1.6vw + 22px, 48px); }
 .tech .t-ui :where(h3) { font-size: clamp(20px, 0.6vw + 16px, 26px); }

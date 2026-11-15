@@ -85,7 +85,7 @@ test("sitemap.xml: no removed pages, both local pages", async ({ request }) => {
 
 test("local page: point card, repairs with prefilled report, local FAQ, Service JSON-LD", async ({ page }) => {
   await page.goto("/serwis-telefonow-rabka-zdroj");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Serwis telefonów\s*Rabka-Zdrój/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Serwis telefonów\s*Rabka-\u2060?Zdrój/); // headings get a word joiner after the hyphen (components/tech/Typeset.tsx)
   await expect(page.locator(".t-pointcard")).toHaveCount(1);
   const report = page.getByRole("link", { name: "Zgłoś: Wymiana baterii" });
   await expect(report).toHaveAttribute("href", /^\/zgloszenie\?category=phone&usterka=S%C5%82aba\+bateria&punkt=rabka$/);

@@ -11,6 +11,7 @@ import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
 import { TabBar } from "./TabBar";
 import { TrackClicks } from "./TrackClicks";
+import { Typeset } from "./Typeset";
 
 /**
  * Public-site shell (SPEC §7, RESPONSYWNOSC): notice, brand bar and capsule on top,
@@ -40,6 +41,7 @@ export function TechShell({ children }: { children: ReactNode }) {
         </div>
         <TrackClicks />
         <MotionRoot />
+        <Typeset />
       </div>
     </ShellProvider>
   );

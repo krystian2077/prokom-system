@@ -14,6 +14,7 @@ import { REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import { publishedPoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { submitHref } from "@/lib/tech/wizard-data";
+import { polishText } from "@/lib/tech/typo";
 
 const published = publishedPoints(servicePoints);
 const cities = citiesTitle(published);
@@ -66,7 +67,7 @@ export default function RepairsHubPage() {
               <Breadcrumbs items={CRUMBS} separator="/" />
               <h1 className="t-dev-hero__h1">
                 Naprawy
-                <span>Serwis telefonów, komputerów i elektroniki · {cities}</span>
+                <span>{polishText(`Serwis telefonów, komputerów i elektroniki · ${cities}`, true)}</span>
               </h1>
               <p className="t-dev-hero__lead">
                 Jeden serwis na telefon, laptop i resztę elektroniki w domu albo firmie. Wybierz urządzenie, żeby zobaczyć, co naprawiamy — albo od razu zgłoś
