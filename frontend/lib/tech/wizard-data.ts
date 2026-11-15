@@ -96,8 +96,6 @@ export type WizardDevice = {
  * desktop: the stage beside the choices at 1180+; phone: the full-screen flow (390).
  */
 export const FRAME_BOX = { desktop: [380, 310], tablet: [300, 290], phone: [300, 320] } as const;
-/** Hotspot target size (px) — WCAG 2.5.5. */
-export const SPOT_TARGET = 44;
 /** Minimum distance between hotspot centres (px): 48 on desktop (1440), 44 on phones (390). */
 export const SPOT_GAP = { desktop: 48, phone: 44 } as const;
 /** Camera zoom on a local fault (mirrors `.t-scene.is-zoom .t-scene__cam` in tech-wizard.css). */

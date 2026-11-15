@@ -77,11 +77,9 @@ def tablet():
     big = crop.resize((w, h), Image.LANCZOS)
     outer = (pad * S, pad * S, w - pad * S, h - pad * S)
     alpha = rrect_mask((w, h), outer, fr * S)
-    body = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     # rim: aluminium edge from the photo, bezel black, then the calm screen
-    rim = big.copy()
-    rim.putalpha(255)
-    body = rim
+    body = big.copy()
+    body.putalpha(255)
     bez = rrect_mask((w, h), (outer[0] + 3 * S, outer[1] + 3 * S, outer[2] - 3 * S, outer[3] - 3 * S), (fr - 3) * S)
     body = Image.composite(Image.new("RGBA", (w, h), (6, 6, 8, 255)), body, bez)
     inset = 14 * S
