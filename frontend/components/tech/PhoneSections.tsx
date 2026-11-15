@@ -5,6 +5,8 @@ import { claim } from "@/lib/tech/claims";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { PHONE_BRANDS, PHONE_REPAIRS, phoneSteps } from "@/lib/tech/phone-repairs";
 import { PageIconSvg } from "./page-icons";
+import { BrandLogo } from "./BrandLogo";
+import { cardBrandLogos } from "./brand-logos";
 import { Timeline } from "./content/Blocks";
 
 const submitHref = (usterka: string, punkt?: PointKey) => {
@@ -65,6 +67,7 @@ export function PhoneRepairsSection({ punkt }: { punkt?: PointKey }) {
 
 /** "Jakie telefony naprawiamy" — brand cards. */
 export function PhoneBrandsSection({ title }: { title: string }) {
+  const logos = cardBrandLogos(PHONE_BRANDS.map((b) => b.n));
   return (
     <section className="t-section" id="marki" data-rail="Marki">
       <div className="t-container">
@@ -76,8 +79,13 @@ export function PhoneBrandsSection({ title }: { title: string }) {
           <p className="t-lead">Nie widzisz swojej marki? Zadzwoń. Sprawdzimy dostępność części do Twojego modelu.</p>
         </div>
         <ul className="t-phbrands t-snap" tabIndex={0} aria-label="Marki telefonów, które naprawiamy">
-          {PHONE_BRANDS.map((b) => (
+          {PHONE_BRANDS.map((b, i) => (
             <li key={b.n} className="t-phbrand">
+              {logos ? (
+                <span className="t-kinds__logo">
+                  <BrandLogo brand={logos[i]} hidden />
+                </span>
+              ) : null}
               <h3>{b.n}</h3>
               <p>{b.s}</p>
             </li>

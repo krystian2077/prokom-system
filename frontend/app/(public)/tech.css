@@ -755,9 +755,11 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 html[data-tech-theme="dark"] .tech .t-brandlogo--color { color: var(--t-brand-dark); }
 @media (hover: hover) and (pointer: fine) {
   .tech .t-brands__track li:hover .t-brandlogo,
-  .tech .t-brandchip:hover .t-brandlogo { color: var(--t-brand, var(--ink)); }
+  .tech .t-brandchip:hover .t-brandlogo,
+  .tech :is(.t-kinds__item, .t-phbrand):hover .t-kinds__logo .t-brandlogo { color: var(--t-brand, var(--ink)); }
   html[data-tech-theme="dark"] .tech .t-brands__track li:hover .t-brandlogo,
-  html[data-tech-theme="dark"] .tech .t-brandchip:hover .t-brandlogo { color: var(--t-brand-dark, var(--ink)); }
+  html[data-tech-theme="dark"] .tech .t-brandchip:hover .t-brandlogo,
+  html[data-tech-theme="dark"] .tech :is(.t-kinds__item, .t-phbrand):hover .t-kinds__logo .t-brandlogo { color: var(--t-brand-dark, var(--ink)); }
 }
 @keyframes t-mq { to { transform: translateX(-50%); } }
 
@@ -1931,6 +1933,8 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 .tech .t-kinds { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .tech .t-kinds__item { min-height: 150px; padding: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; line-height: 1.45; color: var(--ink2); }
 .tech .t-kinds__item .t-h3 { color: var(--ink); }
+/* Brand mark above the name (DevicePage, PhoneBrandsSection): same optical height as the home chips */
+.tech .t-kinds__logo { --t-logo-h: 24px; display: flex; align-items: center; height: 32px; margin-bottom: 4px; color: var(--ink); }
 @media (max-width: 479.98px) { .tech .t-kinds { grid-template-columns: minmax(0, 1fr); } .tech .t-kinds__item { min-height: 0; } }
 @media (min-width: 1024px) {
   .tech .t-kinds--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -2243,6 +2247,9 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 
 /* Brands */
 .tech .t-phbrands { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* phones: the .t-snap carousel; the 2 explicit columns above collapsed to 0 px next to the
+ * implicit 82% ones and stacked Apple, Samsung and Xiaomi on top of each other */
+@media (max-width: 767.98px) { .tech .t-phbrands.t-snap { grid-template-columns: none; grid-auto-columns: 64%; } }
 @media (min-width: 768px) { .tech .t-phbrands { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1180px) { .tech .t-phbrands { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 .tech .t-phbrand { min-height: 150px; box-sizing: border-box; padding: 20px; border-radius: 20px; background: var(--card); border: 1px solid var(--bd); display: flex; flex-direction: column; gap: 8px; }
