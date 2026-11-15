@@ -191,7 +191,7 @@ export function DevicePosts({ category, keywords, title }: { category: CategoryC
   const posts = relatedPosts(category, keywords, 3);
   if (!posts.length) return null;
   return (
-    <nav className="t-section t-section--tight t-dposts" aria-label={title} data-rail="Poradniki">
+    <nav className="t-section t-section--tight t-dposts" aria-label={title} id="poradniki" data-rail="Poradniki">
       <div className="t-container">
         <div className="t-sechead">
           <div>

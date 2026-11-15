@@ -104,7 +104,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
         </Section>
       ) : null}
 
-      <section className="t-section t-section--tight" id="przebieg" data-rail="Przebieg">
+      <section className="t-section t-section--tight" id="przebieg" data-rail="Jak naprawiamy">
         <div className="t-container">
           <span className="t-eyebrow">Jak przebiega naprawa</span>
           <h2 className="t-h2 t-h2--sm">Co robimy krok po kroku</h2>
@@ -188,7 +188,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
         </div>
       </section>
 
-      <section className="t-section t-section--alt t-section--tight" id="zanim-przyjdziesz" data-rail="Zanim przyjdziesz">
+      <section className="t-section t-section--alt t-section--tight" id="zanim-przyjdziesz" data-rail="Przygotowanie">
         <div className="t-container">
           <div className="t-cb-head">
             <span className="t-eyebrow">Przygotowanie</span>
@@ -248,7 +248,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
         </div>
       </section>
 
-      <nav className="t-section t-section--tight t-cb-more" aria-label="Powiązane strony" data-rail="Więcej">
+      <nav className="t-section t-section--tight t-cb-more" aria-label="Powiązane strony" id="wiecej" data-rail="Więcej">
         <div className="t-container">
           <h2 className="t-h2 t-h2--sm">Więcej o naprawie {genitive}</h2>
           {related.length ? (
