@@ -1,5 +1,6 @@
 /*
- * PRO-KOM Tech — /o-firmie (about page, premium pass). Hero scene, business card with
+ * PRO-KOM Tech — /o-firmie (about page, premium pass). The hero stage (.t-ab-hero) is also
+ * used by /punkty-serwisowe and /kontakt (tech-visit.css). Hero scene, business card with
  * numbers, rules as a bento grid, salons, and page-scoped polish of the shared blocks
  * (DataSafety, LineCards) via .t-about. Every selector under `.tech`.
  * Separate file so parallel sessions editing tech.css / tech-pages.css never collide
