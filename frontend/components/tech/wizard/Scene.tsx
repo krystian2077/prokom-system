@@ -93,6 +93,8 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
   const stageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
+  const parRef = useRef<HTMLDivElement>(null);
+  const parFrame = useRef(0);
   const wholeRef = useRef<HTMLButtonElement>(null);
   const introDone = useRef(false);
   const lastDevice = useRef(device);
@@ -152,6 +154,26 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
   }, []);
 
   const showLabel = layout === "full" && !!scene.spot;
+
+  // studio parallax (pointer: fine only, never with reduced motion): the device drifts a few px
+  // with the pointer, the light the other way — depth without moving the layout
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse" || reduced || poster || !interactive) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    const y = ((e.clientY - r.top) / r.height) * 2 - 1;
+    cancelAnimationFrame(parFrame.current);
+    parFrame.current = requestAnimationFrame(() => {
+      const el = rootRef.current;
+      el?.style.setProperty("--px", x.toFixed(3));
+      el?.style.setProperty("--py", y.toFixed(3));
+    });
+  };
+  const onPointerLeave = () => {
+    cancelAnimationFrame(parFrame.current);
+    rootRef.current?.style.setProperty("--px", "0");
+    rootRef.current?.style.setProperty("--py", "0");
+  };
 
   // label placement in stage px (after the camera transform), see lib/tech/wizard-layout.ts
   useIsoLayoutEffect(() => {
@@ -220,7 +242,9 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
       data-effect={scene.effect}
       style={vars}
     >
-      <div ref={stageRef} className="t-scene__stage">
+      <div ref={stageRef} className="t-scene__stage" onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
+        <div className="t-scene__light" aria-hidden="true" />
+        <div ref={parRef} className="t-scene__par">
         {ghost && ghost.photo ? (
           <div className="t-scene__frame is-ghost" style={frameVars(ghost.photo)} aria-hidden="true">
             <Picture photo={ghost.photo} eager uid={`${uid}g`} />
@@ -296,6 +320,7 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
           </>
         ) : null}
 
+        </div>
         {layout === "full" && interactive && zoom ? (
           <button ref={wholeRef} type="button" className="t-scene__whole" onClick={() => setZoom(false)} data-testid="scene-whole">
             Pokaż całe urządzenie
@@ -322,6 +347,11 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
             <Link href={more.href} className="t-lnk t-lnk--sm t-wiz__more">
               {more.label} →
             </Link>
+          ) : layout === "full" ? (
+            // keeps the card height when there is no repair page link (the stage never jumps)
+            <span className="t-lnk t-lnk--sm t-wiz__more t-scene__nolink" aria-hidden="true">
+              &nbsp;
+            </span>
           ) : null}
         </div>
       ) : null}
