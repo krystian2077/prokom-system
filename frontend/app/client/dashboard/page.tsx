@@ -1,7 +1,7 @@
 import { ClientDashboard } from "@/features/client-dashboard/ClientDashboard";
 
 export const metadata = {
-  title: "Panel klienta | PRO-KOM Serwis",
+  title: "Pulpit",
   description: "Twoje naprawy i profil.",
 };
 
