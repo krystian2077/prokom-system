@@ -114,7 +114,7 @@ export const courierService = {
 
 /**
  * Numbers and promises from the design (SPEC §10). Confirmed by Krystian on 15.11.2026:
- * quickRepair, freeDiagnosis, sameDayDiagnosis, hg*, sinceYear, aboutSince.
+ * quickRepair, freeDiagnosis, sameDayDiagnosis, hg*, sinceYear, aboutSince, courierWholeCountry, ruleData.
  * `confirmed: false` → hidden in production (or the sentence goes without the number);
  * with NEXT_PUBLIC_TECH_DRAFT=1 (staging) shown inside the "do potwierdzenia" frame.
  * Flip `confirmed` after confirmation — components read it via lib/tech/claims.ts.
@@ -146,7 +146,7 @@ export const claims = {
   /** TD4 "O firmie" rules outside SPEC §8 promises: which parts we use… */
   ruleParts: { text: "Oryginalne albo sprawdzone zamienniki. Zawsze mówimy, które.", confirmed: false },
   /** …and how we treat data on the device. */
-  ruleData: { text: "Nie przeglądamy zawartości urządzeń bez potrzeby.", confirmed: false },
+  ruleData: { text: "Nie przeglądamy zawartości urządzeń bez potrzeby.", confirmed: true },
   /** Google Business profile link(s) for the rating card on "O firmie" (empty = no card). */
   googleProfiles: { text: "", confirmed: false },
 } satisfies Record<string, Claim>;

@@ -96,7 +96,7 @@ describe("contact form (KONTRAKT §4)", () => {
 
 describe("unconfirmed numbers on 'O firmie' (SPEC §10)", () => {
   it("about claims still unconfirmed: hidden in production, framed on staging", () => {
-    for (const k of ["aboutLines", "ruleParts", "ruleData", "googleProfiles"] as const) {
+    for (const k of ["aboutLines", "ruleParts", "googleProfiles"] as const) {
       expect(claims[k].confirmed).toBe(false);
       expect(claim(k, false)).toBeNull();
     }
@@ -105,6 +105,9 @@ describe("unconfirmed numbers on 'O firmie' (SPEC §10)", () => {
   it("founding year 2004 confirmed on 15.11: shown in production without a frame", () => {
     expect(claim("aboutSince", false)).toEqual({ text: "2004", draft: false });
     expect(claim("sinceYear", false)).toEqual({ text: "2004", draft: false });
+  });
+  it("rule about data confirmed on 15.11: shown in production without a frame", () => {
+    expect(claim("ruleData", false)).toEqual({ text: "Nie przeglądamy zawartości urządzeń bez potrzeby.", draft: false });
   });
   it("flagged content: hidden in production until accepted, draft on staging", () => {
     expect(showFlagged(false, false)).toBe(false);
