@@ -49,9 +49,9 @@ test.describe("desktop 1440", () => {
       q: { category: "printer", usterka: "Zacina papier", dostawa: "kurier" },
     });
 
-    // devices without a photo show the icon fallback
+    // every device is an illustration (the fading previous device is a ghost frame)
     await wiz.getByRole("radio", { name: "Odzysk danych" }).click();
-    await expect(wiz.locator(".t-scene__art")).toBeVisible();
+    await expect(wiz.locator(".t-scene__frame:not(.is-ghost) .t-scene__art")).toBeVisible();
     expect((await params(page, "wizard-next")).q.category).toBe("data_recovery");
   });
 

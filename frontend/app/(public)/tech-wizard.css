@@ -24,6 +24,17 @@ html[data-tech-theme="dark"] .tech .t-artvars {
   --dv-a1: #b9bcc1; --dv-a2: #7e8187; --dv-a3: #9a9da3;
 }
 
+/* static illustration box (StaticArt): the device fits the box, anchored bottom-right */
+.tech .t-sart { display: block; container-type: size; }
+.tech .t-sart__frame { position: absolute; right: 0; bottom: 0; width: min(100cqw, calc(100cqh * var(--arn))); aspect-ratio: var(--arn); }
+.tech .t-sart__art { position: absolute; display: block; filter: drop-shadow(0 14px 18px rgba(18, 22, 19, 0.2)); }
+html[data-tech-theme="dark"] .tech .t-sart__art { filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.55)); }
+.tech .t-sart__art .t-art { display: block; width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-devices__art,
+  .tech .t-devices__phart { transition: none; }
+}
+
 /* ---------- Scene ---------- */
 /* Column: the stage (device centred with room for the label) and the card UNDER it. */
 .tech .t-scene {
