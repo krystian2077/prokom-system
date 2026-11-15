@@ -734,13 +734,27 @@ html[data-tech-theme="dark"] .tech .t-map,
 @keyframes t-fl { from { transform: translateY(0) rotate(var(--r)); } to { transform: translateY(-16px) rotate(var(--r)); } }
 
 /* ---------- Brand marquee ---------- */
-.tech .t-brands { height: clamp(64px, 6vw, 84px); margin-top: clamp(28px, 4vw, 72px); overflow: hidden; display: flex; align-items: center; border-block: 1px solid var(--bd); }
+.tech .t-brands { --t-logo-h: 20px; height: clamp(64px, 6vw, 84px); margin-top: clamp(28px, 4vw, 72px); overflow: hidden; display: flex; align-items: center; border-block: 1px solid var(--bd); }
+@media (min-width: 768px) { .tech .t-brands { --t-logo-h: 23px; } }
+@media (min-width: 1200px) { .tech .t-brands { --t-logo-h: 26px; } }
 .tech .t-brands__track {
-  display: flex; width: max-content; align-items: center; gap: 34px; margin: 0; padding: 0; list-style: none; white-space: nowrap;
-  animation: t-mq 46s linear infinite; font-family: var(--t-font-head); font-stretch: 108%; font-weight: 800; font-size: clamp(18px, 1vw + 10px, 24px); color: var(--ink2);
+  display: flex; width: max-content; align-items: center; margin: 0; padding: 0; list-style: none; white-space: nowrap;
+  animation: t-mq 46s linear infinite; color: var(--ink2);
 }
-.tech .t-brands__track li { display: flex; align-items: center; gap: 34px; }
-.tech .t-brands__track i { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); display: block; flex-shrink: 0; }
+.tech .t-brands__track li { display: flex; align-items: center; padding-inline-end: clamp(36px, 3vw + 14px, 60px); } /* padding, not gap: -50% stays seamless */
+/* Simple Icons marks: monochrome, equal optical height (size factor per logo, brand-logos.ts) */
+.tech .t-brands__logo {
+  --t-h: calc(var(--t-logo-h) * var(--t-logo-size, 1));
+  display: block; flex-shrink: 0; height: var(--t-h); width: calc(var(--t-h) * var(--t-logo-ar, 1)); fill: currentColor; transition: color 0.2s ease;
+}
+/* brands without a Simple Icons mark: text in the same tone, sized to sit with the wordmarks */
+.tech .t-brands__word {
+  font-family: var(--t-font-head); font-weight: 700; font-size: calc(var(--t-logo-h) * 0.74); line-height: 1; letter-spacing: -0.01em; transition: color 0.2s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tech .t-brands__track li:hover .t-brands__logo,
+  .tech .t-brands__track li:hover .t-brands__word { color: var(--ink); }
+}
 @keyframes t-mq { to { transform: translateX(-50%); } }
 
 /* ---------- Wizard ---------- */
