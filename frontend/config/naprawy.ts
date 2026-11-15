@@ -407,7 +407,7 @@ export const repairPages: RepairPageData[] = [
   awaiting({
     slug: "naprawa-smartwatcha",
     title: "Naprawa smartwatcha",
-    h1: "Naprawa smartwatcha: szkło i bateria",
+    h1: "Wymiana szkła i baterii w smartwatchu",
     device: "smartwatch",
     usterka: "Pęknięte szkło",
     description: "Pęknięte szkło w zegarku, bateria na kilka godzin albo spuchnięta koperta? Diagnozujemy Apple Watcha, Galaxy Watcha i inne smartwatche przed naprawą.",
@@ -459,7 +459,7 @@ export const repairPages: RepairPageData[] = [
   awaiting({
     slug: "laptop-sie-przegrzewa",
     title: "Laptop się grzeje",
-    h1: "Laptop się przegrzewa — czyszczenie i pasta",
+    h1: "Laptop się przegrzewa",
     device: "laptop",
     usterka: "Przegrzewa się",
     description: "Wentylator wyje, obudowa parzy, a laptop zwalnia lub sam się wyłącza? Czyścimy układ chłodzenia z kurzu, wymieniamy pastę i testujemy pod obciążeniem.",
@@ -563,7 +563,7 @@ export const repairPages: RepairPageData[] = [
   awaiting({
     slug: "wymiana-dysku-na-ssd",
     title: "Wymiana dysku na SSD",
-    h1: "Wymiana dysku na SSD — przyspieszenie komputera",
+    h1: "Wymiana dysku na SSD w komputerze",
     device: "desktop",
     usterka: "Działa wolno",
     description: "Komputer startuje kilka minut, a programy otwierają się w nieskończoność? Montujemy dysk SSD, przenosimy system i dane albo instalujemy system od nowa.",
