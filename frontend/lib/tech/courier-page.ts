@@ -1,7 +1,7 @@
 /**
  * /naprawa-kurierem data helpers (SPEC §12.10). Fields set to null hide their sentence/row.
  */
-import { courierService, servicePoints, type ServicePoint } from "@/config/prokom";
+import { courierService } from "@/config/prokom";
 import { isDraftMode } from "./points";
 
 type Courier = typeof courierService;
@@ -16,11 +16,6 @@ export function courierInSitemap(service: Courier = courierService): boolean {
   return service.published;
 }
 
-/** The point parcels go to — only a published point. */
-export function courierPoint(points: ServicePoint[] = servicePoints, service: Courier = courierService): ServicePoint | null {
-  const p = points.find((x) => x.key === service.address);
-  return p && p.published ? p : null;
-}
 
 const who = (p: "client" | "service") => (p === "client" ? "Ty" : "serwis");
 

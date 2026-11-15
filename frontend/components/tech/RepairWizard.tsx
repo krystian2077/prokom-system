@@ -26,6 +26,8 @@ export type WizardCourier = {
   pays: string | null;
   /** "/naprawa-kurierem" once published, else null (no "Jak to działa?" link). */
   href: string | null;
+  /** "Wyślij sprzęt na adres jednego z naszych salonów: …" (lib/tech/courier.ts), null = hidden. */
+  where?: string | null;
 };
 
 const PHONE_MQ = "(max-width: 767.98px)";
@@ -189,9 +191,9 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
           <span className={`t-chp__s${courier.sub?.draft ? " t-draft" : ""}`}>{courier.sub ? courier.sub.text : "wysyłka do serwisu"}</span>
         </button>
       </div>
-      {delivery.kind === "courier" && (courier.pays || courier.href) ? (
+      {delivery.kind === "courier" && (courier.pays || courier.href || courier.where) ? (
         <p className="t-wiz__courier" aria-live="polite">
-          {courier.pays}
+          {[courier.where, courier.pays].filter(Boolean).join(" ")}
           {courier.href ? (
             <>
               {" "}

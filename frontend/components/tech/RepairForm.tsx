@@ -27,6 +27,7 @@ import {
 import { hoursSummary } from "@/lib/tech/hours";
 import { ACCOUNT_HREF } from "@/lib/tech/nav";
 import { isDraftMode } from "@/lib/tech/points";
+import { courierWhereText } from "@/lib/tech/courier";
 import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, QUICK_FAULTS, appendFault, chosenPoint, courierLines, type StepNo } from "@/lib/tech/repair-form";
 import { submitRepair } from "@/lib/tech/requests";
 import { trackEvent } from "@/lib/tech/track-event";
@@ -368,7 +369,7 @@ export function RepairForm() {
             ))}
             <Choice on={form.dropoff === "courier"} onClick={() => set("dropoff", "courier")} className="t-option">
               <b>Kurier</b>
-              <span>Wyślesz sprzęt paczką kurierską.</span>
+              <span>{courierWhereText() ?? "Wyślesz sprzęt paczką kurierską."}</span>
               {courierLines().map((l) => (
                 <span key={l} className="t-option__meta">
                   {l}

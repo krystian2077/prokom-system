@@ -122,6 +122,32 @@ test.describe("desktop 1440", () => {
   });
 });
 
+test("courier success card: send to one of the salons, number goes into the parcel (15.11)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await mockSubmit(page, (route) => reply(route, "submit-201-phone-rabka"));
+  await page.goto("/zgloszenie?category=laptop&dostawa=kurier");
+  await page.getByLabel("Marka *").fill("Lenovo");
+  await page.getByLabel("Model *").fill("ThinkPad");
+  await page.getByLabel("Co się dzieje? *").fill("Nie włącza się.");
+  await page.locator("[data-zgl-next]").click();
+  await expect(page.getByRole("radio", { name: /^Kurier/ }).first()).toContainText("jednego z naszych salonów");
+  await page.getByLabel("Ulica *").fill("Testowa 1");
+  await page.getByLabel("Miasto *").fill("Kraków");
+  await page.locator("[data-zgl-next]").click();
+  await page.locator("[data-zgl-next]").click();
+  await page.getByLabel("Imię *").fill("Jan");
+  await page.getByLabel("Nazwisko *").fill("Testowy");
+  await page.getByLabel("E-mail *").fill("jan.testowy@example.com");
+  await page.getByLabel("Telefon *").fill("+48 500 100 234");
+  await page.locator("[data-zgl-next]").click();
+  await page.locator("label.t-check", { hasText: "regulamin" }).locator("input").check();
+  await page.locator("[data-zgl-next]").click();
+  const box = page.locator(".t-success__point");
+  await expect(box).toContainText("jednego z naszych salonów: Rabka-Zdrój lub Zakopane");
+  await expect(box).toContainText("Numer zgłoszenia PROKOM/RMA/2/2026 włóż do paczki.");
+  await expect(box).not.toContainText("Nie wysyłaj");
+});
+
 test.describe("phone 390", () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 

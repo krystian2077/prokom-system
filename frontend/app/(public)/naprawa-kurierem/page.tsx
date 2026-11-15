@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { courierService, line, servicePoints, telHref } from "@/config/prokom";
+import { courierService, line, pointPhone, telHref, type ServicePoint } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PrepChecklist } from "@/components/tech/PrepChecklist";
-import { courierPayRows, courierPageVisible, courierPaymentText, courierPoint } from "@/lib/tech/courier-page";
+import { courierPoints } from "@/lib/tech/courier";
+import { courierPayRows, courierPageVisible, courierPaymentText } from "@/lib/tech/courier-page";
 import { PREP_GUIDE_HREF, TRACK_HREF } from "@/lib/tech/nav";
-import { hoursLong, pointAddress } from "@/lib/tech/point-format";
+import { hoursLong, inCity, pointAddress, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
 
@@ -28,10 +29,18 @@ const CRUMBS: Crumb[] = [
 const SUBMIT_COURIER = "/zgloszenie?dostawa=kurier";
 
 // The boss's answers (SPEC §10, §12.10) passed on by Krystian on 15.11.2026 — data in courierService.
-function faqItems(): FaqItem[] {
+function faqItems(points: ServicePoint[]): FaqItem[] {
   const payment = courierPaymentText();
   const items: FaqItem[] = [
-    { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów — nie odbieramy z nich i nie nadajemy do nich paczek. Wyślij sprzęt kurierem pod adres serwisu." },
+    {
+      q: "Na jaki adres wysłać sprzęt?",
+      a: `Na adres ${points.length > 1 ? "jednego z naszych salonów" : "naszego salonu"}: ${points.map((p) => `${line.name} ${p.city}, ${pointAddress(p)}`).join(" albo ")}. Wybierz ten, który Ci pasuje.`,
+    },
+    {
+      q: "Czy muszę zgłosić naprawę przed wysyłką?",
+      a: "Nie musisz, ale najlepiej to zrób: wypełnij formularz zgłoszenia online, napisz e-mail albo zadzwoń. Wtedy wiemy, że paczka jest w drodze, a po zgłoszeniu online dostaniesz numer zgłoszenia — włóż go do paczki.",
+    },
+    { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów — nie odbieramy z nich i nie nadajemy do nich paczek. Wyślij sprzęt kurierem pod adres jednego z salonów." },
     { q: "Ile trwa naprawa wysyłkowa?", a: "To czas samej naprawy (zależy od usterki i części) plus dni przesyłki w obie strony. Termin naprawy podamy po diagnozie." },
   ];
   if (courierService.returnIfDeclined) {
@@ -52,15 +61,21 @@ function faqItems(): FaqItem[] {
 export default function CourierPage() {
   if (!courierPageVisible()) notFound();
   const draft = !courierService.published;
-  const point = courierPoint(servicePoints);
+  const points = courierPoints();
   const pays = courierPayRows();
-  const faq = faqItems();
+  const faq = faqItems(points);
   const payment = courierPaymentText();
   const steps = [
-    { t: "Zgłoś naprawę online", s: "W formularzu wybierz „Kurier” — jako dostarczenie i jako zwrot." },
-    { t: "Dostajesz e-mail", s: "Z numerem zgłoszenia i adresem serwisu, na który wysyłasz sprzęt." },
-    { t: "Zapakuj sprzęt", s: "Włóż do paczki kartkę z numerem zgłoszenia i swoim telefonem." },
-    { t: "Nadaj dowolnym kurierem", s: "Pod adres serwisu — nie obsługujemy paczkomatów. Numer przesyłki możesz dodać w koncie klienta." },
+    {
+      t: "Zgłoś naprawę, napisz albo zadzwoń",
+      s: "Najlepiej przed wysyłką: formularz online (wybierz „Kurier”), e-mail albo telefon. To nie warunek, ale wtedy wiemy, że paczka jest w drodze.",
+    },
+    { t: "Numer zgłoszenia", s: "Po zgłoszeniu online dostaniesz go od razu na ekranie i w e-mailu." },
+    { t: "Zapakuj sprzęt", s: "Włóż do paczki kartkę z numerem zgłoszenia (albo imieniem i nazwiskiem) i swoim telefonem." },
+    {
+      t: "Nadaj dowolnym kurierem",
+      s: `Na adres ${points.length > 1 ? "jednego z naszych salonów" : "naszego salonu"} — nie obsługujemy paczkomatów. Numer przesyłki możesz dodać w koncie klienta.`,
+    },
     { t: "Diagnoza i wycena", s: "Naprawiamy dopiero po Twojej zgodzie." },
     {
       t: "Odsyłamy sprzęt",
@@ -191,18 +206,28 @@ export default function CourierPage() {
       </section>
       <DataSafety />
 
-      {point ? (
+      {points.length ? (
         <section className="t-section t-section--tight" id="gdzie-wyslac" data-rail="Gdzie wysłać">
           <div className="t-container">
             <span className="t-eyebrow">Gdzie wysłać</span>
-            <h2 className="t-h2 t-h2--sm">Adres serwisu</h2>
-            <div className="t-card t-courier__addr">
-              <b>
-                {line.name} — {point.name}
-              </b>
-              <span>{pointAddress(point)}</span>
-              <span>Paczki odbieramy w godzinach otwarcia punktu: {hoursLong(point)}.</span>
-              <span>Nie obsługujemy paczkomatów — tylko przesyłka kurierska pod ten adres.</span>
+            <h2 className="t-h2 t-h2--sm">{points.length > 1 ? "Wyślij do jednego z salonów" : "Adres salonu"}</h2>
+            <p className="t-lead">Nie obsługujemy paczkomatów — tylko przesyłka kurierska pod adres salonu.</p>
+            <div className="t-courier__addrs">
+              {points.map((p) => (
+                <div key={p.key} className="t-card t-courier__addr">
+                  <b>
+                    {line.name} — {p.name}
+                  </b>
+                  <span>{pointAddress(p)}</span>
+                  <span>Paczki odbieramy w godzinach otwarcia salonu {inCity(p.city)}: {hoursLong(p)}.</span>
+                  <span>
+                    tel.{" "}
+                    <a href={telHref(pointPhone(p))} className="t-inline-link" data-t-inline="" data-track="telefon_klik" data-track-miejsce="kurier">
+                      {pointPhoneDisplay(p)}
+                    </a>
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -223,7 +248,7 @@ export default function CourierPage() {
 
       <CtaBand
         eyebrow="Następny krok"
-        title="Zgłoś naprawę kurierem — adres i numer zgłoszenia dostaniesz e-mailem."
+        title="Zgłoś naprawę online i wyślij sprzęt kurierem do jednego z naszych salonów."
         primary={{ label: "Zgłoś naprawę kurierem", href: SUBMIT_COURIER }}
         secondary={{ label: line.phoneDisplay, href: telHref(line.phone), tel: true, track: "kurier_cta" }}
       />

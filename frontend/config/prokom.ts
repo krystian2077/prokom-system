@@ -102,8 +102,8 @@ export const notices: Notice[] = [];
 /** Courier repair (SPEC §12.10). `null` = the sentence is not shown. */
 export const courierService = {
   // The boss's answers to SPEC §10/§12.10, passed on by Krystian on 15.11.2026.
+  // Parcels may go to ANY published point (Krystian, 15.11.2026) — lib/tech/courier.ts courierPoints().
   published: true,
-  address: "rabka" as PointKey,
   inboundPaidBy: "client" as const,
   returnPaidBy: "service" as "service" | "client" | null,
   returnIfDeclined: "service" as null | "service" | "client",
