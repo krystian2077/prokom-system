@@ -33,7 +33,8 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
     // Enter opens, Tab through the panel, then out of the header → closed
     await page.keyboard.press("Enter");
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
-    for (let i = 0; i < 30; i++) await page.keyboard.press("Tab");
+    await expect(panel.getByRole("link", { name: /Serwis telefonów/ })).toBeFocused(); // focus moved into the panel first
+    for (let i = 0; i < 40 && (await naprawy.getAttribute("aria-expanded")) === "true"; i++) await page.keyboard.press("Tab");
     await expect(naprawy).toHaveAttribute("aria-expanded", "false");
   });
 
