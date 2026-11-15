@@ -445,5 +445,10 @@ export function submitHref(category: CategoryCode, fault?: string, extra: Record
   return `/zgloszenie?${q.toString()}`;
 }
 
-/** Brands in the marquee (design T.Main `brands`). */
-export const brands = ["Apple", "Samsung", "Xiaomi", "Motorola", "realme", "Huawei", "Lenovo", "HP", "Dell", "ASUS", "Acer", "MSI", "PlayStation", "Xbox", "Nintendo", "Canon", "Epson", "Brother"];
+/**
+ * Brands in the marquee (design T.Main `brands`), every one shown as a logo
+ * (components/tech/brand-logos.ts). Xbox, Nintendo, Canon and Brother were dropped on
+ * 15.11.2026: no clean mark in Simple Icons nor among the files Krystian sent, and text
+ * between logos broke the strip's rhythm.
+ */
+export const brands = ["Apple", "Samsung", "Xiaomi", "Motorola", "realme", "Huawei", "Lenovo", "HP", "Dell", "ASUS", "Acer", "MSI", "PlayStation", "Epson"];

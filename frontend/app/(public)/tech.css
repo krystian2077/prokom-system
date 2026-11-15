@@ -775,18 +775,17 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
   animation: t-mq 46s linear infinite; color: var(--ink2);
 }
 .tech .t-brands__track li { display: flex; align-items: center; padding-inline-end: clamp(36px, 3vw + 14px, 60px); } /* padding, not gap: -50% stays seamless */
-/* Simple Icons marks: monochrome, equal optical height (size factor per logo, brand-logos.ts) */
+/* Brand marks (brand-logos.ts): monochrome --ink2 at rest, equal optical height (size factor per logo) */
+.tech .t-brands__sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .tech .t-brands__logo {
   --t-h: calc(var(--t-logo-h) * var(--t-logo-size, 1));
   display: block; flex-shrink: 0; height: var(--t-h); width: calc(var(--t-h) * var(--t-logo-ar, 1)); fill: currentColor; transition: color 0.2s ease;
+  transform: translateY(calc(var(--t-h) * var(--t-logo-dy, 0)));
 }
-/* brands without a Simple Icons mark: text in the same tone, sized to sit with the wordmarks */
-.tech .t-brands__word {
-  font-family: var(--t-font-head); font-weight: 700; font-size: calc(var(--t-logo-h) * 0.74); line-height: 1; letter-spacing: -0.01em; transition: color 0.2s ease;
-}
+/* hover (fine pointer only): the brand's own colour, a lighter tint on the dark theme */
 @media (hover: hover) and (pointer: fine) {
-  .tech .t-brands__track li:hover .t-brands__logo,
-  .tech .t-brands__track li:hover .t-brands__word { color: var(--ink); }
+  .tech .t-brands__track li:hover .t-brands__logo { color: var(--t-brand, var(--ink)); }
+  html[data-tech-theme="dark"] .tech .t-brands__track li:hover .t-brands__logo { color: var(--t-brand-dark, var(--ink)); }
 }
 @keyframes t-mq { to { transform: translateX(-50%); } }
 

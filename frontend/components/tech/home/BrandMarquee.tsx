@@ -1,6 +1,9 @@
 import type { CSSProperties } from "react";
 import { brands } from "@/lib/tech/wizard-data";
-import { brandLogo } from "@/components/tech/brand-logos";
+import { brandLogo, type BrandLogo } from "@/components/tech/brand-logos";
+
+const logos = brands.map((b) => brandLogo(b)).filter((l): l is BrandLogo => Boolean(l));
+const symbolId = (slug: string) => `t-brand-${slug}`;
 
 /** Width/height of a "x y w h" viewBox, so the SVG box is sized before paint (CLS 0). */
 function logoAspect(box: string) {
@@ -8,26 +11,26 @@ function logoAspect(box: string) {
   return Math.round((w / h) * 1000) / 1000;
 }
 
-/** One brand: inline monochrome SVG (Simple Icons) or, when no mark exists, a text wordmark. */
-function Brand({ name, hidden }: { name: string; hidden?: boolean }) {
-  const logo = brandLogo(name);
-  if (!logo) {
-    return (
-      <span className="t-brands__word" aria-hidden={hidden || undefined}>
-        {name}
-      </span>
-    );
-  }
+/** One brand mark; the path lives once in the sprite, both loop copies only `<use>` it. */
+function Brand({ logo, hidden }: { logo: BrandLogo; hidden?: boolean }) {
+  const [x, y, w, h] = logo.box.split(" ").map(Number);
+  const style = {
+    "--t-logo-size": logo.size,
+    "--t-logo-ar": logoAspect(logo.box),
+    ...(logo.dy ? { "--t-logo-dy": logo.dy } : {}),
+    "--t-brand": logo.color,
+    "--t-brand-dark": logo.colorDark,
+  } as CSSProperties;
   return (
     <svg
       className="t-brands__logo"
       viewBox={logo.box}
-      style={{ "--t-logo-size": logo.size, "--t-logo-ar": logoAspect(logo.box) } as CSSProperties}
-      xmlns="http://www.w3.org/2000/svg"
+      style={style}
       focusable="false"
       {...(hidden ? { "aria-hidden": true } : { role: "img", "aria-label": logo.title })}
     >
-      <path d={logo.path} />
+      {/* explicit rect: a symbol is otherwise placed at 0,0, not at the box origin */}
+      <use href={`#${symbolId(logo.slug)}`} x={x} y={y} width={w} height={h} />
     </svg>
   );
 }
@@ -36,15 +39,23 @@ function Brand({ name, hidden }: { name: string; hidden?: boolean }) {
 export function BrandMarquee() {
   return (
     <section className="t-brands t-ui" aria-label="Marki, które naprawiamy">
+      <svg className="t-brands__sprite" aria-hidden="true" focusable="false">
+        {logos.map((l) => (
+          <symbol key={l.slug} id={symbolId(l.slug)} viewBox={l.box}>
+            {/* potrace output relies on even-odd holes; Simple Icons on the default rule */}
+            <path d={l.path} fillRule={l.source === "krystian" ? "evenodd" : undefined} />
+          </symbol>
+        ))}
+      </svg>
       <ul className="t-brands__track">
-        {brands.map((b) => (
-          <li key={b}>
-            <Brand name={b} />
+        {logos.map((l) => (
+          <li key={l.slug}>
+            <Brand logo={l} />
           </li>
         ))}
-        {brands.map((b) => (
-          <li key={`dup-${b}`} aria-hidden="true">
-            <Brand name={b} hidden />
+        {logos.map((l) => (
+          <li key={`dup-${l.slug}`} aria-hidden="true">
+            <Brand logo={l} hidden />
           </li>
         ))}
       </ul>
