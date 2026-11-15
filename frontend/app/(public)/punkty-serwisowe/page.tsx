@@ -120,7 +120,7 @@ export default function PointsPage() {
           <div className="t-faqsplit__head">
             <span className="t-eyebrow">Zanim przyjedziesz</span>
             <h2 className="t-h2">Pytania o wizytę w punkcie</h2>
-            <p className="t-lead">Dojazd, parking i to, co warto zabrać ze sobą.</p>
+            <p className="t-lead">Dojazd i to, co warto zabrać ze sobą.</p>
           </div>
           <Faq items={faq} />
         </div>

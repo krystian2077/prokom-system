@@ -27,8 +27,8 @@ export type LocalPage = {
   /** "Skąd do nas przyjeżdżają": text about the area served from this point. */
   area: string;
   /**
-   * How to get there and where to park, in our own words. null = missing → the page does
-   * not publish (TODO(krystian) with the service). Shown next to the point's parkingNote.
+   * How to get there, in our own words. null = missing → the page does not publish.
+   * Parking info is left out for now (decision 15.11.2026, parkingNote stays null).
    */
   access: string | null;
   faq: FaqItem[];
@@ -48,7 +48,6 @@ export const localPages: LocalPage[] = [
     area:
       "Punkt w Rabce-Zdroju to nasz punkt główny. Przyjeżdżają do nas klienci z Raby Wyżnej, Jordanowa, Mszany Dolnej, Nowego Targu i Czarnego Dunajca. Jeśli nie możesz przyjechać, zgłoś naprawę online i wyślij telefon kurierem.",
     // From the current site: "w centrum Rabki-Zdroju przy ul. Orkana" (the street itself comes from prokom.ts).
-    // TODO(krystian): add parking (parkingNote in prokom.ts) after checking with the service.
     access:
       "Punkt jest w centrum Rabki-Zdroju, więc dojedziesz do niego z każdej strony miasta. Bez umawiania — wystarczy przyjść w godzinach otwarcia. Jeśli wcześniej zgłosisz naprawę online, przyjęcie telefonu zajmie chwilę, bo dane mamy już w systemie.",
     faq: [
@@ -87,7 +86,7 @@ export const localPages: LocalPage[] = [
     area:
       "Punkt w Zakopanem obsługuje też Kościelisko, Poronin, Biały Dunajec, Bukowinę Tatrzańską i Szaflary. Jesteś na urlopie? Naprawiamy także telefony turystów.",
     // From docs/STAN.md (14.11): centre, by ul. Weteranów Wojny and the town park.
-    // TODO(krystian): check wording and add parking with the service before Zakopane is published.
+    // TODO(krystian): check wording before Zakopane is published.
     access:
       "Punkt jest w centrum Zakopanego, przy ulicy Weteranów Wojny i parku miejskim. Przyjdź bez umawiania w godzinach otwarcia.",
     faq: [

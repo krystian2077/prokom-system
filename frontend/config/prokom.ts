@@ -41,6 +41,7 @@ export type ServicePoint = {
   /** null = line.phone */
   phone: string | null;
   mapsUrl: string | null;
+  /** Where to park. null = not shown (15.11.2026: parking info left out for now). */
   parkingNote: string | null;
   published: boolean;
 };
