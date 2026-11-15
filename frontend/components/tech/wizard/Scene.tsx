@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { onVisible, prefersReducedMotion } from "@/lib/tech/motion";
 import { FRAME_BOX, faultMeaning, sceneOf, type Box, type WizardDevice } from "@/lib/tech/wizard-data";
@@ -57,6 +58,8 @@ type Props = {
   interactive?: boolean;
   /** Changes on every pick → camera moves again even for the same fault. */
   pickNonce?: number;
+  /** Link to a published repair page for the chosen fault (TD5b), shown in the card. */
+  more?: { href: string; label: string } | null;
 };
 
 /**
@@ -64,7 +67,7 @@ type Props = {
  * targets), effect of the chosen fault masked to its region, label outside the region
  * with a leader line, camera move to the focus point, "Pokaż całe urządzenie" / Esc.
  */
-export function Scene({ device, fault, preview = null, onPick, onPreview, poster = false, layout = "full", interactive = true, pickNonce = 0 }: Props) {
+export function Scene({ device, fault, preview = null, onPick, onPreview, poster = false, layout = "full", interactive = true, pickNonce = 0, more = null }: Props) {
   const photo = device.photo!;
   const shown = preview && device.scenes[preview] ? preview : fault;
   const scene = sceneOf(device, shown);
@@ -221,10 +224,10 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
             {shown}
           </b>
           <span>{meaning}</span>
-          {device.repairHref ? (
-            <a href={device.repairHref} className="t-lnk t-lnk--sm">
-              Więcej o tej naprawie
-            </a>
+          {more && !(preview && preview !== fault) ? (
+            <Link href={more.href} className="t-lnk t-lnk--sm t-wiz__more">
+              {more.label} →
+            </Link>
           ) : null}
         </div>
       ) : null}

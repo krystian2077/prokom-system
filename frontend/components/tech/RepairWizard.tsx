@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import type { PointKey } from "@/config/prokom";
+import { repairForFault, repairPath } from "@/lib/tech/naprawy";
 import { trackEvent } from "@/lib/tech/track-event";
 import {
   buildWizardHref,
@@ -98,6 +99,9 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
   usePill(devRef, `[data-value="${deviceId}"]`, [deviceId]);
 
   const href = useMemo(() => buildWizardHref({ device: deviceId, fault, delivery }), [deviceId, fault, delivery]);
+  // "Dowiedz się więcej" — only when a published, verified repair page exists (SPEC §12.4, TD5b).
+  const learnMore = repairForFault(device.category, fault);
+  const more = learnMore ? { href: repairPath(learnMore.slug), label: `Dowiedz się więcej: ${learnMore.h1}` } : null;
 
   const selectDevice = useCallback((id: string) => {
     setDeviceId(id);
@@ -210,7 +214,7 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
 
           <div className="t-wiz__body">
             <div className="t-wiz__stagewrap">
-              <Scene device={device} fault={fault} preview={preview} onPick={pickFault} onPreview={setPreview} pickNonce={nonce} />
+              <Scene device={device} fault={fault} preview={preview} onPick={pickFault} onPreview={setPreview} pickNonce={nonce} more={more} />
             </div>
             <div className="t-wiz__side">
               <div className="t-wiz__groups">
@@ -301,6 +305,7 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
               onPick={pickFault}
               pickNonce={nonce}
               layout="phone"
+              more={more}
             />
           }
           onSwipe={swipeDevice}
