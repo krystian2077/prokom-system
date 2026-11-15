@@ -74,7 +74,7 @@ export function PhoneBrandsSection({ title }: { title: string }) {
           </div>
           <p className="t-lead">Nie widzisz swojej marki? Zadzwoń. Sprawdzimy dostępność części do Twojego modelu.</p>
         </div>
-        <ul className="t-phbrands t-snap">
+        <ul className="t-phbrands t-snap" tabIndex={0} aria-label="Marki telefonów, które naprawiamy">
           {PHONE_BRANDS.map((b) => (
             <li key={b.n} className="t-phbrand">
               <h3>{b.n}</h3>
