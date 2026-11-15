@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { pointPhone, telHref } from "@/config/prokom";
 import { hoursSummary } from "@/lib/tech/hours";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { prefersReducedMotion } from "@/lib/tech/motion";
 import { ACCOUNT_HREF, POINTS_HREF, REPAIRS_HREF, SUBMIT_HREF, directionsUrl, inTriangle, isActive, mainNav, repairLinks, type NavItem, type Pt } from "@/lib/tech/nav";
+import { requestSearch } from "@/lib/tech/search/open";
 import { submitHref, wizardDevices } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconChevronDown, IconPin, IconSearch, IconUser, IconWrench } from "./icons";
 import { Logo } from "./Logo";
@@ -24,6 +25,8 @@ export const OPEN_INTENT_MS = 80;
 export const CLOSE_DELAY_MS = 250;
 const TRIANGLE_GRACE_MS = 160;
 const COMPACT_AT_PX = 24;
+const noSubscription = () => () => {};
+const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
 /**
  * Main capsule (design T.Naglowek, PREMIUM §3). ≥ 1024: sticky, narrows on scroll
@@ -34,7 +37,8 @@ const COMPACT_AT_PX = 24;
  */
 export function Capsule() {
   const pathname = usePathname() || "/";
-  const { points, openSheet } = useShell();
+  const { points } = useShell();
+  const mac = useSyncExternalStore(noSubscription, isMac, () => false);
   const [open, setOpen] = useState<Mega | null>(null);
   const [hot, setHot] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -303,6 +307,14 @@ export function Capsule() {
           </nav>
 
           <div className="t-capsule__actions">
+            <button type="button" className="t-capsearch" onClick={() => requestSearch()} aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /">
+              <IconSearch size={18} />
+              {/* The name comes from the content (WCAG 2.5.3); the shortcut is shown, not read out. */}
+              <span className="t-capsearch__label">Szukaj</span>
+              <kbd className="t-capsearch__kbd" aria-hidden="true">
+                {mac ? "⌘K" : "Ctrl K"}
+              </kbd>
+            </button>
             <Link href={ACCOUNT_HREF} className="t-pillbtn t-capsule__account" aria-label="Konto klienta">
               <IconUser />
               <span>Konto</span>
@@ -315,7 +327,7 @@ export function Capsule() {
               <span className="t-cta__long">Zgłoś naprawę</span>
               <span className="t-cta__short">Zgłoś</span>
             </Link>
-            <button type="button" className="t-iconbtn t-capsule__search" aria-label="Szukaj" onClick={(e) => openSheet("szukaj", e.currentTarget)}>
+            <button type="button" className="t-iconbtn t-capsule__search" aria-label="Szukaj" aria-haspopup="dialog" onClick={() => requestSearch()}>
               <IconSearch />
             </button>
           </div>

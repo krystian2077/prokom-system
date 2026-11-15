@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { line, lines, telHref } from "@/config/prokom";
-import { ACCOUNT_HREF, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, footerColumns, mainNav, repairLinks } from "@/lib/tech/nav";
+import { ACCOUNT_HREF, REPAIRS_HREF, SUBMIT_HREF, mainNav, repairLinks } from "@/lib/tech/nav";
+import { requestSearch } from "@/lib/tech/search/open";
 import { DeviceGlyph, IconArrow, IconChevronRight, IconClose, IconSearch } from "./icons";
 import { InstallHint } from "./InstallHint";
 import { MyRepairs } from "./MyRepairs";
@@ -12,7 +13,7 @@ import { OpeningStatus } from "./OpeningStatus";
 import { useShell, type SheetMode } from "./ShellContext";
 import { ThemeSegmented } from "./ThemeToggle";
 
-const TITLES: Record<SheetMode, string> = { menu: "Menu", naprawy: "Naprawy", szukaj: "Szukaj" };
+const TITLES: Record<SheetMode, string> = { menu: "Menu", naprawy: "Naprawy" };
 const CLOSE_DRAG_PX = 110;
 /** A quick flick closes too (px per ms). */
 const CLOSE_FLICK_V = 0.6;
@@ -45,22 +46,9 @@ function lockScroll(): () => void {
   };
 }
 
-/** All site links for the search sheet (unique by href). */
-function searchIndex() {
-  const all = [
-    ...mainNav.map((n) => ({ label: n.label, href: n.href })),
-    ...repairLinks.map((r) => ({ label: r.label, href: r.href })),
-    ...footerColumns.flatMap((c) => c.items),
-    { label: "Zgłoś naprawę", href: SUBMIT_HREF },
-    { label: "Status naprawy", href: TRACK_HREF },
-  ];
-  const seen = new Set<string>();
-  return all.filter((x) => (seen.has(x.href) ? false : (seen.add(x.href), true)));
-}
-const norm = (s: string) => s.toLocaleLowerCase("pl").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
-
 /**
- * Bottom sheet (RESPONSYWNOSC §2, PREMIUM §3): menu, repairs mega menu and search.
+ * Bottom sheet (RESPONSYWNOSC §2, PREMIUM §3): menu (with the search field on top, which hands
+ * over to the search window) and the repairs mega menu.
  * iOS card (page behind shrinks), drag down or flick to close, Esc, close button,
  * staggered items, scroll lock without a jump, focus trap, focus returns to the opener.
  */
@@ -71,9 +59,13 @@ export function MenuSheet() {
   const rootRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState(0);
   const dragStart = useRef<{ y: number; t: number } | null>(null);
-  const [query, setQuery] = useState("");
-  const index = useMemo(searchIndex, []);
-  const results = useMemo(() => (query.trim() ? index.filter((x) => norm(x.label).includes(norm(query.trim()))) : index.slice(0, 8)), [index, query]);
+  // The search window opens once the sheet has closed and given the focus back (one modal at a time).
+  const searchNext = useRef(false);
+  useEffect(() => {
+    if (sheet || !searchNext.current) return;
+    searchNext.current = false;
+    requestSearch();
+  }, [sheet]);
 
   // closed sheet is inert (not focusable); React 18 has no `inert` prop
   useEffect(() => {
@@ -87,7 +79,6 @@ export function MenuSheet() {
 
   useEffect(() => {
     if (!sheet) return;
-    setQuery("");
     const unlock = lockScroll();
     shrinkPage(true);
     const panel = panelRef.current;
@@ -166,28 +157,6 @@ export function MenuSheet() {
         </div>
 
         <div className="t-sheet__body">
-          {mode === "szukaj" ? (
-            <>
-              <label className="t-search">
-                <IconSearch />
-                <span className="t-visually-hidden">Szukaj na stronie</span>
-                <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Np. laptop, bateria, status" enterKeyHint="search" autoComplete="off" />
-              </label>
-              <nav aria-label="Wyniki" className="t-sheet__list">
-                {results.length ? (
-                  results.map((r) => (
-                    <Link key={r.href} href={r.href} className="t-sheet__item">
-                      {r.label}
-                      <IconChevronRight />
-                    </Link>
-                  ))
-                ) : (
-                  <p className="t-sheet__empty">Nic nie znaleźliśmy. Zadzwoń — podpowiemy.</p>
-                )}
-              </nav>
-            </>
-          ) : null}
-
           {mode === "naprawy" ? (
             <>
               <ul className="t-sheet__devices">
@@ -212,6 +181,18 @@ export function MenuSheet() {
 
           {mode === "menu" ? (
             <>
+              <button
+                type="button"
+                className="t-search t-sheet__search"
+                aria-haspopup="dialog"
+                onClick={() => {
+                  searchNext.current = true;
+                  closeSheet();
+                }}
+              >
+                <IconSearch />
+                <span>Szukaj na stronie</span>
+              </button>
               <nav aria-label="Menu" className="t-sheet__list">
                 {mainNav.map((n) => (
                   <Link key={n.key} href={n.href} className="t-sheet__item">

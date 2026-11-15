@@ -1,0 +1,365 @@
+/*
+ * PRO-KOM Tech — side rail, search window and /szukaj (pattern: prokom-web-hub `wspolne.css`
+ * `.srail` / `.sdlg`, board 07 „Szyna i wyszukiwarka”) in the Tech look: tokens from tech.css and
+ * tech-theme.css, timing from tech-motion.css. Scoped like tech.css: every selector under `.tech`,
+ * classes with the `t-` prefix. Motion only transform / opacity / clip-path.
+ */
+
+/* ---------- Side rail (SectionRail) ----------
+ * From 1424 px, fixed in the free margin left of the content column (centred there by its folded
+ * 64 px, never over the content — szyna.spec). Folded by `clip-path` (no width animation): opens
+ * to 248 px over the margin on hover or keyboard focus after 120 ms, folds after 250 ms; labels
+ * slide in one after another. The wrapper carries the shadow (clip-path would cut it) and lets
+ * the pointer through outside the visible part. */
+.tech .t-railwrap { display: none; }
+@media (min-width: 1424px) {
+  .tech .t-railwrap {
+    position: fixed; top: 50%; z-index: 850; display: block;
+    left: max(8px, calc((100vw - var(--t-container) - 2 * var(--t-gutter)) / 4 + var(--t-gutter) / 2 - 32px));
+    translate: 0 -50%;
+    filter: drop-shadow(0 18px 34px rgba(18, 22, 19, 0.2)) drop-shadow(0 2px 4px rgba(18, 22, 19, 0.06));
+    pointer-events: none;
+  }
+}
+html[data-tech-theme="dark"] .tech .t-railwrap { filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)); }
+
+.tech .t-rail {
+  --rail-w: 64px;
+  --rail-r: 22px;
+  --rail-open-delay: var(--m-micro);
+  --rail-close-delay: 250ms;
+  --rail-item: 44px;
+  position: relative; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box;
+  width: 248px; max-height: calc(100dvh - 120px); padding: 8px;
+  border: 1px solid var(--capbd); border-radius: var(--rail-r);
+  background: var(--raised, var(--card)); box-shadow: inset 0 1px 0 var(--hair-top, transparent);
+  font: 700 14px/1.2 var(--t-font-body);
+  pointer-events: auto;
+  clip-path: inset(0 calc(100% - var(--rail-w)) 0 0 round var(--rail-r));
+  transition: clip-path var(--m-small) var(--m-ease-out) var(--rail-close-delay);
+}
+.tech .t-rail:hover,
+.tech .t-rail:focus-within {
+  clip-path: inset(0 0 0 0 round var(--rail-r));
+  transition-delay: var(--rail-open-delay);
+}
+.tech .t-rail[data-collapsed] {
+  clip-path: inset(0 calc(100% - var(--rail-w)) 0 0 round var(--rail-r));
+  transition-delay: 0ms;
+}
+/* Folded, the filled pieces (Szukaj, the marker, Zgłoś) are whole rounded 48 px squares instead of
+   being cut flat by the rail's edge; they grow to full rows together with the rail. */
+.tech .t-rail :is(.t-rail__search, .t-rail__marker, .t-rail__item--action) {
+  clip-path: inset(0 calc(100% - 48px) 0 0 round 13px);
+  transition: clip-path var(--m-small) var(--m-ease-out) var(--rail-close-delay), transform var(--m-panel) var(--m-ease-emph), color var(--m-micro), background-color var(--m-micro), filter var(--m-small);
+}
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) :is(.t-rail__search, .t-rail__marker, .t-rail__item--action) {
+  clip-path: inset(0 0 0 0 round 13px);
+  transition-delay: var(--rail-open-delay), 0ms, 0ms, 0ms, 0ms;
+}
+.tech .t-rail .t-rail__search { clip-path: inset(0 calc(100% - 48px) 0 0 round 15px); }
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) .t-rail__search { clip-path: inset(0 0 0 0 round 15px); }
+
+.tech .t-rail__search,
+.tech .t-rail__item {
+  position: relative; z-index: 1; flex: none; display: flex; align-items: center; gap: 12px;
+  box-sizing: border-box; height: var(--rail-item); padding: 0 12px; border: 0; border-radius: 13px;
+  background: none; color: var(--ink2); font: inherit; text-align: left; white-space: nowrap; cursor: pointer;
+  transition: color var(--m-micro) var(--m-ease-out), background-color var(--m-micro) var(--m-ease-out);
+}
+.tech .t-rail__item:hover { color: var(--ink); }
+.tech .t-rail__item[aria-current="location"] { color: var(--acct); }
+.tech .t-rail__item--action { background: var(--soft); color: var(--acct); }
+.tech .t-rail__item--action:hover { color: var(--acct); background: color-mix(in srgb, var(--acc) 18%, transparent); }
+.tech .t-rail__item--action[aria-current="page"] { box-shadow: inset 0 0 0 1.5px var(--softbd); }
+
+.tech .t-rail__search {
+  height: 48px; border-radius: 15px; background: var(--cta-grad, var(--acc)); color: #fff; font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 22px -12px rgba(196, 54, 43, 0.7);
+  transition: transform var(--m-micro) var(--m-ease-out), filter var(--m-small) var(--m-ease-out);
+}
+.tech .t-rail__search:hover { filter: brightness(1.06) saturate(1.05); }
+.tech .t-rail__search:active { transform: scale(0.97); }
+/* One calm pulse on the first page of a visit (not a loop): a ring spreading from the loupe, inside
+   the button, so the folded rail's clip never cuts it. */
+.tech .t-rail__search[data-pulse] .t-rail__icon::after {
+  content: ""; position: absolute; inset: -5px; border: 2px solid rgba(255, 255, 255, 0.95); border-radius: 50%;
+  opacity: 0; pointer-events: none; animation: t-rail-pulse 1.6s var(--m-ease-out) 0.6s 2;
+}
+@keyframes t-rail-pulse {
+  0% { opacity: 0.9; transform: scale(0.8); }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+.tech .t-rail :is(a, button):focus-visible { outline: 3px solid var(--acc); outline-offset: -1px; }
+.tech .t-rail .t-rail__search:focus-visible { outline-color: var(--ink); outline-offset: 2px; }
+
+.tech .t-rail__icon {
+  position: relative; flex: none; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px;
+  transition: transform var(--m-small) var(--m-ease-out);
+}
+.tech .t-rail__item:hover .t-rail__icon { transform: translateX(2px) scale(1.06); }
+.tech .t-rail__label {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+  opacity: 0; transform: translateX(-8px);
+  transition: opacity var(--m-small) var(--m-ease-out), transform var(--m-panel) var(--m-ease-emph);
+}
+.tech .t-rail__text { overflow: hidden; text-overflow: ellipsis; }
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) .t-rail__label { opacity: 1; transform: none; }
+/* Labels open one after another, 40 ms apart (counted among the entries only). */
+.tech .t-rail__list > :nth-child(2 of .t-rail__item) .t-rail__label { transition-delay: 40ms; }
+.tech .t-rail__list > :nth-child(3 of .t-rail__item) .t-rail__label { transition-delay: 80ms; }
+.tech .t-rail__list > :nth-child(4 of .t-rail__item) .t-rail__label { transition-delay: 120ms; }
+.tech .t-rail__list > :nth-child(5 of .t-rail__item) .t-rail__label { transition-delay: 160ms; }
+.tech .t-rail__list > :nth-child(n + 6 of .t-rail__item) .t-rail__label { transition-delay: 200ms; }
+
+.tech .t-rail__kbd {
+  margin-left: auto; padding: 3px 7px; border-radius: 7px; background: rgba(255, 255, 255, 0.2);
+  font: 800 11.5px/1.2 var(--t-font-body); letter-spacing: 0.02em;
+}
+.tech .t-rail__aside { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ink3, var(--ink2)); }
+.tech .t-rail__chev { width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform var(--m-small) var(--m-ease-out); }
+.tech .t-rail__chev[data-open] { transform: translateY(1px) rotate(-135deg); }
+.tech .t-rail__sep { flex: none; height: 1px; margin: 6px 10px; background: var(--bd); }
+.tech .t-rail__caption {
+  flex: none; display: flex; align-items: center; gap: 12px; height: 22px; padding: 0 12px;
+  color: var(--ink3, var(--ink2)); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+}
+.tech .t-rail__caption .t-rail__icon { font-size: 16px; color: var(--acc); }
+
+.tech .t-rail__list { position: relative; display: flex; flex-direction: column; gap: 2px; min-height: 0; }
+.tech .t-rail__list[hidden] { display: none; }
+.tech .t-rail__list[data-long] { max-height: calc(10 * (var(--rail-item) + 2px)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--scroll-thumb, var(--bd2)) transparent; }
+.tech .t-rail__marker {
+  position: absolute; top: 0; left: 0; width: 100%; height: var(--rail-item); border-radius: 13px;
+  background: var(--soft); box-shadow: inset 3px 0 0 var(--acc);
+  transition: transform var(--m-panel) var(--m-ease-emph);
+}
+/* Progress along the tracked list, from the first entry's centre to the last one's; the filled
+   part ends at the section being read, with a glowing dot on its end. */
+.tech .t-rail__progress {
+  position: absolute; top: var(--rail-line-top, 22px); left: 0; z-index: 2; width: 2px; height: var(--rail-line-h, 0px);
+  border-radius: 2px; background: var(--bd); pointer-events: none;
+}
+.tech .t-rail__progress > span {
+  display: block; height: 100%; border-radius: inherit; background: var(--acc);
+  transform: scaleY(var(--rail-progress, 0)); transform-origin: top; transition: transform 250ms var(--m-ease-out);
+}
+.tech .t-rail__progress > i {
+  position: absolute; top: -3px; left: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--acc);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 22%, transparent), 0 0 12px var(--glow, var(--acc));
+  transform: translateY(var(--rail-dot, 0px)); transition: transform 250ms var(--m-ease-out);
+}
+/* „Do góry” comes in after one screen of scrolling. */
+.tech .t-rail__up { opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity var(--m-small) var(--m-ease-out), transform var(--m-panel) var(--m-ease-out), color var(--m-micro); }
+.tech .t-rail__up[data-shown] { opacity: 1; transform: none; pointer-events: auto; }
+
+/* Lower screens: shorter rows, so the whole rail fits. */
+@media (min-width: 1424px) and (max-height: 1000px) {
+  .tech .t-rail { --rail-item: 38px; }
+  .tech .t-rail__search { height: 42px; }
+}
+@media (min-width: 1424px) and (max-height: 760px) {
+  .tech .t-rail { --rail-item: 34px; }
+  .tech .t-rail__search { height: 38px; }
+  .tech .t-rail__sep { margin: 4px 10px; }
+}
+
+/* A section reached from the rail „arrives”: its heading settles in (tech-motion tokens). */
+.tech .t-main [data-arrive] :is(h1, h2):first-of-type { animation: t-arrive var(--m-scene) var(--m-ease-emph) both; }
+@keyframes t-arrive {
+  0% { opacity: 0.4; transform: translateY(8px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------- Capsule: „Szukaj · Ctrl K” (≥ 1024; below it the loupe icon) ---------- */
+.tech .t-capsearch { display: none; }
+@media (min-width: 1024px) {
+  .tech .t-capsearch {
+    display: inline-flex; align-items: center; gap: 9px; box-sizing: border-box; height: 44px; padding: 0 8px 0 13px;
+    border: 1px solid var(--capbd); border-radius: 14px; background: var(--bg2); color: var(--ink2);
+    font: 600 14px var(--t-font-body); white-space: nowrap; cursor: pointer;
+    transition: background-color var(--m-small) var(--m-ease-out), color var(--m-small) var(--m-ease-out), border-color var(--m-small) var(--m-ease-out), transform var(--m-micro) var(--m-ease-out);
+  }
+  .tech .t-capsearch:hover { color: var(--ink); border-color: var(--bd2); }
+  .tech .t-capsearch:active { transform: scale(0.97); }
+  .tech .t-capsearch:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+  .tech .t-capsearch__kbd { padding: 3px 7px; border: 1px solid var(--bd); border-radius: 7px; background: var(--card); color: var(--ink2); font: 700 12px/1.2 var(--t-font-body); }
+}
+/* Room in the capsule: the loupe alone up to 1679 px, the full pill on PCs (container 1360). In both
+   cases „Konto” becomes an icon (its name stays in aria-label), so the CTA never leaves the capsule. */
+@media (min-width: 1024px) and (max-width: 1679.98px) {
+  .tech .t-capsearch { width: 44px; padding: 0; justify-content: center; }
+  .tech .t-capsearch__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  .tech .t-capsearch__kbd { display: none; }
+}
+@media (min-width: 1024px) {
+  .tech .t-capsule__account span { display: none; }
+  .tech .t-capsule__account { width: 44px; padding: 0; justify-content: center; }
+}
+
+/* 1280–1359: the long CTA and six links left the actions ~20 px past the capsule's edge (seen
+   before the search button too) — slightly tighter links keep everything inside. */
+@media (min-width: 1280px) and (max-width: 1359.98px) {
+  .tech .t-capsule .t-navlink { padding-left: 10px; padding-right: 10px; }
+}
+
+/* ---------- Menu sheet: the field that hands over to the search window ---------- */
+.tech .t-sheet__search { width: 100%; box-sizing: border-box; flex: none; font: 600 16px var(--t-font-body); text-align: left; cursor: pointer; }
+.tech .t-sheet__search span { color: var(--ink2); }
+.tech .t-sheet__search:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+
+/* ---------- Search window (SearchDialog) ----------
+ * A modal <dialog> 10 vh from the top (full screen on a phone), glass over a dimmed, blurred page. */
+.tech .t-sdlg {
+  box-sizing: border-box; width: min(680px, calc(100% - 32px)); max-width: none; max-height: min(80dvh, 720px);
+  margin: 10vh auto auto; padding: 0; overflow: hidden;
+  border: 1px solid var(--capbd); border-radius: 24px;
+  background: color-mix(in srgb, var(--raised, var(--card)) 90%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5); backdrop-filter: blur(24px) saturate(1.5);
+  color: var(--ink);
+  box-shadow: var(--cap-inset), 0 40px 120px -40px rgba(196, 54, 43, 0.35), var(--sh-3, 0 40px 80px -40px rgba(18, 22, 19, 0.42));
+}
+.tech .t-sdlg::backdrop { background: rgba(18, 22, 19, 0.36); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+html[data-tech-theme="dark"] .tech .t-sdlg { box-shadow: var(--cap-inset), 0 40px 120px -40px rgba(226, 72, 58, 0.4), var(--sh-3); }
+html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3, 0.62); }
+.tech .t-sdlg[open] { animation: t-sdlg-in var(--m-panel) var(--m-ease-emph); }
+.tech .t-sdlg[open]::backdrop { animation: t-sdlg-fade var(--m-small) var(--m-ease-out); }
+@keyframes t-sdlg-in {
+  0% { opacity: 0; transform: translateY(12px) scale(0.98); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes t-sdlg-fade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.tech .t-sdlg__in { display: flex; flex-direction: column; max-height: inherit; }
+@media (max-width: 767.98px) {
+  .tech .t-sdlg { width: 100%; height: 100dvh; max-height: none; margin: 0; border: 0; border-radius: 0; padding-top: env(safe-area-inset-top, 0px); }
+  .tech .t-sdlg__in { height: 100%; }
+  .tech .t-sdlg[open] { animation-name: t-sdlg-up; }
+  @keyframes t-sdlg-up {
+    0% { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: none; }
+  }
+}
+
+.tech .t-sdlg__field { flex: none; display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 14px 0 20px; border-bottom: 1px solid var(--bd); }
+/* The field has no outline of its own: the line under it shows where the focus is (WCAG 2.4.7). */
+.tech .t-sdlg__field:focus-within { box-shadow: inset 0 -2px 0 var(--acc); }
+.tech .t-sdlg__loupe { flex: none; color: var(--acct); }
+.tech .t-sdlg__field input {
+  flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; color: var(--ink);
+  font: 600 17px var(--t-font-body); -webkit-appearance: none; appearance: none;
+}
+.tech .t-sdlg__field input::placeholder { color: var(--ink3, var(--ink2)); font-weight: 500; }
+.tech .t-sdlg__field input::-webkit-search-cancel-button { display: none; }
+.tech .t-sdlg__close {
+  flex: none; min-height: 32px; padding: 4px 9px; border: 1px solid var(--bd); border-radius: 9px; background: var(--bg2);
+  color: var(--ink2); font: 800 12px var(--t-font-body); cursor: pointer;
+}
+.tech .t-sdlg__close:hover { color: var(--ink); }
+.tech .t-sdlg :is(a, button):focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+
+.tech .t-sdlg__body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 18px; padding: 14px 12px 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--scroll-thumb, var(--bd2)) transparent; }
+.tech .t-sdlg__list { display: flex; flex-direction: column; gap: 14px; }
+.tech .t-sdlg__list:empty { display: none; }
+.tech .t-sdlg__group ul,
+.tech .t-sdlg__chips,
+.tech .t-szukaj__list { margin: 0; padding: 0; list-style: none; }
+.tech .t-sdlg__group ul { display: flex; flex-direction: column; gap: 2px; }
+.tech .t-sdlg__title,
+.tech .t-szukaj__title { margin: 0 0 6px; padding: 0 10px; color: var(--ink3, var(--ink2)); font: 800 11.5px/1.3 var(--t-font-body); letter-spacing: 0.1em; text-transform: uppercase; }
+.tech .t-sdlg__row { display: flex; align-items: center; justify-content: space-between; }
+.tech .t-sdlg__row .t-sdlg__title { margin: 0; }
+
+.tech .t-sdlg__result,
+.tech .t-szukaj__result {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; box-sizing: border-box; padding: 8px 12px 8px 10px;
+  border-radius: 14px; color: var(--ink); text-decoration: none; cursor: pointer;
+  transition: background-color var(--m-micro) var(--m-ease-out), box-shadow var(--m-micro) var(--m-ease-out);
+}
+.tech .t-sdlg__result[data-active],
+.tech .t-szukaj__result:hover,
+.tech .t-szukaj__result:focus-visible { background: var(--soft); box-shadow: inset 3px 0 0 var(--acc); }
+.tech .t-sdlg__icon {
+  flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px;
+  background: var(--bg2); color: var(--acct); box-shadow: inset 0 0 0 1px var(--hair, transparent);
+}
+.tech :is(.t-sdlg__result[data-active], .t-szukaj__result:hover) .t-sdlg__icon { background: var(--card); }
+.tech .t-sdlg__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.tech .t-sdlg__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: 15px; line-height: 1.35; }
+.tech .t-sdlg__hint { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 1.35; color: var(--ink2); }
+.tech .t-sdlg__hit { padding: 0; border-radius: 3px; background: linear-gradient(transparent 58%, color-mix(in srgb, var(--acc) 26%, transparent) 0); color: inherit; font-weight: 800; }
+.tech .t-sdlg__go { flex: none; color: var(--acct); opacity: 0; transform: translateX(-4px); transition: opacity var(--m-micro) var(--m-ease-out), transform var(--m-small) var(--m-ease-out); }
+.tech :is(.t-sdlg__result[data-active], .t-szukaj__result:hover, .t-szukaj__result:focus-visible) .t-sdlg__go { opacity: 1; transform: none; }
+
+.tech .t-sdlg__chipset { display: flex; flex-direction: column; gap: 8px; }
+.tech .t-sdlg__chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 10px; }
+.tech .t-sdlg__chip {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 40px; box-sizing: border-box; padding: 0 14px;
+  border: 1px solid var(--bd); border-radius: 12px; background: var(--card); color: var(--ink);
+  font: 700 14px var(--t-font-body); text-decoration: none; cursor: pointer;
+  transition: border-color var(--m-small) var(--m-ease-out), color var(--m-small) var(--m-ease-out), transform var(--m-micro) var(--m-ease-out);
+}
+.tech .t-sdlg__chip svg { color: var(--ink3, var(--ink2)); }
+.tech .t-sdlg__chip:hover { border-color: var(--acc); color: var(--acct); }
+.tech .t-sdlg__chip:active { transform: scale(0.97); }
+.tech .t-sdlg[open] .t-sdlg__chips > * { animation: t-sdlg-chip 300ms var(--m-ease-out) both; }
+.tech .t-sdlg[open] .t-sdlg__chips > :nth-child(2) { animation-delay: 20ms; }
+.tech .t-sdlg[open] .t-sdlg__chips > :nth-child(3) { animation-delay: 40ms; }
+.tech .t-sdlg[open] .t-sdlg__chips > :nth-child(4) { animation-delay: 60ms; }
+.tech .t-sdlg[open] .t-sdlg__chips > :nth-child(5) { animation-delay: 80ms; }
+.tech .t-sdlg[open] .t-sdlg__chips > :nth-child(n + 6) { animation-delay: 100ms; }
+@keyframes t-sdlg-chip {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: none; }
+}
+.tech .t-sdlg__link { min-height: 32px; padding: 4px 10px; border: 0; border-radius: 8px; background: none; color: var(--acct); font: 800 13px var(--t-font-body); cursor: pointer; }
+.tech .t-sdlg__link:hover { background: var(--soft); }
+
+.tech .t-sdlg__state { display: flex; align-items: center; gap: 10px; margin: 0; padding: 10px; color: var(--ink2); font-weight: 600; }
+.tech .t-sdlg__spin { width: 16px; height: 16px; border: 2px solid var(--bd2); border-top-color: var(--acc); border-radius: 50%; animation: t-spin 0.8s linear infinite; }
+@keyframes t-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.tech .t-sdlg__none { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 10px 4px; color: var(--ink2); }
+.tech .t-sdlg__none p { margin: 0; }
+.tech .t-ui .t-sdlg__noneh { color: var(--ink); font: 800 20px/1.2 var(--t-font-head); font-stretch: 108%; letter-spacing: -0.01em; }
+.tech .t-sdlg__noneactions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.tech .t-sdlg__noneactions .t-btn { padding: 0 18px; }
+
+.tech .t-sdlg__foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; padding: 6px 12px 6px 20px; border-top: 1px solid var(--bd); }
+.tech .t-sdlg__keys { display: flex; gap: 16px; margin: 0; color: var(--ink3, var(--ink2)); font-size: 12px; font-weight: 700; }
+.tech .t-sdlg__keys kbd { display: inline-block; min-width: 12px; margin-right: 2px; padding: 1px 6px; border: 1px solid var(--bd2); border-radius: 6px; background: var(--card); color: var(--ink2); font: 800 11px/1.5 var(--t-font-body); text-align: center; }
+.tech .t-sdlg__all { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; margin-left: auto; padding: 0 8px; border-radius: 9px; color: var(--acct); font-size: 13px; font-weight: 800; }
+.tech .t-sdlg__all:hover { background: var(--soft); }
+@media (max-width: 767.98px) {
+  .tech .t-sdlg__keys { display: none; }
+  .tech .t-sdlg__foot { padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- /szukaj (no-JS search and „Wszystkie wyniki”) ---------- */
+.tech .t-szukaj__form { display: flex; flex-wrap: wrap; gap: 10px; max-width: 680px; }
+.tech .t-szukaj__field { flex: 1 1 260px; }
+.tech .t-szukaj__form .t-btn { padding: 0 26px; height: 52px; }
+.tech .t-szukaj__body { display: flex; flex-direction: column; gap: 28px; max-width: 860px; }
+.tech .t-szukaj__count { margin: 0; color: var(--ink2); font-size: 17px; }
+.tech .t-szukaj__count b { color: var(--ink); }
+.tech .t-szukaj__group { display: flex; flex-direction: column; gap: 4px; }
+.tech .t-szukaj__title { padding: 0 12px; }
+.tech .t-szukaj__list { display: flex; flex-direction: column; gap: 2px; }
+.tech .t-szukaj__result { min-height: 60px; }
+.tech .t-szukaj__result .t-sdlg__name { white-space: normal; font-size: 16px; }
+.tech .t-szukaj__result .t-sdlg__hint { white-space: normal; }
+.tech .t-szukaj__none p { margin: 0; color: var(--ink2); }
+.tech .t-szukaj__popular .t-sdlg__chips { padding: 0 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tech :is(.t-rail, .t-rail__label, .t-rail__icon, .t-rail__marker, .t-rail__up, .t-rail__chev, .t-rail__progress > *, .t-sdlg__go) { transition: none; }
+  .tech .t-rail__search[data-pulse] .t-rail__icon::after,
+  .tech .t-sdlg[open],
+  .tech .t-sdlg[open]::backdrop,
+  .tech .t-sdlg__chips > * { animation: none !important; }
+  .tech .t-main [data-arrive] :is(h1, h2) { animation: none; }
+}

@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { VisiblePoint } from "@/lib/tech/points";
 
-export type SheetMode = "menu" | "naprawy" | "szukaj";
+export type SheetMode = "menu" | "naprawy";
 
 type ShellState = {
   points: VisiblePoint[];
