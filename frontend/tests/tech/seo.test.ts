@@ -20,9 +20,10 @@ describe("sitemap.ts", () => {
     expect(p).toContain("/punkty-serwisowe");
     expect(p).toContain("/o-firmie");
     expect(p).toContain("/serwis-telefonow-rabka-zdroj");
-    expect(p).not.toContain("/serwis-telefonow-zakopane");
+    expect(paths(withZakopane(false))).not.toContain("/serwis-telefonow-zakopane");
   });
-  it("lists the Zakopane page once the point is published", () => {
+  it("real config: lists the Zakopane page (point published 15.11.2026)", () => {
+    expect(paths(servicePoints)).toContain("/serwis-telefonow-zakopane");
     expect(paths(withZakopane(true))).toContain("/serwis-telefonow-zakopane");
   });
   it("lists every address once", () => {
@@ -63,12 +64,16 @@ describe("local pages (no doorway pages, SPEC §9)", () => {
     expect(localPageState(p, false)).toBe("hidden");
     expect(localPageState(p, true)).toBe("draft");
   });
-  it("Zakopane: hidden in production, draft on staging, published with the point", () => {
+  it("Zakopane unpublished: hidden in production, draft on staging", () => {
     const z = localPages.find((p) => p.point === "zakopane")!;
-    expect(localPageState(z, false)).toBe("hidden");
-    expect(localPageState(z, true)).toBe("draft");
-    expect(localPageState(z, false, withZakopane(true))).toBe("published");
-    expect(publishedLocalPages().map((p) => p.slug)).toEqual(["serwis-telefonow-rabka-zdroj"]);
+    expect(localPageState(z, false, withZakopane(false))).toBe("hidden");
+    expect(localPageState(z, true, withZakopane(false))).toBe("draft");
+    expect(publishedLocalPages(withZakopane(false)).map((p) => p.slug)).toEqual(["serwis-telefonow-rabka-zdroj"]);
+  });
+  it("real config: both local pages published", () => {
+    const z = localPages.find((p) => p.point === "zakopane")!;
+    expect(localPageState(z, false)).toBe("published");
+    expect(publishedLocalPages().map((p) => p.slug)).toEqual(["serwis-telefonow-rabka-zdroj", "serwis-telefonow-zakopane"]);
   });
   it("titles 30–60 with the suffix, descriptions 120–155", () => {
     for (const p of localPages) {

@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { DEVICE_CATEGORIES } from "@/types/repair";
+import { servicePoints, type ServicePoint } from "@/config/prokom";
 import {
   BRAND_REQUIRED,
   DELIVERY_OPTIONS,
@@ -371,8 +372,13 @@ describe("wizard parameters (KONTRAKT §1.4)", () => {
   });
   it("ignores unknown values and unpublished points (without draft)", () => {
     expect(parseWizardParams(new URLSearchParams("category=drone&punkt=krakow&dostawa=paczkomat&x=1"), draftOff)).toEqual({});
-    expect(parseWizardParams(new URLSearchParams("punkt=zakopane"), draftOff)).toEqual({});
-    expect(parseWizardParams(new URLSearchParams("punkt=zakopane"), { draft: true })).toEqual({ dropoff: "zakopane" });
+    const unpublished: ServicePoint[] = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
+    expect(parseWizardParams(new URLSearchParams("punkt=zakopane"), { draft: false, points: unpublished })).toEqual({});
+    expect(parseWizardParams(new URLSearchParams("punkt=zakopane"), { draft: true, points: unpublished })).toEqual({ dropoff: "zakopane" });
+  });
+  it("real config: both published points are accepted (Zakopane published 15.11.2026)", () => {
+    expect(parseWizardParams(new URLSearchParams("punkt=zakopane"), draftOff)).toEqual({ dropoff: "zakopane" });
+    expect(parseWizardParams(new URLSearchParams("punkt=rabka"), draftOff)).toEqual({ dropoff: "rabka" });
   });
   it("caps a long usterka and ignores an empty one", () => {
     expect(parseWizardParams(new URLSearchParams(`usterka=${"a".repeat(3000)}`), draftOff).problem?.length).toBe(500);

@@ -69,8 +69,8 @@ export const servicePoints: ServicePoint[] = [
     street: "ul. Stanisława Staszica 8",
     postal: "34-500",
     city: "Zakopane",
-    // APPROXIMATE (Zakopane centre). TODO(krystian): exact pin of the shop before publishing.
-    geo: { lat: 49.299, lng: 19.9489 },
+    // Shop pin from Krystian, 15.11.2026 (ul. Stanisława Staszica 8, by Krupówki).
+    geo: { lat: 49.2978, lng: 19.9539 },
     hours: [
       { days: "pn–pt", open: "10:00", close: "16:30" },
       { days: "sob", open: null, close: null },
@@ -79,7 +79,7 @@ export const servicePoints: ServicePoint[] = [
     phone: "+48 18 541 20 15",
     mapsUrl: null,
     parkingNote: null,
-    published: false,
+    published: true,
   },
 ];
 

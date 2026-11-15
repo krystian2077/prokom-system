@@ -86,10 +86,10 @@ export const localPages: LocalPage[] = [
       "Naprawa telefonów w Zakopanem: wymiana wyświetlacza, baterii i gniazda ładowania, pomoc po zalaniu. Diagnoza i wycena przed naprawą, gwarancja na usługę i części.",
     area:
       "Punkt w Zakopanem obsługuje też Kościelisko, Poronin, Biały Dunajec, Bukowinę Tatrzańską i Szaflary. Jesteś na urlopie? Naprawiamy także telefony turystów.",
-    // From docs/STAN.md (14.11): centre, by ul. Weteranów Wojny and the town park.
-    // TODO(krystian): check wording and add parking with the service before Zakopane is published.
+    // From the boss (14.11) and Krystian (15.11): town centre, near Krupówki and Równia Krupowa.
+    // The street comes from config/prokom.ts on the page. TODO(krystian): parkingNote once the service confirms it.
     access:
-      "Punkt jest w centrum Zakopanego, przy ulicy Weteranów Wojny i parku miejskim. Przyjdź bez umawiania w godzinach otwarcia.",
+      "Punkt jest w centrum Zakopanego, kilka kroków od Krupówek i Równi Krupowej. Przyjdź bez umawiania w godzinach otwarcia.",
     faq: [
       {
         q: "Ile kosztuje wymiana szybki w telefonie w Zakopanem?",
@@ -102,6 +102,11 @@ export const localPages: LocalPage[] = [
       {
         q: "Zalałem telefon na wyjeździe. Co robić?",
         a: "Wyłącz go, nie ładuj i nie susz suszarką. Przynieś go do punktu jak najszybciej — po zalaniu liczy się czas.",
+      },
+      {
+        // Krystian, 15.11.2026: the Zakopane point has a Hammer Glass plotter.
+        q: "Czy w Zakopanem wytniecie folię Hammer Glass?",
+        a: "Tak. W punkcie w Zakopanem jest ploter Hammer Glass. Folię wycinamy pod Twój model i zakładamy na miejscu, także przy odbiorze telefonu z naprawy.",
       },
       {
         q: "Czy w Zakopanem jest ta sama gwarancja co w Rabce-Zdroju?",

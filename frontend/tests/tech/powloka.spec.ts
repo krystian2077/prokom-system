@@ -27,18 +27,20 @@ test.describe("desktop 1440", () => {
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
-  test("points mega menu shows only published points (no Zakopane in production)", async ({ page }) => {
+  test("points mega menu and footer show both published points", async ({ page }) => {
     await page.goto("/");
     await page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" }).click();
     const panel = page.locator(".t-mega").nth(1);
     await expect(panel.getByText("Rabka-Zdrój", { exact: true })).toBeVisible();
-    await expect(page.locator(".t-header, .t-footer").getByText(/Zakopane|Staszica/)).toHaveCount(0);
+    await expect(panel.getByText("Zakopane", { exact: true })).toBeVisible();
+    await expect(page.locator(".t-footer")).toContainText("Zakopane");
   });
 
   test("brand bar opening status appears after hydration with the literal from SPEC §12.1", async ({ page }) => {
     await page.goto("/");
     const status = page.locator(".t-brandbar .t-status").first();
-    await expect(status).toHaveText(/^(Otwarte do \d{1,2}:\d{2}|Zamykamy za \d+ min|Otwieramy dziś o \d{1,2}:\d{2}|Zamknięte( dziś \(.+\))? · otwieramy .+ o \d{1,2}:\d{2})$/);
+    // two published points → each status starts with the point name, e.g. "Rabka-Zdrój: Otwarte do 17:00"
+    await expect(status).toHaveText(/^(?:(?:Rabka-Zdrój|Zakopane): )?(Otwarte do \d{1,2}:\d{2}|Zamykamy za \d+ min|Otwieramy dziś o \d{1,2}:\d{2}|Zamknięte( dziś \(.+\))? · otwieramy .+ o \d{1,2}:\d{2})$/);
   });
 
   test("theme toggle switches data-tech-theme only", async ({ page }) => {
