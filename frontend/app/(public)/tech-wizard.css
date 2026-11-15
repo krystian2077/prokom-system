@@ -149,12 +149,12 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); }
 .tech .t-wizflow__scene { touch-action: pan-y; }
 
 /* placement in the wizard */
-.tech .t-wiz__stagewrap { display: flex; }
+.tech .t-wiz__stagewrap { display: flex; min-height: 420px; }
 @media (max-width: 767.98px) {
   .tech .t-wiz__body > .t-wiz__stagewrap { display: none; }
 }
 @media (min-width: 820px) {
-  .tech .t-wiz__stagewrap { width: clamp(300px, 34vw, 440px); flex-shrink: 0; align-self: stretch; }
+  .tech .t-wiz__stagewrap { width: clamp(300px, 34vw, 440px); flex-shrink: 0; align-self: stretch; min-height: 540px; }
   .tech .t-wiz__stagewrap .t-scene { min-height: 540px; }
 }
 @media (min-width: 1180px) {

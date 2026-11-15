@@ -68,6 +68,38 @@ function radioKeys(e: ReactKeyboardEvent<HTMLElement>, values: string[], current
   window.requestAnimationFrame(() => group.querySelector<HTMLElement>(`[data-value="${CSS.escape(values[n])}"]`)?.focus());
 }
 
+/**
+ * The page scene mounts only when it can be seen (≥ 768 px) and is near the viewport, or
+ * once the browser is idle — keeps the photo, effects and observers out of the first
+ * load (PREMIUM §4 performance). Phones use the scene inside the full-screen flow.
+ */
+function useLazyStage(ref: React.RefObject<HTMLElement>): boolean {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (on) return;
+    const mq = window.matchMedia(PHONE_MQ);
+    let io: IntersectionObserver | null = null;
+    let idle: number | undefined;
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const arm = () => {
+      if (mq.matches || io) return;
+      if (typeof IntersectionObserver === "function" && ref.current) {
+        io = new IntersectionObserver((e) => e.some((x) => x.isIntersecting) && setOn(true), { rootMargin: "300px 0px" });
+        io.observe(ref.current);
+      }
+      idle = w.requestIdleCallback ? w.requestIdleCallback(() => setOn(true), { timeout: 3000 }) : window.setTimeout(() => setOn(true), 1500);
+    };
+    arm();
+    mq.addEventListener("change", arm);
+    return () => {
+      io?.disconnect();
+      if (idle !== undefined) (w.cancelIdleCallback ?? window.clearTimeout)(idle);
+      mq.removeEventListener("change", arm);
+    };
+  }, [on, ref]);
+  return on;
+}
+
 /** Values that "jump in" when they change (summary). */
 function Pop({ children, k }: { children: ReactNode; k: string }) {
   return (
@@ -96,6 +128,8 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
   const [delivery, setDelivery] = useState<Delivery>(points[0] ? { kind: "point", point: points[0].key } : { kind: "courier" });
   const [step, setStep] = useState<number | null>(null); // phone flow: 1..3 (index in STEPS), null = closed
   const devRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stageOn = useLazyStage(stageRef);
   usePill(devRef, `[data-value="${deviceId}"]`, [deviceId]);
 
   const href = useMemo(() => buildWizardHref({ device: deviceId, fault, delivery }), [deviceId, fault, delivery]);
@@ -213,8 +247,8 @@ export function RepairWizard({ points, courier }: { points: WizardPoint[]; couri
           </div>
 
           <div className="t-wiz__body">
-            <div className="t-wiz__stagewrap">
-              <Scene device={device} fault={fault} preview={preview} onPick={pickFault} onPreview={setPreview} pickNonce={nonce} more={more} />
+            <div ref={stageRef} className="t-wiz__stagewrap">
+              {stageOn ? <Scene device={device} fault={fault} preview={preview} onPick={pickFault} onPreview={setPreview} pickNonce={nonce} more={more} /> : null}
             </div>
             <div className="t-wiz__side">
               <div className="t-wiz__groups">
