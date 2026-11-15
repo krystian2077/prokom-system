@@ -1155,8 +1155,20 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
   .tech .t-trk__form { width: min(700px, 56%); flex-shrink: 0; }
 }
 .tech .t-trk__result { scroll-margin-top: 96px; display: flex; flex-direction: column; gap: 12px; }
-.tech .t-trk__empty { padding: 22px 24px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.6; color: var(--ink2); box-shadow: none; }
-.tech .t-trk__empty b { color: var(--ink); }
+/* placeholders while /track and /zgloszenie render on the client: heights of the real pages per layout (CLS) */
+.tech .t-trk-ph, .tech .t-zgl-ph { box-sizing: border-box; }
+.tech .t-trk-ph { min-height: 1180px; }
+.tech .t-zgl-ph { min-height: 1575px; }
+@media (min-width: 768px) { .tech .t-trk-ph { min-height: 870px; } .tech .t-zgl-ph { min-height: 2290px; } }
+@media (min-width: 1024px) { .tech .t-trk-ph { min-height: 726px; } }
+@media (min-width: 1180px) { .tech .t-zgl-ph { min-height: 1584px; } }
+@media (min-width: 1280px) { .tech .t-trk-ph { min-height: 614px; } }
+/* empty state = the home status band (.t-track) with the hint on the left (przegląd wizualny) */
+.tech .t-trk__empty.t-track { margin-top: 0; }
+.tech .t-trk__empty .t-track__text { gap: 16px; justify-content: center; }
+.tech .t-trk__empty .t-track__desc { font-size: 16px; line-height: 1.6; }
+.tech .t-trk__empty .t-track__desc b { color: #ffffff; }
+.tech .t-ui .t-trk__emptylink { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; color: #f29185; font-size: 14.5px; }
 .tech .t-trk__save { align-self: flex-start; }
 .tech .t-trk__card { border-radius: 28px; padding: clamp(18px, 2.2vw, 30px); display: flex; flex-direction: column; gap: 26px; }
 .tech .t-trk__top { display: flex; flex-direction: column; gap: 16px; }
