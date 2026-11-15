@@ -130,7 +130,6 @@ test("courier: chosen salon goes to additional_notes only; success card shows it
     return reply(route, "submit-201-phone-rabka");
   });
   await page.goto("/zgloszenie?category=laptop&dostawa=kurier");
-  await page.getByLabel("Marka *").fill("Lenovo");
   await page.getByLabel("Model *").fill("ThinkPad");
   await page.getByLabel("Co się dzieje? *").fill("Nie włącza się.");
   await page.locator("[data-zgl-next]").click();
