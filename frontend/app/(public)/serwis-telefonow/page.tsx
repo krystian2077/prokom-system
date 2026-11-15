@@ -11,6 +11,9 @@ import { inCity, joinCities } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, serviceJsonLd, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { towns } from "@/lib/tech/towns";
+import { mobileDeviceExtra } from "@/config/tresci/urzadzenia-mobilne";
+import { DataSafety } from "@/components/tech/DataSafety";
+import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSelfCheck, DeviceSymptoms, DeviceWarranty, DeviceWorth, HammerTeaser } from "@/components/tech/content/DeviceSections";
 import { FaultVisual } from "@/components/tech/subhero/FaultVisual";
 import { SubHero } from "@/components/tech/subhero/SubHero";
 import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
@@ -56,6 +59,10 @@ const FAQ: FaqItem[] = [
   },
 ];
 
+/** Extended texts (2026-11, config/tresci/urzadzenia-mobilne.ts) — to be accepted by Krystian. */
+const EXTRA = mobileDeviceExtra["serwis-telefonow"];
+const ALL_FAQ: FaqItem[] = [...FAQ, ...EXTRA.faq];
+
 export default function PhoneServicePage() {
   const points = visiblePoints();
   const locals = visibleLocalPages();
@@ -63,7 +70,7 @@ export default function PhoneServicePage() {
   return (
     <div className="t-ui t-page">
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
-      <JsonLd data={faqJsonLd(FAQ)} />
+      <JsonLd data={faqJsonLd(ALL_FAQ)} />
       <JsonLd
         data={serviceJsonLd({
           name: "Serwis telefonów",
@@ -106,9 +113,18 @@ export default function PhoneServicePage() {
         </nav>
       ) : null}
 
+      <DeviceIntro paragraphs={EXTRA.intro} title="Serwis telefonów: najczęstsze usterki i jak pracujemy" />
       <PhoneRepairsSection />
+      <DeviceSymptoms extra={EXTRA} name="Serwis telefonów" short="Telefony" category="phone" />
+      <RepairLinks device="phone" title="Konkretne naprawy telefonów" />
+      <DeviceSelfCheck extra={EXTRA} name="Serwis telefonów" short="Telefony" />
+      <DeviceWorth extra={EXTRA} name="Serwis telefonów" short="Telefony" />
       <PhoneBrandsSection title="Jakie telefony naprawiamy" />
+      <DeviceIntake note={EXTRA.intake} points={points} what="telefon" />
       <PhoneStepsSection eyebrow="Jak to działa" cityName={null} />
+      <DeviceWarranty text={EXTRA.warranty} />
+      <DataSafety />
+      <HammerTeaser what="do Twojego telefonu" />
 
       <section className="t-section" id="pytania" data-rail="Pytania">
         <div className="t-container t-faqsplit">
@@ -117,11 +133,11 @@ export default function PhoneServicePage() {
             <h2 className="t-h2">Najczęstsze pytania o naprawę telefonu</h2>
             <p className="t-lead">Nie ma tu Twojego pytania? Zadzwoń albo napisz — odpowiemy w godzinach pracy.</p>
           </div>
-          <Faq items={FAQ} />
+          <Faq items={ALL_FAQ} />
         </div>
       </section>
 
-      <RepairLinks device="phone" title="Konkretne naprawy telefonów" />
+      <DevicePosts category="phone" keywords="telefon ekran bateria ładowanie zalanie" title="Poradniki: telefony" />
       <CtaBand
         eyebrow="Zgłoszenie naprawy"
         title="Pęknięty ekran albo słaba bateria? Zgłoś naprawę online."
