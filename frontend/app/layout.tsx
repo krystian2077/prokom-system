@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Syne, DM_Sans, Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+import { DM_Sans, Unbounded } from "next/font/google";
 import { ClientAuthWrapper } from "@/components/providers/ClientAuthWrapper";
 import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["700", "800"],
-  variable: "--font-syne",
-});
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -19,11 +14,6 @@ const unbounded = Unbounded({
   subsets: ["latin"],
   weight: ["700", "900"],
   variable: "--font-unbounded",
-});
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-jakarta",
 });
 
 
@@ -95,7 +85,7 @@ export default function RootLayout({
     <html
       lang="pl"
       suppressHydrationWarning
-      className={`${syne.variable} ${dmSans.variable} ${unbounded.variable} ${plusJakarta.variable}`}
+      className={`${dmSans.variable} ${unbounded.variable}`}
     >
       <head>
         <script
