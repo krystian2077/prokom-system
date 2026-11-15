@@ -79,10 +79,14 @@ test.describe("desktop 1440", () => {
     await expect(faq).toHaveAttribute("open", "");
   });
 
-  test("unconfirmed numbers are not shown in production (SPEC §10)", async ({ page }) => {
+  // The hide/show rule itself is unit-tested on test data (lib/tech/wizard-data.test.ts, claim()).
+  test("numbers confirmed on 15.11 are shown, still unconfirmed ones are not (SPEC §10)", async ({ page }) => {
     await page.goto("/");
     const main = page.locator("main");
-    for (const t of ["często ok. 1 h", "10 000+", "0,1 mm", "około 5", "z całej Polski", "Opinie Google"]) {
+    for (const t of ["często ok. 1 h", "10 000+", "0,1 mm", "około 5", "od 2004"]) {
+      await expect(main).toContainText(t);
+    }
+    for (const t of ["z całej Polski", "Opinie Google"]) {
       await expect(main).not.toContainText(t);
     }
   });

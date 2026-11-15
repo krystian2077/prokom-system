@@ -75,7 +75,6 @@ export default function AboutPage() {
               <h1 className="t-about-hero__h1">
                 Lokalny serwis.
                 <br />
-                {/* TODO(krystian): wording without the year until „2004” is confirmed (SPEC §10). */}
                 <span className={draftCls(since)}>{since ? `Na Podhalu od ${since.text} roku.` : "Prosto z Podhala."}</span>
               </h1>
               <p className="t-about-hero__lead">

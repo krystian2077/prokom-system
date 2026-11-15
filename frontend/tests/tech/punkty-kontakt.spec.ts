@@ -40,9 +40,9 @@ test.describe("desktop 1440", () => {
     await expect(page.getByText("Czy sprzęt oddany w jednym punkcie odbiorę w drugim?")).toHaveCount(0);
   });
 
-  test("about page: unconfirmed numbers hidden in production", async ({ page }) => {
+  test("about page: 2004 shown (confirmed 15.11), unconfirmed numbers hidden in production", async ({ page }) => {
     await page.goto("/o-firmie");
-    await expect(page.locator("main").getByText("2004")).toHaveCount(0);
+    await expect(page.locator("main")).toContainText("Na Podhalu od 2004 roku.");
     await expect(page.locator("main").getByText("4 + 1")).toHaveCount(0);
     await expect(page.getByText("Twoje dane są bezpieczne")).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Wycena przed naprawą" })).toBeVisible();

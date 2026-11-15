@@ -77,7 +77,7 @@ test("local page: point card, repairs with prefilled report, local FAQ, Service 
   await expect(page.locator(".t-pointcard")).toHaveCount(1);
   const report = page.getByRole("link", { name: "Zgłoś: Wymiana baterii" });
   await expect(report).toHaveAttribute("href", /^\/zgloszenie\?category=phone&usterka=S%C5%82aba\+bateria&punkt=rabka$/);
-  await expect(page.locator(".t-phrep__time").first()).toHaveText(/po diagnozie/); // quickRepair unconfirmed
+  await expect(page.locator(".t-phrep__time").first()).toHaveText(/często ok\. 1 h/); // quickRepair confirmed 15.11
   const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
   expect(ld.some((s) => s.includes('"Service"'))).toBe(true);
   expect(ld.some((s) => s.includes('"FAQPage"'))).toBe(true);
