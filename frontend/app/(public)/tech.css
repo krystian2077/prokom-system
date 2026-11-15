@@ -4,7 +4,7 @@
  * component classes use the `t-` prefix. No global rules for html/body/*.
  * Panels use data-theme/prokom-theme — never referenced here.
  *
- * Ranges: phone < 768 · tablet 768–1179 · laptop 1180–1679 · PC ≥ 1680 · rail ≥ 1400.
+ * Ranges: phone < 768 · tablet 768–1179 · laptop 1180–1679 · PC ≥ 1680 · rail ≥ 1424 (sections ≥ 3).
  */
 
 /* ---------- Tokens (SPEC §4) ---------- */
@@ -398,21 +398,38 @@ html[data-tech-theme="dark"] .tech {
 .tech a.t-notice__text { text-decoration: underline; text-underline-offset: 3px; }
 .tech .t-notice__close { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; color: inherit; cursor: pointer; flex-shrink: 0; }
 
-/* ---------- Side rail ≥ 1400 ---------- */
+/* ---------- Side rail (wide screens) ----------
+ * Centred in the free margin left of the content column: content starts at
+ * (100vw − container − 2·gutter) / 2 + gutter, the rail (56 px) sits in the middle of that.
+ * From 1424 px that margin is ≥ 72 px, so the rail never touches the content (at 1400 it did). */
 .tech .t-rail { display: none; }
-@media (min-width: 1400px) {
+@media (min-width: 1424px) {
   .tech .t-rail {
-    position: fixed; left: 12px; top: 50%; transform: translateY(-50%); z-index: 850; width: 56px; box-sizing: border-box; padding: 6px;
+    position: fixed; top: 50%; z-index: 850; width: 56px; box-sizing: border-box; padding: 6px;
+    left: max(8px, calc((100vw - var(--t-container) - 2 * var(--t-gutter)) / 4 + var(--t-gutter) / 2 - 28px));
+    transform: translateY(-50%); max-height: calc(100vh - 140px);
     border-radius: 22px; background: var(--capbg); border: 1px solid var(--capbd); box-shadow: 0 22px 44px -30px rgba(18,22,19,.4);
     display: flex; flex-direction: column; gap: 4px; align-items: center;
     -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   }
-  .tech .t-rail a, .tech .t-rail button { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--ink2); border: 0; background: transparent; cursor: pointer; }
-  .tech .t-rail .t-rail__search { background: var(--acc); color: var(--onacc); margin-bottom: 6px; }
+  .tech .t-rail a, .tech .t-rail button { position: relative; flex-shrink: 1; min-height: 32px; width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--ink2); border: 0; background: transparent; cursor: pointer; transition: background-color var(--m-micro, 120ms) ease, color var(--m-micro, 120ms) ease; }
+  .tech .t-rail a:hover { background: var(--bg2); color: var(--ink); }
+  .tech .t-rail .t-rail__search { background: var(--acc); color: var(--onacc); margin-bottom: 6px; flex-shrink: 0; }
   .tech .t-rail a.is-on { background: var(--soft); color: var(--acct); }
-  .tech .t-rail__dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-  .tech .t-rail hr { width: 28px; border: 0; border-top: 1px solid var(--bd); margin: 4px 0; }
-  .tech .t-rail .t-rail__acc { color: var(--acct); }
+  .tech .t-rail__dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: 0.55; transition: transform var(--m-small, 200ms) var(--m-ease-spring, ease), opacity var(--m-small, 200ms) ease; }
+  .tech .t-rail a.is-on .t-rail__dot, .tech .t-rail a:hover .t-rail__dot { opacity: 1; transform: scale(1.25); }
+  .tech .t-rail hr { width: 28px; border: 0; border-top: 1px solid var(--bd); margin: 4px 0; flex-shrink: 0; }
+  .tech .t-rail .t-rail__acc { color: var(--acct); flex-shrink: 0; }
+  /* label on hover and keyboard focus (the dots alone said nothing) */
+  .tech .t-rail__label {
+    position: absolute; left: calc(100% + 14px); top: 50%; padding: 7px 12px; border-radius: 10px; white-space: nowrap; pointer-events: none;
+    background: var(--raised, var(--card)); color: var(--ink); border: 1px solid var(--capbd); box-shadow: var(--sh-2, 0 10px 24px -14px rgba(18,22,19,.4));
+    font: 700 13px/1.2 var(--t-font-body); opacity: 0; transform: translate(-6px, -50%); transition: opacity var(--m-small, 200ms) ease, transform var(--m-small, 200ms) var(--m-ease-out, ease);
+  }
+  .tech .t-rail :is(a, button):is(:hover, :focus-visible) .t-rail__label { opacity: 1; transform: translate(0, -50%); }
+}
+@media (min-width: 1424px) and (prefers-reduced-motion: reduce) {
+  .tech .t-rail__label, .tech .t-rail__dot { transition: none; }
 }
 
 /* ---------- Map (design T.Mapa) ---------- */

@@ -15,7 +15,7 @@ import { Typeset } from "./Typeset";
 
 /**
  * Public-site shell (SPEC §7, RESPONSYWNOSC): notice, brand bar and capsule on top,
- * side rail ≥ 1400, footer; on phones and tablet portrait the bottom tab bar and sheets.
+ * side rail ≥ 1424, footer; on phones and tablet portrait the bottom tab bar and sheets.
  */
 export function TechShell({ children }: { children: ReactNode }) {
   const points = visiblePoints();

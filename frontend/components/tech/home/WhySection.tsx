@@ -14,7 +14,7 @@ export function WhySection({ points }: { points: VisiblePoint[] }) {
   cards.push({ k: "RODO", t: "Twoje dane są bezpieczne", s: "Nie przeglądamy zawartości urządzeń bez potrzeby." });
 
   return (
-    <section id="dlaczego" className="t-section t-ui" aria-labelledby="t-dlaczego-h">
+    <section id="dlaczego" data-rail="Dlaczego" className="t-section t-ui" aria-labelledby="t-dlaczego-h">
       <div className="t-container">
         <div className="t-hd">
           <div className="t-hd__text">

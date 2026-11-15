@@ -24,7 +24,7 @@ export function LegalDoc({ title, path, version, children }: { title: string; pa
           </div>
         </div>
       </section>
-      <section className="t-section t-section--tight" id="tresc" data-rail="Treść">
+      <section className="t-section t-section--tight" id="tresc-dokumentu" data-rail="Treść">
         <div className="t-container">
           <div className="t-legal-doc">{children}</div>
         </div>
