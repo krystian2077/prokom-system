@@ -12,9 +12,9 @@ describe("polishText (Polish typesetting, przegląd wizualny)", () => {
     expect(polishText(s).replace(/\u00a0/g, " ")).toBe(s);
     expect(polishText("Ola ma kota")).toBe("Ola ma kota");
   });
-  it("keeps hyphenated names on one line only where asked (headings)", () => {
+  it("keeps hyphenated place names on one line only where asked (headings)", () => {
     expect(polishText("Rabka-Zdrój")).toBe("Rabka-Zdrój");
-    expect(polishText("Rabka-Zdrój, PRO-KOM, USB-C", true)).toBe(`Rabka-${WJ}Zdrój, PRO-${WJ}KOM, USB-${WJ}C`);
+    expect(polishText("Rabka-Zdrój, PRO-KOM, USB-C, e-mail", true)).toBe(`Rabka-${WJ}Zdrój, PRO-KOM, USB-C, e-mail`);
     expect(polishText("9:00 - 17:00", true)).toBe("9:00 - 17:00");
   });
   it("keeps street abbreviations and house numbers with the street", () => {

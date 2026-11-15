@@ -3,7 +3,7 @@
  * - no one-letter word at the end of a line ("sierotki": a, i, o, u, w, z) → the space after it
  *   becomes a no-break space;
  * - "ul." and a short house number stay with the street name ("Długa 8");
- * - no line break inside hyphenated names in headings ("Rabka-Zdrój", "PRO-KOM") → an invisible
+ * - no line break inside hyphenated names in headings ("Rabka-Zdrój") → an invisible
  *   word joiner (U+2060) follows the hyphen. Only text node values change, never the DOM
  *   structure, so React keeps updating these nodes safely.
  * Accepted copy stays word for word: only whitespace and wrapping change.
@@ -16,8 +16,9 @@ const STREET = /(^|[\s,(])(ul\.|al\.|os\.|pl\.) +/g;
 // RegExp constructor for the "u" flag: tsconfig targets ES5
 const HOUSE_NO = new RegExp(String.raw`(\p{L}) +(\d{1,3}[A-Za-z]?)(?=,|\s·|\s*$)`, "gu");
 export const WJ = "\u2060";
-/** A hyphen between letters/digits (not a spaced dash), not yet followed by a word joiner. */
-const HYPHEN = new RegExp(String.raw`([\p{L}\p{N}])-(?=[\p{L}\p{N}])`, "gu");
+/** A hyphen inside a two-part place name ("Rabka-Zdrój", "Bielsko-Biała"); brand names in capitals
+ * ("PRO-KOM") and codes ("USB-C") stay as they are. */
+const HYPHEN = new RegExp(String.raw`(\p{Lu}\p{Ll}+)-(?=\p{Lu}\p{Ll})`, "gu");
 
 export function polishText(text: string, noBreakHyphens = false): string {
   if (!text || text.length < 2) return text;
