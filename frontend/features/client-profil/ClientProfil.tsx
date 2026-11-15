@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapPin, Shield, UserRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { useClientProfile } from "@/hooks/useClientProfile";
@@ -10,6 +9,10 @@ import { apiMySummaryToDashboardStats, type ApiMySummary } from "@/lib/panel-api
 import { formatDate, formatMonthYear } from "@/lib/format";
 import type { PreferredContact } from "@/types/panel";
 import type { DashboardStats } from "@/types/panel";
+import { IconCheck, IconPin, IconUser } from "@/components/tech/icons";
+import { IconKey } from "@/components/tech/account/account-icons";
+import { AuthAlert, PasswordField } from "@/components/tech/account/AuthParts";
+import { KeyValue, PageHead, Panel, Skel } from "@/components/tech/account/AccountUi";
 
 const PREFERRED_CONTACT_OPTIONS: { value: PreferredContact; label: string }[] = [
   { value: "email", label: "E-mail" },
@@ -120,17 +123,13 @@ export function ClientProfil() {
 
   if (profileLoading && !profile) {
     return (
-      <div className="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-          <div className="panel-card h-fit p-6">
-            <div className="skeleton mx-auto mb-4 h-20 w-20 rounded-full" />
-            <div className="skeleton mb-2 h-5 w-3/4 rounded" />
-            <div className="skeleton mb-4 h-4 w-full rounded" />
-            <div className="skeleton h-10 w-full rounded" />
-          </div>
-          <div className="space-y-6">
-            <div className="panel-card skeleton h-64" />
-            <div className="panel-card skeleton h-64" />
+      <div className="t-ck-page" aria-busy="true">
+        <Skel w={220} h={36} r={10} />
+        <div className="t-ck-profgrid">
+          <Skel h={360} r={28} />
+          <div className="t-ck-stack t-ck-stack--l">
+            <Skel h={300} r={28} />
+            <Skel h={300} r={28} />
           </div>
         </div>
       </div>
@@ -138,149 +137,75 @@ export function ClientProfil() {
   }
 
   return (
-    <div className="mx-auto max-w-[1520px] px-4 py-6 max-lg:px-3 sm:px-6 lg:px-8 lg:py-8">
-      <div className="mb-6 max-sm:mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
-          Panel klienta
-        </p>
-        <h1 className="cp-heading font-extrabold" style={{ fontFamily: "var(--font-unbounded)", fontSize: "clamp(22px, 2.5vw, 28px)" }}>
-          Profil
-        </h1>
-        <p className="mt-1 text-sm max-sm:text-xs" style={{ color: "var(--muted)" }}>
-          {readOnly ? "Podgląd danych. Zweryfikuj e-mail, aby edytować." : "Edytuj swoje dane kontaktowe i ustawienia konta"}
-        </p>
-      </div>
+    <div className="t-ck-page">
+      <PageHead
+        eyebrow="Profil"
+        title="Profil"
+        lead={readOnly ? "Podgląd danych. Zweryfikuj e-mail, aby edytować." : "Edytuj swoje dane kontaktowe i ustawienia konta"}
+      />
 
-      <div className="grid gap-8 max-lg:gap-5 lg:grid-cols-[280px_1fr]">
-        {/* Identity card (left) */}
-        <div className="panel-card sticky top-24 h-fit p-6 max-lg:rounded-[22px]">
+      <div className="t-ck-profgrid">
+        {/* Identity card */}
+        <aside className="t-ck-card t-ck-id">
           {profile ? (
             <>
-              <div
-                className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold text-white"
-                style={{ background: "var(--red)" }}
-              >
+              <span className="t-ck-avatar t-ck-avatar--l" aria-hidden="true">
                 {profile.firstName?.[0]?.toUpperCase() ?? "?"}
-              </div>
-              <p className="cp-heading text-center font-bold" style={{ fontFamily: "var(--font-unbounded)" }}>
+              </span>
+              <p className="t-ck-id__name">
                 {profile.firstName} {profile.lastName}
               </p>
-              <p className="mt-1 text-center text-sm" style={{ color: "var(--ink2)" }}>
-                {profile.email}
-              </p>
-              <div
-                className="mx-auto mt-3 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold"
-                style={readOnly ? { background: "rgba(220,30,30,.15)", color: "var(--red)", border: "1px solid rgba(220,30,30,.3)" } : { background: "var(--green-l)", color: "var(--green)", border: "1px solid var(--green-b)" }}
-              >
-                {readOnly ? "E-MAIL NIEZWERYFIKOWANY" : "KONTO AKTYWNE"}
-              </div>
-              <ul className="mt-4 space-y-2 text-sm">
-                <li className="flex justify-between">
-                  <span style={{ color: "var(--muted)" }}>Naprawy łącznie</span>
-                  <span className="cp-heading">{stats?.total ?? "–"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span style={{ color: "var(--muted)" }}>Klient od</span>
-                  <span className="cp-heading">{profile.createdAt ? formatMonthYear(profile.createdAt) : "–"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span style={{ color: "var(--muted)" }}>Ostatnie zgłoszenie</span>
-                  <span className="cp-heading">{profile.lastRepairAt ? formatDate(profile.lastRepairAt) : "–"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span style={{ color: "var(--muted)" }}>Preferowany kontakt</span>
-                  <span className="cp-heading">
-                    {PREFERRED_CONTACT_OPTIONS.find((o) => o.value === preferredContact)?.label ?? "E-mail"}
-                  </span>
-                </li>
-              </ul>
-              <div className="mt-4 border-t border-[var(--border)] pt-4">
-                <p className="text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
-                  Numer klienta
-                </p>
-                <p className="mt-1 font-mono text-sm text-[var(--ink)]" style={{ fontFamily: "'Courier New', monospace" }}>
-                  {profile.id}
-                </p>
+              <p className="t-ck-id__mail">{profile.email}</p>
+              <span className={`t-ck-pill ${readOnly ? "t-ck-pill--wait" : "t-ck-pill--ready"}`}>
+                <i aria-hidden="true" />
+                {readOnly ? "E-mail niezweryfikowany" : "Konto aktywne"}
+              </span>
+              <dl className="t-ck-kvs">
+                <KeyValue label="Naprawy łącznie">{stats?.total ?? "–"}</KeyValue>
+                <KeyValue label="Klient od">{profile.createdAt ? formatMonthYear(profile.createdAt) : "–"}</KeyValue>
+                <KeyValue label="Ostatnie zgłoszenie">{profile.lastRepairAt ? formatDate(profile.lastRepairAt) : "–"}</KeyValue>
+                <KeyValue label="Preferowany kontakt">
+                  {PREFERRED_CONTACT_OPTIONS.find((o) => o.value === preferredContact)?.label ?? "E-mail"}
+                </KeyValue>
+              </dl>
+              <div className="t-ck-id__num">
+                <span className="t-ck-k">Numer klienta</span>
+                <p className="t-ck-ref">{profile.id}</p>
               </div>
             </>
           ) : (
-            <div className="skeleton h-64 rounded-lg" />
+            <Skel h={260} r={20} />
           )}
-        </div>
+        </aside>
 
-        {/* Form cards (right) */}
-        <div className="space-y-6 max-lg:space-y-4">
+        <div className="t-ck-stack t-ck-stack--l">
           {/* Dane kontaktowe */}
-          <div className="panel-card max-lg:rounded-[22px]">
-            <div className="panel-card-header flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--red-l)", border: "1px solid var(--red-border)", color: "var(--red)" }}>
-                <UserRound size={16} />
-              </span>
-              <div>
-                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
-                  Dane kontaktowe
-                </h2>
-                <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
-                  Imię, nazwisko, telefon i preferowany sposób kontaktu
-                </p>
+          <Panel title="Dane kontaktowe" desc="Imię, nazwisko, telefon i preferowany sposób kontaktu" icon={<IconUser size={18} />}>
+            <div className="t-ck-form">
+              <div className="t-ck-field">
+                <label htmlFor="pf-email">E-mail</label>
+                <input id="pf-email" type="email" readOnly value={profile?.email ?? ""} aria-describedby="pf-email-hint" />
+                <span className="t-ck-field__hint" id="pf-email-hint">
+                  tylko do odczytu
+                </span>
               </div>
-            </div>
-            <div className="space-y-4 p-5 max-sm:p-4">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>
-                  E-mail
-                </label>
-                <input
-                  type="email"
-                  readOnly
-                  value={profile?.email ?? ""}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] read-only:opacity-80 max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                />
-                <p className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>tylko do odczytu</p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Imię</label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    readOnly={readOnly}
-                    disabled={readOnly}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                  />
+              <div className="t-ck-grid2">
+                <div className="t-ck-field">
+                  <label htmlFor="pf-fname">Imię</label>
+                  <input id="pf-fname" type="text" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} readOnly={readOnly} disabled={readOnly} />
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Nazwisko</label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    readOnly={readOnly}
-                    disabled={readOnly}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                  />
+                <div className="t-ck-field">
+                  <label htmlFor="pf-lname">Nazwisko</label>
+                  <input id="pf-lname" type="text" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} readOnly={readOnly} disabled={readOnly} />
                 </div>
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Telefon</label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  readOnly={readOnly}
-                  disabled={readOnly}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                />
+              <div className="t-ck-field">
+                <label htmlFor="pf-phone">Telefon</label>
+                <input id="pf-phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} readOnly={readOnly} disabled={readOnly} />
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Preferowany kontakt</label>
-                <select
-                  value={preferredContact}
-                  onChange={(e) => setPreferredContact(e.target.value as PreferredContact)}
-                  disabled={readOnly}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                >
+              <div className="t-ck-field">
+                <label htmlFor="pf-contact">Preferowany kontakt</label>
+                <select id="pf-contact" value={preferredContact} onChange={(e) => setPreferredContact(e.target.value as PreferredContact)} disabled={readOnly}>
                   {PREFERRED_CONTACT_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.label}
@@ -289,183 +214,96 @@ export function ClientProfil() {
                 </select>
               </div>
               {!readOnly && (
-                <div className="flex justify-end max-sm:hidden">
-                  <button
-                    type="button"
-                    onClick={handleSaveContact}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-60 hover:opacity-90"
-                    style={{ background: "var(--red)" }}
-                  >
-                    ✓ Zapisz zmiany
+                <div className="t-ck-actions t-ck-actions--desk">
+                  <button type="button" onClick={handleSaveContact} disabled={isSaving} className="t-pbtn t-pbtn--acc t-pbtn--m">
+                    <IconCheck size={16} strokeWidth={2.8} />
+                    Zapisz zmiany
                   </button>
                 </div>
               )}
             </div>
-          </div>
+          </Panel>
 
           {/* Adres dostawy */}
-          <div className="panel-card max-lg:rounded-[22px]">
-            <div className="panel-card-header flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--blue-l)", border: "1px solid var(--blue-b)", color: "var(--blue)" }}>
-                <MapPin size={16} />
-              </span>
-              <div>
-                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
-                  Adres dostawy
-                </h2>
-                <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
-                  Wykorzystywany przy wysyłce kurierskiej
-                </p>
+          <Panel title="Adres dostawy" desc="Wykorzystywany przy wysyłce kurierskiej" icon={<IconPin size={18} />}>
+            <div className="t-ck-form">
+              <div className="t-ck-field">
+                <label htmlFor="pf-street">Ulica i numer</label>
+                <input id="pf-street" type="text" autoComplete="street-address" placeholder="np. ul. Leśna 7/3" value={street} onChange={(e) => setStreet(e.target.value)} readOnly={readOnly} disabled={readOnly} />
               </div>
-            </div>
-            <div className="space-y-4 p-5 max-sm:p-4">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Ulica i numer</label>
-                <input
-                  type="text"
-                  placeholder="np. ul. Leśna 7/3"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  readOnly={readOnly}
-                  disabled={readOnly}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                />
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Miasto</label>
-                  <input
-                    type="text"
-                    placeholder="np. Kraków"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    readOnly={readOnly}
-                    disabled={readOnly}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                  />
+              <div className="t-ck-grid2">
+                <div className="t-ck-field">
+                  <label htmlFor="pf-city">Miasto</label>
+                  <input id="pf-city" type="text" autoComplete="address-level2" placeholder="np. Kraków" value={city} onChange={(e) => setCity(e.target.value)} readOnly={readOnly} disabled={readOnly} />
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Kod pocztowy</label>
-                  <input
-                    type="text"
-                    placeholder="00-000"
-                    value={zip}
-                    onChange={(e) => setZip(e.target.value)}
-                    readOnly={readOnly}
-                    disabled={readOnly}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-60 disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                  />
+                <div className="t-ck-field">
+                  <label htmlFor="pf-zip">Kod pocztowy</label>
+                  <input id="pf-zip" type="text" autoComplete="postal-code" inputMode="numeric" placeholder="00-000" value={zip} onChange={(e) => setZip(e.target.value)} readOnly={readOnly} disabled={readOnly} />
                 </div>
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-medium uppercase" style={{ color: "var(--muted)" }}>Kraj</label>
-                <input
-                  type="text"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  readOnly={readOnly}
-                  disabled={readOnly}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                />
+              <div className="t-ck-field">
+                <label htmlFor="pf-country">Kraj</label>
+                <input id="pf-country" type="text" autoComplete="country-name" value={country} onChange={(e) => setCountry(e.target.value)} readOnly={readOnly} disabled={readOnly} />
+                <span className="t-ck-field__hint">Adres używany przy zleceniach kurierskich</span>
               </div>
-              <p className="text-[11px]" style={{ color: "var(--muted)" }}>Adres używany przy zleceniach kurierskich</p>
               {!readOnly && (
-                <div className="flex justify-end max-sm:hidden">
-                  <button
-                    type="button"
-                    onClick={handleSaveAddress}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-60 hover:opacity-90"
-                    style={{ background: "var(--red)" }}
-                  >
-                    ✓ Zapisz zmiany
+                <div className="t-ck-actions t-ck-actions--desk">
+                  <button type="button" onClick={handleSaveAddress} disabled={isSaving} className="t-pbtn t-pbtn--acc t-pbtn--m">
+                    <IconCheck size={16} strokeWidth={2.8} />
+                    Zapisz zmiany
                   </button>
                 </div>
               )}
             </div>
-          </div>
+          </Panel>
 
           {/* Hasło i bezpieczeństwo */}
-          <div className="panel-card max-lg:rounded-[22px]">
-            <div className="panel-card-header flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--amber-l)", border: "1px solid var(--amber-b)", color: "var(--amber)" }}>
-                <Shield size={16} />
-              </span>
-              <div>
-                <h2 className="cp-heading font-bold" style={{ fontFamily: "var(--font-unbounded)", fontSize: 13 }}>
-                  Hasło i bezpieczeństwo
-                </h2>
-                <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--muted)" }}>
-                  Zmiana hasła i zgody marketingowe
-                </p>
-              </div>
-            </div>
-            <div className="space-y-4 p-5 max-sm:p-4">
-              <label className={`flex items-center gap-2 ${readOnly ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}>
-                <input
-                  type="checkbox"
-                  checked={marketing}
-                  onChange={() => setMarketing(!marketing)}
-                  disabled={readOnly}
-                  className="rounded border-[var(--border)] bg-[var(--island3)] text-[var(--red)] focus:ring-[var(--red)] disabled:cursor-not-allowed"
-                />
-                <span className="text-sm" style={{ color: "var(--ink)" }}>Akceptuję komunikację marketingową</span>
+          <Panel title="Hasło i bezpieczeństwo" desc="Zmiana hasła i zgody marketingowe" icon={<IconKey size={18} />}>
+            <div className="t-ck-form">
+              <label className={`t-ck-check${readOnly ? " is-off" : ""}`}>
+                <input type="checkbox" checked={marketing} onChange={() => setMarketing(!marketing)} disabled={readOnly} />
+                <span>Akceptuję komunikację marketingową</span>
               </label>
 
-              {/* Zmiana hasła */}
-              <div className="border-t border-[var(--border)] pt-4 mt-4 space-y-3">
-                <p className="text-xs font-medium" style={{ color: "var(--ink)" }}>Zmiana hasła</p>
+              <div className="t-ck-subsection">
+                <p className="t-ck-k">Zmiana hasła</p>
                 {readOnly ? (
-                  <p className="text-[11px]" style={{ color: "var(--muted)" }}>
-                    Zweryfikuj adres e-mail, aby odblokować zmianę hasła i preferencji.
-                  </p>
+                  <p className="t-ck-note">Zweryfikuj adres e-mail, aby odblokować zmianę hasła i preferencji.</p>
                 ) : (
-                  <>
-                    <div>
-                      <label className="block text-[11px] mb-1.5" style={{ color: "var(--muted)" }}>Aktualne hasło</label>
-                      <input
-                        type="password"
-                        value={currentPassword}
-                        onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError(null); }}
-                        placeholder="••••••••"
-                        autoComplete="current-password"
-                        className="w-full rounded-xl border bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)] max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                        style={{ borderColor: "var(--border)" }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] mb-1.5" style={{ color: "var(--muted)" }}>Nowe hasło (min. 8 znaków)</label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => { setNewPassword(e.target.value); setPasswordError(null); }}
-                        placeholder="••••••••"
-                        autoComplete="new-password"
-                        className="w-full rounded-xl border bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)] max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                        style={{ borderColor: "var(--border)" }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] mb-1.5" style={{ color: "var(--muted)" }}>Powtórz nowe hasło</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(null); }}
-                        placeholder="••••••••"
-                        autoComplete="new-password"
-                        className="w-full rounded-xl border bg-[var(--island3)] px-4 py-3 text-sm text-[var(--ink)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--red)] max-sm:min-h-[48px] max-sm:rounded-[14px]"
-                        style={{ borderColor: "var(--border)" }}
-                      />
-                    </div>
-                    {passwordError && <p className="text-[11px]" style={{ color: "var(--red)" }}>{passwordError}</p>}
-                    {passwordSuccess && <p className="text-[11px]" style={{ color: "var(--green)" }}>Hasło zostało zmienione.</p>}
-                  </>
+                  <div className="t-ck-form">
+                    <PasswordField
+                      id="pf-current"
+                      label="Aktualne hasło"
+                      value={currentPassword}
+                      onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError(null); }}
+                      placeholder="Twoje obecne hasło"
+                      autoComplete="current-password"
+                    />
+                    <PasswordField
+                      id="pf-new"
+                      label="Nowe hasło"
+                      hint="Co najmniej 8 znaków."
+                      value={newPassword}
+                      onChange={(e) => { setNewPassword(e.target.value); setPasswordError(null); }}
+                      placeholder="Min. 8 znaków"
+                      autoComplete="new-password"
+                    />
+                    <PasswordField
+                      id="pf-confirm"
+                      label="Powtórz nowe hasło"
+                      value={confirmPassword}
+                      onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(null); }}
+                      placeholder="Wpisz hasło jeszcze raz"
+                      autoComplete="new-password"
+                    />
+                    {passwordError && <AuthAlert>{passwordError}</AuthAlert>}
+                    {passwordSuccess && <AuthAlert tone="ok">Hasło zostało zmienione.</AuthAlert>}
+                  </div>
                 )}
               </div>
 
               {!readOnly && (
-                <div className="flex flex-wrap items-center gap-3 justify-end pt-2">
+                <div className="t-ck-actions">
                   {currentPassword || newPassword || confirmPassword ? (
                     <button
                       type="button"
@@ -496,8 +334,7 @@ export function ClientProfil() {
                         }
                       }}
                       disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
-                      className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-60 hover:opacity-90"
-                      style={{ background: "var(--red)" }}
+                      className="t-pbtn t-pbtn--outline t-pbtn--m"
                     >
                       {isChangingPassword ? "Zapisywanie…" : "Zmień hasło"}
                     </button>
@@ -516,57 +353,34 @@ export function ClientProfil() {
                       }
                     }}
                     disabled={isSaving}
-                    className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-60 hover:opacity-90"
-                    style={{ background: "var(--red)" }}
+                    className="t-pbtn t-pbtn--acc t-pbtn--m"
                   >
-                    ✓ Zapisz zmiany
+                    <IconCheck size={16} strokeWidth={2.8} />
+                    Zapisz zmiany
                   </button>
                 </div>
               )}
             </div>
-          </div>
+          </Panel>
         </div>
       </div>
 
       {/* Toast */}
       {toastVisible && (
-        <div
-          className="fixed bottom-7 right-7 z-[500] flex items-center gap-3 rounded-xl border border-[var(--green-b)] px-4 py-3 shadow-lg"
-          style={{ background: "var(--island2)" }}
-        >
-          <span className="text-xl">✓</span>
-          <span className="cp-heading text-sm font-medium">Zmiany zostały zapisane</span>
+        <div className="t-ck-toast" role="status">
+          <span className="t-ck-toast__ico" aria-hidden="true">
+            <IconCheck size={16} strokeWidth={2.8} />
+          </span>
+          Zmiany zostały zapisane
         </div>
       )}
       {!readOnly && (
-        <div
-          className="fixed inset-x-0 z-[230] px-4 sm:hidden"
-          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)" }}
-        >
-          <div
-            className="grid grid-cols-2 gap-2 rounded-[18px] p-2.5 backdrop-blur-2xl"
-            style={{
-              borderColor: "var(--border)",
-              background: "var(--island2)",
-              border: "1px solid var(--border)",
-              boxShadow: "0 -2px 8px rgba(15,23,42,0.06), 0 -12px 28px rgba(15,23,42,0.09)",
-            }}
-          >
-            <button
-              type="button"
-              onClick={handleSaveContact}
-              disabled={isSaving}
-              className="min-h-[48px] rounded-[14px] bg-[var(--red)] px-3 py-3 text-sm font-semibold text-white disabled:opacity-60 active:scale-[0.97] transition"
-            >
+        <div className="t-ck-savebar">
+          <div className="t-ck-savebar__in">
+            <button type="button" onClick={handleSaveContact} disabled={isSaving} className="t-pbtn t-pbtn--acc">
               Zapisz kontakt
             </button>
-            <button
-              type="button"
-              onClick={handleSaveAddress}
-              disabled={isSaving}
-              className="min-h-[48px] rounded-[14px] border px-3 py-3 text-sm font-semibold disabled:opacity-60 active:scale-[0.97] transition"
-              style={{ borderColor: "var(--border)", color: "var(--ink)", background: "var(--island3)" }}
-            >
+            <button type="button" onClick={handleSaveAddress} disabled={isSaving} className="t-pbtn t-pbtn--outline">
               Zapisz adres
             </button>
           </div>
