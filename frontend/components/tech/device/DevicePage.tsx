@@ -168,7 +168,7 @@ function QuickPromise() {
 
 function MoreDevices({ current }: { current: string }) {
   return (
-    <nav className="t-section t-section--tight t-dev-more" aria-label="Inne naprawy">
+    <nav className="t-section t-section--tight t-dev-more" aria-label="Inne naprawy" id="inne-urzadzenia" data-rail="Inne">
       <div className="t-container">
         <h2 className="t-h2 t-h2--sm">Inne naprawy</h2>
         <MoreDevicesList current={current} />

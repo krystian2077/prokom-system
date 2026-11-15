@@ -63,7 +63,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
         visual={scene ? <FaultVisual device={scene.device} faults={[page.usterka]} /> : null}
         statusCard
         points={points}
-        rail={page.h1}
+        rail="Start"
         variant="repair"
       />
       {page.intro.length ? null : <Missing what="Wstęp" />}

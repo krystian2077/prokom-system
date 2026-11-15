@@ -86,10 +86,10 @@ export default function PhoneServicePage() {
         visual={<FaultVisual device={HERO_SCENES.phone.device} faults={HERO_SCENES.phone.faults} />}
         statusCard
         points={points}
-        rail="Serwis telefonów"
+        rail="Telefony"
       />
       {locals.length ? (
-        <nav className="t-section t-section--tight t-phtowns" aria-label="Serwis telefonów w Twojej okolicy">
+        <nav className="t-section t-section--tight t-phtowns" aria-label="Serwis telefonów w Twojej okolicy" id="okolica" data-rail="Okolica">
           <div className="t-container t-phtowns__in">
             <span>Serwis telefonów w Twojej okolicy:</span>
             <div className="t-townchips">

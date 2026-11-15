@@ -164,7 +164,7 @@
   .tech .t-shero__point:hover { background: var(--bg2); }
   .tech .t-shero__point + .t-shero__point { box-shadow: -1px 0 0 var(--bd); border-radius: 0 18px 18px 0; }
 }
-@media (min-width: 768px) and (max-width: 1023.98px) {
+@media (min-width: 768px) and (max-width: 1279.98px) {
   .tech .t-shero__bar { grid-auto-flow: row; grid-template-columns: 1fr 1fr; }
   .tech .t-shero__point--courier { grid-column: 1 / -1; box-shadow: 0 -1px 0 var(--bd) !important; border-radius: 0 0 18px 18px !important; }
   .tech .t-shero__point:nth-child(2):not(.t-shero__point--courier) { box-shadow: -1px 0 0 var(--bd); }
@@ -217,3 +217,4 @@
 .tech .t-phtowns__in { display: flex; flex-direction: column; gap: 10px; }
 .tech .t-phtowns__in > span { font-size: 13px; font-weight: 800; color: var(--ink2); }
 @media (min-width: 768px) { .tech .t-phtowns__in { flex-direction: row; align-items: center; gap: 14px; } }
+.tech .t-phtowns .t-townchip { min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; }
