@@ -1,16 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { FRAME_BOX, SCENE_ZOOM, frameSize, wizardDevices } from "./wizard-data";
+import { FRAME_BOX, SCENE_ZOOM, wizardDevices } from "./wizard-data";
 import { intersects, leader, nearestOn, placeLabel, segDist, zoomPt, zoomRect, type Rect } from "./wizard-layout";
 
-/** Desktop stage at 1440 (tech-wizard.css: 500 px column, 600 px scene, card ≈ 120 px). */
-const STAGE = { w: 474, h: 440 };
+/** Desktop stage at 1440 (tech-wizard.css: 554 px column, 660 px scene, card ≈ 140 px; feat/tech-glowna-zdjecia). */
+const STAGE = { w: 528, h: 482 };
+/** The frame rule of `.t-scene__frame` (--w): room for the camera zoom and a label row (--resv 100 px). */
+function frameFor(crop: [number, number, number, number]) {
+  const ar = crop[2] / crop[3];
+  const w = Math.min(FRAME_BOX.desktop[0], FRAME_BOX.desktop[1] * ar, (STAGE.w - 8) / 1.24, ((STAGE.h - 100) / SCENE_ZOOM) * ar);
+  return [w, w / ar];
+}
 const LABEL_H = 30;
 const labelW = (t: string) => 34 + t.length * 7.4; // 12.5 px / 800 ≈ 7.4 px per char + dot and padding
 
 function layout(deviceId: string, fault: string, zoom: boolean) {
   const d = wizardDevices.find((x) => x.id === deviceId)!;
   const sc = d.scenes[fault];
-  const [fw, fh] = frameSize(d.photo!.crop, [Math.min(FRAME_BOX.desktop[0], STAGE.w - 48), Math.min(FRAME_BOX.desktop[1], STAGE.h - 136)]);
+  const [fw, fh] = frameFor(d.photo!.crop);
   const F: Rect = { x: (STAGE.w - fw) / 2, y: (STAGE.h - fh) / 2, w: fw, h: fh };
   const s = zoom ? SCENE_ZOOM : 1;
   const f = sc.focus ?? [50, 50];
@@ -45,9 +51,32 @@ describe("label placement (PREMIUM §4, feat/tech-kreator-wizual)", () => {
     }
   });
 
-  it("without the camera, every label sits outside the device", () => {
-    const inside = local.filter(([d, f]) => !layout(d, f, false).place.outsideDevice).map(([d, f]) => `${d} · ${f}`);
+  it("with and without the camera, every label sits outside the device", () => {
+    const inside = local.flatMap(([d, f]) => [false, true].filter((z) => !layout(d, f, z).place.outsideDevice).map((z) => `${d} · ${f}${z ? " (zoom)" : ""}`));
     expect(inside).toEqual([]);
+  });
+
+  it("the zoomed device always fits the stage", () => {
+    for (const [d, f] of local) {
+      const { device } = layout(d, f, true);
+      expect(device.x, `${d} · ${f}`).toBeGreaterThanOrEqual(0);
+      expect(device.x + device.w, `${d} · ${f}`).toBeLessThanOrEqual(STAGE.w);
+    }
+  });
+
+  it("a label tucks in beside a reserved box (the 'whole device' button) instead of covering the device", () => {
+    const place = placeLabel({
+      stage: { w: 528, h: 482 },
+      device: { x: 138, y: 70, w: 274, h: 382 },
+      region: { x: 152, y: 71, w: 50, h: 19 },
+      spot: { x: 175, y: 74 },
+      label: { w: 163, h: 29 },
+      avoid: [{ x: 338, y: 56, w: 34, h: 34 }, { x: 4, y: 4, w: 197, h: 36 }],
+      spots: [{ x: 355, y: 73 }],
+    });
+    expect(place.outsideDevice).toBe(true);
+    expect(place.side).toBe("top");
+    expect(place.x).toBeGreaterThanOrEqual(205);
   });
 
   it("the leader starts at the spot's edge and ends on the label", () => {

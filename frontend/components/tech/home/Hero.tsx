@@ -56,16 +56,19 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
               ))}
             </ul>
           </div>
-          <div className="t-hero__phones" aria-hidden="true">
-            <Image className="t-hero__ph t-hero__ph--2" src="/tech/urzadzenia/samsung.webp" alt="" width={454} height={549} unoptimized />
-            <Image
-              className="t-hero__ph t-hero__ph--1"
-              src="/tech/urzadzenia/iphone.webp"
-              alt="Smartfony naprawiane w PRO-KOM Tech"
-              width={433}
-              height={577}
-              unoptimized
-            />
+          {/* Studio composition (>= 768): laptop behind, two phones in front, each floating on its own
+              rhythm. Crops trimmed to the silhouette (scripts/tech/glowna-kadry.py), never upscaled.
+              The laptop is the largest image above the fold → the only `priority` one (LCP). */}
+          <div className="t-hero__devices" aria-hidden="true">
+            <span className="t-hero__dev t-hero__dev--laptop">
+              <Image src="/tech/urzadzenia/kadr-laptop.webp" alt="" width={608} height={414} priority unoptimized />
+            </span>
+            <span className="t-hero__dev t-hero__dev--iphone">
+              <Image src="/tech/urzadzenia/kadr-iphone.webp" alt="" width={399} height={494} unoptimized />
+            </span>
+            <span className="t-hero__dev t-hero__dev--samsung">
+              <Image src="/tech/urzadzenia/samsung.webp" alt="" width={454} height={549} unoptimized />
+            </span>
           </div>
         </div>
 
