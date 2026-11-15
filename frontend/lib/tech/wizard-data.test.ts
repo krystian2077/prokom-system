@@ -4,6 +4,7 @@ import { courierService, servicePoints, type ServicePoint } from "@/config/proko
 import { claim } from "./claims";
 import { courierPageHref, courierPaysText } from "./courier";
 import { visiblePoints } from "./points";
+import { brandLogo, brandLogos } from "@/components/tech/brand-logos";
 import { EFFECT_FAMILIES, FRAME_BOX, SPOT_TARGET, brands, buildWizardHref, deviceById, faultMeaning, frameSize, lowerFirst, sceneOf, wizardDevices } from "./wizard-data";
 
 const backendCodes = DEVICE_CATEGORIES.map((c) => c.value as string);
@@ -68,6 +69,20 @@ describe("wizard-data", () => {
 
   it("brands are unique", () => {
     expect(new Set(brands).size).toBe(brands.length);
+  });
+
+  it("marquee logos: every Simple Icons mark belongs to a listed brand and has a sane box", () => {
+    for (const l of brandLogos) {
+      expect(brands.map((b) => b.toLowerCase())).toContain(l.title.toLowerCase());
+      expect(l.path).toMatch(/^M/);
+      const [x, y, w, h] = l.box.split(" ").map(Number);
+      expect(x >= 0 && y >= 0 && x + w <= 24.001 && y + h <= 24.001 && w > 0 && h > 0).toBe(true);
+      expect(l.size).toBeGreaterThan(0.4);
+      expect(l.size).toBeLessThanOrEqual(1.2);
+    }
+    // Krystian's must-have list: logos where Simple Icons has them (realme is not there → text)
+    for (const b of ["Apple", "Samsung", "Xiaomi", "Motorola", "Lenovo", "HP", "Dell", "Huawei", "ASUS"]) expect(brandLogo(b)).toBeDefined();
+    expect(brandLogo("realme")).toBeUndefined();
   });
 });
 

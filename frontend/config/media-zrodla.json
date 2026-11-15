@@ -12,5 +12,8 @@
     { "plik": "public/tech/hammer/hg-folie.webp", "z": "docs/design/tech/prototyp/img/hg-folie.jpg", "wymiary": "840x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
     { "plik": "public/tech/hammer/hg-ploter.webp", "z": "docs/design/tech/prototyp/img/hg-ploter.jpg", "wymiary": "1160x640", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — prawa: PRO-KOM (decyzja Krystiana 15.11.2026)", "confirmed": true },
     { "plik": "public/tech/hammer/ploter.mp4", "z": "public/Hammer Glass Cut Ploter - PREZENTACJA - TelconPoland (1080p, h264).mp4", "wymiary": "1920x1080", "zrodlo": "film prezentacyjny plotera (TelconPoland) — prawo do użycia potwierdzone (decyzja Krystiana 15.11.2026)", "confirmed": true }
+  ],
+  "znaki": [
+    { "plik": "components/tech/brand-logos.ts", "co": "loga marek w pasku na stronie głównej (inline SVG, jednobarwne): Apple, Samsung, Xiaomi, Motorola, Huawei, Lenovo, HP, Dell, ASUS, Acer, MSI, PlayStation, Epson", "zrodlo": "Simple Icons 16.37.0 (paczka npm simple-icons@16.37.0, https://simpleicons.org) — ścieżki SVG skopiowane bez zmian", "licencja": "CC0 1.0 (Simple Icons); znaki towarowe należą do ich właścicieli — informacja w stopce (LegalBar)", "brak_w_zrodle": "realme, Xbox, Nintendo, Canon, Brother — w pasku jako napis" }
   ]
 }
