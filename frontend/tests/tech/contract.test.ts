@@ -138,6 +138,21 @@ describe("buildSubmitPayload (KONTRAKT §1.1, §2)", () => {
     expect(p.additional_notes).toBe("Punkt odbioru: Rabka-Zdrój");
   });
 
+  it("courier with a chosen salon: same request shape as the T0 fixture, salon only in additional_notes (15.11)", () => {
+    const base = phoneForm({ category: "laptop", brand: "Lenovo", model: "ThinkPad T14", problem: "Nie ładuje się bateria.", turnsOn: "unknown", dropoff: "courier", returnMethod: "courier", street: "ul. Przykładowa", houseNumber: "1", city: "Nowy Targ", postalCode: "34-400", notes: "Proszę o telefon." });
+    const withSalon = buildSubmitPayload({ ...base, courierPoint: "zakopane" });
+    const fixture = fx("submit-201-laptop-courier").request.body as Record<string, unknown>;
+    const keys = (o: object): string[] => Object.entries(o).flatMap(([k, v]) => (v && typeof v === "object" && !Array.isArray(v) ? keys(v).map((x) => `${k}.${x}`) : [k])).sort();
+    // exactly the keys of today's courier request (no new fields), and still the T0 fixture
+    expect(keys(withSalon)).toEqual(keys(buildSubmitPayload(base)));
+    expect(withSalon).toMatchObject({ ...fixture, additional_notes: withSalon.additional_notes });
+    expect(withSalon).toMatchObject({ delivery_method: "courier", return_method: "courier", delivery_street: "ul. Przykładowa", delivery_city: "Nowy Targ" });
+    expect(withSalon.additional_notes).toBe("Wysyłka na adres: Zakopane\n\nProszę o telefon.");
+    expect(validateRepairForm({ ...base, courierPoint: "zakopane" })).toEqual({});
+    // drop-off in a salon never adds the courier line, even if a stale courierPoint is left in the state
+    expect(buildSubmitPayload(phoneForm({ dropoff: "rabka", courierPoint: "zakopane", notes: "" })).additional_notes).toBe("Punkt przyjęcia: Rabka-Zdrój");
+  });
+
   it("no point lines and no notes = empty additional_notes", () => {
     const p = buildSubmitPayload(phoneForm({ dropoff: "courier", returnMethod: "courier", street: "ul. A", city: "B", notes: "  " }));
     expect(p.additional_notes).toBe("");

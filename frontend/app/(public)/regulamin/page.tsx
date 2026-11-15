@@ -2,11 +2,9 @@ import { company, line, telHref } from "@/config/prokom";
 import { LegalDoc, Li, Ol, Section } from "@/components/tech/legal/LegalDoc";
 import { pageMetadata } from "@/lib/tech/seo";
 
-// Legal text kept word for word (TD5 PR 2); only the skin and contact data from config/prokom.ts.
-// TODO(krystian): update before production (open since 15.11.2026 — the text was accepted, but it still has
-// outdated facts): hosting „Render” (Hetzner now, webh.pl from 29.11), domain pro-kom.eu (→ prokomserwis.pl),
-// name „PRO-KOM Serwis”, „sprzedaż akcesoriów”, and no sentence about Umami statistics (SPEC §12.5).
-// To accept with the lawyer (SPEC §10).
+// Legal text from TD5 PR 2; facts updated on 15.11.2026 (Krystian's decision): domain and name from
+// config/prokom.ts, no shop (old § 11 „Sprzedaż akcesoriów i produktów” removed, later sections renumbered).
+// Everything else word for word. Hosting is described in the privacy policy.
 export const metadata = pageMetadata({
   title: "Regulamin świadczenia usług serwisowych",
   description: "Regulamin świadczenia usług serwisowych PRO-KOM Tech: zgłoszenie naprawy, diagnoza i wycena, realizacja, odbiór sprzętu, gwarancja i reklamacje.",
@@ -15,12 +13,11 @@ export const metadata = pageMetadata({
 
 export default function TermsPage() {
   return (
-    <LegalDoc title="Regulamin świadczenia usług" path="/regulamin" version="25 kwietnia 2026 r.">
+    <LegalDoc title="Regulamin świadczenia usług" path="/regulamin" version="15 listopada 2026 r.">
       <p>
         Niniejszy Regulamin określa zasady korzystania z serwisu internetowego
-        dostępnego pod adresem <strong>pro-kom.eu</strong> oraz warunki
-        świadczenia usług serwisowych i sprzedaży akcesoriów przez PRO-KOM
-        Serwis. Przed skorzystaniem z usług prosimy o uważne zapoznanie się z
+        {line.name} dostępnego pod adresem <strong>{line.domain}</strong> oraz
+        warunki świadczenia usług serwisowych przez {company.name}. Przed skorzystaniem z usług prosimy o uważne zapoznanie się z
         poniższymi postanowieniami.
       </p>
 
@@ -29,7 +26,7 @@ export default function TermsPage() {
         <p>Użyte w Regulaminie pojęcia oznaczają:</p>
         <ul>
           <Li>
-            <strong>Usługodawca / Serwis</strong> – PRO-KOM Serwis, {company.hq.street}, {company.hq.postal} {company.hq.city}; tel.{" "}
+            <strong>Usługodawca / Serwis</strong> – {company.name} ({line.name}), NIP {company.nip}, {company.hq.street}, {company.hq.postal} {company.hq.city}; tel.{" "}
             <a data-t-inline="" href={telHref(line.phone)}>
               {line.phoneDisplay}
             </a>
@@ -52,7 +49,7 @@ export default function TermsPage() {
           </Li>
           <Li>
             <strong>Serwis internetowy</strong> – strona dostępna pod adresem
-            pro-kom.eu wraz ze wszystkimi podstronami.
+            {line.domain} wraz ze wszystkimi podstronami.
           </Li>
           <Li>
             <strong>Zlecenie naprawy</strong> – umowa o świadczenie usługi
@@ -60,7 +57,7 @@ export default function TermsPage() {
           </Li>
           <Li>
             <strong>Formularz zlecenia</strong> – elektroniczny formularz
-            dostępny na stronie pro-kom.eu/zgloszenie służący do zgłoszenia
+            dostępny na stronie {line.domain}/zgloszenie służący do zgłoszenia
             urządzenia do naprawy.
           </Li>
           <Li>
@@ -80,7 +77,7 @@ export default function TermsPage() {
         <Ol>
           <li>
             Regulamin określa prawa i obowiązki Klientów oraz Usługodawcy w
-            zakresie świadczenia usług serwisowych i sprzedaży akcesoriów.
+            zakresie świadczenia usług serwisowych.
           </li>
           <li>
             Korzystanie z serwisu internetowego i składanie zleceń jest
@@ -101,7 +98,7 @@ export default function TermsPage() {
 
       {/* § 3 */}
       <Section title="§ 3. Zakres świadczonych usług">
-        <p>PRO-KOM Serwis świadczy następujące usługi:</p>
+        <p>{company.name} ({line.name}) świadczy następujące usługi:</p>
         <ul>
           <Li>naprawa telefonów komórkowych i smartfonów</Li>
           <Li>naprawa laptopów i notebooków</Li>
@@ -111,7 +108,6 @@ export default function TermsPage() {
           <Li>naprawa smartwatchy i urządzeń ubieralnych</Li>
           <Li>naprawa komputerów stacjonarnych</Li>
           <Li>odzyskiwanie danych z nośników</Li>
-          <Li>sprzedaż akcesoriów GSM i elektronicznych</Li>
           <Li>
             sprzedaż produktów Hammer Glass (szkła hartowane, folie ochronne)
           </Li>
@@ -168,7 +164,7 @@ export default function TermsPage() {
         <Ol>
           <li>
             Klient może zgłosić urządzenie do naprawy za pomocą formularza
-            zlecenia dostępnego pod adresem pro-kom.eu/zgloszenie.
+            zlecenia dostępnego pod adresem {line.domain}/zgloszenie.
           </li>
           <li>
             Formularz obejmuje: dane kontaktowe Klienta, informacje o
@@ -334,7 +330,7 @@ export default function TermsPage() {
                   {line.email}
                 </a>
               </Li>
-              <Li>za pomocą formularza reklamacyjnego dostępnego pod adresem pro-kom.eu/claim-repair</Li>
+              <Li>za pomocą formularza reklamacyjnego dostępnego pod adresem {line.domain}/claim-repair</Li>
               <Li>osobiście w siedzibie serwisu</Li>
               <Li>pisemnie na adres: {company.hq.street}, {company.hq.postal} {company.hq.city}</Li>
             </ul>
@@ -366,45 +362,7 @@ export default function TermsPage() {
       </Section>
 
       {/* § 11 */}
-      <Section title="§ 11. Sprzedaż akcesoriów i produktów">
-        <Ol>
-          <li>
-            Serwis oferuje sprzedaż akcesoriów GSM, elektronicznych oraz
-            produktów z linii Hammer Glass (szkła hartowane, folie ochronne).
-          </li>
-          <li>
-            Zamówienie złożone za pośrednictwem serwisu internetowego uważa się
-            za przyjęte do realizacji po potwierdzeniu przez Usługodawcę drogą
-            e-mailową.
-          </li>
-          <li>
-            Usługodawca zastrzega sobie prawo do odmowy realizacji zamówienia w
-            przypadku braku towaru w magazynie. Klient zostanie niezwłocznie
-            poinformowany, a ewentualna płatność w całości zwrócona.
-          </li>
-          <li>
-            Konsumentowi przysługuje prawo odstąpienia od umowy sprzedaży
-            zawartej na odległość (przez internet) w terminie{" "}
-            <strong>14 dni</strong> bez podania przyczyny, zgodnie z ustawą o
-            prawach konsumenta z dnia 30 maja 2014 r.
-          </li>
-          <li>
-            Prawo odstąpienia nie przysługuje w przypadku towarów
-            wyprodukowanych na specjalne zamówienie lub wyraźnie
-            spersonalizowanych, a także towarów zapieczętowanych, których po
-            otwarciu nie można zwrócić ze względu na ochronę zdrowia lub
-            higienę, jeśli zostały otwarte po dostarczeniu.
-          </li>
-          <li>
-            Aby skorzystać z prawa odstąpienia, Klient powinien poinformować
-            Usługodawcę (e-mail, pisemnie) i odesłać towar w terminie 14 dni
-            od złożenia oświadczenia. Koszty zwrotu ponosi Klient.
-          </li>
-        </Ol>
-      </Section>
-
-      {/* § 12 */}
-      <Section title="§ 12. Konto Klienta">
+      <Section title="§ 11. Konto Klienta">
         <Ol>
           <li>
             Klient może zarejestrować bezpłatne Konto w serwisie internetowym,
@@ -439,8 +397,8 @@ export default function TermsPage() {
         </Ol>
       </Section>
 
-      {/* § 13 */}
-      <Section title="§ 13. Odpowiedzialność Usługodawcy">
+      {/* § 12 */}
+      <Section title="§ 12. Odpowiedzialność Usługodawcy">
         <Ol>
           <li>
             Usługodawca ponosi odpowiedzialność za szkody wyrządzone Klientowi
@@ -477,23 +435,23 @@ export default function TermsPage() {
         </Ol>
       </Section>
 
-      {/* § 14 */}
-      <Section title="§ 14. Ochrona danych osobowych">
+      {/* § 13 */}
+      <Section title="§ 13. Ochrona danych osobowych">
         <p>
           Zasady przetwarzania danych osobowych przez Usługodawcę określa
           Polityka prywatności dostępna pod adresem{" "}
           <a data-t-inline=""
             href="/polityka-prywatnosci"
           >
-            pro-kom.eu/polityka-prywatnosci
+            {line.domain}/polityka-prywatnosci
           </a>
           . Składając zlecenie lub rejestrując Konto, Klient potwierdza, że
           zapoznał się z Polityką prywatności i akceptuje jej warunki.
         </p>
       </Section>
 
-      {/* § 15 */}
-      <Section title="§ 15. Postanowienia końcowe">
+      {/* § 14 */}
+      <Section title="§ 14. Postanowienia końcowe">
         <Ol>
           <li>
             Regulamin wchodzi w życie z dniem 25 kwietnia 2026 r. i obowiązuje
@@ -520,12 +478,12 @@ export default function TermsPage() {
           </li>
           <li>
             Aktualny Regulamin dostępny jest zawsze pod adresem{" "}
-            <strong>pro-kom.eu/regulamin</strong> oraz w siedzibie Usługodawcy.
+            <strong>{line.domain}/regulamin</strong> oraz w siedzibie Usługodawcy.
           </li>
         </Ol>
       </Section>
 
-      <p className="t-legal-doc__updated">Data ostatniej aktualizacji: 25 kwietnia 2026 r.</p>
+      <p className="t-legal-doc__updated">Data ostatniej aktualizacji: 15 listopada 2026 r.</p>
     </LegalDoc>
   );
 }

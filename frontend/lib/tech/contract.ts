@@ -132,6 +132,8 @@ export type RepairFormState = {
   returnMethod: DeliveryMethod;
   /** Asked only for a personal pick-up with two visible points; null = same as drop-off. */
   pickupPoint: PointKey | null;
+  /** Courier drop-off: the salon the parcel goes to (form only — sent as a line in additional_notes, KONTRAKT §2). */
+  courierPoint: PointKey | null;
   street: string;
   houseNumber: string;
   city: string;
@@ -165,6 +167,7 @@ export function emptyRepairForm(): RepairFormState {
     dropoff: null,
     returnMethod: "in_person",
     pickupPoint: null,
+    courierPoint: null,
     street: "",
     houseNumber: "",
     city: "",
@@ -193,6 +196,7 @@ export const FIELD_STEP: Record<FormField, 1 | 2 | 3 | 4 | 5> = {
   dropoff: 2,
   returnMethod: 2,
   pickupPoint: 2,
+  courierPoint: 2,
   street: 2,
   houseNumber: 2,
   city: 2,
@@ -217,16 +221,20 @@ const pointName = (key: PointKey) => servicePoints.find((p) => p.key === key)?.n
 const usesCourier = (f: Pick<RepairFormState, "dropoff" | "returnMethod">) => f.dropoff === "courier" || f.returnMethod === "courier";
 const t = (s: string) => s.trim();
 
-/** Point lines at the start of additional_notes (KONTRAKT §2, variant A). */
-export function pointLines(f: Pick<RepairFormState, "dropoff" | "returnMethod" | "pickupPoint">): string[] {
+/**
+ * Point lines at the start of additional_notes (KONTRAKT §2, variant A). A courier parcel
+ * names its salon the same way ("Wysyłka na adres: Zakopane") — no new request fields.
+ */
+export function pointLines(f: Pick<RepairFormState, "dropoff" | "returnMethod" | "pickupPoint"> & { courierPoint?: PointKey | null }): string[] {
   const out: string[] = [];
   const dropPoint = f.dropoff && f.dropoff !== "courier" ? f.dropoff : null;
   if (dropPoint) out.push(`Punkt przyjęcia: ${pointName(dropPoint)}`);
+  if (f.dropoff === "courier" && f.courierPoint) out.push(`Wysyłka na adres: ${pointName(f.courierPoint)}`);
   if (f.returnMethod === "in_person" && f.pickupPoint && f.pickupPoint !== dropPoint) out.push(`Punkt odbioru: ${pointName(f.pickupPoint)}`);
   return out;
 }
 
-export function buildAdditionalNotes(f: Pick<RepairFormState, "dropoff" | "returnMethod" | "pickupPoint" | "notes">): string {
+export function buildAdditionalNotes(f: Pick<RepairFormState, "dropoff" | "returnMethod" | "pickupPoint" | "notes"> & { courierPoint?: PointKey | null }): string {
   const head = pointLines(f).join("\n");
   const notes = t(f.notes);
   const full = head && notes ? `${head}\n\n${notes}` : head || notes;

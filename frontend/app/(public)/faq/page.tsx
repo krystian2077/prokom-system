@@ -26,7 +26,7 @@ const CRUMBS: Crumb[] = [
 
 type Group = { id: string; title: string; items: FaqItem[]; links?: { href: string; label: string }[] };
 
-// TODO(krystian): answers to accept (TD5 PR 2). Old FAQ promised free diagnosis, parcel
+// Answers accepted by Krystian on 15.11.2026. Old FAQ promised free diagnosis, parcel
 // lockers and a shop — removed (SPEC §8, §10).
 function groups(): Group[] {
   const courier = courierPageHref();
@@ -72,8 +72,8 @@ function groups(): Group[] {
       id: "kurier",
       title: "Wysyłka kurierem",
       items: [
-        { q: "Czy mogę wysłać sprzęt kurierem?", a: "Tak. W zgłoszeniu wybierz „Kurier”. W e-mailu z numerem zgłoszenia dostaniesz adres serwisu i wskazówki, jak zapakować sprzęt." },
-        { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów. Nadaj paczkę kurierem pod adres serwisu." },
+        { q: "Czy mogę wysłać sprzęt kurierem?", a: "Tak, na adres jednego z naszych salonów. Najlepiej najpierw zgłoś naprawę online (wybierz „Kurier”), napisz albo zadzwoń, a numer zgłoszenia włóż do paczki." },
+        { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów. Nadaj paczkę kurierem pod adres salonu." },
       ],
       links: courier ? [{ href: courier, label: "Naprawa wysyłkowa — jak to działa" }] : undefined,
     },

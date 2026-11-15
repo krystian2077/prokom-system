@@ -41,7 +41,7 @@ export type ServicePoint = {
   /** null = line.phone */
   phone: string | null;
   mapsUrl: string | null;
-  /** Where to park. null = not shown (15.11.2026: parking info left out for now). */
+  /** Where to park (free parking at both salons, Krystian 15.11.2026). null = not shown. */
   parkingNote: string | null;
   published: boolean;
 };
@@ -61,7 +61,7 @@ export const servicePoints: ServicePoint[] = [
     ],
     phone: null,
     mapsUrl: null,
-    parkingNote: null,
+    parkingNote: "Bezpłatny parking przy salonie.",
     published: true,
   },
   {
@@ -79,7 +79,7 @@ export const servicePoints: ServicePoint[] = [
     ],
     phone: "+48 18 541 20 15",
     mapsUrl: null,
-    parkingNote: null,
+    parkingNote: "Bezpłatny parking.",
     published: true,
   },
 ];
@@ -102,8 +102,8 @@ export const notices: Notice[] = [];
 /** Courier repair (SPEC §12.10). `null` = the sentence is not shown. */
 export const courierService = {
   // The boss's answers to SPEC §10/§12.10, passed on by Krystian on 15.11.2026.
+  // Parcels may go to ANY published point (Krystian, 15.11.2026) — lib/tech/courier.ts courierPoints().
   published: true,
-  address: "rabka" as PointKey,
   inboundPaidBy: "client" as const,
   returnPaidBy: "service" as "service" | "client" | null,
   returnIfDeclined: "service" as null | "service" | "client",
@@ -114,7 +114,7 @@ export const courierService = {
 
 /**
  * Numbers and promises from the design (SPEC §10). Confirmed by Krystian on 15.11.2026:
- * quickRepair, freeDiagnosis, sameDayDiagnosis, hg*, sinceYear, aboutSince.
+ * quickRepair, freeDiagnosis, sameDayDiagnosis, hg*, sinceYear, aboutSince, courierWholeCountry, ruleData.
  * `confirmed: false` → hidden in production (or the sentence goes without the number);
  * with NEXT_PUBLIC_TECH_DRAFT=1 (staging) shown inside the "do potwierdzenia" frame.
  * Flip `confirmed` after confirmation — components read it via lib/tech/claims.ts.
@@ -146,7 +146,7 @@ export const claims = {
   /** TD4 "O firmie" rules outside SPEC §8 promises: which parts we use… */
   ruleParts: { text: "Oryginalne albo sprawdzone zamienniki. Zawsze mówimy, które.", confirmed: false },
   /** …and how we treat data on the device. */
-  ruleData: { text: "Nie przeglądamy zawartości urządzeń bez potrzeby.", confirmed: false },
+  ruleData: { text: "Nie przeglądamy zawartości urządzeń bez potrzeby.", confirmed: true },
   /** Google Business profile link(s) for the rating card on "O firmie" (empty = no card). */
   googleProfiles: { text: "", confirmed: false },
 } satisfies Record<string, Claim>;

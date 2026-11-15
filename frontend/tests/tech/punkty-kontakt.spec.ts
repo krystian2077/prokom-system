@@ -50,6 +50,7 @@ test.describe("desktop 1440", () => {
     await page.goto("/o-firmie");
     await expect(page.locator("main")).toContainText("Na Podhalu od 2004 roku.");
     await expect(page.locator("main").getByText("4 + 1")).toHaveCount(0);
+    await expect(page.locator("main")).toContainText("Nie przeglądamy zawartości urządzeń bez potrzeby.");
     await expect(page.getByRole("heading", { name: "Twoje dane są bezpieczne" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Wycena przed naprawą" })).toBeVisible();
   });
@@ -115,4 +116,15 @@ test.describe("phone 390", () => {
     await expect(list.getByRole("link", { name: /Waze/ })).toHaveAttribute("href", /^https:\/\/waze\.com\/ul\?ll=49\.\d+,19\.\d+&navigate=yes$/);
     await expect(list.getByRole("link", { name: /Mapy Apple/ })).toHaveAttribute("href", /^https:\/\/maps\.apple\.com\/\?daddr=/);
   });
+});
+
+test("free parking at both salons comes from parkingNote (15.11)", async ({ page }) => {
+  await page.goto("/punkty-serwisowe");
+  const main = page.locator("main");
+  await expect(main).toContainText("Dojazd, parking i to, co warto zabrać ze sobą.");
+  await expect(main).toContainText("Bezpłatny parking przy salonie.");
+  await expect(main).toContainText("Bezpłatny parking.");
+  await expect(page.getByText(/Gdzie zaparkować/)).toHaveCount(1);
+  await page.goto("/serwis-telefonow-zakopane");
+  await expect(page.locator("main")).toContainText("Bezpłatny parking.");
 });

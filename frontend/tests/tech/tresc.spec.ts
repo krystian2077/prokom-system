@@ -22,11 +22,10 @@ const RULES: [string, RegExp, RegExp?][] = [
 
 /**
  * Known pages that still say "sklep" (TD6, 15.11): old blog articles from lib/blog-posts.ts
- * (text = Krystian's decision, SPEC §8) and the privacy policy (left for the lawyer, STAN).
+ * (text = Krystian's decision, SPEC §8). The privacy policy is clean since 15.11.2026.
  * Only shrinks: a listed page without the word fails the test until removed from the list.
  */
 const KNOWN_SKLEP = new Set([
-  "/polityka-prywatnosci",
   "/blog",
   "/blog/kategoria/laptopy-i-komputery",
   "/blog/kategoria/porady-zakupowe",

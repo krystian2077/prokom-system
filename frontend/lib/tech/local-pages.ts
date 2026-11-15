@@ -7,6 +7,7 @@
  * unpublished point shows in draft frames; missing content is never invented.
  *
  * Contact data (address, hours, phone) comes from config/prokom.ts via the point.
+ * Texts for Rabka-Zdrój and Zakopane accepted by Krystian on 15.11.2026.
  */
 import { servicePoints, type PointKey, type ServicePoint } from "@/config/prokom";
 import { isDraftMode } from "./points";
@@ -28,7 +29,7 @@ export type LocalPage = {
   area: string;
   /**
    * How to get there, in our own words. null = missing → the page does not publish.
-   * Parking info is left out for now (decision 15.11.2026, parkingNote stays null).
+   * Parking comes from the point's parkingNote (prokom.ts), shown next to this text.
    */
   access: string | null;
   faq: FaqItem[];
@@ -86,7 +87,7 @@ export const localPages: LocalPage[] = [
     area:
       "Punkt w Zakopanem obsługuje też Kościelisko, Poronin, Biały Dunajec, Bukowinę Tatrzańską i Szaflary. Jesteś na urlopie? Naprawiamy także telefony turystów.",
     // From the boss (14.11) and Krystian (15.11): town centre, near Krupówki and Równia Krupowa.
-    // The street comes from config/prokom.ts on the page. Parking left out for now (15.11).
+    // The street and the parking note come from config/prokom.ts on the page.
     access:
       "Punkt jest w centrum Zakopanego, kilka kroków od Krupówek i Równi Krupowej. Przyjdź bez umawiania w godzinach otwarcia.",
     faq: [

@@ -6,7 +6,7 @@
  * no parcel lockers, no unconfirmed time promises (those go through `claim()`).
  * Categories = KONTRAKT §1.1, faults = wizard-data (the "Zgłoś" links prefill the form).
  *
- * TODO(krystian): texts (leads, repair rows, FAQ) to accept — list in the TD5 PR 1 description.
+ * Texts (leads, repair rows, FAQ) accepted by Krystian on 15.11.2026.
  */
 import type { ServicePoint } from "@/config/prokom";
 import type { HomeIcon } from "@/components/tech/icons";

@@ -29,7 +29,7 @@ const CRUMBS: Crumb[] = [
   { name: "Naprawy", path: REPAIRS_HREF },
 ];
 
-// TODO(krystian): FAQ answers to accept (TD5 PR 1).
+// FAQ answers accepted by Krystian on 15.11.2026.
 const FAQ: FaqItem[] = [
   {
     q: "Ile kosztuje naprawa?",

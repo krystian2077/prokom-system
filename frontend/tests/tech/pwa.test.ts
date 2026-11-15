@@ -7,7 +7,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { courierService, servicePoints } from "@/config/prokom";
 import sitemap from "@/app/sitemap";
-import { courierInSitemap, courierPageVisible, courierPaymentText, courierPayRows, courierPoint } from "@/lib/tech/courier-page";
+import { courierPoints, courierWhereText } from "@/lib/tech/courier";
+import { courierInSitemap, courierPageVisible, courierPaymentText, courierPayRows } from "@/lib/tech/courier-page";
 import { footerColumns } from "@/lib/tech/nav";
 import { PREP_TABS, tabForCategory } from "@/lib/tech/prep-guide";
 import { SW_EXCLUDED_PREFIXES, webManifest } from "@/lib/tech/pwa";
@@ -97,11 +98,17 @@ describe("naprawa kurierem — publikacja (SPEC §12.10)", () => {
   it("null fields hide their rows", () => {
     expect(courierPayRows({ ...courierService, inboundPaidBy: "client", returnPaidBy: null, returnIfDeclined: null }).map((r) => r.k)).toEqual(["Wysyłka do serwisu"]);
   });
-  it("parcels go only to a published point", () => {
+  it("parcels go to every published point, never to an unpublished one (15.11)", () => {
     const draft = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
-    expect(courierPoint(draft, { ...courierService, address: "zakopane" })).toBeNull();
-    expect(courierPoint(servicePoints, { ...courierService, address: "zakopane" })?.key).toBe("zakopane");
-    expect(courierPoint(servicePoints, { ...courierService, address: "rabka" })?.key).toBe("rabka");
+    expect(courierPoints(draft).map((p) => p.key)).toEqual(["rabka"]);
+    expect(courierWhereText(courierPoints(draft))).toBe("Wyślij sprzęt na adres naszego salonu: Rabka-Zdrój.");
+    const both = servicePoints.map((p) => ({ ...p, published: true }));
+    expect(courierPoints(both).map((p) => p.key)).toEqual(["rabka", "zakopane"]);
+    expect(courierWhereText(courierPoints(both))).toBe("Wyślij sprzęt na adres jednego z naszych salonów: Rabka-Zdrój lub Zakopane.");
+    expect(courierWhereText([])).toBeNull();
+  });
+  it("current config: both salons accept parcels", () => {
+    expect(courierPoints().map((p) => p.key)).toEqual(["rabka", "zakopane"]);
   });
 });
 

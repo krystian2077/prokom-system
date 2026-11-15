@@ -13,7 +13,7 @@ import { TownsSection } from "@/components/tech/home/TownsSection";
 import { WhySection } from "@/components/tech/home/WhySection";
 import { RepairWizard } from "@/components/tech/RepairWizard";
 import { claim } from "@/lib/tech/claims";
-import { courierPageHref, courierPaysText } from "@/lib/tech/courier";
+import { courierPageHref, courierPaysText, courierWhereText } from "@/lib/tech/courier";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { SITE_URL } from "@/lib/site-config";
 
@@ -40,7 +40,7 @@ export default function HomePage() {
       <BrandMarquee />
       <RepairWizard
         points={points.map((p) => ({ key: p.key, name: p.name, draft: p.draft }))}
-        courier={{ sub: claim("courierWholeCountry"), pays: courierPaysText(), href: courierPageHref() }}
+        courier={{ sub: claim("courierWholeCountry"), pays: courierPaysText(), href: courierPageHref(), where: courierWhereText() }}
       />
       <DeviceGrid />
       <CommonRepairs />
