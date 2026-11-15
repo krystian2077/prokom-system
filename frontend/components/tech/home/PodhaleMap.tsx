@@ -5,10 +5,16 @@ const PIN: Record<PointKey, { x: number; y: number }> = {
   rabka: { x: 289, y: 107 },
   zakopane: { x: 289, y: 451 },
 };
-const LINES: Record<PointKey, string> = {
-  rabka: "M300 118 130 58M300 118 500 88M300 118 180 168M300 118 150 310M300 118 350 262",
-  zakopane: "M300 462 190 466M300 462 380 418M300 462 500 408M300 462 340 378M300 462 360 322",
-};
+/** Dashed links from a pin to the centre of each town dot (9 px dot at the town's x, centred on y). */
+const DOT = 4.5;
+function linksFor(key: PointKey) {
+  const from = PIN[key];
+  return towns
+    .filter((t) => t.point === key && t.name !== POINT_TOWN[key])
+    .map((t) => `M${from.x} ${from.y} ${Math.round((t.map.x / 100) * 640 + DOT)} ${Math.round((t.map.y / 100) * 560)}`)
+    .join("");
+}
+const POINT_TOWN: Record<PointKey, string> = { rabka: "Rabka-Zdrój", zakopane: "Zakopane" };
 
 /**
  * Illustrative map of Podhale (design T.Main PodhaleMap) — not geographic data.
@@ -24,17 +30,17 @@ export function PodhaleMap({ points }: { points: { key: PointKey; name: string; 
         <g fill="none" stroke="#E2483A" strokeWidth="1" opacity="0.14">
           {keys.map((k) => (
             <g key={k}>
-              <ellipse cx="300" cy={PIN[k].y + 11} rx="90" ry="60" />
-              <ellipse cx="300" cy={PIN[k].y + 11} rx="170" ry="110" />
-              <ellipse cx="300" cy={PIN[k].y + 11} rx="260" ry="168" />
+              <ellipse cx={PIN[k].x} cy={PIN[k].y} rx="90" ry="60" />
+              <ellipse cx={PIN[k].x} cy={PIN[k].y} rx="170" ry="110" />
+              <ellipse cx={PIN[k].x} cy={PIN[k].y} rx="260" ry="168" />
             </g>
           ))}
         </g>
         <path d="M0 560 L0 520 L70 498 L130 512 L200 486 L262 506 L320 478 L384 500 L450 474 L520 498 L590 482 L640 496 L640 560 Z" fill="#2B2220" />
-        <path d="M300 118 C320 170 330 210 350 262 C360 320 345 380 300 462" fill="none" stroke="#5A4A47" strokeWidth="5" strokeLinecap="round" />
+        <path d="M289 107 C309 159 319 199 339 251 C349 309 334 369 289 451" fill="none" stroke="#5A4A47" strokeWidth="5" strokeLinecap="round" />
         <g className="t-podhale__dash" fill="none" stroke="#8C7B78" strokeWidth="1.4" strokeDasharray="4 6">
           {keys.map((k) => (
-            <path key={k} d={LINES[k]} />
+            <path key={k} d={linksFor(k)} />
           ))}
         </g>
       </svg>

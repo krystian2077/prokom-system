@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { line, servicePoints, telHref } from "@/config/prokom";
-import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PhoneBrandsSection, PhoneRepairsSection, PhoneStepsSection } from "@/components/tech/PhoneSections";
-import { PointCard } from "@/components/tech/PointCard";
 import { RepairLinks } from "@/components/tech/repair/RepairLinks";
 import { publishedLocalPages, visibleLocalPages } from "@/lib/tech/local-pages";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
@@ -13,6 +11,10 @@ import { inCity, joinCities } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, serviceJsonLd, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { towns } from "@/lib/tech/towns";
+import { FaultVisual } from "@/components/tech/subhero/FaultVisual";
+import { SubHero } from "@/components/tech/subhero/SubHero";
+import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
+import { submitHref } from "@/lib/tech/wizard-data";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -72,50 +74,37 @@ export default function PhoneServicePage() {
         })}
       />
 
-      <section className="t-section--hero" id="serwis" data-rail="Serwis telefonów">
-        <div className="t-container">
-          <div className="t-stage t-loc-hero t-loc-hero--hub">
-            <div className="t-loc-hero__text">
-              <Breadcrumbs items={CRUMBS} separator="/" />
-              <h1 className="t-loc-hero__h1">
-                Serwis telefonów
-                <span>{where}</span>
-              </h1>
-              <p className="t-lead t-lead--stage">
-                Wymieniamy wyświetlacze, baterie i gniazda ładowania, pomagamy po zalaniu. Diagnoza i wycena przed naprawą, gwarancja na usługę i części, status naprawy online.
-              </p>
-              <div className="t-btnrow">
-                <Link href={`${SUBMIT_HREF}?category=phone`} className="t-pbtn t-pbtn--stage" data-track="zgloszenie_start" data-track-zrodlo="przycisk">
-                  Zgłoś naprawę telefonu
+      <SubHero
+        crumbs={CRUMBS}
+        eyebrow={`${line.name} · telefony`}
+        title="Serwis telefonów"
+        accent={where}
+        lead="Wymieniamy wyświetlacze, baterie i gniazda ładowania, pomagamy po zalaniu. Najpierw diagnoza i wycena, naprawa dopiero po Twojej zgodzie."
+        primary={{ label: "Zgłoś naprawę telefonu", href: submitHref("phone") }}
+        trackPlace="serwis_telefonow"
+        promises={heroPromises({ phoneScreen: true })}
+        visual={<FaultVisual device={HERO_SCENES.phone.device} faults={HERO_SCENES.phone.faults} />}
+        statusCard
+        points={points}
+        rail="Telefony"
+      />
+      {locals.length ? (
+        <nav className="t-section t-section--tight t-phtowns" aria-label="Serwis telefonów w Twojej okolicy" id="okolica" data-rail="Okolica">
+          <div className="t-container t-phtowns__in">
+            <span>Serwis telefonów w Twojej okolicy:</span>
+            <div className="t-townchips">
+              {locals.map((o) => (
+                <Link key={o.slug} href={`/${o.slug}`} className={`t-townchip${pub.has(o.slug) ? "" : " t-draft"}`}>
+                  {o.city}
                 </Link>
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce="serwis_telefonow">
-                  {line.phoneDisplay}
-                </a>
-              </div>
-              {locals.length ? (
-                <div className="t-loc-hero__towns">
-                  <span>Serwis telefonów w Twojej okolicy:</span>
-                  <div className="t-townchips">
-                    {locals.map((o) => (
-                      <Link key={o.slug} href={`/${o.slug}`} className={`t-townchip t-townchip--stage${pub.has(o.slug) ? "" : " t-draft"}`}>
-                        {o.city}
-                      </Link>
-                    ))}
-                    <Link href="/obslugiwane-miejscowosci" className="t-townchip t-townchip--stage">
-                      Wszystkie miejscowości →
-                    </Link>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-            <div className="t-loc-hero__card">
-              {points.map((p) => (
-                <PointCard key={p.key} point={p} layout="stack" as="h2" trackFrom="serwis_telefonow" />
               ))}
+              <Link href="/obslugiwane-miejscowosci" className="t-townchip">
+                Wszystkie miejscowości →
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </nav>
+      ) : null}
 
       <PhoneRepairsSection />
       <PhoneBrandsSection title="Jakie telefony naprawiamy" />

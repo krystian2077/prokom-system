@@ -26,7 +26,7 @@ test.describe("desktop 1440", () => {
 
   test("points page: card with live status, hours, phone and route to Google Maps", async ({ page }) => {
     await page.goto("/punkty-serwisowe");
-    await expect(page.locator("h1")).toHaveText(/Dwa punkty serwisowe: Rabka-Zdrój i\s+Zakopane/);
+    await expect(page.locator("h1")).toHaveText(/Dwa punkty serwisowe: Rabka-\u2060?Zdrój i\s+Zakopane/); // headings get a word joiner after the hyphen (components/tech/Typeset.tsx)
     await expect(page.locator(".t-pointcard")).toHaveCount(2);
     const zak = page.locator(".t-pointcard").nth(1);
     await expect(zak).toContainText("Staszica");

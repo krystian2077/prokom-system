@@ -144,7 +144,7 @@ function build(crop: Px4, faults: string[], defs: Record<string, SceneDef>) {
 const MOBILE = ["Pęknięty ekran", "Bateria", "Nie ładuje", "Aparat", "Głośnik lub mikrofon", "Przyciski i obudowa", "Po zalaniu", "Nie włącza się"];
 
 const PHONE_CROP: Px4 = [24, 50, 392, 486];
-/** Tablet: front only, whole (scripts/tech/urzadzenia-kadry.py); units = image px / 2. */
+/** Tablet: front only, whole (kreator-tablet.webp, scripts/tech/urzadzenia-kadry.py); units = image px / 2. */
 const TABLET_CROP: Px4 = [0, 0, 416, 582];
 const WATCH_CROP: Px4 = [0, 0, 400, 480];
 const LAPTOP_CROP: Px4 = [23, 86, 601, 407];
@@ -264,7 +264,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "phone",
     icon: "phone",
     faults: MOBILE,
-    photo: { src: "/tech/urzadzenia/iphone.webp", width: 433, height: 577, crop: PHONE_CROP, spots: phone.spots },
+    photo: { src: "/tech/urzadzenia/kreator-iphone.webp", width: 433, height: 577, crop: PHONE_CROP, spots: phone.spots },
     scenes: phone.scenes,
   },
   {
@@ -273,7 +273,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "tablet",
     icon: "tablet",
     faults: MOBILE,
-    photo: { src: "/tech/urzadzenia/tablet.webp", width: 416, height: 582, crop: TABLET_CROP, spots: tablet.spots },
+    photo: { src: "/tech/urzadzenia/kreator-tablet.webp", width: 416, height: 582, crop: TABLET_CROP, spots: tablet.spots },
     scenes: tablet.scenes,
   },
   {

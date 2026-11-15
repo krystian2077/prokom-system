@@ -1,6 +1,7 @@
 import { company, line, telHref } from "@/config/prokom";
 import { LegalDoc, Li, Section } from "@/components/tech/legal/LegalDoc";
 import { pageMetadata } from "@/lib/tech/seo";
+import { polishText } from "@/lib/tech/typo";
 
 // Legal text from TD5 PR 2; facts updated on 15.11.2026 (Krystian's decision): domain and name from
 // config/prokom.ts, no shop, Umami statistics, neutral hosting wording. Everything else word for word.
@@ -31,7 +32,7 @@ export default function PrivacyPolicyPage() {
           pod firmą <strong>{company.name}</strong> (NIP {company.nip}), z siedzibą pod adresem:
         </p>
         <p className="t-legal-doc__box">
-          {company.hq.street}, {company.hq.postal} {company.hq.city}
+          {polishText(company.hq.street)}, {company.hq.postal} {company.hq.city}
           <br />
           woj. małopolskie, Polska
           <br />

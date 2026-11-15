@@ -10,6 +10,7 @@ import { Faq } from "./Faq";
 import { JsonLd } from "./JsonLd";
 import { PhoneBrandsSection, PhoneRepairsSection, PhoneStepsSection } from "./PhoneSections";
 import { PointCard } from "./PointCard";
+import { polishText } from "@/lib/tech/typo";
 
 const crumbs = (slug: LocalSlug, city: string): Crumb[] => [
   { name: "Start", path: "/" },
@@ -65,7 +66,7 @@ export function LocalServicePage({ slug }: { slug: LocalSlug }) {
               {draft ? <span className="t-draft-badge">szkic — punkt nieopublikowany</span> : null}
               <h1 className="t-loc-hero__h1">
                 Serwis telefonów
-                <span>{p.city}</span>
+                <span>{polishText(p.city, true)}</span>
               </h1>
               <p className="t-lead t-lead--stage">{p.intro}</p>
               <div className="t-btnrow">

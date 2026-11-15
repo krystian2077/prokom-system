@@ -12,7 +12,7 @@ export function RepairLinks({ device, title = "Konkretne naprawy", className }: 
   const list: RepairPageData[] = device ? repairsForDevice(device) : liveRepairs();
   if (!list.length) return null;
   return (
-    <nav className={`t-section t-section--tight t-repairlinks${className ? ` ${className}` : ""}`} aria-label={title} data-rail={title} id="konkretne-naprawy">
+    <nav className={`t-section t-section--tight t-repairlinks${className ? ` ${className}` : ""}`} aria-label={title} data-rail="Konkretne naprawy" id="konkretne-naprawy">
       <div className="t-container">
         <h2 className="t-h2 t-h2--sm">{title}</h2>
         <ul className="t-dev-more__list">

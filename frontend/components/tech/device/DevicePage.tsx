@@ -1,12 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { line, servicePoints, telHref } from "@/config/prokom";
-import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { deviceSeo, hubCards, type DevicePage as DevicePageData } from "@/lib/tech/devices";
-import { POINTS_HREF, REPAIRS_HREF } from "@/lib/tech/nav";
+import { REPAIRS_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
@@ -15,6 +13,9 @@ import { DeviceGlyph, IconArrow, IconPath } from "../icons";
 import { RepairLinks } from "../repair/RepairLinks";
 import { CourierTeaser } from "./CourierTeaser";
 import { RepairSteps } from "./RepairSteps";
+import { FaultVisual } from "../subhero/FaultVisual";
+import { SubHero } from "../subhero/SubHero";
+import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
 
 export function deviceMetadata(page: DevicePageData) {
   return pageMetadata({ ...deviceSeo(page, publishedPoints(servicePoints)), path: page.path });
@@ -36,6 +37,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
   ];
   const seo = deviceSeo(page, published);
   const submit = submitHref(page.category);
+  const scene = HERO_SCENES[page.category as keyof typeof HERO_SCENES];
 
   return (
     <div className="t-ui t-page t-dev">
@@ -43,56 +45,20 @@ export function DevicePage({ page }: { page: DevicePageData }) {
       <JsonLd data={faqJsonLd(page.faq)} />
       <JsonLd data={serviceJsonLd({ name: `${page.name} — ${line.name}`, serviceType: page.name, path: page.path, description: seo.description })} />
 
-      <section className="t-section--hero" id="start" data-rail={page.short}>
-        <div className="t-container">
-          <div className="t-stage t-dev-hero">
-            <div className="t-dev-hero__text">
-              <Breadcrumbs items={crumbs} separator="/" />
-              <h1 className="t-dev-hero__h1">
-                {page.name}
-                <span>{cities}</span>
-              </h1>
-              <p className="t-dev-hero__lead">{page.lead}</p>
-              <div className="t-btnrow">
-                <Link href={submit} className="t-pbtn t-pbtn--stage" data-track="zgloszenie_start" data-track-zrodlo="przycisk">
-                  Zgłoś naprawę {page.genitive}
-                </Link>
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce="urzadzenie">
-                  {line.phoneDisplay}
-                </a>
-              </div>
-              <div className="t-dev-hero__points">
-                <span>{visible.length > 1 ? "Oddasz w punktach:" : "Oddasz w punkcie:"}</span>
-                <div>
-                  {visible.map((p) => (
-                    <Link key={p.key} href={POINTS_HREF} className={`t-dev-tw${p.draft ? " t-draft" : ""}`}>
-                      {p.city}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="t-dev-hero__art" aria-hidden={page.photo ? undefined : true}>
-              <span className="t-dev-hero__glow" />
-              {page.photo ? (
-                <Image
-                  src={page.photo.src}
-                  width={page.photo.width}
-                  height={page.photo.height}
-                  alt={page.photo.alt}
-                  priority
-                  sizes="(min-width: 1180px) 440px, (min-width: 768px) 40vw, 70vw"
-                  className="t-dev-hero__img"
-                />
-              ) : (
-                <span className="t-dev-hero__glyph">
-                  <DeviceGlyph icon={page.icon} size={140} strokeWidth={1.4} />
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      <SubHero
+        crumbs={crumbs}
+        eyebrow={`${line.name} · ${page.short.toLocaleLowerCase("pl-PL")}`}
+        title={page.name}
+        accent={cities}
+        lead={page.lead}
+        primary={{ label: `Zgłoś naprawę ${page.genitive}`, href: submit }}
+        trackPlace="urzadzenie"
+        promises={heroPromises({ category: page.category })}
+        visual={<FaultVisual device={scene.device} faults={scene.faults} />}
+        statusCard
+        points={visible}
+        rail={page.short}
+      />
 
       <section className="t-section t-section--alt" id="naprawy" data-rail="Naprawy">
         <div className="t-container t-dev-repairs">
@@ -202,7 +168,7 @@ function QuickPromise() {
 
 function MoreDevices({ current }: { current: string }) {
   return (
-    <nav className="t-section t-section--tight t-dev-more" aria-label="Inne naprawy">
+    <nav className="t-section t-section--tight t-dev-more" aria-label="Inne naprawy" id="inne-urzadzenia" data-rail="Inne">
       <div className="t-container">
         <h2 className="t-h2 t-h2--sm">Inne naprawy</h2>
         <MoreDevicesList current={current} />

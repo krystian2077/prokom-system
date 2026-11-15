@@ -212,7 +212,8 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 /* Badge = small round glass HUD with a pictogram (fixed px, never stretched). Masked = layer
    clipped to the region (rounded box via border-radius, polygon via --fx-clip). Only
    transform, opacity and stroke-dashoffset animate; entrance + at most --fx-n cycles. */
-.tech .t-scene__fx > .t-fx { border-radius: inherit; }
+.tech .t-scene__fx > .t-fx,
+.tech .t-fault__fx > .t-fx { border-radius: inherit; }
 .tech .t-fx__masked { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; clip-path: var(--fx-clip, none); }
 .tech .t-fx__tint { position: absolute; inset: 0; display: block; }
 .tech .t-fx__badge {

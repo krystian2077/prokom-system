@@ -5,6 +5,7 @@ import { POINTS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconArrow, IconCheck, IconPhoneCall, IconPin, IconWrench } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
+import { polishText } from "@/lib/tech/typo";
 
 // Promises that already exist in the service (SPEC §8) — verbatim from the design.
 const PROMISES = ["Wycena przed naprawą", "Gwarancja na naprawę i części", "Status naprawy online"];
@@ -26,7 +27,7 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
             </span>
             <h1 id="t-hero-h1" className="t-hero__h1">
               Serwis telefonów <br className="t-hero__br" />i&nbsp;komputerów
-              <span className="t-hero__sub">{publishedNames.join(" · ")}</span>
+              <span className="t-hero__sub">{polishText(publishedNames.join(" · "), true)}</span>
             </h1>
             <p className="t-hero__lead">
               <span className="t-hero__lead--wide">Najpierw diagnoza i wycena. Naprawiamy dopiero wtedy, gdy się zgodzisz.</span>

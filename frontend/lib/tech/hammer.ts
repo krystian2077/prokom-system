@@ -30,4 +30,4 @@ export function filmLayer(layer: FilmLayer): string {
 }
 
 /** One video file in the build (SPEC §9); loaded only after a click, poster first. */
-export const PLOTER_VIDEO = { src: "/tech/hammer/ploter.mp4", poster: "/tech/hammer/hg-ploter.webp", width: 1160, height: 640 };
+export const PLOTER_VIDEO = { src: "/tech/hammer/ploter.mp4", poster: "/tech/hammer/hg-ploter.webp", width: 1671, height: 922 };

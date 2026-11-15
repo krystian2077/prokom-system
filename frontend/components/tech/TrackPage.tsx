@@ -12,6 +12,10 @@ import { MyRepairs } from "./MyRepairs";
 import { PrepChecklist } from "./PrepChecklist";
 import { DEVICE_CATEGORIES } from "@/types/repair";
 import { RepairTracker } from "./RepairTracker";
+import { TrackExample } from "./TrackExample";
+import { visiblePoints } from "@/lib/tech/points";
+
+const examplePoint = visiblePoints().find((p) => !p.draft);
 
 /**
  * /track (TD3 PR 3, design #status-naprawy, KONTRAKT §3): TrackForm, RepairTracker
@@ -155,13 +159,18 @@ export function TrackPage() {
             ) : null}
           </>
         ) : !error ? (
-          <div className="t-trk__empty t-card">
-            <p>
-              <b>Numer zgłoszenia</b> znajdziesz w e-mailu z potwierdzeniem i na ekranie po wysłaniu zgłoszenia. Do sprawdzenia potrzebne są też 4 ostatnie cyfry telefonu podanego w zgłoszeniu.
-            </p>
-            <Link href={SUBMIT_HREF} className="t-linkbtn">
-              Nie masz jeszcze zgłoszenia? Zgłoś naprawę →
-            </Link>
+          // Empty state like the design (#status-naprawy, "widok przykładowy"): the hint next to the
+          // same example panel as on the home page, instead of a lone text card.
+          <div className="t-track t-trk__empty">
+            <div className="t-track__text">
+              <p className="t-track__desc">
+                <b>Numer zgłoszenia</b> znajdziesz w e-mailu z potwierdzeniem i na ekranie po wysłaniu zgłoszenia. Do sprawdzenia potrzebne są też 4 ostatnie cyfry telefonu podanego w zgłoszeniu.
+              </p>
+              <Link href={SUBMIT_HREF} className="t-linkbtn t-trk__emptylink">
+                Nie masz jeszcze zgłoszenia? Zgłoś naprawę →
+              </Link>
+            </div>
+            <TrackExample point={examplePoint} />
           </div>
         ) : null}
       </div>
