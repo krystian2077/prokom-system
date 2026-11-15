@@ -105,7 +105,7 @@ export const repairPages: RepairPageData[] = [
         a: "Czarny ekran bez pęknięć to nie zawsze wina wyświetlacza. Czasem winna jest taśma, złącze albo płyta główna. Dlatego zaczynamy od diagnozy i dopiero ona pokazuje, czy wymiana ekranu w ogóle pomoże.",
       },
     ],
-    powiazane: ["wymiana-tylnej-szybki-iphone", "wymiana-baterii-w-telefonie"],
+    powiazane: ["wymiana-ekranu-samsung", "wymiana-tylnej-szybki-iphone", "wymiana-baterii-w-telefonie"],
   }),
 
   accepted({
