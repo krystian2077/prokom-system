@@ -1,36 +1,59 @@
-import { FillStage } from "./parts";
+import { Badge, Fx, Layer, Masked } from "./parts";
 import type { EffectProps } from "./types";
 
-/** E15 Druk i papier: jam (crumpled sheet), streaks, blank sheet, ink drops. */
-export default function E15Print({ variant }: EffectProps) {
+/** E15 Druk i papier: jam (the sheet buckles), streaks, a blank sheet, ink drops under the tanks. */
+export default function E15Print(p: EffectProps) {
+  const { variant, aspect } = p;
   if (variant === "ink") {
+    const W = 100 * aspect;
     return (
-      <FillStage family="e15" className="is-ink">
-        {[14, 38, 62, 86].map((x, i) => (
-          <ellipse key={x} className="t-fx__drop" cx={x} cy="30" rx="4" ry="9" style={{ animationDelay: `${i * 180}ms` }} />
-        ))}
-        <rect className="t-fx__puddle" x="4" y="88" width="92" height="8" rx="4" />
-      </FillStage>
+      <Fx family="e15" className="is-ink">
+        <Masked>
+          <Layer aspect={aspect}>
+            {[0.14, 0.38, 0.62, 0.86].map((x, i) => (
+              <path key={x} className="t-fx__drop" d={`M${x * W} 18 q4 9 0 13 q-4 -4 0 -13 Z`} style={{ animationDelay: `${i * 200}ms` }} />
+            ))}
+            <ellipse className="t-fx__puddle" cx={W / 2} cy="93" rx={W * 0.44} ry="5" />
+          </Layer>
+        </Masked>
+      </Fx>
     );
   }
+  const W = 100 * aspect;
+  const pw = Math.min(W * 0.46, 120);
+  const x0 = (W - pw) / 2;
   return (
-    <FillStage family="e15" className={`is-${variant ?? "blank"}`}>
-      <g className="t-fx__sheet">
-        {variant === "jam" ? (
-          <path className="t-fx__paper" d="M30 100 L30 40 L38 30 L46 44 L54 26 L62 42 L70 30 L70 100 Z" />
-        ) : (
-          <rect className="t-fx__paper" x="26" y="20" width="48" height="90" rx="1.5" />
-        )}
-        {variant === "streaks" ? (
-          <g className="t-fx__streaks">
-            <rect x="32" y="30" width="36" height="3" />
-            <rect x="32" y="44" width="36" height="1.5" />
-            <rect x="32" y="56" width="36" height="5" />
-            <rect x="32" y="72" width="36" height="2" />
+    <Fx family="e15" className={`is-${variant ?? "blank"}`}>
+      <Masked>
+        <Layer aspect={aspect}>
+          <g className="t-fx__sheet">
+            {variant === "jam" ? (
+              <path
+                className="t-fx__paper"
+                d={`M${x0} 104 L${x0} 46 L${x0 + pw * 0.16} 30 L${x0 + pw * 0.34} 48 L${x0 + pw * 0.52} 24 L${x0 + pw * 0.7} 46 L${x0 + pw * 0.86} 30 L${x0 + pw} 44 L${x0 + pw} 104 Z`}
+              />
+            ) : (
+              <rect className="t-fx__paper" x={x0} y="16" width={pw} height="96" rx="1.5" />
+            )}
+            {variant === "jam" ? (
+              <path className="t-fx__fold" d={`M${x0 + pw * 0.16} 30 L${x0 + pw * 0.2} 100 M${x0 + pw * 0.52} 24 L${x0 + pw * 0.5} 100 M${x0 + pw * 0.86} 30 L${x0 + pw * 0.82} 100`} />
+            ) : null}
+            {variant === "streaks" ? (
+              <g className="t-fx__streaks">
+                <rect x={x0 + pw * 0.1} y="30" width={pw * 0.8} height="3.5" />
+                <rect x={x0 + pw * 0.1} y="44" width={pw * 0.8} height="1.6" />
+                <rect x={x0 + pw * 0.1} y="56" width={pw * 0.8} height="6" />
+                <rect x={x0 + pw * 0.1} y="74" width={pw * 0.8} height="2.2" />
+              </g>
+            ) : null}
           </g>
-        ) : null}
-      </g>
-      {variant === "jam" ? <path className="t-fx__x" d="M44 8 L56 20 M56 8 L44 20" /> : null}
-    </FillStage>
+        </Layer>
+      </Masked>
+      {variant === "jam" || variant === "blank" ? (
+        <Badge p={p} className="is-small">
+          {variant === "jam" ? <path className="t-fx__x" d="M36 36 L64 64 M64 36 L36 64" /> : <path className="t-fx__q" d="M38 39 C38 25 62 25 62 39 C62 50 50 50 50 60 M50 71 L50 71.5" />}
+        </Badge>
+      ) : null}
+    </Fx>
   );
 }

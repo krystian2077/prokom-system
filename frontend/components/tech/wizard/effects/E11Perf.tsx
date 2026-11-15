@@ -1,18 +1,21 @@
-import { IconStage } from "./parts";
+import { Badge, Fx, Tint } from "./parts";
 import type { EffectProps } from "./types";
 
-/** E11 Wydajność: the needle hangs low and the progress bar stalls; "upgrade" — both climb. */
-export default function E11Perf({ variant }: EffectProps) {
-  const up = variant === "upgrade" ? " is-up" : "";
+/** E11 Wydajność: the needle crawls up and falls back, the progress bar stalls; "upgrade" — both climb to green. */
+export default function E11Perf(p: EffectProps) {
+  const up = p.variant === "upgrade" ? " is-up" : "";
   return (
-    <IconStage family="e11" size={70}>
-      <path className="t-fx__line" d="M16 62 A34 34 0 0 1 84 62" />
-      <g className={`t-fx__needle${up}`}>
-        <path d="M50 62 L50 34" />
-        <circle cx="50" cy="62" r="4" />
-      </g>
-      <rect className="t-fx__track" x="18" y="76" width="64" height="6" rx="3" />
-      <rect className={`t-fx__bar${up}`} x="18" y="76" width="64" height="6" rx="3" />
-    </IconStage>
+    <Fx family="e11" className={up}>
+      <Tint className="t-fx__veil" />
+      <Badge p={{ ...p, at: null }}>
+        <path className="t-fx__track" d="M20 60 A30 30 0 0 1 80 60" />
+        <g className={`t-fx__needle${up}`}>
+          <path d="M50 60 L50 35" />
+          <circle cx="50" cy="60" r="4.5" />
+        </g>
+        <rect className="t-fx__bartrack" x="24" y="72" width="52" height="6" rx="3" />
+        <rect className={`t-fx__bar${up}`} x="24" y="72" width="52" height="6" rx="3" />
+      </Badge>
+    </Fx>
   );
 }

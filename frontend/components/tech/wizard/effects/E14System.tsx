@@ -1,30 +1,46 @@
-import { IconStage } from "./parts";
+import { Badge, Fx, Tint } from "./parts";
 import type { EffectProps } from "./types";
 
-/** E14 System i błędy: an error window pops (panel: error dot), bugs crawl, or a "?". */
-export default function E14System({ variant }: EffectProps) {
-  if (variant === "question") {
+/** E14 System i błędy: an error window pops and shakes, bugs crawl; "panel": a blinking error code; "question": a "?". */
+export default function E14System(p: EffectProps) {
+  if (p.variant === "question") {
     return (
-      <IconStage family="e14" size={62}>
-        <circle className="t-fx__line" cx="50" cy="50" r="32" />
-        <path className="t-fx__q" d="M38 40 C38 26 62 26 62 40 C62 50 50 50 50 60 M50 70 L50 71" />
-      </IconStage>
+      <Fx family="e14">
+        <Badge p={{ ...p, at: null }}>
+          <path className="t-fx__q" d="M38 39 C38 25 62 25 62 39 C62 50 50 50 50 60 M50 71 L50 71.5" />
+        </Badge>
+      </Fx>
+    );
+  }
+  if (p.variant === "panel") {
+    return (
+      <Fx family="e14" className="is-panel">
+        <Tint className="t-fx__led" />
+        <Badge p={p}>
+          <rect className="t-fx__err" x="24" y="30" width="52" height="40" rx="9" />
+          <text className="t-fx__code" x="50" y="58" textAnchor="middle">
+            E3
+          </text>
+        </Badge>
+      </Fx>
     );
   }
   return (
-    <IconStage family="e14" size={variant === "panel" ? 80 : 66}>
-      <g className="t-fx__win">
-        <rect className="t-fx__line t-fx__fill-ink" x="14" y="22" width="72" height="56" rx="6" />
-        <path className="t-fx__line" d="M14 34 L86 34" />
-        <circle className="t-fx__err" cx="50" cy="56" r="11" />
-        <path className="t-fx__errx" d="M45 51 L55 61 M55 51 L45 61" />
-      </g>
-      {variant === "panel" ? null : (
-        <g className="t-fx__bugs">
-          <ellipse cx="22" cy="86" rx="5" ry="3.4" />
-          <ellipse cx="80" cy="14" rx="5" ry="3.4" />
+    <Fx family="e14">
+      <Badge p={{ ...p, at: null }} wide>
+        <g className="t-fx__win">
+          <rect className="t-fx__winbg" x="34" y="16" width="92" height="68" rx="9" />
+          <path className="t-fx__winbar" d="M34 31 L126 31" />
+          <circle cx="43" cy="23.5" r="2.4" className="t-fx__dot" />
+          <circle cx="51" cy="23.5" r="2.4" className="t-fx__dot" />
+          <circle className="t-fx__errbg" cx="80" cy="56" r="13" />
+          <path className="t-fx__errx" d="M74.5 50.5 L85.5 61.5 M85.5 50.5 L74.5 61.5" />
         </g>
-      )}
-    </IconStage>
+        <g className="t-fx__bugs">
+          <ellipse cx="22" cy="80" rx="5" ry="3.6" />
+          <ellipse cx="140" cy="18" rx="5" ry="3.6" />
+        </g>
+      </Badge>
+    </Fx>
   );
 }
