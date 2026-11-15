@@ -154,7 +154,9 @@ test("courier: chosen salon goes to additional_notes only; success card shows it
   await expect(box).toContainText("Numer zgłoszenia PROKOM/RMA/2/2026 włóż do paczki.");
   await expect(box).toContainText("Zakopane");
   await expect(box).not.toContainText("Nie wysyłaj");
-  expect(sent).toMatchObject({ delivery_method: "courier", additional_notes: "Wysyłka na adres: Zakopane" });
+  expect(sent).toMatchObject({ delivery_method: "courier", return_method: "in_person" });
+  // salon line first; with a personal pick-up the pick-up point follows (KONTRAKT §2)
+  expect(sent!.additional_notes).toBe("Wysyłka na adres: Zakopane\nPunkt odbioru: Zakopane");
   expect(Object.keys(sent!)).not.toContain("courier_point");
 });
 
