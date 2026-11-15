@@ -12,6 +12,9 @@ import type { ServicePoint } from "@/config/prokom";
 import type { HomeIcon } from "@/components/tech/icons";
 import type { DeviceIcon } from "./nav";
 import { joinCities } from "./point-format";
+import { computerDeviceExtra } from "@/config/tresci/urzadzenia-komputery";
+import { mobileDeviceExtra } from "@/config/tresci/urzadzenia-mobilne";
+import type { DeviceExtra } from "./content-types";
 import type { FaqItem } from "./seo";
 import { wizardDevices, type CategoryCode } from "./wizard-data";
 
@@ -57,12 +60,14 @@ export type DevicePage = {
   /** Highlighted note before FAQ (e.g. data recovery: stop using the drive). */
   note?: { title: string; text: string };
   faq: FaqItem[];
+  /** Extended content (2026-11, config/tresci): intro, symptoms, self-check, worth it, intake, warranty. */
+  extra: DeviceExtra;
 };
 
 const PRICE_ANSWER =
   "Kwota zależy od modelu, usterki i części, dlatego podajemy ją po diagnozie. Zanim zaczniemy naprawę, znasz wycenę. Jeśli się nie zdecydujesz, odbierasz sprzęt.";
 
-export const devicePages: DevicePage[] = [
+const baseDevicePages: Omit<DevicePage, "extra">[] = [
   {
     slug: "serwis-laptopow",
     path: "/serwis-laptopow",
@@ -343,6 +348,16 @@ export const devicePages: DevicePage[] = [
     ],
   },
 ];
+
+/** Extended texts by page slug (phones: /serwis-telefonow has its own page). */
+export const deviceExtra: Record<string, DeviceExtra> = { ...mobileDeviceExtra, ...computerDeviceExtra };
+
+/** Accepted base + extended texts: FAQ appended, `kinds` replaced when the extra has them. */
+export const devicePages: DevicePage[] = baseDevicePages.map((d) => {
+  const extra = deviceExtra[d.slug];
+  if (!extra) throw new Error(`No extended content for ${d.slug}`);
+  return { ...d, extra, kinds: extra.kinds ?? d.kinds, faq: [...d.faq, ...extra.faq] };
+});
 
 export function devicePageBySlug(slug: string): DevicePage {
   const page = devicePages.find((d) => d.slug === slug);

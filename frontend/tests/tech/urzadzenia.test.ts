@@ -3,7 +3,9 @@
  */
 import { describe, expect, it } from "vitest";
 import { servicePoints } from "@/config/prokom";
-import { devicePages, deviceSeo, faultExists, hubCards } from "@/lib/tech/devices";
+import type { DeviceExtra } from "@/lib/tech/content-types";
+import { deviceExtra, devicePageBySlug, devicePages, deviceSeo, faultExists, hubCards } from "@/lib/tech/devices";
+import { sharedRatio, wordCount } from "@/lib/tech/naprawy";
 import { repairLinks } from "@/lib/tech/nav";
 import { CATEGORY_CODES } from "@/lib/tech/contract";
 
@@ -56,10 +58,10 @@ describe("strony urządzeń — dane zgodne z kontraktem", () => {
     }
   });
 
-  it("FAQ: 4–6 unique questions per page", () => {
+  it("FAQ: 6–10 unique questions per page (accepted + extended 2026-11)", () => {
     for (const page of devicePages) {
-      expect(page.faq.length).toBeGreaterThanOrEqual(4);
-      expect(page.faq.length).toBeLessThanOrEqual(6);
+      expect(page.faq.length, page.slug).toBeGreaterThanOrEqual(6);
+      expect(page.faq.length, page.slug).toBeLessThanOrEqual(10);
       expect(new Set(page.faq.map((f) => f.q)).size).toBe(page.faq.length);
     }
   });
@@ -75,5 +77,48 @@ describe("strony urządzeń — treść (SPEC §8)", () => {
   });
   it("no hard-coded second point (Zakopane appears only through published points)", () => {
     expect(text).not.toMatch(/Zakopan/);
+  });
+});
+
+describe("strony urządzeń — rozszerzona treść (2026-11)", () => {
+  const all = Object.entries(deviceExtra);
+  const words = (x: DeviceExtra) =>
+    [
+      ...x.intro,
+      ...x.symptoms.flatMap((s) => [s.t, ...s.signs, s.meaning]),
+      ...x.selfCheck.flatMap((c) => [c.t, c.s]),
+      ...x.worth.yes,
+      ...x.worth.no,
+      x.worth.note,
+      x.intake,
+      x.warranty,
+      ...x.faq.flatMap((f) => [f.q, f.a]),
+    ].join(" ");
+  it("every device page and /serwis-telefonow has extended content", () => {
+    for (const page of devicePages) expect(deviceExtra[page.slug], page.slug).toBeDefined();
+    expect(deviceExtra["serwis-telefonow"]).toBeDefined();
+  });
+  it("≥ 700 new words, 4–6 symptoms, 4–6 self-checks, worth it both ways", () => {
+    for (const [slug, x] of all) {
+      expect(wordCount(words(x)), slug).toBeGreaterThanOrEqual(700);
+      expect(x.symptoms.length, slug).toBeGreaterThanOrEqual(4);
+      expect(x.symptoms.length, slug).toBeLessThanOrEqual(6);
+      expect(x.selfCheck.length, slug).toBeGreaterThanOrEqual(4);
+      expect(x.worth.yes.length, slug).toBeGreaterThanOrEqual(3);
+      expect(x.worth.no.length, slug).toBeGreaterThanOrEqual(2);
+      expect(x.intro.length, slug).toBe(2);
+    }
+  });
+  it("symptom faults exist in wizard-data for the category", () => {
+    const category = (slug: string) => (slug === "serwis-telefonow" ? "phone" : devicePageBySlug(slug).category);
+    for (const [slug, x] of all) for (const s of x.symptoms) if (s.fault) expect(faultExists(category(slug), s.fault), `${slug}: ${s.fault}`).toBe(true);
+  });
+  it("shared text between pages < 30%", () => {
+    for (const [a, xa] of all) for (const [b, xb] of all) if (a !== b) expect(sharedRatio(words(xa), words(xb)), `${a} ~ ${b}`).toBeLessThan(0.3);
+  });
+  it("SPEC §8: no prices, messengers, parcel lockers, shop, cities or unconfirmed promises", () => {
+    const text = JSON.stringify(deviceExtra);
+    expect(text).not.toMatch(/\d\s*zł|PLN|whatsapp|wa\.me|paczkomat|sklep|rabk|zakopan/i);
+    expect(text).not.toMatch(/bezpłatn|gratis|tego samego dnia|ok\. 1 h|w 5 minut/i);
   });
 });

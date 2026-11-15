@@ -11,7 +11,8 @@ import { serviceJsonLd } from "@/lib/tech/service-jsonld";
 import { submitHref } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconPath } from "../icons";
 import { RepairLinks } from "../repair/RepairLinks";
-import { CourierTeaser } from "./CourierTeaser";
+import { DataSafety } from "../DataSafety";
+import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSelfCheck, DeviceSymptoms, DeviceWarranty, DeviceWorth, HammerTeaser } from "../content/DeviceSections";
 import { RepairSteps } from "./RepairSteps";
 import { FaultVisual } from "../subhero/FaultVisual";
 import { SubHero } from "../subhero/SubHero";
@@ -60,6 +61,8 @@ export function DevicePage({ page }: { page: DevicePageData }) {
         rail={page.short}
       />
 
+      <DeviceIntro paragraphs={page.extra.intro} title={`${page.name}: najczęstsze usterki i jak pracujemy`} />
+
       <section className="t-section t-section--alt" id="naprawy" data-rail="Naprawy">
         <div className="t-container t-dev-repairs">
           <div className="t-dev-repairs__head">
@@ -99,6 +102,11 @@ export function DevicePage({ page }: { page: DevicePageData }) {
         </div>
       </section>
 
+      <DeviceSymptoms extra={page.extra} name={page.name} short={page.short} category={page.category} />
+      <RepairLinks device={page.category} title={`Konkretne naprawy: ${page.short.toLocaleLowerCase("pl-PL")}`} />
+      <DeviceSelfCheck extra={page.extra} name={page.name} short={page.short} />
+      <DeviceWorth extra={page.extra} name={page.name} short={page.short} />
+
       <section className="t-section" id="marki" data-rail={page.kindsEyebrow}>
         <div className="t-container">
           <div className="t-sechead">
@@ -119,7 +127,11 @@ export function DevicePage({ page }: { page: DevicePageData }) {
         </div>
       </section>
 
+      <DeviceIntake note={page.extra.intake} points={visible} />
       <RepairSteps title="Cztery kroki do sprawnego sprzętu" />
+      <DeviceWarranty text={page.extra.warranty} />
+      <DataSafety />
+      {HAMMER[page.category] ? <HammerTeaser what={HAMMER[page.category]!} /> : null}
 
       <section className="t-section" id="pytania" data-rail="Pytania">
         <div className="t-container t-faqsplit">
@@ -137,12 +149,9 @@ export function DevicePage({ page }: { page: DevicePageData }) {
           </div>
           <Faq items={page.faq} />
         </div>
-        <div className="t-container">
-          <CourierTeaser className="t-dev-courier" />
-        </div>
       </section>
 
-      <RepairLinks device={page.category} title={`Konkretne naprawy: ${page.short.toLocaleLowerCase("pl-PL")}`} />
+      <DevicePosts category={page.category} keywords={`${page.name} ${page.card}`} title={`Poradniki: ${page.short.toLocaleLowerCase("pl-PL")}`} />
       <MoreDevices current={page.path} />
       <CtaBand
         eyebrow="Następny krok"
@@ -153,6 +162,9 @@ export function DevicePage({ page }: { page: DevicePageData }) {
     </div>
   );
 }
+
+/** Hammer Glass teaser on devices with a screen the plotter cuts foil for. */
+const HAMMER: Partial<Record<string, string>> = { tablet: "do Twojego tabletu", smartwatch: "do Twojego zegarka" };
 
 /** Confirmed promises only (SPEC §8): quote before repair, resign, warranty, status online. */
 function QuickPromise() {
