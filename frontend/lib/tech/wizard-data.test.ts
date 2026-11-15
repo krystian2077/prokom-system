@@ -37,7 +37,8 @@ describe("wizard-data", () => {
       const [cx, cy, cw, ch] = d.photo.crop;
       expect(cx + cw).toBeLessThanOrEqual(d.photo.width);
       expect(cy + ch).toBeLessThanOrEqual(d.photo.height);
-      if (d.photo.art) expect(["watch", "data", "other"]).toContain(d.photo.art);
+      // direction B: every device is a vector illustration (components/tech/wizard/art)
+      if (d.photo.art) expect(["phone", "tablet", "watch", "laptop", "pc", "printer", "console", "data", "other"]).toContain(d.photo.art);
       else expect(d.photo.src).toMatch(/^\/tech\/.+\.webp$/);
     }
   });

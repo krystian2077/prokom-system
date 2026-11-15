@@ -5,6 +5,25 @@
  * `.is-poster` (reduced motion, /lab grid) and `.is-paused` (off screen) stop them.
  */
 
+/* ---------- Device illustrations (direction B): materials per theme ---------- */
+.tech .t-scene,
+.tech .t-fault,
+.tech .t-artvars {
+  --dv-m1: #5b5c63; --dv-m2: #2c2d32; --dv-m3: #45464d; --dv-m4: #1d1e22;
+  --dv-rim: #ffffff; --dv-back: #33343a; --dv-plateau: #2a2b30;
+  --dv-g1: #2b2629; --dv-g2: #101115; --dv-g3: #0b1018;
+  --dv-w1: #ffffff; --dv-w2: #e4e5e8; --dv-w3: #d2d4d8;
+  --dv-key: #1c1d21; --dv-well: #0f1013; --dv-pad: #3a3b41; --dv-hinge: #1a1b1f; --dv-hole: #0c0c0e;
+  --dv-a1: #e3e4e7; --dv-a2: #b4b7bc; --dv-a3: #cdd0d4;
+  --dv-band1: #3b3d44; --dv-band2: #23252a;
+}
+html[data-tech-theme="dark"] .tech .t-scene,
+html[data-tech-theme="dark"] .tech .t-artvars {
+  --dv-m1: #6a6b73; --dv-m2: #2a2b30; --dv-m3: #4b4c54; --dv-m4: #18191c;
+  --dv-back: #303137; --dv-w1: #eceef1; --dv-w2: #cfd2d7; --dv-w3: #b9bcc2;
+  --dv-a1: #b9bcc1; --dv-a2: #7e8187; --dv-a3: #9a9da3;
+}
+
 /* ---------- Scene ---------- */
 /* Column: the stage (device centred with room for the label) and the card UNDER it. */
 .tech .t-scene {
@@ -62,7 +81,9 @@ html[data-tech-theme="dark"] .tech .t-scene__frame::after { background: radial-g
 .tech .t-scene.is-zoom .t-scene__cam { transform: scale(1.12); }
 .tech .t-scene__img { position: absolute; max-width: none; height: auto; filter: drop-shadow(0 16px 22px rgba(18, 22, 19, 0.16)); user-select: none; -webkit-user-drag: none; }
 html[data-tech-theme="dark"] .tech .t-scene__img { filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.18)); }
-.tech .t-scene__art { position: absolute; inset: 0; }
+.tech .t-scene__art { position: absolute; filter: drop-shadow(0 16px 22px rgba(18, 22, 19, 0.18)); }
+html[data-tech-theme="dark"] .tech .t-scene__art { filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.6)); }
+.tech .t-art--wait { display: block; width: 100%; height: 100%; }
 .tech .t-scene__art svg,
 .tech .t-art { display: block; width: 100%; height: 100%; }
 
@@ -154,11 +175,11 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 .tech .t-scene__card span { font-size: 13px; line-height: 1.45; color: var(--ink2); }
 .tech .t-scene__card .t-wiz__more { white-space: normal; text-wrap: pretty; }
 /* full layout: fixed card height — a longer text on hover never resizes the stage (no jumping device) */
-.tech .t-scene--full:not(.is-static) .t-scene__card { height: 9.5rem; box-sizing: border-box; overflow: hidden; }
-.tech .t-scene--full .t-scene__cardtext { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.tech .t-scene--full .t-scene__card .t-wiz__more { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* full layout: the card is as tall as its text, but never shorter than the longest text at this width,
+   so a different fault (or a hover preview) never resizes the stage — the device never jumps */
+.tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; justify-content: center; box-sizing: border-box; }
 @media (min-width: 1180px) {
-  .tech .t-scene--full:not(.is-static) .t-scene__card { height: 7.25rem; }
+  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 8.5rem; }
 }
 /* phone: "Pokaż całe urządzenie" lives in the card (never over the device) */
 .tech .t-scene__card .t-scene__whole { position: static; align-self: flex-start; order: 9; margin-top: 6px; min-height: 34px; padding: 0 14px; background: var(--bg2); box-shadow: none; animation: t-card-in var(--m-panel) var(--m-ease-emph) both; }
@@ -182,16 +203,21 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); b
 
 /* placement in the wizard */
 .tech .t-wiz__stagewrap { display: flex; min-height: 520px; }
+/* right column: compact rhythm, no stretched gaps (the summary bar sits at the bottom) */
+@media (min-width: 820px) {
+  .tech .t-wiz__side { justify-content: flex-start; gap: 26px; }
+  .tech .t-wiz__side > .t-wiz__bar { margin-top: auto; }
+}
 @media (max-width: 767.98px) {
   .tech .t-wiz__body > .t-wiz__stagewrap { display: none; }
 }
 @media (min-width: 820px) {
-  .tech .t-wiz__stagewrap { width: clamp(320px, 36vw, 440px); flex-shrink: 0; align-self: stretch; min-height: 560px; }
-  .tech .t-wiz__stagewrap .t-scene { min-height: 560px; }
+  .tech .t-wiz__stagewrap { width: clamp(320px, 36vw, 440px); flex-shrink: 0; align-self: stretch; min-height: 540px; }
+  .tech .t-wiz__stagewrap .t-scene { min-height: 540px; }
 }
 @media (min-width: 1180px) {
-  .tech .t-wiz__stagewrap { width: clamp(420px, 35vw, 500px); min-height: 600px; }
-  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 380px); --fh: var(--fh-d, 310px); min-height: 600px; }
+  .tech .t-wiz__stagewrap { width: clamp(420px, 36vw, 520px); min-height: 560px; }
+  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 380px); --fh: var(--fh-d, 310px); min-height: 560px; }
 }
 
 /* device chips: radiogroup with a sliding pill; faults preview on hover */

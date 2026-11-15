@@ -5,7 +5,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { onVisible, prefersReducedMotion } from "@/lib/tech/motion";
 import { FRAME_BOX, SCENE_ZOOM, faultMeaning, sceneOf, type Box, type WizardDevice, type WizardPhoto } from "@/lib/tech/wizard-data";
 import { leader, placeLabel, zoomPt, zoomRect, type LabelSide, type Pt, type Rect } from "@/lib/tech/wizard-layout";
-import { DataArt, OtherArt, WatchArt } from "./art/SceneArt";
+import { DeviceArt } from "./art";
 import { EFFECTS } from "./effects";
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -22,9 +22,16 @@ function frameVars(photo: WizardPhoto): CSSProperties {
 }
 
 /** The photo (or illustration) placed in its crop box. */
-function Picture({ photo, eager }: { photo: WizardPhoto; eager?: boolean }) {
+function Picture({ photo, eager, uid }: { photo: WizardPhoto; eager?: boolean; uid: string }) {
   const [cx, cy, cw, ch] = photo.crop;
-  if (!photo.src) return <div className="t-scene__art">{photo.art === "watch" ? <WatchArt /> : photo.art === "data" ? <DataArt /> : <OtherArt />}</div>;
+  if (!photo.src) {
+    // illustration: the SVG is drawn in its full viewBox, placed by the crop like a photo
+    return (
+      <div className="t-scene__art" style={{ left: `${(-cx / cw) * 100}%`, top: `${(-cy / ch) * 100}%`, width: `${(photo.width / cw) * 100}%`, height: `${(photo.height / ch) * 100}%` }}>
+        <DeviceArt kind={photo.art ?? "other"} uid={uid} />
+      </div>
+    );
+  }
   return (
     // eslint-disable-next-line @next/next/no-img-element -- pre-sized WebP with alpha, positioned by %, no optimizer needed
     <img
@@ -167,11 +174,12 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
     const region = zoomRect({ x: F.x + (rx / 100) * F.w, y: F.y + (ry / 100) * F.h, w: (rw / 100) * F.w, h: (rh / 100) * F.h }, origin, s);
     const device = zoomRect(F, origin, s);
     const spot = pt(scene.spot);
-    const avoid: Rect[] = photo.spots.filter(([t]) => t !== shown).map(([, x, y]) => pt([x, y])).map((p) => ({ x: p.x - 17, y: p.y - 17, w: 34, h: 34 }));
+    const others = photo.spots.filter(([t]) => t !== shown).map(([, x, y]) => pt([x, y]));
+    const avoid: Rect[] = others.map((p) => ({ x: p.x - 17, y: p.y - 17, w: 34, h: 34 }));
     const wb = wholeRef.current;
     if (wb) avoid.push({ x: wb.offsetLeft, y: wb.offsetTop, w: wb.offsetWidth, h: wb.offsetHeight });
     const label = { w: lb.offsetWidth, h: lb.offsetHeight };
-    const place = placeLabel({ stage: { w: W, h: H }, device, region, spot, label, avoid });
+    const place = placeLabel({ stage: { w: W, h: H }, device, region, spot, label, avoid, spots: others });
     const line = leader(spot, { x: place.x, y: place.y, w: label.w, h: label.h }, 19 * s);
     setGeo({ x: place.x, y: place.y, side: place.side, a: line.a, b: line.b, w: W, h: H });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- recompute on what moves the label
@@ -215,12 +223,12 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
       <div ref={stageRef} className="t-scene__stage">
         {ghost && ghost.photo ? (
           <div className="t-scene__frame is-ghost" style={frameVars(ghost.photo)} aria-hidden="true">
-            <Picture photo={ghost.photo} eager />
+            <Picture photo={ghost.photo} eager uid={`${uid}g`} />
           </div>
         ) : null}
         <div ref={frameRef} className="t-scene__frame" key={device.id} style={frameVars(photo)} role="img" aria-label={`${device.label} — ${photo.art ? "ilustracja" : "zdjęcie"}`}>
           <div className="t-scene__cam" style={{ transformOrigin: `${focus[0]}% ${focus[1]}%` }}>
-            <Picture photo={photo} eager={interactive} />
+            <Picture photo={photo} eager={interactive} uid={uid} />
 
             <div
               key={`${device.id}:${shown}`}

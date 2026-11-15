@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FRAME_BOX, SCENE_ZOOM, frameSize, wizardDevices } from "./wizard-data";
-import { intersects, leader, placeLabel, zoomPt, zoomRect, type Rect } from "./wizard-layout";
+import { intersects, leader, nearestOn, placeLabel, segDist, zoomPt, zoomRect, type Rect } from "./wizard-layout";
 
 /** Desktop stage at 1440 (tech-wizard.css: 500 px column, 600 px scene, card ≈ 120 px). */
 const STAGE = { w: 474, h: 440 };
@@ -23,14 +23,15 @@ function layout(deviceId: string, fault: string, zoom: boolean) {
   const avoid = d.photo!.spots.filter(([t]) => t !== fault).map(([, x, y]) => pt([x, y])).map((p) => ({ x: p.x - 17, y: p.y - 17, w: 34, h: 34 }));
   if (zoom) avoid.push({ x: 4, y: 4, w: 210, h: 36 }); // "Pokaż całe urządzenie"
   const label = { w: labelW(fault), h: LABEL_H };
-  return { place: placeLabel({ stage: STAGE, device, region, spot, label, avoid }), region, device, spot, label, avoid };
+  const spots = d.photo!.spots.filter(([t]) => t !== fault).map(([, x, y]) => pt([x, y]));
+  return { place: placeLabel({ stage: STAGE, device, region, spot, label, avoid, spots }), region, device, spot, label, avoid, spots };
 }
 
 describe("label placement (PREMIUM §4, feat/tech-kreator-wizual)", () => {
   const local = wizardDevices.flatMap((d) => d.faults.filter((f) => d.scenes[f].spot).map((f) => [d.id, f] as const));
 
   it.each(local.flatMap(([d, f]) => [[d, f, false] as const, [d, f, true] as const]))("%s · %s (zoom %s): inside the stage, off the region and the other spots", (d, f, zoom) => {
-    const { place, region, label, avoid } = layout(d, f, zoom);
+    const { place, region, label, avoid, spot, spots } = layout(d, f, zoom);
     const r = { x: place.x, y: place.y, w: label.w, h: label.h };
     expect(r.x).toBeGreaterThanOrEqual(5.5);
     expect(r.y).toBeGreaterThanOrEqual(5.5);
@@ -38,6 +39,10 @@ describe("label placement (PREMIUM §4, feat/tech-kreator-wizual)", () => {
     expect(r.y + r.h).toBeLessThanOrEqual(STAGE.h - 5.5);
     expect(intersects(r, region), "covers the effect region").toBe(false);
     for (const a of avoid) expect(intersects(r, a), "covers a spot / the button").toBe(false);
+    if (place.outsideDevice) {
+      const end = nearestOn(r, spot);
+      for (const q of spots) expect(segDist(q, spot, end), "leader crosses a spot").toBeGreaterThanOrEqual(22);
+    }
   });
 
   it("without the camera, every label sits outside the device", () => {

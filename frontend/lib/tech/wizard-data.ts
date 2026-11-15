@@ -68,10 +68,13 @@ export type FaultScene = {
   clip?: string;
 };
 
+/** Vector illustration of a device (components/tech/wizard/art). */
+export type ArtKind = "phone" | "tablet" | "watch" | "laptop" | "pc" | "printer" | "console" | "data" | "other";
+
 export type WizardPhoto = {
   /** Photo (WebP) — or `art` for an illustration drawn in the scene style. */
   src?: string;
-  art?: "watch" | "data" | "other";
+  art?: ArtKind;
   width: number;
   height: number;
   /** Crop box in image px: [x, y, w, h]. */
@@ -108,7 +111,7 @@ export function frameSize(crop: [number, number, number, number], box: readonly 
   return [w, w / ar];
 }
 
-type Px4 = [number, number, number, number];
+export type Px4 = [number, number, number, number];
 type SceneDef = { e: EffectFamily; v?: string; r: Px4; s?: [number, number]; radius?: number; clip?: [number, number][] };
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -127,7 +130,7 @@ function pctBox(crop: Px4, [x, y, w, h]: Px4): Box {
 }
 
 /** Image-px scene definitions → % scenes + derived photo spots. */
-function build(crop: Px4, faults: string[], defs: Record<string, SceneDef>) {
+export function buildScenes(crop: Px4, faults: string[], defs: Record<string, SceneDef>) {
   const scenes: Record<string, FaultScene> = {};
   for (const f of faults) {
     const d = defs[f];
@@ -141,120 +144,131 @@ function build(crop: Px4, faults: string[], defs: Record<string, SceneDef>) {
   return { scenes, spots };
 }
 
-const MOBILE = ["Pęknięty ekran", "Bateria", "Nie ładuje", "Aparat", "Głośnik lub mikrofon", "Przyciski i obudowa", "Po zalaniu", "Nie włącza się"];
+export const MOBILE = ["Pęknięty ekran", "Bateria", "Nie ładuje", "Aparat", "Głośnik lub mikrofon", "Przyciski i obudowa", "Po zalaniu", "Nie włącza się"];
 
-const PHONE_CROP: Px4 = [24, 50, 392, 486];
-/** Tablet: front only, whole (kreator-tablet.webp, scripts/tech/urzadzenia-kadry.py); units = image px / 2. */
-const TABLET_CROP: Px4 = [0, 0, 416, 582];
-const WATCH_CROP: Px4 = [0, 0, 400, 480];
-const LAPTOP_CROP: Px4 = [23, 86, 601, 407];
-const PC_CROP: Px4 = [149, 0, 343, 640];
-const PRINTER_CROP: Px4 = [49, 71, 544, 272];
-const CONSOLE_CROP: Px4 = [49, 0, 542, 640];
-const ART_CROP: Px4 = [0, 0, 480, 400];
+// Direction B (feat/tech-kreator-wow): every device is a vector illustration
+// (components/tech/wizard/art/*). Crops, spots and regions are in each illustration's
+// viewBox units — exact, sharp at any size, the same in both themes.
+const build = buildScenes;
+const PHONE_CROP: Px4 = [32, 36, 418, 464];
+const TABLET_CROP: Px4 = [16, 12, 412, 574];
+const WATCH_CROP: Px4 = [88, 0, 236, 480];
+const LAPTOP_CROP: Px4 = [14, 14, 572, 364];
+const PC_CROP: Px4 = [40, 16, 290, 560];
+const PRINTER_CROP: Px4 = [36, 30, 528, 318];
+const CONSOLE_CROP: Px4 = [86, 24, 514, 524];
+const DATA_CROP: Px4 = [34, 32, 430, 320];
+const OTHER_CROP: Px4 = [46, 44, 398, 336];
 
 const WATCH_FAULTS = ["Pęknięte szkło", "Bateria", "Nie ładuje", "Przyciski i obudowa", "Po zalaniu", "Nie włącza się"];
-const LAPTOP_FAULTS = ["Matryca", "Klawiatura", "Bateria", "Nie ładuje", "Przegrzewa się", "Działa wolno", "Po zalaniu", "Nie włącza się"];
+export const LAPTOP_FAULTS = ["Matryca", "Klawiatura", "Bateria", "Nie ładuje", "Przegrzewa się", "Działa wolno", "Po zalaniu", "Nie włącza się"];
 const PC_FAULTS = ["Nie włącza się", "Działa wolno", "Głośno pracuje, grzeje się", "System i wirusy", "Dysk i dane", "Brak obrazu", "Porty USB i audio", "Rozbudowa"];
 const PRINTER_FAULTS = ["Nie drukuje", "Paski na wydruku", "Zacina papier", "Tusz i głowica", "Skaner", "Brak Wi-Fi", "Błąd na panelu", "Nie włącza się"];
 const CONSOLE_FAULTS = ["Brak obrazu (HDMI)", "Nie czyta płyt", "Głośna, przegrzewa się", "Nie włącza się", "Dryf w padzie", "Pad nie ładuje", "Błąd systemu", "Po zalaniu"];
 const DATA_FAULTS = ["Z telefonu", "Z dysku HDD lub SSD", "Z pendrive’a lub karty", "Usunięte pliki", "Sprzęt po zalaniu", "Sprzęt nie włącza się"];
 const OTHER_FAULTS = ["Nie włącza się", "Nie ładuje", "Brak obrazu", "Brak dźwięku", "Po zalaniu", "Inny problem"];
 
-// Screens inside the bezel (image px).
-const PHONE_SCREEN: Px4 = [191, 59, 216, 468];
-const TABLET_SCREEN: Px4 = [16, 16, 384, 550];
-// Outlines of parts seen at an angle (image px) → clip polygons, so effects stay on the device.
-const LAPTOP_LID: [number, number][] = [[140, 88], [506, 116], [513, 132], [402, 476], [388, 488], [32, 402], [25, 386]];
-const LAPTOP_BASE: [number, number][] = [[436, 352], [612, 381], [621, 393], [404, 489], [396, 470]];
-const PC_CASE: [number, number][] = [[152, 22], [286, 2], [487, 100], [489, 590], [306, 640], [152, 640]];
-const PRINTER_BODY: [number, number][] = [[55, 162], [104, 75], [552, 74], [590, 162], [590, 340], [58, 340]];
-const CONSOLE_BODY: [number, number][] = [[74, 88], [216, 2], [318, 22], [300, 622], [58, 622], [53, 560]];
-const PAD: [number, number][] = [[350, 448], [555, 448], [588, 560], [580, 636], [520, 636], [452, 560], [400, 636], [326, 636], [318, 560]];
+// Screens (glass inside the bezel) and outlines, in illustration units.
+const PHONE_SCREEN: Px4 = [253, 51, 178, 434];
+const TABLET_SCREEN: Px4 = [36, 34, 368, 532];
+const WATCH_SCREEN: Px4 = [118, 113, 164, 254];
+const LAPTOP_SCREEN: Px4 = [106, 32, 388, 246];
+const LAPTOP_DECK: Px4 = [18, 292, 564, 82];
+const LAPTOP_DECK_CLIP: [number, number][] = [[78, 294], [522, 294], [582, 358], [578, 374], [22, 374], [18, 358]];
+const PC_BODY: Px4 = [44, 20, 282, 552];
+const PC_CLIP: [number, number][] = [[44, 20], [214, 20], [326, 52], [326, 540], [214, 566], [44, 568]];
+const PRINTER_BODY: Px4 = [40, 34, 520, 310];
+const PRINTER_CLIP: [number, number][] = [[74, 34], [526, 34], [552, 104], [560, 110], [560, 340], [40, 340], [40, 110], [48, 104]];
+const PRINTER_OUT: Px4 = [210, 236, 300, 88];
+const CONSOLE_BODY: Px4 = [92, 30, 176, 486];
+const PAD: Px4 = [318, 380, 284, 166];
+const PAD_CLIP: [number, number][] = [[352, 394], [420, 382], [500, 382], [568, 392], [594, 430], [596, 480], [586, 544], [520, 544], [500, 488], [420, 488], [400, 544], [334, 544], [322, 480], [326, 430]];
+const DATA_ALL: Px4 = [36, 34, 426, 316];
+const OTHER_ALL: Px4 = [48, 46, 394, 332];
 
 const phone = build(PHONE_CROP, MOBILE, {
-  "Pęknięty ekran": { e: "E1", r: PHONE_SCREEN, s: [318, 232], radius: 12 },
-  Bateria: { e: "E2", r: [36, 226, 150, 300], s: [104, 392], radius: 10 },
-  "Nie ładuje": { e: "E3", r: [244, 486, 110, 50], s: [299, 527] },
-  Aparat: { e: "E4", v: "lens", r: [38, 56, 124, 132], s: [99, 121], radius: 26 },
-  "Głośnik lub mikrofon": { e: "E5", r: [244, 52, 110, 46], s: [299, 61] },
-  "Przyciski i obudowa": { e: "E6", r: [396, 176, 26, 96], s: [413, 222], radius: 30 },
-  "Po zalaniu": { e: "E7", r: [28, 52, 390, 484], radius: 9 },
-  "Nie włącza się": { e: "E8", r: PHONE_SCREEN, radius: 12 },
+  "Pęknięty ekran": { e: "E1", r: PHONE_SCREEN, s: [330, 252], radius: 20 },
+  Bateria: { e: "E2", r: [52, 196, 172, 280], s: [138, 360], radius: 14 },
+  "Nie ładuje": { e: "E3", r: [296, 462, 92, 34], s: [342, 494] },
+  Aparat: { e: "E4", v: "lens", r: [58, 62, 100, 104], s: [107, 114], radius: 28 },
+  "Głośnik lub mikrofon": { e: "E5", r: [296, 40, 92, 30], s: [342, 45] },
+  "Przyciski i obudowa": { e: "E6", r: [430, 140, 18, 84], s: [443, 181], radius: 40 },
+  "Po zalaniu": { e: "E7", r: [38, 40, 404, 456], radius: 22 },
+  "Nie włącza się": { e: "E8", r: PHONE_SCREEN, radius: 20 },
 });
 const tablet = build(TABLET_CROP, MOBILE, {
-  "Pęknięty ekran": { e: "E1", r: TABLET_SCREEN, s: [254, 226], radius: 4 },
-  Bateria: { e: "E2", r: [40, 300, 220, 240], s: [140, 430], radius: 6 },
-  "Nie ładuje": { e: "E3", r: [150, 530, 116, 52], s: [208, 575] },
-  Aparat: { e: "E4", v: "lens", r: [360, 251, 56, 80], s: [407, 291], radius: 30 },
-  "Głośnik lub mikrofon": { e: "E5", r: [20, 0, 120, 48], s: [74, 8] },
-  "Przyciski i obudowa": { e: "E6", r: [290, 0, 100, 34], s: [340, 6], radius: 30 },
-  "Po zalaniu": { e: "E7", r: [2, 2, 412, 578], radius: 7 },
-  "Nie włącza się": { e: "E8", r: TABLET_SCREEN, radius: 4 },
+  "Pęknięty ekran": { e: "E1", r: TABLET_SCREEN, s: [240, 240], radius: 5 },
+  Bateria: { e: "E2", r: [56, 320, 210, 220], s: [150, 430], radius: 6 },
+  "Nie ładuje": { e: "E3", r: [170, 548, 100, 34], s: [220, 581] },
+  Aparat: { e: "E4", v: "lens", r: [388, 270, 32, 60], s: [410, 300], radius: 40 },
+  "Głośnik lub mikrofon": { e: "E5", r: [36, 14, 76, 28], s: [71, 19] },
+  "Przyciski i obudowa": { e: "E6", r: [306, 8, 70, 22], s: [341, 17], radius: 40 },
+  "Po zalaniu": { e: "E7", r: [20, 18, 400, 564], radius: 8 },
+  "Nie włącza się": { e: "E8", r: TABLET_SCREEN, radius: 5 },
 });
 const watch = build(WATCH_CROP, WATCH_FAULTS, {
-  "Pęknięte szkło": { e: "E1", r: [118, 113, 164, 254], s: [172, 214], radius: 22 },
-  Bateria: { e: "E2", r: [100, 95, 200, 290], radius: 24 },
-  "Nie ładuje": { e: "E3", r: [130, 318, 140, 66], s: [200, 370] },
-  "Przyciski i obudowa": { e: "E6", r: [292, 160, 40, 140], s: [309, 192], radius: 30 },
-  "Po zalaniu": { e: "E7", r: [100, 95, 200, 290], radius: 24 },
-  "Nie włącza się": { e: "E8", r: [118, 113, 164, 254], radius: 22 },
+  "Pęknięte szkło": { e: "E1", r: WATCH_SCREEN, s: [174, 206], radius: 27 },
+  Bateria: { e: "E2", r: [100, 95, 200, 290], radius: 31 },
+  "Nie ładuje": { e: "E3", r: [140, 344, 120, 41], s: [200, 381] },
+  "Przyciski i obudowa": { e: "E6", r: [290, 160, 30, 140], s: [306, 191], radius: 40 },
+  "Po zalaniu": { e: "E7", r: [100, 95, 200, 290], radius: 31 },
+  "Nie włącza się": { e: "E8", r: WATCH_SCREEN, radius: 27 },
 });
 const laptop = build(LAPTOP_CROP, LAPTOP_FAULTS, {
-  Matryca: { e: "E9", r: [25, 88, 490, 400], s: [300, 250], clip: LAPTOP_LID },
-  Klawiatura: { e: "E12", r: [408, 392, 112, 52], s: [498, 413], radius: 10 },
-  Bateria: { e: "E2", r: [396, 352, 225, 137], clip: LAPTOP_BASE },
-  "Nie ładuje": { e: "E3", r: [398, 448, 100, 40], s: [426, 468] },
-  "Przegrzewa się": { e: "E10", r: [30, 330, 372, 160], s: [210, 432], clip: [[44, 330], [400, 330], [402, 476], [388, 488], [32, 402], [25, 386]] },
-  "Działa wolno": { e: "E11", r: [25, 88, 490, 400], clip: LAPTOP_LID },
-  "Po zalaniu": { e: "E7", r: [396, 352, 225, 137], clip: LAPTOP_BASE },
-  "Nie włącza się": { e: "E8", v: "body", r: [25, 88, 490, 400], clip: LAPTOP_LID },
+  Matryca: { e: "E9", r: LAPTOP_SCREEN, s: [300, 150], radius: 2 },
+  Klawiatura: { e: "E12", r: [100, 299, 436, 42], s: [420, 320], radius: 4, clip: [[100, 299], [500, 299], [536, 341], [64, 341]] },
+  Bateria: { e: "E2", r: LAPTOP_DECK, clip: LAPTOP_DECK_CLIP },
+  "Nie ładuje": { e: "E3", r: [30, 354, 76, 22], s: [58, 365] },
+  "Przegrzewa się": { e: "E10", r: [92, 230, 416, 70], s: [200, 290] },
+  "Działa wolno": { e: "E11", r: LAPTOP_SCREEN, radius: 2 },
+  "Po zalaniu": { e: "E7", r: LAPTOP_DECK, clip: LAPTOP_DECK_CLIP },
+  "Nie włącza się": { e: "E8", r: LAPTOP_SCREEN, radius: 2 },
 });
 const pc = build(PC_CROP, PC_FAULTS, {
-  "Nie włącza się": { e: "E8", v: "body", r: [232, 20, 54, 54], s: [259, 46], radius: 50 },
-  "Działa wolno": { e: "E11", r: [150, 0, 340, 640], clip: PC_CASE },
-  "Głośno pracuje, grzeje się": { e: "E10", r: [154, 300, 132, 330], s: [222, 424], radius: 4 },
-  "System i wirusy": { e: "E14", r: [150, 0, 340, 640], clip: PC_CASE },
-  "Dysk i dane": { e: "E13", v: "disc", r: [152, 44, 82, 236], s: [166, 146], radius: 4 },
-  "Brak obrazu": { e: "E9", v: "nosignal", r: [150, 0, 340, 640], clip: PC_CASE },
-  "Porty USB i audio": { e: "E16", v: "port", r: [236, 104, 52, 140], s: [262, 202], radius: 10 },
-  Rozbudowa: { e: "E11", v: "upgrade", r: [150, 0, 340, 640], clip: PC_CASE },
+  "Nie włącza się": { e: "E8", v: "body", r: [110, 43, 38, 38], s: [129, 62], radius: 50 },
+  "Działa wolno": { e: "E11", r: PC_BODY, clip: PC_CLIP },
+  "Głośno pracuje, grzeje się": { e: "E10", r: [62, 288, 134, 258], s: [129, 420], radius: 6 },
+  "System i wirusy": { e: "E14", r: PC_BODY, clip: PC_CLIP },
+  "Dysk i dane": { e: "E13", v: "disc", r: [66, 226, 126, 26], s: [118, 242], radius: 20 },
+  "Brak obrazu": { e: "E9", v: "nosignal", r: PC_BODY, clip: PC_CLIP },
+  "Porty USB i audio": { e: "E16", v: "port", r: [82, 138, 94, 26], s: [129, 151], radius: 20 },
+  Rozbudowa: { e: "E11", v: "upgrade", r: PC_BODY, clip: PC_CLIP },
 });
 const printer = build(PRINTER_CROP, PRINTER_FAULTS, {
-  "Nie drukuje": { e: "E15", v: "blank", r: [195, 258, 290, 82] },
-  "Paski na wydruku": { e: "E15", v: "streaks", r: [195, 258, 290, 82] },
-  "Zacina papier": { e: "E15", v: "jam", r: [195, 258, 290, 82], s: [344, 296] },
-  "Tusz i głowica": { e: "E15", v: "ink", r: [70, 270, 116, 60], s: [128, 300] },
-  Skaner: { e: "E4", v: "scan", r: [128, 76, 448, 72], s: [380, 112], radius: 4 },
-  "Brak Wi-Fi": { e: "E16", v: "wifi", r: [50, 72, 542, 270], clip: PRINTER_BODY },
-  "Błąd na panelu": { e: "E14", v: "panel", r: [70, 104, 66, 46], s: [100, 124] },
-  "Nie włącza się": { e: "E8", v: "body", r: [50, 72, 542, 270], clip: PRINTER_BODY },
+  "Nie drukuje": { e: "E15", v: "blank", r: PRINTER_OUT },
+  "Paski na wydruku": { e: "E15", v: "streaks", r: PRINTER_OUT },
+  "Zacina papier": { e: "E15", v: "jam", r: PRINTER_OUT, s: [360, 290] },
+  "Tusz i głowica": { e: "E15", v: "ink", r: [66, 236, 120, 74], s: [126, 273], radius: 12 },
+  Skaner: { e: "E4", v: "scan", r: [52, 36, 496, 68], s: [300, 70], clip: [[74, 36], [526, 36], [552, 104], [48, 104]] },
+  "Brak Wi-Fi": { e: "E16", v: "wifi", r: PRINTER_BODY, clip: PRINTER_CLIP },
+  "Błąd na panelu": { e: "E14", v: "panel", r: [70, 124, 104, 40], s: [100, 144], radius: 20 },
+  "Nie włącza się": { e: "E8", v: "body", r: PRINTER_BODY, clip: PRINTER_CLIP },
 });
 const consoleScenes = build(CONSOLE_CROP, CONSOLE_FAULTS, {
-  "Brak obrazu (HDMI)": { e: "E9", v: "nosignal", r: [50, 0, 540, 640], clip: CONSOLE_BODY },
-  "Nie czyta płyt": { e: "E13", v: "disc", r: [60, 330, 190, 280], s: [150, 470], radius: 6 },
-  "Głośna, przegrzewa się": { e: "E10", r: [212, 24, 100, 300], s: [262, 120], radius: 6 },
-  "Nie włącza się": { e: "E8", v: "body", r: [50, 0, 270, 640], clip: CONSOLE_BODY },
-  "Dryf w padzie": { e: "E17", r: [366, 494, 66, 66], s: [398, 530], radius: 50 },
-  "Pad nie ładuje": { e: "E3", r: [400, 436, 112, 46], s: [458, 444] },
-  "Błąd systemu": { e: "E14", r: [50, 0, 270, 640], clip: CONSOLE_BODY },
-  "Po zalaniu": { e: "E7", r: [316, 444, 274, 196], clip: PAD },
+  "Brak obrazu (HDMI)": { e: "E9", v: "nosignal", r: CONSOLE_BODY, radius: 14 },
+  "Nie czyta płyt": { e: "E13", v: "disc", r: [100, 386, 70, 38], s: [134, 405], radius: 30 },
+  "Głośna, przegrzewa się": { e: "E10", r: [140, 36, 80, 180], s: [180, 66], radius: 10 },
+  "Nie włącza się": { e: "E8", v: "body", r: CONSOLE_BODY, radius: 14 },
+  "Dryf w padzie": { e: "E17", r: [394, 450, 48, 48], s: [418, 474], radius: 50 },
+  "Pad nie ładuje": { e: "E3", r: [420, 376, 80, 26], s: [460, 388] },
+  "Błąd systemu": { e: "E14", r: CONSOLE_BODY, radius: 14 },
+  "Po zalaniu": { e: "E7", r: PAD, clip: PAD_CLIP },
 });
-const data = build(ART_CROP, DATA_FAULTS, {
-  "Z telefonu": { e: "E13", v: "phone", r: [30, 130, 120, 200], s: [90, 230] },
-  "Z dysku HDD lub SSD": { e: "E13", v: "hdd", r: [170, 170, 140, 160], s: [240, 250] },
-  "Z pendrive’a lub karty": { e: "E13", v: "card", r: [330, 140, 120, 180], s: [390, 230] },
-  "Usunięte pliki": { e: "E13", v: "files", r: [180, 30, 120, 110], s: [240, 85] },
-  "Sprzęt po zalaniu": { e: "E7", r: [20, 20, 440, 360], radius: 6 },
-  "Sprzęt nie włącza się": { e: "E8", v: "body", r: [20, 20, 440, 360], radius: 6 },
+const data = build(DATA_CROP, DATA_FAULTS, {
+  "Z telefonu": { e: "E13", v: "phone", r: [42, 132, 104, 198], s: [94, 231], radius: 20 },
+  "Z dysku HDD lub SSD": { e: "E13", v: "hdd", r: [178, 158, 146, 186], s: [251, 232], radius: 10 },
+  "Z pendrive’a lub karty": { e: "E13", v: "card", r: [346, 118, 110, 208], s: [420, 284], radius: 10 },
+  "Usunięte pliki": { e: "E13", v: "files", r: [182, 40, 122, 90], s: [243, 88], radius: 8 },
+  "Sprzęt po zalaniu": { e: "E7", r: DATA_ALL, radius: 6 },
+  "Sprzęt nie włącza się": { e: "E8", v: "body", r: DATA_ALL, radius: 6 },
 });
-const other = build(ART_CROP, OTHER_FAULTS, {
+const other = build(OTHER_CROP, OTHER_FAULTS, {
   "Nie włącza się": { e: "E8", v: "body", r: [336, 256, 88, 88], s: [380, 300], radius: 50 },
-  "Nie ładuje": { e: "E3", r: [40, 240, 100, 120], s: [90, 300] },
-  "Brak obrazu": { e: "E9", r: [124, 64, 192, 152], s: [220, 140], radius: 4 },
-  "Brak dźwięku": { e: "E5", r: [345, 85, 90, 120], s: [390, 140] },
-  "Po zalaniu": { e: "E7", r: [20, 20, 440, 360], radius: 6 },
-  "Inny problem": { e: "E14", v: "question", r: [20, 20, 440, 360], radius: 6 },
+  "Nie ładuje": { e: "E3", r: [54, 218, 72, 110], s: [90, 282], radius: 14 },
+  "Brak obrazu": { e: "E9", r: [124, 64, 192, 148], s: [220, 138], radius: 2 },
+  "Brak dźwięku": { e: "E5", r: [348, 78, 88, 128], s: [392, 142], radius: 25 },
+  "Po zalaniu": { e: "E7", r: OTHER_ALL, radius: 6 },
+  "Inny problem": { e: "E14", v: "question", r: OTHER_ALL, radius: 6 },
 });
 
 export const wizardDevices: WizardDevice[] = [
@@ -264,7 +278,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "phone",
     icon: "phone",
     faults: MOBILE,
-    photo: { src: "/tech/urzadzenia/kreator-iphone.webp", width: 433, height: 577, crop: PHONE_CROP, spots: phone.spots },
+    photo: { art: "phone", width: 480, height: 540, crop: PHONE_CROP, spots: phone.spots },
     scenes: phone.scenes,
   },
   {
@@ -273,7 +287,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "tablet",
     icon: "tablet",
     faults: MOBILE,
-    photo: { src: "/tech/urzadzenia/kreator-tablet.webp", width: 416, height: 582, crop: TABLET_CROP, spots: tablet.spots },
+    photo: { art: "tablet", width: 440, height: 600, crop: TABLET_CROP, spots: tablet.spots },
     scenes: tablet.scenes,
   },
   {
@@ -282,7 +296,6 @@ export const wizardDevices: WizardDevice[] = [
     category: "smartwatch",
     icon: "watch",
     faults: WATCH_FAULTS,
-    // No photo with usage rights → illustration in the scene style (PREMIUM §4).
     photo: { art: "watch", width: 400, height: 480, crop: WATCH_CROP, spots: watch.spots },
     scenes: watch.scenes,
   },
@@ -292,7 +305,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "laptop",
     icon: "laptop",
     faults: LAPTOP_FAULTS,
-    photo: { src: "/tech/urzadzenia/laptop.webp", width: 640, height: 640, crop: LAPTOP_CROP, spots: laptop.spots },
+    photo: { art: "laptop", width: 600, height: 400, crop: LAPTOP_CROP, spots: laptop.spots },
     scenes: laptop.scenes,
   },
   {
@@ -301,7 +314,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "desktop",
     icon: "pc",
     faults: PC_FAULTS,
-    photo: { src: "/tech/urzadzenia/komputer.webp", width: 640, height: 640, crop: PC_CROP, spots: pc.spots },
+    photo: { art: "pc", width: 360, height: 580, crop: PC_CROP, spots: pc.spots },
     scenes: pc.scenes,
   },
   {
@@ -310,7 +323,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "printer",
     icon: "printer",
     faults: PRINTER_FAULTS,
-    photo: { src: "/tech/urzadzenia/drukarka.webp", width: 640, height: 449, crop: PRINTER_CROP, spots: printer.spots },
+    photo: { art: "printer", width: 600, height: 380, crop: PRINTER_CROP, spots: printer.spots },
     scenes: printer.scenes,
   },
   {
@@ -319,7 +332,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "console",
     icon: "console",
     faults: CONSOLE_FAULTS,
-    photo: { src: "/tech/urzadzenia/konsola.webp", width: 640, height: 640, crop: CONSOLE_CROP, spots: consoleScenes.spots },
+    photo: { art: "console", width: 600, height: 560, crop: CONSOLE_CROP, spots: consoleScenes.spots },
     scenes: consoleScenes.scenes,
   },
   {
@@ -328,7 +341,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "data_recovery",
     icon: "data",
     faults: DATA_FAULTS,
-    photo: { art: "data", width: 480, height: 400, crop: ART_CROP, spots: data.spots },
+    photo: { art: "data", width: 480, height: 400, crop: DATA_CROP, spots: data.spots },
     scenes: data.scenes,
   },
   {
@@ -337,7 +350,7 @@ export const wizardDevices: WizardDevice[] = [
     category: "other",
     icon: "other",
     faults: OTHER_FAULTS,
-    photo: { art: "other", width: 480, height: 400, crop: ART_CROP, spots: other.spots },
+    photo: { art: "other", width: 480, height: 400, crop: OTHER_CROP, spots: other.spots },
     scenes: other.scenes,
   },
 ];

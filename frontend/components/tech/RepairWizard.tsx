@@ -16,6 +16,7 @@ import {
 } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconClose, IconPath } from "./icons";
 import { usePill } from "./usePill";
+import { preloadArt } from "./wizard/art";
 import { Scene } from "./wizard/Scene";
 
 export type WizardPoint = { key: PointKey; name: string; draft: boolean };
@@ -47,6 +48,7 @@ function deliveryLabel(d: Delivery, points: WizardPoint[]): string {
 /** Warm the photo cache when a device chip is hovered or focused (PREMIUM §4). */
 const preloaded = new Set<string>();
 function preload(d: WizardDevice) {
+  preloadArt(d.photo?.art);
   const src = d.photo?.src;
   if (!src || preloaded.has(src) || typeof window === "undefined") return;
   preloaded.add(src);
