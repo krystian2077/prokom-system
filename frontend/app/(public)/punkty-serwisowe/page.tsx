@@ -10,7 +10,7 @@ import { PointCard } from "@/components/tech/PointCard";
 import { inCity, joinCities, saturdayHours } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
-import { visitFaq } from "@/lib/tech/visit-faq";
+import { visitFaq, visitLead } from "@/lib/tech/visit-faq";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -120,7 +120,7 @@ export default function PointsPage() {
           <div className="t-faqsplit__head">
             <span className="t-eyebrow">Zanim przyjedziesz</span>
             <h2 className="t-h2">Pytania o wizytę w punkcie</h2>
-            <p className="t-lead">Dojazd i to, co warto zabrać ze sobą.</p>
+            <p className="t-lead">{visitLead(published)}</p>
           </div>
           <Faq items={faq} />
         </div>

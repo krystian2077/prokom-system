@@ -117,3 +117,14 @@ test.describe("phone 390", () => {
     await expect(list.getByRole("link", { name: /Mapy Apple/ })).toHaveAttribute("href", /^https:\/\/maps\.apple\.com\/\?daddr=/);
   });
 });
+
+test("free parking at both salons comes from parkingNote (15.11)", async ({ page }) => {
+  await page.goto("/punkty-serwisowe");
+  const main = page.locator("main");
+  await expect(main).toContainText("Dojazd, parking i to, co warto zabrać ze sobą.");
+  await expect(main).toContainText("Bezpłatny parking przy salonie.");
+  await expect(main).toContainText("Bezpłatny parking.");
+  await expect(page.getByText(/Gdzie zaparkować/)).toHaveCount(1);
+  await page.goto("/serwis-telefonow-zakopane");
+  await expect(page.locator("main")).toContainText("Bezpłatny parking.");
+});

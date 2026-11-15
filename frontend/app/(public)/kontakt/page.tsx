@@ -13,7 +13,7 @@ import { hoursLong, inCity, isMainPoint } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
-import { visitFaq } from "@/lib/tech/visit-faq";
+import { visitFaq, visitLead } from "@/lib/tech/visit-faq";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -142,7 +142,7 @@ export default function ContactPage() {
             <span className="t-eyebrow">Zanim przyjedziesz</span>
             <h2 className="t-h2">Pytania o wizytę w punkcie</h2>
             <p className="t-lead">
-              Dojazd i to, co warto zabrać ze sobą. Godziny: {published.map((p) => `${p.name} ${hoursLong(p)}`).join("; ")}.
+              {visitLead(published)} Godziny: {published.map((p) => `${p.name} ${hoursLong(p)}`).join("; ")}.
             </p>
           </div>
           <Faq items={visitFaq(published)} />

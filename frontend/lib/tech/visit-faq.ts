@@ -39,3 +39,8 @@ export function visitFaq(published: Pick<ServicePoint, "city" | "parkingNote">[]
   });
   return items;
 }
+
+/** Lead above the visit questions: mentions parking only when a point has `parkingNote`. */
+export function visitLead(published: Pick<ServicePoint, "parkingNote">[]): string {
+  return published.some((p) => p.parkingNote) ? "Dojazd, parking i to, co warto zabrać ze sobą." : "Dojazd i to, co warto zabrać ze sobą.";
+}

@@ -41,7 +41,7 @@ export type ServicePoint = {
   /** null = line.phone */
   phone: string | null;
   mapsUrl: string | null;
-  /** Where to park. null = not shown (15.11.2026: parking info left out for now). */
+  /** Where to park (free parking at both salons, Krystian 15.11.2026). null = not shown. */
   parkingNote: string | null;
   published: boolean;
 };
@@ -61,7 +61,7 @@ export const servicePoints: ServicePoint[] = [
     ],
     phone: null,
     mapsUrl: null,
-    parkingNote: null,
+    parkingNote: "Bezpłatny parking przy salonie.",
     published: true,
   },
   {
@@ -79,7 +79,7 @@ export const servicePoints: ServicePoint[] = [
     ],
     phone: "+48 18 541 20 15",
     mapsUrl: null,
-    parkingNote: null,
+    parkingNote: "Bezpłatny parking.",
     published: true,
   },
 ];

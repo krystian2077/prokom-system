@@ -7,7 +7,7 @@ import { buildInquiryPayload, type InquiryForm } from "@/lib/tech/contract";
 import { inquiryOutcome, validateInquiry } from "@/lib/tech/inquiry-form";
 import { hoursLong, hoursRows, inCity, isMainPoint, joinCities, pointAddress, pointPhoneDisplay, saturdayHours } from "@/lib/tech/point-format";
 import { faqJsonLd, breadcrumbJsonLd } from "@/lib/tech/seo";
-import { visitFaq } from "@/lib/tech/visit-faq";
+import { visitFaq, visitLead } from "@/lib/tech/visit-faq";
 
 const rabka = servicePoints.find((p) => p.key === "rabka")!;
 const zakopane = servicePoints.find((p) => p.key === "zakopane")!;
@@ -39,8 +39,8 @@ describe("point-format", () => {
 });
 
 describe("visit FAQ", () => {
-  it("one point: no parking or other-point questions", () => {
-    const qs = visitFaq([rabka]).map((f) => f.q);
+  it("one point without a parking note: no parking or other-point questions", () => {
+    const qs = visitFaq([{ ...rabka, parkingNote: null }]).map((f) => f.q);
     expect(qs[0]).toBe("Czy muszę się umawiać?");
     expect(qs.some((q) => /zaparkować|drugim/.test(q))).toBe(false);
   });
@@ -53,6 +53,15 @@ describe("visit FAQ", () => {
     expect(faq.map((f) => f.q)).toContain("Gdzie zaparkować w Rabce-Zdroju?");
     expect(faq.map((f) => f.q)).toContain("Czy sprzęt oddany w jednym punkcie odbiorę w drugim?");
     expect(faq.find((f) => f.q.startsWith("Gdzie"))!.a).toBe("Parking przed budynkiem.");
+  });
+  it("lead mentions parking only when a point has a parking note", () => {
+    expect(visitLead([{ parkingNote: null }])).toBe("Dojazd i to, co warto zabrać ze sobą.");
+    expect(visitLead([{ parkingNote: null }, { parkingNote: "Bezpłatny parking." }])).toBe("Dojazd, parking i to, co warto zabrać ze sobą.");
+  });
+  it("current config (15.11): free parking at both salons, from parkingNote", () => {
+    expect(servicePoints.map((p) => p.parkingNote)).toEqual(["Bezpłatny parking przy salonie.", "Bezpłatny parking."]);
+    const faq = visitFaq(servicePoints);
+    expect(faq.find((f) => f.q.startsWith("Gdzie zaparkować"))?.a).toBe("Rabka-Zdrój: Bezpłatny parking przy salonie. Zakopane: Bezpłatny parking.");
   });
   it("FAQPage and BreadcrumbList JSON-LD", () => {
     const f = faqJsonLd(visitFaq([rabka]));
