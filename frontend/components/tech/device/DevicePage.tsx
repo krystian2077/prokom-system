@@ -3,6 +3,8 @@ import { line, servicePoints, telHref } from "@/config/prokom";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
+import { BrandLogo } from "@/components/tech/BrandLogo";
+import { cardBrandLogos } from "@/components/tech/brand-logos";
 import { deviceSeo, hubCards, type DevicePage as DevicePageData } from "@/lib/tech/devices";
 import { REPAIRS_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
@@ -38,6 +40,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
   const seo = deviceSeo(page, published);
   const submit = submitHref(page.category);
   const scene = HERO_SCENES[page.category as keyof typeof HERO_SCENES];
+  const kindLogos = cardBrandLogos(page.kinds.map((k) => k.n));
 
   return (
     <div className="t-ui t-page t-dev">
@@ -113,8 +116,13 @@ export function DevicePage({ page }: { page: DevicePageData }) {
             <p className="t-lead">{page.kindsLead}</p>
           </div>
           <ul className={`t-kinds t-kinds--${Math.min(page.kinds.length, 6)}`} data-t-stagger="">
-            {page.kinds.map((k) => (
+            {page.kinds.map((k, i) => (
               <li key={k.n} className="t-card t-kinds__item">
+                {kindLogos ? (
+                  <span className="t-kinds__logo">
+                    <BrandLogo brand={kindLogos[i]} hidden />
+                  </span>
+                ) : null}
                 <span className="t-h3">{k.n}</span>
                 <span>{k.s}</span>
               </li>

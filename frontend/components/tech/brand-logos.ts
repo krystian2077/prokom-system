@@ -182,3 +182,12 @@ const byTitle = new Map(brandLogos.map((l) => [l.title.toLowerCase(), l]));
 export function brandLogo(name: string): BrandLogo | undefined {
   return byTitle.get(name.toLowerCase());
 }
+
+/**
+ * Logos for a list of card names ("Apple Watch" → Apple), or null unless every name has
+ * one: a grid where only some cards carry a mark looks unfinished (printers, consoles).
+ */
+export function cardBrandLogos(names: readonly string[]): BrandLogo[] | null {
+  const logos = names.map((n) => brandLogo(n) ?? brandLogo(n.replace(/\s+watch$/i, "")));
+  return logos.every((l): l is BrandLogo => Boolean(l)) ? (logos as BrandLogo[]) : null;
+}
