@@ -191,3 +191,13 @@ export function cardBrandLogos(names: readonly string[]): BrandLogo[] | null {
   const logos = names.map((n) => brandLogo(n) ?? brandLogo(n.replace(/\s+watch$/i, "")));
   return logos.every((l): l is BrandLogo => Boolean(l)) ? (logos as BrandLogo[]) : null;
 }
+
+/**
+ * True when the logo is a wordmark that already spells `name` (Samsung, Lenovo, ASUS…):
+ * the card then hides its text heading visually (still read by screen readers) instead of
+ * showing the same name twice. Square marks (Apple, HP) keep the heading.
+ */
+export function logoSpellsName(logo: BrandLogo, name: string): boolean {
+  const [, , w, h] = logo.box.split(/\s+/).map(Number);
+  return w / h >= 2.5 && logo.title.toLowerCase() === name.trim().toLowerCase();
+}

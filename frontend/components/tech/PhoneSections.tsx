@@ -6,7 +6,7 @@ import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { PHONE_BRANDS, PHONE_REPAIRS, phoneSteps } from "@/lib/tech/phone-repairs";
 import { PageIconSvg } from "./page-icons";
 import { BrandLogo } from "./BrandLogo";
-import { cardBrandLogos } from "./brand-logos";
+import { cardBrandLogos, logoSpellsName } from "./brand-logos";
 import { Timeline } from "./content/Blocks";
 
 const submitHref = (usterka: string, punkt?: PointKey) => {
@@ -86,7 +86,7 @@ export function PhoneBrandsSection({ title }: { title: string }) {
                   <BrandLogo brand={logos[i]} hidden />
                 </span>
               ) : null}
-              <h3>{b.n}</h3>
+              <h3 className={logos && logoSpellsName(logos[i], b.n) ? "t-visually-hidden" : undefined}>{b.n}</h3>
               <p>{b.s}</p>
             </li>
           ))}
