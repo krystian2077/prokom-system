@@ -31,15 +31,15 @@ test.describe("desktop 1440", () => {
     });
 
     // hotspot on the phone photo
-    await wiz.locator(".t-wiz__spot[aria-label='Bateria']").click();
+    await wiz.locator(".t-scene__spot[aria-label='Bateria']").click();
     await expect(wiz.locator(".t-chp--fault.is-on")).toHaveText("Bateria");
     expect((await params(page, "wizard-next")).q.usterka).toBe("Bateria");
 
     // another device → its own faults, first one selected
-    await wiz.getByRole("button", { name: "Drukarka" }).click();
+    await wiz.getByRole("radio", { name: "Drukarka" }).click();
     await expect(wiz.locator(".t-chp--fault").first()).toHaveText("Nie drukuje");
-    await expect(wiz.getByRole("button", { name: "Pęknięty ekran" })).toHaveCount(0);
-    await wiz.getByRole("button", { name: "Zacina papier" }).first().click();
+    await expect(wiz.getByRole("radio", { name: "Pęknięty ekran" })).toHaveCount(0);
+    await wiz.getByRole("radio", { name: "Zacina papier" }).click();
 
     // courier: no `punkt` parameter
     await wiz.getByRole("button", { name: /Kurier/ }).click();
@@ -50,8 +50,8 @@ test.describe("desktop 1440", () => {
     });
 
     // devices without a photo show the icon fallback
-    await wiz.getByRole("button", { name: "Odzysk danych" }).click();
-    await expect(wiz.locator(".t-wiz__nophoto")).toBeVisible();
+    await wiz.getByRole("radio", { name: "Odzysk danych" }).click();
+    await expect(wiz.locator(".t-scene__art")).toBeVisible();
     expect((await params(page, "wizard-next")).q.category).toBe("data_recovery");
   });
 
@@ -101,12 +101,12 @@ test.describe("phone 390", () => {
     await page.goto("/");
     const wiz = page.locator("#kreator");
     await expect(wiz.locator(".t-wiz__group--fault")).toBeHidden();
-    await wiz.getByRole("button", { name: "Laptop" }).click();
+    await wiz.getByRole("radio", { name: "Laptop" }).click();
 
     const flow = page.getByTestId("wizard-flow");
     await expect(flow).toBeVisible();
     await expect(flow).toContainText("2 z 4");
-    await flow.getByRole("button", { name: "Klawiatura" }).first().click();
+    await flow.getByRole("radio", { name: "Klawiatura" }).click();
     await flow.getByRole("button", { name: "Dalej", exact: true }).click();
     await expect(flow).toContainText("3 z 4");
     await flow.getByRole("button", { name: /Kurier/ }).click();
@@ -128,6 +128,6 @@ test.describe("phone 390", () => {
     await expect(flow).toContainText("3 z 4");
     await page.keyboard.press("Escape");
     await expect(flow).toHaveCount(0);
-    await expect(wiz.getByRole("button", { name: "Laptop" })).toBeFocused();
+    await expect(wiz.getByRole("radio", { name: "Laptop" })).toBeFocused();
   });
 });
