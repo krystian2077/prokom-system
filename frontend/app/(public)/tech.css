@@ -1085,7 +1085,7 @@ html[data-tech-theme="dark"] .tech .t-wiz { box-shadow: 0 50px 90px -56px rgba(0
 .tech .t-prep ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .tech .t-prep li { display: flex; gap: 10px; font-size: 14px; line-height: 1.45; font-weight: 600; }
 .tech .t-prep li svg { color: var(--ok); flex-shrink: 0; margin-top: 3px; }
-.tech .t-prep__more { font-weight: 800; font-size: 14px; color: var(--acct); }
+.tech .t-prep__more { display: inline-flex; align-items: center; min-height: 44px; font-weight: 800; font-size: 14px; color: var(--acct); }
 .tech .t-navto { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .tech .t-navto .t-btn { padding: 0 16px; }
 .tech .t-navto__phone { display: none; }

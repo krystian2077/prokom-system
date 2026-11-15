@@ -60,7 +60,7 @@ export default function CourierPage() {
     { t: "Zgłoś naprawę online", s: "W formularzu wybierz „Kurier” — jako dostarczenie i jako zwrot." },
     { t: "Dostajesz e-mail", s: "Z numerem zgłoszenia i adresem serwisu, na który wysyłasz sprzęt." },
     { t: "Zapakuj sprzęt", s: "Włóż do paczki kartkę z numerem zgłoszenia i swoim telefonem." },
-    { t: "Nadaj dowolnym kurierem", s: "Pod adres serwisu, nie do paczkomatu. Numer przesyłki możesz dodać w koncie klienta." },
+    { t: "Nadaj dowolnym kurierem", s: "Pod adres serwisu — nie obsługujemy paczkomatów. Numer przesyłki możesz dodać w koncie klienta." },
     { t: "Diagnoza i wycena", s: "Naprawiamy dopiero po Twojej zgodzie." },
     {
       t: "Odsyłamy sprzęt",
@@ -202,7 +202,7 @@ export default function CourierPage() {
               </b>
               <span>{pointAddress(point)}</span>
               <span>Paczki odbieramy w godzinach otwarcia punktu: {hoursLong(point)}.</span>
-              <span>Nie do paczkomatu — tylko przesyłka kurierska pod ten adres.</span>
+              <span>Nie obsługujemy paczkomatów — tylko przesyłka kurierska pod ten adres.</span>
             </div>
           </div>
         </section>

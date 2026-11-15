@@ -641,7 +641,7 @@ export const repairPages: RepairPageData[] = [
     faq: [
       {
         q: "Konsola jest na gwarancji producenta. Czy czyszczenie ją unieważni?",
-        a: "Otwarcie obudowy może wpłynąć na gwarancję producenta. Jeśli konsola jest nowa i ma usterkę, najpierw zgłoś ją do producenta lub sklepu. Czyszczenie najczęściej ma sens w konsolach po kilku latach używania.",
+        a: "Otwarcie obudowy może wpłynąć na gwarancję producenta. Jeśli konsola jest nowa i ma usterkę, najpierw zgłoś ją do producenta lub sprzedawcy. Czyszczenie najczęściej ma sens w konsolach po kilku latach używania.",
       },
       {
         q: "Czy pady też czyścicie i naprawiacie?",
