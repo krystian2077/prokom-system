@@ -2,7 +2,7 @@
  * PRO-KOM Tech — repair form /zgloszenie, premium layer (feat/tech-formularz-premium).
  * Builds on the TD3 base in tech.css (`.t-zgl`, `.t-field`, `.t-choice` …) and the TP motion
  * tokens (tech-motion.css). Everything is scoped under `.tech .t-zgl` (or `.t-success`,
- * `.t-mguide`), so /track, /kontakt and /claim-repair keep their TD3 look.
+ * `.t-help__trigger`), so /track, /kontakt and /claim-repair keep their TD3 look.
  * Motion: transform/opacity only; reduced motion = final state (last block).
  */
 
@@ -245,122 +245,6 @@
 }
 .tech .t-help__trigger:hover, .tech .t-help__trigger[aria-expanded="true"] { background: var(--soft); }
 .tech .t-help__trigger:focus-visible { outline: 3px solid var(--acc); outline-offset: 1px; }
-.tech .t-help {
-  z-index: 60; display: flex; flex-direction: column; gap: 14px; padding: 18px; background: var(--raised, var(--card)); color: var(--ink);
-  border: 1px solid var(--hair); box-shadow: var(--sh-3);
-}
-.tech .t-help--pop {
-  position: absolute; left: 0; top: calc(100% + 10px); width: min(440px, calc(100vw - 32px)); box-sizing: border-box; border-radius: 22px;
-  transform-origin: var(--nub-x, 28px) top; animation: t-zgl-pop-in var(--m-panel) var(--m-ease-spring) both;
-}
-.tech .t-help--pop::before {
-  content: ""; position: absolute; top: -7px; left: var(--nub-x, 28px); width: 14px; height: 14px; transform: rotate(45deg); border-radius: 3px 0 0 0;
-  background: var(--raised, var(--card)); border-left: 1px solid var(--hair); border-top: 1px solid var(--hair);
-}
-@media (max-width: 1023.98px) { .tech .t-help--pop { scroll-margin-bottom: 110px; } }
-.tech .t-help--pop[data-state="closing"] { animation: t-zgl-pop-out var(--m-small) var(--m-ease-out) both; }
-.tech .t-help__scrim {
-  position: fixed; inset: 0; z-index: 1000; background: rgba(10, 8, 7, .46); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-  animation: t-zgl-fade var(--m-panel) var(--m-ease-out) both;
-}
-.tech .t-help__scrim[data-state="closing"] { animation: t-zgl-fade-out var(--m-small) var(--m-ease-out) both; }
-.tech .t-help--sheet {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1001; max-height: min(86vh, 720px); overflow-y: auto; overscroll-behavior: contain;
-  padding: 10px 18px calc(20px + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; border-bottom: 0;
-  animation: t-zgl-sheet-in var(--m-scene) var(--m-ease-emph) both;
-}
-.tech .t-help--sheet[data-state="closing"] { animation: t-zgl-sheet-out var(--m-small) var(--m-ease-in-out) both; }
-.tech .t-help__grab { align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--bd2); margin-bottom: 2px; }
-.tech .t-help__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.tech .t-help__head h3 { color: var(--ink); margin: 0; font-family: var(--t-font-head); font-stretch: 108%; font-size: 18px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
-.tech .t-help__close {
-  width: 40px; height: 40px; flex-shrink: 0; margin: -6px -6px -6px 0; border: 0; border-radius: 12px; background: var(--bg2); color: var(--ink);
-  display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color var(--m-small), transform var(--m-micro);
-}
-.tech .t-help__close:hover { background: var(--bd); }
-.tech .t-help__close:active { transform: scale(.94); }
-.tech .t-help__close:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
-.tech .t-help__propose {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 12px 12px 12px 14px; border-radius: 16px;
-  background: var(--okbg); color: var(--ok); font-size: 14px; font-weight: 800; animation: t-zgl-in var(--m-panel) var(--m-ease-emph) both;
-}
-.tech .t-help__use {
-  min-height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: var(--card); color: var(--ink); font: 700 14px var(--t-font-body);
-  cursor: pointer; box-shadow: var(--sh-1); transition: transform var(--m-micro);
-}
-.tech .t-help__use b { font-weight: 800; }
-.tech .t-help__use:active { transform: scale(.97); }
-.tech .t-help__use:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
-.tech .t-help__tabs { display: flex; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
-.tech .t-help__tabs > button { flex: 1 1 auto; justify-content: center; min-height: 38px; padding: 0 10px; font-size: 13.5px; font-weight: 800; }
-.tech .t-help__tabs > button:focus-visible { outline: 3px solid var(--acc); outline-offset: -2px; }
-.tech .t-help__tabs .t-pilltabs__pill { top: var(--pill-y, 4px); bottom: auto; height: var(--pill-h, 38px); transform: translate(var(--pill-x, 0px), 0); }
-.tech .t-help__body { display: flex; flex-direction: column; gap: 12px; animation: t-zgl-in var(--m-panel) var(--m-ease-emph) both; }
-.tech .t-help__variants { display: flex; flex-wrap: wrap; gap: 6px; }
-.tech .t-help__variant {
-  min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--bd); background: var(--card); color: var(--ink2);
-  font: 700 13px var(--t-font-body); cursor: pointer; transition: border-color var(--m-small), color var(--m-small), background-color var(--m-small);
-}
-.tech .t-help__variant:hover { color: var(--ink); border-color: var(--bd2); }
-.tech .t-help__variant[aria-checked="true"] { border-color: var(--acc); background: var(--soft); color: var(--acct); }
-.tech .t-help__variant:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
-.tech .t-help__path { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.tech .t-help__path li {
-  display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 11px 0 5px; border-radius: 10px; background: var(--bg2);
-  font-size: 13.5px; font-weight: 800; color: var(--ink);
-}
-.tech .t-help__path li > span {
-  width: 22px; height: 22px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center;
-  background: var(--card); color: var(--acct); font-family: var(--t-font-head); font-size: 12px; box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
-}
-.tech .t-help__path { column-gap: 18px; }
-.tech .t-help__path li { position: relative; }
-.tech .t-help__path li + li::before { content: "›"; position: absolute; left: -13px; color: var(--ink2); font-weight: 800; }
-.tech .t-help__path li:last-child { background: var(--soft); color: var(--acct); }
-.tech .t-help__lines { display: flex; flex-direction: column; gap: 6px; }
-.tech .t-help__lines p { margin: 0; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--ink2); }
-.tech .t-help__more { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; align-self: flex-start; font-size: 13.5px; font-weight: 800; color: var(--acct); }
-.tech .t-help__more:hover { text-decoration: underline; text-underline-offset: 3px; }
-
-/* Illustrations (HelperArt) — tokens follow the theme. */
-.tech .t-hart { display: block; width: 100%; height: auto; max-height: 132px; border-radius: 16px; background: linear-gradient(180deg, var(--bg2), color-mix(in srgb, var(--bg2) 55%, var(--card))); }
-.tech .t-hart__frame { fill: var(--card); stroke: var(--ink); stroke-width: 1.6; stroke-opacity: .55; }
-.tech .t-hart__notch, .tech .t-hart__title { fill: var(--ink); opacity: .22; }
-.tech .t-hart__row { fill: var(--bg2); }
-.tech .t-hart__row.is-hi { fill: var(--soft); stroke: var(--acc); stroke-width: 1.2; }
-.tech .t-hart__line { fill: var(--ink); opacity: .25; }
-.tech .t-hart__line.is-hi { fill: var(--acct); opacity: 1; }
-.tech .t-hart__tag { fill: var(--acc); }
-.tech .t-hart__chev, .tech .t-hart__stand, .tech .t-hart__vent, .tech .t-hart__engrave {
-  fill: none; stroke: var(--ink); stroke-opacity: .35; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
-}
-.tech .t-hart__arrow { fill: none; stroke: var(--acc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.tech .t-hart__num { fill: var(--acc); }
-.tech .t-hart__numt { fill: var(--onacc); font: 800 10px var(--t-font-head); }
-.tech .t-hart__code { fill: var(--ink); font: 800 15px var(--t-font-head); letter-spacing: .06em; }
-.tech .t-hart__key { fill: var(--bg2); }
-.tech .t-hart__key.is-hi { fill: var(--soft); stroke: var(--acc); stroke-width: 1.2; }
-.tech .t-hart__card { fill: var(--card); stroke: var(--acc); stroke-width: 1.4; }
-.tech .t-hart__sticker { fill: var(--card); stroke: var(--ink); stroke-opacity: .4; stroke-width: 1.2; stroke-dasharray: 3 2; }
-.tech .t-hart__barcode { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-opacity: .7; }
-.tech .t-hart__ring { fill: none; stroke: var(--acc); stroke-width: 2.2; stroke-dasharray: 5 4; }
-.tech .t-hart__foot { fill: var(--bg2); stroke: var(--ink); stroke-opacity: .25; stroke-width: 1; }
-.tech .t-help .t-hart__ring { transform-box: fill-box; transform-origin: center; animation: t-zgl-ring 2.4s var(--m-ease-in-out) 3; }
-.tech .t-help .t-hart__arrow { stroke-dasharray: 40; animation: t-zgl-dash 900ms var(--m-ease-out) 200ms both; }
-
-/* ---------- Static guide on /jak-przygotowac-sprzet#model (works without JS) ---------- */
-.tech .t-mguide { display: flex; flex-direction: column; gap: 18px; }
-.tech .t-mguide__head { display: flex; flex-direction: column; gap: 8px; max-width: 62ch; }
-.tech .t-mguide__head h2 { margin: 0; font-size: clamp(26px, 1.4vw + 18px, 36px); line-height: 1.08; letter-spacing: -0.02em; }
-.tech .t-mguide__head p { margin: 0; color: var(--ink2); font-weight: 600; line-height: 1.55; }
-.tech .t-mguide__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
-.tech .t-mguide__card { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 22px; background: var(--card); border: 1px solid var(--hair); box-shadow: var(--sh-1); }
-.tech .t-mguide__card h3 { margin: 0; font-family: var(--t-font-head); font-stretch: 108%; font-size: 18px; font-weight: 800; line-height: 1.2; }
-.tech .t-mguide__card h4 { margin: 0; font-size: 14px; font-weight: 800; color: var(--ink); }
-.tech .t-mguide__variants { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--ink2); }
-.tech .t-mguide__variants b { color: var(--ink); }
-@media (min-width: 768px) { .tech .t-mguide__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1180px) { .tech .t-mguide__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* ---------- Success screen: drawn ✓, springy number, QR after 200 ms ---------- */
 .tech .t-success__ok { animation: t-zgl-pick var(--m-scene) var(--m-ease-spring) both; box-shadow: 0 0 0 8px color-mix(in srgb, var(--okbg) 55%, transparent); }
@@ -399,12 +283,6 @@
   .tech .t-zgl .t-seg .t-seg__opt { min-height: 46px; font-size: 14px; }
   .tech .t-zgl .t-quick__chip { min-height: 44px; }
   .tech .t-help__trigger { min-height: 44px; margin: -10px 0 -10px -8px; }
-  .tech .t-help--sheet .t-help__path { flex-direction: column; align-items: flex-start; row-gap: 6px; }
-  .tech .t-help--sheet .t-help__path li + li::before { content: none; }
-  .tech .t-help__tabs > button { min-height: 44px; }
-  .tech .t-help__variant { min-height: 44px; }
-  .tech .t-help__use { min-height: 44px; }
-  .tech .t-help__close { width: 44px; height: 44px; }
   .tech .t-zgl .t-zgl__foot { box-shadow: 0 -14px 26px -18px rgba(0, 0, 0, .28); }
   .tech .t-zgl .t-option__ok { top: 12px; right: 12px; }
 }
@@ -421,12 +299,6 @@ html[data-tech-theme="dark"] .tech .t-zgl .t-quick__chip.is-on .t-quick__ico { b
 /* dark: --onacc is dark, so the light-theme CTA gradient (white text) would fail contrast */
 html[data-tech-theme="dark"] .tech .t-zgl .t-btn--shine { background: linear-gradient(180deg, #ea5a4c, var(--acc)); }
 html[data-tech-theme="dark"] .tech .t-zgl .t-btn--shine::after { background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .22), transparent); }
-html[data-tech-theme="dark"] .tech .t-help { background: var(--raised); border-color: var(--hair-top); }
-html[data-tech-theme="dark"] .tech .t-help--pop::before { background: var(--raised); border-color: var(--hair-top); }
-html[data-tech-theme="dark"] .tech .t-help__use { background: var(--card); }
-html[data-tech-theme="dark"] .tech .t-hart { background: linear-gradient(180deg, var(--bg2), var(--bg)); }
-html[data-tech-theme="dark"] .tech .t-hart__frame { fill: var(--raised); stroke: var(--ink); stroke-opacity: .4; }
-html[data-tech-theme="dark"] .tech .t-hart__sticker { fill: var(--raised); }
 html[data-tech-theme="dark"] .tech .t-success__ticket::after { background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .12), transparent); }
 
 /* ---------- Keyframes ---------- */
@@ -447,14 +319,6 @@ html[data-tech-theme="dark"] .tech .t-success__ticket::after { background: linea
 @keyframes t-zgl-pop {
   from { opacity: 0; transform: translateY(4px) scale(.96); }
   to { opacity: 1; transform: none; }
-}
-@keyframes t-zgl-pop-in {
-  from { opacity: 0; transform: translateY(-6px) scale(.96); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes t-zgl-pop-out {
-  from { opacity: 1; transform: none; }
-  to { opacity: 0; transform: translateY(-4px) scale(.98); }
 }
 @keyframes t-zgl-fade {
   from { opacity: 0; }
@@ -492,24 +356,15 @@ html[data-tech-theme="dark"] .tech .t-success__ticket::after { background: linea
 @keyframes t-zgl-spin {
   to { transform: rotate(360deg); }
 }
-@keyframes t-zgl-ring {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.08); opacity: .7; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes t-zgl-dash {
-  from { stroke-dashoffset: 40; }
-  to { stroke-dashoffset: 0; }
-}
 
 /* ---------- Reduced motion: final state, no loops (same contract as tech-motion.css) ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .tech :is(.t-help, .t-help__scrim),
-  .tech :is(.t-zgl, .t-success, .t-help) *,
-  .tech :is(.t-zgl, .t-success, .t-help) *::before,
-  .tech :is(.t-zgl, .t-success, .t-help) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .tech :is(.t-help__trigger),
+  .tech :is(.t-zgl, .t-success) *,
+  .tech :is(.t-zgl, .t-success) *::before,
+  .tech :is(.t-zgl, .t-success) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
-.tech.t-reduced :is(.t-help, .t-help__scrim),
-.tech.t-reduced :is(.t-zgl, .t-success, .t-help) *,
-.tech.t-reduced :is(.t-zgl, .t-success, .t-help) *::before,
-.tech.t-reduced :is(.t-zgl, .t-success, .t-help) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+.tech.t-reduced :is(.t-help__trigger),
+.tech.t-reduced :is(.t-zgl, .t-success) *,
+.tech.t-reduced :is(.t-zgl, .t-success) *::before,
+.tech.t-reduced :is(.t-zgl, .t-success) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
