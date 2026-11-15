@@ -75,7 +75,6 @@ export default function AboutPage() {
                 <i aria-hidden="true" />
                 <span>
                   {company.name} · {company.hq.city}
-                  {since ? <span className={draftCls(since)}>, od {since.text}</span> : null}
                 </span>
               </span>
               <h1 className="t-ab-hero__h1">

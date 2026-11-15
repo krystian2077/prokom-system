@@ -86,8 +86,7 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
                     {p.draft ? <span className="t-draft-badge">do uzupełnienia</span> : null}
                   </b>
                   <span className="t-hero__paddr">
-                    {p.street}
-                    {" · "}
+                    <span className="t-hero__pstreet">{p.street}</span>
                     <OpeningStatus points={[p]} className="t-hero__pstatus" skeletonCh={14} />
                   </span>
                 </span>

@@ -1,6 +1,7 @@
 /**
- * /zgloszenie premium (feat/tech-formularz-premium): "Jak sprawdzić model" helper, live
- * validation, fault chips, reduced motion, phone sheet, axe on the form states.
+ * /zgloszenie premium (feat/tech-formularz-premium): "Jak sprawdzić model" helper (a modal
+ * with illustrated steps since feat/tech-pomocnik-modelu-popup), live validation, fault
+ * chips, reduced motion, phone sheet, axe on the form states.
  * The full submit flows (point, courier, 400, 429) stay in zgloszenie.spec.ts.
  */
 import fs from "node:fs";
@@ -23,7 +24,7 @@ const form = (page: Page) => page.locator(".t-zgl__form");
 test.describe("desktop 1440", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("helper: popover with the brand's tab, aria-expanded, Esc closes and returns focus", async ({ page }) => {
+  test("helper: modal with the brand's steps, step by step, aria-modal, Esc closes and returns focus", async ({ page }) => {
     await page.goto("/zgloszenie");
     await form(page).getByRole("radio", { name: "Telefon" }).click();
     await page.getByLabel("Marka *").fill("Samsung");
@@ -36,34 +37,74 @@ test.describe("desktop 1440", () => {
     await expect(page).toHaveURL(/\/zgloszenie$/);
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
     await expect(trigger).toHaveAttribute("aria-controls", "zgl-help-model");
-    await expect(panel).not.toHaveAttribute("aria-modal", "true");
+    await expect(panel).toHaveAttribute("aria-modal", "true");
+    await expect(panel).toHaveClass(/t-hm--modal/);
+    await expect(panel.getByRole("heading", { name: "Jak sprawdzić model" })).toBeVisible();
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe("hidden");
     await expect(panel.locator('[data-help-tab="android"]')).toHaveAttribute("aria-selected", "true");
-    await expect(panel.locator('[data-help-variant="samsung"]')).toHaveAttribute("aria-checked", "true");
-    await expect(panel).toContainText("Informacje o telefonie");
+    await expect(panel.locator('[data-help-variant="samsung"]')).toHaveAttribute("aria-pressed", "true");
+    // step by step: the illustration follows, the last step shows what to type
+    await expect(panel.locator('[data-help-step="0"]')).toHaveAttribute("aria-current", "step");
+    await expect(panel.locator(".t-hm__scene.is-in .t-hs--home")).toHaveCount(1);
+    await panel.locator("[data-help-next]").click();
+    await expect(panel.locator('[data-help-step="1"]')).toHaveAttribute("aria-current", "step");
+    await expect(panel.locator(".t-hm__scene.is-in .t-hs__row.is-hit")).toContainText("Informacje o telefonie");
+    await expect(panel.locator("[aria-live]")).toHaveText("Krok 2 z 3: Stuknij „Informacje o telefonie”");
+    await panel.locator('[data-help-step="2"]').click();
+    await expect(panel.locator(".t-hm__scene.is-in")).toContainText("SM-S911B/DS");
+    await expect(panel.locator(".t-hm__example")).toContainText("Galaxy S23");
+    await expect(panel.locator("[data-help-done]")).toBeVisible();
+    await panel.locator("[data-help-prev]").click();
+    await expect(panel.locator('[data-help-step="1"]')).toHaveAttribute("aria-current", "step");
+    // another brand: its own steps from the start
+    await panel.locator('[data-help-variant="xiaomi"]').click();
+    await expect(panel.locator('[data-help-step="0"]')).toHaveAttribute("aria-current", "step");
+    await panel.locator("[data-help-next]").click();
+    await expect(panel.locator(".t-hm__scene.is-in .t-hs__row.is-hit")).toContainText("O telefonie");
     // tabs by keyboard
     await panel.locator('[data-help-tab="android"]').focus();
     await page.keyboard.press("ArrowLeft");
     await expect(panel.locator('[data-help-tab="apple"]')).toHaveAttribute("aria-selected", "true");
-    await expect(panel).toContainText("To urządzenie");
+    await expect(panel.locator(".t-hm__steps")).toContainText("To urządzenie");
+    await page.waitForTimeout(500);
     expect(await axeSerious(page)).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(panel).toHaveCount(0);
     await expect(trigger).toBeFocused();
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
   });
 
-  test("helper: tab follows the category and the browsing system (laptop on Windows → Windows; IMEI of a phone → *#06#), click outside closes", async ({ page }) => {
+  test("helper: tab follows the category, brand and system (laptop on Windows, PS5, IMEI → *#06#); focus trap; scrim closes", async ({ page }) => {
     await page.goto("/zgloszenie");
     await form(page).getByRole("radio", { name: "Laptop" }).click();
-    await page.locator('[data-help-trigger="model"]').click();
+    const trigger = page.locator('[data-help-trigger="model"]');
+    await trigger.click();
+    const panel = page.locator('[data-help-panel="model"]');
     // Desktop Chrome in Playwright reports Windows: the visitor is probably on that laptop.
-    await expect(page.locator('[data-help-tab="windows"]')).toHaveAttribute("aria-selected", "true");
-    await expect(page.locator('[data-help-tab="label"]')).toHaveText("Naklejka");
-    await page.locator("h1").click();
-    await expect(page.locator('[data-help-panel="model"]')).toHaveCount(0);
+    await expect(panel.locator('[data-help-tab="windows"]')).toHaveAttribute("aria-selected", "true");
+    await expect(panel.locator('[data-help-tab="label"]')).toHaveText("Naklejka");
+    for (let i = 0; i < 30; i++) {
+      await page.keyboard.press(i % 7 === 6 ? "Shift+Tab" : "Tab");
+      expect(await panel.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+    }
+    await page.mouse.click(30, 450);
+    await expect(panel).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+
+    await form(page).getByRole("radio", { name: "Konsola" }).click();
+    await page.locator("#zgl-brand").fill("Sony");
+    await trigger.click();
+    await expect(panel.locator('[data-help-variant="playstation"]')).toHaveAttribute("aria-pressed", "true");
+    await expect(panel.locator(".t-hm__steps")).toContainText("Oprogramowanie systemowe");
+    await page.keyboard.press("Escape");
+
     await form(page).getByRole("radio", { name: "Telefon" }).click();
     await page.locator('[data-help-trigger="imei"]').click();
-    await expect(page.locator('[data-help-tab="dialer"]')).toHaveAttribute("aria-selected", "true");
-    await expect(page.locator('[data-help-panel="imei"]')).toContainText("*#06#");
+    const imei = page.locator('[data-help-panel="imei"]');
+    await expect(imei.locator('[data-help-tab="dialer"]')).toHaveAttribute("aria-selected", "true");
+    await expect(imei).toContainText("*#06#");
+    await imei.locator("[data-help-next]").click();
+    await expect(imei.locator(".t-hm__scene.is-in .t-hs__typed")).toHaveText("*#06#");
   });
 
   test("helper on Chromium/Android proposes the model from UA Client Hints; nothing is sent", async ({ browser }) => {
@@ -82,8 +123,9 @@ test.describe("desktop 1440", () => {
     await page.goto("/zgloszenie");
     await page.locator('[data-help-trigger="model"]').click();
     await expect(page.locator('[data-help-tab="android"]')).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator(".t-hm__propose")).toContainText("SM-S911B");
     const use = page.locator("[data-help-use]");
-    await expect(use).toContainText("Wpisz: SM-S911B");
+    await expect(use).toHaveText("Wpisz do formularza");
     await use.click();
     await expect(page.getByLabel("Model *")).toHaveValue("SM-S911B");
     await expect(page.getByLabel("Model *")).toBeFocused();
@@ -139,6 +181,8 @@ test("dark theme: axe on step 1, the helper and the success screen", async ({ br
   await page.route("**/api/v1/repairs/submit/", (r) => r.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify({ repair_number: "PROKOM/RMA/2/2026", message: "", tracking_url: "/track?ref=PROKOM%2FRMA%2F2%2F2026" }) }));
   await page.goto("/zgloszenie?category=laptop&dostawa=punkt&punkt=rabka");
   await page.locator('[data-help-trigger="model"]').click();
+  await page.locator('[data-help-tab="label"]').click();
+  await page.locator("[data-help-next]").click();
   expect(await axeSerious(page)).toEqual([]);
   await page.keyboard.press("Escape");
   await page.getByLabel("Model *").fill("ThinkPad");
@@ -161,19 +205,28 @@ test("reduced motion: step change runs no animation, the form still works", asyn
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
   const page = await ctx.newPage();
   await page.goto("/zgloszenie?category=laptop");
+  const running = () => page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && (a.effect as KeyframeEffect | null)?.target?.closest?.(".t-zgl, .t-hm") && ((a.effect?.getComputedTiming().duration as number) ?? 0) > 1).length);
+  // the helper: no slide between steps, no pulsing ring, the final picture at once
+  await page.locator('[data-help-trigger="model"]').click();
+  await page.locator('[data-help-tab="label"]').click();
+  await page.locator("[data-help-next]").click();
+  await expect(page.locator(".t-hm__scene.is-out")).toHaveCount(0);
+  await expect(page.locator(".t-hm__scene.is-in .t-hs__loupe")).toBeVisible();
+  expect(await running()).toBe(0);
+  await page.keyboard.press("Escape");
+  // the form: step change without animation
   await page.getByLabel("Model *").fill("ThinkPad");
   await page.getByLabel("Co się dzieje? *").fill("Nie działa");
   await page.locator("[data-zgl-next]").click();
   await expect(page.locator("#zgl-step-2.is-open")).toBeVisible();
-  const running = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && (a.effect as KeyframeEffect | null)?.target?.closest?.(".t-zgl") && ((a.effect?.getComputedTiming().duration as number) ?? 0) > 1).length);
-  expect(running).toBe(0);
+  expect(await running()).toBe(0);
   await ctx.close();
 });
 
 test.describe("phone 390", () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-  test("helper opens as a sheet above the tab bar: focus trap, Esc, focus back", async ({ page }) => {
+  test("helper opens as a bottom sheet above the tab bar: swipe between steps, focus trap, Esc, focus back", async ({ page }) => {
     await page.goto("/zgloszenie");
     await form(page).getByRole("radio", { name: "Smartwatch" }).click();
     const trigger = page.locator('[data-help-trigger="model"]');
@@ -181,16 +234,33 @@ test.describe("phone 390", () => {
     const sheet = page.locator('[data-help-panel="model"]');
     await expect(sheet).toBeVisible();
     await expect(sheet).toHaveAttribute("aria-modal", "true");
-    await expect(sheet).toHaveClass(/t-help--sheet/);
+    await expect(sheet).toHaveClass(/t-hm--sheet/);
     // above the tab bar
-    const z = await sheet.evaluate((el) => Number(getComputedStyle(el).zIndex));
+    const z = await sheet.evaluate((el) => Number(getComputedStyle(el.parentElement!).zIndex));
     const tz = await page.locator("[data-t-tabbar]").evaluate((el) => Number(getComputedStyle(el).zIndex));
     expect(z).toBeGreaterThan(tz);
+    // the sheet fits the screen; "Dalej" is always at hand
+    await expect.poll(async () => { const b = (await sheet.boundingBox())!; return b.y + b.height; }).toBeLessThanOrEqual(845);
+    await expect(sheet.locator("[data-help-next]")).toBeInViewport();
+    // swipe left = next step
+    await sheet.locator(".t-hm__stage").evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const ev = (type: string, x: number) => el.dispatchEvent(new PointerEvent(type, { bubbles: true, pointerType: "touch", clientX: x, clientY: r.top + 100 }));
+      ev("pointerdown", r.right - 40);
+      ev("pointerup", r.left + 60);
+    });
+    await expect(sheet.locator('[data-help-step="1"]')).toHaveAttribute("aria-current", "step");
+    for (const sel of [".t-hm__close", "[data-help-tab]", "[data-help-next]", "[data-help-prev]"]) {
+      const b = (await sheet.locator(sel).first().boundingBox())!;
+      expect(b.height, sel).toBeGreaterThanOrEqual(44);
+    }
     // trap: 25 tabs never leave the sheet
     for (let i = 0; i < 25; i++) {
       await page.keyboard.press("Tab");
       expect(await sheet.evaluate((el) => el.contains(document.activeElement))).toBe(true);
     }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+    await page.waitForTimeout(500);
     expect(await axeSerious(page)).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(sheet).toHaveCount(0);
@@ -214,4 +284,6 @@ test("no-JS target: /jak-przygotowac-sprzet#model has the static guide", async (
   await expect(section.getByRole("heading", { level: 2, name: "Jak sprawdzić model i IMEI" })).toBeVisible();
   await expect(section).toContainText("*#06#");
   await expect(section).toContainText("Galaxy Wearable");
+  await expect(section).toContainText("Samsung: Ustawienia › Informacje o telefonie");
+  await expect(section.locator(".t-mguide__art .t-hs").first()).toBeVisible();
 });
