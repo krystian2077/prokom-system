@@ -101,8 +101,16 @@ describe("theme isolation", () => {
     expect(themeScript).not.toMatch(/prokom-theme|'data-theme'|"data-theme"|prokom-worker|prokom-client/);
   });
 
-  it("tech.css: every rule is scoped under .tech, no data-theme", () => {
-    const css = read("app/(public)/tech.css").replace(/\/\*[\s\S]*?\*\//g, "");
+  const publicCss = fs.readdirSync(path.join(FRONTEND, "app/(public)")).filter((f) => /^tech.*\.css$/.test(f));
+
+  it("public CSS: tech.css plus the TP layers, each imported by the public layout", () => {
+    expect(publicCss).toEqual(expect.arrayContaining(["tech.css", "tech-theme.css", "tech-motion.css"]));
+    const layout = read("app/(public)/layout.tsx");
+    for (const f of publicCss) expect(layout, f).toContain(`import "./${f}";`);
+  });
+
+  it.each(publicCss)("%s: every rule is scoped under .tech, no data-theme", (file) => {
+    const css = read(`app/(public)/${file}`).replace(/\/\*[\s\S]*?\*\//g, "");
     expect(css).not.toMatch(/data-theme|prokom-theme/);
     // selectors = text before "{" that is not an at-rule
     const selectors = Array.from(css.matchAll(/([^{}]+)\{/g))

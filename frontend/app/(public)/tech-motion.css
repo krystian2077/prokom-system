@@ -1,0 +1,183 @@
+/*
+ * PRO-KOM Tech — motion system (TP PR 1, docs/tech/PREMIUM.md §1).
+ * Tokens, reusable patterns and the reduced-motion contract. Timing decisions live
+ * here; lib/tech/motion.ts only decides *when* (reveal, pause off screen).
+ * Scoped like tech.css: every selector under `.tech`. Keyframe stops are written one
+ * per line (`0%`, `55%`…) — tests/tech/fundament.test.ts parses them.
+ */
+
+.tech {
+  --m-micro: 120ms;   /* press, hover colour */
+  --m-small: 200ms;   /* chips, toggles, crossfade fallback */
+  --m-panel: 320ms;   /* menus, sheets, FAQ */
+  --m-scene: 520ms;   /* wizard camera, page-level moves */
+  --m-reveal: 700ms;  /* entrance on scroll */
+  --m-ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --m-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --m-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --m-ease-emph: cubic-bezier(0.16, 1, 0.3, 1);
+  --m-stagger: 40ms;
+  --m-rise: 18px;
+}
+
+/* ---------- Reveal on scroll (only once JS marked the root with .t-motion) ---------- */
+.tech [data-t-reveal] {
+  transition:
+    opacity var(--m-reveal) var(--m-ease-emph) var(--t-delay, 0ms),
+    transform var(--m-reveal) var(--m-ease-emph) var(--t-delay, 0ms);
+}
+.tech.t-motion [data-t-reveal]:not(.is-in) { opacity: 0; transform: translateY(var(--m-rise)); }
+.tech.t-motion [data-t-reveal="fade"]:not(.is-in) { transform: none; }
+.tech.t-motion [data-t-reveal="scale"]:not(.is-in) { transform: scale(0.97); }
+
+/* ---------- Hero: entrance without delaying LCP ----------
+ * The h1 and the phone photos (LCP candidates) never start hidden. Secondary pieces
+ * rise in with transform + opacity after first paint.
+ */
+.tech .t-hero__eyebrow,
+.tech .t-hero__lead,
+.tech .t-hero__actions,
+.tech .t-hero__promises { animation: t-rise var(--m-reveal) var(--m-ease-emph) both; }
+.tech .t-hero__lead { animation-delay: 60ms; }
+.tech .t-hero__actions { animation-delay: 120ms; }
+.tech .t-hero__promises { animation-delay: 200ms; }
+.tech .t-hero__points { animation: t-rise-only var(--m-reveal) var(--m-ease-emph) 160ms both; }
+@keyframes t-rise {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes t-rise-only {
+  0% { transform: translateY(18px); }
+  100% { transform: none; }
+}
+
+/* ---------- Buttons: press and hover ---------- */
+.tech :is(.t-hbtn, .t-cta, .t-btn, .t-chp, .t-iconbtn, .t-pillbtn, .t-sbtn, .t-navlink) {
+  transition:
+    transform var(--m-small) var(--m-ease-out),
+    background-color var(--m-small) var(--m-ease-out),
+    border-color var(--m-small) var(--m-ease-out),
+    color var(--m-small) var(--m-ease-out),
+    box-shadow var(--m-small) var(--m-ease-out),
+    filter var(--m-small) var(--m-ease-out);
+}
+.tech :is(.t-hbtn, .t-cta, .t-btn, .t-chp, .t-iconbtn, .t-pillbtn, .t-sbtn):active {
+  transform: scale(0.97);
+  transition-duration: var(--m-micro);
+}
+.tech .t-hbtn--acc:hover { filter: brightness(1.05) saturate(1.05); }
+
+/* ---------- Cards: lift with a two-layer shadow ---------- */
+.tech .t-card { transition: transform var(--m-panel) var(--m-ease-emph), box-shadow var(--m-panel) var(--m-ease-emph), border-color var(--m-small); }
+.tech a.t-card:active { transform: translateY(-2px) scale(0.99); }
+
+/* ---------- FAQ: height via grid-template-rows (details stays native without JS) ---------- */
+.tech .t-faq__body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--m-panel) var(--m-ease-emph); }
+.tech .t-faq__body > div { min-height: 0; overflow: hidden; }
+.tech .t-faq__item.is-opening .t-faq__body { animation: t-rows-open var(--m-panel) var(--m-ease-emph); }
+.tech .t-faq__item.is-closing .t-faq__body { grid-template-rows: 0fr; }
+.tech .t-faq__item.is-opening .t-faq__a,
+.tech .t-faq__item.is-closing .t-faq__a { transition: opacity var(--m-panel) var(--m-ease-out); }
+.tech .t-faq__item.is-closing .t-faq__a { opacity: 0; }
+.tech .t-faq__toggle { transition: background-color var(--m-small), transform var(--m-panel) var(--m-ease-spring); }
+@keyframes t-rows-open {
+  0% { grid-template-rows: 0fr; }
+  100% { grid-template-rows: 1fr; }
+}
+
+/* ---------- Tabs with a sliding pill (position set by JS: --pill-x, --pill-w) ---------- */
+.tech .t-pilltabs { position: relative; display: inline-flex; gap: 4px; padding: 4px; border-radius: 14px; background: var(--bg2); isolation: isolate; }
+.tech .t-pilltabs > button,
+.tech .t-pilltabs > a {
+  position: relative; z-index: 1; min-height: 40px; padding: 0 14px; border: 0; border-radius: 11px; background: transparent;
+  color: var(--ink2); font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.tech .t-pilltabs > [aria-selected="true"],
+.tech .t-pilltabs > [aria-checked="true"],
+.tech .t-pilltabs > [aria-pressed="true"] { color: var(--ink); }
+.tech .t-pilltabs__pill {
+  position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0; width: var(--pill-w, 0px); border-radius: 11px;
+  background: var(--card); box-shadow: var(--sh-1);
+  transform: translateX(var(--pill-x, 0px));
+}
+.tech [data-pill-ready] > .t-pilltabs__pill { transition: transform var(--m-panel) var(--m-ease-spring), width var(--m-panel) var(--m-ease-emph); }
+
+/* ---------- Status tracker: bars grow, the ✓ draws itself ---------- */
+.tech .t-axis__item.is-done .t-axis__bar,
+.tech .t-axis__item.is-current .t-axis__bar,
+.tech .t-axis__item.is-interrupted .t-axis__bar {
+  transform-origin: left center;
+  animation: t-grow var(--m-scene) var(--m-ease-emph) both;
+}
+.tech .t-axis__item:nth-child(2) .t-axis__bar { animation-delay: 90ms; }
+.tech .t-axis__item:nth-child(3) .t-axis__bar { animation-delay: 180ms; }
+.tech .t-axis__item:nth-child(4) .t-axis__bar { animation-delay: 270ms; }
+.tech .t-axis__item:nth-child(5) .t-axis__bar { animation-delay: 360ms; }
+.tech .t-axis__item.is-done .t-axis__dot svg :is(path, polyline) {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: t-draw var(--m-scene) var(--m-ease-out) 200ms forwards;
+}
+@keyframes t-grow {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+@keyframes t-draw {
+  0% { stroke-dashoffset: 30; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* ---------- Marquee: pause on hover, on focus and off screen ---------- */
+.tech .t-brands:hover .t-brands__track,
+.tech .t-brands:focus-within .t-brands__track,
+.tech .t-brands.is-paused .t-brands__track,
+.tech .is-paused .t-podhale__dash { animation-play-state: paused; }
+.tech .t-brands { -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+
+/* ---------- Skeletons: soft shimmer instead of a flat block ---------- */
+.tech .t-status.is-loading,
+.tech .t-skel {
+  background: linear-gradient(90deg, var(--bd) 0%, var(--bg2) 45%, var(--bd) 90%);
+  background-size: 220% 100%;
+  animation: t-shimmer 1.4s linear infinite;
+}
+.tech .t-skel { display: block; border-radius: 10px; min-height: 1em; }
+@keyframes t-shimmer {
+  0% { background-position: 110% 0; }
+  100% { background-position: -110% 0; }
+}
+
+/* ---------- Theme switch ----------
+ * The circle itself is a View Transition (styles injected by lib/tech/theme.ts, since
+ * ::view-transition pseudos cannot be scoped under .tech). Fallback: 200 ms crossfade.
+ * While switching, component transitions are muted so colours do not "wipe" twice.
+ */
+.tech.t-theme-switching *,
+.tech.t-theme-switching *::before,
+.tech.t-theme-switching *::after { transition: none !important; }
+.tech.t-theme-fade { animation: t-fade-in var(--m-small) var(--m-ease-out); }
+@keyframes t-fade-in {
+  0% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+/* ---------- Generic helpers for later PRs ---------- */
+.tech .t-pop-in { animation: t-pop-in var(--m-panel) var(--m-ease-spring) both; }
+@keyframes t-pop-in {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------- Reduced motion: final states, no loops ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tech.t-motion [data-t-reveal]:not(.is-in) { opacity: 1; transform: none; }
+  .tech .t-brands__track,
+  .tech .t-shine::after,
+  .tech .t-status.is-loading,
+  .tech .t-skel { animation: none !important; }
+  .tech .t-axis__item .t-axis__dot svg :is(path, polyline) { stroke-dashoffset: 0 !important; }
+}
+.tech.t-reduced [data-t-reveal] { opacity: 1 !important; transform: none !important; }
+.tech.t-reduced *,
+.tech.t-reduced *::before,
+.tech.t-reduced *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
