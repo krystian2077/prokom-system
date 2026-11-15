@@ -142,7 +142,7 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
       data-effect={scene.effect}
       style={vars}
     >
-      <div className="t-scene__frame" key={device.id} role="img" aria-label={`${device.label} — ${photo.art ? "ilustracja" : "zdjęcie poglądowe"}`}>
+      <div className="t-scene__frame" key={device.id} role="img" aria-label={`${device.label} — ${photo.art ? "ilustracja" : "zdjęcie"}`}>
         <div className="t-scene__cam" style={{ transformOrigin: `${focus[0]}% ${focus[1]}%` }}>
           {photo.src ? (
             // eslint-disable-next-line @next/next/no-img-element -- pre-sized WebP, positioned by %, no optimizer needed
@@ -236,7 +236,6 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
           {`${fault}. ${faultMeaning(device.id, fault)}`}
         </p>
       ) : null}
-      {photo.src && layout === "full" ? <span className="t-scene__cap">Zdjęcie poglądowe</span> : null}
     </div>
   );
 }

@@ -139,8 +139,6 @@ html[data-tech-theme="dark"] .tech .t-scene__card { border-color: var(--hair); }
 .tech .t-scene__card b { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; color: var(--ink); }
 .tech .t-scene__card b i { width: 8px; height: 8px; border-radius: 50%; background: var(--acc); flex-shrink: 0; }
 .tech .t-scene__card span { font-size: 13px; line-height: 1.45; color: var(--ink2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.tech .t-scene__cap { position: absolute; top: 16px; right: 18px; z-index: 1; font-size: 12px; font-weight: 700; color: var(--ink3); }
-.tech .t-scene.is-zoom .t-scene__cap { opacity: 0; }
 
 /* phone / full-screen flow: label card under the photo */
 .tech .t-scene--phone { --fw: var(--fw-p, 300px); --fh: var(--fh-p, 340px); flex-direction: column; padding: 30px 16px 16px; min-height: 0; gap: 22px; }
