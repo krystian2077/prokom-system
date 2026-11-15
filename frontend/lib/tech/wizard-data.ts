@@ -85,8 +85,6 @@ export type WizardDevice = {
   faults: string[];
   photo: WizardPhoto | null;
   scenes: Record<string, FaultScene>;
-  /** /naprawy/… or a device page once published (TD5b); null = no link yet. */
-  repairHref: string | null;
 };
 
 /**
@@ -249,7 +247,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: MOBILE,
     photo: { src: "/tech/urzadzenia/iphone.webp", width: 433, height: 577, crop: PHONE_CROP, spots: phone.spots },
     scenes: phone.scenes,
-    repairHref: null,
   },
   {
     id: "tablet",
@@ -259,7 +256,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: MOBILE,
     photo: { src: "/tech/urzadzenia/tablet.webp", width: 577, height: 640, crop: TABLET_CROP, spots: tablet.spots },
     scenes: tablet.scenes,
-    repairHref: null,
   },
   {
     id: "smartwatch",
@@ -270,7 +266,6 @@ export const wizardDevices: WizardDevice[] = [
     // No photo with usage rights → illustration in the scene style (PREMIUM §4).
     photo: { art: "watch", width: 400, height: 480, crop: WATCH_CROP, spots: watch.spots },
     scenes: watch.scenes,
-    repairHref: null,
   },
   {
     id: "laptop",
@@ -280,7 +275,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: LAPTOP_FAULTS,
     photo: { src: "/tech/urzadzenia/laptop.webp", width: 640, height: 640, crop: LAPTOP_CROP, spots: laptop.spots },
     scenes: laptop.scenes,
-    repairHref: null,
   },
   {
     id: "komputer",
@@ -290,7 +284,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: PC_FAULTS,
     photo: { src: "/tech/urzadzenia/komputer.webp", width: 640, height: 640, crop: PC_CROP, spots: pc.spots },
     scenes: pc.scenes,
-    repairHref: null,
   },
   {
     id: "drukarka",
@@ -300,7 +293,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: PRINTER_FAULTS,
     photo: { src: "/tech/urzadzenia/drukarka.webp", width: 640, height: 449, crop: PRINTER_CROP, spots: printer.spots },
     scenes: printer.scenes,
-    repairHref: null,
   },
   {
     id: "konsola",
@@ -310,7 +302,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: CONSOLE_FAULTS,
     photo: { src: "/tech/urzadzenia/konsola.webp", width: 640, height: 640, crop: CONSOLE_CROP, spots: consoleScenes.spots },
     scenes: consoleScenes.scenes,
-    repairHref: null,
   },
   {
     id: "odzysk",
@@ -320,7 +311,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: DATA_FAULTS,
     photo: { art: "data", width: 480, height: 400, crop: ART_CROP, spots: data.spots },
     scenes: data.scenes,
-    repairHref: null,
   },
   {
     id: "inne",
@@ -330,7 +320,6 @@ export const wizardDevices: WizardDevice[] = [
     faults: OTHER_FAULTS,
     photo: { art: "other", width: 480, height: 400, crop: ART_CROP, spots: other.spots },
     scenes: other.scenes,
-    repairHref: null,
   },
 ];
 

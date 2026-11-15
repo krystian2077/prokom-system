@@ -9,6 +9,8 @@
     { "plik": "public/tech/urzadzenia/drukarka.webp", "z": "docs/design/tech/prototyp/img/drukarka.png", "wymiary": "640x449", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
     { "plik": "public/tech/urzadzenia/konsola.webp", "z": "docs/design/tech/prototyp/img/konsola.png", "wymiary": "640x640", "zrodlo": "zdjęcie poglądowe z prototypu — źródło nieznane", "confirmed": false },
     { "plik": "public/tech/hammer/hg-ciecie.webp", "z": "docs/design/tech/prototyp/img/hg-ciecie.jpg", "wymiary": "1280x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
-    { "plik": "public/tech/hammer/hg-folie.webp", "z": "docs/design/tech/prototyp/img/hg-folie.jpg", "wymiary": "840x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false }
+    { "plik": "public/tech/hammer/hg-folie.webp", "z": "docs/design/tech/prototyp/img/hg-folie.jpg", "wymiary": "840x650", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
+    { "plik": "public/tech/hammer/hg-ploter.webp", "z": "docs/design/tech/prototyp/img/hg-ploter.jpg", "wymiary": "1160x640", "zrodlo": "kadr z filmu plotera Hammer Glass (prototyp) — potwierdzić prawo", "confirmed": false },
+    { "plik": "public/tech/hammer/ploter.mp4", "z": "public/Hammer Glass Cut Ploter - PREZENTACJA - TelconPoland (1080p, h264).mp4", "wymiary": "1920x1080", "zrodlo": "film prezentacyjny plotera (TelconPoland) — potwierdzić prawo do użycia", "confirmed": false }
   ]
 }

@@ -1,40 +1,20 @@
-﻿export const metadata = {
-  title: "Polityka prywatności | PRO-KOM Serwis",
-  description:
-    "Polityka prywatności i przetwarzania danych osobowych PRO-KOM Serwis – informacje o administratorze, celach przetwarzania, prawach użytkownika (RODO).",
-};
+import { company, line, telHref } from "@/config/prokom";
+import { LegalDoc, Li, Section } from "@/components/tech/legal/LegalDoc";
+import { pageMetadata } from "@/lib/tech/seo";
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+// Legal text kept word for word (TD5 PR 2); only the skin and contact data from config/prokom.ts.
+// TODO(krystian): hosting and domain wording after the VPS migration (webh.pl, Polska) —
+// to accept with the lawyer (SPEC §10); see the PR description.
+export const metadata = pageMetadata({
+  title: "Polityka prywatności i pliki cookies",
+  description: "Polityka prywatności PRO-KOM Tech: administrator danych, cele i podstawy przetwarzania, odbiorcy danych, Twoje prawa (RODO) i pliki cookies.",
+  path: "/polityka-prywatnosci",
+});
+
+export default function PrivacyPolicyPage() {
   return (
-    <section className="mt-6 rounded-2xl bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.09)] lg:mt-10 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
-      <h2 className="text-base font-bold text-prokom-black lg:text-lg">{title}</h2>
-      <div className="mt-3 space-y-3 text-sm leading-relaxed text-prokom-gray">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function Li({ children }: { children: React.ReactNode }) {
-  return <li className="ml-4 list-disc">{children}</li>;
-}
-
-export default function PolitykaPrywatnosciPage() {
-  return (
-    <div className="mx-auto max-w-3xl px-5 py-8 sm:px-6 lg:px-4 lg:py-12">
-      <h1 className="text-2xl font-bold text-prokom-black lg:text-3xl">
-        Polityka prywatności
-      </h1>
-      <p className="mt-2 text-sm text-prokom-gray">
-        Wersja obowiązująca od: <strong>25 kwietnia 2026 r.</strong>
-      </p>
-      <p className="mt-4 text-sm leading-relaxed text-prokom-gray">
+    <LegalDoc title="Polityka prywatności" path="/polityka-prywatnosci" version="25 kwietnia 2026 r.">
+      <p>
         Niniejsza Polityka prywatności opisuje, w jaki sposób PRO-KOM Serwis
         zbiera, przetwarza i chroni dane osobowe Użytkowników korzystających z
         serwisu internetowego dostępnego pod adresem{" "}
@@ -50,16 +30,16 @@ export default function PolitykaPrywatnosciPage() {
           Administratorem Twoich danych osobowych jest przedsiębiorstwo działające
           pod firmą <strong>PRO-KOM Serwis</strong>, z siedzibą pod adresem:
         </p>
-        <p className="rounded-lg bg-gray-50 p-4 font-medium text-prokom-black">
-          ul. Orkana 16B, 34-700 Rabka-Zdrój
+        <p className="t-legal-doc__box">
+          {company.hq.street}, {company.hq.postal} {company.hq.city}
           <br />
           woj. małopolskie, Polska
           <br />
-          tel.: <a href="tel:883200151" className="text-primary hover:underline">883 200 151</a>
+          tel.: <a data-t-inline="" href={telHref(line.phone)}>{line.phoneDisplay}</a>
           <br />
           e-mail:{" "}
-          <a href="mailto:sklep@pro-kom.eu" className="text-primary hover:underline">
-            sklep@pro-kom.eu
+          <a data-t-inline="" href={`mailto:${line.email}`}>
+            {line.email}
           </a>
         </p>
         <p>
@@ -75,10 +55,10 @@ export default function PolitykaPrywatnosciPage() {
           W zależności od sposobu korzystania z serwisu przetwarzamy następujące
           kategorie danych:
         </p>
-        <p className="font-semibold text-prokom-black">
+        <p>
           a) Dane podawane przez Ciebie dobrowolnie:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>imię i nazwisko</Li>
           <Li>adres e-mail</Li>
           <Li>numer telefonu</Li>
@@ -93,10 +73,10 @@ export default function PolitykaPrywatnosciPage() {
           </Li>
           <Li>hasło (przechowywane wyłącznie w formie zaszyfrowanej)</Li>
         </ul>
-        <p className="font-semibold text-prokom-black">
+        <p>
           b) Dane zbierane automatycznie:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>adres IP urządzenia</Li>
           <Li>
             informacje o przeglądarce i systemie operacyjnym (User-Agent)
@@ -104,10 +84,10 @@ export default function PolitykaPrywatnosciPage() {
           <Li>data i godzina logowania, adres odwiedzanej strony</Li>
           <Li>pliki cookies (patrz § 8)</Li>
         </ul>
-        <p className="font-semibold text-prokom-black">
+        <p>
           c) Dane z usług zewnętrznych:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>
             Jeśli logujesz się przez Google OAuth – imię, nazwisko i adres
             e-mail z konta Google
@@ -121,14 +101,14 @@ export default function PolitykaPrywatnosciPage() {
           Przetwarzamy Twoje dane osobowe wyłącznie wtedy, gdy istnieje ku temu
           właściwa podstawa prawna:
         </p>
-        <div className="overflow-x-auto">
-          <table className="mt-2 w-full border-collapse text-xs">
+        <div>
+          <table>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-200 px-3 py-2 text-left font-semibold text-prokom-black">
+              <tr>
+                <th>
                   Cel przetwarzania
                 </th>
-                <th className="border border-gray-200 px-3 py-2 text-left font-semibold text-prokom-black">
+                <th>
                   Podstawa prawna (RODO)
                 </th>
               </tr>
@@ -168,9 +148,9 @@ export default function PolitykaPrywatnosciPage() {
                   "Art. 6 ust. 1 lit. b – wykonanie umowy / środki przedumowne",
                 ],
               ].map(([cel, podstawa]) => (
-                <tr key={cel} className="even:bg-gray-50">
-                  <td className="border border-gray-200 px-3 py-2">{cel}</td>
-                  <td className="border border-gray-200 px-3 py-2">
+                <tr key={cel}>
+                  <td>{cel}</td>
+                  <td>
                     {podstawa}
                   </td>
                 </tr>
@@ -186,7 +166,7 @@ export default function PolitykaPrywatnosciPage() {
           Przechowujemy dane osobowe przez okres niezbędny do realizacji celów,
           dla których zostały zebrane:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>
             <strong>Dane konta klienta:</strong> przez czas trwania konta; po
             jego usunięciu – do 3 lat (przedawnienie roszczeń), chyba że przepisy
@@ -216,7 +196,7 @@ export default function PolitykaPrywatnosciPage() {
           Twoje dane możemy przekazywać wyłącznie zaufanym podmiotom, które
           zapewniają odpowiedni poziom ochrony danych:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>
             <strong>Dostawcy infrastruktury IT:</strong> Render (hosting
             serwera i bazy danych) – świadczący usługi na podstawie umowy
@@ -251,7 +231,7 @@ export default function PolitykaPrywatnosciPage() {
           Na podstawie RODO przysługują Ci następujące prawa w odniesieniu do
           swoich danych osobowych:
         </p>
-        <ul className="space-y-1.5">
+        <ul>
           <Li>
             <strong>Prawo dostępu</strong> – możesz zażądać kopii swoich
             danych, które przetwarzamy (art. 15 RODO).
@@ -289,15 +269,15 @@ export default function PolitykaPrywatnosciPage() {
         </ul>
         <p>
           Aby skorzystać z powyższych praw, skontaktuj się z nami pod adresem{" "}
-          <a href="mailto:sklep@pro-kom.eu" className="text-primary hover:underline">
-            sklep@pro-kom.eu
+          <a data-t-inline="" href={`mailto:${line.email}`}>
+            {line.email}
           </a>
           . Odpowiemy bez zbędnej zwłoki, nie później niż w ciągu 30 dni.
         </p>
         <p>
           Masz również prawo wniesienia skargi do organu nadzorczego –{" "}
           <strong>Prezesa Urzędu Ochrony Danych Osobowych</strong> (PUODO), ul.
-          Stawki 2, 00-193 Warszawa, <a href="https://uodo.gov.pl" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">uodo.gov.pl</a>.
+          Stawki 2, 00-193 Warszawa, <a data-t-inline="" href="https://uodo.gov.pl" target="_blank" rel="noopener noreferrer">uodo.gov.pl</a>.
         </p>
       </Section>
 
@@ -308,7 +288,7 @@ export default function PolitykaPrywatnosciPage() {
           ochrony Twoich danych osobowych przed nieuprawnionym dostępem,
           utratą lub zniszczeniem:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>szyfrowanie połączeń (protokół HTTPS / TLS)</Li>
           <Li>
             przechowywanie haseł wyłącznie w postaci zaszyfrowanej
@@ -331,15 +311,15 @@ export default function PolitykaPrywatnosciPage() {
       </Section>
 
       {/* 8 */}
-      <Section title="§ 8. Pliki cookies">
+      <Section title="§ 8. Pliki cookies" id="cookies">
         <p>
           Serwis pro-kom.eu używa plików cookies (ciasteczek) – małych plików
           tekstowych zapisywanych na Twoim urządzeniu.
         </p>
-        <p className="font-semibold text-prokom-black">
+        <p>
           Rodzaje używanych cookies:
         </p>
-        <ul className="space-y-1">
+        <ul>
           <Li>
             <strong>Niezbędne (sesyjne):</strong> utrzymanie sesji
             zalogowanego użytkownika, token autoryzacyjny – wymagane do
@@ -380,8 +360,8 @@ export default function PolitykaPrywatnosciPage() {
           zbieramy świadomie danych osobowych dzieci. Jeśli uważasz, że dane
           dziecka poniżej 16 lat zostały nam przekazane bez zgody rodzica lub
           opiekuna prawnego, prosimy o niezwłoczny kontakt na adres{" "}
-          <a href="mailto:sklep@pro-kom.eu" className="text-primary hover:underline">
-            sklep@pro-kom.eu
+          <a data-t-inline="" href={`mailto:${line.email}`}>
+            {line.email}
           </a>
           , a dane zostaną usunięte.
         </p>
@@ -398,9 +378,7 @@ export default function PolitykaPrywatnosciPage() {
         </p>
       </Section>
 
-      <div className="mt-8 border-t border-gray-100 pt-5 text-xs text-gray-400 lg:mt-12 lg:pt-6">
-        Data ostatniej aktualizacji: 25 kwietnia 2026 r.
-      </div>
-    </div>
+      <p className="t-legal-doc__updated">Data ostatniej aktualizacji: 25 kwietnia 2026 r.</p>
+    </LegalDoc>
   );
 }

@@ -82,5 +82,23 @@ Cron użytkownika `krystian` (UTC), obok wpisów prokom-web i Gaming:
 ## 7. Dzień przełączenia
 Lista z MIGRACJA §8, komendy w `docs/tech/NIEDZIELA.md`. Pomocne pliki: `scripts/vps/eksport-hetzner.sh prokom_tech_prod` (zrzut końcowy), `scripts/vps/strona-503/default.conf` (strona techniczna na Hetznerze), `restore.sh` do `prokom-tech-prod` **bez** anonimizacji, `deploy.sh prod <sha>` (migracje: oczekiwane „no pending migrations” — inaczej stop i decyzja).
 
-## 8. Wyrejestrowanie service workera (od TD5)
-Dopisze TD5 PR 3 (SPEC §12.2).
+## 8. Service worker — co robi i jak go wyłączyć (od TD5, SPEC §12.2)
+**Co robi:** `frontend/public/sw.js` (rejestruje go tylko layout publiczny, po `load`, `components/tech/SwRegister.tsx`). Trzyma **jedną** kopię strony `/offline` (style wklejone, bez skryptów) w keszu `pk-tech-offline-v<N>` i podaje ją tylko wtedy, gdy przejście na stronę publiczną nie dojdzie do sieci. Nie przechwytuje `/api`, `/panel`, `/admin-panel`, `/client`, `/admin`, `/_next`, zapytań innych niż GET ani niczego poza nawigacją — nic innego nie jest keszowane (test `tests/tech/pwa.spec.ts`).
+
+**Zmiana w SW:** każda zmiana pliku = podbij `VERSION` w `sw.js` (stary kesz `pk-tech-*` kasuje się przy aktywacji). Przeglądarka sprawdza `sw.js` przy każdej nawigacji (max co 24 h) — Nginx nie może go keszować długo: `location = /sw.js { add_header Cache-Control "no-cache"; }` (jeśli Nginx dokłada własne nagłówki keszowania dla `public/`).
+
+**Wyłączenie awaryjne (np. SW psuje stronę):**
+1. Najszybciej, bez nowego builda frontu: podmień `public/sw.js` na serwerze/w obrazie na wersję „samobójczą” i wdroż:
+   ```js
+   self.addEventListener("install", () => self.skipWaiting());
+   self.addEventListener("activate", (e) => e.waitUntil((async () => {
+     for (const k of await caches.keys()) if (k.startsWith("pk-tech-")) await caches.delete(k);
+     await self.registration.unregister();
+     for (const c of await self.clients.matchAll({ type: "window" })) c.navigate(c.url);
+   })()));
+   ```
+   Każda przeglądarka z zarejestrowanym SW pobierze go przy następnej wizycie, wyczyści kesz, wyrejestruje się i przeładuje kartę.
+2. Na stałe: zmienna buildu `NEXT_PUBLIC_TECH_SW=0` (`.env.prod` / zmienne repo `PRODUCTION_NEXT_PUBLIC_TECH_SW`) — `SwRegister` przestaje rejestrować i wyrejestrowuje istniejące SW. Zostaw wersję „samobójczą” `sw.js` co najmniej 30 dni.
+3. Sprawdzenie: Chrome → DevTools → Application → Service Workers (brak wpisu dla domeny) i Cache Storage (brak `pk-tech-*`).
+
+Panele nie rejestrują SW, ale SW o zasięgu `/` „widzi” ich adresy — dlatego lista wykluczeń w `sw.js` jest częścią testów i nie wolno jej skracać.

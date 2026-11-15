@@ -7,6 +7,7 @@ import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { CourierTeaser } from "@/components/tech/device/CourierTeaser";
 import { RepairSteps } from "@/components/tech/device/RepairSteps";
+import { RepairLinks } from "@/components/tech/repair/RepairLinks";
 import { DeviceGlyph, IconArrow, IconPath } from "@/components/tech/icons";
 import { citiesTitle, hubCards } from "@/lib/tech/devices";
 import { REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
@@ -146,6 +147,8 @@ export default function RepairsHubPage() {
           <CourierTeaser className="t-dev-courier" />
         </div>
       </section>
+
+      <RepairLinks />
 
       <RepairSteps title="Cztery kroki do sprawnego sprzętu" />
 

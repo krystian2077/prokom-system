@@ -188,7 +188,7 @@ export function HammerGlass() {
             >
               <video
                 className="h-full w-full object-cover"
-                src="/Hammer%20Glass%20Cut%20Ploter%20-%20PREZENTACJA.mp4"
+                src="/tech/hammer/ploter.mp4"
                 autoPlay
                 loop
                 muted
