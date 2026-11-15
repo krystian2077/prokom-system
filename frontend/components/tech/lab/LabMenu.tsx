@@ -1,6 +1,7 @@
 "use client";
 
 import { useShell } from "../ShellContext";
+import { requestSearch } from "@/lib/tech/search/open";
 
 /** /lab/menu: shortcuts that open the real shell pieces (no copies — what you see is production code). */
 export function LabMenu() {
@@ -34,8 +35,8 @@ export function LabMenu() {
           <button type="button" className="t-hbtn t-hbtn--ghost" onClick={(e) => openSheet("naprawy", e.currentTarget)}>
             Otwórz Naprawy
           </button>
-          <button type="button" className="t-hbtn t-hbtn--ghost" onClick={(e) => openSheet("szukaj", e.currentTarget)}>
-            Otwórz Szukaj
+          <button type="button" className="t-hbtn t-hbtn--ghost" onClick={() => requestSearch()}>
+            Otwórz Szukaj (Ctrl K)
           </button>
         </div>
       </div>

@@ -18,6 +18,7 @@ import "./tech-wizard.css";
 import "./tech-pages.css";
 import "./tech-about.css";
 import "./tech-visit.css";
+import "./tech-rail.css";
 import "./tech-form.css";
 
 // Public-site fonts only (SPEC §3). Panels keep DM Sans / Unbounded from the root layout.
@@ -95,7 +96,9 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       {/* First element: sets data-tech-theme before anything paints (no flash). */}
       <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd()) }} />
-      {umamiId ? <script defer src={umamiSrc} data-website-id={umamiId} data-tech-umami="" /> : null}
+      {/* data-exclude-search: page views without the query string — /szukaj?q= (the phrase) and
+          /track?ref= (a repair number) never reach the statistics (SPEC §12.5). */}
+      {umamiId ? <script defer src={umamiSrc} data-website-id={umamiId} data-exclude-search="true" data-tech-umami="" /> : null}
       <ThemeBoot />
       <SwRegister />
       <div className={`tech ${archivo.variable} ${manrope.variable}`}>

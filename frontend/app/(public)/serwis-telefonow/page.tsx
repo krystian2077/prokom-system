@@ -4,7 +4,6 @@ import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PhoneBrandsSection, PhoneRepairsSection, PhoneStepsSection } from "@/components/tech/PhoneSections";
-import { RepairLinks } from "@/components/tech/repair/RepairLinks";
 import { publishedLocalPages, visibleLocalPages } from "@/lib/tech/local-pages";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { inCity, joinCities } from "@/lib/tech/point-format";
@@ -116,7 +115,6 @@ export default function PhoneServicePage() {
       <DeviceIntro paragraphs={EXTRA.intro} title="Serwis telefonów: najczęstsze usterki i jak pracujemy" />
       <PhoneRepairsSection />
       <DeviceSymptoms extra={EXTRA} name="Serwis telefonów" short="Telefony" category="phone" />
-      <RepairLinks device="phone" title="Konkretne naprawy telefonów" />
       <PhoneBrandsSection title="Jakie telefony naprawiamy" />
       <DeviceIntake note={EXTRA.intake} points={points} what="telefon" />
       <PhoneStepsSection eyebrow="Jak to działa" cityName={null} timeline />

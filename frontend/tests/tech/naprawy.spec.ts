@@ -32,3 +32,26 @@ test("unverified repair pages: 404 in production and absent from sitemap.xml", a
   const xml = await (await request.get("/sitemap.xml")).text();
   for (const p of drafts) expect(xml).not.toContain(repairPath(p.slug));
 });
+
+test("every live repair page is linked from the hub /uslugi; device pages do not list them", async ({ page }) => {
+  await page.goto("/uslugi");
+  for (const p of liveRepairs()) await expect(page.locator(`#konkretne-naprawy a[href="${repairPath(p.slug)}"]`), p.slug).toHaveCount(1);
+  for (const path of ["/serwis-laptopow", "/serwis-telefonow"]) {
+    await page.goto(path);
+    await expect(page.locator("#konkretne-naprawy")).toHaveCount(0);
+  }
+});
+
+test("repair page: before/after slider works with the keyboard; related repairs are cards", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/naprawy/wymiana-ekranu-iphone");
+  const slider = page.getByRole("slider", { name: /przed naprawą i po naprawie/i });
+  await slider.scrollIntoViewIfNeeded();
+  const before = Number(await slider.inputValue());
+  await slider.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  expect(Number(await slider.inputValue())).toBe(before + 2);
+  await expect(page.locator("#powiazane a.t-rrel__card").first()).toBeVisible();
+  await expect(page.locator("#przed-i-po")).toHaveAttribute("data-rail", "Przed i po");
+});

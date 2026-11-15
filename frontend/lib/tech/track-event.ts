@@ -22,6 +22,8 @@ export type TechEvents = {
   kurier_strona: Record<string, never>;
   blog_kategoria: { slug: string };
   blog_powiazana_naprawa_klik: Record<string, never>;
+  /** Site search (SPEC §12.5): phrase length and result count only — never the phrase itself. */
+  szukaj: { dlugosc: number; wyniki: number; zrodlo: "okno" | "strona" };
 };
 export type TechEventName = keyof TechEvents;
 

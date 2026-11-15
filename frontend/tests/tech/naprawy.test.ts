@@ -118,3 +118,14 @@ describe("naprawy — SEO i treść stron z treścią", () => {
     expect(repairPages.some((p) => /rabka|zakopane/i.test(p.slug))).toBe(false);
   });
 });
+
+describe("strony napraw — linkowanie wewnętrzne (2026-11: bez bloku na stronach urządzeń)", () => {
+  it("every live repair page is linked from another live repair page or the wizard", () => {
+    const live = liveRepairs();
+    for (const p of live) {
+      const fromRelated = live.some((o) => o.slug !== p.slug && o.powiazane.includes(p.slug));
+      const fromWizard = repairForFault(p.device, p.usterka)?.slug === p.slug;
+      expect(fromRelated || fromWizard, p.slug).toBe(true);
+    }
+  });
+});
