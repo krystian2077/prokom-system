@@ -5,7 +5,7 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 
 | Data | Plik | Zmiana i powód | Zgoda | PR |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 15.11.2026 | `frontend/app/globals.css` | Usunięcie publicznych bloków starej strony (TD6 PR 2b, −1056 linii); reguły używane przez panele zostają, `panele.spec` bez różnic | Krystian (czat, 15.11) | #52 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **Punkt przyjęcia (`service_point`)** w zgłoszeniu i w śledzeniu (wariant B z KONTRAKT §2): filtr w panelu, właściwy adres punktu w statusie naprawy.
