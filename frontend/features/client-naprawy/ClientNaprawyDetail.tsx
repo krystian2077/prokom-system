@@ -428,7 +428,7 @@ export function ClientNaprawyDetail({ repairId }: { repairId: string }) {
                       value={courierInput}
                       onChange={(e) => { setCourierInput(e.target.value); setTrackingMessage(null); }}
                     >
-                      <option value="">— Wybierz przewoźnika (opcjonalnie) —</option>
+                      <option value="">Wybierz (opcjonalnie)</option>
                       <option value="inpost">InPost</option>
                       <option value="dpd">DPD</option>
                       <option value="dhl">DHL</option>

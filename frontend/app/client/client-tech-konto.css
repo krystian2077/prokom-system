@@ -342,7 +342,7 @@ html[data-tech-theme="dark"] .tech .t-ck-steps .is-done .t-ck-steps__dot { color
 .tech .t-ck-infobox--block { display: block; margin: 0; font-weight: 600; color: var(--ink2); line-height: 1.55; }
 .tech .t-ck-subsection { padding-top: 18px; border-top: 1px solid var(--bd); display: flex; flex-direction: column; gap: 10px; }
 .tech .t-ck-tracking { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: end; }
-@media (min-width: 768px) { .tech .t-ck-tracking { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; } }
+@media (min-width: 768px) { .tech .t-ck-tracking { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; } }
 .tech .t-ck-tracking__btn { min-height: 54px; }
 .tech .t-ck-field input.t-ck-mono { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
 .tech .t-ck-okbox { margin: 0; display: grid; gap: 12px; padding: 14px 16px; border-radius: 16px; background: var(--okbg); border: 1px solid color-mix(in srgb, var(--ok) 28%, transparent); }
