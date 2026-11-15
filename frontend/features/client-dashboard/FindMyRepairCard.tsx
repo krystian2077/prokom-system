@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Clock3, Phone, Search, ShieldCheck } from "lucide-react";
 import { api, API_V1 } from "@/lib/api";
+import { line } from "@/config/prokom";
+import { IconArrow, IconSearch } from "@/components/tech/icons";
+import { IconShield } from "@/components/tech/account/account-icons";
+import { AuthAlert } from "@/components/tech/account/AuthParts";
+import { KeyValue, Panel } from "@/components/tech/account/AccountUi";
 
 interface TrackResult {
   repair_number: string;
@@ -28,18 +32,12 @@ function phoneToLast4(raw: string): string {
   return digits.slice(-4);
 }
 
-function getStatusTone(status: string): { label: string; className: string } {
+function getStatusTone(status: string): "ready" | "wait" | "done" | "new" {
   const normalized = status.toLowerCase();
-  if (normalized.includes("ready") || normalized.includes("got")) {
-    return { label: status, className: "bg-[rgba(34,197,94,.12)] text-[var(--green)] border-[rgba(34,197,94,.22)]" };
-  }
-  if (normalized.includes("wait") || normalized.includes("oczek")) {
-    return { label: status, className: "bg-[rgba(245,158,11,.12)] text-[var(--amber)] border-[rgba(245,158,11,.22)]" };
-  }
-  if (normalized.includes("done") || normalized.includes("zak") || normalized.includes("wyd")) {
-    return { label: status, className: "bg-[rgba(59,130,246,.12)] text-[var(--blue)] border-[rgba(59,130,246,.22)]" };
-  }
-  return { label: status, className: "bg-[rgba(255,255,255,.05)] text-[var(--ink2)] border-[var(--border)]" };
+  if (normalized.includes("ready") || normalized.includes("got")) return "ready";
+  if (normalized.includes("wait") || normalized.includes("oczek")) return "wait";
+  if (normalized.includes("done") || normalized.includes("zak") || normalized.includes("wyd")) return "done";
+  return "new";
 }
 
 /**
@@ -77,153 +75,84 @@ export function FindMyRepairCard() {
   };
 
   return (
-    <div
+    <Panel
       id="szukaj-naprawy"
-      className="panel-card mt-8 scroll-mt-24 overflow-hidden max-lg:mt-5 max-lg:rounded-[18px]"
+      className="t-ck-find"
+      title="Szukaj mojej naprawy"
+      desc="Wpisz numer zgłoszenia oraz pełny numer telefonu z przyjęcia — system automatycznie użyje ostatnich 4 cyfr."
+      icon={<IconSearch size={18} />}
+      action={
+        <span className="t-ck-chip">
+          <IconShield size={14} />
+          Bezpieczna weryfikacja
+        </span>
+      }
     >
-      <div className="panel-card-header max-lg:px-5 max-lg:py-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ borderColor: "var(--red-border)", color: "var(--red)", background: "var(--red-l)" }}>
-              <Search size={12} />
-              Szybkie sprawdzenie
-            </span>
-            <h2 className="mt-3 text-[18px] font-semibold leading-tight sm:text-[22px]" style={{ fontFamily: "var(--font-unbounded)", color: "var(--heading)" }}>
-              Szukaj mojej naprawy
-            </h2>
-            <p className="mt-3 text-[13px] leading-relaxed sm:text-sm" style={{ color: "var(--ink2)" }}>
-              Wpisz numer zgłoszenia oraz pełny numer telefonu z przyjęcia — system automatycznie użyje ostatnich 4&nbsp;cyfr.
-            </p>
-          </div>
-          <div className="hidden rounded-2xl border px-3 py-2 sm:flex items-center gap-2" style={{ borderColor: "var(--border)", background: "var(--island2)", color: "var(--ink2)" }}>
-            <ShieldCheck size={15} />
-            <span className="text-xs font-medium">Bezpieczna weryfikacja</span>
-          </div>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-5 p-5 pt-0 sm:space-y-5 sm:p-5 sm:pt-0 lg:p-6 lg:pt-0">
-        <div className="grid gap-4 pt-3.5 sm:gap-4 lg:grid-cols-[1.2fr_1fr]">
-          <label className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] sm:text-[11px]" style={{ color: "var(--muted)" }}>
-              Numer zgłoszenia (ref)
-            </span>
+      <form onSubmit={handleSubmit} className="t-ck-form">
+        <div className="t-ck-find__grid">
+          <div className="t-ck-field">
+            <label htmlFor="find-ref">Numer zgłoszenia (ref)</label>
             <input
+              id="find-ref"
               type="text"
               value={ref}
               onChange={(e) => setRef(e.target.value)}
               placeholder="np. PROKOM/RMA/123/2025"
-              className="h-12 w-full rounded-xl border bg-[var(--island)] px-3.5 text-[14px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15 sm:h-14 sm:rounded-2xl sm:px-4 sm:text-[15px]"
-              style={{ borderColor: "var(--border)", color: "var(--ink)" }}
               autoComplete="off"
             />
-          </label>
-
-          <label className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] sm:text-[11px]" style={{ color: "var(--muted)" }}>
-              Telefon z przyjęcia (pełny numer)
-            </span>
+          </div>
+          <div className="t-ck-field">
+            <label htmlFor="find-phone">Telefon z przyjęcia (pełny numer)</label>
             <input
+              id="find-phone"
               type="tel"
+              inputMode="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Wpisz pełny numer telefonu"
-              className="h-12 w-full rounded-xl border bg-[var(--island)] px-3.5 text-[14px] outline-none transition focus:border-[var(--red)] focus:ring-2 focus:ring-[var(--red)]/15 sm:h-14 sm:rounded-2xl sm:px-4 sm:text-[15px]"
-              style={{ borderColor: "var(--border)", color: "var(--ink)" }}
               autoComplete="tel"
             />
-          </label>
-        </div>
-
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-2.5 text-[12px] leading-relaxed sm:text-sm" style={{ color: "var(--ink2)" }}>
-            <Clock3 size={14} className="mt-0.5 shrink-0 sm:h-4 sm:w-4" />
-            <span>System sam wytnie ostatnie 4 cyfry z wpisanego numeru telefonu.</span>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl text-[14px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 sm:h-14 sm:w-auto sm:rounded-2xl sm:px-6 sm:text-[15px]"
-            style={{ background: loading ? "var(--red-h)" : "var(--red)" }}
-          >
-            <Search size={16} />
+        </div>
+        <div className="t-ck-find__foot">
+          <p className="t-ck-note">System sam wytnie ostatnie 4 cyfry z wpisanego numeru telefonu.</p>
+          <button type="submit" className="t-pbtn t-pbtn--acc t-pbtn--m t-ck-find__btn" disabled={loading} aria-busy={loading || undefined}>
+            <IconSearch size={16} />
             {loading ? "Szukam…" : "Sprawdź status"}
           </button>
         </div>
-
-        {error && (
-          <div className="rounded-2xl border px-4 py-3 text-sm" style={{ borderColor: "rgba(220,30,30,.22)", background: "rgba(220,30,30,.08)", color: "var(--red)" }}>
-            {error}
-          </div>
-        )}
+        {error && <AuthAlert>{error}</AuthAlert>}
       </form>
 
       {result && (
-        <div className="border-t border-[var(--border)] p-5 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="t-ck-find__result" role="status" aria-live="polite">
+          <div className="t-ck-find__resulthead">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--muted)" }}>
-                Wynik wyszukiwania
-              </p>
-              <p className="mt-1 font-mono text-lg font-bold tracking-wide" style={{ color: "var(--heading)" }}>
-                {result.repair_number}
-              </p>
+              <span className="t-ck-k">Wynik wyszukiwania</span>
+              <p className="t-ck-ref t-ck-ref--l">{result.repair_number}</p>
             </div>
-            <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${getStatusTone(result.status).className}`}>
-              {getStatusTone(result.status).label}
+            <span className={`t-ck-pill t-ck-pill--${getStatusTone(result.status)}`}>
+              <i aria-hidden="true" />
+              {result.status}
             </span>
           </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
-                Status
-              </p>
-              <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--ink)" }}>
-                {result.status}
-              </p>
-            </div>
-            <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
-                Data przyjęcia
-              </p>
-              <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--ink)" }}>
-                {formatDate(result.accepted_at)}
-              </p>
-            </div>
-            <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
-                Szacowany termin / czas
-              </p>
-              <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--ink)" }}>
-                {result.estimated_completion_date ? formatDate(result.estimated_completion_date) : result.estimated_duration || "—"}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3" style={{ borderColor: "var(--border)", background: "var(--island2)" }}>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--ink2)" }}>
-              Pełny podgląd może wymagać przypisania naprawy do konta.
-            </p>
-            <Link href="/client/naprawy" className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--red)" }}>
+          <dl className="t-ck-kvs t-ck-kvs--grid">
+            <KeyValue label="Status">{result.status}</KeyValue>
+            <KeyValue label="Data przyjęcia">{formatDate(result.accepted_at)}</KeyValue>
+            <KeyValue label="Szacowany termin / czas">
+              {result.estimated_completion_date ? formatDate(result.estimated_completion_date) : result.estimated_duration || "—"}
+            </KeyValue>
+          </dl>
+          <div className="t-ck-find__hint">
+            <p>Pełny podgląd może wymagać przypisania naprawy do konta.</p>
+            <Link href="/client/naprawy" className="t-ck-link t-ck-more">
               Lista napraw
-              <ArrowRight size={14} />
+              <IconArrow size={13} />
             </Link>
           </div>
-
-          <div className="mt-4 flex flex-wrap gap-2 text-xs" style={{ color: "var(--ink2)" }}>
-            <span className="inline-flex items-center gap-1 rounded-full border px-3 py-1" style={{ borderColor: "var(--border)" }}>
-              <Phone size={12} />
-              Wsparcie: 883 200 151
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full border px-3 py-1" style={{ borderColor: "var(--border)" }}>
-              <ShieldCheck size={12} />
-              Ostatnie 4 cyfry telefonu
-            </span>
-          </div>
+          <p className="t-ck-note">Wsparcie: {line.phoneDisplay} · weryfikacja po ostatnich 4 cyfrach telefonu</p>
         </div>
       )}
-    </div>
+    </Panel>
   );
 }

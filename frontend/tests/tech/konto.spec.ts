@@ -175,13 +175,76 @@ test.describe("konto klienta — z lokalnym backendem", () => {
     await page.locator("#login-password").press("Enter");
     await page.waitForURL(/\/client\/dashboard/, { timeout: 30_000 });
 
-    await page.goto("/client/naprawy");
-    await expect(page).toHaveURL(/\/client\/naprawy/);
-    await expect(page.getByText(/naprawy/i).first()).toBeVisible();
+    const accountNav = page.getByRole("navigation", { name: "Konto klienta" });
+    await expect(accountNav.locator('[aria-current="page"]')).toHaveText("Pulpit");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Witaj");
+    expect(await page.locator(".t-ck-acct").innerText()).not.toMatch(/[\uD83C-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]/);
+
+    await accountNav.getByRole("link", { name: "Moje naprawy" }).click();
+    await expect(page).toHaveURL(/\/client\/naprawy$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Moje naprawy" })).toBeVisible();
+    const firstRepair = page.locator("a.t-ck-row").first();
+    if (await firstRepair.count()) {
+      await firstRepair.click();
+      await page.waitForURL(/\/client\/naprawy\/[^/]+$/, { timeout: 30_000 });
+      await expect(page.getByRole("list", { name: "Etapy naprawy" })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 2, name: "Szczegóły zgłoszenia" })).toBeVisible();
+    }
+
+    await accountNav.getByRole("link", { name: "Profil" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Profil" })).toBeVisible();
+    await expect(page.locator("#pf-email")).toHaveValue(creds!.email);
 
     await page.getByRole("button", { name: /wyloguj/i }).first().click();
     await page.waitForURL(/\/client\/login/, { timeout: 30_000 });
     await expect(page.getByRole("heading", { level: 1, name: "Zaloguj się" })).toBeVisible();
-    expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => /token/i.test(k)))).toEqual([]);
+    expect(await page.evaluate(() => sessionStorage.getItem("prokom_auth_token"))).toBeNull();
+  });
+
+  test("axe: zalogowane ekrany konta bez krytycznych i poważnych naruszeń", async ({ browser }) => {
+    test.skip(!creds, "brak tests/tech/.client-test.local.json");
+    test.setTimeout(6 * 60_000);
+    const login = await (await fetch(`${API}/api/v1/accounts/login/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(creds),
+    })).json();
+    const token: string = login.token;
+    const list = await (await fetch(`${API}/api/v1/repairs/`, { headers: { Authorization: `Token ${token}` } })).json();
+    const first = (Array.isArray(list) ? list : list.results ?? [])[0];
+    const urls = ["/client/dashboard", "/client/naprawy", "/client/profil", ...(first ? [`/client/naprawy/${first.id}`] : [])];
+    const axeSource = fs.readFileSync(createRequire(__filename).resolve("axe-core/axe.min.js"), "utf8");
+    const found: string[] = [];
+    for (const theme of ["light", "dark"] as const) {
+      for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+        const ctx = await browser.newContext({ viewport, colorScheme: theme, reducedMotion: "reduce", locale: "pl-PL" });
+        // The auth token lives in sessionStorage (lib/auth-storage.ts).
+        await ctx.addInitScript(([t, tok]) => {
+          try {
+            localStorage.setItem("pk-theme", t);
+            sessionStorage.setItem("prokom_auth_token", tok);
+            sessionStorage.setItem("prokom_user_role", "client");
+          } catch {
+            /* ignore */
+          }
+        }, [theme, token]);
+        const page = await ctx.newPage();
+        for (const url of urls) {
+          await page.goto(url, { waitUntil: "networkidle" });
+          await page.locator(".t-ck-acct__main .t-ck-page").first().waitFor();
+          await page.addScriptTag({ content: axeSource });
+          const violations = await page.evaluate(async () => {
+            // @ts-expect-error axe is injected above
+            const r = await window.axe.run({ include: [".t-ck"] }, { runOnly: ["wcag2a", "wcag2aa", "wcag21aa"] });
+            return r.violations
+              .filter((v: { impact: string }) => v.impact === "critical" || v.impact === "serious")
+              .map((v: { id: string; nodes: { target: string[] }[] }) => `${v.id} → ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
+          });
+          for (const v of violations) found.push(`${url} ${viewport.width} ${theme}: ${v}`);
+        }
+        await ctx.close();
+      }
+    }
+    expect(found, found.join("\n")).toEqual([]);
   });
 });

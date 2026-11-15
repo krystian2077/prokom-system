@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { Archivo, Manrope } from "next/font/google";
-import { ClientPanelThemeProvider } from "@/contexts/ClientPanelThemeContext";
 import { TechShell } from "@/components/tech/TechShell";
 import { ThemeBoot } from "@/components/tech/ThemeBoot";
 import { line } from "@/config/prokom";
 import { themeScript } from "@/lib/tech/theme";
 import { ClientGate } from "./ClientGate";
-import { ClientFrame } from "./ClientFrame";
 // PRO-KOM Tech skin for the client account (docs/tech/WYJATKI.md, 15.11): the same
 // scoped stylesheets as the public site (every rule under `.tech`) plus the account layer.
 import "../(public)/tech.css";
@@ -14,6 +12,7 @@ import "../(public)/tech-theme.css";
 import "../(public)/tech-motion.css";
 import "../(public)/tech-nav.css";
 import "./client-tech.css";
+import "./client-tech-konto.css";
 
 // Same faces as app/(public)/layout.tsx (SPEC §3); the fallback face lives in tech.css.
 const archivo = Archivo({
@@ -49,19 +48,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       {/* Public theme (data-tech-theme / pk-theme) — never touches data-theme of the staff panels. */}
       <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       <ThemeBoot />
-      <ClientPanelThemeProvider>
-        <ClientFrame
-          tech={
-            <div className={techClass}>
-              <TechShell>
-                <ClientGate>{children}</ClientGate>
-              </TechShell>
-            </div>
-          }
-        >
+      {/* The whole account (sign-in and logged-in screens) lives in the Tech shell. */}
+      <div className={techClass}>
+        <TechShell>
           <ClientGate>{children}</ClientGate>
-        </ClientFrame>
-      </ClientPanelThemeProvider>
+        </TechShell>
+      </div>
     </>
   );
 }
