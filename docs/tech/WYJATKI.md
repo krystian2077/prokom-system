@@ -5,7 +5,27 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 
 | Data | Plik | Zmiana i powód | Zgoda | PR |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 15.11.2026 | `frontend/app/globals.css` | Usunięcie publicznych bloków starej strony (TD6 PR 2b, −1056 linii); reguły używane przez panele zostają, `panele.spec` bez różnic | Krystian (czat, 15.11) | #52 |
+| 15.11.2026 | `frontend/app/client/layout.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/ClientFrame.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/ClientGate.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/client-tech.css` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/login/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/rejestracja/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/forgot-password/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/reset-password/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/verify-email/page.tsx` | Skórka Tech konta klienta (logowanie, rejestracja, reset hasła, weryfikacja e-mail), logika bez zmian | Krystian (czat, 15.11) | #67 |
+| 15.11.2026 | `frontend/app/client/client-tech-konto.css` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/app/client/dashboard/page.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/app/client/naprawy/page.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/app/client/naprawy/[id]/page.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/app/client/profil/page.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/features/client-dashboard/ClientDashboard.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/features/client-dashboard/FindMyRepairCard.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/features/client-naprawy/ClientNaprawyList.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/features/client-naprawy/ClientNaprawyDetail.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 15.11.2026 | `frontend/features/client-profil/ClientProfil.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 16.11.2026 | `backend/requirements.txt` | Przypięcie `kombu>=5.4,<5.5`: celery 5.4 dopuszcza kombu <6, a świeża instalacja brała kombu 5.7, które odrzuca redis-py 5.2 (`VersionMismatch`) — Celery nie zlecał zadań (powiadomienia o zgłoszeniach, rejestracja konta). Sprawdzone lokalnie: kombu 5.4.2 + redis 5.2.1 + celery 5.4.0, `pip check` czysty, zadanie trafia do Redisa | Krystian (czat, 16.11) | #97 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **Punkt przyjęcia (`service_point`)** w zgłoszeniu i w śledzeniu (wariant B z KONTRAKT §2): filtr w panelu, właściwy adres punktu w statusie naprawy.
@@ -20,3 +40,4 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 - **[T0] SMS to atrapa:** `communications/services/send.py: send_sms` zwraca `True` bez wysyłki (TODO SMSAPI). Kod przypisania naprawy SMS-em i przypomnienia SMS nie dochodzą do klientów.
 - **[14.11] Godziny soboty:** domyślne `SERWIS_PRINT_HOURS` w `config/settings/base.py` to „Sob 9:00–13:00”, a obowiązuje 9:00–14:00 (decyzja Krystiana). Na produkcji wartość ustawiamy w `.env.prod`; domyślną poprawić przy najbliższej zmianie backendu.
 - **[14.11] Numer przesyłki zwrotnej niewidoczny dla klienta:** backend ma `service_tracking_number` i `service_courier` (`repairs/models.py`, serializer pracownika), ale `/track` ich nie zwraca, a konto klienta (`features/client-naprawy/ClientNaprawyDetail.tsx`, strefa zakazana) pokazuje tylko pole na numer wysyłki od klienta. Dotyczy naprawy wysyłkowej (SPEC §12.10).
+- **[15.11] Mail po zgłoszeniu z kurierem podaje tylko adres Rabki:** potwierdzenie zgłoszenia bierze adres serwisu z `SERWIS_PRINT_*` (jeden punkt), a od 15.11 klient może wysłać sprzęt do każdego opublikowanego salonu (Rabka-Zdrój i Zakopane, `/naprawa-kurierem`, ekran sukcesu). Przy `dropoff = courier` mail mógłby wymieniać oba salony (adresy i godziny) i prosić o włożenie numeru zgłoszenia do paczki. Front niczego nie obiecuje ponad to, co pokazuje sam.

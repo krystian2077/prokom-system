@@ -1,0 +1,370 @@
+/*
+ * PRO-KOM Tech — repair form /zgloszenie, premium layer (feat/tech-formularz-premium).
+ * Builds on the TD3 base in tech.css (`.t-zgl`, `.t-field`, `.t-choice` …) and the TP motion
+ * tokens (tech-motion.css). Everything is scoped under `.tech .t-zgl` (or `.t-success`,
+ * `.t-help__trigger`), so /track, /kontakt and /claim-repair keep their TD3 look.
+ * Motion: transform/opacity only; reduced motion = final state (last block).
+ */
+
+/* ---------- Stepper: sliding pill + progress line ---------- */
+.tech .t-zgl .t-stepper {
+  position: relative; isolation: isolate; padding: 6px; border-radius: 20px; background: var(--bg2);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+/* the list stays unpositioned: the pill is measured against .t-stepper (usePill offsetLeft/Top) */
+.tech .t-zgl .t-stepper .t-steps { padding: 0; background: transparent; border-radius: 0; }
+.tech .t-zgl .t-stepper__pill {
+  position: absolute; z-index: 0; left: 0; top: 0; width: var(--pill-w, 0px); height: var(--pill-h, 0px);
+  transform: translate(var(--pill-x, 0px), var(--pill-y, 0px)); border-radius: 14px; background: var(--card); box-shadow: var(--sh-1);
+}
+.tech .t-zgl .t-stepper[data-pill-ready] > .t-stepper__pill {
+  transition: transform var(--m-panel) var(--m-ease-spring), width var(--m-panel) var(--m-ease-emph), height var(--m-panel) var(--m-ease-emph);
+}
+.tech .t-zgl .t-stepper__bar {
+  position: absolute; left: 22px; right: 22px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--acc);
+  transform-origin: left center; transform: scaleX(var(--zgl-progress, 0)); opacity: .9;
+  transition: transform var(--m-scene) var(--m-ease-emph);
+}
+.tech .t-zgl .t-steps__item.is-on button { background: transparent; box-shadow: none; }
+.tech .t-zgl .t-steps button { position: relative; z-index: 1; border-radius: 14px; transition: color var(--m-small) var(--m-ease-out); }
+.tech .t-zgl .t-steps button:not(:disabled):hover { color: var(--ink); }
+.tech .t-zgl .t-steps button:focus-visible { outline: 3px solid var(--acc); outline-offset: -3px; }
+.tech .t-zgl .t-steps__n { transition: background-color var(--m-small), color var(--m-small), transform var(--m-panel) var(--m-ease-spring); }
+.tech .t-zgl .t-steps__item.is-on .t-steps__n { transform: scale(1.06); box-shadow: 0 6px 14px -6px var(--glow); }
+.tech .t-zgl .t-steps__n svg path { stroke-dasharray: 26; stroke-dashoffset: 0; animation: t-zgl-draw var(--m-scene) var(--m-ease-out) both; }
+
+/* ---------- Step card: stage (height animated by JS), heading ---------- */
+.tech .t-zgl .t-zgl__step { position: relative; gap: 0; box-shadow: var(--sh-2); border-color: var(--hair); }
+.tech .t-zgl .t-zgl__step::before {
+  /* hairline light on the top edge (premium card) */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, var(--hair-top), transparent 30%); opacity: .5;
+}
+.tech .t-zgl .t-zgl__stage { position: relative; }
+.tech .t-zgl .t-zgl__pane { display: flex; flex-direction: column; gap: 22px; padding-bottom: 22px; }
+.tech .t-zgl .t-zgl__stephead { display: flex; flex-direction: column; gap: 6px; }
+.tech .t-zgl .t-zgl__steph { letter-spacing: -0.015em; }
+.tech .t-zgl .t-zgl__step .t-zgl__stepn { border-radius: 11px; box-shadow: 0 8px 18px -8px var(--glow); }
+.tech .t-zgl .t-zgl__stepsub { margin: 0 0 0 46px; font-size: 14px; line-height: 1.45; font-weight: 600; color: var(--ink2); max-width: 60ch; }
+.tech .t-zgl .t-zgl__body { gap: 22px; }
+.tech .t-zgl .t-reveal-in { animation: t-zgl-in var(--m-panel) var(--m-ease-emph) both; }
+
+/* ---------- Field chrome: label row, focus ring with glow, ✓, error slide + autofill ---------- */
+.tech .t-zgl .t-field { position: relative; }
+.tech .t-zgl .t-field__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 22px; }
+.tech .t-zgl .t-input { position: relative; }
+.tech .t-zgl .t-field :is(input[type="text"], input[type="email"], input[type="tel"], textarea) {
+  border-radius: 15px; border-color: var(--bd2); background: var(--card);
+  transition: border-color var(--m-small) var(--m-ease-out), box-shadow var(--m-small) var(--m-ease-out), background-color var(--m-small);
+}
+.tech .t-zgl .t-field :is(input, textarea):hover:not(:focus) { border-color: color-mix(in srgb, var(--bd2) 55%, var(--ink2)); }
+.tech .t-zgl .t-field :is(input, textarea):focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--acc) 16%, transparent), 0 10px 26px -14px color-mix(in srgb, var(--acc) 70%, transparent);
+}
+.tech .t-zgl .t-field :is(input, textarea)[aria-invalid="true"] { border-color: var(--acc); background: color-mix(in srgb, var(--soft) 45%, var(--card)); }
+.tech .t-zgl .t-field.is-valid input { padding-right: 46px; }
+.tech .t-zgl .t-input__ok {
+  position: absolute; right: 14px; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: var(--okbg); color: var(--ok);
+  opacity: 0; transform: scale(.5); pointer-events: none;
+  transition: opacity var(--m-small) var(--m-ease-out), transform var(--m-panel) var(--m-ease-spring);
+}
+.tech .t-zgl .t-field.is-valid .t-input__ok { opacity: 1; transform: none; }
+.tech .t-zgl .t-field__error {
+  display: flex; align-items: flex-start; gap: 7px; animation: t-zgl-err var(--m-panel) var(--m-ease-emph) both;
+}
+.tech .t-zgl .t-field__error svg { flex-shrink: 0; margin-top: 2px; }
+.tech .t-zgl .t-field :is(input, textarea):-webkit-autofill,
+.tech .t-zgl .t-field :is(input, textarea):-webkit-autofill:hover,
+.tech .t-zgl .t-field :is(input, textarea):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink); caret-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 1000px color-mix(in srgb, var(--soft) 40%, var(--card)) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+.tech .t-zgl .t-fgrid { row-gap: 20px; }
+
+/* ---------- Device tiles ---------- */
+.tech .t-zgl .t-dtiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tech .t-zgl .t-dtile {
+  position: relative; min-height: 64px; justify-content: flex-start; gap: 12px; padding: 10px 14px 10px 10px; border-radius: 18px;
+  border: 1.5px solid var(--bd); background: var(--card); text-align: left; line-height: 1.2; font-size: 14.5px;
+  box-shadow: 0 1px 0 var(--hair);
+  transition: border-color var(--m-small) var(--m-ease-out), background-color var(--m-small), box-shadow var(--m-panel) var(--m-ease-emph), transform var(--m-panel) var(--m-ease-emph), color var(--m-small);
+}
+.tech .t-zgl .t-dtile__ico {
+  width: 42px; height: 42px; flex-shrink: 0; border-radius: 13px; display: flex; align-items: center; justify-content: center;
+  background: var(--bg2); color: var(--acct);
+  transition: background-color var(--m-small), color var(--m-small), transform var(--m-panel) var(--m-ease-spring);
+}
+.tech .t-zgl .t-dtile__t { min-width: 0; }
+.tech .t-zgl .t-dtile__ok {
+  position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--acc); color: var(--onacc); opacity: 0; transform: scale(.3);
+  transition: opacity var(--m-small), transform var(--m-panel) var(--m-ease-spring);
+}
+@media (hover: hover) {
+  .tech .t-zgl .t-dtile:hover { border-color: var(--bd2); transform: translateY(-2px); box-shadow: var(--sh-1); }
+  .tech .t-zgl .t-dtile:hover .t-dtile__ico { transform: scale(1.06); }
+}
+.tech .t-zgl .t-dtile:active { transform: scale(.97); transition-duration: var(--m-micro); }
+.tech .t-zgl .t-dtile.is-on {
+  border-color: var(--acc); background: color-mix(in srgb, var(--soft) 70%, var(--card)); color: var(--ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 12%, transparent), 0 14px 28px -18px color-mix(in srgb, var(--acc) 80%, transparent);
+  animation: t-zgl-pick var(--m-scene) var(--m-ease-spring);
+}
+.tech .t-zgl .t-dtile.is-on .t-dtile__ico { background: var(--acc); color: var(--onacc); }
+.tech .t-zgl .t-dtile.is-on .t-dtile__ok { opacity: 1; transform: none; }
+.tech .t-zgl .t-dtile:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.tech .t-zgl .t-dtiles[aria-invalid="true"] .t-dtile:not(.is-on) { border-color: color-mix(in srgb, var(--acc) 45%, var(--bd)); }
+
+/* ---------- Segmented switch with a pill ---------- */
+.tech .t-zgl .t-seg {
+  position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(var(--seg-n, 3), minmax(0, 1fr)); gap: 4px;
+  padding: 4px; border-radius: 17px; background: var(--bg2); box-shadow: inset 0 0 0 1px var(--hair);
+}
+.tech .t-zgl .t-seg__pill {
+  position: absolute; z-index: 0; left: 0; top: 0; width: var(--pill-w, 0px); height: var(--pill-h, 0px);
+  transform: translate(var(--pill-x, 0px), var(--pill-y, 0px)); border-radius: 13px;
+  background: var(--card); box-shadow: var(--sh-1), 0 0 0 1.5px var(--acc);
+  transition: opacity var(--m-small);
+}
+.tech .t-zgl .t-seg[data-pill-ready] > .t-seg__pill { transition: transform var(--m-panel) var(--m-ease-spring), width var(--m-panel) var(--m-ease-emph), opacity var(--m-small); }
+.tech .t-zgl .t-seg[data-empty] > .t-seg__pill { opacity: 0; }
+.tech .t-zgl .t-seg .t-seg__opt {
+  position: relative; z-index: 1; min-height: 48px; padding: 0 8px; border: 0; border-radius: 13px; background: transparent; color: var(--ink2);
+  font-weight: 800; line-height: 1.2; transition: color var(--m-small) var(--m-ease-out), transform var(--m-micro);
+}
+.tech .t-zgl .t-seg .t-seg__opt:hover { color: var(--ink); border-color: transparent; }
+.tech .t-zgl .t-seg .t-seg__opt.is-on { background: transparent; color: var(--acct); }
+.tech .t-zgl .t-seg .t-seg__opt:active { transform: scale(.97); }
+.tech .t-zgl .t-seg .t-seg__opt:focus-visible { outline: 3px solid var(--acc); outline-offset: -1px; }
+.tech .t-zgl .t-seg[aria-invalid="true"] { box-shadow: inset 0 0 0 1.5px var(--acc); }
+
+/* ---------- Description: counter, meter, fault chips ---------- */
+.tech .t-zgl .t-area__count { font-size: 12.5px; font-weight: 700; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.tech .t-zgl .t-area__count.is-bad { color: var(--acct); }
+.tech .t-zgl .t-input--area textarea { display: block; min-height: 118px; padding-bottom: 18px; }
+.tech .t-zgl .t-area__meter {
+  position: absolute; left: 16px; right: 16px; bottom: 8px; height: 3px; border-radius: 3px; background: var(--bd); overflow: hidden; pointer-events: none;
+}
+.tech .t-zgl .t-area__meter::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--ok) 80%, var(--acc)));
+  transform-origin: left center; transform: scaleX(var(--fill, 0)); transition: transform var(--m-panel) var(--m-ease-emph);
+}
+.tech .t-zgl .t-quick { margin-top: 2px; gap: 8px; }
+.tech .t-zgl .t-quick__chip {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 14px 0 8px; border: 1.5px solid transparent; background: var(--bg2);
+  color: var(--ink2); animation: t-zgl-in var(--m-panel) var(--m-ease-emph) both;
+  transition: background-color var(--m-small), color var(--m-small), border-color var(--m-small), transform var(--m-micro);
+}
+.tech .t-zgl .t-quick__chip:nth-child(2) { animation-delay: 30ms; }
+.tech .t-zgl .t-quick__chip:nth-child(3) { animation-delay: 60ms; }
+.tech .t-zgl .t-quick__chip:nth-child(4) { animation-delay: 90ms; }
+.tech .t-zgl .t-quick__chip:nth-child(5) { animation-delay: 120ms; }
+.tech .t-zgl .t-quick__chip:nth-child(6) { animation-delay: 150ms; }
+.tech .t-zgl .t-quick__chip:nth-child(7) { animation-delay: 180ms; }
+.tech .t-zgl .t-quick__chip:nth-child(n + 8) { animation-delay: 210ms; }
+.tech .t-zgl .t-quick__ico { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--card); color: var(--acct); box-shadow: 0 1px 2px rgba(0, 0, 0, .06); }
+.tech .t-zgl .t-quick__chip:hover { color: var(--ink); border-color: var(--bd2); }
+.tech .t-zgl .t-quick__chip:active { transform: scale(.96); }
+.tech .t-zgl .t-quick__chip.is-on { background: var(--okbg); color: var(--ok); cursor: default; }
+.tech .t-zgl .t-quick__chip.is-on .t-quick__ico { background: var(--ok); color: var(--card); }
+.tech .t-zgl .t-quick__chip:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+
+/* ---------- Option cards (step 2), check cards (steps 3, 5) ---------- */
+.tech .t-zgl .t-option { border-radius: 20px; padding: 18px 20px; transition: border-color var(--m-small), background-color var(--m-small), box-shadow var(--m-panel) var(--m-ease-emph), transform var(--m-panel) var(--m-ease-emph); }
+@media (hover: hover) { .tech .t-zgl .t-option:hover { transform: translateY(-2px); box-shadow: var(--sh-1); border-color: var(--bd2); } }
+.tech .t-zgl .t-option.is-on { border-color: var(--acc); background: color-mix(in srgb, var(--soft) 55%, var(--card)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 12%, transparent); }
+.tech .t-zgl .t-option__ok {
+  position: absolute; top: 14px; right: 14px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--acc); color: var(--onacc); opacity: 0; transform: scale(.3); transition: opacity var(--m-small), transform var(--m-panel) var(--m-ease-spring);
+}
+.tech .t-zgl .t-option.is-on .t-option__ok { opacity: 1; transform: none; }
+.tech .t-zgl .t-option b { padding-right: 28px; }
+.tech .t-zgl .t-check--card { padding: 16px 18px; border-radius: 18px; border: 1.5px solid var(--bd); background: var(--card); transition: border-color var(--m-small), background-color var(--m-small); }
+.tech .t-zgl .t-check--card:hover { border-color: var(--bd2); }
+.tech .t-zgl .t-check--card.is-on { border-color: color-mix(in srgb, var(--ok) 60%, var(--bd)); background: color-mix(in srgb, var(--okbg) 60%, var(--card)); }
+.tech .t-zgl .t-check--card:has(input[aria-invalid="true"]) { border-color: var(--acc); }
+.tech .t-zgl .t-review > div { align-items: baseline; }
+.tech .t-zgl .t-review dd { display: flex; align-items: baseline; justify-content: flex-end; gap: 10px; }
+
+/* ---------- Footer + buttons with a sheen ---------- */
+.tech .t-zgl .t-zgl__foot { padding-top: 18px; }
+.tech .t-zgl .t-btn--shine { position: relative; overflow: hidden; isolation: isolate; background: var(--cta-grad); }
+.tech .t-zgl .t-btn--shine::after {
+  content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: -60%; width: 50%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .34), transparent); transform: skewX(-18deg) translateX(0);
+  opacity: 0;
+}
+@media (hover: hover) {
+  .tech .t-zgl .t-btn--shine:hover::after { animation: t-zgl-sheen 820ms var(--m-ease-out); }
+  .tech .t-zgl .t-btn--shine:hover { box-shadow: 0 18px 34px -16px rgba(196, 54, 43, .8); transform: translateY(-1px); }
+}
+.tech .t-zgl .t-btn--shine:hover svg { transform: translateX(3px); }
+.tech .t-zgl .t-btn--shine svg { transition: transform var(--m-small) var(--m-ease-out); }
+.tech .t-zgl .t-btn--acc.is-busy { opacity: .85; }
+.tech .t-zgl .t-spin { width: 16px; height: 16px; border-radius: 50%; border: 2.4px solid currentColor; border-right-color: transparent; animation: t-zgl-spin 700ms linear infinite; }
+
+/* ---------- Summary aside ---------- */
+.tech .t-zgl .t-zgl__sum { box-shadow: var(--sh-2); border-color: var(--hair); }
+.tech .t-zgl .t-zgl__sumhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.tech .t-zgl .t-zgl__sumstep { font-size: 12.5px; font-weight: 800; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.tech .t-zgl .t-zgl__sumbar { position: relative; height: 4px; border-radius: 4px; background: var(--bg2); overflow: hidden; margin-top: -4px; }
+.tech .t-zgl .t-zgl__sumbar::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--acc); transform-origin: left center;
+  transform: scaleX(var(--zgl-progress, 0)); transition: transform var(--m-scene) var(--m-ease-emph);
+}
+.tech .t-zgl .t-zgl__sum dd { animation: t-zgl-pop var(--m-panel) var(--m-ease-spring) both; }
+.tech .t-zgl .t-zgl__val { display: inline-flex; align-items: center; gap: 8px; justify-content: flex-end; text-align: right; }
+.tech .t-zgl .t-zgl__vico { width: 26px; height: 26px; flex-shrink: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: var(--soft); color: var(--acct); }
+.tech .t-zgl .t-zgl__sum dl > div { transition: border-color var(--m-small); }
+.tech .t-zgl .t-zgl__sum dl > div.has-v dt { color: var(--ink); }
+
+/* ---------- "Co dalej": timeline with a glow ---------- */
+.tech .t-zgl .t-zgl__next { position: relative; overflow: hidden; isolation: isolate; border-radius: 24px; }
+.tech .t-zgl .t-zgl__next::before {
+  content: ""; position: absolute; z-index: -1; right: -90px; top: -110px; width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(226, 72, 58, .26), transparent 68%); pointer-events: none;
+}
+.tech .t-zgl .t-zgl__next ol { position: relative; gap: 18px; }
+.tech .t-zgl .t-zgl__next ol::before {
+  content: ""; position: absolute; left: 14px; top: 20px; bottom: 20px; width: 2px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(242, 145, 133, .7), rgba(255, 255, 255, .08));
+}
+.tech .t-zgl .t-zgl__next li { position: relative; }
+.tech .t-zgl .t-zgl__next li > span { position: relative; z-index: 1; background: #2a201f; box-shadow: 0 0 0 4px var(--stage2), inset 0 0 0 1px rgba(255, 255, 255, .12); color: #fff; }
+.tech .t-zgl .t-zgl__next li:first-child > span { background: var(--acc); color: var(--onacc); box-shadow: 0 0 0 4px var(--stage2), 0 8px 18px -6px rgba(226, 72, 58, .7); }
+
+/* ---------- "Jak sprawdzić model" helper ---------- */
+.tech .t-zgl .t-field__after { display: flex; margin-top: -2px; }
+.tech .t-help__trigger {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 32px; margin: -4px 0 -4px -8px; padding: 0 8px; border-radius: 10px;
+  font-size: 13px; font-weight: 800; color: var(--acct); white-space: nowrap; text-decoration: none;
+  transition: background-color var(--m-small), color var(--m-small);
+}
+.tech .t-help__trigger:hover, .tech .t-help__trigger[aria-expanded="true"] { background: var(--soft); }
+.tech .t-help__trigger:focus-visible { outline: 3px solid var(--acc); outline-offset: 1px; }
+
+/* ---------- Success screen: drawn ✓, springy number, QR after 200 ms ---------- */
+.tech .t-success__ok { animation: t-zgl-pick var(--m-scene) var(--m-ease-spring) both; box-shadow: 0 0 0 8px color-mix(in srgb, var(--okbg) 55%, transparent); }
+.tech .t-success__ok svg path { stroke-dasharray: 26; stroke-dashoffset: 26; animation: t-zgl-draw var(--m-scene) var(--m-ease-out) 160ms forwards; }
+.tech .t-success__number b { display: inline-block; transform-origin: left center; animation: t-zgl-number 640ms var(--m-ease-spring) 240ms both; }
+.tech .t-success__qr { animation: t-zgl-qr var(--m-scene) var(--m-ease-emph) 200ms both; }
+.tech .t-success__main { box-shadow: var(--sh-2); border-color: var(--hair); }
+.tech .t-success__ticket { position: relative; overflow: hidden; box-shadow: inset 0 0 0 1px var(--hair); }
+.tech .t-success__ticket::after {
+  /* one sheen across the ticket after the number lands */
+  content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent); transform: skewX(-18deg); opacity: 0;
+  animation: t-zgl-sheen 1100ms var(--m-ease-out) 700ms both;
+}
+
+/* ---------- Layout ---------- */
+@media (min-width: 1180px) {
+  .tech .t-zgl .t-zgl__aside { padding-top: 0; margin-top: 146px; }
+}
+@media (max-width: 1179.98px) {
+  /* narrow column: other steps show the number only, the current one its full title */
+  .tech .t-zgl .t-stepper .t-steps { display: flex; }
+  .tech .t-zgl .t-stepper .t-steps__item { flex: 0 0 auto; }
+  .tech .t-zgl .t-stepper .t-steps__item.is-on { flex: 1 1 auto; }
+  .tech .t-zgl .t-stepper .t-steps__item:not(.is-on) .t-steps__t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .tech .t-zgl .t-steps button { padding: 0 12px; }
+}
+@media (max-width: 767.98px) {
+  .tech .t-zgl .t-stepper { display: none; }
+  .tech .t-zgl .t-dtiles { gap: 8px; }
+  .tech .t-zgl .t-dtile { flex-direction: column; justify-content: center; align-items: center; gap: 8px; min-height: 96px; padding: 12px 6px; text-align: center; font-size: 13px; border-radius: 18px; }
+  .tech .t-zgl .t-dtile__ico { width: 40px; height: 40px; }
+  .tech .t-zgl .t-dtile__ok { top: 6px; right: 6px; }
+  .tech .t-zgl .t-zgl__stepsub { margin-left: 0; font-size: 13.5px; }
+  .tech .t-zgl .t-zgl__pane { gap: 18px; padding-bottom: 18px; }
+  .tech .t-zgl .t-seg .t-seg__opt { min-height: 46px; font-size: 14px; }
+  .tech .t-zgl .t-quick__chip { min-height: 44px; }
+  .tech .t-help__trigger { min-height: 44px; margin: -10px 0 -10px -8px; }
+  .tech .t-zgl .t-zgl__foot { box-shadow: 0 -14px 26px -18px rgba(0, 0, 0, .28); }
+  .tech .t-zgl .t-option__ok { top: 12px; right: 12px; }
+}
+
+/* ---------- Dark theme ---------- */
+html[data-tech-theme="dark"] .tech .t-zgl .t-field :is(input, textarea) { background: var(--bg2); border-color: var(--bd); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-field :is(input, textarea):focus { background: color-mix(in srgb, var(--bg2) 70%, var(--card)); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-dtile { background: color-mix(in srgb, var(--card) 85%, var(--bg)); border-color: var(--bd); box-shadow: inset 0 1px 0 var(--hair-top); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-dtile__ico { background: var(--raised); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-dtile.is-on { background: color-mix(in srgb, var(--acc) 14%, var(--card)); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-seg__pill { background: var(--raised); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-quick__ico { background: var(--raised); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-quick__chip.is-on .t-quick__ico { background: var(--ok); color: #10200c; }
+/* dark: --onacc is dark, so the light-theme CTA gradient (white text) would fail contrast */
+html[data-tech-theme="dark"] .tech .t-zgl .t-btn--shine { background: linear-gradient(180deg, #ea5a4c, var(--acc)); }
+html[data-tech-theme="dark"] .tech .t-zgl .t-btn--shine::after { background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .22), transparent); }
+html[data-tech-theme="dark"] .tech .t-success__ticket::after { background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .12), transparent); }
+
+/* ---------- Keyframes ---------- */
+@keyframes t-zgl-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes t-zgl-err {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes t-zgl-pick {
+  0% { transform: scale(1); }
+  35% { transform: scale(.96); }
+  70% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+@keyframes t-zgl-pop {
+  from { opacity: 0; transform: translateY(4px) scale(.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes t-zgl-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes t-zgl-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes t-zgl-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes t-zgl-sheet-out {
+  from { transform: none; }
+  to { transform: translateY(100%); }
+}
+@keyframes t-zgl-draw {
+  from { stroke-dashoffset: 26; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes t-zgl-number {
+  from { opacity: 0; transform: scale(.7) translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes t-zgl-qr {
+  from { opacity: 0; transform: scale(.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes t-zgl-sheen {
+  0% { opacity: 0; transform: skewX(-18deg) translateX(0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: skewX(-18deg) translateX(420%); }
+}
+@keyframes t-zgl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Reduced motion: final state, no loops (same contract as tech-motion.css) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tech :is(.t-help__trigger),
+  .tech :is(.t-zgl, .t-success) *,
+  .tech :is(.t-zgl, .t-success) *::before,
+  .tech :is(.t-zgl, .t-success) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+.tech.t-reduced :is(.t-help__trigger),
+.tech.t-reduced :is(.t-zgl, .t-success) *,
+.tech.t-reduced :is(.t-zgl, .t-success) *::before,
+.tech.t-reduced :is(.t-zgl, .t-success) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

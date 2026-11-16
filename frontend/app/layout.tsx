@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Syne, DM_Sans, Unbounded, Plus_Jakarta_Sans } from "next/font/google";
+import { DM_Sans, Unbounded } from "next/font/google";
 import { ClientAuthWrapper } from "@/components/providers/ClientAuthWrapper";
 import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["700", "800"],
-  variable: "--font-syne",
-});
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -19,11 +14,6 @@ const unbounded = Unbounded({
   subsets: ["latin"],
   weight: ["700", "900"],
   variable: "--font-unbounded",
-});
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-jakarta",
 });
 
 
@@ -95,7 +85,7 @@ export default function RootLayout({
     <html
       lang="pl"
       suppressHydrationWarning
-      className={`${syne.variable} ${dmSans.variable} ${unbounded.variable} ${plusJakarta.variable}`}
+      className={`${dmSans.variable} ${unbounded.variable}`}
     >
       <head>
         <script
@@ -103,111 +93,7 @@ export default function RootLayout({
             __html: `(function(){try{var k='prokom-theme';var s=localStorage.getItem(k);var m=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||m);}catch(e){}})();`,
           }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": ["LocalBusiness", "ElectronicsStore", "RepairBusiness"],
-              "@id": `${SITE_URL}/#business`,
-              name: "PRO-KOM Serwis",
-              alternateName: "Prokom Serwis Rabka-Zdrój",
-              description:
-                "Serwis telefonów, laptopów, tabletów i akcesoriów GSM w Rabce-Zdroju. Naprawa smartfonów, wymiana ekranów i baterii, folie Hammer Glass, szkła hartowane, etui i ładowarki GaN.",
-              url: SITE_URL,
-              logo: `${SITE_URL}/images/logo.png`,
-              image: `${SITE_URL}/images/og-prokom.jpg`,
-              telephone: "+48883200151",
-              email: "sklep@pro-kom.eu",
-              priceRange: "$$",
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "ul. Orkana 16B",
-                addressLocality: "Rabka-Zdrój",
-                postalCode: "34-700",
-                addressRegion: "małopolskie",
-                addressCountry: "PL",
-              },
-              geo: {
-                "@type": "GeoCoordinates",
-                latitude: 49.6130,
-                longitude: 19.9629,
-              },
-              openingHoursSpecification: [
-                {
-                  "@type": "OpeningHoursSpecification",
-                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                  opens: "09:00",
-                  closes: "17:00",
-                },
-                {
-                  "@type": "OpeningHoursSpecification",
-                  dayOfWeek: ["Saturday"],
-                  opens: "09:00",
-                  closes: "14:00",
-                },
-              ],
-              areaServed: [
-                {
-                  "@type": "City",
-                  name: "Rabka-Zdrój",
-                  "@id": "https://www.wikidata.org/wiki/Q985891",
-                },
-                { "@type": "City", name: "Mszana Dolna" },
-                { "@type": "City", name: "Jordanów" },
-                { "@type": "City", name: "Raba Wyżna" },
-                { "@type": "City", name: "Nowy Targ" },
-                { "@type": "City", name: "Czarny Dunajec" },
-              ],
-              hasOfferCatalog: {
-                "@type": "OfferCatalog",
-                name: "Usługi serwisowe i sklep GSM",
-                itemListElement: [
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Naprawa telefonów",
-                      description:
-                        "Naprawa smartfonów wszystkich marek: wymiana ekranu, baterii, gniazda ładowania, naprawa po zalaniu.",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Serwis laptopów",
-                      description:
-                        "Naprawa laptopów: wymiana matrycy, klawiatury, czyszczenie, diagnostyka.",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Hammer Glass CUT",
-                      description:
-                        "Folia ochronna wycinana laserowo na ploterze dla ponad 10 000 modeli telefonów. Montaż w 5 minut.",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Product",
-                      name: "Akcesoria GSM",
-                      description:
-                        "Ładowarki GaN, kable, powerbanki, etui, szkła hartowane, folie ochronne dostępne od ręki.",
-                    },
-                  },
-                ],
-              },
-              sameAs: [
-                "https://www.facebook.com/prokomrabka",
-                "https://www.google.com/maps/place/Orkana+16B,+34-700+Rabka-Zdr%C3%B3j",
-              ],
-            }),
-          }}
-        />
+        {/* Site JSON-LD moved to app/(public)/layout.tsx (SPEC §9) — panels do not need it. */}
       </head>
       <body
         className={`min-h-screen font-sans antialiased ${dmSans.className}`}

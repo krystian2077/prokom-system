@@ -1,7 +1,7 @@
 import { ClientProfil } from "@/features/client-profil/ClientProfil";
 
 export const metadata = {
-  title: "Profil | PRO-KOM Serwis",
+  title: "Profil",
   description: "Twoje dane i ustawienia.",
 };
 

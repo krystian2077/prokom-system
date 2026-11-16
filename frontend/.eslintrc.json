@@ -1,0 +1,17 @@
+{
+  "extends": "next/core-web-vitals",
+  "ignorePatterns": [
+    "tests/tech/__zrzuty__/**",
+    "app/panel/**",
+    "app/admin-panel/**",
+    "app/client/**",
+    "components/panel/**",
+    "features/client-*/**",
+    "contexts/**",
+    "hooks/**",
+    "store/**",
+    "stores/**",
+    "types/**",
+    "components/ui/Select.tsx"
+  ]
+}

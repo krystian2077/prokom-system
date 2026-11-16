@@ -9,7 +9,7 @@ Wymaganie Krystiana (14.11.2026): na telefonie strona ma działać i wyglądać 
 | Tablet | 768 · 820 · 1024 (pion i poziom) | `768–1179` |
 | Laptop | 1280 · 1366 · 1440 | `1180–1679` |
 | PC / duże ekrany | 1680 · 1920 · 2560 | `≥ 1680` |
-Szyna boczna sekcji: tylko `≥ 1400`. Kontener treści: max 1280 px (do 1360 przy `≥ 1680`), tła sekcji na pełną szerokość.
+Szyna boczna sekcji: tylko `≥ 1424` (od tej szerokości mieści się w marginesie obok treści; przegląd wizualny 15.11) i tylko na stronach z co najmniej 3 sekcjami `data-rail`. Kontener treści: max 1280 px (do 1360 przy `≥ 1680`), tła sekcji na pełną szerokość.
 
 ## 2. Telefon jak aplikacja (wzorzec: `docs/design/tech/zrzuty/telefon-6-ekranow.webp`)
 - **Kapsuła u góry:** znak PRO-KOM TECH, przycisk „Zgłoś” i szukaj. Chowa się przy przewijaniu w dół i wraca przy przewijaniu w górę. `position: sticky` z `env(safe-area-inset-top)`.
@@ -31,7 +31,7 @@ Szyna boczna sekcji: tylko `≥ 1400`. Kontener treści: max 1280 px (do 1360 pr
 
 ## 4. Laptop i PC
 - Układ z zrzutów 1440 (`docs/design/tech/zrzuty/1440-*.webp`). Przy 1280 i 1366 te same proporcje, mniejsze odstępy (`clamp()`), bez łamania nagłówków w dziwnych miejscach.
-- Poniżej 1400 bez szyny bocznej. Kapsuła z pełnym menu i mega menu (Naprawy, Punkty serwisowe) z mostkiem pod kursor i opóźnieniem zamykania 200–300 ms.
+- Poniżej 1424 bez szyny bocznej. Kapsuła z pełnym menu i mega menu (Naprawy, Punkty serwisowe) z mostkiem pod kursor i opóźnieniem zamykania 200–300 ms.
 - ≥ 1680: treść w kontenerze, hero z maksymalną wysokością (nie rozciąga się na cały ekran 2560), obrazy z `srcset` w wysokiej rozdzielczości.
 
 ## 5. Wspólne dla wszystkich

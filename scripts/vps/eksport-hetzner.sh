@@ -16,7 +16,9 @@ export MSYS_NO_PATHCONV=1 # only matters for a local test in Git Bash
 target_db="${1:?usage: bash eksport-hetzner.sh <prokom_tech_staging|prokom_tech_prod>}"
 case "$target_db" in prokom_tech_staging | prokom_tech_prod) ;; *) echo "Unknown target: $target_db" >&2; exit 2 ;; esac
 
-compose=(docker compose -f docker-compose.prod.yml)
+# Always with the env file: without it compose interpolates empty passwords (harmless for exec,
+# fatal for `up` — incident 14.11.2026). /app has .env.prod, no .env.
+compose=(docker compose --env-file .env.prod -f docker-compose.prod.yml)
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 out="$PWD/eksport"
 umask 077

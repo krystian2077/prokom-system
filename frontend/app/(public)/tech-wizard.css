@@ -1,0 +1,818 @@
+/*
+ * PRO-KOM Tech — wizard scene and effects E1–E17 (TP PR 3, docs/tech/PREMIUM.md §4).
+ * Every selector under `.tech`. Effects: the SVG's static attributes are the poster
+ * frame; animations run an entrance and at most 3 cycles (--fx-n) and end on it.
+ * `.is-poster` (reduced motion, /lab grid) and `.is-paused` (off screen) stop them.
+ */
+
+/* ---------- Device illustrations (direction B): materials per theme ---------- */
+.tech .t-scene,
+.tech .t-fault,
+.tech .t-artvars {
+  --dv-m1: #5b5c63; --dv-m2: #2c2d32; --dv-m3: #45464d; --dv-m4: #1d1e22;
+  --dv-rim: #ffffff; --dv-back: #3a3b41; --dv-back2: #55565d; --dv-back3: #2c2d32; --dv-plateau: #34353b;
+  --dv-g1: #2b2629; --dv-g2: #101115; --dv-g3: #0b1018;
+  --dv-w1: #ffffff; --dv-w2: #e4e5e8; --dv-w3: #d2d4d8;
+  --dv-key: #1c1d21; --dv-well: #0f1013; --dv-pad: #3a3b41; --dv-hinge: #1a1b1f; --dv-hole: #0c0c0e;
+  --dv-a1: #e3e4e7; --dv-a2: #b4b7bc; --dv-a3: #cdd0d4;
+  --dv-band1: #3b3d44; --dv-band2: #23252a;
+}
+html[data-tech-theme="dark"] .tech .t-scene,
+html[data-tech-theme="dark"] .tech .t-artvars {
+  --dv-m1: #6a6b73; --dv-m2: #2a2b30; --dv-m3: #4b4c54; --dv-m4: #18191c;
+  --dv-back: #36373d; --dv-back2: #5a5b63; --dv-back3: #28292e; --dv-w1: #eceef1; --dv-w2: #cfd2d7; --dv-w3: #b9bcc2;
+  --dv-a1: #b9bcc1; --dv-a2: #7e8187; --dv-a3: #9a9da3;
+}
+
+/* static illustration box (StaticArt): the device fits the box, anchored bottom-right */
+.tech .t-sart { display: block; container-type: size; }
+.tech .t-sart__frame { position: absolute; right: 0; bottom: 0; width: min(100cqw, calc(100cqh * var(--arn))); aspect-ratio: var(--arn); }
+.tech .t-sart__art { position: absolute; display: block; filter: drop-shadow(0 14px 18px rgba(18, 22, 19, 0.2)); }
+html[data-tech-theme="dark"] .tech .t-sart__art { filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.55)); }
+.tech .t-sart__art .t-art { display: block; width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-devices__media { transition: none; }
+}
+
+/* ---------- Scene ---------- */
+/* Column: the stage (device centred with room for the label) and the card UNDER it. */
+.tech .t-scene {
+  --fw: var(--fw-t, 300px);
+  --fh: var(--fh-t, 290px);
+  --fx-a: #e2483a;
+  --fx-ink: #121613;
+  --fx-chip: rgba(255, 255, 255, 0.94);
+  --fx-glass: rgba(255, 255, 255, 0.8);
+  --fx-glass-bd: rgba(18, 22, 19, 0.08);
+  --fx-n: 3;
+  position: relative; box-sizing: border-box; width: 100%; border-radius: 28px; border: 1px solid var(--bd); overflow: hidden;
+  background:
+    radial-gradient(56% 42% at 50% 42%, color-mix(in srgb, var(--card) 92%, transparent) 0, transparent 100%),
+    radial-gradient(120% 90% at 50% 0%, var(--bg2) 0, var(--bg2) 40%, color-mix(in srgb, var(--bg2) 86%, var(--ink) 14%) 100%);
+  display: flex; flex-direction: column; gap: 12px; padding: 12px; min-height: 520px;
+  isolation: isolate;
+}
+html[data-tech-theme="dark"] .tech .t-scene {
+  --fx-ink: #f6f1f0;
+  --fx-chip: rgba(36, 28, 27, 0.92);
+  --fx-glass: rgba(28, 22, 21, 0.72);
+  --fx-glass-bd: rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(56% 42% at 50% 42%, #2c2221 0, transparent 100%),
+    radial-gradient(120% 90% at 50% 0%, var(--bg2) 0, var(--bg) 100%);
+  border-color: var(--hair);
+}
+.tech .t-scene__stage { position: relative; flex: 1 1 0; min-height: 320px; container-type: size; }
+/* studio: a soft key light from above, a floor with a horizon, vignette and fine grain;
+   in the dark theme one accent glow behind the device. The light layer drifts opposite
+   to the device on pointer move (--px/--py set by Scene, pointer: fine only). */
+.tech .t-scene { --px: 0; --py: 0; }
+.tech .t-scene__light {
+  position: absolute; inset: -24px; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(42% 34% at 50% 14%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(48% 22% at 50% 84%, rgba(18, 22, 19, 0.07), transparent 70%),
+    linear-gradient(180deg, transparent 0 70%, rgba(18, 22, 19, 0.045) 70.4%, rgba(18, 22, 19, 0) 100%);
+  transform: translate3d(calc(var(--px) * -10px), calc(var(--py) * -8px), 0);
+  transition: transform 600ms var(--m-ease-out);
+}
+html[data-tech-theme="dark"] .tech .t-scene__light {
+  background:
+    radial-gradient(30% 26% at 50% 48%, color-mix(in srgb, var(--acc) 26%, transparent), transparent 72%),
+    radial-gradient(44% 34% at 50% 12%, rgba(255, 255, 255, 0.075), transparent 70%),
+    linear-gradient(180deg, transparent 0 70%, rgba(255, 255, 255, 0.035) 70.4%, rgba(255, 255, 255, 0) 100%);
+}
+.tech .t-scene::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+  background: url(/tech/grain.svg); opacity: 0.05; mix-blend-mode: overlay;
+}
+.tech .t-scene::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 80px rgba(18, 22, 19, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html[data-tech-theme="dark"] .tech .t-scene::before { box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+.tech .t-scene__stage,
+.tech .t-scene__card { z-index: 1; }
+.tech .t-scene__par {
+  position: absolute; inset: 0;
+  transform: translate3d(calc(var(--px) * 7px), calc(var(--py) * 5px), 0);
+  transition: transform 600ms var(--m-ease-out);
+}
+/* frame = the device's crop box, centred. Sized for the camera zoom (SCENE_ZOOM 1.12): zoomed on a
+   fault at the very edge it still fits the stage (width / 1.24 — 12 % may grow on one side), and a
+   label row (--resv, top + bottom) stays free around the zoomed device, so the label never has to
+   sit on the device and nothing is clipped (audited for 9 devices × every fault, 768–1920). */
+.tech .t-scene__frame {
+  --w: min(var(--fw), calc(var(--fh) * var(--arn)), calc((100cqw - 8px) / 1.24), calc((100cqh - var(--resv, 100px)) / 1.12 * var(--arn)));
+  position: absolute; left: 50%; top: 50%; z-index: 1;
+  width: var(--w); height: calc(var(--w) / var(--arn));
+  margin: calc(var(--w) / var(--arn) / -2) 0 0 calc(var(--w) / -2);
+  animation: t-scene-in 560ms var(--m-ease-spring) both;
+}
+.tech .t-scene__frame.is-ghost { z-index: 0; pointer-events: none; animation: t-scene-out var(--m-panel) var(--m-ease-out) both; }
+/* contact shadow drawn by us: a wide soft pool and a tight core under the device */
+.tech .t-scene__frame::before,
+.tech .t-scene__frame::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none; }
+.tech .t-scene__frame::before { left: 4%; right: 4%; bottom: -7%; height: 12%; background: radial-gradient(closest-side, rgba(18, 22, 19, 0.2), transparent); filter: blur(8px); }
+.tech .t-scene__frame::after { left: 16%; right: 16%; bottom: -1.6%; height: 3.2%; background: radial-gradient(closest-side, rgba(18, 22, 19, 0.38), transparent); filter: blur(3px); }
+html[data-tech-theme="dark"] .tech .t-scene__frame::before { background: radial-gradient(closest-side, rgba(0, 0, 0, 0.6), transparent); }
+html[data-tech-theme="dark"] .tech .t-scene__frame::after { background: radial-gradient(closest-side, rgba(0, 0, 0, 0.85), transparent); }
+@keyframes t-scene-in {
+  0% { opacity: 0; transform: translateY(14px) scale(0.94); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes t-scene-out {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-4px) scale(1.015); }
+}
+.tech .t-scene__cam { position: absolute; inset: 0; transition: transform 640ms cubic-bezier(0.22, 1.12, 0.36, 1); will-change: transform; }
+.tech .t-scene.is-zoom .t-scene__cam { transform: scale(1.12); }
+.tech .t-scene__img { position: absolute; max-width: none; height: auto; filter: drop-shadow(0 16px 22px rgba(18, 22, 19, 0.16)); user-select: none; -webkit-user-drag: none; }
+html[data-tech-theme="dark"] .tech .t-scene__img { filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.18)); }
+.tech .t-scene__art { position: absolute; filter: drop-shadow(0 16px 22px rgba(18, 22, 19, 0.18)); }
+html[data-tech-theme="dark"] .tech .t-scene__art { filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.6)); }
+.tech .t-art--wait { display: block; width: 100%; height: 100%; }
+.tech .t-scene__art svg,
+.tech .t-art { display: block; width: 100%; height: 100%; }
+
+/* effect region: its layers are clipped (rounded box / polygon), badges float free */
+.tech .t-scene__fx { position: absolute; z-index: 1; pointer-events: none; animation: t-fx-in var(--m-panel) var(--m-ease-out) both; }
+.tech .t-scene__fx.is-preview { opacity: 0.88; }
+.tech .t-scene__fx > svg,
+.tech .t-scene__fx > div.t-fx { display: block; width: 100%; height: 100%; }
+.tech div.t-fx { position: relative; }
+.tech .t-fx__layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@keyframes t-fx-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* hotspots: 44 px target, 30 px dot, no ghost rings */
+.tech .t-scene__spot,
+.tech .t-scene__dot {
+  position: absolute; z-index: 3; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border: 0; background: transparent;
+  display: grid; place-items: center; cursor: pointer; transition: opacity var(--m-panel) var(--m-ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.tech .t-scene__dot { width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--card); box-shadow: 0 0 0 2px var(--softbd), 0 2px 6px rgba(0, 0, 0, 0.3); cursor: default; }
+.tech .t-scene__dot.is-on { background: var(--acc); box-shadow: 0 0 0 4px var(--soft); }
+/* spot: a solid light disc in BOTH themes (a translucent one vanished on dark screens), an accent
+   ring that reads on white devices too, a slow halo (3 cycles, then it rests) */
+.tech .t-scene__spotdot {
+  --sp-bg: #ffffff; --sp-ink: #c4362b; --sp-ring: rgba(226, 72, 58, 0.42);
+  position: relative; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; display: grid; place-items: center;
+  background: var(--sp-bg); color: var(--sp-ink); border: 0;
+  box-shadow: 0 0 0 1.5px var(--sp-ring), 0 0 0 4px rgba(255, 255, 255, 0.22), 0 8px 18px -6px rgba(0, 0, 0, 0.55);
+  transition: transform var(--m-panel) var(--m-ease-spring), background-color var(--m-small), color var(--m-small), box-shadow var(--m-panel);
+}
+.tech .t-scene__spotdot::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(226, 72, 58, 0.45);
+  animation: t-spot-halo 2.6s var(--m-ease-out) calc(var(--i, 0) * 240ms + 1.2s) var(--fx-n, 3);
+}
+@keyframes t-spot-halo {
+  0% { box-shadow: 0 0 0 0 rgba(226, 72, 58, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(226, 72, 58, 0); }
+  100% { box-shadow: 0 0 0 12px rgba(226, 72, 58, 0); }
+}
+.tech .t-scene__spotdot svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.tech .t-scene__plus { transition: opacity var(--m-small), transform var(--m-panel) var(--m-ease-spring); transform-origin: 12px 12px; }
+.tech .t-scene__check { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.tech .t-scene__spot:hover .t-scene__spotdot,
+.tech .t-scene__spot.is-hot .t-scene__spotdot,
+.tech .t-scene__spot:focus-visible .t-scene__spotdot { transform: scale(1.16); box-shadow: 0 0 0 2px var(--acc), 0 0 0 6px rgba(226, 72, 58, 0.18), 0 10px 22px -6px rgba(0, 0, 0, 0.55); }
+.tech .t-scene__spot:hover .t-scene__plus,
+.tech .t-scene__spot.is-hot .t-scene__plus { transform: rotate(90deg); }
+.tech .t-scene__spot:focus-visible { outline: none; }
+.tech .t-scene__spot:focus-visible .t-scene__spotdot { box-shadow: 0 0 0 3px var(--card), 0 0 0 5.5px var(--acc), 0 10px 22px -6px rgba(0, 0, 0, 0.55); }
+.tech .t-scene__spot.is-on .t-scene__spotdot { --sp-bg: var(--acc); --sp-ink: #ffffff; transform: scale(1.2); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9), 0 0 0 9px rgba(226, 72, 58, 0.24), 0 12px 26px -8px rgba(196, 54, 43, 0.9); }
+.tech .t-scene__spot.is-on .t-scene__spotdot::after { animation: none; }
+.tech .t-scene__spot.is-on .t-scene__plus { opacity: 0; }
+.tech .t-scene__spot.is-on .t-scene__check { stroke-dashoffset: 0; transition: stroke-dashoffset var(--m-panel) var(--m-ease-out) 120ms; }
+/* camera on a fault: the other spots step back (smaller, calmer) but stay solid and clickable */
+.tech .t-scene.is-zoom .t-scene__spot:not(.is-on) { opacity: 0.82; }
+.tech .t-scene.is-zoom .t-scene__spot:not(.is-on):not(:hover):not(:focus-visible) .t-scene__spotdot { transform: scale(0.74); }
+.tech .t-scene.is-zoom .t-scene__spot:not(.is-on) .t-scene__spotdot::after { animation: none; }
+.tech .t-scene.is-intro .t-scene__spotdot { animation: t-spot-pulse 700ms var(--m-ease-out) both; animation-delay: calc(var(--i, 0) * 220ms + 300ms); }
+@keyframes t-spot-pulse {
+  0% { transform: scale(0.6); opacity: 0; }
+  55% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* label outside the device + straight leader line (stage px, lib/tech/wizard-layout.ts) */
+.tech .t-scene__leader { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; overflow: visible; pointer-events: none; }
+.tech .t-scene__leader line { stroke: var(--ink); stroke-width: 1.5; stroke-linecap: round; opacity: 0.75; stroke-dasharray: 1; stroke-dashoffset: 0; animation: t-fx-draw var(--m-panel) var(--m-ease-out) 60ms both; }
+.tech .t-scene__leader circle { fill: var(--ink); animation: t-label-in var(--m-small) var(--m-ease-out) 300ms both; }
+.tech .t-scene__label {
+  position: absolute; left: 0; top: 0; z-index: 5; display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 12px 7px 10px; border-radius: 999px; background: var(--ink); color: var(--bg);
+  font-size: 12.5px; font-weight: 800; line-height: 1.2; white-space: nowrap; pointer-events: none;
+  box-shadow: 0 14px 26px -14px rgba(18, 22, 19, 0.7), 0 0 0 1px color-mix(in srgb, var(--bg) 14%, transparent);
+  animation: t-label-in var(--m-panel) var(--m-ease-emph) 240ms both;
+}
+.tech .t-scene__label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 30%, transparent); }
+.tech .t-scene__label.is-measuring { visibility: hidden; animation: none; }
+.tech .t-scene.is-zoom .t-scene__leader line { animation-delay: calc(var(--m-scene) * 0.8); }
+.tech .t-scene.is-zoom .t-scene__leader circle { animation-delay: calc(var(--m-scene) * 0.8 + 240ms); }
+.tech .t-scene.is-zoom .t-scene__label { animation-delay: calc(var(--m-scene) * 0.8 + 180ms); }
+@keyframes t-label-in {
+  0% { opacity: 0; transform: scale(0.94); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* card under the stage (never over the device): fault glyph tile, device eyebrow, display title,
+   the "what it usually means" text and the repair link; the camera's way back sits in its head */
+.tech .t-scene__card {
+  position: relative; z-index: 5; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; box-sizing: border-box;
+  padding: 16px 18px; border-radius: 20px; background: var(--card); border: 1px solid var(--bd);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 40px -26px rgba(18, 22, 19, 0.45);
+  overflow: hidden;
+}
+/* a thin accent line along the top, drawn in on every new fault */
+.tech .t-scene__card::before {
+  content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 0%, transparent));
+  transform-origin: 0 50%;
+}
+html[data-tech-theme="dark"] .tech .t-scene__card {
+  border-color: var(--hair); background: color-mix(in srgb, var(--card) 90%, transparent);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 20px 44px -26px rgba(0, 0, 0, 0.8);
+}
+.tech .t-scene__cardhead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.tech .t-scene__cardico {
+  flex-shrink: 0; width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+  background: var(--soft); color: var(--acct); box-shadow: inset 0 0 0 1px var(--softbd);
+  animation: t-card-ico var(--m-panel) var(--m-ease-spring) both;
+}
+.tech .t-scene__cardico svg { width: 22px; height: 22px; }
+.tech .t-scene__cardtitles { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.tech .t-scene__card .t-scene__cardeyb { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink2); line-height: 1.2; }
+.tech .t-scene__card .t-scene__cardtitle {
+  display: block; font-family: var(--t-font-head); font-stretch: 108%; font-weight: 800; font-size: clamp(18px, 0.5vw + 14px, 21px);
+  line-height: 1.15; letter-spacing: -0.015em; color: var(--ink);
+}
+.tech .t-scene__card .t-scene__cardtext { font-size: 14px; line-height: 1.5; color: var(--ink2); text-wrap: pretty; }
+.tech .t-scene__card .t-wiz__more { white-space: normal; text-wrap: pretty; }
+.tech .t-scene__nolink { visibility: hidden; }
+/* full layout: the card is never shorter than the longest text at this width, so a different fault
+   (or a hover preview) never resizes the stage — the device never jumps */
+@media (min-width: 960px) {
+  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 11.5rem; justify-content: flex-start; }
+}
+@media (min-width: 1180px) {
+  .tech .t-scene--full:not(.is-static) .t-scene__card { min-height: 10rem; }
+}
+/* "Całe urządzenie": a quiet pill in the card's head (never over the device) */
+.tech .t-scene__whole {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 6px 0 11px; border-radius: 999px;
+  border: 1px solid var(--bd); background: var(--bg2); color: var(--ink); font: 800 12.5px var(--t-font-body); cursor: pointer; white-space: nowrap;
+  animation: t-pop-in var(--m-panel) var(--m-ease-spring) both; transition: border-color var(--m-small), background-color var(--m-small);
+}
+.tech .t-scene__whole:hover { border-color: var(--acc); }
+.tech .t-scene__whole:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.tech .t-scene__whole svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.tech .t-scene__whole kbd { font: 700 11px var(--t-font-body); padding: 3px 7px; border-radius: 7px; background: var(--card); color: var(--ink2); }
+.tech .t-scene--phone .t-scene__whole { padding-right: 12px; }
+/* phone: the title keeps the whole row, "Całe urządzenie" drops under it (aligned with the text) */
+.tech .t-scene--phone .t-scene__cardhead { flex-wrap: wrap; row-gap: 10px; }
+.tech .t-scene--phone .t-scene__cardtitles { flex: 1 1 calc(100% - 54px); }
+.tech .t-scene--phone .t-scene__whole { margin-left: 54px; }
+.tech .t-scene__cardtitle,
+.tech .t-scene__cardtext { animation: t-card-in var(--m-panel) var(--m-ease-emph) both; }
+.tech .t-scene__cardtext { animation-delay: 50ms; }
+@keyframes t-card-in {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes t-card-ico {
+  0% { opacity: 0; transform: scale(0.7) rotate(-8deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* phone / full-screen flow: label card under the photo */
+.tech .t-scene--phone { --fw: var(--fw-p, 300px); --fh: var(--fh-p, 320px); min-height: 0; padding: 10px; border-radius: 24px; }
+.tech .t-scene--phone { --resv: 84px; } /* room for the camera zoom (+12 %) top and bottom */
+/* phone flow: the label lives in the card, so only the device itself has to fit */
+.tech .t-scene--phone .t-scene__frame { --w: min(var(--fw), calc(var(--fh) * var(--arn)), calc(100cqw - 48px), calc((100cqh - var(--resv)) * var(--arn))); }
+/* phone: the stage is as tall as the device needs (+ room), so wide devices leave no empty band */
+.tech .t-scene--phone .t-scene__stage { flex: none; min-height: 0; height: calc(min(var(--fh), min(var(--fw), 100vw - 84px) / var(--arn)) + var(--resv)); max-height: 54svh; transition: height var(--m-panel) var(--m-ease-in-out); }
+.tech .t-wizflow__scene { touch-action: pan-y; }
+/* lab grid: square stage, no card */
+.tech .t-scene.is-static { min-height: 0; }
+.tech .t-scene.is-static .t-scene__stage { flex: none; aspect-ratio: 1 / 1.02; min-height: 0; }
+
+/* placement in the wizard */
+.tech .t-wiz__stagewrap { display: flex; min-height: 780px; }
+.tech .t-wiz__stagewrap .t-scene { min-height: 780px; }
+/* right column: compact rhythm, no stretched gaps (the summary bar sits at the bottom) */
+@media (min-width: 960px) {
+  .tech .t-wiz__side { justify-content: flex-start; gap: 26px; }
+  /* the taller stage leaves free height in the column: split it before and after "Jak oddasz" */
+  .tech .t-wiz__side > .t-wiz__group--del,
+  .tech .t-wiz__side > .t-wiz__bar { margin-top: auto; }
+}
+@media (max-width: 767.98px) {
+  .tech .t-wiz__body > .t-wiz__stagewrap { display: none; }
+}
+@media (min-width: 960px) {
+  .tech .t-wiz__stagewrap { width: clamp(330px, 42vw, 470px); flex-shrink: 0; align-self: stretch; min-height: 540px; }
+  .tech .t-wiz__stagewrap .t-scene { min-height: 540px; }
+}
+@media (min-width: 960px) and (max-width: 1179.98px) {
+  .tech .t-wiz__delivery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .tech .t-wiz__delivery .t-chp--opt { height: auto; min-height: 66px; padding: 10px 12px; white-space: normal; }
+  .tech .t-wiz__bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+  .tech .t-wiz__bar .t-hbtn--wiz { min-width: 0; width: 100%; }
+}
+@media (min-width: 1180px) {
+  .tech .t-wiz__stagewrap { width: clamp(424px, 50vw - 166px, 580px); min-height: 700px; }
+  .tech .t-wiz__stagewrap .t-scene { --fw: var(--fw-d, 480px); --fh: var(--fh-d, 360px); min-height: 700px; }
+}
+
+/* device chips: radiogroup with a sliding pill; faults preview on hover */
+.tech .t-wiz__devices { position: relative; isolation: isolate; }
+.tech .t-wiz__devices > .t-chp--dev { position: relative; z-index: 1; }
+.tech .t-wiz__devpill {
+  position: absolute; z-index: 0; left: 0; top: 0; width: var(--pill-w, 0px); height: var(--pill-h, 0px); box-sizing: border-box;
+  border-radius: 16px; border: 1.5px solid var(--acc); background: var(--soft); pointer-events: none;
+  transform: translate(var(--pill-x, 0px), var(--pill-y, 0px));
+}
+.tech [data-pill-ready] > .t-wiz__devpill { transition: transform var(--m-panel) var(--m-ease-spring), width var(--m-panel), height var(--m-panel); }
+.tech [data-pill-ready] > .t-chp--dev.is-on { background: transparent; border-color: transparent; box-shadow: none; }
+.tech .t-chp--fault.is-hot:not(.is-on) { border-color: var(--softbd); }
+/* faults arrive with a short stagger when the device changes (max 8 × --m-stagger) */
+.tech .t-wiz__faults > .t-chp--fault { animation: t-chip-in var(--m-panel) var(--m-ease-emph) both; animation-delay: calc(min(var(--i, 0), 8) * var(--m-stagger, 40ms)); }
+@keyframes t-chip-in {
+  0% { opacity: 0; transform: translateY(6px) scale(0.98); }
+  100% { opacity: 1; transform: none; }
+}
+.tech .t-wiz__glabel { display: inline-flex; align-items: center; gap: 8px; }
+.tech .t-wiz__count {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px;
+  background: var(--soft); color: var(--acct); font-size: 11px; font-weight: 800; letter-spacing: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-wiz__faults > .t-chp--fault { animation: none; }
+}
+.tech .t-wiz__val { display: inline-block; }
+.tech .t-wiz__sum b { min-height: 1.2em; }
+
+/* ---------- Effects: shared ---------- */
+/* Badge = small round glass HUD with a pictogram (fixed px, never stretched). Masked = layer
+   clipped to the region (rounded box via border-radius, polygon via --fx-clip). Only
+   transform, opacity and stroke-dashoffset animate; entrance + at most --fx-n cycles. */
+.tech .t-scene__fx > .t-fx,
+.tech .t-fault__fx > .t-fx { border-radius: inherit; }
+.tech .t-fx__masked { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; clip-path: var(--fx-clip, none); }
+.tech .t-fx__tint { position: absolute; inset: 0; display: block; }
+.tech .t-fx__badge {
+  --bs: 58px;
+  position: absolute; z-index: 2; width: var(--bs); height: var(--bs); box-sizing: border-box; border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--fx-glass); border: 1px solid var(--fx-glass-bd);
+  box-shadow: 0 14px 28px -14px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  animation: t-badge-in var(--m-panel) var(--m-ease-spring) 160ms both;
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .tech .t-fx__badge { -webkit-backdrop-filter: blur(10px) saturate(1.5); backdrop-filter: blur(10px) saturate(1.5); }
+}
+.tech .t-fx__badge.is-nudged { transform: translate(calc(-50% + var(--bx, 0) * 52px), calc(-50% + var(--by, 0) * 52px)); }
+.tech .t-fx__badge.is-wide { --bs: 70px; width: 112px; border-radius: 20px; }
+.tech .t-fx__badge.is-small { --bs: 44px; }
+.tech .t-fx__badge::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--fx-a) 55%, transparent);
+  animation: t-badge-ring 1.8s var(--m-ease-out) 700ms var(--fx-n);
+}
+.tech .t-fx__badge svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.tech .t-scene--phone .t-fx__badge { --bs: 52px; }
+.tech .t-scene--phone .t-fx__badge.is-wide { width: 94px; }
+.tech .t-scene.is-static .t-fx__badge { --bs: 40px; }
+.tech .t-scene.is-static .t-fx__badge.is-wide { width: 72px; border-radius: 13px; }
+.tech .t-scene.is-static .t-fx__badge.is-nudged { transform: translate(calc(-50% + var(--bx, 0) * 30px), calc(-50% + var(--by, 0) * 30px)); }
+@keyframes t-badge-in {
+  0% { opacity: 0; scale: 0.6; }
+  100% { opacity: 1; scale: 1; }
+}
+@keyframes t-badge-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--fx-a) 50%, transparent); }
+  100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--fx-a) 0%, transparent); }
+}
+/* pictogram strokes */
+.tech .t-fx__stroke { fill: none; stroke: var(--fx-ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.tech .t-fx__solid { fill: var(--fx-ink); }
+.tech .t-fx__x { fill: none; stroke: var(--fx-a); stroke-width: 6; stroke-linecap: round; animation: t-fx-appear 1.6s var(--m-ease-out) both; }
+.tech .t-fx__layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.tech .t-scene.is-paused .t-fx,
+.tech .t-scene.is-paused .t-fx *,
+.tech .t-scene.is-paused .t-fx *::after { animation-play-state: paused; }
+.tech .t-scene.is-poster .t-scene__frame,
+.tech .t-scene.is-poster .t-scene__spotdot,
+.tech .t-scene.is-poster .t-scene__fx,
+.tech .t-scene.is-poster .t-scene__label,
+.tech .t-scene.is-poster .t-scene__leader *,
+.tech .t-scene.is-poster .t-scene__card *,
+.tech .t-scene.is-poster .t-fx,
+.tech .t-scene.is-poster .t-fx *,
+.tech .t-scene.is-poster .t-fx *::after { animation: none !important; }
+.tech .t-scene.is-poster .t-scene__cam { transition: none; }
+.tech .t-scene.is-poster .t-scene__frame.is-ghost { display: none; }
+
+@keyframes t-fx-draw {
+  0% { stroke-dashoffset: 1; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes t-fx-appear {
+  0% { opacity: 0; }
+  65% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes t-fx-fade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* E1 Pęknięcie — real broken glass */
+.tech .t-fx--e1 .t-fx__c { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: t-fx-draw 300ms var(--m-ease-out) var(--d, 0ms) both; }
+.tech .t-fx--e1 .t-fx__cracks .t-fx__c { stroke: rgba(240, 246, 255, 0.92); }
+.tech .t-fx--e1 .t-fx__shadow .t-fx__c { stroke: rgba(0, 0, 0, 0.6); }
+.tech .t-fx--e1 .t-fx__maskc .t-fx__c { stroke: #fff; animation: none; }
+.tech .t-fx--e1 .t-fx__shards polygon { fill: #eaf2ff; animation: t-fx-fade 500ms var(--m-ease-out) var(--d, 0ms) both; }
+.tech .t-fx--e1 .t-fx__hit { transform-box: fill-box; transform-origin: center; animation: t-fx-hit 520ms var(--m-ease-emph) both; }
+.tech .t-fx--e1 .t-fx__splinters polygon { fill: #fff; opacity: 0.85; animation: t-fx-fade 260ms var(--m-ease-out) var(--d, 0ms) both; }
+.tech .t-fx--e1 .t-fx__glint { opacity: 0.95; animation: t-fx-sweep 1.9s var(--m-ease-in-out) 1050ms var(--fx-n) both; }
+.tech .t-fx--e1 .t-fx__sheen { opacity: 0.07; animation: t-fx-sweep 2.4s var(--m-ease-in-out) 900ms 1 both; }
+@keyframes t-fx-hit {
+  0% { transform: scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes t-fx-sweep {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(var(--gw, 100) * 2px)); }
+}
+
+/* E2 Bateria */
+.tech .t-fx--e2 .t-fx__swell { background: radial-gradient(46% 40% at 50% 50%, rgba(242, 163, 58, 0.34), transparent 70%); animation: t-fx-swell 1.8s ease-in-out 300ms var(--fx-n) both; }
+.tech .t-fx--e2 .t-fx__lvl { transform-box: fill-box; transform-origin: left center; }
+.tech .t-fx--e2 .t-fx__lvl--ok { fill: #3e9b2a; opacity: 0; animation: t-fx-drain 1.8s var(--m-ease-in-out) 300ms var(--fx-n) both; }
+.tech .t-fx--e2 .t-fx__lvl--low { fill: var(--fx-a); animation: t-fx-low 1.8s var(--m-ease-in-out) 300ms var(--fx-n) both; }
+.tech .t-fx--e2 .t-fx__warn { fill: none; stroke: var(--fx-a); stroke-width: 5; stroke-linecap: round; animation: t-fx-blink 0.9s steps(2) 1.2s 4 both; }
+@keyframes t-fx-drain {
+  0% { opacity: 1; transform: scaleX(1); }
+  70% { opacity: 1; transform: scaleX(0.24); }
+  85% { opacity: 0; transform: scaleX(0.2); }
+  100% { opacity: 0; transform: scaleX(0.2); }
+}
+@keyframes t-fx-low {
+  0% { opacity: 0; }
+  70% { opacity: 0; }
+  85% { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes t-fx-swell {
+  0% { opacity: 0.2; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 0.75; transform: scale(1); }
+}
+@keyframes t-fx-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.12; }
+  100% { opacity: 1; }
+}
+
+/* E3 Ładowanie */
+.tech .t-fx--e3 .t-fx__spark { background: radial-gradient(40% 50% at 50% 60%, rgba(242, 201, 76, 0.28), transparent 70%); animation: t-fx-flicker 1.8s linear var(--fx-n) both; }
+.tech .t-fx--e3 .t-fx__plug { animation: t-fx-plug 1.8s var(--m-ease-out) var(--fx-n) both; }
+.tech .t-fx--e3 .t-fx__bolt { fill: #f2c94c; stroke: var(--fx-ink); stroke-width: 2.5; stroke-linejoin: round; opacity: 0.3; animation: t-fx-flicker 1.8s linear var(--fx-n) both; }
+.tech .t-fx--e3 .t-fx__slash { fill: none; stroke: var(--fx-a); stroke-width: 5.5; stroke-linecap: round; animation: t-fx-appear 1.8s var(--m-ease-out) both; }
+@keyframes t-fx-plug {
+  0% { transform: translateY(14px); }
+  30% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+@keyframes t-fx-flicker {
+  0% { opacity: 0.3; }
+  35% { opacity: 1; }
+  42% { opacity: 0.2; }
+  50% { opacity: 0.95; }
+  58% { opacity: 0.15; }
+  100% { opacity: 0.3; }
+}
+
+/* E4 Optyka */
+.tech .t-fx--e4 .t-fx__haze { animation: t-fx-breathe 1.6s ease-in-out var(--fx-n) both; }
+.tech .t-fx--e4 .t-fx__brackets path { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.7)); }
+.tech .t-fx--e4 .t-fx__brackets { animation: t-fx-hunt 1.6s var(--m-ease-in-out) var(--fx-n) both; }
+.tech .t-fx--e4 .t-fx__scanbar { fill: #fff; }
+.tech .t-fx--e4 .t-fx__scanbar,
+.tech .t-fx--e4 .t-fx__scanglow { animation: t-fx-scan 2.4s var(--m-ease-in-out) var(--fx-n) both; }
+.tech .t-fx--e4 .t-fx__scanglow { opacity: 0.8; }
+.tech .t-fx--e4 .t-fx__scanlines rect { fill: var(--fx-a); opacity: 0.8; animation: t-fx-appear 2.4s linear both; }
+@keyframes t-fx-breathe {
+  0% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+@keyframes t-fx-hunt {
+  0% { transform: scale(1.22); opacity: 0; }
+  20% { opacity: 1; }
+  45% { transform: scale(0.9); }
+  70% { transform: scale(1.06); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes t-fx-scan {
+  0% { transform: translateX(0); }
+  40% { transform: translateX(46px); }
+  48% { transform: translateX(41px); }
+  56% { transform: translateX(50px); }
+  100% { transform: translateX(86px); }
+}
+
+/* E5 Dźwięk */
+.tech .t-fx--e5 .t-fx__waves path { fill: none; stroke: var(--fx-ink); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 7 6; opacity: 0.3; animation: t-fx-waves 1.4s linear var(--fx-n) both; }
+.tech .t-fx--e5 .t-fx__waves path:nth-child(2) { animation-delay: 120ms; }
+.tech .t-fx--e5 .t-fx__waves path:nth-child(3) { animation-delay: 240ms; }
+@keyframes t-fx-waves {
+  0% { opacity: 1; stroke-dashoffset: 0; }
+  60% { opacity: 0.85; stroke-dashoffset: 13; }
+  100% { opacity: 0.3; stroke-dashoffset: 26; }
+}
+
+/* E6 Przyciski i obudowa */
+.tech .t-fx--e6 .t-fx__ring { fill: none; stroke: #fff; stroke-width: 1.4; opacity: 0; animation: t-fx-ripple 1.5s var(--m-ease-out) var(--fx-n); }
+.tech .t-fx--e6 .t-fx__ring--2 { stroke: var(--fx-a); animation-delay: 320ms; }
+.tech .t-fx--e6 .t-fx__press { fill: var(--fx-a); opacity: 0.45; animation: t-fx-press 1.5s var(--m-ease-out) var(--fx-n); }
+.tech .t-fx--e6 .t-fx__scratch { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 0.9; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: t-fx-draw 700ms var(--m-ease-out) 400ms both; }
+@keyframes t-fx-ripple {
+  0% { opacity: 0.95; transform: scale(0.15); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@keyframes t-fx-press {
+  0% { transform: scale(1); }
+  40% { transform: scale(1); }
+  100% { transform: scale(1); }
+  20% { transform: scale(0.72); }
+}
+
+/* E7 Zalanie */
+.tech .t-fx--e7 .t-fx__haze { background: linear-gradient(180deg, rgba(120, 190, 230, 0.08), rgba(70, 150, 210, 0.2)); animation: t-fx-fade 900ms var(--m-ease-out) both; }
+.tech .t-fx--e7 .t-fx__level { animation: t-fx-rise 1.8s var(--m-ease-emph) both; }
+.tech .t-fx--e7 .t-fx__wave--back { fill: rgba(60, 140, 205, 0.32); animation: t-fx-drift 3.2s linear var(--fx-n) both; }
+.tech .t-fx--e7 .t-fx__wave--front { fill: rgba(95, 175, 230, 0.42); animation: t-fx-drift 2.2s linear var(--fx-n) reverse both; }
+.tech .t-fx--e7 .t-fx__bubbles circle { fill: none; stroke: rgba(225, 245, 255, 0.85); stroke-width: 0.35; opacity: 0; animation: t-fx-bubble 1.6s ease-in var(--fx-n); }
+.tech .t-fx--e7 .t-fx__drops path { fill: rgba(200, 235, 255, 0.85); stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.25; animation: t-fx-run 1.8s cubic-bezier(0.5, 0, 0.75, 0) var(--fx-n) both; }
+.tech .t-fx--e7 .t-fx__droplet { fill: #4fa3d6; }
+.tech .t-fx--e7 .t-fx__glare { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 4; stroke-linecap: round; }
+@keyframes t-fx-rise {
+  0% { transform: translateY(36px); }
+  100% { transform: translateY(0); }
+}
+@keyframes t-fx-drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50px); }
+}
+@keyframes t-fx-bubble {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-22px); opacity: 0; }
+}
+@keyframes t-fx-run {
+  0% { transform: translateY(-6px); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(58px); opacity: 0; }
+}
+
+/* E8 Zasilanie */
+.tech .t-fx--e8 .t-fx__dark { background: radial-gradient(120% 90% at 30% 20%, #15171b, #030304); opacity: 0.92; animation: t-fx-darken 700ms var(--m-ease-out) both; }
+.tech .t-fx--e8.is-body .t-fx__dark { background: rgba(8, 8, 10, 0.22); opacity: 1; }
+.tech .t-fx--e8 .t-fx__power { fill: none; stroke: var(--fx-ink); stroke-width: 6.5; stroke-linecap: round; opacity: 0.35; animation: t-fx-power 1.6s linear 400ms var(--fx-n) both; }
+.tech .t-fx--e8 .t-fx__try { fill: none; stroke: var(--fx-a); stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; animation: t-fx-try 1.6s var(--m-ease-out) 400ms var(--fx-n); }
+@keyframes t-fx-darken {
+  0% { opacity: 0; }
+  100% { opacity: 0.92; }
+}
+@keyframes t-fx-power {
+  0% { opacity: 0.35; }
+  18% { opacity: 1; }
+  45% { opacity: 0.25; }
+  100% { opacity: 0.35; }
+}
+@keyframes t-fx-try {
+  0% { opacity: 0; transform: scale(0.7); }
+  20% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(1.18); }
+}
+
+/* E9 Obraz */
+.tech .t-fx--e9 .t-fx__flicker { background: #fff; opacity: 0; animation: t-fx-flick 1.3s steps(1) var(--fx-n); }
+.tech .t-fx--e9 .t-fx__bands { opacity: 0.7; animation: t-fx-jitter 1.3s steps(5) var(--fx-n); }
+.tech .t-fx--e9 .t-fx__b1 { fill: #ff4fa3; }
+.tech .t-fx--e9 .t-fx__b2 { fill: #5ee1ff; }
+.tech .t-fx--e9 .t-fx__b3 { fill: #a8ff5e; opacity: 0.7; }
+.tech .t-fx--e9 .t-fx__b4 { fill: #ffffff; opacity: 0.35; }
+.tech .t-fx--e9 .t-fx__vline { fill: #9ff7ff; opacity: 0.9; }
+.tech .t-fx--e9 .t-fx__scan { background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px); }
+.tech .t-fx--e9 .t-fx__nosig { fill: none; stroke: var(--fx-a); stroke-width: 4.5; stroke-linecap: round; animation: t-fx-blink 1.4s steps(2) 500ms var(--fx-n) both; }
+.tech .t-fx--e9 .t-fx__text { fill: var(--fx-ink); font: 800 17px var(--t-font-body); letter-spacing: -0.01em; }
+@keyframes t-fx-flick {
+  0% { opacity: 0; }
+  25% { opacity: 0; }
+  65% { opacity: 0; }
+  100% { opacity: 0; }
+  20% { opacity: 0.22; }
+  60% { opacity: 0.12; }
+}
+@keyframes t-fx-jitter {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-1.5px); }
+  100% { transform: translateX(0); }
+}
+
+/* E10 Temperatura */
+.tech .t-fx--e10 .t-fx__glow { background: radial-gradient(60% 70% at var(--gx, 50%) 75%, rgba(255, 84, 52, 0.55), rgba(255, 140, 60, 0.12) 55%, transparent 80%); animation: t-fx-pulse 1.8s ease-in-out var(--fx-n) both; }
+.tech .t-fx--e10 .t-fx__shimmer path { fill: none; stroke: rgba(255, 170, 120, 0.75); stroke-width: 0.9; stroke-linecap: round; opacity: 0; animation: t-fx-rise-heat 1.6s ease-out calc(var(--fx-n) * 2); }
+.tech .t-fx--e10 .t-fx__fan path { fill: var(--fx-ink); }
+.tech .t-fx--e10 .t-fx__fan { transform-box: view-box; transform-origin: 50px 50px; animation: t-fx-spin 1.8s linear var(--fx-n); }
+.tech .t-fx--e10 .t-fx__hub { fill: var(--fx-a); }
+@keyframes t-fx-pulse {
+  0% { opacity: 0.35; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+@keyframes t-fx-rise-heat {
+  0% { transform: translateY(10px); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-14px); opacity: 0; }
+}
+@keyframes t-fx-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1080deg); }
+}
+
+/* E11 Wydajność */
+.tech .t-fx--e11 .t-fx__veil { background: radial-gradient(70% 60% at 50% 50%, rgba(18, 22, 19, 0.16), transparent 75%); }
+.tech .t-fx--e11 .t-fx__track { fill: none; stroke: var(--fx-ink); stroke-width: 5; stroke-linecap: round; opacity: 0.85; }
+.tech .t-fx--e11 .t-fx__needle { transform-box: view-box; transform-origin: 50px 60px; transform: rotate(-58deg); animation: t-fx-needle 2s var(--m-ease-in-out) var(--fx-n) both; }
+.tech .t-fx--e11 .t-fx__needle path { fill: none; stroke: var(--fx-a); stroke-width: 5; stroke-linecap: round; }
+.tech .t-fx--e11 .t-fx__needle circle { fill: var(--fx-a); }
+.tech .t-fx--e11 .t-fx__needle.is-up { transform: rotate(52deg); animation-name: t-fx-needle-up; }
+.tech .t-fx--e11 .t-fx__needle.is-up path { stroke: #3e9b2a; }
+.tech .t-fx--e11 .t-fx__needle.is-up circle { fill: #3e9b2a; }
+.tech .t-fx--e11 .t-fx__bartrack { fill: var(--fx-ink); opacity: 0.16; }
+.tech .t-fx--e11 .t-fx__bar { fill: var(--fx-a); transform-box: fill-box; transform-origin: left center; transform: scaleX(0.36); animation: t-fx-stall 2s var(--m-ease-out) var(--fx-n) both; }
+.tech .t-fx--e11 .t-fx__bar.is-up { fill: #3e9b2a; transform: scaleX(0.95); animation-name: t-fx-fill; }
+@keyframes t-fx-needle {
+  0% { transform: rotate(-80deg); }
+  40% { transform: rotate(-36deg); }
+  55% { transform: rotate(-64deg); }
+  100% { transform: rotate(-58deg); }
+}
+@keyframes t-fx-needle-up {
+  0% { transform: rotate(-70deg); }
+  100% { transform: rotate(52deg); }
+}
+@keyframes t-fx-stall {
+  0% { transform: scaleX(0); }
+  40% { transform: scaleX(0.34); }
+  100% { transform: scaleX(0.36); }
+}
+@keyframes t-fx-fill {
+  0% { transform: scaleX(0.2); }
+  100% { transform: scaleX(0.95); }
+}
+
+/* E12 Klawiatura */
+.tech .t-fx--e12 .t-fx__key { fill: rgba(255, 255, 255, 0.1); stroke: rgba(255, 255, 255, 0.55); stroke-width: 0.8; animation: t-fx-key 1.2s ease-in-out var(--fx-n) both; }
+.tech .t-fx--e12 .t-fx__key.is-stuck { fill: rgba(226, 72, 58, 0.7); stroke: #ff7a6b; transform: scale(0.84); animation-name: t-fx-stuck; }
+@keyframes t-fx-key {
+  0% { transform: scale(1); opacity: 0.85; }
+  30% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(1); opacity: 0.85; }
+  15% { transform: scale(0.84); opacity: 1; }
+}
+@keyframes t-fx-stuck {
+  0% { transform: scale(1); }
+  15% { transform: scale(0.84); }
+  100% { transform: scale(0.84); }
+}
+
+/* E13 Dane */
+.tech .t-fx--e13 .t-fx__disc { transform-box: view-box; transform-origin: 50px 50px; animation: t-fx-discspin 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) var(--fx-n) both; }
+.tech .t-fx--e13 .t-fx__discface { fill: color-mix(in srgb, var(--fx-ink) 14%, transparent); }
+.tech .t-fx--e13 .t-fx__shine { fill: none; stroke: var(--fx-ink); stroke-width: 3; stroke-linecap: round; opacity: 0.45; }
+.tech .t-fx--e13 .t-fx__files path { fill: var(--fx-chip); stroke: var(--fx-ink); stroke-width: 2.4; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; animation: t-fx-float 2.2s var(--m-ease-in-out) var(--fx-n) both; }
+.tech .t-fx--e13 .t-fx__files path:nth-child(2) { animation-delay: 220ms; }
+.tech .t-fx--e13 .t-fx__files path:nth-child(3) { animation-delay: 440ms; }
+@keyframes t-fx-discspin {
+  0% { transform: rotate(0deg); }
+  70% { transform: rotate(900deg); }
+  100% { transform: rotate(960deg); }
+}
+@keyframes t-fx-float {
+  0% { transform: translate(-20px, 20px) scale(0.5); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+
+/* E14 System i błędy */
+.tech .t-fx--e14 .t-fx__win { animation: t-fx-shake 460ms ease-in-out 800ms var(--fx-n); }
+.tech .t-fx--e14 .t-fx__winbg { fill: var(--fx-chip); stroke: var(--fx-ink); stroke-width: 3; }
+.tech .t-fx--e14 .t-fx__winbar { fill: none; stroke: var(--fx-ink); stroke-width: 3; }
+.tech .t-fx--e14 .t-fx__dot { fill: var(--fx-ink); opacity: 0.45; }
+.tech .t-fx--e14 .t-fx__errbg,
+.tech .t-fx--e14 .t-fx__err { fill: var(--fx-a); }
+.tech .t-fx--e14 .t-fx__errx { fill: none; stroke: #fff; stroke-width: 3.6; stroke-linecap: round; }
+.tech .t-fx--e14 .t-fx__bugs ellipse { fill: var(--fx-a); animation: t-fx-crawl 1.8s ease-in-out var(--fx-n); }
+.tech .t-fx--e14 .t-fx__q { fill: none; stroke: var(--fx-a); stroke-width: 7; stroke-linecap: round; }
+.tech .t-fx--e14 .t-fx__code { fill: #fff; font: 800 22px var(--t-font-body); }
+.tech .t-fx--e14 .t-fx__led { background: radial-gradient(40% 50% at 50% 50%, rgba(255, 70, 50, 0.55), transparent 75%); animation: t-fx-blink 1s steps(2) var(--fx-n) both; }
+@keyframes t-fx-shake {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+@keyframes t-fx-crawl {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, -4px); }
+}
+
+/* E15 Druk i papier */
+.tech .t-fx--e15 .t-fx__paper { fill: #fbfbf8; stroke: rgba(0, 0, 0, 0.16); stroke-width: 0.6; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18)); }
+.tech .t-fx--e15 .t-fx__fold { fill: none; stroke: rgba(0, 0, 0, 0.12); stroke-width: 0.8; }
+.tech .t-fx--e15 .t-fx__sheet { animation: t-fx-feed 2s var(--m-ease-out) var(--fx-n) both; }
+.tech .t-fx--e15.is-jam .t-fx__sheet { animation-name: t-fx-jam; }
+.tech .t-fx--e15 .t-fx__streaks rect { fill: #2b2b2b; opacity: 0.75; }
+.tech .t-fx--e15 .t-fx__streaks rect:nth-child(2) { fill: #1fa2d6; }
+.tech .t-fx--e15 .t-fx__streaks rect:nth-child(3) { opacity: 0.32; }
+.tech .t-fx--e15 .t-fx__streaks rect:nth-child(4) { fill: #c2338a; }
+.tech .t-fx--e15 .t-fx__drop { animation: t-fx-run 1.4s cubic-bezier(0.5, 0, 0.75, 0) var(--fx-n) both; }
+.tech .t-fx--e15 .t-fx__drop:nth-child(1) { fill: #222; }
+.tech .t-fx--e15 .t-fx__drop:nth-child(2) { fill: #1fa2d6; }
+.tech .t-fx--e15 .t-fx__drop:nth-child(3) { fill: #c2338a; }
+.tech .t-fx--e15 .t-fx__drop:nth-child(4) { fill: #f2c94c; }
+.tech .t-fx--e15 .t-fx__puddle { fill: rgba(30, 30, 30, 0.3); }
+.tech .t-fx--e15 .t-fx__q { fill: none; stroke: var(--fx-a); stroke-width: 7; stroke-linecap: round; }
+@keyframes t-fx-feed {
+  0% { transform: translateY(-60px); }
+  100% { transform: translateY(0); }
+}
+@keyframes t-fx-jam {
+  0% { transform: translateY(-44px); }
+  50% { transform: translateY(0); }
+  60% { transform: translateY(-3px); }
+  70% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+/* E16 Łączność i porty */
+.tech .t-fx--e16 .t-fx__arcs path { fill: none; stroke: var(--fx-ink); stroke-width: 7; stroke-linecap: round; opacity: 0.2; animation: t-fx-arcfade 1.8s var(--m-ease-out) var(--fx-n) both; }
+.tech .t-fx--e16 .t-fx__arcs path:nth-child(2) { animation-delay: 250ms; }
+.tech .t-fx--e16 .t-fx__arcs path:nth-child(3) { animation-delay: 500ms; }
+.tech .t-fx--e16 .t-fx__sparks { animation: t-fx-spark 900ms var(--m-ease-out) calc(var(--fx-n) * 2); }
+.tech .t-fx--e16 .t-fx__sparks path { fill: none; stroke: #ffd36b; stroke-width: 1.6; stroke-linecap: round; }
+.tech .t-fx--e16 .t-fx__flash { fill: rgba(255, 196, 80, 0.3); opacity: 0; animation: t-fx-spark 900ms var(--m-ease-out) calc(var(--fx-n) * 2); }
+.tech .t-fx--e16 .t-fx__core { fill: #fff2c4; }
+@keyframes t-fx-arcfade {
+  0% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+@keyframes t-fx-spark {
+  0% { transform: scale(0.3); opacity: 0; }
+  30% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* E17 Sterowanie */
+.tech .t-fx--e17 .t-fx__base { fill: rgba(18, 22, 19, 0.28); stroke: rgba(255, 255, 255, 0.75); stroke-width: 2; stroke-dasharray: 4 5; }
+.tech .t-fx--e17 .t-fx__cross { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
+.tech .t-fx--e17 .t-fx__trail { fill: none; stroke: var(--fx-a); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: t-fx-draw 2.4s ease-in-out var(--fx-n) both; }
+.tech .t-fx--e17 .t-fx__knob circle { fill: rgba(226, 72, 58, 0.25); stroke: #e2483a; stroke-width: 3; }
+.tech .t-fx--e17 .t-fx__knob .t-fx__knobdot { fill: #e2483a; stroke: none; }
+.tech .t-fx--e17 .t-fx__knob { animation: t-fx-stick 2.4s ease-in-out var(--fx-n) both; }
+@keyframes t-fx-stick {
+  0% { transform: translate(-17px, 10px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- Reduced motion: posters only ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-scene .t-fx,
+  .tech .t-scene .t-fx *,
+  .tech .t-scene .t-fx *::after,
+  .tech .t-scene__frame,
+  .tech .t-scene__spotdot,
+  .tech .t-scene__label,
+  .tech .t-scene__leader *,
+  .tech .t-scene__card * { animation: none !important; }
+  .tech .t-scene__frame.is-ghost { display: none; }
+  .tech .t-scene__cam { transition: none; }
+  .tech .t-scene__par,
+  .tech .t-scene__light { transition: none; transform: none; }
+}

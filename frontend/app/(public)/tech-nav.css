@@ -1,0 +1,256 @@
+/*
+ * PRO-KOM Tech — premium navigation (TP PR 2, docs/tech/PREMIUM.md §3).
+ * Capsule (sticky, narrows on scroll, sliding pill), shared mega-menu box, dimmed
+ * page under it; phone TabBar glass + pill, Menu sheet as an iOS card.
+ * Loaded after tech.css / tech-theme.css / tech-motion.css; every selector under `.tech`.
+ */
+
+/* ---------- Capsule ≥ 1024: sticky, narrows on scroll (transform only) ---------- */
+@media (min-width: 1024px) {
+  .tech .t-capwrap { position: sticky; top: 0; padding-top: 8px; }
+  .tech .t-capsule {
+    transform-origin: 50% 0;
+    transition: transform var(--m-panel) var(--m-ease-emph), box-shadow var(--m-panel) var(--m-ease-out), background-color var(--m-panel);
+  }
+  .tech .t-capwrap.is-compact .t-capsule {
+    transform: scale(0.965);
+    background: var(--overlay);
+    box-shadow: var(--cap-inset), var(--sh-3);
+  }
+}
+
+/* anchors land below the sticky capsule */
+@media (min-width: 1024px) {
+  .tech .t-main [id] { scroll-margin-top: 104px; }
+}
+
+/* sliding pill under the hot / open / active top-level item */
+.tech .t-navpills { position: relative; isolation: isolate; }
+.tech .t-navpills > .t-navlink { position: relative; z-index: 1; }
+.tech .t-navpill {
+  top: var(--pill-y, 0px);
+  bottom: auto;
+  height: var(--pill-h, 0px);
+  background: var(--bg2);
+  box-shadow: none;
+}
+html[data-tech-theme="dark"] .tech .t-navpill { background: var(--raised); box-shadow: inset 0 1px 0 var(--hair-top); }
+.tech [data-pill-ready] > .t-navlink,
+.tech [data-pill-ready] > .t-navlink:hover,
+.tech [data-pill-ready] > .t-navlink.is-open,
+.tech [data-pill-ready] > .t-navlink.is-active { background: transparent; }
+.tech [data-pill-ready] > .t-navlink:hover,
+.tech [data-pill-ready] > .t-navlink.is-open { color: var(--ink); }
+
+/* ---------- Mega menu: one box, panels inside, grows from the capsule ---------- */
+@media (max-width: 1023.98px) {
+  .tech .t-megabox { display: none; }
+}
+.tech .t-megabox {
+  position: absolute; left: var(--mega-x, 0px); top: 100%; z-index: 60;
+  width: var(--mega-w, 560px); height: calc(var(--mega-h, 0px) + 12px);
+  pointer-events: none;
+}
+.tech .t-megabox__bg {
+  position: absolute; left: 0; right: 0; top: 12px; height: var(--mega-h, 0px);
+  border-radius: 24px; background: var(--card); border: 1px solid var(--bd); box-shadow: var(--sh-3);
+  transform-origin: 30% 0; opacity: 0; transform: translateY(-8px) scale(0.96);
+  transition:
+    opacity var(--m-small) var(--m-ease-out),
+    transform var(--m-panel) var(--m-ease-spring),
+    height var(--m-panel) var(--m-ease-emph);
+}
+html[data-tech-theme="dark"] .tech .t-megabox__bg { background: var(--raised); border-color: var(--hair); }
+.tech .t-megabox.is-open .t-megabox__bg { opacity: 1; transform: none; }
+.tech .t-megabox { transition: left var(--m-panel) var(--m-ease-emph), width var(--m-panel) var(--m-ease-emph); }
+.tech .t-megabox .t-mega { position: absolute; left: 0; top: 0; padding-top: 12px; z-index: 1; }
+.tech .t-megabox .t-mega.is-open { pointer-events: auto; }
+.tech .t-megabox .t-mega__panel { width: max-content; background: transparent; border: 0; box-shadow: none; animation: none; padding: 20px; }
+.tech .t-megabox .t-mega.is-open [style*="--i"] { animation: t-mega-item var(--m-panel) var(--m-ease-emph) both; animation-delay: calc(var(--i) * var(--m-stagger)); }
+@keyframes t-mega-item {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* Panels on the capsule's full width (PREMIUM §3.2): --mega-panel-w comes from Capsule. */
+.tech .t-megabox .t-mega__panel { width: var(--mega-panel-w, 1180px); box-sizing: border-box; padding: 22px; }
+
+/* repairs panel: device tiles | submit + courier cards, a bar of links under both */
+.tech .t-mega__repairs { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-areas: "grid aside" "bar bar"; gap: 18px 22px; }
+.tech .t-megabox .t-mega__repairs .t-mega__grid { grid-area: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.tech .t-mega__tile {
+  display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px 14px 12px; border-radius: 18px;
+  border: 1px solid transparent;
+  transition: background-color var(--m-small) var(--m-ease-out), border-color var(--m-small) var(--m-ease-out), box-shadow var(--m-panel) var(--m-ease-emph);
+}
+.tech .t-mega__tile:is(:hover, :focus-within) { background: var(--bg2); border-color: var(--bd); }
+html[data-tech-theme="dark"] .tech .t-mega__tile:is(:hover, :focus-within) { background: var(--card); border-color: var(--hair); box-shadow: inset 0 1px 0 var(--hair-top); }
+.tech .t-megabox .t-mega__repairs .t-mega__device {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 0; border-radius: 14px;
+  font-family: var(--t-font-head); font-stretch: 104%; font-size: 16px; line-height: 1.2; color: var(--ink);
+}
+.tech .t-megabox .t-mega__repairs .t-mega__device:hover { background: transparent; }
+.tech .t-megabox .t-mega__tile .t-mega__ico {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(160deg, var(--soft), color-mix(in srgb, var(--soft) 40%, var(--card)));
+  box-shadow: inset 0 0 0 1px var(--softbd);
+  transition: transform var(--m-panel) var(--m-ease-spring), box-shadow var(--m-panel) var(--m-ease-emph), background-color var(--m-small), color var(--m-small);
+}
+.tech .t-mega__tile:is(:hover, :focus-within) .t-mega__ico { transform: translateY(-3px); box-shadow: inset 0 0 0 1px var(--softbd), 0 12px 20px -12px rgba(196, 54, 43, 0.6); background: var(--acc); color: var(--onacc); }
+.tech .t-mega__go { color: var(--acct); opacity: 0; transform: translateX(-4px); transition: opacity var(--m-small) var(--m-ease-out), transform var(--m-small) var(--m-ease-out); }
+.tech :is(.t-mega__tile, .t-mega__card):is(:hover, :focus-within) .t-mega__go { opacity: 1; transform: none; }
+.tech .t-mega__faults { list-style: none; margin: 0; padding: 0 0 0 4px; display: flex; flex-direction: column; gap: 1px; }
+/* PCs: the faults line up under the name */
+@media (min-width: 1680px) {
+  .tech .t-mega__faults { padding-left: 64px; }
+}
+.tech .t-mega__faults a {
+  display: flex; align-items: center; min-height: 28px; font-size: 13.5px; font-weight: 600; line-height: 1.3; color: var(--ink2);
+  border-radius: 8px; transition: color var(--m-micro);
+}
+.tech .t-mega__faults a::before { content: ""; width: 5px; height: 5px; margin-right: 9px; border-radius: 50%; background: var(--bd2); flex: none; transition: background-color var(--m-micro); }
+.tech .t-mega__faults a:hover { color: var(--acct); }
+.tech .t-mega__faults a:hover::before { background: var(--acc); }
+.tech .t-mega__aside { grid-area: aside; display: flex; flex-direction: column; gap: 12px; }
+.tech .t-mega__submit {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 20px;
+  background: radial-gradient(320px 200px at 85% -10%, rgba(226, 72, 58, 0.45), transparent 70%), var(--stage); color: #f6f1f0;
+  box-shadow: 0 24px 50px -26px rgba(196, 54, 43, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.tech .t-mega__submit .t-eyb { color: #f29185; }
+.tech .t-mega__submit b { font-family: var(--t-font-head); font-stretch: 108%; font-size: 23px; line-height: 1.08; }
+.tech .t-mega__submit > span:not(.t-eyb) { font-size: 13.5px; line-height: 1.5; color: #d6ccca; }
+.tech .t-mega__cta { height: 48px; padding: 0 18px; font-size: 15px; margin-top: 6px; background: #e2483a; color: #1a0806; box-shadow: 0 0 30px -6px rgba(226, 72, 58, 0.7); }
+.tech .t-mega__card {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px; border-radius: 18px;
+  background: var(--bg2); border: 1px solid var(--bd); color: var(--ink);
+  transition: border-color var(--m-small) var(--m-ease-out);
+}
+html[data-tech-theme="dark"] .tech .t-mega__card { background: var(--card); border-color: var(--hair); box-shadow: inset 0 1px 0 var(--hair-top); }
+.tech .t-mega__card:hover { border-color: var(--softbd); }
+.tech .t-mega__cico { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: var(--soft); color: var(--acct); }
+.tech .t-mega__ctext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tech .t-mega__ctext b { font-size: 15px; }
+.tech .t-mega__ctext span { font-size: 13px; line-height: 1.4; color: var(--ink2); }
+.tech .t-mega__bar { grid-area: bar; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; padding: 14px 14px 0; border-top: 1px solid var(--bd); }
+.tech .t-mega__barlink { display: inline-flex; align-items: center; min-height: 40px; font-size: 14px; font-weight: 700; color: var(--ink2); }
+.tech .t-mega__barlink:hover { color: var(--ink); }
+.tech .t-mega__bar .t-mega__more { min-height: 40px; margin-right: auto; }
+
+/* points panel: two large salon cards in the same width */
+.tech .t-mega__pointsw { display: flex; flex-direction: column; gap: 18px; }
+.tech .t-megabox .t-mega__points { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tech .t-megabox .t-mega__points.is-single { grid-template-columns: minmax(0, 640px); }
+.tech .t-megabox .t-mega__point {
+  display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); align-items: stretch; padding: 0; overflow: hidden; gap: 0;
+  border-radius: 20px; background: var(--bg2); border: 1px solid var(--bd);
+}
+html[data-tech-theme="dark"] .tech .t-megabox .t-mega__point { background: var(--card); border-color: var(--hair); box-shadow: inset 0 1px 0 var(--hair-top); }
+.tech .t-mega__map { width: 100%; height: 100% !important; min-height: 210px; border-radius: 0 !important; }
+.tech .t-mega__pbody { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 18px 18px 16px; }
+.tech .t-megabox .t-mega__point b { font-size: 22px; line-height: 1.1; }
+.tech .t-mega__addr { font-size: 14px; font-weight: 600; color: var(--ink); }
+.tech .t-mega__addr span { white-space: nowrap; }
+.tech .t-mega__hours { font-size: 13.5px; font-weight: 600; color: var(--ink2); }
+.tech .t-mega__park { font-size: 13px; color: var(--ok); font-weight: 700; }
+.tech .t-mega__pact { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 8px; }
+.tech .t-mega__pbtn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 0 14px; border-radius: 12px;
+  background: var(--card); border: 1px solid var(--bd); font-size: 13.5px; font-weight: 800; color: var(--ink);
+  transition: border-color var(--m-small), transform var(--m-micro);
+}
+html[data-tech-theme="dark"] .tech .t-mega__pbtn { background: var(--raised); border-color: var(--hair); }
+.tech .t-mega__pbtn.t-mega__tel { color: var(--acct); }
+.tech .t-mega__pbtn:hover { border-color: var(--softbd); }
+.tech .t-mega__pbtn:active { transform: scale(0.97); }
+
+/* laptops (1024–1279): three tiles a row, a narrower aside, salon cards stacked inside */
+@media (max-width: 1279.98px) {
+  .tech .t-mega__repairs { grid-template-columns: minmax(0, 1fr) 260px; gap: 16px; }
+  .tech .t-megabox .t-mega__repairs .t-mega__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tech .t-mega__faults { padding-left: 0; }
+  .tech .t-megabox .t-mega__point { grid-template-columns: 1fr; }
+  .tech .t-mega__map { min-height: 130px; height: 130px !important; }
+}
+.tech .t-megabox a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .tech :is(.t-mega__tile, .t-mega__ico, .t-mega__go, .t-mega__card) { transition: none; }
+  .tech .t-mega__tile:is(:hover, :focus-within) .t-mega__ico { transform: none; }
+}
+
+/* dimmed, blurred page under an open mega menu */
+.tech .t-megascrim { display: none; }
+@media (min-width: 1024px) {
+  .tech .t-megascrim {
+    display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+    background: rgba(10, 7, 6, 0.24);
+    transition: opacity var(--m-panel) var(--m-ease-out);
+  }
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .tech .t-megascrim { -webkit-backdrop-filter: blur(5px) saturate(0.9); backdrop-filter: blur(5px) saturate(0.9); }
+  }
+  html[data-tech-theme="dark"] .tech .t-megascrim { background: rgba(0, 0, 0, 0.45); }
+  .tech .t-capwrap.is-mega .t-megascrim { opacity: 1; pointer-events: auto; }
+}
+
+/* ---------- Phone: TabBar glass + pill, raised "Zgłoś" ---------- */
+.tech .t-tabbar { background: var(--overlay); box-shadow: var(--cap-inset), 0 20px 40px -18px rgba(18, 22, 19, 0.5); isolation: isolate; }
+html[data-tech-theme="dark"] .tech .t-tabbar { box-shadow: var(--cap-inset), 0 24px 48px -16px rgba(0, 0, 0, 0.85); }
+.tech .t-tabbar > a,
+.tech .t-tabbar > button { position: relative; z-index: 1; transition: color var(--m-small), transform var(--m-small) var(--m-ease-out); }
+.tech .t-tabbar__pill {
+  position: absolute; z-index: 0; left: 0; top: var(--pill-y, 6px); width: var(--pill-w, 0px); height: var(--pill-h, 0px);
+  border-radius: 14px; background: var(--soft); transform: translateX(var(--pill-x, 0px)); pointer-events: none;
+}
+.tech [data-pill-ready] > .t-tabbar__pill { transition: transform var(--m-panel) var(--m-ease-spring), width var(--m-panel) var(--m-ease-emph); }
+.tech .t-tabbar > a.t-tabbar__mid { transition: transform var(--m-panel) var(--m-ease-spring), box-shadow var(--m-small); }
+.tech .t-tabbar > a.t-tabbar__mid:active { transform: scale(0.92); }
+.tech .t-tabbar > a.t-tabbar__mid { box-shadow: 0 14px 26px -8px rgba(196, 54, 43, 0.8), 0 0 0 5px var(--bg), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+
+/* ---------- Menu sheet as an iOS card: the page behind shrinks ---------- */
+.tech .t-header,
+.tech .t-main,
+.tech [data-t-region="footer"] {
+  transition: transform var(--m-panel) var(--m-ease-emph), border-radius var(--m-panel), filter var(--m-panel);
+}
+@media (max-width: 1023.98px) {
+  .tech.t-sheet-open .t-header,
+  .tech.t-sheet-open .t-main,
+  .tech.t-sheet-open [data-t-region="footer"] {
+    transform: scale(0.94);
+    border-radius: 22px;
+    overflow: hidden;
+    filter: brightness(0.92);
+  }
+}
+.tech .t-sheet__scrim { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.tech .t-sheet__panel { transition: transform var(--m-panel) var(--m-ease-emph), visibility 0s linear var(--m-panel); }
+.tech .t-sheet.is-open .t-sheet__panel { transition: transform var(--m-panel) var(--m-ease-spring); }
+.tech .t-sheet.is-dragging .t-sheet__panel { transition: none; }
+.tech .t-sheet.is-open .t-sheet__body > *,
+.tech .t-sheet.is-open .t-sheet__list > * { animation: t-mega-item var(--m-panel) var(--m-ease-emph) both; }
+.tech .t-sheet.is-open .t-sheet__list > :nth-child(2) { animation-delay: 40ms; }
+.tech .t-sheet.is-open .t-sheet__list > :nth-child(3) { animation-delay: 80ms; }
+.tech .t-sheet.is-open .t-sheet__list > :nth-child(4) { animation-delay: 120ms; }
+.tech .t-sheet.is-open .t-sheet__list > :nth-child(5) { animation-delay: 160ms; }
+.tech .t-sheet.is-open .t-sheet__list > :nth-child(6) { animation-delay: 200ms; }
+.tech .t-sheet.is-open .t-sheet__list > :nth-child(n + 7) { animation-delay: 240ms; }
+.tech .t-sheet.is-open .t-sheet__body > :nth-child(2) { animation-delay: 120ms; }
+.tech .t-sheet.is-open .t-sheet__body > :nth-child(3) { animation-delay: 180ms; }
+.tech .t-sheet.is-open .t-sheet__body > :nth-child(n + 4) { animation-delay: 240ms; }
+
+/* segmented theme switch with a sliding pill */
+.tech .t-segmented { position: relative; isolation: isolate; }
+.tech .t-segmented > button { position: relative; z-index: 1; }
+.tech [data-pill-ready].t-segmented > button.is-on { background: transparent; box-shadow: none; }
+.tech .t-segmented > .t-pilltabs__pill { top: var(--pill-y, 4px); bottom: auto; height: var(--pill-h, 44px); }
+html[data-tech-theme="dark"] .tech .t-segmented > .t-pilltabs__pill { background: var(--raised); box-shadow: inset 0 1px 0 var(--hair-top), 0 1px 2px rgba(0, 0, 0, 0.5); }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-capwrap.is-compact .t-capsule { transform: none; }
+  .tech.t-sheet-open .t-header,
+  .tech.t-sheet-open .t-main,
+  .tech.t-sheet-open [data-t-region="footer"] { transform: none; filter: none; }
+}
+.tech.t-reduced .t-capwrap.is-compact .t-capsule { transform: none; }

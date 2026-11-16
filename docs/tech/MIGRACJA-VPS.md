@@ -10,7 +10,7 @@ Wersja 1.0 · 14.11.2026. Wykonuje Krystian z Claude Code. **Każdy krok na serw
 ## 1. Warunki wejścia (blokery — bez nich nie zaczynamy przełączenia)
 1. Gaming działa stabilnie na tym samym VPS co najmniej 5 dni (wspólny Nginx bez incydentów).
 2. **Dostęp do DNS domeny prokomserwis.pl** — ✔ od 14.11.2026 strefa w **Seohost** (`dns1/dns2.microhost.pl`, TM+ etap A), rejestracja: transfer z cyber_Folks do Seohost (TM+ A5). Poczty (MX) nie ma. Stan i dziennik zmian: `docs/tech/DNS-PROKOMSERWIS.md`.
-3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony.
+3. Kopie zapasowe działają: ten sam cel `rclone` co prokom-web (runbook prokom-web §1.8/§7), **test odtworzenia** bazy Tech na stagingu zrobiony. — ✔ 14.11.2026 (staging: `backup.sh` → B2 → `restore.sh`, liczba napraw zgodna; prod — cron po przełączeniu, §8 pkt 10).
 4. Staging `staging.prokomserwis.pl` przeszedł próbę generalną (§7) na kopii bazy z produkcji.
 5. Wolne zasoby VPS po Gaming: `free -h` i `df -h`. Potrzeba ok. 2,5 GB RAM (prod + staging, §4) i ok. 5 GB dysku plus rozmiar mediów razy trzy (wolumen, kopia lokalna, zapas).
 6. Krystian ma dostęp SSH do Hetznera i do VPS, a w menedżerze haseł: `.env.prod` z Hetznera, hasło aplikacji Gmail (SMTP), Google OAuth.
@@ -75,21 +75,22 @@ Klucze jak w `.env.prod.example`. Różnice między środowiskami:
 ## 7. Próba generalna na stagingu (TM, przed przełączeniem)
 1. Na Hetznerze `pg_dump -Fc` (bez zatrzymywania produkcji) i `tar` wolumenu mediów → kopia na komputer Krystiana → VPS. Na serwerze nie zostawiamy plików z danymi poza wolumenami i katalogiem kopii (uprawnienia 600).
 2. Odtworzenie do stosu staging → `anonimizuj.sql` → kontrola z §6 → start.
-3. Smoke `scripts/vps/smoke.sh staging`: strona główna 200, `/api/v1/` 200/401 zgodnie z dziś, `/admin/` 302, statyczne pliki Django 200, media 200, `/zgloszenie` wysyła zgłoszenie testowe (numer naprawy wraca), `/track` z tym numerem pokazuje status, logowanie do `/panel`, lista napraw w panelu, PDF protokołu przyjęcia się generuje, upload zdjęcia w panelu działa (limit 20 MB).
+3. Smoke `scripts/vps/smoke.sh staging`: strona główna 200, `/api/v1/` 200/401 zgodnie z dziś, `/admin/` 302, statyczne pliki Django 200, media 200, `/zgloszenie` wysyła zgłoszenie testowe (numer naprawy wraca), `/track` z tym numerem pokazuje status, logowanie do `/panel`, lista napraw w panelu, PDF protokołu przyjęcia się generuje, limit uploadu 20 MB przez oba Nginxy (19 MB dochodzi do Django, 21 MB → 413; panel nie ma pola do zdjęć — sprawdzone 14.11).
 4. Pomiar: `docker stats` w czasie testów, czas odpowiedzi strony głównej i `/api/`, limity pamięci bez restartów (`docker inspect … RestartCount`).
 5. Test odtworzenia kopii: `backup.sh staging` → `restore.sh` do świeżej bazy → liczba zgłoszeń się zgadza.
 Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 
 ## 8. Przełączenie — niedziela (lista do odhaczania)
+Komendy krok po kroku, z terminalem przy każdym kroku: **`docs/tech/NIEDZIELA.md`**.
 **T−48 h:** TTL rekordów A dla `@` i `www` na 300 s **w strefie Seohost** (AAAA nie ma). Komunikat dla serwisu: „W niedzielę wieczorem przerwa techniczna strony i panelu, w poniedziałek od rana wszystko działa”.
 **T−0 (np. 18:00):**
 1. Stary serwer: strona techniczna 503 dla całego ruchu (tymczasowa konfiguracja Nginx na Hetznerze z prostą stroną „Przerwa techniczna, wracamy wkrótce. Pilne: 883 200 151”). Od tej chwili nie powstają nowe dane.
-2. Stary serwer: `docker compose stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu).
+2. Stary serwer: `docker compose --env-file .env.prod -f docker-compose.prod.yml stop celery celery-beat backend frontend` (baza zostaje uruchomiona do zrzutu). **Na Hetznerze zawsze z `--env-file .env.prod`** — bez tego compose podstawia puste hasła i odtwarza `db`/`redis` (incydent 14.11.2026, 12 min bez API).
 3. Zrzut końcowy: `pg_dump -Fc` + `tar` mediów → sumy kontrolne (`sha256sum`) → przeniesienie na VPS → porównanie sum.
-4. VPS: odtworzenie do **pustej** bazy stosu prod (bez anonimizacji), media do wolumenu, start stosu prod z `<sha>` = commit z Hetznera. `migrate` nie powinien mieć nic do zrobienia (ten sam commit). Jeśli ma — **stop i decyzja**.
-5. Test przed DNS: `curl --resolve prokomserwis.pl:443:194.28.50.70 …` i plik `hosts` na komputerze Krystiana: strona, logowanie do panelu, lista napraw, szczegóły naprawy z załącznikami, PDF, panel admina, konto klienta.
+4. VPS: odtworzenie do bazy stosu prod (bez anonimizacji), media do wolumenu, start stosu prod. **Stos prod już stoi od 14.11 z `61f8f54`** (`master`; kod aplikacji = Hetzner `50f926c` + `frontend/scripts/patch-next-font.js`, czyli poprawka budowania; dla `50f926c` obrazów w GHCR nie ma). Kolejność: `RESTORE_CONFIRM=prokom-tech-prod scripts/vps/restore.sh ../import/<plik>.tar prokom-tech-prod prokom_tech_prod` (plik eksportu z `eksport-hetzner.sh prokom_tech_prod`) → `scripts/vps/smoke.sh prod`. `migrate` nie powinien mieć nic do zrobienia (te same migracje — porównaj listę w `manifest.txt` z `showmigrations`). Jeśli ma — **stop i decyzja**.
+5. Test przed DNS: `scripts/vps/smoke.sh prod` przez `gateway` (`127.0.0.1:3300`). Test w przeglądarce dopiero po DNS i certyfikacie (pkt 7–8), wciąż w oknie przerwy — wcześniej certyfikatu `prokomserwis.pl` na VPS nie ma, a Django przekierowuje na HTTPS. Zakres ręcznego testu: strona, logowanie do panelu, lista napraw, szczegóły naprawy z załącznikami, PDF, panel admina, konto klienta.
 6. Zgłoszenie testowe przez stronę → widoczne w panelu → oznaczyć jako testowe i anulować (procedura z panelu, bez kasowania w bazie).
-7. Certyfikat: na czas przełączenia skopiuj ważny certyfikat z Hetznera (`certbot_certs`) do magazynu certyfikatów wspólnego Nginx (zgodnie z runbookiem prokom-web). Po propagacji DNS wystaw nowy certyfikat przez certbot prokom-web (`--expand` albo osobny, wg runbooka) i przełącz Nginx na niego. Bez tego HTTP-01 nie zadziała przed zmianą DNS.
+7. Certyfikat: **nowy certyfikat `prokom-tech-prod` zaraz po zmianie DNS** (runbook prokom-web §9.2 — decyzja tam: bez kopiowania certyfikatu z Hetznera, bo kopia nie odnowi się na VPS). Kilka minut bez HTTPS na VPS przypada na okno przerwy. Kolejność w praktyce: DNS (pkt 8) → certyfikat → Nginx z nakładką `tech-prod`. Komendy: `docs/tech/NIEDZIELA.md` §D.
 8. DNS **w strefie Seohost**: A `@` i `www` → `194.28.50.70`. AAAA nie ma (sprawdzone w T0) — nic do usuwania. TXT i pozostałe bez zmian. Wpis „przed/po” w `DNS-PROKOMSERWIS.md`.
 9. Kontrola przez 1–2 h: `dig` z kilku resolverów (1.1.1.1, 8.8.8.8), test z telefonu w sieci komórkowej, logi `gateway`, `backend` i `celery` (beat uruchomiony, zadania przechodzą), certyfikat, maile (np. reset hasła testowego konta).
 10. Kopia zaraz po przełączeniu (`scripts/vps/backup.sh prod`) i włączenie crona kopii (`WDROZENIE.md` §5: prod 03:45 UTC, dzienne 14 dni + miesięczne 93 dni, cel `offsite:prokom-backups-r7k2/tech-prod/`) oraz monitora dostępności i heartbeatu kopii w Better Stack.
@@ -97,7 +98,7 @@ Wynik: tabela „krok → wynik → dowód” w opisie PR TM i w `docs/STAN.md`.
 
 ## 9. Powrót (gdy coś nie działa i nie da się naprawić w 30 minut)
 1. DNS z powrotem na IP Hetznera (TTL 300 s, więc szybko) i przywrócenie AAAA, jeśli był.
-2. Na Hetznerze: zdjęcie strony 503, `docker compose start` backend, frontend, celery, celery-beat.
+2. Na Hetznerze: zdjęcie strony 503, `docker compose --env-file .env.prod -f docker-compose.prod.yml start backend frontend celery celery-beat`, potem **`docker compose --env-file .env.prod -f docker-compose.prod.yml exec nginx nginx -s reload`** — Nginx Hetznera pamięta IP kontenerów z chwili startu; po starcie/odtworzeniu backendu bez przeładowania zwraca 502 (incydent 14.11.2026). Sprawdzenie: `curl -s -o /dev/null -w '%{http_code}' https://prokomserwis.pl/api/v1/repairs/track/` = 400.
 3. Dane, które powstały na VPS po przełączeniu (zwykle zero w niedzielę wieczorem), trzeba przenieść ręcznie. Lista z logów i panelu.
 4. Wpis w STAN: co zawiodło. Nowy termin.
 

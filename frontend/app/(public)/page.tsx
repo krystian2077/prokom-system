@@ -1,49 +1,56 @@
 ﻿import type { Metadata } from "next";
-import { SITE_URL } from "@/lib/site-config";
-import dynamic from "next/dynamic";
+import { line, servicePoints } from "@/config/prokom";
+import { BrandMarquee } from "@/components/tech/home/BrandMarquee";
+import { CommonRepairs } from "@/components/tech/home/CommonRepairs";
+import { CtaBand } from "@/components/tech/home/CtaBand";
+import { DeviceGrid } from "@/components/tech/home/DeviceGrid";
+import { HammerBlock } from "@/components/tech/home/HammerBlock";
+import { Hero } from "@/components/tech/home/Hero";
+import { HomeFaq } from "@/components/tech/home/HomeFaq";
+import { PointsSection } from "@/components/tech/home/PointsSection";
+import { ProcessSection } from "@/components/tech/home/ProcessSection";
+import { TownsSection } from "@/components/tech/home/TownsSection";
+import { WhySection } from "@/components/tech/home/WhySection";
+import { RepairWizard } from "@/components/tech/RepairWizard";
+import { claim } from "@/lib/tech/claims";
+import { courierPageHref, courierPaysText, courierWhereText } from "@/lib/tech/courier";
+import { publishedPoints, visiblePoints } from "@/lib/tech/points";
+import { pageMetadata } from "@/lib/tech/seo";
 
+const published = publishedPoints(servicePoints);
+// SPEC §9: "… — Rabka-Zdrój i Zakopane | PRO-KOM Tech"; one city only if a point is unpublished.
+const title = `Serwis telefonów i komputerów — ${published.map((p) => p.city).join(" i ")}`;
+const description =
+  published.length > 1
+    ? `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju i Zakopanem. Wycena przed naprawą, gwarancja i status naprawy online.`
+    : `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju. Najpierw diagnoza i wycena, gwarancja i status naprawy online.`;
+
+// pageMetadata: canonical + full Open Graph (image, site name, pl_PL, type) like the other pages;
+// the title is absolute because it already ends with the brand.
 export const metadata: Metadata = {
-  title: "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój",
-  description:
-    "Serwis telefonów, laptopów i tabletów w Rabce-Zdroju. Akcesoria GSM, szkła hartowane, folie Hammer Glass, etui dostępne od ręki. Bezpłatna diagnoza, szybka naprawa. ul. Orkana 16B.",
-  alternates: {
-    canonical: `${SITE_URL}`,
-  },
-  openGraph: {
-    title: "PRO-KOM Serwis — Naprawa telefonów i akcesoria GSM | Rabka-Zdrój",
-    description:
-      "Serwis telefonów, laptopów i tabletów w Rabce-Zdroju. Szkła hartowane, folie Hammer Glass, etui i akcesoria GSM. ul. Orkana 16B.",
-    url: `${SITE_URL}`,
-  },
+  ...pageMetadata({ title, description, path: "/" }),
+  title: { absolute: `${title} | ${line.name}` },
 };
 
-import { Hero } from "@/sections/Hero";
-import { TrustStats } from "@/sections/TrustStats";
-import { DeviceCategories } from "@/sections/DeviceCategories";
-import { HowItWorks } from "@/sections/HowItWorks";
-import { MostCommonRepairs } from "@/sections/MostCommonRepairs";
-
-const Reviews = dynamic(() => import("@/sections/Reviews").then((mod) => mod.Reviews));
-const HammerGlass = dynamic(() => import("@/sections/HammerGlass").then((mod) => mod.HammerGlass));
-const Accessories = dynamic(() => import("@/sections/Accessories").then((mod) => mod.Accessories));
-const CTA = dynamic(() => import("@/sections/CTA").then((mod) => mod.CTA));
-const FAQ = dynamic(() => import("@/sections/FAQ").then((mod) => mod.FAQ));
-const Contact = dynamic(() => import("@/sections/Contact").then((mod) => mod.Contact));
-
 export default function HomePage() {
+  const points = visiblePoints();
   return (
-    <div className="public-home-page">
-      <Hero />
-      <TrustStats />
-      <DeviceCategories />
-      <HowItWorks />
-      <MostCommonRepairs />
-      <Reviews />
-      <HammerGlass />
-      <Accessories />
-      <CTA />
-      <FAQ />
-      <Contact />
-    </div>
+    <>
+      <Hero points={points} publishedNames={published.map((p) => p.name)} />
+      <BrandMarquee />
+      <RepairWizard
+        points={points.map((p) => ({ key: p.key, name: p.name, draft: p.draft }))}
+        courier={{ sub: claim("courierWholeCountry"), pays: courierPaysText(), href: courierPageHref(), where: courierWhereText() }}
+      />
+      <DeviceGrid />
+      <CommonRepairs />
+      <PointsSection points={points} />
+      <ProcessSection point={points.find((p) => !p.draft) ?? points[0]} />
+      <HammerBlock />
+      <WhySection points={points} />
+      <TownsSection points={points} />
+      <HomeFaq points={points} />
+      <CtaBand points={points} />
+    </>
   );
 }
