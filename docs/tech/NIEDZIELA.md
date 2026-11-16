@@ -57,7 +57,7 @@ Stan wejściowy (sprawdzony 14.11): stos `prokom-tech-prod` na VPS działa na pu
     for s in dns1.microhost.pl 1.1.1.1 8.8.8.8; do dig +short @$s prokomserwis.pl A; dig +short @$s www.prokomserwis.pl A; done
     ```
 14. **[VPS-web]** certyfikat `prokom-tech-prod` — runbook prokom-web §0 „Nowy certyfikat bez zatrzymywania Nginx” z `<domeny>` = `prokomserwis.pl www.prokomserwis.pl` i `--cert-name prokom-tech-prod -d prokomserwis.pl -d www.prokomserwis.pl`: **najpierw `--dry-run`**, po zielonym to samo bez `--dry-run`, potem usunięcie tymczasowego bloku. Błąd dry-runu = DNS jeszcze nie dotarł do Let's Encrypt → odczekaj kilka minut, powtórz dry-run (limit: 5 nieudanych prawdziwych walidacji na godzinę).
-15. **[VPS-web]** Nginx z nakładką `tech-prod` (runbook §9.2 pkt 4): drugie polecenie startu z §0 + `-f docker/compose.proxy.tech-prod.yml` — najpierw `run --rm --no-deps nginx nginx -t`, po `successful` → `up -d nginx`, `ps nginx` (`Up`), `logs --tail 20 nginx`.
+15. **[VPS-web]** Nginx z nakładką `tech-prod` (runbook §9.2 pkt 4): **pełne aktualne polecenie startu z runbooka prokom-web §0** (od 16.11 także `hub-prod.yml`; lista: `WDROZENIE.md` → „Wspólny Nginx”) + `-f docker/compose.proxy.tech-prod.yml` — najpierw `run --rm --no-deps nginx nginx -t`, po `successful` → `up -d nginx`, `ps nginx` (`Up`), `logs --tail 20 nginx`.
 
 ### E. Kontrola
 16. **[Komputer]**
