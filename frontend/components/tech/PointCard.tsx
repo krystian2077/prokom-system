@@ -19,6 +19,8 @@ type Props = {
   /** Second action: "submit" → report a repair at this point, or a custom link. */
   secondary?: "submit" | { label: string; href: string } | null;
   className?: string;
+  /** Anchor id (e.g. the point key on /punkty-serwisowe, target of `#rabka` links). */
+  id?: string;
 };
 
 /**
@@ -27,7 +29,7 @@ type Props = {
  * Unpublished points reach this only on staging (NEXT_PUBLIC_TECH_DRAFT=1) and get the
  * "do uzupełnienia" frame.
  */
-export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "punkt", secondary = "submit", className }: Props) {
+export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "punkt", secondary = "submit", className, id }: Props) {
   const main = isMainPoint(point);
   const feature = layout === "feature";
   const second =
@@ -36,6 +38,7 @@ export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "p
       : secondary;
   return (
     <article
+      id={id}
       className={`t-pointcard t-pointcard--${layout}${point.draft ? " t-draft" : ""}${className ? ` ${className}` : ""}`}
       aria-label={`Punkt serwisowy ${point.name}`}
     >

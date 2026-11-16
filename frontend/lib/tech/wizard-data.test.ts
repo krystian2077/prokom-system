@@ -119,7 +119,7 @@ describe("courier (SPEC §12.10)", () => {
     );
     expect(courierPaysText({ ...base, returnPaidBy: null })).toBe("Wysyłka do serwisu na Twój koszt.");
     // current config (boss's answers 15.11): the return after declining is also on us
-    expect(courierPaysText()).toBe("Wysyłka do serwisu na Twój koszt, odesłanie po naprawie na nasz koszt, odesłanie po rezygnacji na nasz koszt.");
+    expect(courierPaysText()).toBe("Wysyłkę do serwisu opłacasz Ty, odesłanie po naprawie i po rezygnacji — na nasz koszt.");
   });
   it("links the courier page only when published", () => {
     expect(courierPageHref({ ...courierService, published: false })).toBeNull();

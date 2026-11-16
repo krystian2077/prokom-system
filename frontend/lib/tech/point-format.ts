@@ -36,6 +36,17 @@ export function saturdayHours(point: Pick<ServicePoint, "hours">): string | null
   return h?.open && h.close ? `${formatTime(h.open)}–${formatTime(h.close)}` : null;
 }
 
+/**
+ * Saturday promise for a list of points: "Otwarte także w soboty" when every point opens on
+ * Saturday, "W soboty: Rabka-Zdrój" when only some do, null when none does.
+ */
+export function saturdayPromise(points: Pick<ServicePoint, "hours" | "name">[]): string | null {
+  const open = points.filter((p) => saturdayHours(p));
+  if (!open.length) return null;
+  if (open.length === points.length) return "Otwarte także w soboty";
+  return `W soboty: ${open.map((p) => p.name).join(" i ")}`;
+}
+
 /** "street, postal city" (street may be missing → just postal + city). */
 export function pointAddress(point: Pick<ServicePoint, "street" | "postal" | "city">): string {
   const city = `${point.postal} ${point.city}`;

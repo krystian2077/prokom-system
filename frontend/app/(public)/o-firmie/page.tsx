@@ -134,7 +134,15 @@ export default function AboutPage() {
               </div>
               <div>
                 <dt>Godziny</dt>
-                <dd>{hoursLong(main)}</dd>
+                <dd>
+                  {two
+                    ? published.map((p) => (
+                        <span key={p.key} className="t-ab-vcard__hours">
+                          {p.name}: {hoursLong(p)}
+                        </span>
+                      ))
+                    : hoursLong(main)}
+                </dd>
               </div>
             </dl>
             <a href={CEIDG_URL} target="_blank" rel="noopener noreferrer" className="t-ab-vcard__ceidg">

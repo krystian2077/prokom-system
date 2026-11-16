@@ -63,7 +63,7 @@ export const PREP_TABS: PrepTab[] = [
     label: "Konsola",
     categories: ["console"],
     steps: [
-      { t: "Włącz kopię zapisów gier w chmurze", why: "PS Plus, Xbox Cloud albo Nintendo Online — zapisy będą bezpieczne, nawet gdy naprawa dotyczy dysku." },
+      { t: "Włącz kopię zapisów gier w chmurze", why: "PS Plus, Xbox Cloud albo Nintendo Switch Online — zapisy będą bezpieczne, nawet gdy naprawa dotyczy dysku." },
       { t: "Znaj login do konta (PSN, Xbox, Nintendo)", why: "Po niektórych naprawach trzeba zalogować się ponownie." },
       { t: "Wyjmij płytę z napędu", why: "Chyba że konsola nie chce jej wysunąć — wtedy zaznacz to w zgłoszeniu." },
       { t: "Pad i przewód zasilający tylko wtedy, gdy usterka ich dotyczy", why: "Przy dryfie joysticka przynieś sam pad — konsola nie jest potrzebna." },

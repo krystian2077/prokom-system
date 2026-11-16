@@ -83,13 +83,13 @@ Na Androidzie możesz skorzystać z aplikacji diagnostycznych lub poprosić serw
 
 ## Czy warto wymieniać baterię?
 
-W większości przypadków tak. Zakres wymiany baterii jest wielokrotnie niższy niż zakup nowego telefonu. Nowa bateria przywraca telefon do pierwotnej sprawności i przedłuża jego żywotność o kolejne 2–3 lata.
+W większości przypadków tak. Wymiana baterii wychodzi wielokrotnie taniej niż zakup nowego telefonu. Nowa bateria przywraca telefon do pierwotnej sprawności i przedłuża jego żywotność o kolejne 2–3 lata.
 
 Wyjątek stanowią sytuacje, gdy oprócz baterii telefon ma inne poważne uszkodzenia mechaniczne lub gdy model jest bardzo stary i nie obsługuje aktualnych aplikacji.
 
 ## Gdzie wymienić baterię w Rabce-Zdroju?
 
-W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju wymieniamy baterie do większości popularnych modeli smartfonów — Samsung, iPhone, Xiaomi, Motorola, Huawei i inne. Diagnoza jest bezpłatna. Wycenę przedstawiamy przed naprawą.
+W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju wymieniamy baterie do większości popularnych modeli smartfonów — Samsung, iPhone, Xiaomi, Motorola, Huawei i inne. Diagnoza jest bezpłatna. Wycenę przedstawiamy przed naprawą.
 
 Prostą wymianę baterii realizujemy często tego samego dnia.
 
@@ -123,7 +123,7 @@ Prostą wymianę baterii realizujemy często tego samego dnia.
       },
       {
         q: "Jak wygląda montaż Hammer Glass?",
-        a: "Zakresy zależą od rodzaju folii i modelu telefonu. Zapraszamy do serwisu lub zadzwoń pod 883 200 151.",
+        a: "Koszt zależy od rodzaju folii i modelu telefonu. Zapraszamy do serwisu.",
       },
     ],
     content: `
@@ -194,7 +194,7 @@ Folie Hammer Glass CUT wycinamy i montujemy na miejscu w serwisie PRO-KOM przy u
       },
       {
         q: "Jak wygląda naprawa po zalaniu?",
-        a: "Zakres zależy od zakresu uszkodzeń. Diagnoza jest bezpłatna — wycenę podajemy przed naprawą.",
+        a: "Koszt zależy od rozległości uszkodzeń. Diagnoza jest bezpłatna — wycenę podajemy przed naprawą.",
       },
     ],
     content: `
@@ -226,7 +226,7 @@ To zależy od kilku czynników:
 
 ## Gdzie naprawić telefon po zalaniu w Rabce-Zdroju?
 
-PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju. Przyjedź jak najszybciej po zalaniu. Obsługujemy też klientów wysyłkowo z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca.
+PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju. Przyjedź jak najszybciej po zalaniu. Obsługujemy też klientów wysyłkowo z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -262,7 +262,7 @@ PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju. Przyjedź jak najszybciej po 
       },
     ],
     content: `
-Wybór ładowarki do telefonu przestał być prosty. GaN, USB-C, PD, QC3, MagSafe — rynek jest pełen skrótów i standardów. W PRO-KOM Serwis w Rabce-Zdroju codziennie pomagamy klientom wybrać odpowiedni sprzęt.
+Wybór ładowarki do telefonu przestał być prosty. GaN, USB-C, PD, QC3, MagSafe — rynek jest pełen skrótów i standardów. W PRO-KOM Tech w Rabce-Zdroju codziennie pomagamy klientom wybrać odpowiedni sprzęt.
 
 ## Technologia GaN — dlaczego warto?
 
@@ -373,7 +373,7 @@ W sklepie PRO-KOM przy ul. Orkana 16B mamy etui do najpopularniejszych modeli te
       },
     ],
     content: `
-PRO-KOM Serwis przy ul. Orkana 16B to nie tylko serwis napraw — to też sklep GSM z szerokim wyborem akcesoriów dostępnych od ręki.
+PRO-KOM Tech przy ul. Orkana 16B to nie tylko serwis napraw — to też sklep GSM z szerokim wyborem akcesoriów dostępnych od ręki.
 
 ## Co znajdziesz w naszym sklepie?
 
@@ -408,7 +408,7 @@ Szkła hartowane do popularnych modeli. Folia Hammer Glass CUT wycinana laserowo
     slug: "ile-kosztuje-wymiana-ekranu-telefonu",
     title: "Jak wygląda wymiana ekranu telefonu?",
     description:
-      "Zakres wymiany ekranu zależy od modelu telefonu i rodzaju wyświetlacza. Sprawdź, ile możesz zapłacić za wymianę ekranu iPhone, Samsung, Xiaomi w serwisie PRO-KOM w Rabce-Zdroju.",
+      "Koszt wymiany ekranu zależy od modelu telefonu i rodzaju wyświetlacza. Sprawdź, od czego zależy wycena wymiany ekranu iPhone, Samsung i Xiaomi.",
     date: "2025-12-18",
     readingTime: "4 min",
     category: "Naprawa telefonów",
@@ -435,13 +435,13 @@ Szkła hartowane do popularnych modeli. Folia Hammer Glass CUT wycinana laserowo
     content: `
 Pęknięty lub rozbity ekran to najczęstsza przyczyna wizyty w serwisie. W PRO-KOM naprawiamy ekrany wszystkich popularnych marek — iPhone, Samsung, Xiaomi, Motorola, Huawei i wielu innych.
 
-## Od czego zależy zakres wymiany ekranu?
+## Od czego zależy koszt wymiany ekranu?
 
 - **Model telefonu** — ekrany do flagowych modeli są droższe niż do telefonów z niższej półki.
 - **Rodzaj wyświetlacza** — OLED jest droższy niż LCD.
-- **Jakość ekranu** — oryginalne części lub wysokiej jakości zamienniki mają różne zakresy.
+- **Jakość ekranu** — oryginalne części lub wysokiej jakości zamienniki różnią się kosztem.
 
-## Co wpływa na zakres naprawy?
+## Co wpływa na koszt naprawy?
 
 Dokładny zakres naprawy zależy głównie od modelu telefonu, rodzaju wyświetlacza i stopnia uszkodzenia.
 
@@ -457,7 +457,7 @@ Serwis PRO-KOM przy ul. Orkana 16B w Rabce-Zdroju. Wymieniamy ekrany na poczekan
     slug: "co-zrobic-gdy-telefon-nie-chce-sie-ladowac",
     title: "Co zrobić, gdy telefon nie chce się ładować?",
     description:
-      "Telefon nie ładuje się, ładuje wolno lub tylko przy pewnym ułożeniu kabla? Sprawdź najczęstsze przyczyny i dowiedz się, kiedy potrzebujesz serwisu. Poradnik od PRO-KOM Rabka-Zdrój.",
+      "Telefon nie ładuje się, ładuje wolno lub tylko przy pewnym ułożeniu kabla? Sprawdź najczęstsze przyczyny i dowiedz się, kiedy potrzebujesz serwisu. Poradnik serwisu PRO-KOM Tech.",
     date: "2025-12-21",
     readingTime: "4 min",
     category: "Naprawa telefonów",
@@ -530,14 +530,14 @@ Zużyta bateria może powodować problemy z ładowaniem. Telefon ładuje się do
       "najczestsze-problemy-z-iphone",
     ],
     keyTakeaways: [
-      "Diagnoza jest zawsze bezpłatna — płacisz tylko jeśli zgadzasz się z wyceną.",
+      "Diagnoza jest w większości przypadków bezpłatna — płacisz tylko jeśli zgadzasz się z wyceną.",
       "Przy prostych naprawach telefon odbierasz często tego samego dnia.",
       "Obsługujemy naprawy wysyłkowe z całej okolicy.",
     ],
     faq: [
       {
         q: "Czy muszę się umawiać na wizytę?",
-        a: "Nie, ale możesz zadzwonić wcześniej pod 883 200 151, żeby zapytać o aktualny czas oczekiwania.",
+        a: "Nie, ale możesz wcześniej zadzwonić do serwisu, żeby zapytać o aktualny czas oczekiwania.",
       },
       {
         q: "Czy mogę wysłać telefon do serwisu kurierem?",
@@ -622,7 +622,7 @@ GaN to skrót od galium nitride (azotek galu) — materiał półprzewodnikowy, 
 
 ## Gdzie kupić ładowarkę GaN w Rabce-Zdroju?
 
-W PRO-KOM Serwis przy ul. Orkana 16B mamy ładowarki GaN różnych mocy dostępne od ręki.
+W PRO-KOM Tech przy ul. Orkana 16B mamy ładowarki GaN różnych mocy dostępne od ręki.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -692,7 +692,7 @@ Telefony Samsung z serii Galaxy to jedne z najczęściej serwisowanych smartfon�
 
 ## Serwis Samsung w Rabce-Zdroju
 
-W PRO-KOM Serwis diagnozujemy i naprawiamy telefony Samsung: wymiana baterii, portów ładowania, ekranów i innych podzespołów. Diagnoza jest bezpłatna, a naprawę rozpoczynamy dopiero po Twojej akceptacji zakresu prac.
+W PRO-KOM Tech diagnozujemy i naprawiamy telefony Samsung: wymiana baterii, portów ładowania, ekranów i innych podzespołów. Diagnoza jest bezpłatna, a naprawę rozpoczynamy dopiero po Twojej akceptacji zakresu prac.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon-pt 9:00-17:00, sob 9:00-14:00)
@@ -762,7 +762,7 @@ iPhone uchodzi za niezawodny, ale jak każde urządzenie zużywa się i bywa pod
 
 ## Serwis iPhone w Rabce-Zdroju
 
-W PRO-KOM Serwis naprawiamy iPhone: wymiana baterii, ekranów, portów ładowania oraz diagnostyka usterek po zalaniu. Przed naprawą zawsze dostajesz wycenę, a sama diagnoza jest bezpłatna.
+W PRO-KOM Tech naprawiamy iPhone: wymiana baterii, ekranów, portów ładowania oraz diagnostyka usterek po zalaniu. Przed naprawą zawsze dostajesz wycenę, a sama diagnoza jest bezpłatna.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon-pt 9:00-17:00, sob 9:00-14:00)
@@ -821,7 +821,7 @@ Jeśli telefon regularnie robi się gorący, warto zareagować od razu. Czasami 
 
 Jeśli telefon przegrzewa się nawet przy zwykłym używaniu (rozmowy, przeglądarka), szybko traci energię lub sam się wyłącza, warto wykonać diagnozę.
 
-W PRO-KOM Serwis sprawdzamy stan baterii, port ładowania i układy odpowiedzialne za zasilanie oraz temperaturę pracy.
+W PRO-KOM Tech sprawdzamy stan baterii, port ładowania i układy odpowiedzialne za zasilanie oraz temperaturę pracy.
     `.trim(),
   },
   {
@@ -1110,7 +1110,7 @@ const LAPTOP_POSTS: BlogPost[] = [
     faq: [
       {
         q: "Jak wygląda diagnoza laptopa?",
-        a: "W PRO-KOM diagnoza jest zawsze bezpłatna. Wycenę naprawy przedstawiamy przed jej wykonaniem.",
+        a: "W PRO-KOM diagnoza jest w większości przypadków bezpłatna. Wycenę naprawy przedstawiamy przed jej wykonaniem.",
       },
       {
         q: "Ile trwa naprawa laptopa?",
@@ -1146,7 +1146,7 @@ Ciekawą opcją jest **laptop poleasingowy** — certyfikowany sprzęt biznesowe
 
 ## Bezpłatna diagnoza w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju ocenimy usterkę bezpłatnie i powiemy, czy naprawa się opłaca. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa, Nowego Targu i okolic.
+W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju ocenimy usterkę bezpłatnie i powiemy, czy naprawa się opłaca. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa, Nowego Targu i okolic.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -1156,7 +1156,7 @@ W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju ocenimy usterkę bezpłatnie
     slug: "laptop-sie-przegrewa-co-zrobic",
     title: "Laptop się przegrzewa — co zrobić?",
     description:
-      "Wentylator laptopa huczy, obudowa jest gorąca, sprzęt wyłącza się niespodziewanie? Sprawdź przyczyny przegrzewania i jak je usunąć. Poradnik serwisu PRO-KOM Rabka-Zdrój.",
+      "Wentylator laptopa huczy, obudowa jest gorąca, sprzęt wyłącza się niespodziewanie? Sprawdź przyczyny przegrzewania i jak je usunąć. Poradnik serwisu PRO-KOM Tech.",
     date: "2026-01-07",
     readingTime: "5 min",
     category: "Laptopy",
@@ -1220,7 +1220,7 @@ Jeśli powyższe nie pomaga, laptop wymaga:
 
 ## Serwis laptopów w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju czyścimy laptopy i wymieniamy pastę termalną. Po serwisie temperatury wyraźnie spadają, a laptop działa sprawnie i cicho.
+W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju czyścimy laptopy i wymieniamy pastę termalną. Po serwisie temperatury wyraźnie spadają, a laptop działa sprawnie i cicho.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -1230,7 +1230,7 @@ W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju czyścimy laptopy i wymienia
     slug: "kiedy-warto-wymienic-dysk-hdd-na-ssd",
     title: "Kiedy warto wymienić dysk HDD na SSD w laptopie?",
     description:
-      "Laptop uruchamia się wolno, programy ładują się długo? Wymiana starego dysku HDD na SSD to najprostszy i bardzo przystępny sposób na odświeżenie laptopa. Poradnik od PRO-KOM Rabka-Zdrój.",
+      "Laptop uruchamia się wolno, programy ładują się długo? Wymiana starego dysku HDD na SSD to najprostszy i bardzo przystępny sposób na odświeżenie laptopa. Poradnik serwisu PRO-KOM Tech.",
     date: "2026-01-10",
     readingTime: "4 min",
     category: "Laptopy",
@@ -1282,7 +1282,7 @@ Główne różnice:
 
 ## Wymiana dysku HDD na SSD w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju wymieniamy dyski i przenosimy system wraz z danymi. Po wymianie laptop uruchamia się kilkukrotnie szybciej.
+W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju wymieniamy dyski i przenosimy system wraz z danymi. Po wymianie laptop uruchamia się kilkukrotnie szybciej.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -1353,7 +1353,7 @@ Jednym z pierwszych pytań, jakie słyszymy w serwisie, jest to, jak wygląda ca
 
 ## Bezpłatna diagnoza w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B w Rabce-Zdroju diagnoza jest zawsze bezpłatna. Zakres naprawy przedstawiamy przed realizacją. Jeśli się nie zgadzasz — możesz zabrać sprzęt bez zobowiązań.
+W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju diagnoza jest w większości przypadków bezpłatna. Zakres naprawy przedstawiamy przed realizacją. Jeśli się nie zgadzasz — możesz zabrać sprzęt bez zobowiązań.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -1416,15 +1416,15 @@ Klasyk biurowy. Seria T (T14, T16) i X (X1 Carbon) to laptopy znane z doskonały
 
 ## Dell Latitude
 
-Seria biznesowa Dell. Latitude 5000 to dobry stosunek zakresy do jakości. Latitude 7000 to modele premium z ekranami OLED i Ultra i9.
+Seria biznesowa Dell. Latitude 5000 to dobry stosunek możliwości do kosztu. Latitude 7000 to modele premium z ekranami OLED i Ultra i9.
 
 ## HP EliteBook i ProBook
 
-EliteBook to flagowce HP z HP Wolf Security. ProBook to dobra opcja dla małych firm szukających niższej zakresy przy zachowaniu jakości biznesowej.
+EliteBook to flagowce HP z HP Wolf Security. ProBook to dobra opcja dla małych firm szukających niższego kosztu przy zachowaniu jakości biznesowej.
 
 ## Jaki laptop do biura wybrać?
 
-- **Do biura i pracy zdalnej:** ThinkPad T14 lub Dell Latitude 5440 — dobry balans zakresy, trwałości i wydajności.
+- **Do biura i pracy zdalnej:** ThinkPad T14 lub Dell Latitude 5440 — dobry balans kosztu, trwałości i wydajności.
 - **Dużo podróżujesz:** ThinkPad X1 Carbon lub HP EliteBook 840 — lekkie, mocne baterie.
 - **Budżet ograniczony:** poleasingowy ThinkPad T480/T490 lub Dell Latitude 5490 — znakomita jakość w niższej cenie.
 
@@ -1528,7 +1528,7 @@ PRO-KOM oferuje laptopy poleasingowe od certyfikowanego partnera — z gwarancj�
       "Do codziennej pracy biurowej wystarczy procesor Intel Core i5/i7 lub AMD Ryzen 5/7 i 16 GB RAM.",
       "Matryca IPS FHD z niskim odbiciem to komfort przy wielogodzinnej pracy.",
       "Czas pracy baterii powyżej 8 godzin jest kluczowy przy pracy mobilnej.",
-      "Najlepsze proporcje zakresy do jakości przy pracy biurowej to laptopy z serii ThinkPad T i Dell Latitude.",
+      "Najlepsze proporcje kosztu do jakości przy pracy biurowej to laptopy z serii ThinkPad T i Dell Latitude.",
     ],
     faq: [
       {
@@ -1569,7 +1569,7 @@ Rzeczywisty czas pracy powyżej **8 godzin** — szukaj laptopów z baterią 50 
 
 - **Lenovo ThinkPad T14 (Gen 3/4)** — jeden z najlepszych do pracy biurowej i zdalnej.
 - **Dell Latitude 5540** — mocna konstrukcja, dobry serwis.
-- **HP ProBook 450 G10** — dobry stosunek zakresy do jakości.
+- **HP ProBook 450 G10** — dobry stosunek możliwości do kosztu.
 - **Poleasingowy ThinkPad T480/T490** — jeśli budżet jest ograniczony.
 
 ## Gdzie kupić lub dobrać laptop w Rabce-Zdroju?
@@ -1845,7 +1845,7 @@ const DESKTOP_POSTS: BlogPost[] = [
       },
       {
         q: "Czy lepiej kupić gotowy komputer czy złożyć samemu?",
-        a: "Składanie daje lepszy stosunek zakresy do wydajności i możliwość wyboru każdego elementu. Gotowe zestawy bywają droższe za tę samą wydajność lub używają słabszych zasilaczy.",
+        a: "Składanie daje lepszy stosunek kosztu do wydajności i możliwość wyboru każdego elementu. Gotowe zestawy bywają droższe za tę samą wydajność lub używają słabszych zasilaczy.",
       },
       {
         q: "Czy PRO-KOM składa komputery na zamówienie?",
@@ -2217,7 +2217,7 @@ Wiele programów uruchamia się automatycznie ze startem systemu i spowalnia ła
 
 ## Diagnostyka w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B diagnoza jest bezpłatna. Ocenimy przyczynę spowolnienia i zaproponujemy optymalne rozwiązanie.
+W PRO-KOM Tech przy ul. Orkana 16B diagnoza jest bezpłatna. Ocenimy przyczynę spowolnienia i zaproponujemy optymalne rozwiązanie.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -2280,7 +2280,7 @@ Bardzo małe komputery jak Intel NUC czy ASUS Mini PC. Wydajność biurowa w wyj
 
 - **Dell OptiPlex 3000/5000 SFF** — sprawdzony klasyk, często dostępny w ofercie poleasingowej.
 - **Lenovo ThinkCentre M-series** — niezawodny, dobra wentylacja, długie wsparcie producenta.
-- **HP ProDesk** — dobry stosunek zakresy do jakości.
+- **HP ProDesk** — dobry stosunek możliwości do kosztu.
 
 ## Jaki procesor i RAM do biura?
 
@@ -2491,11 +2491,11 @@ const PRINTER_POSTS: BlogPost[] = [
     slug: "drukarka-laserowa-czy-atramentowa",
     title: "Drukarka laserowa czy atramentowa — co wybrać?",
     description:
-      "Drukarki laserowe i atramentowe różnią się sposobem pracy, wydajnością i jakością wydruku. Sprawdź, która sprawdzi się lepiej w domu i biurze. Poradnik PRO-KOM Rabka-Zdrój.",
+      "Drukarki laserowe i atramentowe różnią się sposobem pracy, wydajnością i jakością wydruku. Sprawdź, która sprawdzi się lepiej w domu i biurze. Poradnik serwisu PRO-KOM Tech.",
     date: "2026-02-10",
     readingTime: "5 min",
     category: "Drukarki",
-    tags: ["drukarka laserowa", "drukarka atramentowa", "jaka drukarka", "zakresy drukowania"],
+    tags: ["drukarka laserowa", "drukarka atramentowa", "jaka drukarka", "koszty drukowania"],
     relatedServiceHref: "/serwis-drukarek",
     relatedServiceLabel: "Serwis drukarek",
     areaServed: ["Rabka-Zdrój", "Nowy Targ", "Mszana Dolna"],
@@ -2542,7 +2542,7 @@ Drukarka atramentowa nakłada krople tuszu na papier przez mikroskopijne dysze w
 
 ### Wady
 
-- Wyższy zakres eksploatacji przy częstym druku.
+- Wyższy koszt eksploatacji przy częstym druku.
 - Tusz wysycha przy długich przestojach.
 - Wolniejszy druk niż laser.
 
@@ -2560,7 +2560,7 @@ Drukarka laserowa używa tonera (proszku) i ciepła do utrwalenia wydruku na pap
 
 ### Zalety
 
-- Niższy zakres drukowania strony — szczególnie przy dużych nakładach.
+- Niższy koszt wydruku strony — szczególnie przy dużych nakładach.
 - Szybki druk (20–40 stron na minutę).
 - Toner nie wysycha przy przestojach.
 - Ostra, czytelna czcionka — idealna do dokumentów.
@@ -2584,7 +2584,7 @@ Drukarka laserowa używa tonera (proszku) i ciepła do utrwalenia wydruku na pap
 
 ## Serwis drukarek w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B serwisujemy drukarki atramentowe i laserowe wszystkich popularnych marek. Oferujemy też sprzęt do biura.
+W PRO-KOM Tech przy ul. Orkana 16B serwisujemy drukarki atramentowe i laserowe wszystkich popularnych marek. Oferujemy też sprzęt do biura.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -2666,7 +2666,7 @@ Pojemnik na nadmiar tuszu jest pełny. Wymaga serwisu — fizyczne opróżnienie
 
 ## Serwis drukarek w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B naprawiamy drukarki HP, Canon, Epson, Brother, Kyocera i innych marek.
+W PRO-KOM Tech przy ul. Orkana 16B naprawiamy drukarki HP, Canon, Epson, Brother, Kyocera i innych marek.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
@@ -2767,9 +2767,9 @@ Jeśli powyższe kroki nie pomogły, problem może być sprzętowy:
     relatedSlugs: ["drukarka-laserowa-czy-atramentowa", "najczestsze-usterki-drukarek"],
     keyTakeaways: [
       "Biurowa drukarka laserowa A4 monochromatyczna to standard — szybka i tania w eksploatacji.",
-      "Kyocera to jedna z najlepszych marek do intensywnego druku biurowego — niski zakres strony.",
+      "Kyocera to jedna z najlepszych marek do intensywnego druku biurowego — niski koszt wydruku strony.",
       "Do biura z potrzebą skanowania i kopiowania — drukarka wielofunkcyjna MFP.",
-      "Roczny zakres eksploatacji jest ważniejszy niż zakres zakupu.",
+      "Roczny koszt eksploatacji jest ważniejszy niż koszt zakupu.",
     ],
     faq: [
       {
@@ -2782,7 +2782,7 @@ Jeśli powyższe kroki nie pomogły, problem może być sprzętowy:
       },
     ],
     content: `
-Drukarka biurowa musi sprostać wymaganiom, jakich nie stawia użytkownik domowy: duże nakłady, praca ciągła, szybki druk, niski zakres strony.
+Drukarka biurowa musi sprostać wymaganiom, jakich nie stawia użytkownik domowy: duże nakłady, praca ciągła, szybki druk, niski koszt wydruku strony.
 
 ## Na co zwrócić uwagę przy wyborze drukarki biurowej?
 
@@ -2890,7 +2890,7 @@ Szczególnie warto naprawiać:
 
 ## Serwis drukarek w Rabce-Zdroju
 
-W PRO-KOM Serwis przy ul. Orkana 16B serwisujemy drukarki HP, Canon, Epson, Brother, Kyocera i inne. Przyjmujemy sprzęt domowy i biurowy z Rabki-Zdroju oraz z okolic — Mszany Dolnej, Jordanowa, Nowego Targu i Czarnego Dunajca.
+W PRO-KOM Tech przy ul. Orkana 16B serwisujemy drukarki HP, Canon, Epson, Brother, Kyocera i inne. Przyjmujemy sprzęt domowy i biurowy z Rabki-Zdroju oraz z okolic — Mszany Dolnej, Jordanowa, Nowego Targu i Czarnego Dunajca.
 
 **Zadzwoń:** 883 200 151
 **Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)

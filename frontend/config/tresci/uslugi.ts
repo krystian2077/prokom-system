@@ -9,7 +9,7 @@ export const hubExtra = {
   ],
   /** "Od czego zacząć" — three ways in, plain steps. */
   start: [
-    { t: "Wiesz, co się zepsuło", s: "Wybierz urządzenie poniżej albo od razu zgłoś naprawę online. Opis usterki i dane trafią do systemu, więc przyjęcie w salonie trwa krócej." },
+    { t: "Wiesz, co się zepsuło", s: "Wybierz urządzenie powyżej albo od razu zgłoś naprawę online. Opis usterki i dane trafią do systemu, więc przyjęcie w salonie trwa krócej." },
     { t: "Nie wiesz, co jest przyczyną", s: "Opisz objawy w zgłoszeniu albo zadzwoń. Przyczynę ustalimy podczas diagnozy, a Ty zdecydujesz po wycenie." },
     { t: "Mieszkasz dalej", s: `Wyślij sprzęt kurierem ${courierDestination()}. Płacisz przelewem po diagnozie i akceptacji wyceny, a sprzęt wraca do Ciebie kurierem.` },
   ] satisfies Titled[],

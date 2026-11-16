@@ -77,7 +77,7 @@ export default function TownsPage() {
                 {list.map((t) => {
                   const local = locals.get(t.name);
                   return (
-                    <li key={t.slug} className="t-towncard">
+                    <li key={t.slug} id={t.slug} className="t-towncard">
                       <h3>{t.name}</h3>
                       <p>{t.name === p.city ? "Tu jest punkt serwisowy." : `Najbliższy punkt: ${p.name}.`}</p>
                       {local ? (

@@ -25,6 +25,8 @@ function inline(text: string): string {
     });
 }
 
+const CONTACT_LINE = /^\*\*(Zadzwoń|Adres|Tel|Telefon):\*\*/;
+
 export function renderPostContent(raw: string): string {
   const out: string[] = [];
   let list: "ul" | "ol" | null = null;
@@ -46,6 +48,9 @@ export function renderPostContent(raw: string): string {
   };
 
   for (const line of raw.split("\n")) {
+    // Legacy posts end with a hard-coded "**Zadzwoń:** … / **Adres:** …" block (Rabka only).
+    // Contact data comes from config/prokom.ts in the page around the post, so these lines are dropped.
+    if (CONTACT_LINE.test(line.trim())) continue;
     if (line.startsWith("## ")) {
       closePara();
       closeList();

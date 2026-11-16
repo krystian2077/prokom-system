@@ -43,7 +43,7 @@ export function HammerBlock() {
                 Poznaj Hammer Glass
                 <IconArrow size={17} strokeWidth={2.6} />
               </Link>
-              <Link href="/hammer-glass#rodzaje" className="t-sbtn t-sbtn--lg t-sbtn--ghost">
+              <Link href="/hammer-glass#folie" className="t-sbtn t-sbtn--lg t-sbtn--ghost">
                 {foils && !foils.draft ? `${foils.text} rodzajów folii` : "Rodzaje folii"}
               </Link>
             </div>

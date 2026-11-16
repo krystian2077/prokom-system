@@ -125,8 +125,9 @@ export default function TermsPage() {
       <Section title="§ 4. Przyjęcie urządzenia do naprawy – tryb stacjonarny">
         <Ol>
           <li>
-            Klient może oddać urządzenie do naprawy osobiście w siedzibie
-            serwisu lub za pośrednictwem formularza zlecenia online.
+            Klient może oddać urządzenie do naprawy osobiście w jednym z
+            punktów serwisowych lub za pośrednictwem formularza zlecenia
+            online.
           </li>
           <li>
             Przy przyjęciu urządzenia Usługodawca wystawia dokument przyjęcia
@@ -182,7 +183,7 @@ export default function TermsPage() {
             zgłoszeniem i nie wiąże stron.
           </li>
           <li>
-            W przypadku wysyłki urządzenia kurierskiej Klient pakuje urządzenie
+            W przypadku wysyłki urządzenia kurierem Klient pakuje urządzenie
             we własnym zakresie. Usługodawca nie odpowiada za szkody powstałe
             wskutek nieprawidłowego zapakowania.
           </li>
@@ -193,8 +194,8 @@ export default function TermsPage() {
       <Section title="§ 6. Wycena i realizacja naprawy">
         <Ol>
           <li>
-            Po przyjęciu urządzenia Usługodawca przeprowadza bezpłatną diagnozę
-            i przedstawia Klientowi wycenę naprawy.
+            Po przyjęciu urządzenia Usługodawca przeprowadza diagnozę
+            (w większości przypadków bezpłatną) i przedstawia Klientowi wycenę naprawy.
           </li>
           <li>
             Wycena podawana jest Klientowi telefonicznie, e-mailem lub przez
@@ -230,9 +231,9 @@ export default function TermsPage() {
           <li>
             Akceptowane formy płatności:
             <ul>
-              <Li>gotówka (przy odbiorze w siedzibie serwisu)</Li>
+              <Li>gotówka (przy odbiorze w punkcie serwisowym)</Li>
               <Li>przelew bankowy na rachunek wskazany w wycenie</Li>
-              <Li>płatność kartą (terminal w siedzibie serwisu)</Li>
+              <Li>płatność kartą (terminal w punkcie serwisowym)</Li>
             </ul>
           </li>
           <li>
@@ -269,7 +270,9 @@ export default function TermsPage() {
             urządzeniem zgodnie z przepisami o nieodebranych rzeczach.
           </li>
           <li>
-            W przypadku wysyłki zwrotnej koszty wysyłki ponosi Klient.
+            Koszt odesłania urządzenia kurierem po naprawie albo po rezygnacji
+            z naprawy ponosi Usługodawca. Koszt wysyłki urządzenia do serwisu
+            ponosi Klient.
           </li>
         </Ol>
       </Section>
@@ -307,7 +310,7 @@ export default function TermsPage() {
             >
               {line.email}
             </a>{" "}
-            lub osobiście w siedzibie serwisu.
+            lub osobiście w punkcie serwisowym.
           </li>
         </Ol>
       </Section>
@@ -331,15 +334,13 @@ export default function TermsPage() {
                   {line.email}
                 </a>
               </Li>
-              <Li>za pomocą formularza reklamacyjnego dostępnego pod adresem {line.domain}/claim-repair</Li>
-              <Li>osobiście w siedzibie serwisu</Li>
+              <Li>osobiście w punkcie serwisowym</Li>
               <Li>pisemnie na adres: {polishText(company.hq.street)}, {company.hq.postal} {company.hq.city}</Li>
             </ul>
           </li>
           <li>
             Reklamacja powinna zawierać: imię i nazwisko, dane kontaktowe, opis
-            problemu, numer RMA (jeśli dotyczy naprawy) lub numer zamówienia
-            (jeśli dotyczy towaru), oraz oczekiwany sposób rozpatrzenia.
+            problemu, numer RMA oraz oczekiwany sposób rozpatrzenia.
           </li>
           <li>
             Usługodawca rozpatruje reklamację w terminie 14 dni od jej
@@ -347,17 +348,10 @@ export default function TermsPage() {
             pisemnie.
           </li>
           <li>
-            Konsument może skorzystać z pozasądowych metod rozwiązywania
-            sporów, w szczególności z platformy ODR Komisji Europejskiej
-            dostępnej pod adresem{" "}
-            <a data-t-inline=""
-              href="https://ec.europa.eu/consumers/odr"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ec.europa.eu/consumers/odr
-            </a>
-            .
+            Konsument może skorzystać z pozasądowych metod rozpatrywania
+            reklamacji i dochodzenia roszczeń, w szczególności z pomocy
+            miejskiego lub powiatowego rzecznika konsumentów albo
+            Wojewódzkiego Inspektoratu Inspekcji Handlowej.
           </li>
         </Ol>
       </Section>
@@ -455,7 +449,7 @@ export default function TermsPage() {
       <Section title="§ 14. Postanowienia końcowe">
         <Ol>
           <li>
-            Regulamin wchodzi w życie z dniem 25 kwietnia 2026 r. i obowiązuje
+            Regulamin wchodzi w życie z dniem 15 listopada 2026 r. i obowiązuje
             do czasu jego zmiany lub odwołania.
           </li>
           <li>
