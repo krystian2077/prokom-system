@@ -477,7 +477,7 @@ class StaffResetPasswordView(APIView):
             # Uproszczone: w pełnej wersji budujesz URL do frontu resetu z tokenem
             try:
                 send_mail(
-                    subject="Reset hasła — PRO-KOM Serwis",
+                    subject="Reset hasła — PRO-KOM Tech",
                     message=f"Link do resetu hasła (token w systemie). Skontaktuj się z administratorem lub użyj funkcji resetu w panelu.",
                     from_email=settings.DEFAULT_FROM_EMAIL or "noreply@prokom.pl",
                     recipient_list=[user.email],

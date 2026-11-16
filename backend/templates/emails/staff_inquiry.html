@@ -1,0 +1,38 @@
+{% extends "emails/base_email.html" %}
+{% comment %}
+Contact-form inquiry sent to the service (inquiry_views._build_inquiry_html).
+All values are HTML-escaped by the caller (django.utils.html.escape), so autoescape is off here.
+{% endcomment %}
+{% block title %}Nowe zapytanie ze strony — PRO-KOM Tech{% endblock %}
+{% block preheader %}{% autoescape off %}{{ full_name }} — nowe zapytanie z formularza kontaktowego. Odezwij się do klienta.{% endautoescape %}{% endblock %}
+{% block header_label %}Powiadomienie wewnętrzne{% endblock %}
+{% block hero_icon %}{% include "emails/_hero_icon.html" with icon="message" %}{% endblock %}
+{% block eyebrow %}Wymaga odpowiedzi{% endblock %}
+{% block heading %}Nowe zapytanie ze strony{% endblock %}
+{% block lead %}Klient wypełnił formularz kontaktowy na prokomserwis.pl. Odezwij się do niego możliwie szybko.{% endblock %}
+{% block content %}{% autoescape off %}
+  {% include "emails/_h2.html" with text="Dane kontaktowe" top="0" %}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-bd" style="border-top:1px solid #E3E6DF;">
+    {% include "emails/_row.html" with label="Imię i nazwisko" value=full_name %}
+    <tr>
+      <td class="em-stack em-dt em-ink2 em-bd" width="38%" valign="top" style="padding:13px 16px 13px 0; border-bottom:1px solid #E3E6DF; font-size:13px; line-height:21px; font-weight:600; color:#4F5650;">Telefon</td>
+      <td class="em-stack em-dd em-bd" valign="top" style="padding:13px 0; border-bottom:1px solid #E3E6DF; font-size:15px; line-height:22px; font-weight:700;">{% if phone %}<a class="em-ink" href="tel:{{ phone_href }}" style="color:#121613; text-decoration:none;">{{ phone }}</a>{% else %}<span class="em-ink2" style="color:#4F5650; font-weight:600;">nie podano</span>{% endif %}</td>
+    </tr>
+    <tr>
+      <td class="em-stack em-dt em-ink2 em-bd" width="38%" valign="top" style="padding:13px 16px 13px 0; border-bottom:1px solid #E3E6DF; font-size:13px; line-height:21px; font-weight:600; color:#4F5650;">E-mail</td>
+      <td class="em-stack em-dd em-bd" valign="top" style="padding:13px 0; border-bottom:1px solid #E3E6DF; font-size:15px; line-height:22px; font-weight:700; word-break:break-all;"><a class="em-acc" href="mailto:{{ email }}" style="color:#B3301F; text-decoration:none;">{{ email }}</a></td>
+    </tr>
+    {% if interest %}{% include "emails/_row.html" with label="Zainteresowanie" value=interest %}{% endif %}
+  </table>
+
+  {% include "emails/_h2.html" with text="Treść pytania" %}
+  {% include "emails/_quote_box.html" with body=message %}
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:30px;" class="em-full">
+    <tr>
+      <td class="em-stack em-stack-gap" style="padding:0 10px 0 0;">{% include "emails/_button.html" with url=reply_href label="Odpowiedz klientowi" full=True %}</td>
+      {% if phone %}<td class="em-stack">{% include "emails/_button.html" with url=phone_tel label="Zadzwoń" secondary=True full=True %}</td>{% endif %}
+    </tr>
+  </table>
+{% endautoescape %}{% endblock %}
+{% block footer %}{% include "emails/_staff_footer.html" with note="Wiadomość wysłana automatycznie z formularza kontaktowego na prokomserwis.pl." %}{% endblock %}

@@ -1,0 +1,13 @@
+{% comment %}Bulletproof button. Params: url, label, secondary (bool), full (bool: full width on phones).{% endcomment %}<table role="presentation" cellpadding="0" cellspacing="0" border="0" class="em-btn{% if full %} em-full{% endif %}" style="border-collapse:separate;">
+  <tr>
+    {% if secondary %}
+    <td class="em-card em-bd" align="center" bgcolor="#FFFFFF" style="border-radius:12px; background-color:#FFFFFF; border:1.5px solid #CFD3CA; mso-padding-alt:14px 26px;">
+      <a class="em-ink" href="{{ url }}" target="_blank" style="display:inline-block; padding:14px 26px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:20px; font-weight:800; color:#121613; text-decoration:none; border-radius:12px;">{{ label }}</a>
+    </td>
+    {% else %}
+    <td align="center" bgcolor="#D13A2E" style="border-radius:12px; background-color:#D13A2E; mso-padding-alt:15px 28px;">
+      <a href="{{ url }}" target="_blank" style="display:inline-block; padding:15px 28px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:20px; font-weight:800; color:#FFFFFF; text-decoration:none; border-radius:12px;">{{ label }}&nbsp;&rarr;</a>
+    </td>
+    {% endif %}
+  </tr>
+</table>

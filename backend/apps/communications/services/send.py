@@ -194,14 +194,14 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         "estimated_duration_display": repair.get_estimated_duration_display() if hasattr(repair, "get_estimated_duration_display") else "",
     }
     subject = (
-        f"Potwierdzenie przyjęcia w serwisie — {repair.repair_number} | PRO-KOM Serwis"
+        f"Potwierdzenie przyjęcia w serwisie — {repair.repair_number} | PRO-KOM Tech"
         if intake_stationary
-        else f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Serwis"
+        else f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Tech"
     )
     if intake_stationary:
         body_plain = (
             f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
-            "Dziękujemy za wizytę w serwisie PRO-KOM. Poniżej masz potwierdzenie przyjęcia sprzętu oraz najważniejsze informacje.\n\n"
+            "Dziękujemy za wizytę w serwisie PRO-KOM Tech. Poniżej masz potwierdzenie przyjęcia sprzętu oraz najważniejsze informacje.\n\n"
             f"NUMER ZGŁOSZENIA: {repair.repair_number}\n"
             "Zapisz go — przyda się przy kontakcie z nami i przy śledzeniu statusu.\n\n"
             f"Urządzenie: {device_name}\n"
@@ -226,7 +226,7 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         body_plain += (
             f"Kontakt: tel. {service_address['phone']}, {service_address['email']}\n"
             f"{addr_full}\n\n"
-            "Z poważaniem,\nZespół PRO-KOM Serwis"
+            "Z poważaniem,\nZespół PRO-KOM Tech"
         )
     else:
         body_plain = (
@@ -271,7 +271,7 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         )
         if claim_url:
             body_plain += f"Chcesz przypisać tę naprawę do konta? Link (ważny 7 dni): {claim_url}\n\n"
-        body_plain += "Z poważaniem,\nZespół PRO-KOM Serwis"
+        body_plain += "Z poważaniem,\nZespół PRO-KOM Tech"
     try:
         html_content = render_to_string("emails/repair_submission_confirmation.html", context)
         return send_email_html(to_email, subject, body_plain, html_content, fail_silently=fail_silently)
@@ -293,7 +293,7 @@ def send_guest_repair_confirmation(repair, fail_silently=True):
     to_email = repair.client.email or ""
     if not to_email:
         return False
-    subject = f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Serwis"
+    subject = f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Tech"
     body = (
         f"Dzień dobry,\n\n"
         f"Twoje zgłoszenie naprawy zostało przyjęte.\n\n"
@@ -309,7 +309,7 @@ def send_guest_repair_confirmation(repair, fail_silently=True):
     body += (
         "Załóż konto w panelu klienta, aby na stałe śledzić naprawy i zarządzać profilem:\n"
         f"{base}/client/rejestracja\n\n"
-        "— PRO-KOM Serwis"
+        "— PRO-KOM Tech"
     )
     try:
         send_email(to_email, subject, body, fail_silently=fail_silently)
@@ -534,9 +534,9 @@ def send_quote_summary_email_to_client(repair, quote, sent_by, *, fail_silently=
 
     html_content = render_to_string("emails/quote_summary.html", ctx)
     subject = (
-        f"Zaktualizowana wycena — {repair.repair_number} | PRO-KOM Serwis"
+        f"Zaktualizowana wycena — {repair.repair_number} | PRO-KOM Tech"
         if is_resend
-        else f"Wycena naprawy {repair.repair_number} | PRO-KOM Serwis"
+        else f"Wycena naprawy {repair.repair_number} | PRO-KOM Tech"
     )
     _log, ok = send_freeform_email_to_repair_client(
         repair, subject, body_plain, sent_by, fail_silently=fail_silently, html_content=html_content
@@ -567,10 +567,10 @@ def send_repair_completion_thank_you_email(repair, sent_by=None, *, fail_silentl
         except Exception:
             completed_at_display = str(completed_at)
 
-    subject = f"Dziękujemy za zaufanie — {repair.repair_number} | PRO-KOM Serwis"
+    subject = f"Dziękujemy za zaufanie — {repair.repair_number} | PRO-KOM Tech"
     body_plain = (
         f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
-        "Dziękujemy za zaufanie i skorzystanie z usług PRO-KOM Serwis.\n"
+        "Dziękujemy za zaufanie i skorzystanie z usług PRO-KOM Tech.\n"
         "Twoja naprawa została zakończona, a urządzenie jest gotowe do odbioru.\n\n"
         f"Numer zgłoszenia: {repair.repair_number}\n"
         f"Urządzenie: {device_label}\n"
@@ -581,7 +581,7 @@ def send_repair_completion_thank_you_email(repair, sent_by=None, *, fail_silentl
         f"\nPanel klienta: {panel_detail_url}\n"
         f"Śledzenie bez logowania: {track_url}\n\n"
         "Dziękujemy za wybór naszego serwisu.\n"
-        "Zespół PRO-KOM Serwis"
+        "Zespół PRO-KOM Tech"
     )
 
     ctx = {
@@ -615,13 +615,20 @@ def _outbound_client_email_footer(repair):
 
 
 def _outbound_client_email_footer_html(repair):
+    # Appended after the rendered e-mail (templates/emails/base_email.html), so it is a centred
+    # 600 px block on the page background, styled like the PRO-KOM Tech layout.
     rn = repair.repair_number
     return (
-        f'<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:28px;'
-        f'border-top:1px solid #e5e5e5;padding-top:18px;"><tr><td style="font-size:12px;line-height:1.55;color:#737373;">'
-        f"Odpowiadając na tę wiadomość, zachowaj w temacie numer zgłoszenia: "
-        f'<strong style="color:#404040;">{rn}</strong> — wtedy odpowiedź trafi do wątku tej naprawy w serwisie.'
-        f"</td></tr></table>"
+        '<table role="presentation" class="em-bg" width="100%" cellpadding="0" cellspacing="0" border="0" '
+        'bgcolor="#F4F5F1" style="background-color:#F4F5F1;"><tr><td align="center" style="padding:0 12px 36px;">'
+        '<table role="presentation" class="em-wrap" width="600" cellpadding="0" cellspacing="0" border="0" '
+        'style="width:600px;max-width:600px;"><tr>'
+        '<td class="em-px em-ink2" align="center" style="padding:18px 44px 0;font-family:\'Manrope\',-apple-system,'
+        "BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:19px;color:#4F5650;\">"
+        "Odpowiadając na tę wiadomość, zachowaj w temacie numer zgłoszenia "
+        f'<strong class="em-ink" style="color:#121613;font-weight:800;">{rn}</strong> — '
+        "wtedy odpowiedź trafi do wątku tej naprawy w serwisie."
+        "</td></tr></table></td></tr></table>"
     )
 
 

@@ -1,12 +1,25 @@
 {% extends "emails/base_email.html" %}
-{% block title %}Kod weryfikacyjny — PRO-KOM Serwis{% endblock %}
+{% block title %}Kod weryfikacyjny — PRO-KOM Tech{% endblock %}
+{% block preheader %}Twój kod weryfikacyjny: {{ code }}. Kod jest ważny przez 15 minut.{% endblock %}
+{% block header_label %}Konto klienta{% endblock %}
+{% block hero_icon %}{% include "emails/_hero_icon.html" with icon="lock" %}{% endblock %}
+{% block eyebrow %}Weryfikacja konta{% endblock %}
+{% block heading %}Twój kod weryfikacyjny{% endblock %}
+{% block lead %}Dzień dobry. Wpisz poniższy kod na stronie weryfikacji, aby dokończyć rejestrację w&nbsp;panelu klienta PRO-KOM Tech.{% endblock %}
 {% block content %}
-  <p>Dzień dobry,</p>
-  <p>Oto Twój kod weryfikacyjny do dokończenia rejestracji w panelu klienta PRO-KOM Serwis:</p>
-  <div class="code-box">
-    <div class="code">{{ code }}</div>
-    <div class="hint">Kod jest ważny przez 15 minut.</div>
-  </div>
-  <p>Wpisz powyższy kod na stronie weryfikacji. Jeśli to nie Ty zakładałeś konto, zignoruj tę wiadomość.</p>
-  <p>Z poważaniem,<br><strong style="color:#171717;">Zespół PRO-KOM Serwis</strong></p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-ticket" bgcolor="#121613" style="background-color:#121613; border-radius:16px; border-collapse:separate;">
+    <tr>
+      <td align="center" style="padding:28px 20px 26px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <p style="margin:0; font-size:11px; line-height:16px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase; color:#9aa39b;">Kod weryfikacyjny</p>
+        <p style="margin:10px 0 0; font-family:'Archivo',Consolas,'Courier New',monospace; font-size:40px; line-height:48px; font-weight:800; letter-spacing:0.22em; color:#FFFFFF; padding-left:0.22em;">{{ code }}</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:14px auto 0; border-collapse:separate;">
+          <tr><td style="padding:6px 12px; border-radius:999px; background-color:#2a1917; font-size:13px; line-height:18px; font-weight:700; color:#f29185;" bgcolor="#2a1917">Ważny przez 15 minut</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <p class="em-ink2" style="margin:24px 0 0; font-size:14px; line-height:22px; color:#4F5650;">Jeśli to nie Ty zakładałeś konto, zignoruj tę wiadomość — bez kodu nikt nie dokończy rejestracji.</p>
+
+  {% include "emails/_contact.html" %}
 {% endblock %}
