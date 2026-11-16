@@ -1,0 +1,13 @@
+{% comment %}Highlighted sentence with an icon. Params: icon, title, text, red (bool: red-tinted box).{% endcomment %}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="{% if red %}em-redsoft{% else %}em-soft{% endif %}" bgcolor="{% if red %}#FBE9E6{% else %}#F4F5F1{% endif %}" style="margin:0 0 {{ bottom|default:"14" }}px; background-color:{% if red %}#FBE9E6{% else %}#F4F5F1{% endif %}; border-radius:14px;{% if red %} border:1px solid #F1C9C3;{% endif %} border-collapse:separate;">
+  <tr>
+    <td style="padding:16px 18px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td width="32" valign="top" style="width:32px; padding-top:1px;"><img src="https://prokomserwis.pl/tech/mail/ic-{{ icon|default:"pin" }}.png" width="20" height="20" alt="" style="display:block; width:20px; height:20px; border:0;"></td>
+        <td valign="top">
+          {% if title %}<p class="em-ink" style="margin:0 0 2px; font-size:15px; line-height:22px; font-weight:800; color:#121613;">{{ title }}</p>{% endif %}
+          <p class="em-ink" style="margin:0; font-size:14px; line-height:22px; color:#121613;">{{ text }}</p>
+        </td>
+      </tr></table>
+    </td>
+  </tr>
+</table>
