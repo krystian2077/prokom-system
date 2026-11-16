@@ -49,7 +49,7 @@ export function buildSearchIndex(draft: boolean = isDraftMode()): SearchEntry[] 
     add({ id: `strona:${PREP_GUIDE_HREF}`, group: "strony", title: "Jak przygotować sprzęt do serwisu", href: PREP_GUIDE_HREF, hint: "Kopia danych, kod, akcesoria", text: "przygotowanie kopia zapasowa haslo kod blokady poradnik", icon: "doc", popularity: 50 });
   }
   const courier = courierPageHref();
-  if (courier) add({ id: `strona:${courier}`, group: "strony", title: "Naprawa wysyłkowa", href: courier, hint: "Wyślij sprzęt kurierem", text: "kurier wysylka paczka cala polska", icon: "truck", popularity: 55 });
+  if (courier) add({ id: `strona:${courier}`, group: "strony", title: "Naprawa wysyłkowa", href: courier, hint: "Wyślij sprzęt kurierem", aliases: "kurier wysyłka", text: "kurier wysylka paczka cala polska", icon: "truck", popularity: 55 });
   for (const lp of visibleLocalPages(draft)) {
     add({ id: `strona:/${lp.slug}`, group: "strony", title: lp.title, href: `/${lp.slug}`, hint: lp.inCity, text: clip(`${lp.description} ${lp.area}`), icon: "phone", popularity: 60 });
   }
