@@ -60,7 +60,8 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
           // HTTPS only (Nginx terminates TLS); browsers ignore HSTS over http, and localhost never gets it.
-          ...(isProd ? [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }] : []),
+          // No includeSubDomains until every *.prokomserwis.pl host is confirmed HTTPS-only.
+          ...(isProd ? [{ key: "Strict-Transport-Security", value: "max-age=31536000" }] : []),
         ],
       },
       // Files from public/ (photos, icons); /_next/static already gets immutable caching from Next.
