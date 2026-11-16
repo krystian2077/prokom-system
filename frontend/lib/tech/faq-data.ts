@@ -3,7 +3,7 @@
  * Old FAQ promised free diagnosis, parcel lockers and a shop — removed (SPEC §8, §10).
  */
 import { servicePoints } from "@/config/prokom";
-import { courierPageHref } from "./courier";
+import { courierDestination, courierPageHref } from "./courier";
 import { PREP_GUIDE_HREF, PREP_GUIDE_READY, SUBMIT_HREF, TRACK_HREF } from "./nav";
 import { inCity } from "./point-format";
 import { publishedPoints } from "./points";
@@ -58,7 +58,7 @@ export function faqGroups(): FaqGroup[] {
       id: "kurier",
       title: "Wysyłka kurierem",
       items: [
-        { q: "Czy mogę wysłać sprzęt kurierem?", a: "Tak, na adres jednego z naszych salonów. Najlepiej najpierw zgłoś naprawę online (wybierz „Kurier”), napisz albo zadzwoń, a numer zgłoszenia włóż do paczki." },
+        { q: "Czy mogę wysłać sprzęt kurierem?", a: `Tak, ${courierDestination()}. Najlepiej najpierw zgłoś naprawę online (wybierz „Kurier”), napisz albo zadzwoń, a numer zgłoszenia włóż do paczki.` },
         { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów. Nadaj paczkę kurierem pod adres salonu." },
       ],
       links: courier ? [{ href: courier, label: "Naprawa wysyłkowa — jak to działa" }] : undefined,

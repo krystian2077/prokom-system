@@ -7,7 +7,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { courierService, servicePoints } from "@/config/prokom";
 import sitemap from "@/app/sitemap";
-import { courierPoints, courierWhereText } from "@/lib/tech/courier";
+import { courierDestination, courierPoints, courierWhereText } from "@/lib/tech/courier";
 import { courierInSitemap, courierPageVisible, courierPaymentText, courierPayRows } from "@/lib/tech/courier-page";
 import { footerColumns } from "@/lib/tech/nav";
 import { PREP_TABS, tabForCategory } from "@/lib/tech/prep-guide";
@@ -98,17 +98,24 @@ describe("naprawa kurierem — publikacja (SPEC §12.10)", () => {
   it("null fields hide their rows", () => {
     expect(courierPayRows({ ...courierService, inboundPaidBy: "client", returnPaidBy: null, returnIfDeclined: null }).map((r) => r.k)).toEqual(["Wysyłka do serwisu"]);
   });
-  it("parcels go to every published point, never to an unpublished one (15.11)", () => {
-    const draft = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
-    expect(courierPoints(draft).map((p) => p.key)).toEqual(["rabka"]);
-    expect(courierWhereText(courierPoints(draft))).toBe("Wyślij sprzęt na adres naszego salonu: Rabka-Zdrój.");
+  it("parcels go only to published points listed in parcelPoints", () => {
     const both = servicePoints.map((p) => ({ ...p, published: true }));
-    expect(courierPoints(both).map((p) => p.key)).toEqual(["rabka", "zakopane"]);
-    expect(courierWhereText(courierPoints(both))).toBe("Wyślij sprzęt na adres jednego z naszych salonów: Rabka-Zdrój lub Zakopane.");
+    const all = { ...courierService, parcelPoints: ["rabka", "zakopane"] as typeof courierService.parcelPoints };
+    expect(courierPoints(both, all).map((p) => p.key)).toEqual(["rabka", "zakopane"]);
+    expect(courierWhereText(courierPoints(both, all))).toBe("Wyślij sprzęt na adres jednego z naszych salonów: Rabka-Zdrój lub Zakopane.");
+    const draft = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));
+    expect(courierPoints(draft, all).map((p) => p.key)).toEqual(["rabka"]);
+    const rabkaDraft = servicePoints.map((p) => (p.key === "rabka" ? { ...p, published: false } : { ...p, published: true }));
+    expect(courierPoints(rabkaDraft)).toEqual([]);
     expect(courierWhereText([])).toBeNull();
   });
-  it("current config: both salons accept parcels", () => {
-    expect(courierPoints().map((p) => p.key)).toEqual(["rabka", "zakopane"]);
+  it("parcels go to the Rabka salon only — no courier to Zakopane (16.11)", () => {
+    expect(courierService.parcelPoints).toEqual(["rabka"]);
+    const both = servicePoints.map((p) => ({ ...p, published: true }));
+    expect(courierPoints(both).map((p) => p.key)).toEqual(["rabka"]);
+    expect(courierPoints().map((p) => p.key)).toEqual(["rabka"]);
+    expect(courierDestination()).toBe("na adres salonu w Rabce-Zdroju");
+    expect(courierWhereText()).toBe("Wyślij sprzęt na adres salonu w Rabce-Zdroju.");
   });
 });
 

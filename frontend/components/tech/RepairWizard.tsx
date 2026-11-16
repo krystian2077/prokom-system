@@ -27,7 +27,7 @@ export type WizardCourier = {
   pays: string | null;
   /** "/naprawa-kurierem" once published, else null (no "Jak to działa?" link). */
   href: string | null;
-  /** "Wyślij sprzęt na adres jednego z naszych salonów: …" (lib/tech/courier.ts), null = hidden. */
+  /** "Wyślij sprzęt na adres salonu w Rabce-Zdroju." (lib/tech/courier.ts), null = hidden. */
   where?: string | null;
 };
 

@@ -3,6 +3,7 @@
  * Built only from `courierService`; a `null` field means the line is not shown.
  */
 import { courierService, servicePoints, type ServicePoint } from "@/config/prokom";
+import { inCity } from "./point-format";
 
 type Payer = "client" | "service";
 const who = (p: Payer) => (p === "client" ? "na Twój koszt" : "na nasz koszt");
@@ -26,14 +27,20 @@ export function courierPageHref(service: typeof courierService = courierService)
   return service.published ? "/naprawa-kurierem" : null;
 }
 
-/** Points that accept courier parcels: every published point (Krystian, 15.11.2026). */
-export function courierPoints(points: ServicePoint[] = servicePoints): ServicePoint[] {
-  return points.filter((p) => p.published);
+/** Points that accept courier parcels: published points listed in `courierService.parcelPoints`
+ * (only Rabka: there is no courier to Zakopane — Krystian, 16.11.2026). */
+export function courierPoints(points: ServicePoint[] = servicePoints, service: typeof courierService = courierService): ServicePoint[] {
+  return points.filter((p) => p.published && service.parcelPoints.includes(p.key));
+}
+
+/** "na adres salonu w Rabce-Zdroju" / "na adres jednego z naszych salonów" — the destination in courier copy. */
+export function courierDestination(points: ServicePoint[] = courierPoints()): string {
+  return points.length === 1 ? `na adres salonu ${inCity(points[0].city)}` : "na adres jednego z naszych salonów";
 }
 
 /** "Where to send" sentence for the wizard, the form and the success card; null without a published point. */
 export function courierWhereText(points: ServicePoint[] = courierPoints()): string | null {
   if (!points.length) return null;
-  if (points.length === 1) return `Wyślij sprzęt na adres naszego salonu: ${points[0].city}.`;
-  return `Wyślij sprzęt na adres jednego z naszych salonów: ${points.map((p) => p.city).join(" lub ")}.`;
+  if (points.length === 1) return `Wyślij sprzęt ${courierDestination(points)}.`;
+  return `Wyślij sprzęt ${courierDestination(points)}: ${points.map((p) => p.city).join(" lub ")}.`;
 }

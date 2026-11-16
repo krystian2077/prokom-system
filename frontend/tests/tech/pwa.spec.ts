@@ -87,12 +87,14 @@ test("courier page is linked from /uslugi, device pages, FAQ, footer and /obslug
   await expect(page.locator('footer a[href="/naprawa-kurierem"]').first()).toBeAttached();
 });
 
-test("courier page: 'Gdzie wysłać' lists both salons with address and hours (15.11)", async ({ page }) => {
+test("courier page: 'Gdzie wysłać' shows only the Rabka salon (audit 16.11, variant a)", async ({ page }) => {
   await page.goto("/naprawa-kurierem");
   const cards = page.locator("#gdzie-wyslac .t-courier__addr");
-  await expect(cards).toHaveCount(2);
+  await expect(cards).toHaveCount(1);
   await expect(cards.nth(0)).toContainText("Rabka-Zdrój");
-  await expect(cards.nth(1)).toContainText("Zakopane");
+  await expect(page.locator("#gdzie-wyslac")).not.toContainText("Zakopane");
+  await expect(page.locator("main")).toContainText("na adres salonu w Rabce-Zdroju");
+  await expect(page.locator("main")).not.toContainText("jednego z naszych salonów");
   await expect(page.locator("#jak-to-dziala")).toContainText("Najlepiej przed wysyłką");
   await expect(page.locator("main")).not.toContainText("Nie wysyłaj sprzętu przed kontaktem");
 });
