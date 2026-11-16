@@ -4,11 +4,13 @@ import { line, telHref } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { IconArrow, IconSearch } from "@/components/tech/icons";
 import { SearchIcon } from "@/components/tech/rail-icons";
+import { SearchPageActions } from "@/components/tech/search/SearchPageActions";
 import { SearchPageMeasure } from "@/components/tech/search/SearchPageMeasure";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { buildSearchIndex } from "@/lib/tech/search/build-index";
 import { highlight } from "@/lib/tech/search/engine";
-import { MAX_QUERY, PAGE_GROUP_LIMIT, POPULAR, buildProvider } from "@/lib/tech/search/provider";
+import { MAX_QUERY, PAGE_GROUP_LIMIT, buildProvider } from "@/lib/tech/search/provider";
+import { POPULAR_PHRASES, countCategories, resultsLabel } from "@/lib/tech/search/shortcuts";
 import type { Crumb } from "@/lib/tech/seo";
 
 type Props = { searchParams: { q?: string | string[] } };
@@ -30,8 +32,7 @@ const CRUMBS: Crumb[] = [
 // One provider per server process: the index is the same for every request of a build.
 let provider: ReturnType<typeof buildProvider> | null = null;
 const getProvider = () => (provider ??= buildProvider(buildSearchIndex()));
-
-const resultsLabel = (n: number) => `${n} ${n === 1 ? "wynik" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "wyniki" : "wyników"}`;
+const searchHref = (q: string) => `/szukaj?q=${encodeURIComponent(q)}`;
 
 /**
  * `/szukaj?q=` — the search without JavaScript (a plain GET form) and the „Wszystkie wyniki”
@@ -132,18 +133,50 @@ export default function SearchPage({ searchParams }: Props) {
           ) : null}
 
           {!q || !total ? (
-            <div className="t-szukaj__popular">
-              <h2 className="t-szukaj__title">Najczęściej szukane</h2>
-              <ul className="t-sdlg__chips">
-                {POPULAR.map((phrase) => (
-                  <li key={phrase}>
-                    <Link href={`/szukaj?q=${encodeURIComponent(phrase)}`} className="t-sdlg__chip">
-                      {phrase}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <>
+              <section className="t-szukaj__sec" aria-labelledby="szukaj-akcje">
+                <h2 id="szukaj-akcje" className="t-szukaj__title">
+                  Szybkie akcje
+                </h2>
+                <SearchPageActions />
+              </section>
+              <section className="t-szukaj__sec t-szukaj__popular" aria-labelledby="szukaj-popularne">
+                <h2 id="szukaj-popularne" className="t-szukaj__title">
+                  Najczęściej szukane
+                </h2>
+                <ul className="t-sdlg__chips">
+                  {POPULAR_PHRASES.map((phrase) => (
+                    <li key={phrase.label}>
+                      <Link href={searchHref(phrase.query)} className="t-sdlg__chip">
+                        <IconSearch size={14} strokeWidth={2.4} />
+                        {phrase.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <section className="t-szukaj__sec" aria-labelledby="szukaj-skroty">
+                <h2 id="szukaj-skroty" className="t-szukaj__title">
+                  Na skróty
+                </h2>
+                <ul className="t-szukaj__cats">
+                  {countCategories(p).map((c) => (
+                    <li key={c.key}>
+                      <Link href={searchHref(c.query)} className="t-sdlg__cat">
+                        <span className="t-sdlg__caticon">
+                          <SearchIcon icon={c.icon} size={20} />
+                        </span>
+                        <span className="t-sdlg__text">
+                          <span className="t-sdlg__catname">{c.label}</span>
+                          <span className="t-sdlg__catcount">{resultsLabel(c.count)}</span>
+                        </span>
+                        <IconArrow className="t-sdlg__go" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </>
           ) : null}
           </div>
         </div>

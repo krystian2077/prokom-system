@@ -9,7 +9,7 @@ import { prepareIndex, searchIndex } from "./engine";
 export type SearchGroupKey = "akcje" | "strony" | "urzadzenia" | "naprawy" | "usterki" | "punkty" | "pytania" | "blog";
 
 export const GROUP_TITLES: Record<SearchGroupKey, string> = {
-  akcje: "Na skróty",
+  akcje: "Szybkie akcje",
   strony: "Strony",
   urzadzenia: "Urządzenia",
   naprawy: "Naprawy",
@@ -39,7 +39,16 @@ export type SearchIconName =
   | "truck"
   | "shield"
   | "user"
-  | "map";
+  | "map"
+  // Quick actions and the sections of the empty window.
+  | "copy"
+  | "mail"
+  | "route"
+  | "chat"
+  | "moon"
+  | "sun"
+  | "check"
+  | "trend";
 
 export type SearchEntry = {
   id: string;
@@ -87,7 +96,7 @@ export const SYNONYMS: readonly string[] = [
 /** Words that say nothing on their own in a query. */
 export const STOP_WORDS: readonly string[] = ["na", "do", "od", "ze", "we", "sie", "jak", "czy", "mi", "mam", "moj", "moja", "mojego", "jest"];
 
-export const POPULAR: readonly string[] = ["Wymiana ekranu", "Bateria", "Po zalaniu", "Status naprawy", "Hammer Glass", "Godziny otwarcia"];
+/** Phrases of „Najczęściej szukane” with their target pages: `shortcuts.ts` (`POPULAR_PHRASES`). */
 
 export type Provider = {
   /** Groups for a query; an empty list means nothing found. */
