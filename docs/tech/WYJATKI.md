@@ -26,29 +26,29 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 | 15.11.2026 | `frontend/features/client-naprawy/ClientNaprawyDetail.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
 | 15.11.2026 | `frontend/features/client-profil/ClientProfil.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
 | 16.11.2026 | `backend/requirements.txt` | Przypięcie `kombu>=5.4,<5.5`: celery 5.4 dopuszcza kombu <6, a świeża instalacja brała kombu 5.7, które odrzuca redis-py 5.2 (`VersionMismatch`) — Celery nie zlecał zadań (powiadomienia o zgłoszeniach, rejestracja konta). Sprawdzone lokalnie: kombu 5.4.2 + redis 5.2.1 + celery 5.4.0, `pip check` czysty, zadanie trafia do Redisa | Krystian (czat, 16.11) | #97 |
-| 16.11.2026 | `backend/apps/communications/services/send.py` | Szablony maili PRO-KOM Tech, bez zmian w logice: stopka HTML maili z panelu, „PRO-KOM Tech” w tematach i podpisach | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/apps/communications/services/staff_notifications.py` | Szablony maili PRO-KOM Tech, bez zmian w logice: HTML powiadomienia serwisu przez `emails/staff_new_repair.html`, polskie znaki w etykietach | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/apps/communications/views/inquiry_views.py` | Szablony maili PRO-KOM Tech, bez zmian w logice: HTML zapytania z formularza przez `emails/staff_inquiry.html`, dane klienta escapowane (`django.utils.html.escape`, błąd z backlogu) | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_button.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_check.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_contact.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_h2.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_hero_icon.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_point.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_points.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_quote_box.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_row.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_staff_footer.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_step.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/_ticket.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/base_email.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/password_reset.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/quote_summary.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/repair_completion_thank_you.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/repair_submission_confirmation.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/staff_inquiry.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/staff_new_repair.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
-| 16.11.2026 | `backend/templates/emails/verification_code.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #PR |
+| 16.11.2026 | `backend/apps/communications/services/send.py` | Szablony maili PRO-KOM Tech, bez zmian w logice: stopka HTML maili z panelu, „PRO-KOM Tech” w tematach i podpisach | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/apps/communications/services/staff_notifications.py` | Szablony maili PRO-KOM Tech, bez zmian w logice: HTML powiadomienia serwisu przez `emails/staff_new_repair.html`, polskie znaki w etykietach | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/apps/communications/views/inquiry_views.py` | Szablony maili PRO-KOM Tech, bez zmian w logice: HTML zapytania z formularza przez `emails/staff_inquiry.html`, dane klienta escapowane (`django.utils.html.escape`, błąd z backlogu) | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_button.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_check.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_contact.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_h2.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_hero_icon.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_point.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_points.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_quote_box.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_row.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_staff_footer.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_step.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/_ticket.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/base_email.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/password_reset.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/quote_summary.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/repair_completion_thank_you.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/repair_submission_confirmation.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/staff_inquiry.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/staff_new_repair.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/templates/emails/verification_code.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **[16.11, audyt produkcji, P1] Formularz gościa nadpisuje dane istniejącego klienta:** drugie zgłoszenie z tym samym e-mailem zmienia imię, nazwisko i telefon klienta (`public_submit`). Skutki: `/track` starszej naprawy z cyframi telefonu podanymi wtedy zwraca 404 (porównanie z bieżącym `client.phone`, `track_views.py`), a ktoś znający czyjś e-mail może nadpisać mu dane. Propozycja: nie nadpisywać danych istniejącego klienta z formularza gościa (nowe dane do notatki zgłoszenia), a `/track` porównywać z telefonem zapisanym przy zgłoszeniu.
