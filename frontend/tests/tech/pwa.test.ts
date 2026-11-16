@@ -109,7 +109,7 @@ describe("naprawa kurierem — publikacja (SPEC §12.10)", () => {
     expect(courierPoints(rabkaDraft)).toEqual([]);
     expect(courierWhereText([])).toBeNull();
   });
-  it("audit 16.11, variant (a): parcels go to the Rabka salon only — the address the backend e-mail gives", () => {
+  it("parcels go to the Rabka salon only — no courier to Zakopane (16.11)", () => {
     expect(courierService.parcelPoints).toEqual(["rabka"]);
     const both = servicePoints.map((p) => ({ ...p, published: true }));
     expect(courierPoints(both).map((p) => p.key)).toEqual(["rabka"]);

@@ -28,7 +28,7 @@ export function courierPageHref(service: typeof courierService = courierService)
 }
 
 /** Points that accept courier parcels: published points listed in `courierService.parcelPoints`
- * (audit 16.11, variant (a): only Rabka — the address the backend e-mail gives). */
+ * (only Rabka: there is no courier to Zakopane — Krystian, 16.11.2026). */
 export function courierPoints(points: ServicePoint[] = servicePoints, service: typeof courierService = courierService): ServicePoint[] {
   return points.filter((p) => p.published && service.parcelPoints.includes(p.key));
 }
