@@ -607,7 +607,7 @@ export function RepairForm() {
         ) : null}
         {usesCourier ? (
           <fieldset className="t-fieldset t-reveal-in">
-            <legend className="t-field__label">Adres do wysyłki</legend>
+            <legend className="t-field__label">{form.returnMethod === "courier" ? "Twój adres — tu odeślemy sprzęt po naprawie" : "Twój adres (nadawca paczki)"}</legend>
             <div className="t-fgrid t-fgrid--addr">
               <TextField field="street" label="Ulica *" value={form.street} onValue={(v) => set("street", v)} onBlurField={blurField} errors={errors} valid={isValid("street")} autoComplete="address-line1" maxLength={200} />
               <TextField field="houseNumber" label={<>Nr domu / lokalu <em>opcjonalnie</em></>} value={form.houseNumber} onValue={(v) => set("houseNumber", v)} onBlurField={blurField} errors={errors} autoComplete="address-line2" maxLength={50} />
