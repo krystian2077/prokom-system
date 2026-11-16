@@ -11,6 +11,8 @@ import { expect, test, type Page } from "@playwright/test";
 const axeSource = fs.readFileSync(createRequire(__filename).resolve("axe-core/axe.min.js"), "utf8");
 
 async function axeSerious(page: Page): Promise<string[]> {
+  // measure the settled state: finite transitions/animations (step change, colour fades) must end first
+  await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => null))));
   await page.addScriptTag({ content: axeSource });
   return page.evaluate(async () => {
     const w = window as unknown as { axe: { run: (c: unknown, o: unknown) => Promise<{ violations: { id: string; impact: string | null; nodes: { target: string[] }[] }[] }> } };
