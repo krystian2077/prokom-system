@@ -26,15 +26,21 @@
       </td>
       <td class="em-ink em-bd" align="right" valign="top" style="padding:15px 0; border-bottom:1px solid #E3E6DF; font-size:15px; line-height:22px; font-weight:800; color:#121613; white-space:nowrap;">{{ row.line_total }}</td>
     </tr>
+    {% empty %}
+    <tr>
+      <td class="em-ink2 em-bd" colspan="2" style="padding:15px 0; border-bottom:1px solid #E3E6DF; font-size:14px; line-height:22px; color:#4F5650;">Szczegóły pozycji znajdziesz w panelu klienta.</td>
+    </tr>
     {% endfor %}
   </table>
 
+  {% if quote_rows %}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-ticket" bgcolor="#121613" style="margin-top:16px; background-color:#121613; border-radius:14px; border-collapse:separate;">
     <tr>
       <td valign="middle" style="padding:20px 22px; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#9aa39b;">Suma brutto</td>
       <td align="right" valign="middle" style="padding:20px 22px; font-family:'Archivo','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:28px; line-height:32px; font-weight:800; color:#FFFFFF; white-space:nowrap;">{{ total_amount_display }}</td>
     </tr>
   </table>
+  {% endif %}
 
   {% if valid_until_display or sent_at_display %}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:12px;">

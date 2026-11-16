@@ -11,7 +11,7 @@ All values are HTML-escaped by the caller, so autoescape is off here.
 {% block heading %}Nowe zgłoszenie naprawy{% endblock %}
 {% block lead %}Klient wypełnił formularz zgłoszenia na stronie. Zgłoszenie czeka na potwierdzenie i&nbsp;diagnozę.{% endblock %}
 {% block content %}{% autoescape off %}
-  {% include "emails/_ticket.html" with status_url=panel_url button_label="Otwórz naprawę w panelu" hint="Potwierdź zgłoszenie klientowi i ustal sposób dostarczenia sprzętu." %}
+  {% include "emails/_ticket.html" with status_url=panel_url button_label="Otwórz naprawę w panelu" extra=logistics_hint hint="Potwierdź zgłoszenie klientowi." %}
 
   {% include "emails/_h2.html" with text="Szczegóły zgłoszenia" %}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-bd" style="border-top:1px solid #E3E6DF;">

@@ -98,6 +98,163 @@ def _phone_last4_email(phone: str) -> str:
     return digits[-4:] if len(digits) >= 4 else ""
 
 
+# --- E-mail presentation: PRO-KOM Tech salons and the point lines the public form writes ---
+# Salon data mirrors frontend/config/prokom.ts (servicePoints, courierService) — keep in sync.
+EMAIL_SERVICE_POINTS = {
+    "Rabka-Zdrój": {
+        "key": "rabka",
+        "name": "Rabka-Zdrój",
+        "loc": "w Rabce-Zdroju",
+        "street": "ul. Orkana 16B",
+        "city": "34-700 Rabka-Zdrój",
+        "hours1": "Pn–Pt 9:00–17:00",
+        "hours2": "Sob 9:00–14:00",
+        "hours3": "Nd nieczynne",
+        "hours_short": "Pn–Pt 9:00–17:00, Sob 9:00–14:00",
+        "phone": "883 200 151",
+        "tel": "+48883200151",
+        "map": "https://www.google.com/maps/dir/?api=1&destination=49.613,19.9629",
+        "note": "Bezpłatny parking przy salonie.",
+    },
+    "Zakopane": {
+        "key": "zakopane",
+        "name": "Zakopane",
+        "loc": "w Zakopanem",
+        "street": "ul. Stanisława Staszica 8",
+        "city": "34-500 Zakopane",
+        "hours1": "Pn–Pt 10:00–16:30",
+        "hours2": "Sob–Nd nieczynne",
+        "hours3": "",
+        "hours_short": "Pn–Pt 10:00–16:30",
+        "phone": "18 541 20 15",
+        "tel": "+48185412015",
+        "map": "https://www.google.com/maps/dir/?api=1&destination=49.2978,19.9539",
+        "note": "Bezpłatny parking.",
+    },
+}
+# Courier parcels go to the Rabka salon only (courierService.parcelPoints).
+EMAIL_COURIER_DEFAULT_POINT = "Rabka-Zdrój"
+
+# Lines written by the public form at the top of additional_notes (frontend/lib/tech/contract.ts, pointLines).
+_POINT_LINE_LABELS = {
+    "punkt przyjęcia": "dropoff",
+    "punkt odbioru": "pickup",
+    "wysyłka na adres": "parcel",
+}
+
+
+def parse_point_notes(notes):
+    """
+    Splits client notes into the salon lines from the public form and the client's own text.
+
+    Returns {"dropoff": name|None, "pickup": name|None, "parcel": name|None, "notes": clean text}.
+    Only lines with a known label and a known salon name are taken out; everything else stays.
+    """
+    found = {"dropoff": None, "pickup": None, "parcel": None}
+    kept = []
+    for line in (notes or "").splitlines():
+        label, sep, value = line.partition(":")
+        kind = _POINT_LINE_LABELS.get(label.strip().lower()) if sep else None
+        name = value.strip()
+        if kind and name in EMAIL_SERVICE_POINTS and not found[kind]:
+            found[kind] = name
+            continue
+        kept.append(line)
+    found["notes"] = "\n".join(kept).strip()
+    return found
+
+
+def _format_client_address(address):
+    if not address:
+        return ""
+    street = " ".join(p for p in [getattr(address, "street", "") or "", getattr(address, "house_number", "") or ""] if p).strip()
+    city = " ".join(p for p in [getattr(address, "postal_code", "") or "", getattr(address, "city", "") or ""] if p).strip()
+    return ", ".join(p for p in [street, city] if p)
+
+
+def email_logistics_context(repair, *, intake_stationary=False, ready=False):
+    """
+    Where the device arrives and where it goes back — for e-mail templates and plain text only.
+    Does not change who gets an e-mail or when.
+    """
+    parsed = parse_point_notes(getattr(repair, "client_notes", None) or "")
+    delivery = getattr(repair, "delivery_method", None) or ""
+    ret = getattr(repair, "return_method", None) or ""
+    by_courier = delivery in ("courier", "parcel_locker")
+    return_by_courier = ret in ("courier", "parcel_locker")
+
+    def point(name):
+        return EMAIL_SERVICE_POINTS.get(name) if name else None
+
+    dropoff = None if by_courier else point(parsed["dropoff"])
+    parcel = point(parsed["parcel"] or EMAIL_COURIER_DEFAULT_POINT) if by_courier else None
+    arrives = dropoff or parcel
+    pickup = None
+    if not return_by_courier:
+        pickup = point(parsed["pickup"]) or arrives
+    pickup_differs = bool(pickup and arrives and pickup["key"] != arrives["key"])
+    return_address = _format_client_address(getattr(repair, "return_address", None)) if return_by_courier else ""
+
+    # One-sentence summaries (HTML and plain text use the same words).
+    if ready and return_by_courier:
+        pickup_sentence = (
+            "Odeślemy sprzęt kurierem"
+            + (f" na adres: {return_address}" if return_address else " na adres podany w zgłoszeniu")
+            + ". Koszt odesłania jest po naszej stronie."
+        )
+    elif ready and pickup:
+        pickup_sentence = f"Sprzęt czeka na Ciebie w salonie {pickup['loc']} ({pickup['street']})."
+    elif ready:
+        pickup_sentence = "Sprzęt czeka na Ciebie w salonie, w którym go zostawiono."
+    elif return_by_courier:
+        pickup_sentence = (
+            "Po naprawie odeślemy sprzęt kurierem"
+            + (f" na adres: {return_address}" if return_address else " na adres podany w zgłoszeniu")
+            + ". Koszt odesłania jest po naszej stronie — także wtedy, gdy zrezygnujesz z naprawy."
+        )
+    elif pickup and pickup_differs:
+        if by_courier:
+            where_from = f"wysyłasz paczkę do salonu {arrives['loc']}"
+        elif intake_stationary:
+            where_from = f"sprzęt przyjęliśmy {arrives['loc']}"
+        else:
+            where_from = f"oddajesz sprzęt {arrives['loc']}"
+        pickup_sentence = f"{where_from[0].upper()}{where_from[1:]}, a odbierasz osobiście {pickup['loc']} ({pickup['street']})."
+    elif pickup:
+        pickup_sentence = (
+            f"Odbierzesz sprzęt osobiście w salonie {pickup['loc']} ({pickup['street']})"
+            + (", tam, gdzie przyjdzie paczka." if by_courier else ".")
+        )
+    elif intake_stationary:
+        pickup_sentence = "Odbierzesz sprzęt w salonie, w którym go zostawiono."
+    else:
+        pickup_sentence = "Odbierzesz sprzęt w salonie, w którym go oddasz."
+
+    if by_courier:
+        dropoff_sentence = f"Wyślij paczkę do salonu {parcel['loc']} — adres masz wyżej. Numer zgłoszenia włóż do środka."
+    elif dropoff:
+        dropoff_sentence = f"Przynieś sprzęt do salonu {dropoff['loc']} ({dropoff['street']}) w godzinach otwarcia."
+    else:
+        dropoff_sentence = "Przynieś sprzęt do salonu w Rabce-Zdroju albo w Zakopanem, w godzinach otwarcia."
+
+    return {
+        "dropoff_point": dropoff,
+        "parcel_point": parcel,
+        "pickup_point": pickup,
+        "pickup_differs": pickup_differs,
+        "return_by_courier": return_by_courier,
+        "return_address_display": return_address,
+        "client_notes_clean": parsed["notes"][:2000],
+        "pickup_sentence": pickup_sentence,
+        "dropoff_sentence": dropoff_sentence,
+        "service_points": list(EMAIL_SERVICE_POINTS.values()),
+    }
+
+
+def _point_label(p):
+    return f"{p['name']}, {p['street']}, {p['city']}" if p else ""
+
+
 def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_stationary=False):
     """
     Wysyła e-mail potwierdzenia przyjęcia zlecenia na podany adres klienta (dla każdego zgłoszenia).
@@ -140,7 +297,6 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
             accessories_summary = ", ".join(names) if names else "Tak"
         elif any(i.choose_for_me for i in interests):
             accessories_summary = "Proszę doradzić przy odbiorze"
-    client_notes = (getattr(repair, "client_notes", None) or "").strip()[:2000]
     device_turns_on = getattr(repair, "device_turns_on", None)
     visual_condition_description = (getattr(repair, "visual_condition_description", None) or "").strip()[:1000]
     delivery_by_courier = (getattr(repair, "delivery_method", None) or "") in ("courier", "parcel_locker")
@@ -166,6 +322,8 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         if getattr(repair, "estimated_completion_date", None)
         else ""
     )
+    logistics = email_logistics_context(repair, intake_stationary=intake_stationary)
+    clean_notes = logistics["client_notes_clean"]
     context = {
         "client_name": client_name,
         "repair_number": repair.repair_number,
@@ -176,7 +334,7 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         "claim_url": claim_url,
         "hammer_glass_display": hammer_glass_display,
         "accessories_summary": accessories_summary,
-        "client_notes": client_notes,
+        "client_notes": clean_notes,
         "device_turns_on": device_turns_on,
         "visual_condition_description": visual_condition_description,
         "delivery_by_courier": delivery_by_courier,
@@ -192,12 +350,26 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         "estimated_cost_display": est_cost,
         "estimated_completion_display": est_date,
         "estimated_duration_display": repair.get_estimated_duration_display() if hasattr(repair, "get_estimated_duration_display") else "",
+        **logistics,
     }
     subject = (
         f"Potwierdzenie przyjęcia w serwisie — {repair.repair_number} | PRO-KOM Tech"
         if intake_stationary
         else f"Zgłoszenie przyjęte — {repair.repair_number} | PRO-KOM Tech"
     )
+
+    # Plain-text lines about salons (same facts as the HTML version).
+    logistics_plain = ""
+    if logistics["dropoff_point"]:
+        logistics_plain += f"- Punkt przyjęcia: {_point_label(logistics['dropoff_point'])}\n"
+    if logistics["parcel_point"]:
+        logistics_plain += f"- Paczka na adres: PRO-KOM Tech, {_point_label(logistics['parcel_point'])}\n"
+    if logistics["pickup_point"]:
+        logistics_plain += f"- Punkt odbioru: {_point_label(logistics['pickup_point'])}\n"
+    if logistics["return_address_display"]:
+        logistics_plain += f"- Adres odesłania: {logistics['return_address_display']}\n"
+    contact_plain = "Kontakt: Rabka-Zdrój tel. 883 200 151, Zakopane tel. 18 541 20 15, kontakt@prokomserwis.pl\n\n"
+
     if intake_stationary:
         body_plain = (
             f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
@@ -212,8 +384,12 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         if est_date:
             body_plain += f"Szacowana data zakończenia: {est_date}\n"
         body_plain += f"Dostawa: {delivery_display}\nZwrot: {return_display}\n"
+        body_plain += logistics_plain.replace("- ", "", 4) if logistics_plain else ""
         if hammer_glass_display:
             body_plain += f"Folia Hammer Glass / szkło hartowane: {hammer_glass_display}\n"
+        if clean_notes:
+            body_plain += f"Dodatkowe uwagi: {clean_notes}\n"
+        body_plain += f"\nODBIÓR: {logistics['pickup_sentence']}\n"
         body_plain += (
             f"\nPANEL KLIENTA — rejestracja: {register_url}\n"
             f"Zaloguj się: {login_url}\n"
@@ -223,16 +399,11 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         )
         if claim_url:
             body_plain += f"Przypisanie naprawy do konta (link 7 dni): {claim_url}\n\n"
-        body_plain += (
-            f"Kontakt: tel. {service_address['phone']}, {service_address['email']}\n"
-            f"{addr_full}\n\n"
-            "Z poważaniem,\nZespół PRO-KOM Tech"
-        )
+        body_plain += contact_plain + "Z poważaniem,\nZespół PRO-KOM Tech"
     else:
         body_plain = (
             f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
-            "Przyjęliśmy Twoje zlecenie naprawy. Skontaktujemy się z Tobą w ciągu kilku godzin roboczych, "
-            "by potwierdzić przyjęcie zlecenia i ustalić szczegóły.\n\n"
+            "Przyjęliśmy Twoje zgłoszenie naprawy. Skontaktujemy się w celu potwierdzenia lub po diagnozie.\n\n"
             f"Numer naprawy: {repair.repair_number}\n"
             "Zapisz ten numer — jest ważny. Użyj go w kontakcie z serwisem.\n\n"
             "Podsumowanie zgłoszenia:\n"
@@ -240,38 +411,43 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
             f"- Opis problemu: {repair.problem_description or ''}\n"
             f"- Dostawa: {delivery_display}\n"
             f"- Zwrot: {return_display}\n"
+            + logistics_plain
         )
         if hammer_glass_display:
             body_plain += f"- Folia Hammer Glass / szkło: {hammer_glass_display}\n"
         if accessories_summary:
             body_plain += f"- Dobierz Akcesoria: {accessories_summary}\n"
-        if client_notes:
-            body_plain += f"- Dodatkowe uwagi: {client_notes}\n"
+        if clean_notes:
+            body_plain += f"- Dodatkowe uwagi: {clean_notes}\n"
         if device_turns_on is not None:
             body_plain += f"- Czy urządzenie się włącza: {'Tak' if device_turns_on else 'Nie'}\n"
         if visual_condition_description:
             body_plain += f"- Stan wizualny: {visual_condition_description}\n"
         body_plain += "\n"
         if delivery_by_courier:
+            parcel = logistics["parcel_point"]
             body_plain += (
-                "Wysyłka kurierem — nasz adres do nadania paczki:\n"
-                f"{service_address['name']}\n"
-                f"{service_address['street']}\n"
-                f"Godziny: {service_address['hours']}\n"
-                f"Tel. {service_address['phone']}\n"
-                f"E-mail: {service_address['email']}\n\n"
-                "Wysyłkę paczki do nas opłacasz we własnym zakresie. Po naprawie odsyłamy Ci sprzęt za darmo — zwrot do domu jest po naszej stronie.\n\n"
+                "Wysyłka kurierem — adres do nadania paczki:\n"
+                f"PRO-KOM Tech, salon {parcel['name']}\n"
+                f"{parcel['street']}, {parcel['city']}\n"
+                f"Paczki odbieramy: {parcel['hours_short']}\n"
+                f"Tel. {parcel['phone']}\n\n"
+                f"Do paczki włóż kartkę z numerem zgłoszenia {repair.repair_number}.\n"
+                "Wysyłkę paczki do nas opłacasz we własnym zakresie.\n"
                 "Prosimy o staranne zabezpieczenie urządzenia przed wysyłką (np. oryginalne opakowanie, wypełniacz, folia bąbelkowa). "
                 "Dzięki temu sprzęt dotrze do nas bez uszkodzeń.\n"
                 "Po nadaniu paczki możesz dodać numer listu przewozowego w panelu klienta — ułatwi to nam śledzenie przesyłki.\n\n"
             )
+        else:
+            body_plain += f"Dostarczenie: {logistics['dropoff_sentence']}\n\n"
+        body_plain += f"Po naprawie: {logistics['pickup_sentence']}\n\n"
         body_plain += (
             f"Panel klienta — rejestracja: {register_url}\n"
             f"Śledzenie: {track_url_with_ref}\n\n"
         )
         if claim_url:
             body_plain += f"Chcesz przypisać tę naprawę do konta? Link (ważny 7 dni): {claim_url}\n\n"
-        body_plain += "Z poważaniem,\nZespół PRO-KOM Tech"
+        body_plain += contact_plain + "Z poważaniem,\nZespół PRO-KOM Tech"
     try:
         html_content = render_to_string("emails/repair_submission_confirmation.html", context)
         return send_email_html(to_email, subject, body_plain, html_content, fail_silently=fail_silently)
@@ -567,16 +743,31 @@ def send_repair_completion_thank_you_email(repair, sent_by=None, *, fail_silentl
         except Exception:
             completed_at_display = str(completed_at)
 
+    logistics = email_logistics_context(repair, ready=True)
+    tracking_number = (getattr(repair, "service_tracking_number", None) or "").strip()
+    tracking_courier = (getattr(repair, "service_courier", None) or "").strip()
+
     subject = f"Dziękujemy za zaufanie — {repair.repair_number} | PRO-KOM Tech"
     body_plain = (
         f"Dzień dobry{f', {client_name}' if client_name else ''},\n\n"
         "Dziękujemy za zaufanie i skorzystanie z usług PRO-KOM Tech.\n"
-        "Twoja naprawa została zakończona, a urządzenie jest gotowe do odbioru.\n\n"
-        f"Numer zgłoszenia: {repair.repair_number}\n"
+        + (
+            "Twoja naprawa została zakończona.\n\n"
+            if logistics["return_by_courier"]
+            else "Twoja naprawa została zakończona, a urządzenie jest gotowe do odbioru.\n\n"
+        )
+        + f"Numer zgłoszenia: {repair.repair_number}\n"
         f"Urządzenie: {device_label}\n"
     )
     if completed_at_display:
         body_plain += f"Data zakończenia: {completed_at_display}\n"
+    body_plain += f"\n{logistics['pickup_sentence']}\n"
+    if logistics["pickup_point"]:
+        p = logistics["pickup_point"]
+        body_plain += f"Salon {p['name']}: {p['street']}, {p['city']}, {p['hours_short']}, tel. {p['phone']}\n"
+        body_plain += "Zabierz numer zgłoszenia.\n"
+    if tracking_number:
+        body_plain += f"Numer przesyłki: {tracking_number}{f' ({tracking_courier})' if tracking_courier else ''}\n"
     body_plain += (
         f"\nPanel klienta: {panel_detail_url}\n"
         f"Śledzenie bez logowania: {track_url}\n\n"
@@ -591,6 +782,9 @@ def send_repair_completion_thank_you_email(repair, sent_by=None, *, fail_silentl
         "completed_at_display": completed_at_display,
         "panel_detail_url": panel_detail_url,
         "track_url": track_url,
+        "tracking_number": tracking_number,
+        "tracking_courier": tracking_courier,
+        **logistics,
     }
     html_content = render_to_string("emails/repair_completion_thank_you.html", ctx)
     _log, ok = send_freeform_email_to_repair_client(

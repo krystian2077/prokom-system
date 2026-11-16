@@ -1,10 +1,15 @@
 {% extends "emails/base_email.html" %}
+{% comment %}
+Logistics context (send.email_logistics_context): dropoff_point, parcel_point, pickup_point (salon dicts or None),
+pickup_differs, return_by_courier, return_address_display, dropoff_sentence, pickup_sentence, service_points.
+client_notes = the client's own text (salon lines from the form removed).
+{% endcomment %}
 {% block title %}{% if intake_stationary %}Potwierdzenie przyjęcia{% else %}Zgłoszenie przyjęte{% endif %} — {{ repair_number }} | PRO-KOM Tech{% endblock %}
-{% block preheader %}{% if intake_stationary %}Sprzęt jest u nas. Numer zgłoszenia {{ repair_number }} — zachowaj go do odbioru i śledzenia statusu.{% else %}Numer zgłoszenia {{ repair_number }}. Skontaktujemy się, by potwierdzić szczegóły.{% endif %}{% endblock %}
+{% block preheader %}{% if intake_stationary %}Sprzęt jest u nas. Numer zgłoszenia {{ repair_number }} — zachowaj go do odbioru i śledzenia statusu.{% elif delivery_by_courier %}Numer zgłoszenia {{ repair_number }}. Adres do wysyłki paczki i co dalej — w środku.{% elif dropoff_point %}Numer zgłoszenia {{ repair_number }}. Sprzęt oddajesz w salonie {{ dropoff_point.name }}.{% else %}Numer zgłoszenia {{ repair_number }}. Skontaktujemy się w celu potwierdzenia lub po diagnozie.{% endif %}{% endblock %}
 {% block hero_icon %}{% include "emails/_hero_icon.html" with icon="check" %}{% endblock %}
 {% block eyebrow %}{% if intake_stationary %}Potwierdzenie przyjęcia{% else %}Zgłoszenie przyjęte{% endif %}{% endblock %}
 {% block heading %}{% if intake_stationary %}Sprzęt jest już u&nbsp;nas{% else %}Mamy Twoje zgłoszenie{% endif %}{% endblock %}
-{% block lead %}Dzień dobry{% if client_name %}, {{ client_name }}{% endif %}. {% if intake_stationary %}Dziękujemy za wizytę w&nbsp;serwisie PRO-KOM Tech. Poniżej masz potwierdzenie przyjęcia sprzętu i&nbsp;wszystko, czego potrzebujesz, by śledzić naprawę.{% else %}Przyjęliśmy Twoje zlecenie naprawy. Skontaktujemy się z&nbsp;Tobą w&nbsp;ciągu kilku godzin roboczych, by potwierdzić szczegóły.{% endif %}{% endblock %}
+{% block lead %}Dzień dobry{% if client_name %}, {{ client_name }}{% endif %}. {% if intake_stationary %}Dziękujemy za wizytę w&nbsp;serwisie PRO-KOM Tech. Poniżej masz potwierdzenie przyjęcia sprzętu i&nbsp;wszystko, czego potrzebujesz, by śledzić naprawę.{% else %}Przyjęliśmy Twoje zgłoszenie naprawy. Skontaktujemy się w&nbsp;celu potwierdzenia lub po diagnozie.{% endif %}{% endblock %}
 {% block content %}
   {% if intake_stationary %}
     {% include "emails/_ticket.html" with device_name=device_name status_url=track_url_with_ref phone_last4=phone_last4 extra="Zachowaj ten numer — przy odbiorze, kontakcie i śledzeniu statusu." %}
@@ -12,6 +17,8 @@
     {% include "emails/_ticket.html" with device_name=device_name status_url=track_url_with_ref phone_last4=phone_last4 extra="Zapisz ten numer — przyda się w kontakcie z serwisem." %}
   {% endif %}
 
+  {# ---------- How the device gets to us (online form only) ---------- #}
+  {% if not intake_stationary %}
   {% if delivery_by_courier %}
   {% include "emails/_h2.html" with text="Wyślij sprzęt kurierem" %}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-soft" bgcolor="#F4F5F1" style="background-color:#F4F5F1; border-radius:14px; border-collapse:separate;">
@@ -22,9 +29,9 @@
             <td width="34" valign="top" style="width:34px; padding-top:2px;"><img src="https://prokomserwis.pl/tech/mail/ic-box.png" width="22" height="22" alt="" style="display:block; width:22px; height:22px; border:0;"></td>
             <td valign="top">
               <p class="em-acc" style="margin:0; font-size:11px; line-height:16px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#C4362B;">Adres do wysyłki</p>
-              <p class="em-ink" style="margin:4px 0 0; font-family:'Archivo','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:19px; line-height:25px; font-weight:800; color:#121613;">PRO-KOM Tech · salon Rabka-Zdrój</p>
-              <p class="em-ink" style="margin:4px 0 0; font-size:15px; line-height:23px; font-weight:600; color:#121613;">{{ service_address.street }}</p>
-              <p class="em-ink2" style="margin:2px 0 0; font-size:14px; line-height:21px; color:#4F5650;">Paczki odbieramy: Pn–Pt 9:00–17:00, Sob 9:00–14:00<br>Tel. <a class="em-ink" href="tel:+48883200151" style="color:#121613; font-weight:800; text-decoration:none;">883 200 151</a></p>
+              <p class="em-ink" style="margin:4px 0 0; font-family:'Archivo','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:19px; line-height:25px; font-weight:800; color:#121613;">PRO-KOM Tech · salon {{ parcel_point.name }}</p>
+              <p class="em-ink" style="margin:4px 0 0; font-size:15px; line-height:23px; font-weight:600; color:#121613;">{{ parcel_point.street }}, {{ parcel_point.city }}</p>
+              <p class="em-ink2" style="margin:2px 0 0; font-size:14px; line-height:21px; color:#4F5650;">Paczki odbieramy: {{ parcel_point.hours_short }}<br>Tel. <a class="em-ink" href="tel:{{ parcel_point.tel }}" style="color:#121613; font-weight:800; text-decoration:none;">{{ parcel_point.phone }}</a></p>
             </td>
           </tr>
         </table>
@@ -34,13 +41,45 @@
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
     {% include "emails/_check.html" with text="Do paczki włóż kartkę z numerem zgłoszenia" strong=repair_number %}
     {% include "emails/_check.html" with text="Zabezpiecz sprzęt starannie: oryginalne pudełko, wypełniacz albo folia bąbelkowa." %}
-    {% include "emails/_check.html" with text="Wysyłkę do nas opłacasz we własnym zakresie. Po naprawie odsyłamy sprzęt do Ciebie — zwrot jest po naszej stronie." %}
+    {% if return_by_courier %}
+    {% include "emails/_check.html" with text="Wysyłkę do nas opłacasz we własnym zakresie. Odesłanie sprzętu po naprawie jest po naszej stronie." %}
+    {% else %}
+    {% include "emails/_check.html" with text="Wysyłkę do nas opłacasz we własnym zakresie. Po naprawie odbierasz sprzęt osobiście — szczegóły niżej." %}
+    {% endif %}
     {% include "emails/_check.html" with text="Po nadaniu paczki dodaj numer listu przewozowego w panelu klienta — łatwiej śledzimy przesyłkę." last=True %}
   </table>
+  {% elif dropoff_point %}
+  {% include "emails/_h2.html" with text="Gdzie oddajesz sprzęt" %}
+  <p class="em-ink2" style="margin:0 0 14px; font-size:14px; line-height:22px; color:#4F5650;">Przyjdź w godzinach otwarcia i podaj numer zgłoszenia — dane mamy już w systemie.</p>
+  {% include "emails/_point_card.html" with p=dropoff_point label="Tu oddajesz sprzęt" %}
   {% else %}
-  {% include "emails/_h2.html" with text=intake_stationary|yesno:"Nasze salony,Gdzie przynieść sprzęt" %}
-  <p class="em-ink2" style="margin:0 0 14px; font-size:14px; line-height:22px; color:#4F5650;">{% if intake_stationary %}Odbiór w salonie, w którym zostawiono sprzęt. Zabierz numer zgłoszenia.{% else %}Przynieś sprzęt do wybranego salonu w godzinach otwarcia i podaj numer zgłoszenia.{% endif %}</p>
+  {% include "emails/_h2.html" with text="Gdzie przynieść sprzęt" %}
+  <p class="em-ink2" style="margin:0 0 14px; font-size:14px; line-height:22px; color:#4F5650;">Przynieś sprzęt do wybranego salonu w godzinach otwarcia i podaj numer zgłoszenia.</p>
   {% include "emails/_points.html" %}
+  {% endif %}
+  {% endif %}
+
+  {# ---------- How the device gets back ---------- #}
+  {% include "emails/_h2.html" with text=return_by_courier|yesno:"Odesłanie po naprawie,Odbiór po naprawie" %}
+  {% if return_by_courier %}
+    {% include "emails/_callout.html" with icon="box" text=pickup_sentence bottom="0" %}
+  {% elif pickup_point %}
+    {% if pickup_differs %}
+      {% include "emails/_callout.html" with icon="pin" title="Odbiór w innym salonie" text=pickup_sentence red=True %}
+      {% include "emails/_point_card.html" with p=pickup_point label="Tu odbierasz sprzęt" %}
+    {% elif intake_stationary or delivery_by_courier %}
+      {% include "emails/_callout.html" with icon="pin" text=pickup_sentence %}
+      {% include "emails/_point_card.html" with p=pickup_point label="Tu odbierasz sprzęt" %}
+    {% else %}
+      {% include "emails/_callout.html" with icon="pin" title="Ten sam salon" text=pickup_sentence bottom="0" %}
+    {% endif %}
+  {% else %}
+    {% if intake_stationary %}
+      {% include "emails/_callout.html" with icon="pin" text=pickup_sentence %}
+      {% include "emails/_points.html" %}
+    {% else %}
+      {% include "emails/_callout.html" with icon="pin" text=pickup_sentence bottom="0" %}
+    {% endif %}
   {% endif %}
 
   {% include "emails/_h2.html" with text="Podsumowanie zgłoszenia" %}
@@ -51,7 +90,11 @@
     {% if estimated_completion_display %}{% include "emails/_row.html" with label="Szacowana data zakończenia" value=estimated_completion_display %}{% endif %}
     {% if estimated_duration_display %}{% include "emails/_row.html" with label="Szacowany czas" value=estimated_duration_display %}{% endif %}
     {% include "emails/_row.html" with label="Dostarczenie" value=delivery_display %}
+    {% if dropoff_point %}{% include "emails/_row.html" with label="Punkt przyjęcia" value=dropoff_point.name %}{% endif %}
+    {% if parcel_point %}{% include "emails/_row.html" with label="Paczka na adres" value=parcel_point.street|add:", "|add:parcel_point.city %}{% endif %}
     {% include "emails/_row.html" with label="Zwrot" value=return_display %}
+    {% if pickup_point %}{% include "emails/_row.html" with label="Punkt odbioru" value=pickup_point.name %}{% endif %}
+    {% if return_address_display %}{% include "emails/_row.html" with label="Adres odesłania" value=return_address_display %}{% endif %}
     {% if hammer_glass_display %}{% include "emails/_row.html" with label="Folia Hammer Glass / szkło hartowane" value=hammer_glass_display %}{% endif %}
     {% if accessories_summary %}{% include "emails/_row.html" with label="Akcesoria" value=accessories_summary %}{% endif %}
     {% if client_notes %}{% include "emails/_row.html" with label="Dodatkowe uwagi" value=client_notes %}{% endif %}
@@ -65,17 +108,13 @@
       {% include "emails/_step.html" with n="1" title="Diagnoza i wycena" text="Sprawdzamy usterkę i przesyłamy wycenę." %}
       {% include "emails/_step.html" with n="2" title="Twoja decyzja" text="Akceptujesz albo rezygnujesz bez konsekwencji." %}
       {% include "emails/_step.html" with n="3" title="Naprawa" text="Gdy naprawa się zakończy, dostaniesz od nas wiadomość." %}
-      {% include "emails/_step.html" with n="4" title="Odbiór" text="Zabierz numer zgłoszenia. Status sprawdzisz online w każdej chwili." last=True %}
+      {% include "emails/_step.html" with n="4" title=return_by_courier|yesno:"Odesłanie,Odbiór" text=pickup_sentence last=True %}
     {% else %}
-      {% include "emails/_step.html" with n="1" title="Potwierdzenie" text="Odezwiemy się, żeby potwierdzić zgłoszenie i ustalić szczegóły." %}
-      {% if delivery_by_courier %}
-      {% include "emails/_step.html" with n="2" title="Wysyłka do serwisu" text="Nadaj paczkę na adres salonu w Rabce-Zdroju (wyżej)." %}
-      {% else %}
-      {% include "emails/_step.html" with n="2" title="Dostarczenie sprzętu" text="Przynieś sprzęt do salonu w Rabce-Zdroju albo w Zakopanem." %}
-      {% endif %}
+      {% include "emails/_step.html" with n="1" title="Potwierdzenie" text="Skontaktujemy się w celu potwierdzenia zgłoszenia lub po diagnozie." %}
+      {% include "emails/_step.html" with n="2" title=delivery_by_courier|yesno:"Wysyłka do serwisu,Dostarczenie sprzętu" text=dropoff_sentence %}
       {% include "emails/_step.html" with n="3" title="Diagnoza i wycena" text="Po przyjęciu sprzętu sprawdzamy usterkę i przesyłamy wycenę." %}
       {% include "emails/_step.html" with n="4" title="Twoja decyzja" text="Akceptujesz albo rezygnujesz bez konsekwencji." %}
-      {% include "emails/_step.html" with n="5" title="Naprawa i zwrot" text_prefix="Po naprawie: " text=return_display last=True %}
+      {% include "emails/_step.html" with n="5" title=return_by_courier|yesno:"Odesłanie po naprawie,Odbiór po naprawie" text=pickup_sentence last=True %}
     {% endif %}
   </table>
 
