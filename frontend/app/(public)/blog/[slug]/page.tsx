@@ -88,8 +88,9 @@ export default async function BlogPostPage({ params }: Props) {
               <Link href={catPath} className="t-bhero__cat">
                 {cat.name}
               </Link>
-              <span>{formatPostDate(post.date)}</span>
-              <span>· {post.readingTime} czytania</span>
+              <span>
+                {formatPostDate(post.date)} · {post.readingTime} czytania
+              </span>
             </div>
             <h1 className="t-bhero__h1 t-bhero__h1--post">{post.title}</h1>
             <p className="t-bhero__lead t-bhero__lead--wide">{post.description}</p>

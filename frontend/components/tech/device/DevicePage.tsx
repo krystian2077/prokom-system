@@ -54,7 +54,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
         title={page.name}
         accent={cities}
         lead={page.lead}
-        primary={{ label: `Zgłoś naprawę ${page.genitive}`, href: submit }}
+        primary={{ label: page.category === "data_recovery" ? "Zgłoś odzysk danych" : `Zgłoś naprawę ${page.genitive}`, href: submit }}
         trackPlace="urzadzenie"
         promises={heroPromises({ category: page.category })}
         visual={<FaultVisual device={scene.device} faults={scene.faults} />}
@@ -159,7 +159,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
       <MoreDevices current={page.path} />
       <CtaBand
         eyebrow="Następny krok"
-        title={`Zepsuty sprzęt? Zgłoś naprawę ${page.genitive} online albo zadzwoń.`}
+        title={page.category === "data_recovery" ? "Potrzebujesz odzyskać dane? Zgłoś to online albo zadzwoń." : `Zepsuty sprzęt? Zgłoś naprawę ${page.genitive} online albo zadzwoń.`}
         primary={{ label: "Zgłoś naprawę", href: submit }}
         secondary={{ label: line.phoneDisplay, href: telHref(line.phone), tel: true, track: "urzadzenie_cta" }}
       />

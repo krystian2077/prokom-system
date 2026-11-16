@@ -135,6 +135,7 @@
 .tech .t-ab-vcard__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .tech .t-ab-vcard__seal { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: var(--acct); background: var(--soft); box-shadow: inset 0 0 0 1px var(--softbd); }
 .tech .t-ui .t-ab-vcard__name { margin: 10px 0 16px; font-size: clamp(23px, 0.7vw + 18px, 28px); letter-spacing: -0.02em; }
+.tech .t-ab-vcard__hours { display: block; }
 .tech .t-ab-vkv { margin: 0; }
 .tech .t-ab-vkv > div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 13px 0; border-top: 1px solid var(--bd); font-size: 15px; }
 .tech .t-ab-vkv dt { flex-shrink: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink2); }

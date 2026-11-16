@@ -2,6 +2,7 @@ import Link from "next/link";
 import { line, telHref } from "@/config/prokom";
 import { hoursSummary } from "@/lib/tech/hours";
 import { directionsUrl, footerColumns } from "@/lib/tech/nav";
+import { saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconCheck } from "./icons";
 import { LegalBar } from "./LegalBar";
@@ -9,12 +10,14 @@ import { LinesBand } from "./LinesBand";
 import { Logo } from "./Logo";
 import { OsmMap } from "./OsmMap";
 
-const PROMISES = ["Diagnoza i wycena przed naprawą", "Status naprawy online", "Otwarte także w soboty"];
+const PROMISES = ["Diagnoza i wycena przed naprawą", "Status naprawy online"];
 
 /** Footer (design T.Stopka) — always dark, both themes. */
 export function Footer({ points, publishedCount }: { points: VisiblePoint[]; publishedCount: number }) {
   // Two points are mentioned only once Zakopane is published (SPEC §5).
   const twoPoints = publishedCount > 1;
+  const saturday = saturdayPromise(points.filter((p) => !p.draft));
+  const promises = saturday ? [...PROMISES, saturday] : PROMISES;
   const intro = twoPoints
     ? "Serwis telefonów, laptopów, tabletów, konsol i drukarek. Dwa punkty na Podhalu: Rabka-Zdrój i Zakopane. Folie Hammer Glass wycinane na miejscu."
     : "Serwis telefonów, laptopów, tabletów, konsol i drukarek w Rabce-Zdroju na Podhalu. Folie Hammer Glass wycinane na miejscu.";
@@ -26,7 +29,7 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
             <Logo size={28} dark />
             <p>{intro}</p>
             <ul className="t-footer__promises">
-              {PROMISES.map((p) => (
+              {promises.map((p) => (
                 <li key={p}>
                   <IconCheck />
                   {p}

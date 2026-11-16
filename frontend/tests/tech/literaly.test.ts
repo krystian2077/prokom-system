@@ -27,7 +27,6 @@ const CONTACT_LITERALS: [string, RegExp][] = [
 
 /** Old files (before TD2–TD5) that still contain contact literals. Only shrinks. */
 const LEGACY_CONTACT = new Set<string>([
-  "components/layout/PublicFooter.tsx",
 ]);
 // FAQ (rebuilt in TD5) keeps one allowed sentence: "nie obsługujemy paczkomatów" (SPEC §11 pt 5).
 const LEGACY_PACZKOMAT = new Set<string>(["lib/tech/faq-data.ts", "app/(public)/naprawa-kurierem/page.tsx"]);

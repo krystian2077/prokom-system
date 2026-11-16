@@ -16,7 +16,7 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalDoc title="Polityka prywatności" path="/polityka-prywatnosci" version="15 listopada 2026 r.">
       <p>
-        Niniejsza Polityka prywatności opisuje, w jaki sposób {company.name}
+        Niniejsza Polityka prywatności opisuje, w jaki sposób {company.name}{" "}
         zbiera, przetwarza i chroni dane osobowe Użytkowników korzystających z
         serwisu internetowego {line.name} dostępnego pod adresem{" "}
         <strong>{line.domain}</strong> oraz usług świadczonych przez firmę.

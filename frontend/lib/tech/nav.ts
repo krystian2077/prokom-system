@@ -24,18 +24,19 @@ export const mainNav: NavItem[] = [
 ];
 
 export type DeviceIcon = "phone" | "laptop" | "tablet" | "pc" | "console" | "printer" | "watch" | "data";
-export type RepairLink = { label: string; href: string; icon: DeviceIcon };
+/** `short`: nominative label for tight grids (phone menu sheet). */
+export type RepairLink = { label: string; short: string; href: string; icon: DeviceIcon };
 
 /** Device pages (SPEC §6, TD4–TD5). */
 export const repairLinks: RepairLink[] = [
-  { label: "Serwis telefonów", href: "/serwis-telefonow", icon: "phone" },
-  { label: "Serwis laptopów", href: "/serwis-laptopow", icon: "laptop" },
-  { label: "Serwis tabletów", href: "/serwis-tabletow", icon: "tablet" },
-  { label: "Serwis komputerów", href: "/serwis-komputerow", icon: "pc" },
-  { label: "Serwis konsol", href: "/serwis-konsol", icon: "console" },
-  { label: "Serwis drukarek", href: "/serwis-drukarek", icon: "printer" },
-  { label: "Serwis smartwatchy", href: "/serwis-smartwatchy", icon: "watch" },
-  { label: "Odzyskiwanie danych", href: "/odzyskiwanie-danych", icon: "data" },
+  { label: "Serwis telefonów", short: "Telefony", href: "/serwis-telefonow", icon: "phone" },
+  { label: "Serwis laptopów", short: "Laptopy", href: "/serwis-laptopow", icon: "laptop" },
+  { label: "Serwis tabletów", short: "Tablety", href: "/serwis-tabletow", icon: "tablet" },
+  { label: "Serwis komputerów", short: "Komputery", href: "/serwis-komputerow", icon: "pc" },
+  { label: "Serwis konsol", short: "Konsole", href: "/serwis-konsol", icon: "console" },
+  { label: "Serwis drukarek", short: "Drukarki", href: "/serwis-drukarek", icon: "printer" },
+  { label: "Serwis smartwatchy", short: "Smartwatche", href: "/serwis-smartwatchy", icon: "watch" },
+  { label: "Odzyskiwanie danych", short: "Odzysk danych", href: "/odzyskiwanie-danych", icon: "data" },
 ];
 
 export const footerColumns: { title: string; items: { label: string; href: string }[] }[] = [

@@ -4,6 +4,7 @@
  *   becomes a no-break space;
  * - a middle dot separator ("Rabka-Zdrój · Zakopane") never opens a line → the space before it
  *   becomes a no-break space, so the dot stays at the end of the first line;
+ * - a spaced dash ("Hammer Glass czy szkło — co wybrać") never opens a line either;
  * - "ul." and a short house number stay with the street name ("Długa 8");
  * - no line break inside hyphenated names in headings ("Rabka-Zdrój") → an invisible
  *   word joiner (U+2060) follows the hyphen. Only text node values change, never the DOM
@@ -20,6 +21,8 @@ const HOUSE_NO = new RegExp(String.raw`(\p{L}) +(\d{1,3}[A-Za-z]?)(?=,|\s·|\s*$
 export const WJ = "\u2060";
 /** " \u00b7 " separator: the dot stays with the word before it. */
 const MIDDOT = / +\u00b7/g;
+/** " \u2014 " / " \u2013 " between words: the dash stays at the end of the line. */
+const DASH = / +([\u2013\u2014]) /g;
 /** A hyphen inside a two-part place name ("Rabka-Zdrój", "Bielsko-Biała"); brand names in capitals
  * ("PRO-KOM") and codes ("USB-C") stay as they are. */
 const HYPHEN = new RegExp(String.raw`(\p{Lu}\p{Ll}+)-(?=\p{Lu}\p{Ll})`, "gu");
@@ -32,13 +35,14 @@ export function polishText(text: string, noBreakHyphens = false): string {
     .replace(ORPHAN, `$1$2${NBSP}`)
     .replace(STREET, `$1$2${NBSP}`)
     .replace(HOUSE_NO, `$1${NBSP}$2`)
-    .replace(MIDDOT, `${NBSP}·`);
+    .replace(MIDDOT, `${NBSP}·`)
+    .replace(DASH, `${NBSP}$1 `);
   return noBreakHyphens ? out.replace(HYPHEN, `$1-${WJ}`) : out;
 }
 
 /** Skipped: form fields, code, editable text, the live opening status (re-rendered every minute,
  * matched literally by the hours tests) and the repair wizard (its own session). */
-export const TYPO_SKIP = "input, textarea, select, option, code, pre, script, style, [contenteditable], [data-no-typo], .t-status, .t-wiz, .t-wizflow";
+export const TYPO_SKIP = "input, textarea, select, option, code, pre, script, style, svg, [contenteditable], [data-no-typo], .t-status, .t-wiz, .t-wizflow, .t-art";
 /** Where hyphenated words must not break: headings and short display lines. */
 export const NOBREAK_IN = "h1, h2, h3, .t-lead, .t-eyb, .t-hero__sub";
 

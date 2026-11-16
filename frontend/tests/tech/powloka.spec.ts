@@ -106,7 +106,7 @@ test.describe("phone 390", () => {
   test("Naprawy tab opens the repairs sheet; the capsule loupe opens the search window", async ({ page }) => {
     await page.goto("/");
     await page.locator("[data-t-tabbar]").getByRole("button", { name: "Naprawy" }).click();
-    await expect(page.getByRole("dialog", { name: "Naprawy" }).getByRole("link", { name: "Laptopów" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Naprawy" }).getByRole("link", { name: "Laptopy" })).toBeVisible();
     await page.keyboard.press("Escape");
     await page.locator(".t-capsule").getByRole("button", { name: "Szukaj" }).click();
     const dialog = page.getByRole("dialog", { name: "Szukaj na stronie" });

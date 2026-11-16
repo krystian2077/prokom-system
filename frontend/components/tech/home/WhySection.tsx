@@ -1,5 +1,6 @@
 import { company } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
+import { saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconPath } from "../icons";
 
@@ -9,7 +10,7 @@ export function WhySection({ points }: { points: VisiblePoint[] }) {
   const rating = claim("googleRating");
   const cards: { k: string; t: string; s: string; draft?: boolean }[] = [];
   if (since) cards.push({ k: String(company.since), t: `Na Podhalu od ${company.since} roku`, s: `${company.name}, ${company.hq.city}. Sprawdzisz nas w CEIDG.`, draft: since.draft });
-  if (points.length > 1) cards.push({ k: String(points.length), t: "Punkty serwisowe", s: `${points.map((p) => p.name).join(" i ")}. Otwarte także w soboty.`, draft: points.some((p) => p.draft) });
+  if (points.length > 1) cards.push({ k: String(points.length), t: "Punkty serwisowe", s: `${points.map((p) => p.name).join(" i ")}.${saturdayPromise(points) ? ` ${saturdayPromise(points)}.` : ""}`, draft: points.some((p) => p.draft) });
   cards.push({ k: "Wycena", t: "Zawsze przed naprawą", s: "Możesz zrezygnować bez konsekwencji. Nie opłaca się? Powiemy to wprost." });
   cards.push({ k: "RODO", t: "Twoje dane są bezpieczne", s: "Nie przeglądamy zawartości urządzeń bez potrzeby." });
 

@@ -105,7 +105,8 @@ describe("buildSubmitPayload (KONTRAKT §1.1, §2)", () => {
         notes: "",
       }),
     );
-    expect(payload).toMatchObject(fx("submit-201-laptop-courier").request.body as object);
+    // the fixture predates the audit fix: a laptop gets no screen film question → null (KONTRAKT §1.1 allows null)
+    expect(payload).toMatchObject({ ...(fx("submit-201-laptop-courier").request.body as object), hammer_glass_interest: null });
     expect(payload.additional_notes).toBe("");
   });
 
@@ -145,12 +146,17 @@ describe("buildSubmitPayload (KONTRAKT §1.1, §2)", () => {
     const keys = (o: object): string[] => Object.entries(o).flatMap(([k, v]) => (v && typeof v === "object" && !Array.isArray(v) ? keys(v).map((x) => `${k}.${x}`) : [k])).sort();
     // exactly the keys of today's courier request (no new fields), and still the T0 fixture
     expect(keys(withSalon)).toEqual(keys(buildSubmitPayload(base)));
-    expect(withSalon).toMatchObject({ ...fixture, additional_notes: withSalon.additional_notes });
+    expect(withSalon).toMatchObject({ ...fixture, additional_notes: withSalon.additional_notes, hammer_glass_interest: null });
     expect(withSalon).toMatchObject({ delivery_method: "courier", return_method: "courier", delivery_street: "ul. Przykładowa", delivery_city: "Nowy Targ" });
     expect(withSalon.additional_notes).toBe("Wysyłka na adres: Zakopane\n\nProszę o telefon.");
     expect(validateRepairForm({ ...base, courierPoint: "zakopane" })).toEqual({});
     // drop-off in a salon never adds the courier line, even if a stale courierPoint is left in the state
     expect(buildSubmitPayload(phoneForm({ dropoff: "rabka", courierPoint: "zakopane", notes: "" })).additional_notes).toBe("Punkt przyjęcia: Rabka-Zdrój");
+  });
+
+  it("courier pickup in the salon the parcel went to adds no second point line", () => {
+    const p = buildSubmitPayload(phoneForm({ dropoff: "courier", courierPoint: "rabka", returnMethod: "in_person", pickupPoint: "rabka", street: "ul. A", city: "B", notes: "" }));
+    expect(p.additional_notes).toBe("Wysyłka na adres: Rabka-Zdrój");
   });
 
   it("no point lines and no notes = empty additional_notes", () => {

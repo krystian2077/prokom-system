@@ -14,14 +14,21 @@ import { citiesTitle, hubCards } from "@/lib/tech/devices";
 import { REPAIRS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb, type FaqItem } from "@/lib/tech/seo";
-import { submitHref } from "@/lib/tech/wizard-data";
+import { submitHref, type ArtKind } from "@/lib/tech/wizard-data";
 import { HubCollage } from "@/components/tech/subhero/HubCollage";
+import { StaticArt } from "@/components/tech/wizard/art/StaticArt";
 import { SubHero } from "@/components/tech/subhero/SubHero";
 import { heroPromises } from "@/lib/tech/subhero";
 
 const published = publishedPoints(servicePoints);
 const cities = citiesTitle(published);
 
+
+/** Devices without a photo use the same illustrations as the home page device grid (DeviceGrid). */
+const HUB_ART: Partial<Record<string, { kind: ArtKind; crop: [number, number, number, number] }>> = {
+  watch: { kind: "watch", crop: [88, 0, 236, 480] },
+  data: { kind: "data", crop: [34, 32, 430, 320] },
+};
 export const metadata = pageMetadata({
   title: "Naprawy — serwis telefonów i komputerów",
   description: `Serwis PRO-KOM Tech: ${cities}. Naprawa telefonów, laptopów, tabletów, komputerów, konsol, drukarek i smartwatchy. Wycena przed naprawą.`,
@@ -97,7 +104,9 @@ export default function RepairsHubPage() {
                 <Link href={c.href} className="t-card t-hub__card">
                   <span className="t-hub__art" aria-hidden="true">
                     {c.photo ? (
-                      <Image src={c.photo.src} width={c.photo.width} height={c.photo.height} alt="" sizes="160px" className="t-hub__img" />
+                      <Image src={c.photo.src} width={c.photo.width} height={c.photo.height} alt="" sizes="(max-width: 767px) 340px, 160px" className="t-hub__img" />
+                    ) : HUB_ART[c.icon] ? (
+                      <StaticArt kind={HUB_ART[c.icon]!.kind} crop={HUB_ART[c.icon]!.crop} uid={`hub${c.icon}`} className="t-hub__sart" />
                     ) : (
                       <span className="t-ico">
                         <DeviceGlyph icon={c.icon} size={24} />

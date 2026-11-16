@@ -133,7 +133,7 @@
 .tech .t-hm__steps li.is-on .t-hm__num { background: var(--acc); color: #fff; transform: scale(1.06); box-shadow: 0 0 0 4px var(--card), 0 8px 18px -8px var(--acc); }
 .tech .t-hm__steps li.is-done .t-hm__num { background: var(--okbg); color: var(--ok); }
 .tech .t-hm__steptext { display: flex; flex-direction: column; min-width: 0; padding-top: 5px; }
-.tech .t-hm__steptext b { font-size: 15px; font-weight: 800; line-height: 1.35; }
+.tech .t-hm__steptext b { font-size: 15px; font-weight: 800; line-height: 1.35; color: var(--ink); }
 .tech .t-hm__steps li:not(.is-on) .t-hm__steptext b { color: var(--ink2); }
 .tech .t-hm__stepmore {
   display: block; max-height: 0; opacity: 0; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--ink2);

@@ -96,7 +96,7 @@ export default function PointsPage() {
                   <div>
                     <dt>Soboty</dt>
                     <dd>
-                      {main.city.split("-")[0]} {saturday}
+                      {main.city} {saturday}
                     </dd>
                   </div>
                 ) : null}
@@ -119,7 +119,7 @@ export default function PointsPage() {
         <div className="t-container">
           <div className={`t-pts2-cards${points.length === 1 ? " is-single" : ""}`}>
             {points.map((p) => (
-              <PointCard key={p.key} point={p} layout="feature" trackFrom="punkty" className="t-card" />
+              <PointCard key={p.key} id={p.key} point={p} layout="feature" trackFrom="punkty" className="t-card" />
             ))}
           </div>
         </div>

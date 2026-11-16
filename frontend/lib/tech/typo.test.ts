@@ -22,6 +22,10 @@ describe("polishText (Polish typesetting, przegląd wizualny)", () => {
     expect(polishText("Punkt: Nowa-Wieś, ul. Polna 16B")).toBe(`Punkt: Nowa-Wieś, ul.${NBSP}Polna${NBSP}16B`);
     expect(polishText("około 5 minut")).toBe("około 5 minut");
   });
+  it("keeps a spaced dash at the end of the line", () => {
+    expect(polishText("Hammer Glass czy szkło hartowane — co wybrać")).toBe(`Hammer Glass czy szkło hartowane${NBSP}— co wybrać`);
+    expect(polishText("Pn – Pt")).toBe(`Pn${NBSP}– Pt`);
+  });
   it("keeps the middle dot at the end of the line, never at the start of the next one", () => {
     expect(polishText("Rabka-Zdrój · Zakopane", true)).toBe(`Rabka-${WJ}Zdrój${NBSP}· Zakopane`);
     expect(polishText("PRO-KOM Tech · serwis")).toBe(`PRO-KOM Tech${NBSP}· serwis`);

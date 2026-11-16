@@ -103,7 +103,7 @@ export default function CourierPage() {
             <Breadcrumbs items={CRUMBS} separator="/" />
             <h1 className="t-bhero__h1">Naprawa wysyłkowa — wyślij sprzęt kurierem</h1>
             <p className="t-bhero__lead t-bhero__lead--wide">
-              Mieszkasz daleko od naszego punktu albo nie masz czasu przyjechać? Zgłoś naprawę online i wyślij sprzęt kurierem — po naprawie odeślemy go na
+              Mieszkasz daleko od naszych punktów albo nie masz czasu przyjechać? Zgłoś naprawę online i wyślij sprzęt kurierem — po naprawie odeślemy go na
               Twój adres.
             </p>
             <div className="t-btnrow">

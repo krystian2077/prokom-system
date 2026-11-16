@@ -30,7 +30,7 @@ export const phoneRepairExtra: Record<string, RepairExtra> = {
       { t: "Etui z rantem", s: "Krawędź etui wystająca ponad szybę przyjmuje uderzenie przy upadku ekranem w dół. Cienkie etui bez rantu chroni głównie przed rysami." },
       { t: "Szkło lub folia na ekran", s: "Pęka zamiast wyświetlacza i wymienia się je w chwilę. Popękane albo odklejone szkło zmień, bo pod nim zbiera się brud i wilgoć." },
       { t: "Nie siadaj z telefonem w kieszeni", s: "Nacisk ciała wygina panel OLED. Linie po takim zgięciu często pojawiają się bez żadnego pęknięcia szyby." },
-      { t: "Nie dociskaj odstającego ekranu", s: "Szpara między ekranem a ramką to zwykle spuchnięte ogniwo. Dociskanie może przebić baterię albo pęknąć wyświetlacz." },
+      { t: "Nie dociskaj odstającego ekranu", s: "Szpara między ekranem a ramką to zwykle spuchnięte ogniwo. Dociskanie może przebić baterię albo uszkodzić wyświetlacz." },
     ],
     faq: [
       {

@@ -25,7 +25,7 @@ export function TownsSection({ points }: { points: VisiblePoint[] }) {
             <h2 id="t-okolice-h" className="t-h2">
               Serwis telefonów dla całego Podhala
             </h2>
-            <p className="t-lead">Każda miejscowość ma swoją stronę: dojazd do bliższego punktu, godziny i najczęstsze naprawy.</p>
+            <p className="t-lead">Sprawdź, do którego punktu masz bliżej, i przyjedź bez umawiania.</p>
           </div>
         </div>
         <div className={`t-towns${multi ? "" : " is-single"}`}>

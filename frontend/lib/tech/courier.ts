@@ -18,6 +18,11 @@ export function courierPaysLines(service: typeof courierService = courierService
 
 /** One sentence, e.g. "Wysyłka do serwisu na Twój koszt, odesłanie po naprawie na nasz koszt." */
 export function courierPaysText(service: typeof courierService = courierService): string | null {
+  // Both returns paid by the same side → one clause instead of two near-identical ones.
+  if (service.inboundPaidBy && service.returnPaidBy && service.returnPaidBy === service.returnIfDeclined) {
+    const inbound = service.inboundPaidBy === "client" ? "Wysyłkę do serwisu opłacasz Ty" : "Wysyłka do serwisu jest na nasz koszt";
+    return `${inbound}, odesłanie po naprawie i po rezygnacji — ${who(service.returnPaidBy)}.`;
+  }
   const lines = courierPaysLines(service);
   return lines.length ? `${lines.join(", ")}.` : null;
 }
