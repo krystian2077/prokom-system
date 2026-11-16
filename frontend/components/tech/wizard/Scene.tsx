@@ -287,7 +287,9 @@ export function Scene({ device, fault, preview = null, onPick, onPreview, poster
             <Picture photo={ghost.photo} eager uid={`${uid}g`} />
           </div>
         ) : null}
-        <div ref={frameRef} className="t-scene__frame" key={device.id} style={frameVars(photo)} role="img" aria-label={`${device.label} — ${photo.art ? "ilustracja" : "zdjęcie"}`}>
+        <div ref={frameRef} className="t-scene__frame" key={device.id} style={frameVars(photo)} role="group" aria-label={`${device.label}: wybierz miejsce usterki`}>
+          {/* The photo's description, separate from the group: a role="img" container must not hold the clickable spots (axe nested-interactive). */}
+          <span className="t-visually-hidden">{`${device.label} — ${photo.art ? "ilustracja" : "zdjęcie"}`}</span>
           <div className="t-scene__cam" style={{ transformOrigin: `${focus[0]}% ${focus[1]}%` }}>
             <Picture photo={photo} eager={interactive} uid={uid} />
 
