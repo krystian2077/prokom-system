@@ -1,26 +1,45 @@
 {% extends "emails/base_email.html" %}
+{% comment %}Logistics context as in repair_submission_confirmation.html (ready=True wording), plus tracking_number / tracking_courier.{% endcomment %}
 {% block title %}Dziękujemy za zaufanie — {{ repair_number }} | PRO-KOM Tech{% endblock %}
-{% block preheader %}Naprawa {{ repair_number }} zakończona — sprzęt jest gotowy do odbioru. Dziękujemy za zaufanie.{% endblock %}
+{% block preheader %}{% if return_by_courier %}Naprawa {{ repair_number }} zakończona — odeślemy sprzęt kurierem.{% elif pickup_point %}Naprawa {{ repair_number }} zakończona — sprzęt czeka w salonie {{ pickup_point.name }}.{% else %}Naprawa {{ repair_number }} zakończona — sprzęt jest gotowy do odbioru.{% endif %} Dziękujemy za zaufanie.{% endblock %}
 {% block hero_icon %}{% include "emails/_hero_icon.html" with icon="check" %}{% endblock %}
 {% block eyebrow %}Naprawa zakończona{% endblock %}
-{% block heading %}Sprzęt jest gotowy do odbioru{% endblock %}
+{% block heading %}{% if return_by_courier %}Sprzęt wróci do Ciebie kurierem{% else %}Sprzęt jest gotowy do odbioru{% endif %}{% endblock %}
 {% block lead %}Dzień dobry{% if client_name %}, {{ client_name }}{% endif %}. Twoje zgłoszenie zostało pomyślnie zakończone. Dziękujemy za wybór PRO-KOM Tech — cieszymy się, że mogliśmy pomóc.{% endblock %}
 {% block content %}
   {% include "emails/_ticket.html" with device_name=device_name status_url=track_url extra_prefix="Zakończono: " extra=completed_at_display %}
 
+  {% if return_by_courier %}
+  {% include "emails/_h2.html" with text="Odesłanie kurierem" %}
+  {% include "emails/_callout.html" with icon="box" text=pickup_sentence %}
+  {% if tracking_number %}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-bd" style="border-top:1px solid #E3E6DF;">
+    {% include "emails/_row.html" with label="Numer przesyłki" value=tracking_number %}
+    {% if tracking_courier %}{% include "emails/_row.html" with label="Przewoźnik" value=tracking_courier %}{% endif %}
+  </table>
+  {% endif %}
+  <p class="em-ink2" style="margin:14px 0 0; font-size:14px; line-height:22px; color:#4F5650;">Pytania o wysyłkę? Zadzwoń do salonu w Rabce-Zdroju: <a class="em-ink" href="tel:+48883200151" style="color:#121613; font-weight:800; text-decoration:none;">883 200 151</a>.</p>
+  {% else %}
   {% include "emails/_h2.html" with text="Odbiór sprzętu" %}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     {% include "emails/_step.html" with n="1" title="Zabierz numer zgłoszenia" text=repair_number %}
-    {% include "emails/_step.html" with n="2" title="Przyjdź do salonu w godzinach otwarcia" text="Odbiór w salonie, w którym zostawiono sprzęt — adresy i godziny poniżej." %}
-    {% include "emails/_step.html" with n="3" title="Wybrany zwrot kurierem?" text="Szczegóły wysyłki znajdziesz w panelu klienta albo zapytaj nas telefonicznie." last=True %}
+    {% if pickup_point %}
+    {% include "emails/_step.html" with n="2" title="Przyjdź do salonu w godzinach otwarcia" text=pickup_sentence last=True %}
+    {% else %}
+    {% include "emails/_step.html" with n="2" title="Przyjdź do salonu w godzinach otwarcia" text="Odbiór w salonie, w którym zostawiono sprzęt — adresy i godziny poniżej." last=True %}
+    {% endif %}
   </table>
-
   <div style="height:22px; line-height:22px; font-size:22px;">&nbsp;</div>
+  {% if pickup_point %}
+  {% include "emails/_point_card.html" with p=pickup_point label="Tu odbierasz sprzęt" %}
+  {% else %}
   {% include "emails/_points.html" %}
+  {% endif %}
+  {% endif %}
 
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;" class="em-full">
     <tr>
-      <td class="em-stack em-stack-gap" style="padding:0 10px 0 0;">{% include "emails/_button.html" with url=panel_detail_url label="Szczegóły naprawy" full=True %}</td>
+      <td>{% include "emails/_button.html" with url=panel_detail_url label="Szczegóły naprawy" full=True %}</td>
     </tr>
   </table>
 
