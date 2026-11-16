@@ -1,0 +1,27 @@
+{% comment %}
+Repair number "ticket" (graphite card — stays dark in dark mode).
+Params: repair_number, label (eyebrow), device_name, extra (small line under the device),
+status_url (shows "Sprawdź status" button), button_label, phone_last4, hint (overrides the default hint), no_hint.
+{% endcomment %}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-ticket" bgcolor="#121613" style="background-color:#121613; border-radius:16px; border-collapse:separate;">
+  <tr>
+    <td width="5" bgcolor="#D13A2E" style="width:5px; background-color:#D13A2E; border-radius:16px 0 0 16px; font-size:1px; line-height:1px;">&nbsp;</td>
+    <td style="padding:24px 26px 24px 24px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+      <p style="margin:0; font-size:11px; line-height:16px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase; color:#9aa39b;">{{ label|default:"Numer zgłoszenia" }}</p>
+      <p class="em-num" style="margin:6px 0 0; font-family:'Archivo','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:32px; line-height:38px; font-weight:800; letter-spacing:0.01em; color:#FFFFFF; word-break:break-all;">{{ repair_number }}</p>
+      {% if device_name %}<p style="margin:6px 0 0; font-size:15px; line-height:22px; font-weight:600; color:#d4d9d3;">{{ device_name }}</p>{% endif %}
+      {% if extra %}<p style="margin:2px 0 0; font-size:14px; line-height:21px; font-weight:700; color:#ef6a5d;">{{ extra_prefix }}{{ extra }}</p>{% endif %}
+      {% if status_url %}
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px; border-collapse:separate;" class="em-full">
+        <tr>
+          <td align="center" bgcolor="#D13A2E" style="border-radius:12px; background-color:#D13A2E; mso-padding-alt:14px 24px;">
+            <a href="{{ status_url }}" target="_blank" style="display:inline-block; padding:14px 24px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:20px; font-weight:800; color:#FFFFFF; text-decoration:none; border-radius:12px;">{{ button_label|default:"Sprawdź status" }}&nbsp;&rarr;</a>
+          </td>
+        </tr>
+      </table>
+      {% endif %}
+      {% if not no_hint %}
+      <p style="margin:16px 0 0; font-size:13px; line-height:20px; color:#9aa39b;">{% if hint %}{{ hint }}{% else %}Status sprawdzisz po numerze zgłoszenia i&nbsp;4 ostatnich cyfrach telefonu{% if phone_last4 %} (Twoja końcówka: <strong style="color:#ffffff;">{{ phone_last4 }}</strong>){% endif %}.{% endif %}</p>
+      {% endif %}
+    </td>
+  </tr>
+</table>

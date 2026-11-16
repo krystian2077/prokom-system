@@ -1,0 +1,6 @@
+{% comment %}Left-ruled text block for client-provided text. Param: body (pre-escaped by caller), muted.{% endcomment %}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-soft" bgcolor="#F4F5F1" style="background-color:#F4F5F1; border-radius:0 12px 12px 0; border-collapse:separate;">
+  <tr>
+    <td width="4" bgcolor="{% if muted %}#CFD3CA{% else %}#D13A2E{% endif %}" style="width:4px; background-color:{% if muted %}#CFD3CA{% else %}#D13A2E{% endif %}; font-size:1px; line-height:1px;">&nbsp;</td>
+    <td class="em-ink" style="padding:18px 20px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#121613; white-space:pre-wrap;">{{ body }}</td>
+  </tr>
+</table>

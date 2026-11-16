@@ -1,73 +1,183 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}PRO-KOM SERWIS Rabka-Zdrój{% endblock %}</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{% block title %}PRO-KOM Tech{% endblock %}</title>
   <!--[if mso]>
-  <noscript>
-    <p style="color:#333;">Twoja skrzynka może nie obsługiwać stylów. Treść wiadomości znajduje się poniżej.</p>
-  </noscript>
+  <noscript><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <style>body, table, td, th, p, a, span, h1, h2 { font-family: Arial, Helvetica, sans-serif !important; }</style>
   <![endif]-->
+  <!--[if !mso]><!-->
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!--<![endif]-->
   <style>
-    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0a; }
-    .wrapper { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-    .header { background-color: #000000; color: #ffffff; padding: 28px 32px; text-align: center; border-bottom: 4px solid #dc1e1e; }
-    .header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: 0.02em; }
-    .header .tagline { margin: 8px 0 0; font-size: 13px; color: #a3a3a3; }
-    .content { padding: 32px 32px 24px; color: #171717; font-size: 15px; line-height: 1.65; }
-    .content p { margin: 0 0 16px; }
-    .footer { padding: 28px 32px; background-color: #0a0a0a; color: #a3a3a3; font-size: 12px; }
-    .footer a { color: #dc1e1e; text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
-    .footer-about { color: #d4d4d4; line-height: 1.55; margin-bottom: 20px; max-width: 520px; }
-    .footer-address { margin-bottom: 16px; line-height: 1.6; }
-    .footer-address strong { color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
-    .footer-bottom { margin-top: 20px; padding-top: 16px; border-top: 1px solid #262626; color: #737373; font-size: 11px; text-align: center; }
-    .button { display: inline-block; padding: 14px 28px; background-color: #dc1e1e; color: #ffffff !important; text-decoration: none; font-weight: 600; border-radius: 8px; font-size: 15px; }
-    .button:hover { background-color: #b81818; }
-    .code-box { background-color: #fafafa; border: 2px dashed #dc1e1e; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0; }
-    .code-box .code { font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #171717; font-family: 'Consolas', 'Monaco', monospace; }
-    .code-box .hint { font-size: 13px; color: #525252; margin-top: 8px; }
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    a { text-decoration: none; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+    u + #body a { color: inherit; text-decoration: none; }
+    .em-btn a:hover { opacity: .92; }
+
+    @media only screen and (max-width: 620px) {
+      .em-wrap { width: 100% !important; }
+      .em-outer { padding: 0 !important; }
+      .em-card, .em-foot { border-radius: 0 !important; }
+      .em-px { padding-left: 22px !important; padding-right: 22px !important; }
+      .em-h1 { font-size: 26px !important; line-height: 32px !important; }
+      .em-num { font-size: 26px !important; line-height: 32px !important; }
+      .em-stack { display: block !important; width: 100% !important; box-sizing: border-box; }
+      .em-stack-gap { padding: 0 0 12px 0 !important; }
+      .em-np { padding-left: 0 !important; padding-right: 0 !important; }
+      .em-hide-m { display: none !important; max-height: 0 !important; overflow: hidden !important; }
+      .em-full { width: 100% !important; }
+      .em-full a { display: block !important; }
+      .em-dt { padding-bottom: 2px !important; border-bottom: 0 !important; }
+      .em-dd { padding-top: 0 !important; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .em-bg { background-color: #0c0f0d !important; }
+      .em-card { background-color: #161a17 !important; }
+      .em-soft { background-color: #1e231f !important; }
+      .em-redsoft { background-color: #2a1917 !important; border-color: #5a2a24 !important; }
+      .em-ink { color: #f1f3ef !important; }
+      .em-ink2 { color: #b3bab2 !important; }
+      .em-acc { color: #ef6a5d !important; }
+      .em-bd { border-color: #2b312c !important; }
+      .em-ticket { border: 1px solid #2f3631 !important; }
+      .em-foot { background-color: #0f1210 !important; }
+    }
+    [data-ogsc] .em-ink { color: #f1f3ef !important; }
+    [data-ogsc] .em-ink2 { color: #b3bab2 !important; }
+    [data-ogsc] .em-acc { color: #ef6a5d !important; }
+    [data-ogsb] .em-bg { background-color: #0c0f0d !important; }
+    [data-ogsb] .em-card { background-color: #161a17 !important; }
+    [data-ogsb] .em-soft { background-color: #1e231f !important; }
+    [data-ogsb] .em-redsoft { background-color: #2a1917 !important; }
   </style>
 </head>
-<body>
-  <div class="wrapper">
-    <div class="header">
-      <h1>PRO-KOM SERWIS Rabka-Zdrój</h1>
-      <p class="tagline">Naprawy sprzętu — szybko i rzetelnie</p>
-    </div>
-    <div class="content">
-      {% block content %}{% endblock %}
-    </div>
-    <div class="footer">
-      <p class="footer-about">
-        <strong style="color:#fff; font-size:12px;">O nas</strong><br>
-        Profesjonalny serwis elektroniki w Rabce-Zdroju. Naprawiamy telefony, laptopy, tablety, drukarki i nie tylko — szybko, uczciwie, z gwarancją.
-      </p>
-      <div class="footer-address">
-        <strong>Adres</strong><br>
-        ul. Orkana 16B<br>
-        34-700 Rabka-Zdrój
-      </div>
-      <div class="footer-address">
-        <strong>Telefon</strong><br>
-        <a href="tel:+48883200151">883 200 151</a>
-      </div>
-      <div class="footer-address">
-        <strong>E-mail</strong><br>
-        <a href="mailto:sklep@pro-kom.eu">sklep@pro-kom.eu</a>
-      </div>
-      <div class="footer-address">
-        <strong>Godziny otwarcia</strong><br>
-        Poniedziałek – Piątek: 9:00 – 17:00<br>
-        Sobota: 9:00 – 14:00 · Niedziela: zamknięte
-      </div>
-      <div class="footer-bottom">
-        <p style="margin:0 0 4px;">© {% now "Y" %} PRO-KOM Serwis. Wszystkie prawa zastrzeżone.</p>
-        <p style="margin:0;">Ta wiadomość została wysłana automatycznie. Nie odpowiadaj na ten e-mail.</p>
-      </div>
-    </div>
-  </div>
+<body id="body" class="em-bg" style="margin:0; padding:0; width:100%; background-color:#F4F5F1; word-spacing:normal;">
+  <!-- Preheader: text shown in the inbox list, hidden in the message. -->
+  <div style="display:none; font-size:1px; color:#F4F5F1; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">{% block preheader %}PRO-KOM Tech — serwis telefonów i komputerów w Rabce-Zdroju i Zakopanem.{% endblock %}&#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp;</div>
+
+  <table role="presentation" class="em-bg" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F5F1" style="background-color:#F4F5F1;">
+    <tr>
+      <td class="em-outer" align="center" style="padding:32px 12px 40px;">
+        <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+        <table role="presentation" class="em-wrap" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+
+          <!-- Header: graphite band, negative logo (stays legible when a client darkens the message). -->
+          <tr>
+            <td class="em-foot" style="border-radius:18px 18px 0 0; background-color:#121613; overflow:hidden;" bgcolor="#121613">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="em-px" style="padding:26px 36px 24px; background-color:#121613;" bgcolor="#121613" valign="middle">
+                    <a href="https://prokomserwis.pl" target="_blank" style="text-decoration:none;">
+                      <img src="https://prokomserwis.pl/tech/mail/logo-tech-negatyw.png" width="180" height="36" alt="PRO-KOM Tech" style="display:block; width:180px; height:36px; border:0; color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:20px; font-weight:800; line-height:36px;">
+                    </a>
+                  </td>
+                  <td class="em-px em-hide-m" align="right" valign="middle" style="padding:26px 36px 24px 0; background-color:#121613; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12px; line-height:18px; color:#aeb5ad; letter-spacing:0.02em;" bgcolor="#121613">
+                    {% block header_label %}Serwis · Rabka-Zdrój · Zakopane{% endblock %}
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" height="4" style="height:4px; line-height:4px; font-size:4px; background-color:#D13A2E;" bgcolor="#D13A2E">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Hero + content -->
+          <tr>
+            <td class="em-card" bgcolor="#FFFFFF" style="background-color:#FFFFFF;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="em-px" style="padding:40px 44px 8px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                    {% block hero_icon %}{% endblock %}
+                    <p class="em-acc" style="margin:0 0 10px; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#C4362B;">{% block eyebrow %}PRO-KOM Tech{% endblock %}</p>
+                    <h1 class="em-h1 em-ink" style="margin:0; font-family:'Archivo','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:30px; line-height:36px; font-weight:800; letter-spacing:-0.01em; color:#121613;">{% block heading %}{% endblock %}</h1>
+                    {% block lead_wrap %}<p class="em-ink2" style="margin:14px 0 0; font-size:16px; line-height:26px; color:#4F5650;">{% block lead %}{% endblock %}</p>{% endblock %}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="em-px em-ink" style="padding:24px 44px 44px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#121613;">
+                    {% block content %}{% endblock %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          {% block footer %}
+          <tr>
+            <td class="em-foot" bgcolor="#121613" style="background-color:#121613; border-radius:0 0 18px 18px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="em-px" style="padding:36px 44px 8px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                    <img src="https://prokomserwis.pl/tech/mail/logo-tech-negatyw.png" width="140" height="28" alt="PRO-KOM Tech" style="display:block; width:140px; height:28px; border:0; color:#ffffff; font-size:16px; font-weight:800; line-height:28px;">
+                    <p style="margin:14px 0 0; font-size:14px; line-height:22px; color:#b9c0b8;">Naprawy telefonów, komputerów i&nbsp;elektroniki. Na Podhalu od 2004&nbsp;roku.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="em-px" style="padding:20px 44px 4px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td class="em-stack em-stack-gap" width="50%" valign="top" style="padding:0 12px 0 0; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#b9c0b8;">
+                          <p style="margin:0 0 4px; font-size:11px; line-height:16px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#ef6a5d;">Salon Rabka-Zdrój</p>
+                          <p style="margin:0; color:#f4f5f1; font-weight:700;">ul. Orkana 16B</p>
+                          <p style="margin:0;">34-700 Rabka-Zdrój</p>
+                          <p style="margin:0;">Pn–Pt 9:00–17:00 · Sob 9:00–14:00</p>
+                          <p style="margin:0;"><a href="tel:+48883200151" style="color:#ffffff; text-decoration:none; font-weight:700;">883 200 151</a> · <a href="https://www.google.com/maps/dir/?api=1&amp;destination=49.613,19.9629" target="_blank" style="color:#f29185; text-decoration:none;">mapa</a></p>
+                        </td>
+                        <td class="em-stack em-np" width="50%" valign="top" style="padding:0 0 0 12px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#b9c0b8;">
+                          <p style="margin:0 0 4px; font-size:11px; line-height:16px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#ef6a5d;">Salon Zakopane</p>
+                          <p style="margin:0; color:#f4f5f1; font-weight:700;">ul. Stanisława Staszica 8</p>
+                          <p style="margin:0;">34-500 Zakopane</p>
+                          <p style="margin:0;">Pn–Pt 10:00–16:30 · Sob–Nd nieczynne</p>
+                          <p style="margin:0;"><a href="tel:+48185412015" style="color:#ffffff; text-decoration:none; font-weight:700;">18 541 20 15</a> · <a href="https://www.google.com/maps/dir/?api=1&amp;destination=49.2978,19.9539" target="_blank" style="color:#f29185; text-decoration:none;">mapa</a></p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="em-px" style="padding:20px 44px 0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td height="1" style="height:1px; line-height:1px; font-size:1px; background-color:#2b312c;" bgcolor="#2b312c">&nbsp;</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="em-px" style="padding:18px 44px 36px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#b9c0b8;">
+                    <p style="margin:0 0 10px;">
+                      <a href="mailto:kontakt@prokomserwis.pl" style="color:#ffffff; text-decoration:none; font-weight:700;">kontakt@prokomserwis.pl</a>
+                      <span style="color:#5d655e;">&nbsp;·&nbsp;</span>
+                      <a href="https://prokomserwis.pl" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:700;">prokomserwis.pl</a>
+                    </p>
+                    <p style="margin:0; font-size:12px; line-height:19px; color:#7f877f;">
+                      {% block footer_note %}Wiadomość wysłana automatycznie przez system serwisu PRO-KOM Tech.{% endblock %}<br>
+                      PRO-KOM Tadeusz Wójciak · ul. Orkana 16B, 34-700 Rabka-Zdrój · NIP 7352511447 · © {% now "Y" %}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {% endblock %}
+
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
