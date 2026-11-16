@@ -33,12 +33,12 @@ def generate_and_send_verification_code(user, log_send=True):
         expires_at=expires_at,
     )
 
-    subject = "Kod weryfikacyjny — PRO-KOM Serwis"
+    subject = "Kod weryfikacyjny — PRO-KOM Tech"
     body_plain = (
         f"Twój kod weryfikacyjny: {code}\n\n"
         "Kod jest ważny przez 15 minut.\n\n"
         "Jeśli to nie Ty zakładałeś konto, zignoruj tę wiadomość.\n\n"
-        "— PRO-KOM Serwis"
+        "— PRO-KOM Tech"
     )
     html_content = render_to_string("emails/verification_code.html", {"code": code})
 

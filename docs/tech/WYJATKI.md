@@ -49,6 +49,9 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 | 16.11.2026 | `backend/templates/emails/staff_inquiry.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
 | 16.11.2026 | `backend/templates/emails/staff_new_repair.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
 | 16.11.2026 | `backend/templates/emails/verification_code.html` | Szablony maili PRO-KOM Tech, bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/apps/accounts/views/auth_views.py` | Szablony maili PRO-KOM Tech: tylko tekst tematu i podpisu maila („PRO-KOM Serwis” → „PRO-KOM Tech”), bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/apps/accounts/views/staff_management_views.py` | Szablony maili PRO-KOM Tech: tylko tekst tematu i podpisu maila („PRO-KOM Serwis” → „PRO-KOM Tech”), bez zmian w logice | Krystian (czat, 16.11) | #106 |
+| 16.11.2026 | `backend/apps/accounts/services/email_verification.py` | Szablony maili PRO-KOM Tech: tylko tekst tematu i podpisu maila („PRO-KOM Serwis” → „PRO-KOM Tech”), bez zmian w logice | Krystian (czat, 16.11) | #106 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **[16.11, audyt produkcji, P1] Formularz gościa nadpisuje dane istniejącego klienta:** drugie zgłoszenie z tym samym e-mailem zmienia imię, nazwisko i telefon klienta (`public_submit`). Skutki: `/track` starszej naprawy z cyframi telefonu podanymi wtedy zwraca 404 (porównanie z bieżącym `client.phone`, `track_views.py`), a ktoś znający czyjś e-mail może nadpisać mu dane. Propozycja: nie nadpisywać danych istniejącego klienta z formularza gościa (nowe dane do notatki zgłoszenia), a `/track` porównywać z telefonem zapisanym przy zgłoszeniu.
