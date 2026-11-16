@@ -5,7 +5,7 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 
 | Data | Plik | Zmiana i powód | Zgoda | PR |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 16.11.2026 | `backend/requirements.txt` | Przypięcie `kombu>=5.4,<5.5` przed przenosinami na VPS: obraz z 61f8f54 ma kombu 5.7, które odrzuca redis-py 5.2 (`VersionMismatch`) — Celery na VPS w pętli restartów. Ta sama zmiana co #97 na develop | Krystian (czat, 16.11) | #99 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **Punkt przyjęcia (`service_point`)** w zgłoszeniu i w śledzeniu (wariant B z KONTRAKT §2): filtr w panelu, właściwy adres punktu w statusie naprawy.
