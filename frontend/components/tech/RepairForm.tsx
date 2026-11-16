@@ -28,6 +28,7 @@ import { hoursSummary } from "@/lib/tech/hours";
 import { ACCOUNT_HREF } from "@/lib/tech/nav";
 import { isDraftMode } from "@/lib/tech/points";
 import { courierWhereText } from "@/lib/tech/courier";
+import { RepairFormHead } from "./PageHeads";
 import { polishText } from "@/lib/tech/typo";
 import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, appendFault, chosenPoint, courierLines, faultSuggestions, hasFault, type StepNo } from "@/lib/tech/repair-form";
 import { EASE, prefersReducedMotion } from "@/lib/tech/motion";
@@ -728,15 +729,7 @@ export function RepairForm() {
   return (
     <div className="t-ui t-container t-zgl">
       <div className="t-zgl__main">
-        <header className="t-zgl__head">
-          <nav aria-label="Okruszki" className="t-crumbs">
-            <Link href="/">Start</Link>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page">Zgłoś naprawę</span>
-          </nav>
-          <h1>Zgłoś naprawę</h1>
-          <p className="t-lead">Bez logowania, około minuty. Wycenę dostajesz po diagnozie, przed naprawą.</p>
-        </header>
+        <RepairFormHead />
 
         <div className="t-stepper" ref={stepsRef} style={{ ["--zgl-progress" as string]: (step - 1) / 4 }}>
           <span className="t-stepper__pill" aria-hidden="true" />

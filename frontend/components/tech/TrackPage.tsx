@@ -9,6 +9,7 @@ import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { fetchTrack } from "@/lib/tech/requests";
 import { trackEvent } from "@/lib/tech/track-event";
 import { MyRepairs } from "./MyRepairs";
+import { TrackHead } from "./PageHeads";
 import { PrepChecklist } from "./PrepChecklist";
 import { DEVICE_CATEGORIES } from "@/types/repair";
 import { RepairTracker } from "./RepairTracker";
@@ -94,14 +95,7 @@ export function TrackPage() {
   return (
     <div className="t-ui t-container t-trk">
       <div className="t-trk__head">
-        <div className="t-trk__title">
-          <nav aria-label="Okruszki" className="t-crumbs">
-            <Link href="/">Start</Link>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page">Status naprawy</span>
-          </nav>
-          <h1>Status naprawy</h1>
-        </div>
+        <TrackHead />
         <form className="t-card t-trk__form" onSubmit={onSubmit} noValidate aria-label="Sprawdź status naprawy">
           <label className="t-field t-trk__fref" htmlFor="trk-ref">
             <span className="t-field__label">Numer zgłoszenia</span>
