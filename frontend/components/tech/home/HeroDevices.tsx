@@ -5,11 +5,12 @@ import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/tech/motion";
 
 /**
- * Hero product scene (>= 768): the laptop at the back, two single phones in front of it, all on one
+ * Hero product scene (>= 768): the tablet at the back, two single phones in front of it, all on one
  * lit floor with their own contact shadows. Each device floats on its own rhythm and its shadow
  * breathes with it; with a fine pointer the devices drift by depth (the front phone most).
- * Crops: scripts/tech/glowna-kadry.py (never upscaled). The laptop is the largest image above the
- * fold → the only `priority` one (LCP).
+ * No laptop: a logo-bearing notebook in the middle of an independent service's page reads as
+ * "authorised" (audit 16.11). Crops: scripts/tech/hero-kadry.py (never upscaled). The tablet is the
+ * largest image above the fold → the only `priority` one (LCP).
  */
 export function HeroDevices() {
   const ref = useRef<HTMLDivElement>(null);
@@ -46,12 +47,12 @@ export function HeroDevices() {
   return (
     <div ref={ref} className="t-hero__devices" aria-hidden="true">
       <span className="t-hero__floor" />
-      <span className="t-hero__shadow t-hero__shadow--laptop" />
+      <span className="t-hero__shadow t-hero__shadow--tablet" />
       <span className="t-hero__shadow t-hero__shadow--samsung" />
       <span className="t-hero__shadow t-hero__shadow--iphone" />
-      <span className="t-hero__dev t-hero__dev--laptop">
+      <span className="t-hero__dev t-hero__dev--tablet">
         <span className="t-hero__float">
-          <Image src="/tech/urzadzenia/kadr-laptop.webp" alt="" width={608} height={414} priority unoptimized />
+          <Image src="/tech/urzadzenia/hero-tablet.webp" alt="" width={519} height={592} priority unoptimized />
         </span>
       </span>
       <span className="t-hero__dev t-hero__dev--samsung">
