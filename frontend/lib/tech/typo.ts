@@ -2,6 +2,8 @@
  * Polish typesetting rules for rendered text (przegląd wizualny):
  * - no one-letter word at the end of a line ("sierotki": a, i, o, u, w, z) → the space after it
  *   becomes a no-break space;
+ * - a middle dot separator ("Rabka-Zdrój · Zakopane") never opens a line → the space before it
+ *   becomes a no-break space, so the dot stays at the end of the first line;
  * - "ul." and a short house number stay with the street name ("Długa 8");
  * - no line break inside hyphenated names in headings ("Rabka-Zdrój") → an invisible
  *   word joiner (U+2060) follows the hyphen. Only text node values change, never the DOM
@@ -16,6 +18,8 @@ const STREET = /(^|[\s,(])(ul\.|al\.|os\.|pl\.) +/g;
 // RegExp constructor for the "u" flag: tsconfig targets ES5
 const HOUSE_NO = new RegExp(String.raw`(\p{L}) +(\d{1,3}[A-Za-z]?)(?=,|\s·|\s*$)`, "gu");
 export const WJ = "\u2060";
+/** " \u00b7 " separator: the dot stays with the word before it. */
+const MIDDOT = / +\u00b7/g;
 /** A hyphen inside a two-part place name ("Rabka-Zdrój", "Bielsko-Biała"); brand names in capitals
  * ("PRO-KOM") and codes ("USB-C") stay as they are. */
 const HYPHEN = new RegExp(String.raw`(\p{Lu}\p{Ll}+)-(?=\p{Lu}\p{Ll})`, "gu");
@@ -27,7 +31,8 @@ export function polishText(text: string, noBreakHyphens = false): string {
     .replace(ORPHAN, `$1$2${NBSP}`)
     .replace(ORPHAN, `$1$2${NBSP}`)
     .replace(STREET, `$1$2${NBSP}`)
-    .replace(HOUSE_NO, `$1${NBSP}$2`);
+    .replace(HOUSE_NO, `$1${NBSP}$2`)
+    .replace(MIDDOT, `${NBSP}·`);
   return noBreakHyphens ? out.replace(HYPHEN, `$1-${WJ}`) : out;
 }
 
