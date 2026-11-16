@@ -7,7 +7,7 @@
     "prebuild": "node scripts/patch-next-font.js",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --dir app/(public) --dir components/tech --dir lib/tech --dir config --dir tests",
+    "lint": "next lint --dir \"app/(public)\" --dir components/tech --dir lib/tech --dir config --dir tests",
     "clean": "node -e \"try{require('fs').rmSync('.next',{recursive:true,force:true});console.log('Usunieto .next');}catch(e){}\"",
     "dev:clean": "npm run clean && next dev",
     "test": "vitest run",

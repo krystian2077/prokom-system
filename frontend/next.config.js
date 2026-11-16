@@ -15,8 +15,13 @@ const cspReportOnly = [
   ...(cspReportUri ? [`report-uri ${cspReportUri}`] : []),
 ].join("; ");
 
+const isProd = process.env.NODE_ENV === "production";
+// 30 days: public/ files keep their names, so no `immutable` (a replaced photo shows up within a month at worst).
+const publicFilesCache = "public, max-age=2592000";
+
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   output: "standalone",
   /** Domyślnie Next 14 przerywa build/dev przy useSearchParams() bez Suspense (często 500). */
   experimental: {
@@ -38,17 +43,8 @@ const nextConfig = {
       },
     ];
   },
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
-    ],
-  },
   async rewrites() {
     return [
-      {
-        source: "/api/proxy/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/:path*`,
-      },
       { source: "/panel/naprawy", destination: "/panel/repairs" },
       { source: "/panel/naprawy/:path*", destination: "/panel/repairs/:path*" },
     ];
@@ -63,8 +59,14 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "geolocation=(), microphone=(), camera=()" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
+          // HTTPS only (Nginx terminates TLS); browsers ignore HSTS over http, and localhost never gets it.
+          // No includeSubDomains until every *.prokomserwis.pl host is confirmed HTTPS-only.
+          ...(isProd ? [{ key: "Strict-Transport-Security", value: "max-age=31536000" }] : []),
         ],
       },
+      // Files from public/ (photos, icons); /_next/static already gets immutable caching from Next.
+      { source: "/tech/:path*", headers: [{ key: "Cache-Control", value: publicFilesCache }] },
+      { source: "/images/:path*", headers: [{ key: "Cache-Control", value: publicFilesCache }] },
     ];
   },
 };

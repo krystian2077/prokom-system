@@ -37,7 +37,15 @@ export const STATIC_ROUTES: { path: string; priority: number; freq: Freq }[] = [
   { path: "/regulamin", priority: 0.2, freq: "yearly" },
 ];
 
-export function buildSitemap(now: Date = new Date(), points: ServicePoint[] = servicePoints): MetadataRoute.Sitemap {
+/**
+ * lastModified of pages without their own date: the build date (BUILD_DATE, ISO) or the last
+ * content review. Not `new Date()`: every request would announce a fresh change to crawlers.
+ */
+const CONTENT_DATE = "2026-11-16";
+const buildDate = process.env.BUILD_DATE;
+export const SITEMAP_DATE = new Date(buildDate && !Number.isNaN(Date.parse(buildDate)) ? buildDate : CONTENT_DATE);
+
+export function buildSitemap(now: Date = SITEMAP_DATE, points: ServicePoint[] = servicePoints): MetadataRoute.Sitemap {
   const url = (path: string) => (path === "/" ? SITE_URL : `${SITE_URL}${path}`);
   const pages: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({ url: url(r.path), lastModified: now, changeFrequency: r.freq, priority: r.priority }));
   const locals: MetadataRoute.Sitemap = publishedLocalPages(points).map((p) => ({
