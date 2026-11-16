@@ -172,38 +172,38 @@ export function InquiryForm({ points }: { points: PointOption[] }) {
         </fieldset>
       ) : null}
       <div className="t-inq__grid">
-        <label className={`t-fld${st("firstName", f.firstName)}`}>
+        <label htmlFor="inq-firstName" className={`t-fld${st("firstName", f.firstName)}`}>
           <span>Imię *</span>
-          <input name="firstName" type="text" autoComplete="given-name" placeholder="np. Anna" value={f.firstName} onChange={(e) => set("firstName", e.target.value)} {...aria("firstName")} />
+          <input id="inq-firstName" name="firstName" type="text" autoComplete="given-name" placeholder="np. Anna" value={f.firstName} onChange={(e) => set("firstName", e.target.value)} {...aria("firstName")} />
           {err("firstName")}
         </label>
-        <label className="t-fld">
+        <label htmlFor="inq-lastName" className="t-fld">
           <span>Nazwisko</span>
-          <input name="lastName" type="text" autoComplete="family-name" placeholder="np. Nowak" value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />
+          <input id="inq-lastName" name="lastName" type="text" autoComplete="family-name" placeholder="np. Nowak" value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />
         </label>
-        <label className={`t-fld${st("phone", f.phone)}`}>
+        <label htmlFor="inq-phone" className={`t-fld${st("phone", f.phone)}`}>
           <span>
             Telefon <em>— żebyśmy mogli oddzwonić</em>
           </span>
-          <input name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="np. 600 100 200" value={f.phone} onChange={(e) => set("phone", e.target.value)} {...aria("phone")} />
+          <input id="inq-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="np. 600 100 200" value={f.phone} onChange={(e) => set("phone", e.target.value)} {...aria("phone")} />
           {err("phone")}
         </label>
-        <label className={`t-fld${st("email", f.email)}`}>
+        <label htmlFor="inq-email" className={`t-fld${st("email", f.email)}`}>
           <span>E-mail *</span>
-          <input name="email" type="email" inputMode="email" autoComplete="email" placeholder="np. anna@poczta.pl" value={f.email} onChange={(e) => set("email", e.target.value)} {...aria("email")} />
+          <input id="inq-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="np. anna@poczta.pl" value={f.email} onChange={(e) => set("email", e.target.value)} {...aria("email")} />
           {err("email")}
         </label>
       </div>
-      <label className={`t-fld t-fld--msg${st("message", f.message)}`}>
+      <label htmlFor="inq-message" className={`t-fld t-fld--msg${st("message", f.message)}`}>
         <span>Wiadomość *</span>
-        <textarea name="message" rows={4} placeholder="Model urządzenia i co się dzieje, np. iPhone 13, pęknięta szybka" value={f.message} onChange={(e) => set("message", e.target.value)} {...aria("message")} />
+        <textarea id="inq-message" name="message" rows={4} placeholder="Model urządzenia i co się dzieje, np. iPhone 13, pęknięta szybka" value={f.message} onChange={(e) => set("message", e.target.value)} {...aria("message")} />
         <span className={`t-inq__count${f.message.trim().length > INQUIRY_MESSAGE_MAX ? " is-over" : ""}`} aria-hidden="true">
           {f.message.trim().length} / {INQUIRY_MESSAGE_MAX}
         </span>
         {err("message")}
       </label>
-      <label className="t-inq__consent">
-        <input name="consent" type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); check("consent", f, e.target.checked); }} {...aria("consent")} />
+      <label htmlFor="inq-consent" className="t-inq__consent">
+        <input id="inq-consent" name="consent" type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); check("consent", f, e.target.checked); }} {...aria("consent")} />
         <span>
           Zgadzam się na przetwarzanie danych przez {company.name} w celu odpowiedzi na zapytanie. Szczegóły w{" "}
           <Link href="/polityka-prywatnosci" data-t-inline="">polityce prywatności</Link>.
