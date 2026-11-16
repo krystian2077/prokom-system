@@ -25,6 +25,7 @@ Format: data · plik · co i dlaczego · kto zatwierdził · PR. Skrypt `scripts
 | 15.11.2026 | `frontend/features/client-naprawy/ClientNaprawyList.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
 | 15.11.2026 | `frontend/features/client-naprawy/ClientNaprawyDetail.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
 | 15.11.2026 | `frontend/features/client-profil/ClientProfil.tsx` | Skórka Tech zalogowanego konta klienta (pulpit, naprawy, profil; tytuły stron bez „PRO-KOM Serwis”), logika i wywołania API bez zmian | Krystian (czat, 15.11) | #73 |
+| 16.11.2026 | `backend/requirements.txt` | Przypięcie `kombu>=5.4,<5.5`: celery 5.4 dopuszcza kombu <6, a świeża instalacja brała kombu 5.7, które odrzuca redis-py 5.2 (`VersionMismatch`) — Celery nie zlecał zadań (powiadomienia o zgłoszeniach, rejestracja konta). Sprawdzone lokalnie: kombu 5.4.2 + redis 5.2.1 + celery 5.4.0, `pip check` czysty, zadanie trafia do Redisa | Krystian (czat, 16.11) | #97 |
 
 ## Backlog zmian backendu (poza przebudową — osobne decyzje)
 - **Punkt przyjęcia (`service_point`)** w zgłoszeniu i w śledzeniu (wariant B z KONTRAKT §2): filtr w panelu, właściwy adres punktu w statusie naprawy.
