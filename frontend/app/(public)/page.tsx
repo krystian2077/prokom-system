@@ -15,7 +15,7 @@ import { RepairWizard } from "@/components/tech/RepairWizard";
 import { claim } from "@/lib/tech/claims";
 import { courierPageHref, courierPaysText, courierWhereText } from "@/lib/tech/courier";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
-import { SITE_URL } from "@/lib/site-config";
+import { pageMetadata } from "@/lib/tech/seo";
 
 const published = publishedPoints(servicePoints);
 // SPEC §9: "… — Rabka-Zdrój i Zakopane | PRO-KOM Tech"; one city only if a point is unpublished.
@@ -25,11 +25,11 @@ const description =
     ? `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju i Zakopanem. Wycena przed naprawą, gwarancja i status naprawy online.`
     : `Serwis telefonów, laptopów, tabletów, komputerów, konsol i drukarek w Rabce-Zdroju. Najpierw diagnoza i wycena, gwarancja i status naprawy online.`;
 
+// pageMetadata: canonical + full Open Graph (image, site name, pl_PL, type) like the other pages;
+// the title is absolute because it already ends with the brand.
 export const metadata: Metadata = {
+  ...pageMetadata({ title, description, path: "/" }),
   title: { absolute: `${title} | ${line.name}` },
-  description,
-  alternates: { canonical: SITE_URL },
-  openGraph: { title: `${title} | ${line.name}`, description, url: SITE_URL },
 };
 
 export default function HomePage() {
