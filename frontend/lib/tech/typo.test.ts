@@ -22,8 +22,14 @@ describe("polishText (Polish typesetting, przegląd wizualny)", () => {
     expect(polishText("Punkt: Nowa-Wieś, ul. Polna 16B")).toBe(`Punkt: Nowa-Wieś, ul.${NBSP}Polna${NBSP}16B`);
     expect(polishText("około 5 minut")).toBe("około 5 minut");
   });
+  it("keeps the middle dot at the end of the line, never at the start of the next one", () => {
+    expect(polishText("Rabka-Zdrój · Zakopane", true)).toBe(`Rabka-${WJ}Zdrój${NBSP}· Zakopane`);
+    expect(polishText("PRO-KOM Tech · serwis")).toBe(`PRO-KOM Tech${NBSP}· serwis`);
+    expect(polishText(" · serwis")).toBe(`${NBSP}· serwis`);
+    expect(polishText("ul. Polna 8 · otwarte")).toBe(`ul.${NBSP}Polna${NBSP}8${NBSP}· otwarte`);
+  });
   it("is idempotent", () => {
-    const once = polishText("Serwis w Rabce-Zdroju i w Zakopanem", true);
+    const once = polishText("Serwis w Rabce-Zdroju i w Zakopanem · Rabka-Zdrój · Zakopane", true);
     expect(polishText(once, true)).toBe(once);
   });
 });

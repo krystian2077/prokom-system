@@ -19,6 +19,9 @@ RUN npm run build
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+# next/image in standalone needs sharp: `npm ci` on alpine installs the musl build
+# (@img/sharp-linuxmusl-*), the standalone trace copies it; the path makes it explicit.
+ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
