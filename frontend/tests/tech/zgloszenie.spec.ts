@@ -133,7 +133,7 @@ test("courier: parcels go to the Rabka salon only (audit 16.11, variant a); addr
   await page.getByLabel("Model *").fill("ThinkPad");
   await page.getByLabel("Co się dzieje? *").fill("Nie włącza się.");
   await page.locator("[data-zgl-next]").click();
-  await expect(page.getByRole("radio", { name: /^Kurier/ }).first()).toContainText("Wyślij sprzęt na adres salonu w Rabce-Zdroju.");
+  await expect(page.getByRole("radio", { name: /^Kurier/ }).first()).toContainText(/Wyślij sprzęt na adres salonu w\sRabce-\u2060?Zdroju\./);
   // one parcel address → no "which salon" question
   await expect(page.locator('[data-field="courierPoint"]')).toHaveCount(0);
   await page.getByLabel("Ulica *").fill("Testowa 1");

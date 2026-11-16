@@ -2448,6 +2448,8 @@ html[data-tech-theme="dark"] .tech .t-podhale__pin b { background: #120d0c; colo
 }
 .tech .t-courier__addrs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; margin-top: 16px; }
 .tech .t-courier__addrs .t-courier__addr { margin-top: 0; max-width: none; }
+/* one parcel address (audit 16.11, variant a): the card keeps its single-point width */
+.tech .t-courier__addrs:has(> .t-courier__addr:only-child) { grid-template-columns: minmax(0, 620px); }
 .tech .t-courier__addr { margin-top: 16px; max-width: 620px; padding: 22px 24px; border-radius: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--ink2); }
 .tech .t-courier__addr b { font-size: 17px; color: var(--ink); }
 

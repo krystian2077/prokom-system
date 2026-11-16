@@ -28,6 +28,7 @@ import { hoursSummary } from "@/lib/tech/hours";
 import { ACCOUNT_HREF } from "@/lib/tech/nav";
 import { isDraftMode } from "@/lib/tech/points";
 import { courierWhereText } from "@/lib/tech/courier";
+import { polishText } from "@/lib/tech/typo";
 import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, appendFault, chosenPoint, courierLines, faultSuggestions, hasFault, type StepNo } from "@/lib/tech/repair-form";
 import { EASE, prefersReducedMotion } from "@/lib/tech/motion";
 import { submitRepair } from "@/lib/tech/requests";
@@ -546,7 +547,8 @@ export function RepairForm() {
                 <IconCheck size={12} strokeWidth={3.4} />
               </span>
               <b>Kurier</b>
-              <span>{courierWhereText() ?? "Wyślesz sprzęt paczką kurierską."}</span>
+              {/* noBreakHyphens: "Rabce-Zdroju" stays on one line in the narrow card */}
+              <span>{polishText(courierWhereText() ?? "Wyślesz sprzęt paczką kurierską.", true)}</span>
               {courierLines().map((l) => (
                 <span key={l} className="t-option__meta">
                   {l}
