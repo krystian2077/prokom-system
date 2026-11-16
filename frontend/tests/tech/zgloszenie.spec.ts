@@ -155,8 +155,8 @@ test("courier: parcels go to the Rabka salon only (audit 16.11, variant a); addr
   await expect(box).not.toContainText("Zakopane");
   await expect(box).not.toContainText("Nie wysyłaj");
   expect(sent).toMatchObject({ delivery_method: "courier", return_method: "in_person" });
-  // salon line first; with a personal pick-up the pick-up point follows (KONTRAKT §2)
-  expect(sent!.additional_notes).toBe("Wysyłka na adres: Rabka-Zdrój\nPunkt odbioru: Rabka-Zdrój");
+  // parcel goes to Rabka and is picked up there → no second, identical point line (audit 16.11)
+  expect(sent!.additional_notes).toBe("Wysyłka na adres: Rabka-Zdrój");
   expect(Object.keys(sent!)).not.toContain("courier_point");
 });
 
