@@ -185,11 +185,14 @@ export function RepairForm() {
     if (form.dropoff && form.dropoff !== "courier" && !pointKeys.includes(form.dropoff)) set("dropoff", null);
   }, [form.dropoff, pointKeys, set]);
 
-  // Courier drop-off: the salon the parcel goes to (default = first point; asked with two points).
+  // Courier drop-off: the salon the parcel goes to — only points in courierService.parcelPoints
+  // (audit 16.11, variant (a): Rabka). Default = the first one; asked only when there are two.
+  const courierChoices = useMemo(() => points.filter((p) => courierService.parcelPoints.includes(p.key)), [points]);
   useEffect(() => {
-    const want = form.dropoff !== "courier" ? null : form.courierPoint && pointKeys.includes(form.courierPoint) ? form.courierPoint : points[0]?.key ?? null;
+    const keys = courierChoices.map((p) => p.key);
+    const want = form.dropoff !== "courier" ? null : form.courierPoint && keys.includes(form.courierPoint) ? form.courierPoint : keys[0] ?? null;
     if (form.courierPoint !== want) setForm((f) => ({ ...f, courierPoint: want }));
-  }, [form.dropoff, form.courierPoint, pointKeys, points]);
+  }, [form.dropoff, form.courierPoint, courierChoices]);
 
   // Pick-up point: asked only with two visible points; with one it is that point when needed.
   const askPickup = form.returnMethod === "in_person" && points.length > 1;
@@ -559,12 +562,12 @@ export function RepairForm() {
           </div>
           <FieldError field="dropoff" errors={errors} />
         </div>
-        {form.dropoff === "courier" && points.length > 1 ? (
+        {form.dropoff === "courier" && courierChoices.length > 1 ? (
           <div className="t-field t-reveal-in" data-field="courierPoint">
             <span className="t-field__label" id="zgl-cpoint-label">
               Na adres którego salonu wyślesz?
             </span>
-            <Segmented labelId="zgl-cpoint-label" options={points.map((p) => ({ value: p.key, label: p.name }))} value={form.courierPoint} onChange={(v) => set("courierPoint", v)} />
+            <Segmented labelId="zgl-cpoint-label" options={courierChoices.map((p) => ({ value: p.key, label: p.name }))} value={form.courierPoint} onChange={(v) => set("courierPoint", v)} />
             <span className="t-field__hint">Adres i godziny salonu pokażemy po wysłaniu zgłoszenia.</span>
           </div>
         ) : null}

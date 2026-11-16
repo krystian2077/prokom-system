@@ -103,7 +103,11 @@ export const notices: Notice[] = [];
 export const courierService = {
   // The boss's answers to SPEC §10/§12.10, passed on by Krystian on 15.11.2026.
   // Parcels may go to ANY published point (Krystian, 15.11.2026) — lib/tech/courier.ts courierPoints().
+  // Audit 16.11, variant (a): the backend confirmation e-mail (SERWIS_PRINT_ADDRESS) gives only the
+  // Rabka address, so parcels go to Rabka only. TODO(krystian): decision (a) vs a backend change.
   published: true,
+  /** Points that take courier parcels (still only the published ones). */
+  parcelPoints: ["rabka"] as PointKey[],
   inboundPaidBy: "client" as const,
   returnPaidBy: "service" as "service" | "client" | null,
   returnIfDeclined: "service" as null | "service" | "client",

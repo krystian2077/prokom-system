@@ -1,4 +1,5 @@
 import type { Titled } from "@/lib/tech/content-types";
+import { courierDestination } from "@/lib/tech/courier";
 
 /** Hub /uslugi — extended texts (2026-11), to be accepted by Krystian. No cities, no prices. */
 export const hubExtra = {
@@ -10,7 +11,7 @@ export const hubExtra = {
   start: [
     { t: "Wiesz, co się zepsuło", s: "Wybierz urządzenie poniżej albo od razu zgłoś naprawę online. Opis usterki i dane trafią do systemu, więc przyjęcie w salonie trwa krócej." },
     { t: "Nie wiesz, co jest przyczyną", s: "Opisz objawy w zgłoszeniu albo zadzwoń. Przyczynę ustalimy podczas diagnozy, a Ty zdecydujesz po wycenie." },
-    { t: "Mieszkasz dalej", s: "Wyślij sprzęt kurierem do jednego z salonów. Płacisz przelewem po diagnozie i akceptacji wyceny, a sprzęt wraca do Ciebie kurierem." },
+    { t: "Mieszkasz dalej", s: `Wyślij sprzęt kurierem ${courierDestination()}. Płacisz przelewem po diagnozie i akceptacji wyceny, a sprzęt wraca do Ciebie kurierem.` },
   ] satisfies Titled[],
   intake:
     "Zabierz urządzenie z ładowarką lub zasilaczem, jeśli usterka dotyczy ładowania albo zasilania. Zapisz kod blokady albo przygotuj się, że podasz go przy przyjęciu, i zrób kopię ważnych danych, jeśli sprzęt jeszcze działa. Do wysyłki zapakuj sprzęt w folię bąbelkową i sztywny karton, a do środka włóż kartkę z numerem zgłoszenia.",

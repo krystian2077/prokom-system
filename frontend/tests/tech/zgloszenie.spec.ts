@@ -122,7 +122,7 @@ test.describe("desktop 1440", () => {
   });
 });
 
-test("courier: chosen salon goes to additional_notes only; success card shows its address (15.11)", async ({ page }) => {
+test("courier: parcels go to the Rabka salon only (audit 16.11, variant a); address in additional_notes and on the success card", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   let sent: Record<string, unknown> | null = null;
   await mockSubmit(page, (route, body) => {
@@ -133,10 +133,9 @@ test("courier: chosen salon goes to additional_notes only; success card shows it
   await page.getByLabel("Model *").fill("ThinkPad");
   await page.getByLabel("Co się dzieje? *").fill("Nie włącza się.");
   await page.locator("[data-zgl-next]").click();
-  await expect(page.getByRole("radio", { name: /^Kurier/ }).first()).toContainText("jednego z naszych salonów");
-  const salon = page.locator('[data-field="courierPoint"]');
-  await expect(salon.getByRole("radio", { name: "Rabka-Zdrój" })).toHaveAttribute("aria-checked", "true");
-  await salon.getByRole("radio", { name: "Zakopane" }).click();
+  await expect(page.getByRole("radio", { name: /^Kurier/ }).first()).toContainText("Wyślij sprzęt na adres salonu w Rabce-Zdroju.");
+  // one parcel address → no "which salon" question
+  await expect(page.locator('[data-field="courierPoint"]')).toHaveCount(0);
   await page.getByLabel("Ulica *").fill("Testowa 1");
   await page.getByLabel("Miasto *").fill("Kraków");
   await page.locator("[data-zgl-next]").click();
@@ -146,17 +145,18 @@ test("courier: chosen salon goes to additional_notes only; success card shows it
   await page.getByLabel("E-mail *").fill("jan.testowy@example.com");
   await page.getByLabel("Telefon *").fill("+48 500 100 234");
   await page.locator("[data-zgl-next]").click();
-  await expect(page.locator("main")).toContainText("Kurier · na adres: Zakopane");
+  await expect(page.locator("main")).toContainText("Kurier · na adres: Rabka-Zdrój");
   await page.locator("label.t-check", { hasText: "regulamin" }).locator("input").check();
   await page.locator("[data-zgl-next]").click();
   const box = page.locator(".t-success__point");
-  await expect(box).toContainText("Możesz wysłać sprzęt na adres wybranego salonu.");
+  await expect(box).toContainText("Możesz wysłać sprzęt na adres salonu w Rabce-Zdroju.");
   await expect(box).toContainText("Numer zgłoszenia PROKOM/RMA/2/2026 włóż do paczki.");
-  await expect(box).toContainText("Zakopane");
+  await expect(box).toContainText("Rabka-Zdrój");
+  await expect(box).not.toContainText("Zakopane");
   await expect(box).not.toContainText("Nie wysyłaj");
   expect(sent).toMatchObject({ delivery_method: "courier", return_method: "in_person" });
   // salon line first; with a personal pick-up the pick-up point follows (KONTRAKT §2)
-  expect(sent!.additional_notes).toBe("Wysyłka na adres: Zakopane\nPunkt odbioru: Zakopane");
+  expect(sent!.additional_notes).toBe("Wysyłka na adres: Rabka-Zdrój\nPunkt odbioru: Rabka-Zdrój");
   expect(Object.keys(sent!)).not.toContain("courier_point");
 });
 

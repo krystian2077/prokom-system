@@ -7,7 +7,7 @@ import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PrepChecklist } from "@/components/tech/PrepChecklist";
-import { courierPoints } from "@/lib/tech/courier";
+import { courierDestination, courierPoints } from "@/lib/tech/courier";
 import { courierPayRows, courierPageVisible, courierPaymentText } from "@/lib/tech/courier-page";
 import { PREP_GUIDE_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import { hoursLong, inCity, pointAddress, pointPhoneDisplay } from "@/lib/tech/point-format";
@@ -34,13 +34,13 @@ function faqItems(points: ServicePoint[]): FaqItem[] {
   const items: FaqItem[] = [
     {
       q: "Na jaki adres wysłać sprzęt?",
-      a: `Na adres ${points.length > 1 ? "jednego z naszych salonów" : "naszego salonu"}: ${points.map((p) => `${line.name} ${p.city}, ${pointAddress(p)}`).join(" albo ")}. Wybierz ten, który Ci pasuje.`,
+      a: `${points.length > 1 ? "Na adres jednego z naszych salonów" : "Na adres salonu"}: ${points.map((p) => `${line.name} ${p.city}, ${pointAddress(p)}`).join(" albo ")}.${points.length > 1 ? " Wybierz ten, który Ci pasuje." : ""}`,
     },
     {
       q: "Czy muszę zgłosić naprawę przed wysyłką?",
       a: "Nie musisz, ale najlepiej to zrób: wypełnij formularz zgłoszenia online, napisz e-mail albo zadzwoń. Wtedy wiemy, że paczka jest w drodze, a po zgłoszeniu online dostaniesz numer zgłoszenia — włóż go do paczki.",
     },
-    { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: "Nie, nie obsługujemy paczkomatów — nie odbieramy z nich i nie nadajemy do nich paczek. Wyślij sprzęt kurierem pod adres jednego z salonów." },
+    { q: "Czy mogę wysłać sprzęt przez paczkomat?", a: `Nie, nie obsługujemy paczkomatów — nie odbieramy z nich i nie nadajemy do nich paczek. Wyślij sprzęt kurierem ${courierDestination(points)}.` },
     { q: "Ile trwa naprawa wysyłkowa?", a: "To czas samej naprawy (zależy od usterki i części) plus dni przesyłki w obie strony. Termin naprawy podamy po diagnozie." },
   ];
   if (courierService.returnIfDeclined) {
@@ -74,7 +74,7 @@ export default function CourierPage() {
     { t: "Zapakuj sprzęt", s: "Włóż do paczki kartkę z numerem zgłoszenia (albo imieniem i nazwiskiem) i swoim telefonem." },
     {
       t: "Nadaj dowolnym kurierem",
-      s: `Na adres ${points.length > 1 ? "jednego z naszych salonów" : "naszego salonu"} — nie obsługujemy paczkomatów. Numer przesyłki możesz dodać w koncie klienta.`,
+      s: `${courierDestination(points).replace(/^n/, "N")} — nie obsługujemy paczkomatów. Numer przesyłki możesz dodać w koncie klienta.`,
     },
     { t: "Diagnoza i wycena", s: "Naprawiamy dopiero po Twojej zgodzie." },
     {
@@ -248,7 +248,7 @@ export default function CourierPage() {
 
       <CtaBand
         eyebrow="Następny krok"
-        title="Zgłoś naprawę online i wyślij sprzęt kurierem do jednego z naszych salonów."
+        title={`Zgłoś naprawę online i wyślij sprzęt kurierem ${courierDestination(points)}.`}
         primary={{ label: "Zgłoś naprawę kurierem", href: SUBMIT_COURIER }}
         secondary={{ label: line.phoneDisplay, href: telHref(line.phone), tel: true, track: "kurier_cta" }}
       />

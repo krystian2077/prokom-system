@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { line, type ServicePoint } from "@/config/prokom";
 import { trackHref, type DeviceCategory, type SubmitResponse } from "@/lib/tech/contract";
-import { courierPageHref, courierPoints, courierWhereText } from "@/lib/tech/courier";
+import { courierDestination, courierPageHref, courierPoints, courierWhereText } from "@/lib/tech/courier";
 import { hoursSummary } from "@/lib/tech/hours";
 import { pointAddress } from "@/lib/tech/point-format";
 import { qrMatrix, qrPath, type QrMatrix } from "@/lib/tech/qr";
@@ -198,7 +198,7 @@ export function SuccessCard({ response, deviceLabel, category, point, courier, c
             {courierPoint ? (
               <>
                 <span>
-                  Możesz wysłać sprzęt na adres wybranego salonu. Numer zgłoszenia <b>{number}</b> włóż do paczki.
+                  Możesz wysłać sprzęt {courierPoints().length > 1 ? "na adres wybranego salonu" : courierDestination([courierPoint])}. Numer zgłoszenia <b>{number}</b> włóż do paczki.
                 </span>
                 <b className="t-success__pname">
                   {line.name} · {courierPoint.name}
