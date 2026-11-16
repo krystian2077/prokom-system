@@ -173,6 +173,9 @@ html[data-tech-theme="dark"] .tech {
     grid-auto-columns: 82%;
     gap: 12px;
     overflow-x: auto;
+    /* containing block for absolutely positioned children (e.g. a .t-visually-hidden heading):
+       without it they escape the scroller and widen the page */
+    position: relative;
     scroll-snap-type: x mandatory;
     padding-inline: var(--t-gutter);
     margin-inline: calc(-1 * var(--t-gutter));
