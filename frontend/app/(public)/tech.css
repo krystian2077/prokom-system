@@ -173,6 +173,9 @@ html[data-tech-theme="dark"] .tech {
     grid-auto-columns: 82%;
     gap: 12px;
     overflow-x: auto;
+    /* containing block for absolutely positioned children (e.g. a .t-visually-hidden heading):
+       without it they escape the scroller and widen the page */
+    position: relative;
     scroll-snap-type: x mandatory;
     padding-inline: var(--t-gutter);
     margin-inline: calc(-1 * var(--t-gutter));
@@ -715,7 +718,7 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
     --hd-w: clamp(360px, 37vw + 12px, 580px); --hd-r: clamp(20px, 3.4vw, 64px); --hd-t: clamp(48px, 4.6vw, 84px);
     --px: 0; --py: 0;
   }
-  /* key light: a warm pool behind the laptop and a soft spot from above */
+  /* key light: a warm pool behind the tablet and a soft spot from above */
   .tech .t-hero__devices::before {
     content: ""; position: absolute; inset: -14% -12% 2% -10%; z-index: -1; border-radius: 50%;
     background:
@@ -736,7 +739,7 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
     filter: blur(5px); transform-origin: 50% 50%;
     animation: t-hero-fade 900ms var(--m-ease-out) both, t-hero-breathe var(--hs, 7s) ease-in-out var(--hdl, 1s) infinite alternate;
   }
-  .tech .t-hero__shadow--laptop { left: 20%; width: 66%; top: 68%; --hs: 9s; --hdl: 900ms; height: 6%; opacity: 0.8; }
+  .tech .t-hero__shadow--tablet { left: 27%; width: 50%; top: 76%; --hs: 9s; --hdl: 900ms; height: 6%; opacity: 0.8; }
   .tech .t-hero__shadow--samsung { left: 64%; width: 26%; top: 86.5%; --hs: 7s; --hdl: 1.1s; }
   .tech .t-hero__shadow--iphone { left: 6%; width: 30%; top: 90.5%; --hs: 6s; --hdl: 1s; }
   .tech .t-hero__dev {
@@ -761,8 +764,8 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
   }
   .tech .t-hero__dev--iphone { --hm: url(/tech/urzadzenia/hero-iphone.webp); }
   .tech .t-hero__dev--samsung { --hm: url(/tech/urzadzenia/hero-samsung.webp); }
-  .tech .t-hero__dev--laptop { left: 16%; top: 7%; width: 74%; z-index: 1; --d: 4; --hs: 9s; --hdl: 900ms; --hf: -6px; }
-  .tech .t-hero__dev--laptop img {
+  .tech .t-hero__dev--tablet { left: 24%; top: 5%; width: 54%; z-index: 1; --d: 4; --hs: 9s; --hdl: 900ms; --hf: -6px; }
+  .tech .t-hero__dev--tablet img {
     filter: brightness(0.94) drop-shadow(0 0 0.6px rgba(255, 236, 230, 0.6)) drop-shadow(0 -2px 14px rgba(255, 210, 200, 0.14)) drop-shadow(0 30px 34px rgba(0, 0, 0, 0.5));
   }
   .tech .t-hero__dev--samsung { left: 66%; top: 33%; width: 22%; rotate: 5deg; --d: 9; --hs: 7s; --hdl: 1.1s; --hf: -10px; --hin: 140ms; }
