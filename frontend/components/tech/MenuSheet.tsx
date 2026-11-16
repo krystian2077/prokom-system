@@ -164,7 +164,7 @@ export function MenuSheet() {
                   <li key={r.href}>
                     <Link href={r.href} className="t-sheet__device">
                       <DeviceGlyph icon={r.icon} />
-                      {r.label.replace(/^Serwis /, "")}
+                      {r.short}
                     </Link>
                   </li>
                 ))}

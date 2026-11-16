@@ -54,7 +54,12 @@ export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "p
           <OpeningStatus points={[point]} variant="pill" skeletonCh={9} />
         </div>
         <H className="t-pointcard__name">{point.name}</H>
-        <p className="t-pointcard__addr">{pointAddress(point)}</p>
+        <p className="t-pointcard__addr">
+          {point.street ? `${point.street}, ` : null}
+          <span className="t-nowrap">
+            {point.postal} {point.city}
+          </span>
+        </p>
         <HoursChips point={point} />
         {feature && point.parkingNote ? (
           <p className="t-pointcard__park">

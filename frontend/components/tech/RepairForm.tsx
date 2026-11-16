@@ -282,9 +282,16 @@ export function RepairForm() {
     }, 40);
   };
 
+  /** Moves focus to the new step's heading so keyboard and screen reader users land on it
+   * (the "Dalej" button they pressed is gone or far below). */
+  const focusStep = (n: StepNo) => {
+    window.setTimeout(() => document.getElementById(`zgl-step-${n}-h`)?.focus({ preventScroll: true }), 60);
+  };
+
   const showStep = (n: StepNo) => {
     setStep(n);
     revealCard();
+    focusStep(n);
   };
 
   const goTo = (n: StepNo) => {
@@ -292,6 +299,7 @@ export function RepairForm() {
     setMaxStep((m) => (n > m ? n : m));
     trackEvent("zgloszenie_krok", { nr: n });
     revealCard();
+    focusStep(n);
   };
 
   const next = () => {
@@ -773,7 +781,7 @@ export function RepairForm() {
             <div className="t-zgl__stage" ref={stageRef}>
               <div className="t-zgl__pane" key={step}>
                 <div className="t-zgl__stephead">
-                  <h2 id={`zgl-step-${step}-h`} className="t-zgl__steph">
+                  <h2 id={`zgl-step-${step}-h`} className="t-zgl__steph" tabIndex={-1}>
                     <span className="t-zgl__stepn">{step}</span>
                     {stepMeta.long}
                   </h2>

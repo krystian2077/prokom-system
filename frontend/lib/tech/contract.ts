@@ -70,7 +70,8 @@ export type SubmitPayload = {
   delivery_city: string;
   delivery_postal_code: string;
   delivery_country: string;
-  hammer_glass_interest: HammerGlassInterest;
+  /** null when the device has no screen film offer (laptop, PC…): the question is not asked. */
+  hammer_glass_interest: HammerGlassInterest | null;
   accessory_interest: [];
   accessory_choose_for_me: false;
   accessory_wishlist: "";
@@ -230,7 +231,8 @@ export function pointLines(f: Pick<RepairFormState, "dropoff" | "returnMethod" |
   const dropPoint = f.dropoff && f.dropoff !== "courier" ? f.dropoff : null;
   if (dropPoint) out.push(`Punkt przyjęcia: ${pointName(dropPoint)}`);
   if (f.dropoff === "courier" && f.courierPoint) out.push(`Wysyłka na adres: ${pointName(f.courierPoint)}`);
-  if (f.returnMethod === "in_person" && f.pickupPoint && f.pickupPoint !== dropPoint) out.push(`Punkt odbioru: ${pointName(f.pickupPoint)}`);
+  const arrives = dropPoint ?? (f.dropoff === "courier" ? f.courierPoint ?? null : null);
+  if (f.returnMethod === "in_person" && f.pickupPoint && f.pickupPoint !== arrives) out.push(`Punkt odbioru: ${pointName(f.pickupPoint)}`);
   return out;
 }
 
@@ -268,7 +270,7 @@ export function buildSubmitPayload(f: RepairFormState): SubmitPayload {
     delivery_city: courier ? t(f.city) : "",
     delivery_postal_code: courier ? t(f.postalCode) : "",
     delivery_country: "Polska",
-    hammer_glass_interest: f.hammerGlass,
+    hammer_glass_interest: f.category && BRAND_REQUIRED.has(f.category) ? f.hammerGlass : null,
     accessory_interest: [],
     accessory_choose_for_me: false,
     accessory_wishlist: "",
