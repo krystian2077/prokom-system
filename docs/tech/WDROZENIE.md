@@ -104,8 +104,8 @@ Lista z MIGRACJA §8, komendy w `docs/tech/NIEDZIELA.md`. Pomocne pliki: `script
 Panele nie rejestrują SW, ale SW o zasięgu `/` „widzi” ich adresy — dlatego lista wykluczeń w `sw.js` jest częścią testów i nie wolno jej skracać.
 
 ## Wspólny Nginx (`prokom-proxy`) — start tylko ze wszystkimi nakładkami
-Od 16.11.2026 proxy obsługuje 7 nakładek. **Pominięta nakładka zdejmuje swoją domenę** (16.11 o 21:08 start z nakładką Tech prod bez `hub-prod.yml` wyłączył pro-kom.eu na ok. 10 min). Źródło prawdy: `prokom-web/docs/runbook.md` §0 — przed każdym startem sprawdź tam aktualną listę. Stan na 16.11 (w `/srv/prokom/prokom-web`, najpierw to samo z `run --rm --no-deps nginx nginx -t` zamiast `up …`):
+Od 16.11.2026 (23:05) proxy obsługuje 8 nakładek (ósma: 301 starej pro-kom.pl). **Pominięta nakładka zdejmuje swoją domenę** (16.11 o 21:08 start z nakładką Tech prod bez `hub-prod.yml` wyłączył pro-kom.eu na ok. 10 min). Źródło prawdy: `prokom-web/docs/runbook.md` §0 — przed każdym startem sprawdź tam aktualną listę. Stan na 16.11, 23:05 (w `/srv/prokom/prokom-web`, najpierw to samo z `run --rm --no-deps nginx nginx -t` zamiast `up …`):
 ```bash
-docker compose --env-file .env.proxy -f docker/compose.proxy.yml -f docker/compose.proxy.prod.yml -f docker/compose.proxy.gaming-staging.yml -f docker/compose.proxy.gaming-prod.yml -f docker/compose.proxy.tech-staging.yml -f docker/compose.proxy.tech-prod.yml -f docker/compose.proxy.hub-prod.yml up -d --force-recreate --no-deps nginx
+docker compose --env-file .env.proxy -f docker/compose.proxy.yml -f docker/compose.proxy.prod.yml -f docker/compose.proxy.gaming-staging.yml -f docker/compose.proxy.gaming-prod.yml -f docker/compose.proxy.tech-staging.yml -f docker/compose.proxy.tech-prod.yml -f docker/compose.proxy.hub-prod.yml -f docker/compose.proxy.prokom-pl.yml up -d --force-recreate --no-deps nginx
 ```
 Sprawdzenie listy na serwerze: `docker compose ls | grep prokom-proxy` (kolumna CONFIG FILES).
