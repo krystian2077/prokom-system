@@ -108,8 +108,8 @@ def _log_failed_login_and_maybe_lock(request, email_lower):
             from apps.communications.services.send import send_email
             send_email(
                 user.email,
-                "Konto PRO-KOM Serwis zablokowane — zbyt wiele nieudanych logowań",
-                "Dzień dobry,\n\nTwoje konto zostało tymczasowo zablokowane z powodu zbyt wielu nieudanych prób logowania (zabezpieczenie przed nieautoryzowanym dostępem).\n\nSkontaktuj się z nami, aby odblokować konto.\n\n— PRO-KOM Serwis",
+                "Konto PRO-KOM Tech zablokowane — zbyt wiele nieudanych logowań",
+                "Dzień dobry,\n\nTwoje konto zostało tymczasowo zablokowane z powodu zbyt wielu nieudanych prób logowania (zabezpieczenie przed nieautoryzowanym dostępem).\n\nSkontaktuj się z nami, aby odblokować konto.\n\n— PRO-KOM Tech",
                 fail_silently=True,
             )
 
@@ -497,13 +497,13 @@ def _send_password_reset_email(user, token_obj):
 
     base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3000").rstrip("/")
     reset_url = f"{base}/client/reset-password?token={token_obj.token}"
-    subject = "Reset hasła — PRO-KOM Serwis"
+    subject = "Reset hasła — PRO-KOM Tech"
     body_plain = (
         f"Dzień dobry,\n\n"
-        f"Otrzymaliśmy prośbę o zresetowanie hasła do konta w panelu klienta PRO-KOM Serwis.\n\n"
+        f"Otrzymaliśmy prośbę o zresetowanie hasła do konta w panelu klienta PRO-KOM Tech.\n\n"
         f"Kliknij link (ważny 1 godzinę):\n{reset_url}\n\n"
         "Jeśli to nie Ty prosiłeś o reset, zignoruj tę wiadomość.\n\n"
-        "— Zespół PRO-KOM Serwis"
+        "— Zespół PRO-KOM Tech"
     )
     html_content = render_to_string("emails/password_reset.html", {"reset_url": reset_url})
     return send_email_html(user.email, subject, body_plain, html_content, fail_silently=False)

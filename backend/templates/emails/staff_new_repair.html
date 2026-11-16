@@ -1,0 +1,29 @@
+{% extends "emails/base_email.html" %}
+{% comment %}
+Internal notification to the service (staff_notifications._build_new_repair_html).
+All values are HTML-escaped by the caller, so autoescape is off here.
+{% endcomment %}
+{% block title %}Nowe zgłoszenie naprawy online — {{ repair_number|safe }}{% endblock %}
+{% block preheader %}{% autoescape off %}{{ repair_number }} — klient wypełnił formularz zgłoszenia online. Czeka na potwierdzenie i diagnozę.{% endautoescape %}{% endblock %}
+{% block header_label %}Powiadomienie wewnętrzne{% endblock %}
+{% block hero_icon %}{% include "emails/_hero_icon.html" with icon="wrench" %}{% endblock %}
+{% block eyebrow %}Nowe zgłoszenie online{% endblock %}
+{% block heading %}Nowe zgłoszenie naprawy{% endblock %}
+{% block lead %}Klient wypełnił formularz zgłoszenia na stronie. Zgłoszenie czeka na potwierdzenie i&nbsp;diagnozę.{% endblock %}
+{% block content %}{% autoescape off %}
+  {% include "emails/_ticket.html" with status_url=panel_url button_label="Otwórz naprawę w panelu" hint="Potwierdź zgłoszenie klientowi i ustal sposób dostarczenia sprzętu." %}
+
+  {% include "emails/_h2.html" with text="Szczegóły zgłoszenia" %}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="em-bd" style="border-top:1px solid #E3E6DF;">
+    {% for label, value in rows %}{% include "emails/_row.html" with label=label value=value %}{% endfor %}
+  </table>
+
+  {% include "emails/_h2.html" with text="Opis usterki" %}
+  {% include "emails/_quote_box.html" with body=problem %}
+
+  {% if notes %}
+  {% include "emails/_h2.html" with text="Uwagi klienta" %}
+  {% include "emails/_quote_box.html" with body=notes muted=True %}
+  {% endif %}
+{% endautoescape %}{% endblock %}
+{% block footer %}{% include "emails/_staff_footer.html" with note="Powiadomienie wewnętrzne — wysłane automatycznie przez system serwisu PRO-KOM Tech." %}{% endblock %}

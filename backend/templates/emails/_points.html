@@ -1,0 +1,14 @@
+{% comment %}
+Both PRO-KOM Tech salons (data as in frontend/config/prokom.ts — keep in sync).
+Cards are table cells, so both columns keep the same height; stacked on phones.
+{% endcomment %}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;">
+  <tr>
+    <td class="em-stack em-soft" width="49%" valign="top" bgcolor="#F4F5F1" style="background-color:#F4F5F1; border-radius:14px; padding:20px 20px 18px;">
+      {% include "emails/_point.html" with name="Rabka-Zdrój" street="ul. Orkana 16B" city="34-700 Rabka-Zdrój" hours1="Pn–Pt 9:00–17:00" hours2="Sob 9:00–14:00" hours3="Nd nieczynne" phone="883 200 151" tel="+48883200151" map="https://www.google.com/maps/dir/?api=1&amp;destination=49.613,19.9629" note="Bezpłatny parking przy salonie." %}
+    </td>
+    <td class="em-stack" width="2%" style="font-size:12px; line-height:12px; height:12px;">&nbsp;</td>
+    <td class="em-stack em-soft" width="49%" valign="top" bgcolor="#F4F5F1" style="background-color:#F4F5F1; border-radius:14px; padding:20px 20px 18px;">
+      {% include "emails/_point.html" with name="Zakopane" street="ul. Stanisława Staszica 8" city="34-500 Zakopane" hours1="Pn–Pt 10:00–16:30" hours2="Sob–Nd nieczynne" phone="18 541 20 15" tel="+48185412015" map="https://www.google.com/maps/dir/?api=1&amp;destination=49.2978,19.9539" note="Bezpłatny parking." %}
+    </td>
+  </tr>
+</table>
