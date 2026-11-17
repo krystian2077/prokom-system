@@ -38,7 +38,7 @@ Stan na 16.11.2026, po pełnym audycie (treść, wygląd, działanie, gotowość
   Google GSI (101 kB) na każdej stronie publicznej — wyjątek w `WYJATKI.md` albo świadomie zostawić.
 - [ ] Next 14.2.35: 1 krytyczna + 2 wysokie w `npm audit` (poprawki tylko w Next 15/16). Ryzyko ograniczone
   w #95 (bez `remotePatterns` i rewrite `/api/proxy`); akceptacja albo plan aktualizacji (panele też).
-- [ ] `public/images/background-remover.zip` (11 MB) i stare zdjęcia sklepu w `public/images/` — usunąć.
+- [x] `public/images/background-remover.zip` (11 MB) i stare zdjęcia sklepu w `public/images/` — usunięte (perf/tech-wydajnosc).
 - [ ] Wyjątek `globals.css` (#52), akceptacja wyglądu i release przez szefa (Asana).
 
 ## 3. Serwer i usługi (poza kodem, tylko Krystian)
