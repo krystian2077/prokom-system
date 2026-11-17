@@ -105,6 +105,14 @@ const SEARCH: Record<SearchIconName, string> = {
   shield: HOME_PATHS.shield,
   user: D.user,
   map: HOME_PATHS.map,
+  copy: "M9 9h11v11H9zM5 15H4V4h11v1",
+  mail: PAGE_PATHS.mail,
+  route: "M3 11 21 3l-8 18-2-8z",
+  chat: D.chat,
+  moon: "M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z",
+  sun: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
+  check: "M5 12.5l4.5 4.5L19 7.5",
+  trend: "M3 17l6-6 4 4 8-8M15 7h6v6",
 };
 
 export const RailIcon = ({ icon, size = 22, strokeWidth = 1.9, className }: P & { icon: RailIconName }) => (

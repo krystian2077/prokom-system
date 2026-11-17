@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import { line, telHref } from "@/config/prokom";
-import { POINTS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
+import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { highlight } from "@/lib/tech/search/engine";
 import { onSearchRequest } from "@/lib/tech/search/open";
-import { MAX_QUERY, POPULAR, buildProvider, type SearchEntry, type SearchGroup, type SearchResult } from "@/lib/tech/search/provider";
+import { MAX_QUERY, buildProvider, type SearchEntry, type SearchGroup, type SearchResult } from "@/lib/tech/search/provider";
+import { matchActions, quickActions, type QuickAction } from "@/lib/tech/search/quick-actions";
 import { clearRecent, pushRecent, readRecent } from "@/lib/tech/search/recent";
+import { POPULAR_PHRASES, SEARCH_CATEGORIES, countCategories, resultsLabel, type CountedCategory } from "@/lib/tech/search/shortcuts";
 import { isSearchShortcut, isTypingTarget } from "@/lib/tech/search/shortcut";
 import { trackEvent } from "@/lib/tech/track-event";
-import { IconArrow, IconSearch } from "../icons";
+import { IconArrow, IconClose, IconSearch } from "../icons";
 import { IconClock, SearchIcon } from "../rail-icons";
+import { QuickActionItem, QuickActionTiles, useQuickRun } from "./QuickActions";
 
 /** Built at build time from the Tech data (app/(public)/szukaj/indeks.json/route.ts). */
 export const INDEX_URL = "/szukaj/indeks.json";
@@ -35,13 +38,6 @@ function loadIndex(): Promise<SearchEntry[]> {
   return indexRequest;
 }
 
-/** Shortcuts of the empty window (the same places the tab bar and the menu lead to). */
-const SHORTCUTS: SearchResult[] = [
-  { id: "skrot:zgloszenie", title: "Zgłoś naprawę online", hint: "Formularz zgłoszenia — kilka minut", href: SUBMIT_HREF, group: "akcje", icon: "wrench" },
-  { id: "skrot:status", title: "Status naprawy", hint: "Sprawdź po numerze zgłoszenia", href: TRACK_HREF, group: "akcje", icon: "track" },
-  { id: "skrot:punkty", title: "Punkty serwisowe", hint: "Adresy i godziny otwarcia", href: POINTS_HREF, group: "akcje", icon: "pin" },
-];
-
 function lockScroll(): () => void {
   const body = document.body;
   const prev = { overflow: body.style.overflow, paddingRight: body.style.paddingRight };
@@ -54,16 +50,22 @@ function lockScroll(): () => void {
   };
 }
 
-const resultsLabel = (n: number) => `${n} ${n === 1 ? "wynik" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "wyniki" : "wyników"}`;
+/** One row of the listbox: a result, a matching action, or a category of the empty window. */
+type Item = { type: "result"; result: SearchResult } | { type: "action"; action: QuickAction } | { type: "category"; category: CountedCategory };
+
+const sec = (i: number) => ({ "--i": i }) as CSSProperties;
 
 /**
- * Search window of PRO-KOM Tech — the behaviour of the lines' `SearchDialog` (prokom-web-hub,
- * spec §5.1) in the Tech look. Ctrl/⌘ K, „/” (outside fields), the capsule, the rail and the
- * Menu sheet open a modal `<dialog>` (the browser keeps focus inside and gives it back on close).
- * The field is a combobox: ↑↓ move through the results, Enter opens the active one (the first by
- * default), Esc closes. Empty: shortcuts, recent phrases (this browser only), popular phrases.
- * Typing: groups with the hit highlighted; nothing found → phone, form, contact. The index comes
- * as JSON when the browser is idle or at the first request to search.
+ * Search window of PRO-KOM Tech — the „mega” search of the PRO-KOM lines (prokom-web Biznes
+ * `SearchDialog`: quick actions, popular phrases, shortcuts with counts) in the Tech look.
+ * Ctrl/⌘ K, „/” (outside fields), the capsule, the rail and the Menu sheet open a modal
+ * `<dialog>` (the browser keeps focus inside and gives it back on close). The field is a
+ * combobox: ↑↓ move through the listbox, Enter runs the active row through its own click (link,
+ * action or category), Tab walks the tiles and chips, Esc closes.
+ * Empty: quick actions (call, copy, e-mail, route, form, status, contact, theme), recent phrases
+ * (this browser only), popular phrases and categories with the number of results from the index.
+ * Typing: matching actions on top, then groups with the hit highlighted; nothing found → tips,
+ * phone, form, contact. The index comes as JSON when the browser is idle or at the first request.
  */
 export function SearchDialog() {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -78,6 +80,9 @@ export function SearchDialog() {
   const [failed, setFailed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [recent, setRecent] = useState<string[]>([]);
+  // Deterministic on the server; the route tile follows the clock once the window opens.
+  const [actions, setActions] = useState<QuickAction[]>(() => quickActions());
+  const runner = useQuickRun();
   const measured = useRef<Set<string>>(new Set());
   const unlock = useRef<(() => void) | null>(null);
 
@@ -108,6 +113,7 @@ export function SearchDialog() {
       if (!box || box.open || document.querySelector("dialog[open]")) return;
       if (!entries) load();
       setRecent(readRecent());
+      setActions(quickActions({ now: new Date() }));
       measured.current = new Set();
       if (phrase !== undefined) setQuery(phrase);
       setActiveIndex(phrase ? 0 : -1);
@@ -134,7 +140,7 @@ export function SearchDialog() {
         input.current?.select();
         return;
       }
-      if (document.querySelector('.t-sheet.is-open')) return;
+      if (document.querySelector(".t-sheet.is-open")) return;
       e.preventDefault();
       show();
     };
@@ -145,16 +151,21 @@ export function SearchDialog() {
   useEffect(() => onSearchRequest((phrase) => show(phrase)), [show]);
 
   const provider = useMemo(() => (entries ? buildProvider(entries) : null), [entries]);
+  const categories = useMemo(() => (provider ? countCategories(provider) : null), [provider]);
   const deferred = useDeferredValue(query);
   const trimmed = deferred.trim().slice(0, MAX_QUERY);
   const groups: SearchGroup[] = useMemo(() => (trimmed && provider ? provider.query(trimmed) : []), [provider, trimmed]);
   const total = useMemo(() => (trimmed && provider ? provider.count(trimmed) : 0), [provider, trimmed]);
-  const options: SearchResult[] = useMemo(() => (trimmed ? groups.flatMap((g) => g.results) : SHORTCUTS), [groups, trimmed]);
+  const matched = useMemo(() => (trimmed ? matchActions(actions, trimmed) : []), [actions, trimmed]);
+  const items: Item[] = useMemo(() => {
+    if (!trimmed) return (categories ?? []).map((category) => ({ type: "category" as const, category }));
+    return [...matched.map((action) => ({ type: "action" as const, action })), ...groups.flatMap((g) => g.results.map((result) => ({ type: "result" as const, result })))];
+  }, [categories, groups, matched, trimmed]);
   const loading = Boolean(trimmed) && !provider && !failed;
-  const nothing = Boolean(trimmed) && Boolean(provider) && total === 0;
+  const nothing = Boolean(trimmed) && Boolean(provider) && total === 0 && matched.length === 0;
   const optionId = (i: number) => `${uid}-opt-${i}`;
-  // Empty field: nothing is picked until ↑↓ (Enter does nothing); typing: the first result.
-  const current = activeIndex < 0 || !options.length ? -1 : Math.min(activeIndex, options.length - 1);
+  // Empty field: nothing is picked until ↑↓ (Enter does nothing); typing: the first row.
+  const current = activeIndex < 0 || !items.length ? -1 : Math.min(activeIndex, items.length - 1);
 
   // SPEC §12.5: length of the phrase and the number of results, never the phrase itself.
   useEffect(() => {
@@ -166,23 +177,28 @@ export function SearchDialog() {
     return () => window.clearTimeout(timer);
   }, [open, provider, trimmed, total]);
 
-  // The active option stays in view while ↑↓ walk the list.
+  // The active row stays in view while ↑↓ walk the list.
   useEffect(() => {
     if (!open || current < 0) return;
     document.getElementById(optionId(current))?.scrollIntoView({ block: "nearest" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, open]);
 
-  /** A result was opened: the phrase goes to „Ostatnio szukane” and the next opening starts empty. */
+  /** A link was followed: the phrase goes to „Ostatnio szukane” and the next opening starts empty. */
   const remember = () => {
     if (trimmed) setRecent(pushRecent(trimmed));
     setQuery("");
   };
-
-  const go = (result: SearchResult) => {
+  const follow = () => {
     remember();
     close();
-    router.push(result.href);
+  };
+
+  /** A chip or a category types its phrase; the first row becomes active. */
+  const typeIn = (phrase: string) => {
+    setQuery(phrase);
+    setActiveIndex(0);
+    input.current?.focus();
   };
 
   const onFieldKey = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -192,15 +208,17 @@ export function SearchDialog() {
       close();
     } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      if (!options.length) return;
+      if (!items.length) return;
       const step = e.key === "ArrowDown" ? 1 : -1;
-      setActiveIndex(current < 0 ? (step > 0 ? 0 : options.length - 1) : (current + step + options.length) % options.length);
+      setActiveIndex(current < 0 ? (step > 0 ? 0 : items.length - 1) : (current + step + items.length) % items.length);
     } else if (e.key === "Home" && e.ctrlKey) {
       setActiveIndex(0);
+    } else if (e.key === "End" && e.ctrlKey && items.length) {
+      setActiveIndex(items.length - 1);
     } else if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       e.preventDefault();
-      const chosen = current >= 0 ? options[current] : undefined;
-      if (chosen) go(chosen);
+      // The active row runs through its own click: links navigate, actions run, categories type.
+      if (current >= 0) document.getElementById(optionId(current))?.click();
       else if (trimmed && failed) {
         close();
         router.push(`/szukaj?q=${encodeURIComponent(trimmed)}`);
@@ -210,59 +228,110 @@ export function SearchDialog() {
 
   const onLinkClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
-    remember();
-    close();
+    follow();
   };
 
-  const option = (r: SearchResult, i: number) => (
-    <li key={r.id} role="presentation">
-      <Link
-        id={optionId(i)}
-        href={r.href}
-        role="option"
-        aria-selected={i === current}
-        tabIndex={-1}
-        className="t-sdlg__result"
-        data-active={i === current ? "" : undefined}
-        onMouseMove={() => i !== current && setActiveIndex(i)}
-        onClick={onLinkClick}
-      >
-        <span className="t-sdlg__icon">
-          <SearchIcon icon={r.icon} />
-        </span>
-        <span className="t-sdlg__text">
-          <span className="t-sdlg__name">
-            {trimmed
-              ? highlight(r.title, trimmed).map((m, k) =>
-                  m.hit ? (
-                    <mark key={k} className="t-sdlg__hit">
-                      {m.text}
-                    </mark>
-                  ) : (
-                    m.text
-                  ),
-                )
-              : r.title}
-          </span>
-          {r.hint ? <span className="t-sdlg__hint">{r.hint}</span> : null}
-        </span>
-        <IconArrow className="t-sdlg__go" size={15} />
-      </Link>
-    </li>
+  const optionProps = (i: number) => ({
+    id: optionId(i),
+    role: "option",
+    "aria-selected": i === current,
+    tabIndex: -1,
+    "data-active": i === current ? "" : undefined,
+    onMouseMove: () => i !== current && setActiveIndex(i),
+  });
+
+  const marked = (title: string) =>
+    trimmed
+      ? highlight(title, trimmed).map((m, k) =>
+          m.hit ? (
+            <mark key={k} className="t-sdlg__hit">
+              {m.text}
+            </mark>
+          ) : (
+            m.text
+          ),
+        )
+      : title;
+
+  const rowBody = (icon: SearchResult["icon"], title: ReactNode, hint?: string, tail?: ReactNode) => (
+    <>
+      <span className="t-sdlg__icon">
+        <SearchIcon icon={icon} />
+      </span>
+      <span className="t-sdlg__text">
+        <span className="t-sdlg__name">{title}</span>
+        {hint ? <span className="t-sdlg__hint">{hint}</span> : null}
+      </span>
+      {tail ?? <IconArrow className="t-sdlg__go" size={15} />}
+    </>
   );
 
   let index = 0;
-  const groupBlock = (g: { key: string; title: string; results: SearchResult[] }) => (
-    <div key={g.key} role="group" aria-labelledby={`${uid}-g-${g.key}`} className="t-sdlg__group">
-      <p id={`${uid}-g-${g.key}`} className="t-sdlg__title" role="presentation">
-        {g.title}
+  const resultOption = (r: SearchResult) => {
+    const i = index++;
+    return (
+      <li key={r.id} role="presentation">
+        <Link href={r.href} className="t-sdlg__result" {...optionProps(i)} onClick={onLinkClick}>
+          {rowBody(r.icon, marked(r.title), r.hint)}
+        </Link>
+      </li>
+    );
+  };
+  const actionOption = (a: QuickAction) => {
+    const i = index++;
+    const v = runner.view(a);
+    return (
+      <li key={a.id} role="presentation">
+        <QuickActionItem action={a} runner={runner} onFollow={follow} className={`t-sdlg__result t-sdlg__result--action${v.done ? " is-done" : ""}`} extra={optionProps(i)}>
+          {rowBody(v.icon, v.done ? v.short : marked(a.label), v.hint, <span className="t-sdlg__kind">{a.kind === "copy" || a.kind === "theme" ? "Akcja" : a.external ? "Mapy" : "Otwórz"}</span>)}
+        </QuickActionItem>
+      </li>
+    );
+  };
+  const categoryOption = (c: CountedCategory, n: number) => {
+    const i = index++;
+    return (
+      <li key={c.key} role="presentation" style={sec(n)}>
+        <button type="button" className="t-sdlg__cat" {...optionProps(i)} onClick={() => typeIn(c.query)}>
+          <span className="t-sdlg__caticon">
+            <SearchIcon icon={c.icon} size={20} />
+          </span>
+          <span className="t-sdlg__text">
+            <span className="t-sdlg__catname">{c.label}</span>
+            <span className="t-sdlg__catcount">{resultsLabel(c.count)}</span>
+          </span>
+          <IconArrow className="t-sdlg__go" size={14} />
+        </button>
+      </li>
+    );
+  };
+
+  const groupBlock = (key: string, title: string, children: ReactNode, count?: number) => (
+    <div key={key} role="group" aria-labelledby={`${uid}-g-${key}`} className="t-sdlg__group">
+      <p id={`${uid}-g-${key}`} className="t-sdlg__title" role="presentation">
+        {title}
+        {count ? (
+          <span className="t-sdlg__count" aria-hidden="true">
+            {count}
+          </span>
+        ) : null}
       </p>
-      <ul role="presentation">{g.results.map((r) => option(r, index++))}</ul>
+      <ul role="presentation">{children}</ul>
     </div>
   );
 
   const tel = telHref(line.phone);
   const fullHref = `/szukaj?q=${encodeURIComponent(trimmed)}`;
+  const chips = (list: readonly { label: string; query: string }[]) => (
+    <div className="t-sdlg__chips">
+      {list.map((p) => (
+        <button key={p.label} type="button" className="t-sdlg__chip" onClick={() => typeIn(p.query)}>
+          <IconSearch size={14} strokeWidth={2.4} />
+          {p.label}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
     <dialog
@@ -270,6 +339,7 @@ export function SearchDialog() {
       aria-labelledby={`${uid}-h`}
       className="t-sdlg t-ui"
       data-t-search=""
+      data-state={trimmed ? (nothing ? "none" : "results") : "empty"}
       onClose={() => {
         setOpen(false);
         unlock.current?.();
@@ -293,7 +363,7 @@ export function SearchDialog() {
             type="search"
             role="combobox"
             aria-label="Szukaj na stronie"
-            aria-expanded={options.length > 0}
+            aria-expanded={items.length > 0}
             aria-controls={listId}
             aria-autocomplete="list"
             aria-activedescendant={current >= 0 ? optionId(current) : undefined}
@@ -304,25 +374,54 @@ export function SearchDialog() {
               setActiveIndex(e.target.value.trim() ? 0 : -1);
             }}
             onKeyDown={onFieldKey}
-            placeholder="Szukaj: ekran, bateria, laptop, status…"
+            placeholder="Szukaj: ekran, bateria, laptop…"
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
             enterKeyHint="search"
           />
+          {query ? (
+            <button
+              type="button"
+              className="t-sdlg__clear"
+              onClick={() => {
+                setQuery("");
+                setActiveIndex(-1);
+                input.current?.focus();
+              }}
+            >
+              <IconClose size={16} />
+              <span className="t-visually-hidden">Wyczyść pole</span>
+            </button>
+          ) : null}
           <button type="button" className="t-sdlg__close" onClick={close}>
-            Esc<span className="t-visually-hidden"> — zamknij wyszukiwarkę</span>
+            <span className="t-sdlg__esc" aria-hidden="true">
+              Esc
+            </span>
+            <span className="t-sdlg__x" aria-hidden="true">
+              <IconClose size={20} />
+            </span>
+            <span className="t-visually-hidden">Zamknij wyszukiwarkę</span>
           </button>
         </div>
         <p className="t-visually-hidden" aria-live="polite">
           {trimmed && provider ? resultsLabel(total) : ""}
         </p>
+        <p className="t-visually-hidden" role="status">
+          {runner.status}
+        </p>
 
         <div className="t-sdlg__body">
           {!trimmed ? (
             <>
+              <section className="t-sdlg__sec" style={sec(0)} aria-labelledby={`${uid}-qa`}>
+                <p id={`${uid}-qa`} className="t-sdlg__title">
+                  Szybkie akcje
+                </p>
+                <QuickActionTiles actions={actions} runner={runner} onFollow={follow} />
+              </section>
               {recent.length ? (
-                <section className="t-sdlg__chipset" aria-labelledby={`${uid}-recent`}>
+                <section className="t-sdlg__sec" style={sec(1)} aria-labelledby={`${uid}-recent`}>
                   <div className="t-sdlg__row">
                     <p id={`${uid}-recent`} className="t-sdlg__title">
                       Ostatnio szukane
@@ -341,16 +440,7 @@ export function SearchDialog() {
                   </div>
                   <div className="t-sdlg__chips">
                     {recent.map((phrase) => (
-                      <button
-                        key={phrase}
-                        type="button"
-                        className="t-sdlg__chip"
-                        onClick={() => {
-                          setQuery(phrase);
-                          setActiveIndex(0);
-                          input.current?.focus();
-                        }}
-                      >
+                      <button key={phrase} type="button" className="t-sdlg__chip t-sdlg__chip--recent" onClick={() => typeIn(phrase)}>
                         <IconClock size={15} />
                         {phrase}
                       </button>
@@ -358,32 +448,49 @@ export function SearchDialog() {
                   </div>
                 </section>
               ) : null}
-              <section className="t-sdlg__chipset" aria-labelledby={`${uid}-popular`}>
+              <section className="t-sdlg__sec" style={sec(2)} aria-labelledby={`${uid}-popular`}>
                 <p id={`${uid}-popular`} className="t-sdlg__title">
                   Najczęściej szukane
                 </p>
-                <div className="t-sdlg__chips">
-                  {POPULAR.map((phrase) => (
-                    <button
-                      key={phrase}
-                      type="button"
-                      className="t-sdlg__chip"
-                      onClick={() => {
-                        setQuery(phrase);
-                        setActiveIndex(0);
-                        input.current?.focus();
-                      }}
-                    >
-                      {phrase}
-                    </button>
-                  ))}
-                </div>
+                {chips(POPULAR_PHRASES)}
               </section>
             </>
           ) : null}
 
-          <div id={listId} role="listbox" aria-label={trimmed ? "Wyniki wyszukiwania" : "Na skróty"} className="t-sdlg__list">
-            {!trimmed ? groupBlock({ key: "akcje", title: "Na skróty", results: SHORTCUTS }) : groups.map(groupBlock)}
+          <div id={listId} role="listbox" aria-label={trimmed ? "Wyniki wyszukiwania" : "Na skróty"} className={`t-sdlg__list${trimmed ? "" : " t-sdlg__sec"}`} style={trimmed ? undefined : sec(3)}>
+            {!trimmed ? (
+              <div role="group" aria-labelledby={`${uid}-g-cats`} className="t-sdlg__group">
+                <p id={`${uid}-g-cats`} className="t-sdlg__title" role="presentation">
+                  Na skróty
+                </p>
+                {categories ? (
+                  <ul role="presentation" className="t-sdlg__cats">
+                    {categories.map(categoryOption)}
+                  </ul>
+                ) : (
+                  <ul role="presentation" className="t-sdlg__cats" aria-hidden="true">
+                    {SEARCH_CATEGORIES.map((c) => (
+                      <li key={c.key} role="presentation">
+                        <span className="t-sdlg__cat t-sdlg__cat--wait">
+                          <span className="t-sdlg__caticon">
+                            <SearchIcon icon={c.icon} size={20} />
+                          </span>
+                          <span className="t-sdlg__text">
+                            <span className="t-sdlg__catname">{c.label}</span>
+                            <span className="t-sdlg__skel" />
+                          </span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <>
+                {matched.length ? groupBlock("akcje", "Szybkie akcje", matched.map(actionOption)) : null}
+                {groups.map((g) => groupBlock(g.key, g.title, g.results.map(resultOption), g.results.length))}
+              </>
+            )}
           </div>
 
           {loading ? (
@@ -403,18 +510,30 @@ export function SearchDialog() {
           ) : null}
           {nothing ? (
             <div className="t-sdlg__none">
+              <span className="t-sdlg__noneicon" aria-hidden="true">
+                <IconSearch size={26} strokeWidth={2.2} />
+              </span>
               <p className="t-sdlg__noneh">Nie znaleźliśmy „{trimmed}”</p>
               <p>Opisz usterkę w zgłoszeniu albo zadzwoń — podpowiemy, czy to naprawimy.</p>
+              <ul className="t-sdlg__tips">
+                <li>Sprawdź pisownię albo wpisz krócej, np. „ekran”.</li>
+                <li>Wpisz rodzaj sprzętu: telefon, laptop, konsola.</li>
+                <li>Opisz objaw: „nie ładuje”, „zalany”, „grzeje się”.</li>
+              </ul>
               <div className="t-sdlg__noneactions">
                 <a href={tel} className="t-btn t-btn--acc t-btn--sm" data-track="telefon_klik" data-track-miejsce="szukaj">
                   Zadzwoń: {line.phoneDisplay}
                 </a>
-                <Link href={SUBMIT_HREF} className="t-btn t-btn--ghost t-btn--sm" onClick={onLinkClick}>
+                <Link href={SUBMIT_HREF} className="t-btn t-btn--ghost t-btn--sm" data-track="zgloszenie_start" data-track-zrodlo="przycisk" onClick={onLinkClick}>
                   Zgłoś naprawę
                 </Link>
                 <Link href="/kontakt" className="t-btn t-btn--ghost t-btn--sm" onClick={onLinkClick}>
                   Napisz do nas
                 </Link>
+              </div>
+              <div className="t-sdlg__nonepop">
+                <p className="t-sdlg__title">Może chodziło o</p>
+                {chips(POPULAR_PHRASES.slice(0, 6))}
               </div>
             </div>
           ) : null}
@@ -428,6 +547,9 @@ export function SearchDialog() {
             </span>
             <span>
               <kbd>Enter</kbd> otwórz
+            </span>
+            <span>
+              <kbd>Tab</kbd> akcje
             </span>
             <span>
               <kbd>Esc</kbd> zamknij
