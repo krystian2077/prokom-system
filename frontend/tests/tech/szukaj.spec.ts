@@ -145,20 +145,20 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
     await page.goto("/");
     await openWithKeys(page);
     const tiles = dialog(page).getByRole("group", { name: "Szybkie akcje" });
-    await expect(tiles.locator("[data-qa]")).toHaveCount(9);
+    await expect(tiles.locator("[data-qa]")).toHaveCount(5);
     await expect(tiles.locator('[data-qa="call"]')).toHaveAttribute("href", telHref(line.phone));
     await expect(tiles.locator('[data-qa="call"]')).toHaveAttribute("data-track", "telefon_klik");
     const zakopane = servicePoints.find((p) => p.key === "zakopane")!;
     await expect(tiles.locator('[data-qa="call2"]')).toHaveAttribute("href", telHref(pointPhone(zakopane)));
     await expect(tiles.locator('[data-qa="call2"]')).toContainText("Zakopane");
-    await expect(tiles.locator('[data-qa="mail"]')).toHaveAttribute("href", `mailto:${line.email}`);
+    await expect(tiles.locator('[data-qa="mail"]')).toHaveCount(0);
     const route = tiles.locator('[data-qa="route"]');
     await expect(route).toHaveAttribute("href", /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&destination=/);
     await expect(route).toHaveAttribute("target", "_blank");
     await expect(route).toHaveAttribute("data-track", "nawigacja_klik");
     await expect(tiles.locator('[data-qa="submit"]')).toHaveAttribute("href", "/zgloszenie");
     await expect(tiles.locator('[data-qa="track"]')).toHaveAttribute("href", "/track");
-    await expect(tiles.locator('[data-qa="contact"]')).toHaveAttribute("href", "/kontakt");
+    await expect(tiles.locator('[data-qa="contact"]')).toHaveCount(0);
   });
 
   test("Kopiuj numer copies and says „Skopiowano”; Motyw switches the theme like the capsule", async ({ page, context }) => {
@@ -166,17 +166,20 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.goto("/");
     await openWithKeys(page);
+    // copy is no longer a tile: it answers the query „kopiuj”
+    await field(page).fill("kopiuj");
     // by its kind: the accessible name itself turns into „Skopiowano” for a moment
     const copy = dialog(page).locator('button[data-qa="copy"]');
-    await expect(copy).toHaveAccessibleName(/Kopiuj numer/);
+    await expect(copy).toHaveAccessibleName(/kopiuj numer/i);
     await copy.click();
     await expect(copy).toContainText("Skopiowano");
     await expect(dialog(page).getByRole("status").filter({ hasText: "Skopiowano numer" })).toHaveCount(1);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(line.phoneDisplay);
-    await expect(copy).toContainText("Kopiuj numer", { timeout: 4000 });
+    await expect(copy).toContainText(/kopiuj numer/i, { timeout: 4000 });
 
     await expect(page.locator("html")).toHaveAttribute("data-tech-theme", "light");
-    await dialog(page).getByRole("button", { name: /^Motyw/ }).click();
+    await field(page).fill("motyw");
+    await dialog(page).locator('[data-qa="theme"]').click();
     await expect(page.locator("html")).toHaveAttribute("data-tech-theme", "dark");
     expect(await page.evaluate(() => localStorage.getItem("pk-theme"))).toBe("dark");
     await expect(dialog(page)).toBeVisible();

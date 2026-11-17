@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import type { QuickAction } from "@/lib/tech/search/quick-actions";
+import { TILE_KINDS, type QuickAction } from "@/lib/tech/search/quick-actions";
 import { getTechTheme, switchTechTheme } from "@/lib/tech/theme";
 import { useTechTheme } from "../ThemeToggle";
 import { SearchIcon } from "../rail-icons";
@@ -146,7 +146,7 @@ type TilesProps = { actions: readonly QuickAction[]; runner: Run; onFollow?: () 
 export function QuickActionTiles({ actions, runner, onFollow, label = "Szybkie akcje", className }: TilesProps) {
   return (
     <div className={`t-qa${className ? ` ${className}` : ""}`} role="group" aria-label={label}>
-      {actions.map((action, i) => {
+      {actions.filter((a) => TILE_KINDS.has(a.kind)).map((action, i) => {
         const v = runner.view(action);
         return (
           <QuickActionItem
@@ -160,8 +160,10 @@ export function QuickActionTiles({ actions, runner, onFollow, label = "Szybkie a
             <span className="t-qa__icon">
               <SearchIcon icon={v.icon} size={19} strokeWidth={2.1} />
             </span>
-            <span className="t-qa__label">{v.short}</span>
-            <span className="t-qa__sub">{v.sub}</span>
+            <span className="t-qa__text">
+              <span className="t-qa__label">{v.short}</span>
+              <span className="t-qa__sub">{v.sub}</span>
+            </span>
           </QuickActionItem>
         );
       })}

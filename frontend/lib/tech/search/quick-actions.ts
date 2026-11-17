@@ -152,7 +152,7 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
     id: "track",
     kind: "track",
     label: "Sprawdź status naprawy",
-    short: "Status naprawy",
+    short: "Status",
     sub: "Po numerze",
     hint: "Po numerze zgłoszenia",
     icon: "track",
@@ -187,6 +187,12 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
 export function routeActions(points: readonly ServicePoint[] = publishedPoints(servicePoints)): QuickAction[] {
   return points.filter((p) => p.published && p.geo).map((p) => routeAction(p, `route:${p.key}`));
 }
+
+/**
+ * Kinds shown as tiles in the empty window (Krystian 17.11: nine tiles were too much). The rest
+ * (copy, e-mail, contact, theme) still answer a query such as „kopiuj” or „motyw”.
+ */
+export const TILE_KINDS: ReadonlySet<QuickAction["kind"]> = new Set<QuickAction["kind"]>(["call", "call2", "route", "submit", "track"]);
 
 /** Most actions shown above the results. */
 export const MATCHED_ACTIONS_MAX = 3;
