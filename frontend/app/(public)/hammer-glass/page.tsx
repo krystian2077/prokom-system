@@ -168,7 +168,6 @@ export default function HammerGlassPage() {
               <span className="t-eyebrow">Co dostajesz</span>
               <h2 className="t-h2">Każda folia, każdy model</h2>
             </div>
-            <span className="t-hg-cert">Certyfikaty PZH i RoHS</span>
           </div>
           <ul className="t-hg-specs">
             {specs.map((x) => (

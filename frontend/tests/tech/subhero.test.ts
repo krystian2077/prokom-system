@@ -36,4 +36,9 @@ describe("SubHero — obietnice", () => {
     expect(heroPromises({ category: "desktop" }, false).map((x) => x.text)).toContain("Diagnoza zwykle tego samego dnia");
     expect(heroPromises({ category: "tablet" }, false).map((x) => x.text)).toEqual(confirmedTexts);
   });
+  it("data recovery promises no warranty on parts (audit 16.11)", () => {
+    const p = heroPromises({ category: "data_recovery" }, false).map((x) => x.text);
+    expect(p).toEqual(["Wycena przed rozpoczęciem", "Możesz zrezygnować", "Status naprawy online"]);
+    expect(p.join(" ")).not.toMatch(/Gwarancja/);
+  });
 });
