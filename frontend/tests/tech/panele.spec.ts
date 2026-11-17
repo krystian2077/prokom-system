@@ -65,7 +65,8 @@ for (const theme of THEMES) {
       await usePanelTheme(page, theme);
       await page.goto("/client/login");
       await settle(page);
-      await expect(page).toHaveScreenshot(`client-login-${theme}.png`, { fullPage: true });
+      // the live opening status ("Otwarte do 17:00" / "Otwieramy jutro…") depends on the clock → masked
+      await expect(page).toHaveScreenshot(`client-login-${theme}.png`, { fullPage: true, mask: [page.locator(".t-status")] });
     });
 
     test(`/admin-panel bez logowania (${theme})`, async ({ page }) => {
