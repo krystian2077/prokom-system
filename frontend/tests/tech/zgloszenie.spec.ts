@@ -139,7 +139,7 @@ test.describe("desktop 1440", () => {
     await expect(page.getByLabel("Model *")).toHaveValue("");
   });
 
-  test("draft: 'Zacznij od nowa' clears the restored form; a fresh draft wins over a refreshed wizard link", async ({ page }) => {
+  test("draft: a refreshed wizard link restores what was typed; 'Zacznij od nowa' keeps only the wizard prefill", async ({ page }) => {
     const DRAFT = "pk-tech-zgloszenie-szkic:v1";
     await page.goto("/zgloszenie?category=laptop");
     await page.getByLabel("Model *").fill("ThinkPad T14");

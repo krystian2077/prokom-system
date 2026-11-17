@@ -382,12 +382,16 @@ html[data-tech-theme="dark"] .tech .t-success__ticket::after { background: linea
 .tech .t-zgl .t-zgl__restoredt { color: var(--ink); font-weight: 700; }
 .tech .t-zgl .t-zgl__restoreddot { opacity: .5; }
 .tech .t-zgl .t-zgl__restart {
-  min-height: 32px; padding: 0 4px; border: 0; background: none; color: var(--acct); font: inherit; font-weight: 700; cursor: pointer;
+  min-height: 44px; margin-block: -6px; padding: 0 4px; border: 0; background: none; color: var(--acct); font: inherit; font-weight: 700; cursor: pointer;
   text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   transition: text-decoration-color var(--m-small, 180ms) var(--m-ease-out, ease-out);
 }
 .tech .t-zgl .t-zgl__restart:hover { text-decoration-color: currentColor; }
 .tech .t-zgl .t-zgl__restart:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 479.98px) {
+  .tech .t-zgl .t-zgl__restoreddot { display: none; }
+  .tech .t-zgl .t-zgl__restart { margin-left: 28px; }
+}
 @keyframes t-zgl-restored {
   from { opacity: 0; transform: translateY(-6px); }
 }
