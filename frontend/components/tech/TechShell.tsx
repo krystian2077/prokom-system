@@ -8,7 +8,7 @@ import { Footer } from "./Footer";
 import { MenuSheet } from "./MenuSheet";
 import { MotionRoot } from "./MotionRoot";
 import { NoticeBar } from "./NoticeBar";
-import { SearchDialog } from "./search/SearchDialog";
+import { LazySearchDialog } from "./search/LazySearchDialog";
 import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
 import { TabBar } from "./TabBar";
@@ -42,7 +42,7 @@ export function TechShell({ children }: { children: ReactNode }) {
         <div className="t-ui">
           <TabBar />
           <MenuSheet />
-          <SearchDialog />
+          <LazySearchDialog />
         </div>
         <TrackClicks />
         <MotionRoot />
