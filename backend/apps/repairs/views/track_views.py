@@ -60,8 +60,10 @@ class TrackRepairView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        client_phone_last4 = _phone_last4(repair.client.phone)
-        if client_phone_last4 != phone_last4:
+        # Telefon z profilu klienta albo podany przy tym zgłoszeniu (contact_phone).
+        allowed = {_phone_last4(repair.client.phone), _phone_last4(getattr(repair, "contact_phone", "") or "")}
+        allowed.discard("")
+        if phone_last4 not in allowed:
             return Response(
                 {"detail": "Nie znaleziono zgłoszenia lub nieprawidłowe dane."},
                 status=status.HTTP_404_NOT_FOUND,
