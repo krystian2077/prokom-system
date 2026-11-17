@@ -55,6 +55,9 @@ type Item = { type: "result"; result: SearchResult } | { type: "action"; action:
 
 const sec = (i: number) => ({ "--i": i }) as CSSProperties;
 
+/** Set by LazySearchDialog: `request` — a pending open (new object = open again), `onReady` — listeners attached. */
+export type SearchDialogProps = { request?: { phrase?: string } | null; onReady?: () => void };
+
 /**
  * Search window of PRO-KOM Tech — the „mega” search of the PRO-KOM lines (prokom-web Biznes
  * `SearchDialog`: quick actions, popular phrases, shortcuts with counts) in the Tech look.
@@ -67,7 +70,7 @@ const sec = (i: number) => ({ "--i": i }) as CSSProperties;
  * Typing: matching actions on top, then groups with the hit highlighted; nothing found → tips,
  * phone, form, contact. The index comes as JSON when the browser is idle or at the first request.
  */
-export function SearchDialog() {
+export function SearchDialog({ request, onReady }: SearchDialogProps = {}) {
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -149,6 +152,15 @@ export function SearchDialog() {
   }, [show]);
 
   useEffect(() => onSearchRequest((phrase) => show(phrase)), [show]);
+
+  // LazySearchDialog: a request made before this chunk arrived opens the window once it is here.
+  const showRef = useRef(show);
+  showRef.current = show;
+  useEffect(() => {
+    if (request) showRef.current(request.phrase);
+  }, [request]);
+  // Declared after the listeners above, so they are already attached when the loader lets go.
+  useEffect(() => onReady?.(), [onReady]);
 
   const provider = useMemo(() => (entries ? buildProvider(entries) : null), [entries]);
   const categories = useMemo(() => (provider ? countCategories(provider) : null), [provider]);

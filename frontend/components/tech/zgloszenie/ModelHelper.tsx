@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import type { DeviceCategory } from "@/lib/tech/contract";
@@ -24,7 +25,11 @@ import { trackEvent } from "@/lib/tech/track-event";
 import { DEVICE_CATEGORIES } from "@/types/repair";
 import { IconArrowUpRight, IconClose } from "../icons";
 import { usePill } from "../usePill";
-import { HelperScene } from "./HelperScene";
+
+// The illustrations only show in the open window: their own chunk, warmed when the form shows
+// the trigger (idle) and again on hover / focus, so the first opening already has them.
+const loadScene = () => import("./HelperScene");
+const HelperScene = dynamic(() => loadScene().then((m) => m.HelperScene), { ssr: false, loading: () => null });
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 const PHONE_MQ = "(max-width: 767.98px)";
@@ -111,6 +116,17 @@ export function ModelHelper({ field, category, brand, model, onUseModel }: Props
   stateRef.current = state;
 
   usePill(tabsRef, '[aria-selected="true"]', [tab, open, sheet, guides.length]);
+
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const warm = () => void loadScene();
+    const idle = w.requestIdleCallback?.(warm, { timeout: 3000 });
+    const timer = idle === undefined ? window.setTimeout(warm, 1500) : undefined;
+    return () => {
+      if (idle !== undefined) w.cancelIdleCallback?.(idle);
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   // Cross-fade of the illustration: the previous scene stays for one transition.
   const sceneKey = `${guide.id}|${variant ?? ""}|${at}`;
@@ -465,6 +481,8 @@ export function ModelHelper({ field, category, brand, model, onUseModel }: Props
         aria-haspopup="dialog"
         data-help-trigger={field}
         data-no-vt=""
+        onPointerEnter={() => void loadScene()}
+        onFocus={() => void loadScene()}
         onClick={(e) => {
           e.preventDefault();
           if (state === "open") hide(true);

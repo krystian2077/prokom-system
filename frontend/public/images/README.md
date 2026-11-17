@@ -1,6 +1,9 @@
-# Zdjęcia strony PRO-KOM
+# Pliki w public/images
 
 Obecnie używane pliki:
 
-- **2023-02-08.webp** — wnętrze serwisu (Hero na stronie głównej)
-- **unnamed.webp** — budynek / siedziba (sekcja Kontakt)
+- **og-prokom.jpg** — obraz udostępniania (Open Graph), 1200×630 (`scripts/tech/og-obraz.mjs`)
+- **logo.png** — logo do schema.org (`lib/tech/jsonld.ts`), 512×512
+
+Zdjęcia strony PRO-KOM Tech leżą w `public/tech/` (źródła i prawa: `config/media-zrodla.json`).
+Stare zdjęcia sklepu i `background-remover.zip` usunięte w `perf/tech-wydajnosc` (nic ich nie używało).
