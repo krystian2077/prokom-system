@@ -19,7 +19,7 @@ const PHONE_LIST = [
 type Photo = { src: string; w: number; h: number };
 const PHOTOS = {
   iphone: { src: "/tech/urzadzenia/kadr-iphone.webp", w: 399, h: 494 },
-  laptop: { src: "/tech/urzadzenia/kadr-laptop.webp", w: 608, h: 414 },
+  laptop: { src: "/tech/urzadzenia/kadr-laptop-bez-logo.webp", w: 608, h: 414 },
   tablet: { src: "/tech/urzadzenia/kadr-tablet.webp", w: 519, h: 592 },
   pc: { src: "/tech/urzadzenia/kadr-komputer.webp", w: 350, h: 640 },
   console: { src: "/tech/urzadzenia/kadr-konsola.webp", w: 548, h: 640 },
