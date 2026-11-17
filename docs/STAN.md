@@ -87,6 +87,8 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - DNS prokomserwis.pl: rejestrator i strefa w **cyber_Folks**; plan przeniesienia do Seohost i skrzynki kontakt@ w promptcie TM+.
 
 ## Pomysły na później
+- [blog 17.11] `lib/blog-posts.ts` ma 30× wpisany na sztywno telefon, adres i stare godziny („pon–pt 9:00–17:00, sob 9:00–14:00”) — zastąpić danymi z `config/prokom.ts` (CLAUDE.md §4) albo usunąć stopki z treści. Do tego sekcje „Dlaczego to ważne dla SEO i AI?” / „…dla SEO?” (wpisy o oryginalnych częściach GSM i drukarkach) piszą do wyszukiwarek, nie do klienta — przepisać.
+- [blog 17.11] Formularz zgłoszenia nadal oferuje preferowany kontakt „SMS” (`lib/tech/contract.ts`, `repair-form.ts`), a SMS w backendzie to atrapa — decyzja Krystiana, czy ukryć tę opcję.
 - [przegląd 15.11] Drukarki (Canon, Brother) i konsole (Xbox, Nintendo) nie mają znaków w `brand-logos.ts` — karty marek na tych stronach zostają tekstowe.
 - [przegląd 15.11] W kartach marek z logo-napisem (Lenovo, ASUS, Samsung) nazwa stoi drugi raz w nagłówku karty — ewentualnie ukryć ją wizualnie (zostawić dla czytników).
 - [przegląd 15.11] `/o-firmie`: „2004” trzy razy nad zgięciem; pasek punktów na głównej: Zakopane łamie się na dwie linie, Rabka nie.
