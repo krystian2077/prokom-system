@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
+import { loadIndex } from "@/lib/tech/search/load-index";
 import { onSearchRequest } from "@/lib/tech/search/open";
 import { isSearchShortcut, isTypingTarget } from "@/lib/tech/search/shortcut";
 
@@ -23,6 +24,8 @@ export function LazySearchDialog() {
   useEffect(() => {
     if (ready) return;
     const ask = (phrase?: string) => {
+      // The index downloads in parallel with the window's chunk.
+      loadIndex().catch(() => undefined);
       setRequest({ phrase });
       setMounted(true);
     };
@@ -40,6 +43,19 @@ export function LazySearchDialog() {
       off();
     };
   }, [ready]);
+
+  // The index (JSON) comes when the browser is idle, as before the window had its own chunk:
+  // an early opening already has the categories with their counts.
+  useEffect(() => {
+    const w = window as IdleWindow;
+    const fetchIndex = () => void loadIndex().catch(() => undefined);
+    const idle = w.requestIdleCallback?.(fetchIndex, { timeout: 4000 });
+    const timer = idle === undefined ? window.setTimeout(fetchIndex, 1500) : undefined;
+    return () => {
+      if (idle !== undefined) w.cancelIdleCallback?.(idle);
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     if (mounted) return;
