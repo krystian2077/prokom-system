@@ -9,6 +9,14 @@ import { SITE_URL } from "@/lib/site-config";
 export type Crumb = { name: string; path: string };
 export type FaqItem = { q: string; a: string };
 
+/** Blog post titles longer than this skip the " | PRO-KOM Tech" suffix (blog/[slug]/page.tsx). */
+export const POST_TITLE_SUFFIX_MAX = 44;
+
+/** The `<title>` a blog post renders with; keep it within 60 characters (tests/tech/seo.test.ts). */
+export function postDocumentTitle(title: string): string {
+  return title.length > POST_TITLE_SUFFIX_MAX ? title : `${title} | ${line.name}`;
+}
+
 /**
  * Metadata for a public page. `title` is the part before " | PRO-KOM Tech"
  * (the layout template adds the suffix); keep the full title within 30–60 characters
