@@ -32,6 +32,9 @@ const WARRANTY = "Gwarancja na usługę i części";
 const QUOTE = "Wycena przed naprawą";
 const STATUS = "Status naprawy online";
 
+/** Confirmed promises that fit data recovery (quote first, you can resign, status online). */
+export const DATA_RECOVERY_PROMISES = ["Wycena przed rozpoczęciem", "Możesz zrezygnować", STATUS] as const;
+
 /**
  * 3 short promises for the hero. Phone screen → the confirmed "często ok. 1 h";
  * computers, laptops, consoles, printers → "Diagnoza zwykle tego samego dnia";
@@ -39,6 +42,8 @@ const STATUS = "Status naprawy online";
  */
 export function heroPromises(ctx: PromiseContext = {}, draft?: boolean): HeroPromise[] {
   const plain = (text: string): HeroPromise => ({ text, draft: false });
+  // Data recovery is not a repair: no parts, no warranty in the usual form (config/tresci).
+  if (ctx.category === "data_recovery") return DATA_RECOVERY_PROMISES.map(plain);
   const out: HeroPromise[] = [plain(QUOTE)];
   if (ctx.phoneScreen) {
     const quick = claim("quickRepair", draft);

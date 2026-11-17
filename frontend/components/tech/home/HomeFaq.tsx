@@ -23,7 +23,7 @@ export function HomeFaq({ points }: { points: VisiblePoint[] }) {
     },
     {
       q: "Jak długo trwa naprawa?",
-      a: "Zależy od usterki i dostępności części. Czas realizacji podajemy razem z wyceną, a o każdej zmianie informujemy telefonicznie albo SMS-em.",
+      a: "Zależy od usterki i dostępności części. Czas realizacji podajemy razem z wyceną, a o każdej zmianie informujemy telefonicznie albo e-mailem.",
     },
     ...(free && !free.draft
       ? [{ q: "Czy diagnoza jest darmowa?", a: "Tak — w większości przypadków diagnoza jest bezpłatna. W bardziej złożonych przypadkach informujemy o ewentualnej opłacie z góry." }]

@@ -66,7 +66,7 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     slug: "porady-zakupowe",
     name: "Porady zakupowe",
     intro:
-      "Nowy czy poleasingowy laptop? Jaki komputer do firmy albo pracy zdalnej? Na co uważać przy zakupie akcesoriów do telefonu? Zebraliśmy porady, które dajemy klientom w naszych sklepach {punkty} — bez reklam konkretnych ofert i bez cen.",
+      "Nowy czy poleasingowy laptop? Jaki komputer do firmy albo pracy zdalnej? Na co uważać przy zakupie akcesoriów do telefonu? Zebraliśmy porady, które dajemy klientom w naszych punktach serwisowych {punkty} — bez reklam konkretnych ofert i bez cen.",
     description: "Porady przed zakupem: laptop nowy czy poleasingowy, komputer do firmy i pracy zdalnej, akcesoria do telefonu. Bez reklam konkretnych ofert i bez cen.",
     service: { href: "/uslugi", label: "Naprawy" },
     related: [

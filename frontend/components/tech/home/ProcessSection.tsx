@@ -56,7 +56,7 @@ export function ProcessSection({ point }: { point: VisiblePoint | undefined }) {
           <div className="t-track__text">
             <span className="t-eyb t-eyb--dark">Status naprawy online</span>
             <span className="t-track__title">Sprawdzasz sam, kiedy chcesz</span>
-            <span className="t-track__desc">Po numerze zgłoszenia i 4 ostatnich cyfrach telefonu. O statusie informujemy też telefonicznie albo SMS-em.</span>
+            <span className="t-track__desc">Po numerze zgłoszenia i 4 ostatnich cyfrach telefonu. O statusie informujemy też telefonicznie albo e-mailem.</span>
             <div className="t-track__actions">
               <Link href={TRACK_HREF} className="t-sbtn">
                 Sprawdź status naprawy

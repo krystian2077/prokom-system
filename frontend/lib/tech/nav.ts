@@ -80,7 +80,8 @@ export const legalLinks: { label: string; href: string }[] = [
   { label: "Polityka prywatności", href: "/polityka-prywatnosci" },
   { label: "Cookies", href: "/polityka-prywatnosci#cookies" },
   // TODO(krystian): "Dostępność" from the design needs a page (TD5) — hidden until it exists.
-  { label: "Mapa strony", href: "/sitemap.xml" },
+  // No HTML sitemap page: /sitemap.xml is raw XML for crawlers (audit 16.11).
+  { label: "Wszystkie naprawy", href: "/uslugi" },
 ];
 
 export const ACCOUNT_HREF = "/client/login";
