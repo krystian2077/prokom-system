@@ -368,3 +368,30 @@ html[data-tech-theme="dark"] .tech .t-success__ticket::after { background: linea
 .tech.t-reduced :is(.t-zgl, .t-success) *,
 .tech.t-reduced :is(.t-zgl, .t-success) *::before,
 .tech.t-reduced :is(.t-zgl, .t-success) *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+
+/* ---------- Restored draft (feat/tech-szkic-formularza): a quiet bar above the stepper ---------- */
+.tech .t-zgl .t-zgl__restored {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 14px; border-radius: 16px;
+  background: var(--bg2); box-shadow: inset 0 0 0 1px var(--hair); color: var(--ink2); font-size: 14px; font-weight: 600;
+  animation: t-zgl-restored var(--m-panel, 420ms) var(--m-ease-emph, ease-out) both;
+}
+.tech .t-zgl .t-zgl__restoredico {
+  width: 22px; height: 22px; flex: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--okbg); color: var(--ok);
+}
+.tech .t-zgl .t-zgl__restoredt { color: var(--ink); font-weight: 700; }
+.tech .t-zgl .t-zgl__restoreddot { opacity: .5; }
+.tech .t-zgl .t-zgl__restart {
+  min-height: 44px; margin-block: -6px; padding: 0 4px; border: 0; background: none; color: var(--acct); font: inherit; font-weight: 700; cursor: pointer;
+  text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: text-decoration-color var(--m-small, 180ms) var(--m-ease-out, ease-out);
+}
+.tech .t-zgl .t-zgl__restart:hover { text-decoration-color: currentColor; }
+.tech .t-zgl .t-zgl__restart:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 479.98px) {
+  .tech .t-zgl .t-zgl__restoreddot { display: none; }
+  .tech .t-zgl .t-zgl__restart { margin-left: 28px; }
+}
+@keyframes t-zgl-restored {
+  from { opacity: 0; transform: translateY(-6px); }
+}

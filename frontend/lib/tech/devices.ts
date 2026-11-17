@@ -80,7 +80,7 @@ const baseDevicePages: Omit<DevicePage, "extra">[] = [
     descEnd: "Matryca, klawiatura, czyszczenie, dysk SSD i zasilanie. Wycena przed naprawą.",
     lead: "Naprawiamy laptopy wszystkich popularnych marek: wymiana matrycy i klawiatury, czyszczenie układu chłodzenia, dysk SSD i pamięć RAM, problemy z ładowaniem. Najpierw diagnoza i wycena, naprawa dopiero po Twojej zgodzie.",
     card: "Matryca, klawiatura, czyszczenie, dysk SSD, zasilanie.",
-    photo: { src: "/tech/urzadzenia/laptop.webp", width: 640, height: 640, alt: "Laptop w serwisie" },
+    photo: { src: "/tech/urzadzenia/laptop-bez-logo.webp", width: 640, height: 640, alt: "Laptop w serwisie" },
     repairsTitle: "Co naprawiamy w laptopach",
     repairsLead: "Kwota zależy od modelu i części, dlatego podajemy ją po diagnozie. Zanim zaczniemy, znasz wycenę.",
     repairs: [
