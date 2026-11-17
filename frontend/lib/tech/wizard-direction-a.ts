@@ -34,5 +34,5 @@ const laptop = build(LAPTOP_CROP, LAPTOP_FAULTS, {
 
 export const directionA: WizardDevice[] = [
   { ...deviceById("telefon"), photo: { src: "/tech/urzadzenia/kreator-iphone.webp", width: 433, height: 577, crop: PHONE_CROP, spots: phone.spots }, scenes: phone.scenes },
-  { ...deviceById("laptop"), photo: { src: "/tech/urzadzenia/laptop.webp", width: 640, height: 640, crop: LAPTOP_CROP, spots: laptop.spots }, scenes: laptop.scenes },
+  { ...deviceById("laptop"), photo: { src: "/tech/urzadzenia/laptop-bez-logo.webp", width: 640, height: 640, crop: LAPTOP_CROP, spots: laptop.spots }, scenes: laptop.scenes },
 ];

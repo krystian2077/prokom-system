@@ -2,7 +2,8 @@
 import { describe, expect, it } from "vitest";
 import { line, servicePoints, type ServicePoint } from "@/config/prokom";
 import { hasUniqueContent, localPages, localPageState, nearbyTowns, publishedLocalPages } from "@/lib/tech/local-pages";
-import { breadcrumbJsonLd, pageMetadata, serviceJsonLd } from "@/lib/tech/seo";
+import { BLOG_POSTS } from "@/lib/blog-posts";
+import { breadcrumbJsonLd, pageMetadata, POST_TITLE_SUFFIX_MAX, postDocumentTitle, serviceJsonLd } from "@/lib/tech/seo";
 import { buildSitemap, STATIC_ROUTES } from "@/lib/tech/sitemap";
 import { SITE_URL } from "@/lib/site-config";
 import nextConfig from "../../next.config.js";
@@ -82,6 +83,30 @@ describe("local pages (no doorway pages, SPEC §9)", () => {
       expect(full.length, full).toBeLessThanOrEqual(60);
       expect(p.description.length, p.description).toBeGreaterThanOrEqual(120);
       expect(p.description.length, p.description).toBeLessThanOrEqual(155);
+    }
+  });
+});
+
+describe("blog posts (meta in search results)", () => {
+  it("rendered titles 30–60, descriptions 120–155", () => {
+    for (const p of BLOG_POSTS) {
+      const full = postDocumentTitle(p.title);
+      expect(full.length, full).toBeGreaterThanOrEqual(30);
+      expect(full.length, full).toBeLessThanOrEqual(60);
+      expect(p.description.length, p.slug).toBeGreaterThanOrEqual(120);
+      expect(p.description.length, p.slug).toBeLessThanOrEqual(155);
+    }
+  });
+  it("short titles get the suffix, long ones stand alone", () => {
+    expect(postDocumentTitle("Krótki tytuł")).toBe(`Krótki tytuł | ${line.name}`);
+    const long = "x".repeat(POST_TITLE_SUFFIX_MAX + 1);
+    expect(postDocumentTitle(long)).toBe(long);
+  });
+  it("no shop or sales copy (CLAUDE.md §5)", () => {
+    const shop = /sklep|w ofercie|oferujemy|z naszej oferty|kupisz u nas|dostępne od ręki|na stanie|na zamówienie/i;
+    for (const p of BLOG_POSTS) {
+      const text = [p.title, p.description, p.content, ...(p.keyTakeaways ?? []), ...(p.faq ?? []).flatMap((f) => [f.q, f.a]), ...(p.tags ?? [])].join("\n");
+      expect(text, p.slug).not.toMatch(shop);
     }
   });
 });

@@ -21,24 +21,10 @@ const RULES: [string, RegExp, RegExp?][] = [
 ];
 
 /**
- * Known pages that still say "sklep" (TD6, 15.11): old blog articles from lib/blog-posts.ts
- * (text = Krystian's decision, SPEC §8). The privacy policy is clean since 15.11.2026.
- * Only shrinks: a listed page without the word fails the test until removed from the list.
+ * Known pages that still say "sklep". Empty since 17.11.2026 (blog rewritten without shop copy,
+ * CLAUDE.md §5) and must stay empty. A listed page without the word fails until removed.
  */
-const KNOWN_SKLEP = new Set([
-  "/blog",
-  "/blog/kategoria/laptopy-i-komputery",
-  "/blog/kategoria/porady-zakupowe",
-  "/blog/dlaczego-warto-kupowac-akcesoria-gsm-w-sprawdzonym-sklepie",
-  "/blog/gdzie-kupic-akcesoria-gsm-rabka-zdroj",
-  "/blog/jak-dobrac-etui-do-telefonu",
-  "/blog/jak-dobrac-ladowarke-do-telefonu",
-  "/blog/jak-dobrac-ram-ssd-zasilacz-do-komputera",
-  "/blog/jak-przygotowac-pc-do-grania-online-bez-lagow",
-  "/blog/laptop-gamingowy-czy-komputer-stacjonarny",
-  "/blog/oryginalne-podzespoly-w-komputerze-gamingowym-dlaczego-to-ma-znaczenie",
-  "/blog/skladanie-komputera-gamingowego",
-]);
+const KNOWN_SKLEP = new Set<string>([]);
 
 async function sitemapPaths(baseURL: string): Promise<string[]> {
   const xml = await (await fetch(`${baseURL}/sitemap.xml`)).text();
@@ -61,8 +47,9 @@ test("treść stron bez WhatsAppa, cen, paczkomatu, sklepu i zaślepek", async (
         return body.textContent || "";
       })
     ).replace(/\s+/g, " ");
+    // og:url is the address, not text: the slug "…-w-sprawdzonym-sklepie" stays for links and SEO.
     const meta = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('title, meta[name="description"], meta[property^="og:"]'))
+      Array.from(document.querySelectorAll('title, meta[name="description"], meta[property^="og:"]:not([property="og:url"])'))
         .map((e) => e.getAttribute("content") || e.textContent || "")
         .join(" "),
     );

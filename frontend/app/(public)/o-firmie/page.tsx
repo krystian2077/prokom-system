@@ -49,7 +49,7 @@ export default function AboutPage() {
   const stats = [
     since ? { key: "since", icon: "clock", b: since.text, s: `Rok założenia firmy ${inCity(company.hq.city)}`, c: since } : null,
     two ? { key: "points", icon: "pin", b: String(published.length), s: `Punkty serwisowe: ${joinCities(published)}`, c: null } : null,
-    foils ? { key: "foils", icon: "layers", b: foils.text, s: "Rodzajów folii Hammer Glass wycinanych na miejscu", c: foils } : null,
+    foils ? { key: "foils", icon: "layers", b: foils.text, s: "rodzajów folii Hammer Glass wycinanych na miejscu", c: foils } : null,
     linesClaim ? { key: "lines", icon: "grid", b: linesClaim.text, s: "Linie PRO-KOM i marka PRO-KOM Gaming", c: linesClaim } : null,
   ].filter((x): x is Stat => x !== null);
 
