@@ -65,6 +65,7 @@ def submit_repair_from_public_form(
     """
     email = email.strip().lower()
     client_created = False
+    guest_mismatch = None
 
     if client_id:
         client = client_by_id(client_id)
@@ -97,16 +98,10 @@ def submit_repair_from_public_form(
             client.save()
             client_created = True
         else:
-            client.first_name = first_name.strip() or client.first_name
-            client.last_name = last_name.strip() or client.last_name
-            client.phone = phone.strip() or client.phone
-            client.preferred_contact = preferred_contact or client.preferred_contact
-            if street or city or postal_code:
-                client.street = street.strip() or client.street
-                client.city = city.strip() or client.city
-                client.postal_code = postal_code.strip() or client.postal_code
-                client.country = (country or "Polska").strip() or client.country
-            client.save(update_fields=["first_name", "last_name", "phone", "preferred_contact", "street", "city", "postal_code", "country", "updated_at"])
+            # Formularz gościa NIE nadpisuje danych istniejącego klienta (ktoś znający czyjś e-mail
+            # mógłby zmienić mu imię i telefon, a /track starszej naprawy przestałby działać).
+            # Rozbieżne dane trafiają do wewnętrznej notatki naprawy (niżej).
+            guest_mismatch = _guest_contact_mismatch(client, first_name, last_name, phone)
 
     delivery_address_id = None
     return_address_id = None
@@ -168,6 +163,9 @@ def submit_repair_from_public_form(
         repair.save(update_fields=["claim_token", "claim_token_expires_at"])
 
     update_fields = []
+    if (phone or "").strip():
+        repair.contact_phone = phone.strip()[:20]
+        update_fields.append("contact_phone")
     if hammer_glass_interest:
         repair.hammer_glass_interest = hammer_glass_interest
         update_fields.append("hammer_glass_interest")
@@ -182,6 +180,17 @@ def submit_repair_from_public_form(
         update_fields.append("visual_condition_description")
     if update_fields:
         repair.save(update_fields=update_fields)
+
+    if guest_mismatch:
+        from apps.repairs.models import RepairNote
+        RepairNote.objects.create(
+            repair=repair,
+            author=None,
+            note=guest_mismatch,
+            is_internal=True,
+            is_important=True,
+            note_type=RepairNote.NOTE_TYPE_SYSTEM,
+        )
 
     from apps.accessories.models import RepairAccessoryInterest
     product_ids = list(accessory_product_ids or [])
@@ -222,3 +231,20 @@ def _dispatch_staff_notification(repair):
             "Nie udało się zlecić powiadomienia serwisu o zgłoszeniu %s",
             repair.repair_number,
         )
+
+
+def _guest_contact_mismatch(client, first_name, last_name, phone):
+    """Treść notatki wewnętrznej, gdy formularz gościa podaje inne dane niż profil klienta."""
+    given = {
+        "Imię": (first_name or "").strip(),
+        "Nazwisko": (last_name or "").strip(),
+        "Telefon": (phone or "").strip(),
+    }
+    current = {"Imię": client.first_name or "", "Nazwisko": client.last_name or "", "Telefon": client.phone or ""}
+    diffs = [f"{k}: {v} (w profilu: {current[k] or '—'})" for k, v in given.items() if v and v != current[k]]
+    if not diffs:
+        return None
+    return (
+        "Zgłoszenie z formularza gościa na istniejący e-mail klienta — dane w profilu NIE zostały zmienione. "
+        "Dane podane w tym zgłoszeniu: " + "; ".join(diffs) + "."
+    )
