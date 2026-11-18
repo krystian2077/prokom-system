@@ -14,6 +14,11 @@ from apps.repairs.views.staff_views import StaffRepairsListView, StaffRepairDeta
 admin.site.site_header = "PRO-KOM Serwis — Panel Admina"
 admin.site.site_title = "PRO-KOM Admin"
 admin.site.index_title = "Panel administracyjny"
+# Audit AB4 (T-13): the Django admin only for superusers. Every employee has is_staff (panel
+# accounts), but the staff panel is /panel in Next.js — the full database admin is not for them.
+admin.site.has_permission = lambda request: bool(
+    request.user.is_active and request.user.is_superuser
+)
 
 urlpatterns = [
     # Django Admin

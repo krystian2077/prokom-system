@@ -28,6 +28,14 @@ def _phone_last4(phone):
     return digits[-4:] if len(digits) >= 4 else digits
 
 
+TRACK_FAILS_PER_REPAIR = 10
+TRACK_FAILS_WINDOW_SECONDS = 60 * 60
+
+
+def _track_fail_key(repair_id):
+    return f"track-fail:{repair_id}"
+
+
 class TrackRepairView(APIView):
     """
     GET /api/v1/repairs/track/?ref=PROKOM/RMA/1/2025&phone_last4=1234
@@ -60,10 +68,26 @@ class TrackRepairView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Audit AB4 (T-11): repair numbers are sequential and the secret is 4 digits, so wrong
+        # answers are also counted per repair (any IP): after 10 in an hour the repair locks for
+        # an hour. The per-IP throttle alone allowed spreading guesses over many addresses.
+        from django.core.cache import cache
+        fail_key = _track_fail_key(repair.pk)
+        if (cache.get(fail_key) or 0) >= TRACK_FAILS_PER_REPAIR:
+            return Response(
+                {"detail": "Zbyt wiele prób dla tego zgłoszenia. Spróbuj ponownie za godzinę albo skontaktuj się z serwisem."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
         # Telefon z profilu klienta albo podany przy tym zgłoszeniu (contact_phone).
         allowed = {_phone_last4(repair.client.phone), _phone_last4(getattr(repair, "contact_phone", "") or "")}
         allowed.discard("")
         if phone_last4 not in allowed:
+            if cache.add(fail_key, 1, TRACK_FAILS_WINDOW_SECONDS) is False:
+                try:
+                    cache.incr(fail_key)
+                except ValueError:
+                    cache.set(fail_key, 1, TRACK_FAILS_WINDOW_SECONDS)
             return Response(
                 {"detail": "Nie znaleziono zgłoszenia lub nieprawidłowe dane."},
                 status=status.HTTP_404_NOT_FOUND,
