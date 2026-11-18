@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
+from apps.common.permissions import IsStaffOrAdmin
 from apps.devices.models import Device
 from apps.devices.serializers import DeviceSerializer, DeviceListSerializer, DeviceCreateUpdateSerializer
 from apps.devices.selectors import device_list, device_by_id
@@ -10,6 +11,9 @@ from apps.devices.selectors import device_list, device_by_id
 
 class DeviceViewSet(viewsets.ModelViewSet):
     """Lista, tworzenie, szczegóły i edycja urządzeń."""
+    # Staff only (audit AB2): the queryset is not scoped to a client and the serializer exposes
+    # serial number, IMEI and the device password. Clients see their devices through their repairs.
+    permission_classes = [IsStaffOrAdmin]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["client", "category", "brand"]
     search_fields = ["model_name", "serial_number", "imei", "client__first_name", "client__last_name"]
