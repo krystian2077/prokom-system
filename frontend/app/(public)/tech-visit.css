@@ -214,3 +214,15 @@ html[data-tech-theme="dark"] .tech .t-visit .t-intent:not(.t-intent--acc) { bord
   .tech .t-inq__spin { animation-duration: 1.6s; }
   .tech :is(.t-ct2-tile, .t-visit .t-linecard, .t-visit .t-intent, .t-pointcard--feature):hover { transform: none; }
 }
+
+/* ---------- Contact: one point = its own phone and e-mail (runda 18.11 §1.2) ---------- */
+.tech .t-ct2-hero__plabel { margin-top: 22px; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #c9bfbd; }
+.tech .t-ct2-hero__plabel + .t-ct2-hero__phone { margin-top: 6px; }
+.tech .t-ct2-tile__link { color: inherit; }
+/* the name's link covers the card; the phone and e-mail links sit above it */
+.tech .t-ct2-tile__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.tech .t-ct2-tile__link:focus-visible { outline: none; }
+.tech .t-ct2-tile--point:has(.t-ct2-tile__link:focus-visible) { outline: 2px solid #f29185; outline-offset: 3px; }
+.tech .t-ct2-tile__links { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 4px; font-size: 14px; font-weight: 700; }
+.tech .t-ct2-tile__links a { display: inline-flex; align-items: center; min-height: 44px; color: #f6c9c3; text-decoration: underline; text-decoration-color: rgba(246, 201, 195, 0.4); text-underline-offset: 3px; }
+.tech .t-ct2-tile__links a:hover { color: #fff; }

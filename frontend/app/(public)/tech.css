@@ -465,6 +465,10 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-footer__contact { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; white-space: nowrap; }
 .tech .t-footer a.t-footer__phone { font-family: var(--t-font-head); font-weight: 800; font-size: 22px; color: var(--foot-ink-strong); }
 .tech .t-footer a.t-footer__mail { color: var(--foot-acc); font-weight: 700; font-size: 13px; }
+/* label of the general number (GENERAL_PHONE_LABEL, runda 18.11 §1.2) */
+.tech .t-footer__plabel, .tech .t-sheet__plabel { font-family: var(--t-font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.72; line-height: 1.3; }
+.tech .t-footer__plabel { display: inline-block; margin-right: 10px; vertical-align: 0.25em; }
+.tech .t-sheet__plabel { display: block; }
 .tech .t-footer__cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tech .t-footer__cards.is-single { grid-template-columns: minmax(0, 1fr); }
 .tech .t-footer__card { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); }

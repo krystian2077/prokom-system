@@ -6,7 +6,7 @@
  * appears only when published (never a draft, also on staging). Client-safe and pure: the window
  * and `/szukaj` render the same list.
  */
-import { line, pointPhone, servicePoints, telHref, type ServicePoint } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, pointPhone, servicePoints, telHref, type ServicePoint } from "@/config/prokom";
 import { getOpeningStatus } from "../hours";
 import { SUBMIT_HREF, TRACK_HREF, directionsUrl } from "../nav";
 import { publishedPoints } from "../points";
@@ -89,8 +89,8 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
     kind: "call",
     label: `Zadzwoń · ${line.phoneDisplay}`,
     short: "Zadzwoń",
-    sub: main ? pointName(main) : line.phoneDisplay,
-    hint: main ? `${line.phoneDisplay} · ${pointName(main)}` : line.phoneDisplay,
+    sub: main ? pointName(main) : GENERAL_PHONE_LABEL,
+    hint: main ? `${line.phoneDisplay} · ${pointName(main)}` : `${line.phoneDisplay} · ${GENERAL_PHONE_LABEL.toLowerCase()}`,
     icon: "call",
     href: telHref(line.phone),
     track: { event: "telefon_klik", params: { miejsce: "szukaj" } },

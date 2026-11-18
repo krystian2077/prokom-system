@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { line, servicePoints, telHref } from "@/config/prokom";
+import { pointPhone, servicePoints, telHref } from "@/config/prokom";
 import { localPage, localPageState, nearbyTowns, visibleLocalPages, type LocalSlug } from "@/lib/tech/local-pages";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
@@ -11,6 +11,7 @@ import { JsonLd } from "./JsonLd";
 import { PhoneBrandsSection, PhoneRepairsSection, PhoneStepsSection } from "./PhoneSections";
 import { PointCard } from "./PointCard";
 import { polishText } from "@/lib/tech/typo";
+import { pointPhoneDisplay } from "@/lib/tech/point-format";
 
 const crumbs = (slug: LocalSlug, city: string): Crumb[] => [
   { name: "Start", path: "/" },
@@ -73,8 +74,9 @@ export function LocalServicePage({ slug }: { slug: LocalSlug }) {
                 <Link href={`${SUBMIT_HREF}?category=phone&punkt=${p.point}`} className="t-pbtn t-pbtn--stage">
                   Zgłoś naprawę {p.inCity}
                 </Link>
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce={`lokalna_${p.point}`}>
-                  {line.phoneDisplay}
+                {/* a page about one point shows only that point's own contact (runda 18.11 §1.2) */}
+                <a href={telHref(pointPhone(point))} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce={`lokalna_${p.point}`}>
+                  {pointPhoneDisplay(point)}
                 </a>
               </div>
               {others.length ? (

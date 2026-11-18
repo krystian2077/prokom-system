@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { company, pointPhone, telHref } from "@/config/prokom";
+import { GENERAL_EMAIL_LABEL, company, pointEmail, pointPhone, telHref } from "@/config/prokom";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { CEIDG_URL, inCity, isMainPoint, pointAddress, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
@@ -79,6 +79,11 @@ export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "p
           Telefon:{" "}
           <a href={telHref(pointPhone(point))} data-track="telefon_klik" data-track-miejsce={`${trackFrom}_${point.key}`}>
             {pointPhoneDisplay(point)}
+          </a>
+          {" · "}
+          {pointEmail(point).general ? `${GENERAL_EMAIL_LABEL}: ` : "E-mail: "}
+          <a href={`mailto:${pointEmail(point).email}`} className="t-pointcard__mail">
+            {pointEmail(point).email}
           </a>
           {main ? (
             <>

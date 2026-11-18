@@ -19,6 +19,7 @@ const IGNORE = /(\.test\.ts|\.spec\.ts)$/;
 const CONTACT_LITERALS: [string, RegExp][] = [
   ["telefon serwisu", /883[\s-]?200[\s-]?151/],
   ["telefon Zakopane", /18[\s-]?541[\s-]?20[\s-]?15/],
+  ["telefon Rabka", /18[\s-]?541[\s-]?20[\s-]?55/],
   ["e-mail", /[\w.+-]+@(pro-kom\.eu|prokomserwis\.pl)/i],
   ["adres Rabka", /Orkana\s+16/i],
   ["adres Zakopane", /Staszica\s+8/i],

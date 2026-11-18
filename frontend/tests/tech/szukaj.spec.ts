@@ -145,12 +145,15 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
     await page.goto("/");
     await openWithKeys(page);
     const tiles = dialog(page).getByRole("group", { name: "Szybkie akcje" });
-    await expect(tiles.locator("[data-qa]")).toHaveCount(5);
+    await expect(tiles.locator("[data-qa]")).toHaveCount(6);
     await expect(tiles.locator('[data-qa="call"]')).toHaveAttribute("href", telHref(line.phone));
     await expect(tiles.locator('[data-qa="call"]')).toHaveAttribute("data-track", "telefon_klik");
     const zakopane = servicePoints.find((p) => p.key === "zakopane")!;
-    await expect(tiles.locator('[data-qa="call2"]')).toHaveAttribute("href", telHref(pointPhone(zakopane)));
-    await expect(tiles.locator('[data-qa="call2"]')).toContainText("Zakopane");
+    // each point has its own number (runda 18.11 §1.2)
+    await expect(tiles.locator('[data-qa="call2"]')).toHaveCount(2);
+    await expect(tiles.locator('[data-qa="call2"]').filter({ hasText: "Zakopane" })).toHaveAttribute("href", telHref(pointPhone(zakopane)));
+    const rabka = servicePoints.find((p) => p.key === "rabka")!;
+    await expect(tiles.locator('[data-qa="call2"]').filter({ hasText: "Rabka-Zdrój" })).toHaveAttribute("href", telHref(pointPhone(rabka)));
     await expect(tiles.locator('[data-qa="mail"]')).toHaveCount(0);
     const route = tiles.locator('[data-qa="route"]');
     await expect(route).toHaveAttribute("href", /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&destination=/);

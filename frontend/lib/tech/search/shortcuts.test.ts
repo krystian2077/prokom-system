@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { line, pointPhone, servicePoints, telHref, type ServicePoint } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, pointPhone, servicePoints, telHref, type ServicePoint } from "@/config/prokom";
 import { SUBMIT_HREF, TRACK_HREF, directionsUrl } from "../nav";
 import { buildSearchIndex } from "./build-index";
 import { buildProvider } from "./provider";
@@ -70,7 +70,7 @@ describe("szybkie akcje", () => {
   const byKind = (kind: string) => actions.filter((a) => a.kind === kind);
 
   it("come in the order of the pattern and every one is unique", () => {
-    expect(actions.map((a) => a.kind)).toEqual(["call", "call2", "copy", "mail", "route", "submit", "track", "contact", "theme"]);
+    expect(actions.map((a) => a.kind)).toEqual(["call", "call2", "call2", "copy", "mail", "route", "submit", "track", "contact", "theme"]);
     expect(new Set(actions.map((a) => a.id)).size).toBe(actions.length);
   });
 
@@ -78,8 +78,10 @@ describe("szybkie akcje", () => {
     expect(byKind("call")[0].href).toBe(telHref(line.phone));
     expect(byKind("copy")[0].value).toBe(line.phoneDisplay);
     expect(byKind("mail")[0].href).toBe(`mailto:${line.email}`);
-    expect(byKind("call2")[0].href).toBe(telHref(pointPhone(zakopane)));
-    expect(byKind("call2")[0].sub).toBe(zakopane.name);
+    // runda 18.11 §1.2: every point has its own number, the general one is the „Infolinia”
+    expect(byKind("call")[0].sub).toBe(GENERAL_PHONE_LABEL);
+    expect(byKind("call2").map((a) => a.href)).toEqual([telHref(pointPhone(rabka)), telHref(pointPhone(zakopane))]);
+    expect(byKind("call2").map((a) => a.sub)).toEqual([rabka.name, zakopane.name]);
   });
 
   it("lead to the form, the status page and contact", () => {
@@ -98,7 +100,7 @@ describe("szybkie akcje", () => {
   it("show an unpublished point nowhere (no second number, no route)", () => {
     const hidden: ServicePoint = { ...zakopane, published: false };
     const list = quickActions({ points: [rabka, hidden] });
-    expect(list.some((a) => a.kind === "call2")).toBe(false);
+    expect(list.filter((a) => a.kind === "call2").map((a) => a.sub)).toEqual([rabka.name]);
     expect(list.filter((a) => a.kind === "route").map((a) => a.href)).toEqual([directionsUrl(rabka.geo!)]);
     expect(routeActions([rabka, hidden]).map((a) => a.id)).toEqual(["route:rabka"]);
   });
@@ -114,7 +116,7 @@ describe("szybkie akcje", () => {
   });
 
   it("match a query by their words, at most a few", () => {
-    expect(matchActions(actions, "zadzwoń").map((a) => a.kind)).toEqual(["call", "call2"]);
+    expect(matchActions(actions, "zadzwoń").map((a) => a.kind)).toEqual(["call", "call2", "call2"]);
     expect(matchActions(actions, "kopiuj").map((a) => a.kind)).toEqual(["copy"]);
     expect(matchActions(actions, "motyw ciemny").map((a) => a.kind)).toEqual(["theme"]);
     expect(matchActions(actions, "dojazd zakopane").map((a) => a.id)).toEqual(["route:zakopane"]);
