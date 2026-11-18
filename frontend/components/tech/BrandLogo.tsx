@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { brandLogo, type BrandLogo as BrandLogoData } from "@/components/tech/brand-logos";
+import { brandLogo, isTextMark, type BrandLogo as BrandLogoData } from "@/components/tech/brand-logos";
 
 const symbolId = (slug: string) => `t-brand-${slug}`;
 
@@ -72,4 +72,20 @@ export function BrandLogoSprite({ logos }: { logos: readonly BrandLogoData[] }) 
       ))}
     </svg>
   );
+}
+
+/**
+ * Mark on a brand card (device pages, /serwis-telefonow): the SVG mark, or — for brands in
+ * TEXT_MARK_BRANDS (Apple, Samsung) — the card name in the site font. Decorative: the card's
+ * heading carries the name for screen readers (cardMarkSpellsName hides it visually).
+ */
+export function CardBrandMark({ logo, name }: { logo: BrandLogoData; name: string }) {
+  if (isTextMark(logo)) {
+    return (
+      <span className="t-brandname" aria-hidden="true">
+        {name}
+      </span>
+    );
+  }
+  return <BrandLogo brand={logo} hidden />;
 }

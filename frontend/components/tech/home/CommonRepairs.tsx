@@ -6,6 +6,7 @@ import { submitHref } from "@/lib/tech/wizard-data";
 import { IconArrow, IconPath, type HomeIcon } from "../icons";
 import { BrandLogo } from "../BrandLogo";
 
+// TODO(krystian): home page keeps the marks here too, like the marquee (open decision, plan §7.7).
 const BRANDS = ["Apple", "Samsung", "Xiaomi", "Motorola", "realme", "Huawei"];
 
 const REST: { t: string; s: string; icon: HomeIcon; fault?: string; tag?: string; soft?: boolean }[] = [

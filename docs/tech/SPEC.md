@@ -118,7 +118,7 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 - Dodatki (§12): `NoticeBar` (komunikat z `prokom.ts`), `MyRepairs` (zapamiętane naprawy), `SuccessCard` (QR, udostępnij, zapisz), `NavigateButtons` (Mapy Google / Apple / Waze), `DataSafety` (sekcja zaufania), `PrepChecklist` (lista „przygotuj sprzęt”, także skrót w formularzu i na ekranie sukcesu), `RepairPage` (szablon strony naprawy), `InstallHint` (dyskretna podpowiedź „Dodaj do ekranu głównego” w arkuszu Menu, bez wyskakujących okien).
 
 ## 8. Treść i zasady treści (obowiązują w każdej sesji)
-- Bez WhatsAppa, bez zdjęć ludzi, bez cen (do decyzji szefa), **bez paczkomatu** (serwis nie nadaje i nie odbiera, decyzja 14.11), **bez sklepu**.
+- Bez WhatsAppa, bez zdjęć ludzi, bez cen (do decyzji szefa), **bez paczkomatu** (serwis nie nadaje i nie odbiera, decyzja 14.11), **bez sklepu** — czyli bez koszyka, płatności i cen; sprzedaż tylko jako katalog z listą zapytania (decyzja 18.11, §13).
 - Nazwa linii: „PRO-KOM Tech”. Słowo „serwis” zostaje w H1, tytułach i adresach (SEO).
 - Obietnice tylko istniejące: wycena przed naprawą, możliwość rezygnacji, gwarancja na usługę i części, status online, wymiana wyświetlacza „często ok. 1 h”. Liczby z prototypu z §10 tylko po potwierdzeniu.
 - Teksty z prototypu przenosimy dosłownie. Zmiana tekstu = najpierw zmiana we wzorcu (czat), potem kod.
@@ -151,6 +151,11 @@ Stopka: kolumny Naprawy / Hammer Glass / Informacje (O firmie, Kontakt, Blog, Ob
 5. Testy treści: brak WhatsApp/wa.me, brak „paczkomat” (wyjątek: zdanie „nie obsługujemy paczkomatów” na `/naprawa-kurierem` i w FAQ), brak literałów kontaktowych poza `prokom.ts`, brak zaślepek `[…]` na buildzie produkcyjnym.
 6. Zrzuty przed/po w opisie PR (1440, 1024, 768, 390, 360, jasny i ciemny).
 7. `docs/STAN.md` zaktualizowany (`/koniec-sesji`).
+
+## 13. Decyzje 18.11.2026 (runda marek Apple i Samsung, `docs/zadania/runda-1811-tech-marki.md`)
+- **Sprzedaż jako katalog z listą zapytania** (Krystian 18.11). **Zmienia decyzję z 14.11** („sklep znika ze strony Tech”, §6 `/akcesoria` i `/oferta`, §8 „bez sklepu”): na Tech wraca sprzedaż urządzeń Apple i Samsung, ale **to nie jest sklep** — zero cen, zero koszyka i płatności. Klient wybiera model, kolor i pamięć, dodaje do listy zapytania i wysyła ją przez API kontaktu (KONTRAKT §4); odpowiadamy ceną i dostępnością, odbiór w salonie. Ceny najwcześniej z panelem ofert smartfonów (osobny projekt). Stare `/akcesoria` i `/oferta` zostają przekierowaniami (§6).
+- **Strony serwisu marki** `/serwis-apple` i `/serwis-samsung` (jedna strona na markę, **bez stron miasto × marka** — §9, ryzyko doorway). Bez „autoryzowany/certyfikowany serwis/partner Apple/Samsung” — certyfikaty wygasły, w FAQ uczciwie: niezależny serwis.
+- **Znaki marek:** na stronach serwisu, katalogu i salonów **nazwa krojem strony zamiast znaku** — Apple bez jabłka; Samsung tak samo, dopóki zasady dystrybutora nie pozwolą na logotyp (`TEXT_MARK_BRANDS` w `components/tech/brand-logos.ts`). Pas marek i chipy marek na głównej na razie ze znakami — `TODO(krystian)` (decyzja otwarta, plan §7.7).
 
 ## 12. Dodatki (decyzja Krystiana 14.11.2026)
 

@@ -3,8 +3,8 @@ import { line, servicePoints, telHref } from "@/config/prokom";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
-import { BrandLogo } from "@/components/tech/BrandLogo";
-import { cardBrandLogos, logoSpellsName } from "@/components/tech/brand-logos";
+import { CardBrandMark } from "@/components/tech/BrandLogo";
+import { cardBrandLogos, cardMarkSpellsName } from "@/components/tech/brand-logos";
 import { deviceSeo, hubCards, type DevicePage as DevicePageData } from "@/lib/tech/devices";
 import { REPAIRS_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
@@ -120,10 +120,10 @@ export function DevicePage({ page }: { page: DevicePageData }) {
               <li key={k.n} className="t-card t-kinds__item">
                 {kindLogos ? (
                   <span className="t-kinds__logo">
-                    <BrandLogo brand={kindLogos[i]} hidden />
+                    <CardBrandMark logo={kindLogos[i]} name={k.n} />
                   </span>
                 ) : null}
-                <span className={kindLogos && logoSpellsName(kindLogos[i], k.n) ? "t-h3 t-visually-hidden" : "t-h3"}>{k.n}</span>
+                <span className={kindLogos && cardMarkSpellsName(kindLogos[i], k.n) ? "t-h3 t-visually-hidden" : "t-h3"}>{k.n}</span>
                 <span>{k.s}</span>
               </li>
             ))}

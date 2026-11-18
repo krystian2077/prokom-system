@@ -79,3 +79,9 @@
 .tech .t-mega__brand .t-mega__barlink:hover { color: var(--acct); }
 .tech .t-bmodels__salon { margin: 8px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink2); }
 .tech .t-bmodels__salon a { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; color: var(--acct); }
+
+/* ---------- Brand name instead of a mark (fix/tech-znak-apple): Apple, Samsung on service pages ---------- */
+.tech .t-brandname {
+  display: inline-block; font: 800 calc(var(--t-logo-h, 20px) * 0.95) / 1 var(--t-font-head); font-stretch: 108%;
+  letter-spacing: -0.01em; color: currentColor; white-space: nowrap;
+}
