@@ -97,12 +97,19 @@ async function downloadPhoto(url, slug, colorKey) {
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   const buf = Buffer.from(await res.arrayBuffer());
   fs.mkdirSync(dir, { recursive: true });
-  await sharp(buf).trim().resize({ width: 720, height: 720, fit: "inside", withoutEnlargement: true }).webp({ quality: 80, alphaQuality: 90 }).toFile(file);
+  // trim the empty margin (transparent or the flat background) so the device fills the frame
+  await sharp(buf).trim({ threshold: 12 }).resize({ width: 720, height: 720, fit: "inside", withoutEnlargement: true }).webp({ quality: 80, alphaQuality: 90 }).toFile(file);
   return rel;
 }
 
+/** Background of an opaque photo (its top-left pixel) — the tile takes it, so the photo blends in. */
+async function photoBackground(rel) {
+  const { data } = await sharp(path.join(ROOT, "public", rel)).extract({ left: 0, top: 0, width: 1, height: 1 }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  return `#${[...data.subarray(0, 3)].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+}
+
 /** Better product shots chosen later (e.g. iphone-photos.json): { slug: { "Kolor": { url, transparent } } }. */
-const OVERRIDES = Object.assign({}, ...["iphone-photos.json"].map((f) => readJson(path.join(SRC, f)) ?? {}));
+const OVERRIDES = Object.assign({}, ...["iphone-photos.json", "apple-photos.json"].map((f) => readJson(path.join(SRC, f)) ?? {}));
 
 async function build(brand, specFiles, copyFiles) {
   const specs = specFiles.flatMap((f) => readJson(path.join(SRC, f)) ?? []);
@@ -150,7 +157,8 @@ async function build(brand, specFiles, copyFiles) {
           report.push(`zdjęcie nie pobrane ${s.slug}/${col.key}: ${e.message}`);
         }
       } else if (fs.existsSync(path.join(PUB, s.slug, `${col.key}.webp`))) src = `/tech/katalog/${s.slug}/${col.key}.webp`;
-      images.push({ color: col.key, src, ...(img.transparent ? { transparent: true } : {}), source: { url: img.url, date: TODAY, consent: CONSENT } });
+      const bg = src && !img.transparent ? await photoBackground(src) : null;
+      images.push({ color: col.key, src, ...(img.transparent ? { transparent: true } : {}), ...(bg ? { bg } : {}), source: { url: img.url, date: TODAY, consent: CONSENT } });
     }
     const specsRows = (s.specs ?? []).filter((r) => r.value).slice(0, 14);
     out.push({

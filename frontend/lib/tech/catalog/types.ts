@@ -43,6 +43,8 @@ export type CatalogImage = {
   src: string | null;
   /** Cut-out product shot (transparent background): shown free-standing with the glow, not as a tile. */
   transparent?: boolean;
+  /** Flat background of an opaque photo (#rrggbb) — the tile takes it, so the photo blends in. */
+  bg?: string;
   /** Original URL, who and when, and the permission (Krystian 18.11.2026: photos from manufacturers allowed). */
   source: { url: string | null; date: string; consent: string };
 };

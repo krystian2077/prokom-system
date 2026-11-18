@@ -153,8 +153,12 @@ test.describe("nawigacja sprzedaży (1440)", () => {
   test("search finds a model and the salons", async ({ page }) => {
     await pinDaylight(page);
     await page.goto("/");
-    await page.keyboard.press("Control+K");
     const dialog = page.getByRole("dialog", { name: "Szukaj na stronie" });
+    // Ctrl K once the page is hydrated (a key pressed before that is lost) — same as szukaj.spec
+    await expect(async () => {
+      await page.keyboard.press("Control+k");
+      await expect(dialog).toBeVisible({ timeout: 500 });
+    }).toPass({ timeout: 10_000 });
     await dialog.getByRole("combobox").fill("galaxy s26 ultra");
     await expect(dialog.getByRole("option", { name: /Galaxy S26 Ultra/ }).first()).toBeVisible();
     await dialog.getByRole("combobox").fill("salon apple");

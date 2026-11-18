@@ -16,7 +16,7 @@ export function ModelVisual({ model, color, priority = false, size = "card", cla
   const dims = silhouetteSize(model.kind);
   const box = size === "hero" ? 640 : 360;
   return (
-    <span className={`t-mvis t-mvis--${model.kind} t-mvis--${size}${photo?.src && !photo.transparent ? " t-mvis--photo" : ""}${photo?.transparent ? " t-mvis--cutout" : ""} ${className}`} style={{ "--variant": c?.hex ?? "#888888" } as React.CSSProperties} data-color={c?.key}>
+    <span className={`t-mvis t-mvis--${model.kind} t-mvis--${size}${photo?.src && !photo.transparent ? " t-mvis--photo" : ""}${photo?.transparent ? " t-mvis--cutout" : ""} ${className}`} style={{ "--variant": c?.hex ?? "#888888", ...(photo?.bg ? { "--photo-bg": photo.bg } : {}) } as React.CSSProperties} data-color={c?.key}>
       <span className="t-mvis__glow" aria-hidden="true" />
       {photo?.src ? (
         <Image src={photo.src} alt={alt} width={box} height={photo.transparent ? box : Math.round(box * 0.625)} sizes={size === "hero" ? "(max-width: 768px) 90vw, 560px" : "(max-width: 768px) 45vw, 280px"} priority={priority} className="t-mvis__img" />
