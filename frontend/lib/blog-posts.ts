@@ -1,3 +1,11 @@
+import { line, servicePoints } from "@/config/prokom";
+import { hoursLong } from "@/lib/tech/point-format";
+
+/** Contact data in the posts comes from config/prokom.ts (CLAUDE.md §4) — never typed into the text. */
+const RABKA = servicePoints.find((p) => p.key === "rabka")!;
+const RABKA_STREET_SHORT = (RABKA.street ?? "").replace(/^ul\. /, "");
+const RABKA_HOURS = hoursLong(RABKA);
+
 export type BlogPost = {
   slug: string;
   title: string;
@@ -89,12 +97,12 @@ Wyjątek stanowią sytuacje, gdy oprócz baterii telefon ma inne poważne uszkod
 
 ## Gdzie wymienić baterię w Rabce-Zdroju?
 
-W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju wymieniamy baterie do większości popularnych modeli smartfonów — Samsung, iPhone, Xiaomi, Motorola, Huawei i inne. Diagnoza jest bezpłatna. Wycenę przedstawiamy przed naprawą.
+W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju wymieniamy baterie do większości popularnych modeli smartfonów — Samsung, iPhone, Xiaomi, Motorola, Huawei i inne. Diagnoza jest bezpłatna. Wycenę przedstawiamy przed naprawą.
 
 Prostą wymianę baterii realizujemy często tego samego dnia.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -162,10 +170,10 @@ Jeśli priorytetem jest **twardość i odporność na zarysowania** — wybierz 
 
 ## Gdzie zamontować folię w Rabce-Zdroju?
 
-Folie Hammer Glass CUT wycinamy i montujemy na miejscu w serwisie PRO-KOM przy ul. Orkana 16B w Rabce-Zdroju. Posiadamy ploter VersaBlade i bazę 10 000+ modeli. Montaż trwa około 5 minut.
+Folie Hammer Glass CUT wycinamy i montujemy na miejscu w serwisie PRO-KOM przy ${RABKA.street} w Rabce-Zdroju. Posiadamy ploter VersaBlade i bazę 10 000+ modeli. Montaż trwa około 5 minut.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój
     `.trim(),
   },
   {
@@ -226,10 +234,10 @@ To zależy od kilku czynników:
 
 ## Gdzie naprawić telefon po zalaniu w Rabce-Zdroju?
 
-PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju. Przyjedź jak najszybciej po zalaniu. Obsługujemy też klientów wysyłkowo z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca.
+PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju. Przyjedź jak najszybciej po zalaniu. Obsługujemy też klientów wysyłkowo z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -288,8 +296,8 @@ Większość współczesnych telefonów ładuje się przez USB-C. Standard Power
 
 Wybieraj ładowarki z oznaczeniem CE i danymi producenta. Sprawdź, czy obsługują standard szybkiego ładowania Twojego telefonu, i dobierz kabel o odpowiedniej mocy. Jeśli telefon mimo dobrej ładowarki ładuje się wolno albo się grzeje, przyczyną może być port ładowania lub zużyta bateria — to sprawdzimy w serwisie.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -344,8 +352,8 @@ Dla iPhone 12 i nowszych. Ma wbudowany magnes zgodny z ekosystemem MagSafe.
 
 Dobieraj etui do dokładnego modelu telefonu — otwory na aparaty, przyciski i port muszą się zgadzać. Etui nie powinno naciskać na ekran ani przyciski, a przy ładowaniu indukcyjnym sprawdź, czy nie jest za grube. Ekran dodatkowo ochroni folia Hammer Glass CUT, którą wycinamy na wymiar w serwisie.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -407,9 +415,9 @@ Jeśli telefon po zmianie ładowarki ładuje się wolno albo się grzeje — prz
 
 ## Gdzie jesteśmy?
 
-**Adres:** ul. Orkana 16B, 34-700 Rabka-Zdrój
-**Tel:** 883 200 151
-**Godziny:** pon–pt 9:00–17:00, sob 9:00–14:00
+**Adres:** ${RABKA.street}, 34-700 Rabka-Zdrój
+**Tel:** ${line.phoneDisplay}
+**Godziny:** ${RABKA_HOURS}
     `.trim(),
   },
   {
@@ -455,10 +463,10 @@ Dokładny zakres naprawy zależy głównie od modelu telefonu, rodzaju wyświetl
 
 ## Gdzie naprawić ekran w Rabce-Zdroju?
 
-Serwis PRO-KOM przy ul. Orkana 16B w Rabce-Zdroju. Wymieniamy ekrany na poczekaniu lub w ciągu jednego dnia.
+Serwis PRO-KOM przy ${RABKA.street} w Rabce-Zdroju. Wymieniamy ekrany na poczekaniu lub w ciągu jednego dnia.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -515,8 +523,8 @@ Zużyta bateria może powodować problemy z ładowaniem. Telefon ładuje się do
 - **Bateria jest zużyta** — wymiana przywraca pełną sprawność.
 - **Problem z płytą główną** — rzadsze, ale możliwe po zalaniu lub upadku.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -557,7 +565,7 @@ Zastanawiasz się, jak wygląda wizyta w serwisie PRO-KOM w Rabce-Zdroju? Opisuj
 
 ## Krok 1: Przyjęcie urządzenia
 
-Przynosisz telefon lub inne urządzenie do naszego serwisu przy ul. Orkana 16B. Opisujesz problem. Wystawiamy potwierdzenie przyjęcia.
+Przynosisz telefon lub inne urządzenie do naszego serwisu przy ${RABKA.street}. Opisujesz problem. Wystawiamy potwierdzenie przyjęcia.
 
 ## Krok 2: Bezpłatna diagnoza
 
@@ -579,8 +587,8 @@ Przed oddaniem telefonu testujemy go — sprawdzamy, czy naprawa się powiodła.
 
 Nie tylko z Rabki-Zdroju. Obsługujemy klientów z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca — osobiście i przez wysyłkę kurierską.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -632,8 +640,8 @@ GaN to skrót od galium nitride (azotek galu) — materiał półprzewodnikowy, 
 
 Wybieraj ładowarki GaN znanych producentów, z oznaczeniem CE i obsługą USB-C Power Delivery. Do ładowania laptopa użyj kabla USB-C, który obsługuje pełną moc ładowarki — przy 100W potrzebny jest kabel 5A.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -702,8 +710,8 @@ Telefony Samsung z serii Galaxy to jedne z najczęściej serwisowanych smartfon�
 
 W PRO-KOM Tech diagnozujemy i naprawiamy telefony Samsung: wymiana baterii, portów ładowania, ekranów i innych podzespołów. Diagnoza jest bezpłatna, a naprawę rozpoczynamy dopiero po Twojej akceptacji zakresu prac.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon-pt 9:00-17:00, sob 9:00-14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -772,8 +780,8 @@ iPhone uchodzi za niezawodny, ale jak każde urządzenie zużywa się i bywa pod
 
 W PRO-KOM Tech naprawiamy iPhone: wymiana baterii, ekranów, portów ładowania oraz diagnostyka usterek po zalaniu. Przed naprawą zawsze dostajesz wycenę, a sama diagnoza jest bezpłatna.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon-pt 9:00-17:00, sob 9:00-14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1154,10 +1162,10 @@ Ciekawą opcją jest **laptop poleasingowy** — certyfikowany sprzęt biznesowe
 
 ## Bezpłatna diagnoza w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju ocenimy usterkę bezpłatnie i powiemy, czy naprawa się opłaca. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa, Nowego Targu i okolic.
+W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju ocenimy usterkę bezpłatnie i powiemy, czy naprawa się opłaca. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa, Nowego Targu i okolic.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1228,10 +1236,10 @@ Jeśli powyższe nie pomaga, laptop wymaga:
 
 ## Serwis laptopów w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju czyścimy laptopy i wymieniamy pastę termalną. Po serwisie temperatury wyraźnie spadają, a laptop działa sprawnie i cicho.
+W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju czyścimy laptopy i wymieniamy pastę termalną. Po serwisie temperatury wyraźnie spadają, a laptop działa sprawnie i cicho.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1290,10 +1298,10 @@ Główne różnice:
 
 ## Wymiana dysku HDD na SSD w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju wymieniamy dyski i przenosimy system wraz z danymi. Po wymianie laptop uruchamia się kilkukrotnie szybciej.
+W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju wymieniamy dyski i przenosimy system wraz z danymi. Po wymianie laptop uruchamia się kilkukrotnie szybciej.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1361,10 +1369,10 @@ Jednym z pierwszych pytań, jakie słyszymy w serwisie, jest to, jak wygląda ca
 
 ## Bezpłatna diagnoza w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B w Rabce-Zdroju diagnoza jest w większości przypadków bezpłatna. Zakres naprawy przedstawiamy przed realizacją. Jeśli się nie zgadzasz — możesz zabrać sprzęt bez zobowiązań.
+W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju diagnoza jest w większości przypadków bezpłatna. Zakres naprawy przedstawiamy przed realizacją. Jeśli się nie zgadzasz — możesz zabrać sprzęt bez zobowiązań.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1440,8 +1448,8 @@ EliteBook to flagowce HP z HP Wolf Security. ProBook to dobra opcja dla małych 
 
 PRO-KOM oferuje laptopy biznesowe nowe i poleasingowe. Możemy doradzić, skonfigurować i serwisować zakupiony sprzęt.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1515,8 +1523,8 @@ To inny kategoria niż "używany" laptop kupiony od osoby prywatnej — laptopy 
 
 PRO-KOM oferuje laptopy poleasingowe od certyfikowanego partnera — z gwarancją, sprawdzone i gotowe do pracy. Możemy też serwisować zakupiony sprzęt.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1584,8 +1592,8 @@ Rzeczywisty czas pracy powyżej **8 godzin** — szukaj laptopów z baterią 50 
 
 Jeśli Twój obecny laptop zwalnia albo się psuje, w PRO-KOM sprawdzimy, czy wystarczy naprawa lub modernizacja (np. dysk SSD, więcej RAM), zanim zdecydujesz się na nowy sprzęt. Diagnoza jest bezpłatna.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1912,8 +1920,8 @@ Tani zasilacz może zniszczyć całą resztę zestawu przy awarii.
 
 Jeśli składasz komputer sam i coś nie działa — zestaw nie startuje, przegrzewa się albo restartuje w grach — w PRO-KOM zdiagnozujemy podzespoły, sprawdzimy temperatury i stabilność oraz zainstalujemy system ze sterownikami.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -1982,8 +1990,8 @@ Jeśli grasz głównie w domu — PC stacjonarny da Ci więcej za mniejsze pieni
 
 Niezależnie od wyboru, w PRO-KOM serwisujemy zarówno komputery stacjonarne, jak i laptopy gamingowe — od czyszczenia i wymiany pasty termoprzewodzącej po modernizację.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2057,8 +2065,8 @@ Wymiana karty graficznej na nowszą pozwoli grać lub pracować z grafiką na wy
 
 W PRO-KOM doradzamy w doborze komponentów, instalujemy i testujemy. Możemy też ocenić, czy upgrade ma sens w Twoim konkretnym przypadku.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2146,8 +2154,8 @@ Dobry zasilacz od sprawdzonego producenta (Corsair, be quiet!, Seasonic, EVGA) t
 
 W PRO-KOM pomagamy dobrać kompatybilne podzespoły i instalujemy je w Twoim sprzęcie.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2225,10 +2233,10 @@ Wiele programów uruchamia się automatycznie ze startem systemu i spowalnia ła
 
 ## Diagnostyka w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B diagnoza jest bezpłatna. Ocenimy przyczynę spowolnienia i zaproponujemy optymalne rozwiązanie.
+W PRO-KOM Tech przy ${RABKA.street} diagnoza jest bezpłatna. Ocenimy przyczynę spowolnienia i zaproponujemy optymalne rozwiązanie.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2300,8 +2308,8 @@ Bardzo małe komputery jak Intel NUC czy ASUS Mini PC. Wydajność biurowa w wyj
 
 PRO-KOM oferuje komputery biznesowe — nowe i poleasingowe, sprawdzone z gwarancją. Doradzamy, konfigurujemy i serwisujemy.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2592,10 +2600,10 @@ Drukarka laserowa używa tonera (proszku) i ciepła do utrwalenia wydruku na pap
 
 ## Serwis drukarek w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B serwisujemy drukarki atramentowe i laserowe wszystkich popularnych marek.
+W PRO-KOM Tech przy ${RABKA.street} serwisujemy drukarki atramentowe i laserowe wszystkich popularnych marek.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2674,10 +2682,10 @@ Pojemnik na nadmiar tuszu jest pełny. Wymaga serwisu — fizyczne opróżnienie
 
 ## Serwis drukarek w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B naprawiamy drukarki HP, Canon, Epson, Brother, Kyocera i innych marek.
+W PRO-KOM Tech przy ${RABKA.street} naprawiamy drukarki HP, Canon, Epson, Brother, Kyocera i innych marek.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2756,8 +2764,8 @@ Jeśli powyższe kroki nie pomogły, problem może być sprzętowy:
 - Problem z płytą elektroniczną.
 - Zatkane głowice wymagające profesjonalnego czyszczenia.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2836,8 +2844,8 @@ Sprawdzone drukarki z szeroką dostępnością serwisu i materiałów. Seria HP 
 
 PRO-KOM oferuje drukarki biurowe i serwisuje sprzęt różnych marek. Doradzamy w wyborze odpowiedniego modelu do potrzeb Twojej firmy.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
@@ -2898,10 +2906,10 @@ Szczególnie warto naprawiać:
 
 ## Serwis drukarek w Rabce-Zdroju
 
-W PRO-KOM Tech przy ul. Orkana 16B serwisujemy drukarki HP, Canon, Epson, Brother, Kyocera i inne. Przyjmujemy sprzęt domowy i biurowy z Rabki-Zdroju oraz z okolic — Mszany Dolnej, Jordanowa, Nowego Targu i Czarnego Dunajca.
+W PRO-KOM Tech przy ${RABKA.street} serwisujemy drukarki HP, Canon, Epson, Brother, Kyocera i inne. Przyjmujemy sprzęt domowy i biurowy z Rabki-Zdroju oraz z okolic — Mszany Dolnej, Jordanowa, Nowego Targu i Czarnego Dunajca.
 
-**Zadzwoń:** 883 200 151
-**Adres:** ul. Orkana 16B, Rabka-Zdrój (pon–pt 9:00–17:00, sob 9:00–14:00)
+**Zadzwoń:** ${line.phoneDisplay}
+**Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
   {
