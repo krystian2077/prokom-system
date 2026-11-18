@@ -43,7 +43,9 @@ function walk(dir: string): string[] {
     return EXT.test(e.name) && !IGNORE.test(e.name) ? [rel] : [];
   });
 }
-const files = SCAN_DIRS.flatMap(walk);
+/** Single files outside the scanned folders (blog content, 19.11: contacts from config/prokom.ts). */
+const SCAN_FILES = ["lib/blog-posts.ts"];
+const files = [...SCAN_DIRS.flatMap(walk), ...SCAN_FILES.filter((f) => fs.existsSync(path.join(FRONTEND, f)))];
 const read = (rel: string) => fs.readFileSync(path.join(FRONTEND, rel), "utf8");
 
 function contactHits(rel: string): string[] {
