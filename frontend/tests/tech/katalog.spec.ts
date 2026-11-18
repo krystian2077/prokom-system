@@ -108,6 +108,36 @@ test.describe("desktop 1440", () => {
   });
 });
 
+test.describe("nawigacja sprzedaży (1440)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test("„Sprzedaż” mega menu: both salons, enquiry card; the count badge appears after adding", async ({ page }) => {
+    await pinDaylight(page);
+    await page.goto("/");
+    const cap = page.locator(".t-capsule");
+    await expect(cap.locator(".t-navbadge")).toHaveCount(0); // nothing on the list yet
+    await cap.getByRole("button", { name: "Sprzedaż" }).click();
+    const panel = page.locator('.t-mega[data-mega="sprzedaz"]');
+    await expect(panel.getByRole("navigation", { name: "Salon Apple" }).getByRole("link", { name: "iPhone Pro" })).toHaveAttribute("href", "/apple#iphone-pro");
+    await expect(panel.getByRole("navigation", { name: "Salon Samsung" }).getByRole("link", { name: "Galaxy S" })).toHaveAttribute("href", "/samsung#galaxy-s");
+    await expect(panel.getByRole("link", { name: "Cały katalog" })).toHaveAttribute("href", "/sprzedaz");
+    await page.keyboard.press("Escape");
+    await page.goto("/sprzedaz/apple/iphone-17");
+    await page.getByRole("button", { name: "Dodaj do zapytania" }).click();
+    await expect(cap.locator(".t-navbadge")).toHaveText(/1/);
+    await expect(cap.getByRole("button", { name: /Sprzedaż \(w zapytaniu: 1\)/ })).toBeVisible();
+  });
+  test("search finds a model and the salons", async ({ page }) => {
+    await pinDaylight(page);
+    await page.goto("/");
+    await page.keyboard.press("Control+K");
+    const dialog = page.getByRole("dialog", { name: "Szukaj na stronie" });
+    await dialog.getByRole("combobox").fill("galaxy s26 ultra");
+    await expect(dialog.getByRole("option", { name: /Galaxy S26 Ultra/ }).first()).toBeVisible();
+    await dialog.getByRole("combobox").fill("salon apple");
+    await expect(dialog.getByRole("option", { name: /Salon Apple/ }).first()).toBeVisible();
+  });
+});
+
 test.describe("phone 360", () => {
   test.use({ viewport: { width: 360, height: 780 }, hasTouch: true, isMobile: true });
   for (const path of ["/sprzedaz", "/apple", "/samsung", "/sprzedaz/apple/iphone-air", "/sprzedaz/samsung/galaxy-z-fold8", "/zapytanie"]) {

@@ -8,6 +8,7 @@
  */
 import { line } from "@/config/prokom";
 import { BLOG_POSTS } from "@/lib/blog-posts";
+import { catalog, modelPath } from "../catalog";
 import { BLOG_CATEGORIES } from "../blog-taxonomy";
 import { courierPageHref } from "../courier";
 import { devicePages } from "../devices";
@@ -83,6 +84,23 @@ export function buildSearchIndex(draft: boolean = isDraftMode()): SearchEntry[] 
         popularity: 45,
       });
     }
+  }
+
+  // Sales catalogue (runda 18.11 v2): both salons, the catalogue and every model (no prices).
+  add({ id: "sprzedaz:/sprzedaz", group: "sprzedaz", title: "Sprzedaż Apple i Samsung — katalog", href: "/sprzedaz", hint: "Wybierz model, kolor i pamięć, wyślij zapytanie", text: "sprzedaz kup nowy telefon katalog zapytanie cena dostepnosc", icon: "phone", popularity: 70 });
+  add({ id: "sprzedaz:/apple", group: "sprzedaz", title: "Salon Apple", href: "/apple", hint: "iPhone, iPad, Mac, Apple Watch, AirPods", text: "apple iphone ipad mac macbook watch airpods salon", icon: "phone", popularity: 65 });
+  add({ id: "sprzedaz:/samsung", group: "sprzedaz", title: "Salon Samsung", href: "/samsung", hint: "Galaxy S, Z, A, Tab, Watch, Buds", text: "samsung galaxy salon tablet zegarek sluchawki", icon: "phone", popularity: 65 });
+  for (const m of catalog.models) {
+    add({
+      id: `model:${m.slug}`,
+      group: "sprzedaz",
+      title: m.name,
+      href: modelPath(m),
+      hint: `${m.brand === "apple" ? "Apple" : "Samsung"} · ${m.colors.length} ${m.colors.length === 1 ? "kolor" : "kolory"} · zapytaj o cenę`,
+      text: clip(`${m.keyFacts.join(" ")} ${m.colors.map((c) => c.name).join(" ")} ${m.storage.map((s) => s.label).join(" ")}`, 240),
+      icon: m.kind === "laptop" ? "laptop" : m.kind === "tablet" ? "tablet" : m.kind === "desktop" ? "pc" : m.kind === "watch" ? "watch" : "phone",
+      popularity: 40 + Math.min(20, Math.round((m.order - 800) / 10)),
+    });
   }
 
   for (const p of visiblePoints(draft)) {

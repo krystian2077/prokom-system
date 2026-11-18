@@ -6,13 +6,14 @@ import { prepareIndex, searchIndex } from "./engine";
  * bundle stays small and the index itself comes as JSON when the browser is idle.
  */
 
-export type SearchGroupKey = "akcje" | "strony" | "urzadzenia" | "naprawy" | "usterki" | "punkty" | "pytania" | "blog";
+export type SearchGroupKey = "akcje" | "strony" | "urzadzenia" | "naprawy" | "sprzedaz" | "usterki" | "punkty" | "pytania" | "blog";
 
 export const GROUP_TITLES: Record<SearchGroupKey, string> = {
   akcje: "Szybkie akcje",
   strony: "Strony",
   urzadzenia: "Urządzenia",
   naprawy: "Naprawy",
+  sprzedaz: "Sprzedaż",
   usterki: "Zgłoś usterkę",
   punkty: "Punkty serwisowe",
   pytania: "Pytania",

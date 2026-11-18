@@ -32,7 +32,7 @@ test.describe("desktop 1440", () => {
   test("points mega menu and footer show both published points", async ({ page }) => {
     await page.goto("/");
     await page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" }).click();
-    const panel = page.locator(".t-mega").nth(1);
+    const panel = page.locator('.t-mega[data-mega="punkty"]');
     await expect(panel.getByText("Rabka-Zdrój", { exact: true })).toBeVisible();
     await expect(panel.getByText("Zakopane", { exact: true })).toBeVisible();
     await expect(page.locator(".t-footer")).toContainText("Zakopane");

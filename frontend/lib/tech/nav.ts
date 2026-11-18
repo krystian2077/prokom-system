@@ -5,8 +5,9 @@
  */
 import { courierService } from "@/config/prokom";
 
-export type NavKey = "naprawy" | "punkty" | "hammer" | "ofirmie" | "kontakt";
-export type NavItem = { key: NavKey; label: string; href: string; mega?: "naprawy" | "punkty"; match: string[] };
+export type NavKey = "naprawy" | "sprzedaz" | "punkty" | "hammer" | "ofirmie" | "kontakt";
+/** `short`: the label in the capsule when the full one does not fit (the full one stays the accessible name). */
+export type NavItem = { key: NavKey; label: string; short?: string; href: string; mega?: "naprawy" | "sprzedaz" | "punkty"; match: string[] };
 
 export const mainNav: NavItem[] = [
   {
@@ -16,7 +17,9 @@ export const mainNav: NavItem[] = [
     mega: "naprawy",
     match: ["/uslugi", "/serwis-", "/odzyskiwanie-danych", "/naprawy", "/naprawa-kurierem"],
   },
-  { key: "punkty", label: "Punkty serwisowe", href: "/punkty-serwisowe", mega: "punkty", match: ["/punkty-serwisowe", "/obslugiwane-miejscowosci"] },
+  // Sales catalogue (runda 18.11 v2): Apple and Samsung salons, enquiry list — no prices.
+  { key: "sprzedaz", label: "Sprzedaż", href: "/sprzedaz", mega: "sprzedaz", match: ["/sprzedaz", "/apple", "/samsung", "/zapytanie"] },
+  { key: "punkty", label: "Punkty serwisowe", short: "Punkty", href: "/punkty-serwisowe", mega: "punkty", match: ["/punkty-serwisowe", "/obslugiwane-miejscowosci"] },
   { key: "hammer", label: "Hammer Glass", href: "/hammer-glass", match: ["/hammer-glass"] },
   // Blog left the capsule 18.11.2026 (Krystian): room for the labelled theme button; it stays in the footer and search.
   { key: "ofirmie", label: "O firmie", href: "/o-firmie", match: ["/o-firmie"] },
