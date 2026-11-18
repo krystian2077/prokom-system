@@ -24,6 +24,9 @@ export type TechEvents = {
   blog_powiazana_naprawa_klik: Record<string, never>;
   /** Site search (SPEC §12.5): phrase length and result count only — never the phrase itself. */
   szukaj: { dlugosc: number; wyniki: number; zrodlo: "okno" | "strona" };
+  /** Sales enquiry list (runda 18.11 v2): counts only, never the models or the person. */
+  zapytanie_dodaj: { rodzaj: string };
+  zapytanie_wyslane: { pozycje: number };
 };
 export type TechEventName = keyof TechEvents;
 
