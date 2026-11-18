@@ -57,6 +57,11 @@ export function pickModels(brand: Brand, kind: Kind, picked: string[], limit = 3
     .map((x) => x.m);
 }
 
+/** Small map for „Ostatnio oglądane” (name, link, first colour) — not the whole catalogue. */
+export function recentEntries(): Record<string, { name: string; href: string; hex: string }> {
+  return Object.fromEntries(catalog.models.map((m) => [m.slug, { name: m.name, href: modelPath(m), hex: m.colors[0]?.hex ?? "#888888" }]));
+}
+
 /** „Pasuje do”: accessories and other models named in `compat`. */
 export function compatOf(m: CatalogModel): { accessories: Accessory[]; models: CatalogModel[] } {
   return {

@@ -102,9 +102,13 @@ export function EnquiryPage() {
                 <li key={k} className="t-enq__item">
                   {m ? <ModelVisual model={m} color={i.color} decorative /> : <span />}
                   <span>
-                    <Link href={`/sprzedaz/${i.brand}/${i.slug}`} className="t-enq__name">
-                      {i.name}
-                    </Link>
+                    {i.brand === "akcesoria" ? (
+                      <span className="t-enq__name">{i.name}</span>
+                    ) : (
+                      <Link href={`/sprzedaz/${i.brand}/${i.slug}`} className="t-enq__name">
+                        {i.name}
+                      </Link>
+                    )}
                     <span className="t-enq__variant">{[i.colorName, i.storageLabel].filter(Boolean).join(" · ") || "wersja do ustalenia"}</span>
                     <button type="button" className="t-enq__remove" onClick={() => save(removeItem(list, k))} aria-label={`Usuń: ${itemLabel(i)}`}>
                       Usuń

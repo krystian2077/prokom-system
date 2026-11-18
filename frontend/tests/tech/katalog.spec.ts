@@ -108,6 +108,30 @@ test.describe("desktop 1440", () => {
   });
 });
 
+test.describe("dodatki (1440)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test("„Ostatnio oglądane” remembers model cards on this device only", async ({ page }) => {
+    await pinDaylight(page);
+    await page.goto("/sprzedaz");
+    await expect(page.getByRole("navigation", { name: "Ostatnio oglądane" })).toHaveCount(0);
+    await page.goto("/sprzedaz/apple/iphone-air");
+    await page.goto("/sprzedaz/samsung/galaxy-z-flip8");
+    await page.goto("/sprzedaz");
+    const recent = page.getByRole("navigation", { name: "Ostatnio oglądane" });
+    await expect(recent.getByRole("link")).toHaveText(["Galaxy Z Flip8", "iPhone Air"]);
+  });
+  test("„Zapytaj o całość” adds the model, fitting models and accessories at once", async ({ page }) => {
+    await pinDaylight(page);
+    await page.goto("/sprzedaz/apple/iphone-18-pro");
+    await page.getByRole("button", { name: "Dodaj zestaw do zapytania" }).click();
+    await page.getByRole("link", { name: "Dodano · Zobacz zapytanie" }).click();
+    const items = page.locator(".t-enq__item");
+    await expect(items.nth(2)).toBeVisible();
+    await expect(items.first()).toContainText("iPhone 18 Pro");
+    await expect(page.locator(".t-enq__items")).toContainText("Folia ochronna Hammer Glass — do: iPhone 18 Pro");
+  });
+});
+
 test.describe("nawigacja sprzedaży (1440)", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
   test("„Sprzedaż” mega menu: both salons, enquiry card; the count badge appears after adding", async ({ page }) => {

@@ -304,3 +304,16 @@ html[data-tech-theme="dark"] .tech .t-mcard__dots i { box-shadow: inset 0 0 0 1p
   .tech .t-capsule .t-cta__long { display: none; }
   .tech .t-capsule .t-cta__short { display: inline; }
 }
+
+/* ---------- „Ostatnio oglądane” and „Zapytaj o całość” ---------- */
+.tech .t-recent { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 16px; }
+.tech .t-recent__t { font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); }
+.tech .t-recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tech .t-recent__chip { display: inline-flex; align-items: center; gap: 8px; }
+.tech .t-recent__chip i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); }
+.tech .t-model .t-recent { margin-top: 8px; }
+.tech .t-bundle { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-top: 18px; padding: 18px 20px; border-radius: 22px; background: var(--soft); border: 1px solid var(--softbd); }
+.tech .t-bundle div { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 280px; }
+.tech .t-bundle b { font-family: var(--t-font-head); font-size: 18px; }
+.tech .t-bundle span { font-size: 14px; color: var(--ink2); }
+html[data-tech-theme="dark"] .tech .t-bundle { background: color-mix(in srgb, var(--acc) 12%, var(--card)); border-color: color-mix(in srgb, var(--acc) 30%, transparent); }
