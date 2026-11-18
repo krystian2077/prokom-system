@@ -10,6 +10,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { pinDaylight } from "./zegar";
 import { line, pointPhone, servicePoints, telHref } from "../../config/prokom";
 
 const axeSource = fs.readFileSync(createRequire(__filename).resolve("axe-core/axe.min.js"), "utf8");
@@ -167,6 +168,7 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
   test("Kopiuj numer copies and says „Skopiowano”; Motyw switches the theme like the capsule", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await pinDaylight(page);
     await page.goto("/");
     await openWithKeys(page);
     // copy is no longer a tile: it answers the query „kopiuj”

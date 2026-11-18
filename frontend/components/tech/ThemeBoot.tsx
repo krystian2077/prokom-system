@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { applyThemeColor, getTechTheme, themeScript } from "@/lib/tech/theme";
+import { withoutThemeParam } from "@/lib/tech/theme-carry";
 
 /**
  * The inline theme script runs on full page loads only. After a client-side
@@ -20,6 +21,12 @@ export function ThemeBoot() {
         /* ignore */
       }
     }
+    // ?motyw from another PRO-KOM line was read by the head script; drop it from the address now.
+    // Next 14.2 App Router patches history.replaceState and syncs usePathname/useSearchParams — but
+    // only when the state has no `__NA` flag, so pass null (not history.state): Next copies its own
+    // internal state in. No router.replace — that would fetch the RSC payload again.
+    const clean = withoutThemeParam(window.location.href);
+    if (clean !== null) window.history.replaceState(null, "", clean);
     const prev = applyThemeColor(getTechTheme().theme);
     const added = document.querySelector('meta[name="theme-color"][data-tech]');
     const onTheme = () => applyThemeColor(getTechTheme().theme);

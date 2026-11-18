@@ -227,7 +227,11 @@ export function MenuSheet() {
                   </a>
                 ))}
               </div>
+              <span className="t-label" id="t-sheet-theme">
+                Motyw strony
+              </span>
               <ThemeSegmented />
+              <p className="t-sheet__themenote">Auto: w nocy ciemny, w dzień jak ustawienia telefonu.</p>
               <InstallHint />
             </>
           ) : null}

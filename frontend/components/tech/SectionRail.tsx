@@ -9,6 +9,7 @@ import { HOME_SECTIONS, RAIL_MIN_SECTIONS, RAIL_QUERY, activeSection, glideTo, r
 import { requestSearch } from "@/lib/tech/search/open";
 import { IconSearch, IconWrench } from "./icons";
 import { IconToTop, RailIcon } from "./rail-icons";
+import { ThemeRailItem } from "./ThemeToggle";
 
 type Section = { id: string; label: string; icon: RailIconName };
 
@@ -303,6 +304,7 @@ export function SectionRail() {
             <span className="t-rail__text">Zgłoś naprawę</span>
           </span>
         </Link>
+        <ThemeRailItem />
         <button ref={up} type="button" className="t-rail__item t-rail__up" data-shown={showUp ? "" : undefined} onClick={toTop}>
           <span className="t-rail__icon">
             <IconToTop />

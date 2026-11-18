@@ -552,3 +552,25 @@ html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3,
   .tech :is(.t-qa__tile, .t-qa__icon, .t-sdlg__cat, .t-sdlg__caticon, .t-sdlg__chip) { transition: none; }
   .tech .t-main [data-arrive] :is(h1, h2) { animation: none; }
 }
+
+/* ---------- Theme entry above „Do góry” (runda 18.11 §1.3, MOTYW-PASEK-LINII §6) ---------- */
+.tech .t-rail__themewrap { flex: none; display: flex; flex-direction: column; }
+.tech .t-rail__theme .t-rail__icon { color: inherit; }
+/* moon and sun share the icon cell; data-tech-theme picks one (same rule as the capsule button) */
+.tech .t-rail__themeico { display: grid; place-items: center; }
+.tech .t-rail__themeico > svg { grid-area: 1 / 1; width: 21px; height: 21px; }
+/* Jasny · Ciemny · Auto unfolds with the rail (no jump when folded) */
+.tech .t-rail__themes { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--m-small) var(--m-ease-out) var(--rail-close-delay); }
+.tech .t-rail__themes > * { min-height: 0; overflow: hidden; }
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) .t-rail__themes { grid-template-rows: 1fr; transition-delay: var(--rail-open-delay); }
+.tech .t-rail__seg { position: relative; isolation: isolate; display: flex; gap: 2px; margin: 2px 8px 6px 46px; padding: 3px; border-radius: 999px; background: var(--bg2); visibility: hidden; transition: visibility 0s linear var(--rail-close-delay); }
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) .t-rail__seg { visibility: visible; transition-delay: 0s; }
+.tech .t-rail__seg > button { position: relative; z-index: 1; flex: 1; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: none; color: var(--ink2); font: 700 12.5px/1 var(--t-font-body); cursor: pointer; }
+.tech .t-rail__seg > button.is-on { color: var(--ink); background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+.tech [data-pill-ready].t-rail__seg > button.is-on { background: transparent; box-shadow: none; }
+.tech .t-rail__seg > .t-pilltabs__pill { top: 3px; bottom: auto; height: 28px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+html[data-tech-theme="dark"] .tech .t-rail__seg > .t-pilltabs__pill,
+html[data-tech-theme="dark"] .tech .t-rail__seg > button.is-on { background: var(--raised); }
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-rail__themes, .tech .t-rail__seg { transition: none; }
+}

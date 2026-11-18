@@ -12,6 +12,7 @@ import { LazySearchDialog } from "./search/LazySearchDialog";
 import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
 import { TabBar } from "./TabBar";
+import { ThemeCarry } from "./ThemeCarry";
 import { TrackClicks } from "./TrackClicks";
 import { Typeset } from "./Typeset";
 
@@ -48,6 +49,7 @@ export function TechShell({ children }: { children: ReactNode }) {
           <LazySearchDialog />
         </div>
         <TrackClicks />
+        <ThemeCarry />
         <MotionRoot />
         <Typeset />
       </div>
