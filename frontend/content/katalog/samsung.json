@@ -166,6 +166,7 @@
       {
         "color": "fioletowy",
         "src": "/tech/katalog/galaxy-s26-ultra/fioletowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Cobalt-Violet_PC.jpg",
           "date": "2026-11-18",
@@ -175,6 +176,7 @@
       {
         "color": "jasnoniebieski",
         "src": "/tech/katalog/galaxy-s26-ultra/jasnoniebieski.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Sky-Blue_PC.jpg",
           "date": "2026-11-18",
@@ -184,6 +186,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-s26-ultra/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Black_PC.jpg",
           "date": "2026-11-18",
@@ -193,6 +196,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-s26-ultra/bialy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_White_PC.jpg",
           "date": "2026-11-18",
@@ -202,6 +206,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-s26-ultra/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Silver-Shadow_PC.jpg",
           "date": "2026-11-18",
@@ -211,6 +216,7 @@
       {
         "color": "zloty",
         "src": "/tech/katalog/galaxy-s26-ultra/zloty.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Pink-Gold_PC.jpg",
           "date": "2026-11-18",
@@ -394,6 +400,7 @@
       {
         "color": "fioletowy",
         "src": "/tech/katalog/galaxy-s26-plus/fioletowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Cobalt-Violet_PC.jpg",
           "date": "2026-11-18",
@@ -403,6 +410,7 @@
       {
         "color": "jasnoniebieski",
         "src": "/tech/katalog/galaxy-s26-plus/jasnoniebieski.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Sky-Blue_PC.jpg",
           "date": "2026-11-18",
@@ -412,6 +420,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-s26-plus/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Black_PC.jpg",
           "date": "2026-11-18",
@@ -421,6 +430,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-s26-plus/bialy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_White_PC.jpg",
           "date": "2026-11-18",
@@ -430,6 +440,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-s26-plus/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Silver-Shadow_PC.jpg",
           "date": "2026-11-18",
@@ -439,6 +450,7 @@
       {
         "color": "zloty",
         "src": "/tech/katalog/galaxy-s26-plus/zloty.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Pink-Gold_PC.jpg",
           "date": "2026-11-18",
@@ -627,6 +639,7 @@
       {
         "color": "fioletowy",
         "src": "/tech/katalog/galaxy-s26/fioletowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Cobalt-Violet_PC.jpg",
           "date": "2026-11-18",
@@ -636,6 +649,7 @@
       {
         "color": "jasnoniebieski",
         "src": "/tech/katalog/galaxy-s26/jasnoniebieski.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Sky-Blue_PC.jpg",
           "date": "2026-11-18",
@@ -645,6 +659,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-s26/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Black_PC.jpg",
           "date": "2026-11-18",
@@ -654,6 +669,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-s26/bialy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_White_PC.jpg",
           "date": "2026-11-18",
@@ -663,6 +679,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-s26/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Silver-Shadow_PC.jpg",
           "date": "2026-11-18",
@@ -672,6 +689,7 @@
       {
         "color": "zloty",
         "src": "/tech/katalog/galaxy-s26/zloty.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Pink-Gold_PC.jpg",
           "date": "2026-11-18",
@@ -847,6 +865,7 @@
       {
         "color": "zielony",
         "src": "/tech/katalog/galaxy-z-fold8-ultra/zielony.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Green_Shadow_PC.jpg",
           "date": "2026-11-18",
@@ -856,6 +875,7 @@
       {
         "color": "ciemnofioletowy",
         "src": "/tech/katalog/galaxy-z-fold8-ultra/ciemnofioletowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Violet_Shadow_PC.jpg",
           "date": "2026-11-18",
@@ -865,6 +885,7 @@
       {
         "color": "grafitowy",
         "src": "/tech/katalog/galaxy-z-fold8-ultra/grafitowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Graphite_PC.jpg",
           "date": "2026-11-18",
@@ -874,6 +895,7 @@
       {
         "color": "kremowy",
         "src": "/tech/katalog/galaxy-z-fold8-ultra/kremowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Cream_PC.jpg",
           "date": "2026-11-18",
@@ -1044,6 +1066,7 @@
       {
         "color": "zielony",
         "src": "/tech/katalog/galaxy-z-fold8/zielony.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Pistachio_PC.jpg",
           "date": "2026-11-18",
@@ -1053,6 +1076,7 @@
       {
         "color": "jasnofioletowy",
         "src": "/tech/katalog/galaxy-z-fold8/jasnofioletowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Lavender_PC.jpg",
           "date": "2026-11-18",
@@ -1062,6 +1086,7 @@
       {
         "color": "grafitowy",
         "src": "/tech/katalog/galaxy-z-fold8/grafitowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Graphite_PC.jpg",
           "date": "2026-11-18",
@@ -1071,6 +1096,7 @@
       {
         "color": "kremowy",
         "src": "/tech/katalog/galaxy-z-fold8/kremowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Cream_PC.jpg",
           "date": "2026-11-18",
@@ -1236,6 +1262,7 @@
       {
         "color": "zielony",
         "src": "/tech/katalog/galaxy-z-flip8/zielony.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Mint_PC.jpg",
           "date": "2026-11-18",
@@ -1245,6 +1272,7 @@
       {
         "color": "rozowy",
         "src": "/tech/katalog/galaxy-z-flip8/rozowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Pink_PC.jpg",
           "date": "2026-11-18",
@@ -1254,6 +1282,7 @@
       {
         "color": "grafitowy",
         "src": "/tech/katalog/galaxy-z-flip8/grafitowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Graphite_PC.jpg",
           "date": "2026-11-18",
@@ -1263,6 +1292,7 @@
       {
         "color": "kremowy",
         "src": "/tech/katalog/galaxy-z-flip8/kremowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Cream_PC.jpg",
           "date": "2026-11-18",
@@ -1428,6 +1458,7 @@
       {
         "color": "jasnozielony",
         "src": "/tech/katalog/galaxy-s26-fe/jasnozielony.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/cz/smartphones/galaxy-s26/images/S26_FE_Color_Selection_Pistachio_PC_1600x864.jpg",
           "date": "2026-11-18",
@@ -1437,6 +1468,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-s26-fe/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/cz/smartphones/galaxy-s26/images/S26_FE_Color_Selection_Graphite_PC_1600x864.jpg",
           "date": "2026-11-18",
@@ -1446,6 +1478,7 @@
       {
         "color": "niebieski",
         "src": "/tech/katalog/galaxy-s26-fe/niebieski.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/cz/smartphones/galaxy-s26/images/S26_FE_Color_Selection_Blueberry_PC_944x510.jpg",
           "date": "2026-11-18",
@@ -1607,6 +1640,7 @@
       {
         "color": "granatowy",
         "src": "/tech/katalog/galaxy-a57-5g/granatowy.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_navy_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1616,6 +1650,7 @@
       {
         "color": "szary",
         "src": "/tech/katalog/galaxy-a57-5g/szary.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_gray_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1625,6 +1660,7 @@
       {
         "color": "niebieski",
         "src": "/tech/katalog/galaxy-a57-5g/niebieski.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_icyblue_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1634,6 +1670,7 @@
       {
         "color": "fioletowy",
         "src": "/tech/katalog/galaxy-a57-5g/fioletowy.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_lilac_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1799,6 +1836,7 @@
       {
         "color": "zielony",
         "src": "/tech/katalog/galaxy-a37-5g/zielony.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_graygreen_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1808,6 +1846,7 @@
       {
         "color": "fioletowy",
         "src": "/tech/katalog/galaxy-a37-5g/fioletowy.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_lavender_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1817,6 +1856,7 @@
       {
         "color": "szary",
         "src": "/tech/katalog/galaxy-a37-5g/szary.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_charcoal_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1826,6 +1866,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-a37-5g/bialy.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_white_color-section_buypage_1600x864px.png",
           "date": "2026-11-18",
@@ -1985,6 +2026,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-a27-5g/czarny.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/pl/sm-a276bzkbeue/gallery/pl-galaxy-a27-5g-sm-a276-sm-a276bzkbeue-553470921",
           "date": "2026-11-18",
@@ -2145,6 +2187,7 @@
       {
         "color": "szary",
         "src": "/tech/katalog/galaxy-a17/szary.webp",
+        "bg": "#000000",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/pl/sm-a175fzaeeue/gallery/pl-galaxy-a17-sm-a175-sm-a175fzaeeue-549188456",
           "date": "2026-11-18",
@@ -2310,6 +2353,7 @@
       {
         "color": "szary",
         "src": "/tech/katalog/galaxy-tab-s12-ultra/szary.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12-ultra/TS12-Ultra-Color-Selection_Gray_PC.jpg",
           "date": "2026-11-18",
@@ -2319,6 +2363,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-tab-s12-ultra/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12-ultra/TS12-Ultra-Color-Selection_Silver_PC.jpg",
           "date": "2026-11-18",
@@ -2470,6 +2515,7 @@
       {
         "color": "szary",
         "src": "/tech/katalog/galaxy-tab-s12-plus/szary.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12plus/TS12-Plus-Color-Selection_Gray_PC.jpg",
           "date": "2026-11-18",
@@ -2479,6 +2525,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-tab-s12-plus/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12plus/TS12-Plus-Color-Selection_Silver_PC.jpg",
           "date": "2026-11-18",
@@ -2627,6 +2674,7 @@
       {
         "color": "grafitowy",
         "src": "/tech/katalog/galaxy-watch9/grafitowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch9_Graphite_40_Side_Sport_Black_1600x864_PC-554009431",
           "date": "2026-11-18",
@@ -2636,6 +2684,7 @@
       {
         "color": "kremowy",
         "src": "/tech/katalog/galaxy-watch9/kremowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch9_Cream_40_Side_Sport_Cream_1600x864_PC-554008597",
           "date": "2026-11-18",
@@ -2645,6 +2694,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-watch9/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch9_Silver_44_Side_Sport_Olive_1600x864_PC-554008054",
           "date": "2026-11-18",
@@ -2776,6 +2826,7 @@
       {
         "color": "tytanowy-szary",
         "src": "/tech/katalog/galaxy-watch-ultra2/tytanowy-szary.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch_Ultra2_TitaniumGray_Marine_Black_Side_PC_1600x864-554013226",
           "date": "2026-11-18",
@@ -2785,6 +2836,7 @@
       {
         "color": "tytanowy-srebrny",
         "src": "/tech/katalog/galaxy-watch-ultra2/tytanowy-srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch_Ultra2_TitaniumSilver_Marine_Olive_Side_PC_1600x864-554013497",
           "date": "2026-11-18",
@@ -2920,6 +2972,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-watch8-classic/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_Classic_black_Side_hybrid_black_1600x864_PC-549961894",
           "date": "2026-11-18",
@@ -2929,6 +2982,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-watch8-classic/bialy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_Classic_white_Side_hybrid_white_1600x864_PC-549964755",
           "date": "2026-11-18",
@@ -3068,6 +3122,7 @@
       {
         "color": "grafitowy",
         "src": "/tech/katalog/galaxy-watch8/grafitowy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_graphite_40_Side_Sport_sm_graphite_1600x864_PC-549980183",
           "date": "2026-11-18",
@@ -3077,6 +3132,7 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/galaxy-watch8/srebrny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_silver_40_Side_Sport_sm_white_1600x864_PC-549932253",
           "date": "2026-11-18",
@@ -3217,6 +3273,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-buds4-pro/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Bach/Color_Selection_Black_PC.png",
           "date": "2026-11-18",
@@ -3226,6 +3283,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-buds4-pro/bialy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Bach/Color_Selection_White_PC.png",
           "date": "2026-11-18",
@@ -3235,6 +3293,7 @@
       {
         "color": "zloty",
         "src": "/tech/katalog/galaxy-buds4-pro/zloty.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Bach/Color_Selection_PinkGold_PC.png",
           "date": "2026-11-18",
@@ -3372,6 +3431,7 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/galaxy-buds4/czarny.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Handel/Color_Selection_Black_PC.png",
           "date": "2026-11-18",
@@ -3381,6 +3441,7 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/galaxy-buds4/bialy.webp",
+        "bg": "#ffffff",
         "source": {
           "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Handel/Color_Selection_White_PC.png",
           "date": "2026-11-18",
