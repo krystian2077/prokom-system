@@ -128,3 +128,22 @@ test("brand page links its salon (catalogue)", async ({ page }) => {
     await expect(page.locator(".t-bmodels__salon a")).toHaveAttribute("href", salon);
   }
 });
+
+test.describe("znak Apple — napis krojem strony na stronach serwisu", () => {
+  for (const [path, names] of [
+    // grids where every brand has a mark (tablets and watches have text-only grids anyway)
+    ["/serwis-laptopow", ["Apple"]],
+    ["/serwis-telefonow", ["Apple", "Samsung"]],
+  ] as const) {
+    test(`${path}: ${names.join(", ")} as text, no apple mark`, async ({ page }) => {
+      await page.goto(path);
+      const marks = page.locator("#marki .t-brandname");
+      await expect(marks).toHaveText([...names]);
+      await expect(page.locator('#marki svg.t-brandlogo[viewBox="2.225 0 19.55 24"]')).toHaveCount(0);
+    });
+  }
+  test("home brand strip keeps the marks (open decision)", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('svg[aria-label="Apple"]').first()).toBeAttached();
+  });
+});

@@ -161,3 +161,16 @@ describe("serwis marek — SEO, sitemap, wyszukiwarka", () => {
     expect(entries[1].text).toContain("Galaxy A54");
   });
 });
+
+describe("znak Apple i Samsung (fix/tech-znak-apple)", () => {
+  it("Apple and Samsung are text marks, other brands keep their marks", async () => {
+    const { brandLogo, cardMarkSpellsName, isTextMark, TEXT_MARK_BRANDS } = await import("@/components/tech/brand-logos");
+    expect(Array.from(TEXT_MARK_BRANDS).sort()).toEqual(["apple", "samsung"]);
+    expect(isTextMark(brandLogo("Apple")!)).toBe(true);
+    expect(isTextMark(brandLogo("Samsung")!)).toBe(true);
+    expect(isTextMark(brandLogo("Lenovo")!)).toBe(false);
+    // a text mark prints the card name, so the heading is hidden visually (no "Apple" twice)
+    expect(cardMarkSpellsName(brandLogo("Apple")!, "Apple Watch")).toBe(true);
+    expect(cardMarkSpellsName(brandLogo("HP")!, "HP")).toBe(false);
+  });
+});
