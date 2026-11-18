@@ -121,3 +121,10 @@ test.describe("desktop 1440 — mega menu Naprawy", () => {
     await expect(page.locator("h1")).toContainText("Serwis Samsung Galaxy");
   });
 });
+
+test("brand page links its salon (catalogue)", async ({ page }) => {
+  for (const [path, salon] of [["/serwis-apple", "/apple"], ["/serwis-samsung", "/samsung"]] as const) {
+    await page.goto(path);
+    await expect(page.locator(".t-bmodels__salon a")).toHaveAttribute("href", salon);
+  }
+});

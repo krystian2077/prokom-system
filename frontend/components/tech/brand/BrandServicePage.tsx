@@ -32,7 +32,7 @@ export function brandMetadata(page: BrandPage) {
  * Brand service page (/serwis-apple, /serwis-samsung — round 18.11, T-R2c): hero, "Wybierz
  * model", "Najczęstsze naprawy", "Części i gwarancja", "Jak oddać sprzęt", steps, FAQ, CTA.
  * Same building blocks as device pages (DevicePage). Server Component.
- * TODO(krystian): link to the brand salon (/apple, /samsung) once T-R2b ships those pages (plan §4).
+ * Links to the brand salon (/apple, /samsung — catalogue from T-R2b) under "Wybierz model" (plan §4).
  * The "Zgłoś naprawę" link carries only `category` — the form has no brand parameter (KONTRAKT §1.4).
  */
 export function BrandServicePage({ page }: { page: BrandPage }) {
@@ -141,6 +141,13 @@ function BrandModels({ page }: { page: BrandPage }) {
           Zgłoś naprawę
         </Link>{" "}
         i wpisz model w formularzu — przyjmujemy też inne modele {page.brand}.
+      </p>
+      <p className="t-bmodels__salon">
+        Szukasz nowego sprzętu?{" "}
+        <Link href={`/${page.key}`}>
+          Salon {page.brand} <IconArrow size={14} />
+        </Link>{" "}
+        — modele, kolory i pamięć, zapytanie o cenę i dostępność.
       </p>
     </Section>
   );
