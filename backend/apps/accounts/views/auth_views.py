@@ -25,7 +25,6 @@ from apps.accounts.models import (
 )
 from apps.accounts.serializers import UserSerializer, UserSelfUpdateSerializer, LoginSerializer, ClientRegisterSerializer
 from apps.clients.models import Client
-from apps.clients.selectors import client_by_email
 from apps.availability.models import EmployeeAvailability
 from apps.availability.enums import AvailabilityType
 
@@ -283,29 +282,20 @@ class RegisterView(APIView):
             phone=phone,
             role=UserRole.CLIENT,
         )
-        client = client_by_email(email)
-        if client:
-            client.user = user
-            client.first_name = first_name or client.first_name
-            client.last_name = last_name or client.last_name
-            client.phone = phone or client.phone
-            if street or city or postal_code:
-                client.street = street or client.street
-                client.city = city or client.city
-                client.postal_code = postal_code or client.postal_code
-            client.save(update_fields=["user", "first_name", "last_name", "phone", "street", "city", "postal_code", "updated_at"])
-        else:
-            Client.objects.create(
-                user=user,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                phone=phone,
-                street=street,
-                city=city,
-                postal_code=postal_code,
-                country="Polska",
-            )
+        # Always a new profile (audit AB2): linking an existing guest profile by e-mail here, before
+        # the e-mail is verified, let anyone take over a guest's repairs. Guest repairs move to this
+        # profile only after verification (_assign_guest_repairs_to_user in VerifyEmailView).
+        Client.objects.create(
+            user=user,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+            street=street,
+            city=city,
+            postal_code=postal_code,
+            country="Polska",
+        )
 
         verification = _send_verification_code(user)
         if not verification:
