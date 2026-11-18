@@ -101,7 +101,7 @@ test.describe("desktop 1440", () => {
       // order: theme entry, then „Do góry”
       const order = await rail.locator("[data-tech-theme-rail], .t-rail__up").evaluateAll((els) => els.map((e) => (e.matches("[data-tech-theme-rail]") ? "theme" : "up")));
       expect(order).toEqual(["theme", "up"]);
-      await entry.hover();
+      await entry.hover({ position: { x: 22, y: 18 } }); // the folded rail shows only the icon column
       const seg = rail.getByRole("radiogroup", { name: "Motyw strony" });
       await expect(seg).toBeVisible();
       await seg.getByRole("radio", { name: "Ciemny" }).click();
