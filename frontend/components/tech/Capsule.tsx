@@ -30,11 +30,12 @@ const noSubscription = () => () => {};
 const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
 /**
- * Main capsule (design T.Naglowek, PREMIUM §3). ≥ 1024: sticky, narrows on scroll
- * (transform only), sliding pill under the hot/active item, mega menus in one shared
- * box (switches panels without closing), hover intent + safe triangle, full keyboard,
- * dimmed and blurred page under an open menu. < 1024: logo, "Zgłoś" and search; hides
- * on scroll down and returns on scroll up. Without JS the mega triggers are plain links.
+ * Main capsule (design T.Naglowek, PREMIUM §3). Sticky to the whole page on every width; hides
+ * on scroll down and returns on scroll up (not while a mega menu is open or focus is inside).
+ * ≥ 1024: narrows on scroll (transform only), sliding pill under the hot/active item, mega menus
+ * in one shared box (switches panels without closing), hover intent + safe triangle, full
+ * keyboard, dimmed and blurred page under an open menu. < 1024: logo, "Zgłoś" and search.
+ * Without JS the mega triggers are plain links.
  */
 export function Capsule() {
   const pathname = usePathname() || "/";
@@ -127,7 +128,12 @@ export function Capsule() {
   }, [open]);
   useEffect(() => () => clearTimers(), []);
 
-  // scroll: phones hide/show, desktop narrows
+  // An open mega menu or focus inside the capsule keeps it on screen (it must not slip away from
+  // under the pointer or the keyboard). Read inside the scroll handler through a ref.
+  const holdRef = useRef(false);
+  holdRef.current = open !== null;
+
+  // scroll (runda 18.11 §1.1): hides going down and returns going up on every width; ≥ 1024 also narrows
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023.98px)");
     let last = window.scrollY;
@@ -137,7 +143,8 @@ export function Capsule() {
       ticking = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        if (!mq.matches || y < 80) setHidden(false);
+        const held = holdRef.current || !!rootRef.current?.contains(document.activeElement);
+        if (y < 80 || held) setHidden(false);
         else if (Math.abs(y - last) > 6) setHidden(y > last);
         setCompact(!mq.matches && y > COMPACT_AT_PX);
         last = y;

@@ -222,6 +222,8 @@ html[data-tech-theme="dark"] .tech .t-tabbar { box-shadow: var(--cap-inset), 0 2
     overflow: hidden;
     filter: brightness(0.92);
   }
+  /* the capsule shrinks with the page (no clipping: its shadow stays); a hidden one stays hidden */
+  .tech.t-sheet-open .t-capwrap:not(.is-hidden) { transform: scale(0.94); filter: brightness(0.92); }
 }
 .tech .t-sheet__scrim { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .tech .t-sheet__panel { transition: transform var(--m-panel) var(--m-ease-emph), visibility 0s linear var(--m-panel); }
@@ -250,6 +252,7 @@ html[data-tech-theme="dark"] .tech .t-segmented > .t-pilltabs__pill { background
 @media (prefers-reduced-motion: reduce) {
   .tech .t-capwrap.is-compact .t-capsule { transform: none; }
   .tech.t-sheet-open .t-header,
+  .tech.t-sheet-open .t-capwrap:not(.is-hidden),
   .tech.t-sheet-open .t-main,
   .tech.t-sheet-open [data-t-region="footer"] { transform: none; filter: none; }
 }

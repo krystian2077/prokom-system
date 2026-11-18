@@ -335,7 +335,8 @@ html[data-tech-theme="dark"] .tech {
 .tech .t-capsule .t-cta__short { display: inline; }
 .tech .t-capsule .t-iconbtn { width: 44px; height: 44px; border-radius: 13px; }
 @media (min-width: 1024px) {
-  .tech .t-capwrap { position: relative; padding-top: 4px; transform: none !important; }
+  /* sticky to the whole page (direct child of .t-shell); hides going down, returns going up (runda 18.11 §1.1) */
+  .tech .t-capwrap { padding-top: 4px; }
   .tech .t-capsule { height: 72px; padding: 0 12px 0 26px; border-radius: 22px; box-shadow: var(--cap-inset), var(--sh); }
   .tech .t-capsule__logo .t-logo { --l-size: 28px !important; }
   .tech .t-capsule__nav { display: flex; align-items: center; gap: 2px; }

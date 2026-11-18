@@ -139,7 +139,11 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
     const h = (await capsule.boundingBox())!.height;
     await page.mouse.wheel(0, 900);
     await expect(page.locator(".t-capwrap")).toHaveClass(/is-compact/);
+    await page.mouse.wheel(0, -100); // going down hides it (runda 18.11 §1.1); a nudge up brings it back
+    await expect(page.locator(".t-capwrap")).not.toHaveClass(/is-hidden/);
+    await page.waitForTimeout(450);
     const after = (await capsule.boundingBox())!;
+    expect(after.y).toBeGreaterThanOrEqual(0); // on screen, not scrolled away with the header
     expect(after.y).toBeLessThan(20);
     expect(await capsule.evaluate((el) => (el as HTMLElement).offsetHeight)).toBe(Math.round(h)); // layout untouched
   });
