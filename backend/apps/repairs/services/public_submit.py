@@ -81,7 +81,14 @@ def submit_repair_from_public_form(
             client.country = (country or "Polska").strip() or client.country
         client.save(update_fields=["first_name", "last_name", "phone", "preferred_contact", "street", "city", "postal_code", "country", "updated_at"])
     else:
-        client = client_by_email(email)
+        # Skip profiles of accounts with an unverified e-mail (audit AB2): anyone can register with
+        # someone else's address, and the newest profile would otherwise receive that person's next
+        # guest submissions. They move to the account after verification (_assign_guest_repairs_to_user).
+        client = (
+            Client.objects.filter(email=email, is_deleted=False)
+            .exclude(user__isnull=False, user__email_verified=False)
+            .first()
+        )
         if client is None:
             client = Client(
                 first_name=first_name.strip(),
