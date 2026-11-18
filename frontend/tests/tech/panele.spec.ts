@@ -11,6 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { pinDaylight } from "./zegar";
 
 type PanelTheme = "light" | "dark";
 const THEMES: PanelTheme[] = ["light", "dark"];
@@ -24,6 +25,8 @@ const creds: { email: string; password: string } | null = fs.existsSync(credsFil
 /** Same theme in every panel mechanism: system scheme, prokom-theme, worker and client keys. */
 async function usePanelTheme(page: Page, theme: PanelTheme) {
   await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
+  // /client uses the public theme script: in Auto a night hour would turn the light shot dark
+  await pinDaylight(page);
   await page.addInitScript((t) => {
     try {
       localStorage.setItem("prokom-theme", t);
@@ -97,6 +100,7 @@ for (const theme of THEMES) {
 
 test("zmiana motywu strony publicznej nie zmienia data-theme ani kluczy paneli", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
+  await pinDaylight(page);
   await page.addInitScript(() => {
     try {
       if (!sessionStorage.getItem("seeded")) {

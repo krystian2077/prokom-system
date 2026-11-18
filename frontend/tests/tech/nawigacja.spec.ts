@@ -1,5 +1,6 @@
 /** TP PR 2: premium navigation (docs/tech/PREMIUM.md §3). */
 import { expect, test, type Page } from "@playwright/test";
+import { pinDaylight } from "./zegar";
 
 test.describe("desktop 1440 — capsule and mega menu", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -218,6 +219,7 @@ test.describe("phone 390 — tab bar and menu sheet", () => {
 
   test("theme segmented control has a sliding pill and switches the theme", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
+    await pinDaylight(page);
     await page.goto("/");
     await page.locator("[data-t-tabbar]").getByRole("button", { name: "Menu" }).click();
     const seg = page.locator(".t-segmented");

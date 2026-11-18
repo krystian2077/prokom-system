@@ -5,7 +5,7 @@
  */
 import { courierService } from "@/config/prokom";
 
-export type NavKey = "naprawy" | "punkty" | "hammer" | "blog" | "ofirmie" | "kontakt";
+export type NavKey = "naprawy" | "punkty" | "hammer" | "ofirmie" | "kontakt";
 export type NavItem = { key: NavKey; label: string; href: string; mega?: "naprawy" | "punkty"; match: string[] };
 
 export const mainNav: NavItem[] = [
@@ -18,7 +18,7 @@ export const mainNav: NavItem[] = [
   },
   { key: "punkty", label: "Punkty serwisowe", href: "/punkty-serwisowe", mega: "punkty", match: ["/punkty-serwisowe", "/obslugiwane-miejscowosci"] },
   { key: "hammer", label: "Hammer Glass", href: "/hammer-glass", match: ["/hammer-glass"] },
-  { key: "blog", label: "Blog", href: "/blog", match: ["/blog"] },
+  // Blog left the capsule 18.11.2026 (Krystian): room for the labelled theme button; it stays in the footer and search.
   { key: "ofirmie", label: "O firmie", href: "/o-firmie", match: ["/o-firmie"] },
   { key: "kontakt", label: "Kontakt", href: "/kontakt", match: ["/kontakt"] },
 ];
