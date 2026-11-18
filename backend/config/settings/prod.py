@@ -58,6 +58,8 @@ CORS_ALLOWED_ORIGINS = [
 _redis_url = env("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_BROKER_URL = _redis_url
 CELERY_RESULT_BACKEND = _redis_url
+# Audit AB4: one shared cache for DRF throttling (was per gunicorn worker, reset on restart).
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.redis.RedisCache", "LOCATION": _redis_url}}
 
 # =============================================================================
 # EMAIL

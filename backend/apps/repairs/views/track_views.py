@@ -143,6 +143,12 @@ class RequestClaimCodeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        # Audit AB4: switched off — SMS sending is a stub, so the 6-digit code could only be
+        # guessed. No screen uses it; the claim link from the confirmation e-mail stays.
+        return Response(
+            {"detail": "Przypisanie naprawy kodem SMS jest wyłączone. Użyj linku z e-maila potwierdzenia zgłoszenia."},
+            status=status.HTTP_410_GONE,
+        )
         from apps.accounts.models import User
         if not getattr(request.user, "email_verified", True):
             return Response(
@@ -190,6 +196,12 @@ class ConfirmClaimByCodeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        # Audit AB4: switched off — SMS sending is a stub, so the 6-digit code could only be
+        # guessed. No screen uses it; the claim link from the confirmation e-mail stays.
+        return Response(
+            {"detail": "Przypisanie naprawy kodem SMS jest wyłączone. Użyj linku z e-maila potwierdzenia zgłoszenia."},
+            status=status.HTTP_410_GONE,
+        )
         if not getattr(request.user, "email_verified", True):
             return Response(
                 {"detail": "Zweryfikuj adres e-mail, aby przypisać naprawę."},

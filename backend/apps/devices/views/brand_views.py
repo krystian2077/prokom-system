@@ -3,12 +3,14 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
+from apps.common.permissions import IsStaffOrAdminOrReadOnly
 from apps.devices.models import Brand
 from apps.devices.serializers import BrandSerializer, BrandListSerializer
 from apps.devices.selectors import brand_list
 
 
 class BrandViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsStaffOrAdminOrReadOnly]
     """Lista i szczegóły marek (read-only dla listy, pełna edycja w adminie)."""
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["is_active"]

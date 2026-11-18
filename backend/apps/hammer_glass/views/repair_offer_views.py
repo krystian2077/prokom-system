@@ -2,7 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from apps.common.permissions import IsStaffOrAdmin
 
 from apps.hammer_glass.models import RepairHammerGlassOffer, HammerGlassProduct
 from apps.hammer_glass.serializers import (
@@ -18,7 +18,7 @@ class RepairHammerGlassOfferViewSet(viewsets.ReadOnlyModelViewSet):
     Tworzenie: POST for-repair/<repair_id>/ z product_id, quantity, note.
     """
     serializer_class = RepairHammerGlassOfferSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStaffOrAdmin]
     filterset_fields = ["repair", "accepted"]
 
     def get_queryset(self):

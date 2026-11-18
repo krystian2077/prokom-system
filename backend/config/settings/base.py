@@ -193,7 +193,8 @@ INBOUND_IMAP_MAILBOX = env("INBOUND_IMAP_MAILBOX", default="INBOX")
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        # Audit AB4: tokens expire (TOKEN_EXPIRY_HOURS, default 12 h).
+        "apps.accounts.authentication.ExpiringTokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -236,6 +237,8 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API systemu zarządzania serwisem elektroniki PRO-KOM",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # Audit AB4: schema and docs only for Django admin users (was public in production).
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
 }
 
 # =============================================================================
