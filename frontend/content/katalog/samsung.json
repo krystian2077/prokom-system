@@ -1,0 +1,3404 @@
+[
+  {
+    "slug": "galaxy-s26-ultra",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-s",
+    "name": "Galaxy S26 Ultra",
+    "order": 1000,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#4b3f72"
+      },
+      {
+        "key": "jasnoniebieski",
+        "name": "Jasnoniebieski",
+        "hex": "#a9c6e3"
+      },
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#1f1f22"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc",
+        "officialStoreOnly": true
+      },
+      {
+        "key": "zloty",
+        "name": "Złoty",
+        "hex": "#e6c9b8",
+        "officialStoreOnly": true
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ekran 6,9″ z wbudowaną funkcją Privacy Display (Prywatny wyświetlacz)",
+      "Aparat 200 MP, teleobiektywy 3x i 5x, zoom do 100x",
+      "Snapdragon 8 Elite Gen 5 dla Galaxy; do 16 GB RAM i 1 TB",
+      "Wbudowany rysik S Pen i ładowanie do 60 W"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,9″ Dynamic AMOLED 2X, 3120 × 1440 (Quad HD+), do 120 Hz, funkcja Privacy Display"
+      },
+      {
+        "label": "Procesor",
+        "value": "Snapdragon 8 Elite Gen 5 dla Galaxy (8 rdzeni, do 4,74 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB (256/512 GB) lub 16 GB (1 TB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "200 MP (F1.4) + 50 MP (F2.9, tele 5x) + 50 MP (F1.9) + 10 MP (F2.4, tele 3x); zoom cyfrowy do 100x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2, AF)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 8K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "5000 mAh (typowa), odtwarzanie wideo do 31 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Super Fast Charging 3.0 do 60 W"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7 (802.11be), Bluetooth 6.0, NFC, UWB, USB‑C 3.2 Gen 1"
+      },
+      {
+        "label": "Wymiary",
+        "value": "163,6 × 78,1 × 7,9 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "214 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; Gorilla Armor 2 z przodu, Gorilla Glass Victus 2 z tyłu, ramka Armor Aluminum"
+      },
+      {
+        "label": "Rysik S Pen",
+        "value": "Tak, wbudowany"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 28.02.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy S26 Ultra to najbardziej rozbudowany telefon z serii S26 – z ekranem 6,9″ i wbudowanym rysikiem S Pen. Jest dla Ciebie, jeśli dużo fotografujesz, robisz notatki odręcznie albo po prostu chcesz mieć wszystko w jednym urządzeniu.",
+      "Z tyłu są cztery aparaty: główny 200 MP, dwa po 50 MP (w tym teleobiektyw 5x) oraz teleobiektyw 10 MP 3x, a zoom cyfrowy sięga 100x. Pracuje tu procesor Snapdragon 8 Elite Gen 5 dla Galaxy z 12 GB RAM, a w wersji 1 TB – z 16 GB RAM. Ekran ma funkcję Privacy Display, która utrudnia podglądanie z boku, a bateria 5000 mAh ładuje się z mocą do 60 W.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z ceną i dostępnością wybranej wersji. Kolory Srebrny i Złoty są dostępne tylko w Oficjalnych Sklepach Samsung, więc w odpowiedzi potwierdzimy, czy możemy je zamówić. Telefon odbierzesz w Rabce‑Zdroju albo w Zakopanem, a w salonie w około 5 minut przytniemy i nakleimy folię Hammer Glass. W razie awarii nasz serwis jest na miejscu, a przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy S Pen jest w zestawie?",
+        "a": "Tak, rysik S Pen jest wbudowany w telefon – chowa się w obudowie."
+      },
+      {
+        "q": "Ile RAM ma każda wersja?",
+        "a": "Wersje 256 GB i 512 GB mają 12 GB RAM, a wersja 1 TB – 16 GB RAM."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. Telefon obsługuje ładowanie do 60 W, ale zasilacz trzeba mieć osobno. W zestawie jest kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Dlaczego nie ma ceny na stronie?",
+        "a": "Ceny zmieniają się często. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "galaxy-buds4-pro",
+      "galaxy-watch9"
+    ],
+    "tags": [
+      "size:large",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/galaxy-s26-ultra/fioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Cobalt-Violet_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasnoniebieski",
+        "src": "/tech/katalog/galaxy-s26-ultra/jasnoniebieski.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Sky-Blue_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-s26-ultra/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Black_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-s26-ultra/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_White_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-s26-ultra/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Silver-Shadow_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zloty",
+        "src": "/tech/katalog/galaxy-s26-ultra/zloty.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/05_Color-Selection/Color-Selection_Pink-Gold_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26-ultra/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (dane SKU SM-S948B), zawartość pudełka, zdjęcia kolorów, kolory tylko w Oficjalnych Sklepach"
+      },
+      {
+        "url": "https://www.samsung.com/pl/business/smartphones/galaxy-s/galaxy-s26-ultra-black-256gb-sm-s948bzkdeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, S Pen, IP68, szkło"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26-ultra/",
+        "date": "2026-11-18",
+        "what": "procesor Snapdragon 8 Elite Gen 5 dla Galaxy, Super Fast Charging 3.0 do 60 W, Privacy Display, wbudowany S Pen (FAQ)"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-s26-plus",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-s",
+    "name": "Galaxy S26+",
+    "order": 999,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#4b3f72"
+      },
+      {
+        "key": "jasnoniebieski",
+        "name": "Jasnoniebieski",
+        "hex": "#a9c6e3"
+      },
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#1f1f22"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc",
+        "officialStoreOnly": true
+      },
+      {
+        "key": "zloty",
+        "name": "Złoty",
+        "hex": "#e6c9b8",
+        "officialStoreOnly": true
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      }
+    ],
+    "keyFacts": [
+      "Duży ekran 6,7″ Quad HD+ 120 Hz",
+      "Exynos 2600 i 12 GB RAM",
+      "Bateria 4900 mAh – do 31 h odtwarzania wideo",
+      "UWB, Wi‑Fi 7 i Bluetooth 6.0"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,7″ Dynamic AMOLED 2X, 3120 × 1440 (Quad HD+), do 120 Hz"
+      },
+      {
+        "label": "Procesor",
+        "value": "Exynos 2600 (10 rdzeni, do 3,8 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 10 MP (F2.4, tele 3x optyczny) + 12 MP (F2.2); zoom cyfrowy do 30x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2, AF)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 8K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "4900 mAh (typowa), odtwarzanie wideo do 31 h"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7 (802.11be), Bluetooth 6.0, NFC, UWB, USB‑C 3.2 Gen 1"
+      },
+      {
+        "label": "SIM",
+        "value": "Dual SIM (nano‑SIM + eSIM / Dual eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "158,4 × 75,8 × 7,3 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "190 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; ramka Armor Aluminum, Gorilla Glass Victus 2 z przodu i z tyłu"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 28.02.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy S26+ to środkowy model serii S26 – z dużym ekranem 6,7″ i większą baterią niż w podstawowym S26. Sprawdzi się, jeśli dużo oglądasz, czytasz albo grasz na telefonie i chcesz, żeby wytrzymał cały dzień.",
+      "Ekran ma rozdzielczość Quad HD+ i odświeżanie do 120 Hz, a całość napędza procesor Exynos 2600 z 12 GB RAM. Aparaty są takie same jak w S26: główny 50 MP ze stabilizacją, szerokokątny 12 MP i teleobiektyw 10 MP z zoomem optycznym 3x. Bateria 4900 mAh daje do 31 godzin odtwarzania wideo, a do tego masz UWB, Wi‑Fi 7, Bluetooth 6.0 i odporność IP68.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Srebrny i Złoty to kolory sprzedawane tylko w Oficjalnych Sklepach Samsung, dlatego ich dostępność potwierdzimy w odpowiedzi. Odbiór jest w naszym salonie w Rabce‑Zdroju lub w Zakopanem, a na miejscu w około 5 minut nakleimy dociętą folię ochronną Hammer Glass. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym S26+ różni się od S26?",
+        "a": "Ma większy ekran (6,7″ zamiast 6,3″) w rozdzielczości Quad HD+, większą baterię (4900 mAh), UWB i Bluetooth 6.0. Procesor, RAM i aparaty są takie same."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "256 GB albo 512 GB, w obu przypadkach z 12 GB RAM."
+      },
+      {
+        "q": "Ile kosztuje Galaxy S26+?",
+        "a": "Ceny się zmieniają, więc podajemy je w odpowiedzi na zapytanie – razem z aktualną dostępnością wybranej wersji."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "galaxy-buds4-pro",
+      "galaxy-watch9"
+    ],
+    "tags": [
+      "size:large",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/galaxy-s26-plus/fioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Cobalt-Violet_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasnoniebieski",
+        "src": "/tech/katalog/galaxy-s26-plus/jasnoniebieski.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Sky-Blue_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-s26-plus/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Black_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-s26-plus/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_White_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-s26-plus/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Silver-Shadow_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zloty",
+        "src": "/tech/katalog/galaxy-s26-plus/zloty.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M2_Color-Selection/M2_Color-Selection_Pink-Gold_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (dane SKU SM-S947B), zawartość pudełka, zdjęcia kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26/specs/",
+        "date": "2026-11-18",
+        "what": "lista kolorów i przypis o Oficjalnych Sklepach Samsung"
+      },
+      {
+        "url": "https://www.samsung.com/pl/business/smartphones/galaxy-s/galaxy-s26-plus-white-256gb-sm-s947bzwdeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna (SM-S947B), IP68, szkło"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26/",
+        "date": "2026-11-18",
+        "what": "procesor Exynos 2600 dla S26 i S26+"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-s26",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-s",
+    "name": "Galaxy S26",
+    "order": 998,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#4b3f72"
+      },
+      {
+        "key": "jasnoniebieski",
+        "name": "Jasnoniebieski",
+        "hex": "#a9c6e3"
+      },
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#1f1f22"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc",
+        "officialStoreOnly": true
+      },
+      {
+        "key": "zloty",
+        "name": "Złoty",
+        "hex": "#e6c9b8",
+        "officialStoreOnly": true
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      }
+    ],
+    "keyFacts": [
+      "Kompaktowy ekran 6,3″ Dynamic AMOLED 2X 120 Hz",
+      "Procesor Exynos 2600 i 12 GB RAM w każdej wersji",
+      "Potrójny aparat 50 MP z teleobiektywem 3x",
+      "Odporność IP68, Gorilla Glass Victus 2 z obu stron"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,3″ Dynamic AMOLED 2X, 2340 × 1080 (FHD+), do 120 Hz"
+      },
+      {
+        "label": "Procesor",
+        "value": "Exynos 2600 (10 rdzeni, do 3,8 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 10 MP (F2.4, tele 3x optyczny) + 12 MP (F2.2); zoom cyfrowy do 30x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2, AF)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 8K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "4300 mAh (typowa), odtwarzanie wideo do 30 h"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7 (802.11be), Bluetooth 5.4, NFC, USB‑C 3.2 Gen 1"
+      },
+      {
+        "label": "SIM",
+        "value": "Dual SIM (nano‑SIM + eSIM / Dual eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "149,6 × 71,7 × 7,2 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "167 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; ramka Armor Aluminum, Gorilla Glass Victus 2 z przodu i z tyłu"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 28.02.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy S26 to najmniejszy model z serii S26 – z ekranem 6,3″, który wygodnie trzymasz jedną ręką. To dobry wybór dla Ciebie, jeśli chcesz szybki telefon z porządnym aparatem, ale bez dużych gabarytów.",
+      "W środku pracuje procesor Exynos 2600 i 12 GB RAM w każdej wersji, a ekran Dynamic AMOLED 2X odświeża obraz do 120 Hz. Z tyłu masz trzy aparaty: główny 50 MP ze stabilizacją, szerokokątny 12 MP i teleobiektyw 10 MP z zoomem optycznym 3x. Bateria 4300 mAh pozwala oglądać wideo do 30 godzin, a obudowa waży 167 g i ma odporność IP68 oraz szkło Gorilla Glass Victus 2 z obu stron.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z aktualną ceną i dostępnością wybranej wersji. Kolory Srebrny i Złoty Samsung sprzedaje tylko w Oficjalnych Sklepach Samsung, więc ich dostępność potwierdzimy w odpowiedzi. Telefon odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego przy Galaxy S26 nie widzę ceny?",
+        "a": "Ceny zmieniają się często, więc nie wpisujemy ich na stronę. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do wyjmowania karty SIM."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "256 GB albo 512 GB – obie wersje mają 12 GB RAM. Napisz w zapytaniu, która Cię interesuje."
+      },
+      {
+        "q": "Jakie kolory są dostępne?",
+        "a": "Fioletowy, Jasnoniebieski, Czarny, Biały, Srebrny i Złoty. Srebrny i Złoty są oznaczone jako dostępne tylko w Oficjalnych Sklepach Samsung – ich dostępność potwierdzimy w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "galaxy-buds4",
+      "galaxy-watch9"
+    ],
+    "tags": [
+      "size:compact",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/galaxy-s26/fioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Cobalt-Violet_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasnoniebieski",
+        "src": "/tech/katalog/galaxy-s26/jasnoniebieski.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Sky-Blue_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-s26/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Black_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-s26/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_White_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-s26/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Silver-Shadow_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zloty",
+        "src": "/tech/katalog/galaxy-s26/zloty.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-s26/buy/05_Color-Selection/M1_Color-Selection/M1_Color-Selection_Pink-Gold_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (selektor i dane SKU), zawartość pudełka, zdjęcia kolorów, oznaczenie kolorów tylko w Oficjalnych Sklepach"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26/specs/",
+        "date": "2026-11-18",
+        "what": "lista kolorów i przypis „Kolory dostępne tylko w Oficjalnych Sklepach Samsung”"
+      },
+      {
+        "url": "https://www.samsung.com/pl/business/smartphones/galaxy-s/galaxy-s26-cobalt-violet-512gb-sm-s942bzvheue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna (SM-S942B), IP68, szkło, procesor Exynos 2600"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-z-fold8-ultra",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-z",
+    "name": "Galaxy Z Fold8 Ultra",
+    "order": 996,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "zielony",
+        "name": "Zielony",
+        "hex": "#4f5b4f",
+        "officialStoreOnly": true
+      },
+      {
+        "key": "ciemnofioletowy",
+        "name": "Ciemnofioletowy",
+        "hex": "#3e3550"
+      },
+      {
+        "key": "grafitowy",
+        "name": "Grafitowy",
+        "hex": "#3a3b3e"
+      },
+      {
+        "key": "kremowy",
+        "name": "Kremowy",
+        "hex": "#e9e3d6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Duży ekran 8,0″ i zewnętrzny 6,5″",
+      "Aparat 200 MP",
+      "Snapdragon 8 Elite Gen 5 dla Galaxy; do 16 GB RAM i 1 TB",
+      "Bateria 5000 mAh, IP48"
+    ],
+    "specs": [
+      {
+        "label": "Ekran główny",
+        "value": "8,0″ Dynamic AMOLED 2X, 2504 × 2256 (QXGA+), do 120 Hz"
+      },
+      {
+        "label": "Ekran zewnętrzny",
+        "value": "6,5″ Dynamic AMOLED 2X, 2520 × 1080 (FHD+)"
+      },
+      {
+        "label": "Procesor",
+        "value": "Snapdragon 8 Elite Gen 5 dla Galaxy (8 rdzeni, do 4,74 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB (256/512 GB) lub 16 GB (1 TB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "200 MP (F1.7, OIS) + 50 MP (F1.9) + 10 MP (F2.4, tele 3x optyczny); zoom cyfrowy do 30x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "2 × 10 MP (F2.2)"
+      },
+      {
+        "label": "Bateria",
+        "value": "5000 mAh (typowa), odtwarzanie wideo do 27 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–45 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7 (802.11be), Bluetooth 6.0, NFC, UWB, USB‑C 3.2 Gen 1"
+      },
+      {
+        "label": "Wymiary",
+        "value": "rozłożony 158,4 × 143,2 × 4,1 mm; złożony 158,4 × 72,8 × 8,9 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "215 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP48; ramka Armor Aluminum, zawias Armor FlexHinge"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 31.07.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy Z Fold8 Ultra to składany smartfon, który po otwarciu zamienia się w mały tablet z ekranem 8,0″. Jest dla Ciebie, jeśli na telefonie pracujesz, czytasz dokumenty albo lubisz mieć dwie aplikacje obok siebie.",
+      "Zewnętrzny ekran ma 6,5″, więc na co dzień korzystasz z niego jak ze zwykłego telefonu, a w środku czeka duży ekran 120 Hz. Pracuje tu procesor Snapdragon 8 Elite Gen 5 dla Galaxy, a z tyłu masz aparat główny 200 MP, szerokokątny 50 MP i teleobiektyw 10 MP z zoomem optycznym 3x. Bateria ma 5000 mAh, telefon waży 215 g i ma odporność IP48.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością wybranej wersji. Kolor Zielony jest dostępny tylko w Oficjalnych Sklepach Samsung, dlatego jego dostępność potwierdzimy w odpowiedzi. Telefon odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, a jeśli coś się zepsuje, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Ile RAM ma każda wersja?",
+        "a": "Wersje 256 GB i 512 GB mają 12 GB RAM, a wersja 1 TB – 16 GB RAM."
+      },
+      {
+        "q": "Jakie ma wymiary po złożeniu?",
+        "a": "Złożony ma 158,4 × 72,8 × 8,9 mm, a rozłożony – 158,4 × 143,2 × 4,1 mm."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Zielony, Ciemnofioletowy, Grafitowy i Kremowy. Zielony jest dostępny tylko w Oficjalnych Sklepach Samsung – sprawdzimy go dla Ciebie w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "etui",
+      "ladowarka",
+      "galaxy-buds4-pro"
+    ],
+    "tags": [
+      "size:fold",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "zielony",
+        "src": "/tech/katalog/galaxy-z-fold8-ultra/zielony.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Green_Shadow_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ciemnofioletowy",
+        "src": "/tech/katalog/galaxy-z-fold8-ultra/ciemnofioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Violet_Shadow_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "grafitowy",
+        "src": "/tech/katalog/galaxy-z-fold8-ultra/grafitowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Graphite_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "kremowy",
+        "src": "/tech/katalog/galaxy-z-fold8-ultra/kremowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/05_Color_Selection/Q8_Color_Selection_Cream_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-z-fold8-ultra/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (SKU SM-F976B), zawartość pudełka, zdjęcia, Zielony tylko w Oficjalnych Sklepach"
+      },
+      {
+        "url": "https://www.samsung.com/pl/business/smartphones/galaxy-z/galaxy-z-fold8-ultra-graphite-256gb-sm-f976bzkbeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, procesor, IP48"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-z-fold8",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-z",
+    "name": "Galaxy Z Fold8",
+    "order": 995,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "zielony",
+        "name": "Zielony",
+        "hex": "#c9d8b6",
+        "officialStoreOnly": true
+      },
+      {
+        "key": "jasnofioletowy",
+        "name": "Jasnofioletowy",
+        "hex": "#c9bfe0"
+      },
+      {
+        "key": "grafitowy",
+        "name": "Grafitowy",
+        "hex": "#3a3b3e"
+      },
+      {
+        "key": "kremowy",
+        "name": "Kremowy",
+        "hex": "#e9e3d6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Najlżejszy fold w historii Samsunga – 201 g (wg strony)",
+      "Ekran 7,6″ i zewnętrzny 5,5″",
+      "Snapdragon 8 Elite Gen 5 dla Galaxy",
+      "Dwa aparaty 50 MP, IP48"
+    ],
+    "specs": [
+      {
+        "label": "Ekran główny",
+        "value": "7,6″ Dynamic AMOLED 2X, 1848 × 2448 (QXGA+), do 120 Hz"
+      },
+      {
+        "label": "Ekran zewnętrzny",
+        "value": "5,5″ Dynamic AMOLED 2X, 1972 × 1248 (WUXGA+)"
+      },
+      {
+        "label": "Procesor",
+        "value": "Snapdragon 8 Elite Gen 5 dla Galaxy (8 rdzeni, do 4,74 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB (256/512 GB) lub 16 GB (1 TB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 50 MP (F1.9); 2x zoom jakości optycznej, zoom cyfrowy do 10x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "2 × 10 MP (F2.2)"
+      },
+      {
+        "label": "Bateria",
+        "value": "4800 mAh (typowa), odtwarzanie wideo do 26 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–45 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7 (802.11be), Bluetooth 6.0, NFC, UWB, USB‑C 3.2 Gen 1"
+      },
+      {
+        "label": "Wymiary",
+        "value": "rozłożony 123,9 × 161,4 × 4,5 mm; złożony 123,9 × 81,9 × 9,7 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "201 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP48; Gorilla Glass Ceramic 3 z przodu, Gorilla Glass Victus 2 z tyłu"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 31.07.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy Z Fold8 to składany smartfon z wewnętrznym ekranem 7,6″, który waży tylko 201 g. Wybierz go, jeśli chcesz duży ekran do pracy i filmów, ale zależy Ci na lżejszym urządzeniu niż Fold8 Ultra.",
+      "Na zewnątrz masz ekran 5,5″ do szybkich czynności, a po rozłożeniu – ekran 120 Hz w rozdzielczości QXGA+. Pracuje tu procesor Snapdragon 8 Elite Gen 5 dla Galaxy, a z tyłu są dwa aparaty 50 MP z 2x zoomem jakości optycznej. Bateria ma 4800 mAh i pozwala oglądać wideo do 26 godzin, a obudowa ma odporność IP48.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z ceną i dostępnością. Kolor Zielony Samsung sprzedaje tylko w Oficjalnych Sklepach Samsung, więc jego dostępność potwierdzimy w odpowiedzi. Odbiór jest w naszym salonie w Rabce‑Zdroju lub w Zakopanem, a gdyby coś się zepsuło, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym Fold8 różni się od Fold8 Ultra?",
+        "a": "Fold8 jest lżejszy (201 g zamiast 215 g) i ma mniejsze ekrany: 7,6″ i 5,5″. Ultra ma ekrany 8,0″ i 6,5″, aparat 200 MP i teleobiektyw 3x."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "256 GB i 512 GB z 12 GB RAM albo 1 TB z 16 GB RAM."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Dlaczego nie ma ceny?",
+        "a": "Ceny się zmieniają. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "etui",
+      "ladowarka",
+      "galaxy-buds4-pro"
+    ],
+    "tags": [
+      "size:fold",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "zielony",
+        "src": "/tech/katalog/galaxy-z-fold8/zielony.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Pistachio_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasnofioletowy",
+        "src": "/tech/katalog/galaxy-z-fold8/jasnofioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Lavender_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "grafitowy",
+        "src": "/tech/katalog/galaxy-z-fold8/grafitowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Graphite_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "kremowy",
+        "src": "/tech/katalog/galaxy-z-fold8/kremowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-fold8/05_Color_Selection/H8_Color_Selection_Cream_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-z-fold8/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (SKU SM-F971B), zawartość pudełka, zdjęcia, Zielony tylko w Oficjalnych Sklepach"
+      },
+      {
+        "url": "https://www.samsung.com/pl/business/smartphones/galaxy-z/galaxy-z-fold8-graphite-256gb-sm-f971bzkbeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, procesor, IP48, szkło, waga 201 g"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-z-flip8",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-z",
+    "name": "Galaxy Z Flip8",
+    "order": 994,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "zielony",
+        "name": "Zielony",
+        "hex": "#bfe3d0",
+        "officialStoreOnly": true
+      },
+      {
+        "key": "rozowy",
+        "name": "Różowy",
+        "hex": "#f0c8d0"
+      },
+      {
+        "key": "grafitowy",
+        "name": "Grafitowy",
+        "hex": "#3a3b3e"
+      },
+      {
+        "key": "kremowy",
+        "name": "Kremowy",
+        "hex": "#e9e3d6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      }
+    ],
+    "keyFacts": [
+      "Składany smartfon z klapką – ekran 6,9″",
+      "Zewnętrzny ekran 4,1″",
+      "Procesor Exynos 2600 i 12 GB RAM",
+      "Aparat 50 MP, IP48"
+    ],
+    "specs": [
+      {
+        "label": "Ekran główny",
+        "value": "6,9″ Dynamic AMOLED 2X, 2520 × 1080 (FHD+), do 120 Hz"
+      },
+      {
+        "label": "Ekran zewnętrzny",
+        "value": "4,1″ Super AMOLED, 1048 × 948"
+      },
+      {
+        "label": "Procesor",
+        "value": "Exynos 2600 (10 rdzeni, do 3,8 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 12 MP (F2.2); 2x zoom jakości optycznej, zoom cyfrowy do 10x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "10 MP (F2.2)"
+      },
+      {
+        "label": "Bateria",
+        "value": "4300 mAh (typowa), odtwarzanie wideo do 31 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–25 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7 (802.11be), Bluetooth 5.4, NFC, USB‑C 3.2 Gen 1"
+      },
+      {
+        "label": "Wymiary",
+        "value": "rozłożony 166,9 × 75,4 × 6,1 mm; złożony 85,7 × 75,4 × 13,1 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "180 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP48; Gorilla Glass Victus 2 z przodu, ramka Armor Aluminum"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 31.07.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy Z Flip8 to smartfon z klapką: po rozłożeniu ma ekran 6,9″, a po złożeniu mieści się w małej kieszeni. To dobry wybór, jeśli chcesz pełnowymiarowy telefon, który po złożeniu zajmuje połowę miejsca.",
+      "Na zewnątrz jest ekran 4,1″, na którym sprawdzisz powiadomienia bez otwierania telefonu. W środku pracuje procesor Exynos 2600 z 12 GB RAM, a z tyłu masz aparat główny 50 MP ze stabilizacją i szerokokątny 12 MP. Bateria 4300 mAh daje do 31 godzin odtwarzania wideo, telefon waży 180 g i ma odporność IP48.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Kolor Zielony jest dostępny tylko w Oficjalnych Sklepach Samsung, więc jego dostępność potwierdzimy w odpowiedzi. Telefon odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, a jeśli coś się zepsuje, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "256 GB albo 512 GB, obie z 12 GB RAM."
+      },
+      {
+        "q": "Jaki jest po złożeniu?",
+        "a": "Złożony ma 85,7 × 75,4 × 13,1 mm, a rozłożony – 166,9 × 75,4 × 6,1 mm."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Zielony, Różowy, Grafitowy i Kremowy. Zielony sprzedaje się tylko w Oficjalnych Sklepach Samsung – jego dostępność potwierdzimy w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "etui",
+      "ladowarka",
+      "galaxy-buds4"
+    ],
+    "tags": [
+      "size:fold",
+      "camera:basic",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "zielony",
+        "src": "/tech/katalog/galaxy-z-flip8/zielony.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Mint_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "rozowy",
+        "src": "/tech/katalog/galaxy-z-flip8/rozowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Pink_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "grafitowy",
+        "src": "/tech/katalog/galaxy-z-flip8/grafitowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Graphite_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "kremowy",
+        "src": "/tech/katalog/galaxy-z-flip8/kremowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/smartphones/galaxy-z-flip8/05_Color_Selection/B8_Color_Selection_Cream_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-z-flip8/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (SKU SM-F776B), zawartość pudełka, zdjęcia, Zielony tylko w Oficjalnych Sklepach"
+      },
+      {
+        "url": "https://www.samsung.com/pl/business/smartphones/galaxy-z/galaxy-z-flip8-graphite-256gb-sm-f776bzkgeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, procesor Exynos 2600, IP48, szkło"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-s26-fe",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-s",
+    "name": "Galaxy S26 FE",
+    "order": 970,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "jasnozielony",
+        "name": "Jasnozielony",
+        "hex": "#c9d8b6"
+      },
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#3a3b3d"
+      },
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#3d4a73"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "8 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "8 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "8 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ekran 6,7″ Dynamic AMOLED 2X 120 Hz",
+      "Exynos 2500 i 8 GB RAM",
+      "Potrójny aparat 50 MP z teleobiektywem 3x",
+      "Odporność IP68 i bateria 4900 mAh"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,7″ Dynamic AMOLED 2X, 2340 × 1080 (FHD+), do 120 Hz"
+      },
+      {
+        "label": "Procesor",
+        "value": "Samsung Exynos 2500 (10 rdzeni, do 3,3 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "8 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 12 MP (F2.2) + 8 MP (F2.4, tele 3x optyczny); zoom cyfrowy do 30x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 8K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "4900 mAh (typowa), odtwarzanie wideo do 29 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–45 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 6E (802.11ax, 6 GHz), Bluetooth 5.4, NFC, USB‑C 2.0"
+      },
+      {
+        "label": "Wymiary",
+        "value": "161,6 × 76,9 × 7,4 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "193 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; Gorilla Glass Victus+ i ramka ze stopu aluminium"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 30.09.2033"
+      }
+    ],
+    "inBox": [
+      "Smartfon",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy S26 FE to tańsza odmiana serii S26 z dużym ekranem 6,7″. To propozycja dla Ciebie, jeśli chcesz telefon z teleobiektywem i odpornością IP68, ale nie potrzebujesz najmocniejszych podzespołów.",
+      "W środku pracuje procesor Exynos 2500 z 8 GB RAM w każdej wersji, a ekran Dynamic AMOLED 2X odświeża obraz do 120 Hz. Z tyłu masz aparat główny 50 MP ze stabilizacją, szerokokątny 12 MP i teleobiektyw 8 MP z zoomem optycznym 3x. Bateria 4900 mAh daje do 29 godzin odtwarzania wideo, a aktualizacje zabezpieczeń są zapowiedziane do września 2033 roku.",
+      "Wyślij zapytanie – nie musisz się logować – a odpiszemy z aktualną ceną i dostępnością. Telefon odbierzesz w naszym salonie w Rabce‑Zdroju albo w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Gdyby coś się zepsuło, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "128 GB, 256 GB lub 512 GB – każda z 8 GB RAM. Wersja 512 GB jest tylko w kolorze Czarnym."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Jasnozielony, Czarny i Niebieski. Jasnozielony i Niebieski występują w wersjach 128 i 256 GB."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Dlaczego nie podajecie ceny?",
+        "a": "Ceny się zmieniają, więc podajemy je w odpowiedzi na zapytanie razem z dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "galaxy-buds4"
+    ],
+    "tags": [
+      "size:large",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "jasnozielony",
+        "src": "/tech/katalog/galaxy-s26-fe/jasnozielony.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/cz/smartphones/galaxy-s26/images/S26_FE_Color_Selection_Pistachio_PC_1600x864.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-s26-fe/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/cz/smartphones/galaxy-s26/images/S26_FE_Color_Selection_Graphite_PC_1600x864.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/galaxy-s26-fe/niebieski.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/cz/smartphones/galaxy-s26/images/S26_FE_Color_Selection_Blueberry_PC_944x510.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s26/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM wszystkich wariantów (dane SKU SM-S741B), zawartość pudełka, zdjęcia kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-s/galaxy-s26-fe-pistachio-128gb-sm-s741blgdeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, IP68, Gorilla Glass Victus+"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-a57-5g",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-a",
+    "name": "Galaxy A57 5G",
+    "order": 940,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "granatowy",
+        "name": "Granatowy",
+        "hex": "#26304a"
+      },
+      {
+        "key": "szary",
+        "name": "Szary",
+        "hex": "#8a8c8f"
+      },
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#c4dbe9"
+      },
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#c8b6d8"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "8 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "8 GB"
+      }
+    ],
+    "keyFacts": [
+      "Smukła obudowa 6,9 mm i 179 g",
+      "Ekran 6,7″ Super AMOLED Plus 120 Hz",
+      "Odporność IP68",
+      "8 GB RAM w każdej wersji, ładowanie do 45 W"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,7″ Super AMOLED Plus, 2340 × 1080 (FHD+), do 120 Hz"
+      },
+      {
+        "label": "Procesor",
+        "value": "8 rdzeni, 2,9 GHz + 2,6 GHz + 1,9 GHz"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "8 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 12 MP (F2.2) + 5 MP (F2.4); zoom cyfrowy do 10x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 4K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "5000 mAh (typowa), odtwarzanie wideo do 29 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–45 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 6E (802.11ax, 6 GHz), Bluetooth 6.0, USB‑C 2.0"
+      },
+      {
+        "label": "Wymiary",
+        "value": "161,5 × 76,8 × 6,9 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "179 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; Gorilla Glass Victus+"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 31.03.2032"
+      }
+    ],
+    "inBox": [
+      "Galaxy A57 5G",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy A57 5G to najwyższy model z serii A – smukły (6,9 mm) i lekki (179 g), z ekranem 6,7″. Jest dla Ciebie, jeśli chcesz telefon z 5G i IP68, który dobrze leży w dłoni i nie ciąży w kieszeni.",
+      "Ekran Super AMOLED Plus odświeża obraz do 120 Hz, a każda wersja ma 8 GB RAM. Z tyłu są trzy aparaty: główny 50 MP ze stabilizacją, szerokokątny 12 MP i aparat 5 MP, a wideo nagrasz w 4K. Bateria 5000 mAh obsługuje ładowanie do 45 W, a do tego masz Wi‑Fi 6E i Bluetooth 6.0.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Odbiór jest w naszym salonie w Rabce‑Zdroju lub w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym A57 różni się od A37?",
+        "a": "A57 jest cieńszy i lżejszy (6,9 mm, 179 g), ma 8 GB RAM w każdej wersji, szerokokątny aparat 12 MP, Wi‑Fi 6E i Bluetooth 6.0."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "128 GB albo 256 GB – obie z 8 GB RAM i we wszystkich kolorach: Granatowym, Szarym, Niebieskim i Fioletowym."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "galaxy-buds4"
+    ],
+    "tags": [
+      "size:large",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "granatowy",
+        "src": "/tech/katalog/galaxy-a57-5g/granatowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_navy_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "szary",
+        "src": "/tech/katalog/galaxy-a57-5g/szary.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_gray_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/galaxy-a57-5g/niebieski.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_icyblue_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/galaxy-a57-5g/fioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a57/color-selection/260320_a57_lilac_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a57-5g/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (SKU SM-A576B), zawartość pudełka, zdjęcia kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a57-5g-awesome-navy-128gb-sm-a576bdbbeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, IP68"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-a37-5g",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-a",
+    "name": "Galaxy A37 5G",
+    "order": 930,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "zielony",
+        "name": "Zielony",
+        "hex": "#8f9c8a"
+      },
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#b9aed6"
+      },
+      {
+        "key": "szary",
+        "name": "Szary",
+        "hex": "#3c3d40"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "6 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "8 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ekran 6,7″ Super AMOLED 120 Hz",
+      "Odporność IP68",
+      "Aparat 50 MP z OIS",
+      "Bateria 5000 mAh, ładowanie do 45 W"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,7″ Super AMOLED, 2340 × 1080 (FHD+), do 120 Hz"
+      },
+      {
+        "label": "Procesor",
+        "value": "8 rdzeni, 2,75 GHz + 2 GHz"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "6 GB (128 GB) lub 8 GB (256 GB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 8 MP (F2.2) + 5 MP (F2.4); zoom cyfrowy do 10x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 4K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "5000 mAh (typowa), odtwarzanie wideo do 29 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–45 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 6 (802.11ax), Bluetooth 5.3, USB‑C 2.0"
+      },
+      {
+        "label": "Wymiary",
+        "value": "162,9 × 78,2 × 7,4 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "196 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; Gorilla Glass Victus+"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 31.03.2032"
+      }
+    ],
+    "inBox": [
+      "Galaxy A37 5G",
+      "Kabel do transmisji danych",
+      "Szpilka do wyjmowania karty SIM"
+    ],
+    "description": [
+      "Galaxy A37 5G to telefon ze średniej półki z ekranem 6,7″ i pełną odpornością IP68. Wybierz go, jeśli chcesz solidny telefon z 5G, który zniesie deszcz i kurz.",
+      "Ekran Super AMOLED odświeża obraz do 120 Hz, a z tyłu masz aparat główny 50 MP ze stabilizacją, szerokokątny 8 MP i aparat 5 MP. Wideo nagrasz w 4K, a bateria 5000 mAh daje do 29 godzin odtwarzania wideo i obsługuje ładowanie do 45 W. Masz też Wi‑Fi 6 i szkło Gorilla Glass Victus+.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z ceną i dostępnością wybranej wersji. Telefon odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, gdzie w około 5 minut nakleimy dociętą folię ochronną Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "128 GB z 6 GB RAM albo 256 GB z 8 GB RAM. Obie wersje są we wszystkich czterech kolorach."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Zielony, Fioletowy, Szary i Biały."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon, kabel do transmisji danych i szpilka do karty SIM."
+      },
+      {
+        "q": "Dlaczego nie ma ceny?",
+        "a": "Ceny się zmieniają, więc podajemy je w odpowiedzi na zapytanie razem z dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "galaxy-buds4"
+    ],
+    "tags": [
+      "size:large",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "zielony",
+        "src": "/tech/katalog/galaxy-a37-5g/zielony.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_graygreen_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/galaxy-a37-5g/fioletowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_lavender_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "szary",
+        "src": "/tech/katalog/galaxy-a37-5g/szary.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_charcoal_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-a37-5g/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/smartphones/galaxy-a/galaxy-a37/color-selection/260320_a37_white_color-section_buypage_1600x864px.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a37-5g/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM (SKU SM-A376B), zawartość pudełka, zdjęcia kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a37-5g-awesome-charcoal-128gb-sm-a376bzabeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, IP68"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-a27-5g",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-a",
+    "name": "Galaxy A27 5G",
+    "order": 920,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#1f1f22"
+      },
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#3f5f9a"
+      },
+      {
+        "key": "jasnorozowy",
+        "name": "Jasnoróżowy",
+        "hex": "#f2ccd4"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "6 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "8 GB"
+      }
+    ],
+    "keyFacts": [
+      "5G i procesor Snapdragon 6 Gen 3",
+      "Ekran 6,7″ Super AMOLED 120 Hz",
+      "Bateria 5000 mAh i microSD do 2 TB",
+      "Ochrona IP64 i Gorilla Glass Victus+"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,7″ Super AMOLED, 2340 × 1080 (FHD+), do 120 Hz"
+      },
+      {
+        "label": "Procesor",
+        "value": "Snapdragon 6 Gen 3 (8 rdzeni, do 2,4 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "6 GB (128 GB) lub 8 GB (256 GB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 5 MP (F2.2) + 2 MP (F2.4); zoom cyfrowy do 10x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP (F2.2)"
+      },
+      {
+        "label": "Wideo",
+        "value": "do 4K 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "5000 mAh (typowa), odtwarzanie wideo do 23 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 10–25 W (wg specyfikacji)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 5 (802.11ac), Bluetooth 5.1, USB‑C 2.0"
+      },
+      {
+        "label": "Karta pamięci",
+        "value": "microSD do 2 TB"
+      },
+      {
+        "label": "Wymiary",
+        "value": "162,4 × 78,2 × 7,8 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "200 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP64; Gorilla Glass Victus+"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 31.07.2032"
+      }
+    ],
+    "inBox": [],
+    "description": [
+      "Galaxy A27 5G to niedrogi telefon z 5G i dużym ekranem 6,7″. To propozycja dla Ciebie, jeśli chcesz szybki internet mobilny i płynny ekran, a nie potrzebujesz flagowca.",
+      "Pracuje tu procesor Snapdragon 6 Gen 3, a ekran Super AMOLED odświeża obraz do 120 Hz. Aparat główny 50 MP ma optyczną stabilizację, a wideo nagrasz w 4K. Bateria ma 5000 mAh, pamięć rozszerzysz kartą microSD do 2 TB, a obudowa ma ochronę IP64.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Odbiór jest w naszym salonie w Rabce‑Zdroju albo w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "128 GB z 6 GB RAM albo 256 GB z 8 GB RAM. Wersję 256 GB potwierdziliśmy w kolorze Czarnym – dla innych kolorów sprawdzimy ją w odpowiedzi."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Czarny, Niebieski i Jasnoróżowy."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie, ładowarki nie ma w zestawie."
+      },
+      {
+        "q": "Dlaczego nie podajecie ceny?",
+        "a": "Ceny często się zmieniają. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [
+      "size:large",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-a27-5g/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/pl/sm-a276bzkbeue/gallery/pl-galaxy-a27-5g-sm-a276-sm-a276bzkbeue-553470921",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a27-5g-black-128gb-sm-a276bzkbeue/buy/",
+        "date": "2026-11-18",
+        "what": "kolory (Czarny, Niebieski, Jasnoróżowy), pamięć 128/256 GB, kody SKU, zdjęcia (Czarny)"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a27-5g-black-128gb-sm-a276bzkbeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna 128 GB / 6 GB RAM, Snapdragon 6 Gen 3, IP64"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a27-5g-black-256gb-sm-a276bzkceue/",
+        "date": "2026-11-18",
+        "what": "wariant 256 GB / 8 GB RAM"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-a17",
+    "brand": "samsung",
+    "kind": "phone",
+    "family": "galaxy-a",
+    "name": "Galaxy A17",
+    "order": 910,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#1f1f22"
+      },
+      {
+        "key": "szary",
+        "name": "Szary",
+        "hex": "#8a8c8f"
+      },
+      {
+        "key": "jasnoniebieski",
+        "name": "Jasnoniebieski",
+        "hex": "#b8d0e6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "4 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "8 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ekran 6,7″ Super AMOLED FHD+",
+      "Aparat 50 MP z optyczną stabilizacją",
+      "Bateria 5000 mAh i slot microSD do 2 TB",
+      "Ochrona IP54 i Gorilla Glass Victus+"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,7″ Super AMOLED, 2340 × 1080 (FHD+)"
+      },
+      {
+        "label": "Procesor",
+        "value": "8 rdzeni, 2,2 GHz + 2 GHz"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "4 GB (128 GB) lub 8 GB (256 GB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "50 MP (F1.8, OIS) + 5 MP (F2.2) + 2 MP (F2.4); zoom cyfrowy do 10x"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "13 MP (F2.0)"
+      },
+      {
+        "label": "Wideo",
+        "value": "Full HD 30 kl./s"
+      },
+      {
+        "label": "Bateria",
+        "value": "5000 mAh (typowa), odtwarzanie wideo do 18 h"
+      },
+      {
+        "label": "Łączność",
+        "value": "4G LTE (bez 5G), Wi‑Fi 5 (802.11ac), Bluetooth 5.3, NFC, USB‑C 2.0"
+      },
+      {
+        "label": "Karta pamięci",
+        "value": "microSD do 2 TB"
+      },
+      {
+        "label": "Wymiary",
+        "value": "164,4 × 77,9 × 7,5 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "190 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP54; Gorilla Glass Victus+"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 30.09.2031"
+      }
+    ],
+    "inBox": [],
+    "description": [
+      "Galaxy A17 to prosty telefon na co dzień z dużym ekranem 6,7″ i baterią 5000 mAh. Sprawdzi się u Ciebie, jeśli potrzebujesz telefonu do rozmów, wiadomości, zdjęć i internetu – albo szukasz telefonu dla kogoś bliskiego.",
+      "Ekran Super AMOLED ma rozdzielczość Full HD+, a aparat główny 50 MP ma optyczną stabilizację obrazu. Pamięć rozszerzysz kartą microSD do 2 TB, a telefon obsługuje NFC. To wersja LTE, czyli bez 5G, a obudowa ma ochronę IP54 i szkło Gorilla Glass Victus+.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z aktualną ceną i dostępnością wybranej wersji. Telefon odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy Galaxy A17 ma 5G?",
+        "a": "Nie, to wersja 4G LTE. Jeśli zależy Ci na 5G, spójrz na Galaxy A27 5G."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "128 GB z 4 GB RAM albo 256 GB z 8 GB RAM. Wersję 128 GB potwierdziliśmy na razie w kolorze Szarym – inne kolory sprawdzimy w odpowiedzi."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie, ładowarki nie ma w zestawie."
+      },
+      {
+        "q": "Dlaczego nie ma ceny?",
+        "a": "Ceny się zmieniają, więc podajemy je w odpowiedzi na zapytanie razem z dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [
+      "size:large",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "szary",
+        "src": "/tech/katalog/galaxy-a17/szary.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/pl/sm-a175fzaeeue/gallery/pl-galaxy-a17-sm-a175-sm-a175fzaeeue-549188456",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a17-gray-256gb-sm-a175fzaeeue/buy/",
+        "date": "2026-11-18",
+        "what": "kolory (Czarny, Szary, Jasnoniebieski), pamięć 128/256 GB, kody SKU, zdjęcia (Szary)"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a17-gray-256gb-sm-a175fzaeeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna 256 GB / 8 GB RAM, IP54"
+      },
+      {
+        "url": "https://www.samsung.com/pl/smartphones/galaxy-a/galaxy-a17-gray-128gb-sm-a175fzabeue/",
+        "date": "2026-11-18",
+        "what": "wariant 128 GB / 4 GB RAM (tytuł: „Galaxy A17 Szary 4GB 128GB LTE”)"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-tab-s12-ultra",
+    "brand": "samsung",
+    "kind": "tablet",
+    "family": "galaxy-tab",
+    "name": "Galaxy Tab S12 Ultra",
+    "order": 890,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "szary",
+        "name": "Szary",
+        "hex": "#5a5c60"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb-wi-fi-5g",
+        "label": "256 GB (Wi‑Fi / 5G)",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb-wi-fi-5g",
+        "label": "512 GB (Wi‑Fi / 5G)",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb-wi-fi-5g",
+        "label": "1 TB (Wi‑Fi / 5G)",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ogromny ekran 14,6″ Dynamic AMOLED 2X",
+      "Grubość ok. 5,1 mm i odporność IP68",
+      "Rysik S Pen w zestawie",
+      "MediaTek Dimensity 9500, do 16 GB RAM i 1 TB"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "14,6″ Dynamic AMOLED 2X, 2960 × 1848 (WQXGA+)"
+      },
+      {
+        "label": "Procesor",
+        "value": "MediaTek Dimensity 9500 (8 rdzeni, do 4,21 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB (256/512 GB) lub 16 GB (1 TB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "13 MP + 8 MP"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP"
+      },
+      {
+        "label": "Bateria",
+        "value": "11 600 mAh (typowa), odtwarzanie wideo do 23 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 20–45 W (wg specyfikacji); ładowarka 45 W sprzedawana oddzielnie"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 7 (802.11be), Bluetooth 6.0, USB‑C 3.2 Gen 1; wersja 5G opcjonalnie"
+      },
+      {
+        "label": "Karta pamięci",
+        "value": "microSD do 2 TB"
+      },
+      {
+        "label": "Wymiary",
+        "value": "208,5 × 326,3 × 5,1 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "692 g (Wi‑Fi)"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68; ramka Armor Aluminum"
+      },
+      {
+        "label": "Rysik S Pen",
+        "value": "Tak, w zestawie"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 30.09.2033"
+      }
+    ],
+    "inBox": [
+      "Tablet",
+      "Rysik S Pen",
+      "Kabel do transmisji danych (USB-C)",
+      "Szpilka do wyjmowania karty SIM/microSD"
+    ],
+    "description": [
+      "Galaxy Tab S12 Ultra to największy tablet Samsunga z ekranem 14,6″ i rysikiem S Pen w zestawie. Jest dla Ciebie, jeśli rysujesz, robisz notatki, pracujesz na kilku oknach albo chcesz tablet zamiast laptopa do filmów i dokumentów.",
+      "Ekran Dynamic AMOLED 2X ma rozdzielczość WQXGA+, a w środku pracuje procesor MediaTek Dimensity 9500. Mimo ogromnego ekranu tablet ma tylko 5,1 mm grubości, odporność IP68 i baterię 11 600 mAh, która daje do 23 godzin odtwarzania wideo. Pamięć rozszerzysz kartą microSD do 2 TB, a każdą pojemność wybierzesz w wersji Wi‑Fi albo 5G.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z aktualną ceną i dostępnością wybranej wersji. Tablet odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy S Pen jest w zestawie?",
+        "a": "Tak. W pudełku jest tablet, rysik S Pen, kabel USB‑C i szpilka do karty SIM/microSD. Ładowarkę 45 W kupuje się osobno."
+      },
+      {
+        "q": "Ile RAM ma każda wersja?",
+        "a": "Wersje 256 GB i 512 GB mają 12 GB RAM, a wersja 1 TB – 16 GB RAM."
+      },
+      {
+        "q": "W jakich wersjach jest kolor Srebrny?",
+        "a": "Srebrny występuje tylko jako 256 GB Wi‑Fi, 1 TB Wi‑Fi i 1 TB 5G. Szary jest we wszystkich wersjach. Dostępność potwierdzimy w odpowiedzi."
+      },
+      {
+        "q": "Dlaczego nie ma ceny?",
+        "a": "Ceny się zmieniają, a wersji jest dużo. Po zapytaniu podamy aktualną cenę i dostępność wybranej konfiguracji."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "szary",
+        "src": "/tech/katalog/galaxy-tab-s12-ultra/szary.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12-ultra/TS12-Ultra-Color-Selection_Gray_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-tab-s12-ultra/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12-ultra/TS12-Ultra-Color-Selection_Silver_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/tablets/galaxy-tab-s12/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM, Wi‑Fi/5G (SKU SM-X940 / SM-X946B), zawartość pudełka, zdjęcia"
+      },
+      {
+        "url": "https://www.samsung.com/pl/tablets/galaxy-tab-s/galaxy-tab-s12-ultra-gray-256gb-sm-x940nzareue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna (Wi‑Fi 256 GB), IP68, procesor, zestaw"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-tab-s12-plus",
+    "brand": "samsung",
+    "kind": "tablet",
+    "family": "galaxy-tab",
+    "name": "Galaxy Tab S12+",
+    "order": 889,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "szary",
+        "name": "Szary",
+        "hex": "#5a5c60"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb-wi-fi-5g",
+        "label": "256 GB (Wi‑Fi / 5G)",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb-wi-fi-5g",
+        "label": "512 GB (Wi‑Fi / 5G)",
+        "ram": "12 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ekran 12,6″ Dynamic AMOLED 2X",
+      "Rysik S Pen w zestawie",
+      "Odporność IP68 i grubość 5,3 mm",
+      "MediaTek Dimensity 9500 i 12 GB RAM"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "12,6″ Dynamic AMOLED 2X, 2800 × 1752 (WQXGA+)"
+      },
+      {
+        "label": "Procesor",
+        "value": "MediaTek Dimensity 9500 (8 rdzeni, do 4,21 GHz)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "13 MP"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "12 MP"
+      },
+      {
+        "label": "Bateria",
+        "value": "10 600 mAh (typowa), odtwarzanie wideo do 21 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "moc wymagana do ładowania 20–45 W (wg specyfikacji); ładowarka 45 W sprzedawana oddzielnie"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 6E (802.11ax, 6 GHz), Bluetooth 6.0, USB‑C 3.2 Gen 1; wersja 5G opcjonalnie"
+      },
+      {
+        "label": "Karta pamięci",
+        "value": "microSD do 2 TB"
+      },
+      {
+        "label": "Wymiary",
+        "value": "187,8 × 289,5 × 5,3 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "555 g (5G)"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP68"
+      },
+      {
+        "label": "Rysik S Pen",
+        "value": "Tak, w zestawie"
+      },
+      {
+        "label": "System",
+        "value": "Android (One UI); aktualizacje zabezpieczeń do 30.09.2033"
+      }
+    ],
+    "inBox": [
+      "Tablet",
+      "Rysik S Pen",
+      "Kabel do transmisji danych (USB-C)",
+      "Szpilka do wyjmowania karty SIM/microSD"
+    ],
+    "description": [
+      "Galaxy Tab S12+ to tablet z ekranem 12,6″ i rysikiem S Pen w zestawie. Sprawdzi się, jeśli chcesz duży ekran do nauki, notatek i filmów, ale w poręczniejszym rozmiarze niż Tab S12 Ultra.",
+      "Ekran Dynamic AMOLED 2X ma rozdzielczość WQXGA+, a w środku pracuje procesor MediaTek Dimensity 9500 z 12 GB RAM. Tablet ma 5,3 mm grubości, odporność IP68 i baterię 10 600 mAh, która daje do 21 godzin odtwarzania wideo. Pamięć rozszerzysz kartą microSD do 2 TB.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Tablet odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy S Pen jest w zestawie?",
+        "a": "Tak. W pudełku jest tablet, rysik S Pen, kabel USB‑C i szpilka do karty SIM/microSD. Ładowarkę 45 W kupuje się osobno."
+      },
+      {
+        "q": "Jakie wersje mogę wybrać?",
+        "a": "256 GB albo 512 GB, każda z 12 GB RAM, w wersji Wi‑Fi lub 5G."
+      },
+      {
+        "q": "W jakich wersjach jest kolor Srebrny?",
+        "a": "Srebrny występuje tylko jako 256 GB Wi‑Fi. Szary jest w 256 i 512 GB, w Wi‑Fi i 5G. Dostępność potwierdzimy w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "szary",
+        "src": "/tech/katalog/galaxy-tab-s12-plus/szary.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12plus/TS12-Plus-Color-Selection_Gray_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-tab-s12-plus/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/assets/global/mkt/tablets/galaxy-tab-s12/05-color-selection/s12plus/TS12-Plus-Color-Selection_Silver_PC.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/tablets/galaxy-tab-s12/buy/",
+        "date": "2026-11-18",
+        "what": "kolory, pamięć/RAM, Wi‑Fi/5G (SKU SM-X840 / SM-X846B), zawartość pudełka, zdjęcia"
+      },
+      {
+        "url": "https://www.samsung.com/pl/tablets/galaxy-tab-s/galaxy-tab-s12-plus-5g-gray-512gb-sm-x846bzapeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna (5G 512 GB), IP68, procesor"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-watch9",
+    "brand": "samsung",
+    "kind": "watch",
+    "family": "galaxy-watch",
+    "name": "Galaxy Watch9",
+    "order": 830,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "grafitowy",
+        "name": "Grafitowy",
+        "hex": "#404347"
+      },
+      {
+        "key": "kremowy",
+        "name": "Kremowy",
+        "hex": "#dad6cb"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc"
+      }
+    ],
+    "storage": [
+      {
+        "key": "40-mm-bluetooth",
+        "label": "40 mm, Bluetooth"
+      },
+      {
+        "key": "40-mm-lte",
+        "label": "40 mm, LTE"
+      },
+      {
+        "key": "44-mm-bluetooth",
+        "label": "44 mm, Bluetooth"
+      },
+      {
+        "key": "44-mm-lte",
+        "label": "44 mm, LTE"
+      }
+    ],
+    "keyFacts": [
+      "Dwa rozmiary: 40 mm i 44 mm, wersje Bluetooth i LTE",
+      "Pomiar składu ciała (BIA), EKG i temperatury",
+      "Do 40 h pracy bez Always On Display (44 mm)",
+      "Wodoszczelność 5 ATM"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "1,5″ (37,3 mm) Super AMOLED, 480 × 480 (44 mm)"
+      },
+      {
+        "label": "Procesor",
+        "value": "5 rdzeni, 2,1 GHz + 1,95 GHz"
+      },
+      {
+        "label": "Pamięć",
+        "value": "2 GB RAM + 32 GB"
+      },
+      {
+        "label": "Bateria",
+        "value": "445 mAh (44 mm); do 40 h bez AOD, do 30 h z AOD"
+      },
+      {
+        "label": "Czujniki",
+        "value": "BIA, EKG (elektryczny), optyczny czujnik tętna, temperatura, barometr, akcelerometr, żyroskop"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 6.0, Wi‑Fi 2,4 + 5 GHz, NFC, GPS/Glonass/Beidou/Galileo/QZSS; wersja LTE opcjonalnie"
+      },
+      {
+        "label": "Wymiary",
+        "value": "46,0 × 43,7 × 8,6 mm (44 mm)"
+      },
+      {
+        "label": "Waga",
+        "value": "34 g (korpus 44 mm)"
+      },
+      {
+        "label": "Odporność",
+        "value": "5 ATM"
+      },
+      {
+        "label": "System",
+        "value": "Wear OS Powered by Samsung; aktualizacje zabezpieczeń do 31.07.2031"
+      }
+    ],
+    "inBox": [
+      "Galaxy Watch9",
+      "Sport Band",
+      "Kabel do transmisji danych"
+    ],
+    "description": [
+      "Galaxy Watch9 to smartwatch w dwóch rozmiarach – 40 mm i 44 mm – w wersji Bluetooth albo LTE. Jest dla Ciebie, jeśli chcesz śledzić zdrowie i treningi oraz odbierać powiadomienia na nadgarstku.",
+      "Zegarek mierzy skład ciała (BIA), robi EKG, sprawdza tętno i temperaturę, a do tego ma barometr i GPS. Ma 2 GB RAM i 32 GB pamięci, działa na Wear OS Powered by Samsung i jest wodoszczelny do 5 ATM. W wersji 44 mm bateria wytrzymuje do 40 godzin bez Always On Display.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z aktualną ceną i dostępnością wybranego rozmiaru i koloru. Zegarek odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy na ekran folię ochronną Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Jakie kolory są w każdym rozmiarze?",
+        "a": "40 mm: Grafitowy i Kremowy. 44 mm: Grafitowy i Srebrny."
+      },
+      {
+        "q": "Na jakim systemie działa?",
+        "a": "Na Wear OS Powered by Samsung. Napisz w zapytaniu, jaki masz telefon, a odpowiemy, czy zegarek będzie z nim współpracował."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Zegarek, pasek Sport Band i kabel. Kolor paska zależy od wybranej wersji."
+      },
+      {
+        "q": "Dlaczego nie ma ceny?",
+        "a": "Ceny się zmieniają, a wersji jest kilka. Po zapytaniu podamy aktualną cenę i dostępność."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "galaxy-s26"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "grafitowy",
+        "src": "/tech/katalog/galaxy-watch9/grafitowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch9_Graphite_40_Side_Sport_Black_1600x864_PC-554009431",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "kremowy",
+        "src": "/tech/katalog/galaxy-watch9/kremowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch9_Cream_40_Side_Sport_Cream_1600x864_PC-554008597",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-watch9/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch9_Silver_44_Side_Sport_Olive_1600x864_PC-554008054",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch9/buy/",
+        "date": "2026-11-18",
+        "what": "SKU, rozmiary, łączność i kolory per rozmiar (dane strukturalne), FAQ o kolorach per rozmiar, zawartość pudełka, zdjęcia"
+      },
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch/galaxy-watch9-44mm-graphite-bluetooth-sm-l350nzkaeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna (44 mm Bluetooth), polskie nazwy kolorów (w tym Srebrny dla 44 mm)"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-watch-ultra2",
+    "brand": "samsung",
+    "kind": "watch",
+    "family": "galaxy-watch",
+    "name": "Galaxy Watch Ultra2",
+    "order": 829,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "tytanowy-szary",
+        "name": "Tytanowy szary",
+        "hex": "#404347"
+      },
+      {
+        "key": "tytanowy-srebrny",
+        "name": "Tytanowy srebrny",
+        "hex": "#6d6e72"
+      }
+    ],
+    "storage": [
+      {
+        "key": "47-mm-lte",
+        "label": "47 mm, LTE"
+      }
+    ],
+    "keyFacts": [
+      "Tytanowa koperta 47 mm, wersja LTE",
+      "Do 80 h pracy bez Always On Display",
+      "Odporność 10 ATM i IP69K",
+      "64 GB pamięci"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "1,5″ (38,5 mm) Super AMOLED, 498 × 498"
+      },
+      {
+        "label": "Procesor",
+        "value": "5 rdzeni, 2,1 GHz + 1,95 GHz"
+      },
+      {
+        "label": "Pamięć",
+        "value": "2 GB RAM + 64 GB"
+      },
+      {
+        "label": "Bateria",
+        "value": "800 mAh; do 80 h bez AOD, do 60 h z AOD"
+      },
+      {
+        "label": "Czujniki",
+        "value": "BIA, EKG (elektryczny), optyczny czujnik tętna, temperatura, barometr, akcelerometr, żyroskop"
+      },
+      {
+        "label": "Łączność",
+        "value": "LTE, Bluetooth 6.0, Wi‑Fi 2,4 + 5 GHz, NFC, GPS/Glonass/Beidou/Galileo/QZSS"
+      },
+      {
+        "label": "Wymiary",
+        "value": "47,4 × 47,1 × 10,7 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "61,5 g (korpus)"
+      },
+      {
+        "label": "Odporność",
+        "value": "10 ATM, IP69K"
+      },
+      {
+        "label": "Obudowa",
+        "value": "tytanowa"
+      },
+      {
+        "label": "System",
+        "value": "Wear OS Powered by Samsung; aktualizacje zabezpieczeń do 31.07.2031"
+      }
+    ],
+    "inBox": [
+      "Galaxy Watch Ultra2",
+      "Marine Band",
+      "Kabel do transmisji danych"
+    ],
+    "description": [
+      "Galaxy Watch Ultra2 to wytrzymały smartwatch w tytanowej kopercie 47 mm, zawsze z LTE. Jest dla Ciebie, jeśli chodzisz po górach, biegasz, pływasz albo po prostu chcesz zegarek, który wytrzyma kilka dni bez ładowania.",
+      "Bateria 800 mAh daje do 80 godzin pracy bez Always On Display i do 60 godzin z nim. Zegarek ma wodoszczelność 10 ATM i odporność IP69K, 64 GB pamięci oraz pomiar składu ciała (BIA), EKG, tętna i temperatury. Do nawigacji masz GPS, Glonass, Beidou, Galileo i QZSS, a LTE pozwala korzystać z zegarka bez telefonu w pobliżu.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Zegarek odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy na ekran folię ochronną Hammer Glass. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy jest wersja bez LTE albo w innym rozmiarze?",
+        "a": "Nie, Watch Ultra2 występuje tylko jako 47 mm z LTE."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Tytanowy szary i Tytanowy srebrny. W zestawie jest pasek Marine Band, a jego kolor zależy od wersji."
+      },
+      {
+        "q": "Na jakim systemie działa?",
+        "a": "Na Wear OS Powered by Samsung. Napisz w zapytaniu, jaki masz telefon, a odpowiemy, czy zegarek będzie z nim współpracował."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "galaxy-s26-ultra"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "tytanowy-szary",
+        "src": "/tech/katalog/galaxy-watch-ultra2/tytanowy-szary.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch_Ultra2_TitaniumGray_Marine_Black_Side_PC_1600x864-554013226",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "tytanowy-srebrny",
+        "src": "/tech/katalog/galaxy-watch-ultra2/tytanowy-srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/wearable/f2607/global-wearable-Galaxy_Watch_Ultra2_TitaniumSilver_Marine_Olive_Side_PC_1600x864-554013497",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch-ultra2/buy/",
+        "date": "2026-11-18",
+        "what": "SKU (SM-L715F), kolory, rozmiar, łączność, zawartość pudełka, zdjęcia, kody kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch/galaxy-watch-ultra2-titanium-silver-lte-sm-l715fzsaeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-watch8-classic",
+    "brand": "samsung",
+    "kind": "watch",
+    "family": "galaxy-watch",
+    "name": "Galaxy Watch8 Classic",
+    "order": 820,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#494a4d"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f5f7f6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "46-mm-bluetooth",
+        "label": "46 mm, Bluetooth"
+      },
+      {
+        "key": "46-mm-lte",
+        "label": "46 mm, LTE"
+      }
+    ],
+    "keyFacts": [
+      "Klasyczna koperta 46 mm",
+      "64 GB pamięci",
+      "Pomiar składu ciała (BIA) i EKG",
+      "Wersje Bluetooth i LTE"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "1,3″ (34 mm) Super AMOLED, 438 × 438"
+      },
+      {
+        "label": "Procesor",
+        "value": "5 rdzeni, 1,6 GHz + 1,5 GHz"
+      },
+      {
+        "label": "Pamięć",
+        "value": "2 GB RAM + 64 GB"
+      },
+      {
+        "label": "Bateria",
+        "value": "445 mAh; do 40 h bez AOD, do 30 h z AOD"
+      },
+      {
+        "label": "Czujniki",
+        "value": "BIA, EKG (elektryczny), optyczny czujnik tętna, czujnik temperatury (podczerwień), barometr"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 5.3, Wi‑Fi 2,4 + 5 GHz, NFC, GPS/Glonass/Beidou/Galileo; wersja LTE opcjonalnie"
+      },
+      {
+        "label": "Wymiary",
+        "value": "46,0 × 46,4 × 10,6 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "63,5 g (korpus)"
+      },
+      {
+        "label": "Odporność",
+        "value": "5 ATM"
+      },
+      {
+        "label": "System",
+        "value": "Wear OS Powered by Samsung"
+      }
+    ],
+    "inBox": [
+      "Galaxy Watch8 Classic",
+      "Pasek Hybrid Band",
+      "Fast Wireless Charger"
+    ],
+    "description": [
+      "Galaxy Watch8 Classic to smartwatch o klasycznym wyglądzie, w kopercie 46 mm. Wybierz go, jeśli chcesz zegarek, który pasuje i do garnituru, i na trening.",
+      "Zegarek mierzy skład ciała (BIA), robi EKG, sprawdza tętno i temperaturę, a do tego ma barometr i GPS. Ma 2 GB RAM i 64 GB pamięci, a bateria 445 mAh wytrzymuje do 40 godzin bez Always On Display. Jest wodoszczelny do 5 ATM i dostępny w wersji Bluetooth albo LTE.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z ceną i dostępnością wybranej wersji. Zegarek odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy na ekran folię ochronną Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Zegarek, pasek Hybrid Band i ładowarka Fast Wireless Charger."
+      },
+      {
+        "q": "Jakie są rozmiary i kolory?",
+        "a": "Tylko 46 mm, w kolorach Czarnym i Białym, w wersji Bluetooth lub LTE."
+      },
+      {
+        "q": "Na jakim systemie działa?",
+        "a": "Na Wear OS Powered by Samsung. Napisz w zapytaniu, jaki masz telefon, a odpowiemy, czy zegarek będzie z nim współpracował."
+      },
+      {
+        "q": "Dlaczego nie ma ceny?",
+        "a": "Ceny się zmieniają. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "galaxy-s26"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-watch8-classic/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_Classic_black_Side_hybrid_black_1600x864_PC-549961894",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-watch8-classic/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_Classic_white_Side_hybrid_white_1600x864_PC-549964755",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch8/buy/",
+        "date": "2026-11-18",
+        "what": "SKU (SM-L500 BT, SM-L505F LTE), kolory, rozmiar, zawartość pudełka, zdjęcia, kody kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch/galaxy-watch8-classic-46mm-black-bluetooth-sm-l500nzkaeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-watch8",
+    "brand": "samsung",
+    "kind": "watch",
+    "family": "galaxy-watch",
+    "name": "Galaxy Watch8",
+    "order": 819,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "grafitowy",
+        "name": "Grafitowy",
+        "hex": "#404347"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#c7c9cc"
+      }
+    ],
+    "storage": [
+      {
+        "key": "40-mm-bluetooth",
+        "label": "40 mm, Bluetooth"
+      },
+      {
+        "key": "40-mm-lte",
+        "label": "40 mm, LTE"
+      },
+      {
+        "key": "44-mm-bluetooth",
+        "label": "44 mm, Bluetooth"
+      },
+      {
+        "key": "44-mm-lte",
+        "label": "44 mm, LTE"
+      }
+    ],
+    "keyFacts": [
+      "Dwa rozmiary: 40 mm i 44 mm",
+      "Smukła koperta 8,6 mm (40 mm)",
+      "Pomiar składu ciała (BIA) i EKG",
+      "Wersje Bluetooth i LTE"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "1,3″ (34 mm) Super AMOLED, 438 × 438 (40 mm)"
+      },
+      {
+        "label": "Procesor",
+        "value": "5 rdzeni, 1,6 GHz + 1,5 GHz"
+      },
+      {
+        "label": "Pamięć",
+        "value": "2 GB RAM + 32 GB"
+      },
+      {
+        "label": "Bateria",
+        "value": "325 mAh (40 mm); do 40 h bez AOD"
+      },
+      {
+        "label": "Czujniki",
+        "value": "BIA, EKG (elektryczny), optyczny czujnik tętna, czujnik temperatury (podczerwień), barometr"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 5.3, Wi‑Fi 2,4 + 5 GHz, NFC, GPS/Glonass/Beidou/Galileo; wersja LTE opcjonalnie"
+      },
+      {
+        "label": "Wymiary",
+        "value": "42,7 × 40,4 × 8,6 mm (40 mm)"
+      },
+      {
+        "label": "Waga",
+        "value": "30,0 g (korpus 40 mm)"
+      },
+      {
+        "label": "Odporność",
+        "value": "5 ATM"
+      },
+      {
+        "label": "Obudowa",
+        "value": "Armor Aluminum"
+      },
+      {
+        "label": "System",
+        "value": "Wear OS Powered by Samsung"
+      }
+    ],
+    "inBox": [],
+    "description": [
+      "Galaxy Watch8 to smukły smartwatch w dwóch rozmiarach – 40 mm i 44 mm – w wersji Bluetooth albo LTE. Jest dla Ciebie, jeśli chcesz lekki zegarek do codziennego śledzenia zdrowia i aktywności.",
+      "Koperta 40 mm ma tylko 8,6 mm grubości i waży 30 g, a obudowa jest z Armor Aluminum. Zegarek mierzy skład ciała (BIA), robi EKG, sprawdza tętno i temperaturę, ma 32 GB pamięci i jest wodoszczelny do 5 ATM. W wersji 40 mm bateria wytrzymuje do 40 godzin bez Always On Display.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością wybranego rozmiaru. Zegarek odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy na ekran folię ochronną Hammer Glass. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Jakie kolory są w każdym rozmiarze?",
+        "a": "Oba rozmiary, 40 mm i 44 mm, są w kolorach Grafitowym i Srebrnym."
+      },
+      {
+        "q": "Czym Watch8 różni się od Watch8 Classic?",
+        "a": "Watch8 jest smuklejszy i ma dwa rozmiary (40 i 44 mm) oraz 32 GB pamięci. Classic ma kopertę 46 mm o klasycznym wyglądzie i 64 GB pamięci."
+      },
+      {
+        "q": "Na jakim systemie działa?",
+        "a": "Na Wear OS Powered by Samsung. Napisz w zapytaniu, jaki masz telefon, a odpowiemy, czy zegarek będzie z nim współpracował."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "galaxy-s26"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "grafitowy",
+        "src": "/tech/katalog/galaxy-watch8/grafitowy.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_graphite_40_Side_Sport_sm_graphite_1600x864_PC-549980183",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/galaxy-watch8/srebrny.webp",
+        "source": {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/global/global-wearable-Galaxy_Watch8_silver_40_Side_Sport_sm_white_1600x864_PC-549932253",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch8/buy/",
+        "date": "2026-11-18",
+        "what": "SKU Watch8 w danych strukturalnych (SM-L320/L325F 40 mm, SM-L330/L335F 44 mm), kolory Graphite/Silver, zdjęcia"
+      },
+      {
+        "url": "https://www.samsung.com/pl/watches/galaxy-watch/galaxy-watch8-40mm-silver-bluetooth-sm-l320nzsaeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna (40 mm Bluetooth), polskie nazwy kolorów (Grafitowy, Srebrny), rozmiary 40/44 mm"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-buds4-pro",
+    "brand": "samsung",
+    "kind": "audio",
+    "family": "galaxy-buds",
+    "name": "Galaxy Buds4 Pro",
+    "order": 810,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#494d53"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f3f4f5"
+      },
+      {
+        "key": "zloty",
+        "name": "Złoty",
+        "hex": "#faebef",
+        "officialStoreOnly": true
+      }
+    ],
+    "storage": [],
+    "keyFacts": [
+      "Dwudrożny głośnik z podwójnym wzmacniaczem – dźwięk Hi‑Fi 24 bit / 96 kHz",
+      "Aktywna redukcja szumu i Dźwięk 360",
+      "Funkcje Galaxy AI, m.in. Tłumacz",
+      "Odporność IP57"
+    ],
+    "specs": [
+      {
+        "label": "Głośnik",
+        "value": "ulepszony 2‑drożny: Dynamic Driver (woofer) + tweeter, podwójny wzmacniacz"
+      },
+      {
+        "label": "Kodeki",
+        "value": "SSC‑UHQ (24 bit / 96 kHz), SSC, AAC, SBC, LC3"
+      },
+      {
+        "label": "Bluetooth",
+        "value": "6.1, LE Audio, Auracast"
+      },
+      {
+        "label": "Mikrofony",
+        "value": "6"
+      },
+      {
+        "label": "ANC",
+        "value": "aktywna redukcja szumu, adaptacyjna kontrola szumu, adaptacyjne EQ/ANC"
+      },
+      {
+        "label": "Dźwięk 360",
+        "value": "ze śledzeniem ruchów głowy"
+      },
+      {
+        "label": "Rozmowy",
+        "value": "Super Clear Call (pasmo do 16 kHz)"
+      },
+      {
+        "label": "Sterowanie",
+        "value": "przesuwanie, szczypanie, gesty głowy"
+      },
+      {
+        "label": "Czas pracy (ANC wył.)",
+        "value": "do 7 h słuchawki / 30 h z etui"
+      },
+      {
+        "label": "Czas pracy (ANC wł.)",
+        "value": "do 6 h słuchawki / 26 h z etui"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP57"
+      },
+      {
+        "label": "Etui",
+        "value": "ładowanie bezprzewodowe"
+      }
+    ],
+    "inBox": [
+      "Słuchawki douszne",
+      "Etui ładujące",
+      "Końcówki douszne (3 zestawy: S/M/L)",
+      "Skrócona instrukcja obsługi"
+    ],
+    "description": [
+      "Galaxy Buds4 Pro to douszne słuchawki bezprzewodowe z aktywną redukcją szumu. Są dla Ciebie, jeśli słuchasz muzyki w podróży, dużo rozmawiasz przez telefon albo chcesz odciąć się od hałasu.",
+      "W każdej słuchawce jest dwudrożny głośnik z podwójnym wzmacniaczem, a przez kodek SSC‑UHQ usłyszysz dźwięk w jakości 24 bit / 96 kHz. Masz też Dźwięk 360 ze śledzeniem ruchów głowy, sześć mikrofonów do rozmów i Bluetooth 6.1 z LE Audio i Auracast. Z włączoną redukcją szumu słuchasz do 6 godzin (do 26 godzin z etui), a słuchawki mają odporność IP57.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z aktualną ceną i dostępnością. Kolor Złoty jest dostępny tylko w Oficjalnych Sklepach Samsung, więc jego dostępność potwierdzimy w odpowiedzi. Słuchawki odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem, a gdyby coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Słuchawki, etui ładujące, trzy zestawy końcówek dousznych (S/M/L) i skrócona instrukcja. Kabla USB‑C nie ma w zestawie."
+      },
+      {
+        "q": "Czy etui ładuje się bezprzewodowo?",
+        "a": "Tak, etui obsługuje ładowanie bezprzewodowe."
+      },
+      {
+        "q": "Czym różnią się od Galaxy Buds4?",
+        "a": "Buds4 Pro mają dwudrożny głośnik, silikonowe końcówki douszne, odporność IP57 i kolor Złoty. Buds4 mają konstrukcję bez końcówek i odporność IP54."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Czarny, Biały i Złoty. Złoty jest dostępny tylko w Oficjalnych Sklepach Samsung – sprawdzimy go dla Ciebie w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "galaxy-s26-ultra"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-buds4-pro/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Bach/Color_Selection_Black_PC.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-buds4-pro/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Bach/Color_Selection_White_PC.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zloty",
+        "src": "/tech/katalog/galaxy-buds4-pro/zloty.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Bach/Color_Selection_PinkGold_PC.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/audio-sound/galaxy-buds4-pro/buy/",
+        "date": "2026-11-18",
+        "what": "kolory i SKU (Złoty tylko SM-R640NZDAEUE), zawartość pudełka, zdjęcia kolorów"
+      },
+      {
+        "url": "https://www.samsung.com/pl/audio-sound/galaxy-buds/galaxy-buds4-pro-white-sm-r640nzwaeue/",
+        "date": "2026-11-18",
+        "what": "dane z tabeli porównania (głośnik, kodeki, BT, mikrofony, czas pracy), IP57, FAQ (zestaw, etui bezprzewodowe), przypis o złotym kolorze"
+      }
+    ]
+  },
+  {
+    "slug": "galaxy-buds4",
+    "brand": "samsung",
+    "kind": "audio",
+    "family": "galaxy-buds",
+    "name": "Galaxy Buds4",
+    "order": 809,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#494d53"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f3f4f5"
+      }
+    ],
+    "storage": [],
+    "keyFacts": [
+      "Lekkie słuchawki – 4,6 g każda",
+      "Aktywna redukcja szumów i Dźwięk 360",
+      "Do 30 h słuchania z etui (ANC wył.)",
+      "Bluetooth 6.1, LE Audio, dźwięk SSC‑UHQ"
+    ],
+    "specs": [
+      {
+        "label": "Głośnik",
+        "value": "1‑kierunkowy (Dynamic Driver), pojedynczy wzmacniacz"
+      },
+      {
+        "label": "Kodeki",
+        "value": "AAC, SBC, SSC, SSC‑UHQ, LC3"
+      },
+      {
+        "label": "Bluetooth",
+        "value": "6.1, LE Audio, Auto Switch"
+      },
+      {
+        "label": "Mikrofony",
+        "value": "6"
+      },
+      {
+        "label": "ANC",
+        "value": "aktywna redukcja szumów, adaptacyjne ANC"
+      },
+      {
+        "label": "Dźwięk 360",
+        "value": "Tak"
+      },
+      {
+        "label": "Czas pracy (ANC wył.)",
+        "value": "do 6 h muzyki / 30 h z etui"
+      },
+      {
+        "label": "Czas pracy (ANC wł.)",
+        "value": "do 5 h muzyki / 24 h z etui"
+      },
+      {
+        "label": "Bateria",
+        "value": "45 mAh słuchawka, 515 mAh etui"
+      },
+      {
+        "label": "Wymiary",
+        "value": "słuchawka 30,5 × 18,3 × 19,3 mm; etui 51 × 28,3 × 51 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "słuchawka 4,6 g; etui 45,1 g"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP54"
+      },
+      {
+        "label": "Etui",
+        "value": "ładowanie bezprzewodowe (ładowarka sprzedawana oddzielnie)"
+      }
+    ],
+    "inBox": [
+      "Słuchawki douszne",
+      "Etui ładujące",
+      "Skrócona instrukcja obsługi"
+    ],
+    "description": [
+      "Galaxy Buds4 to lekkie słuchawki bezprzewodowe z aktywną redukcją szumów, w konstrukcji bez silikonowych końcówek. To dobry wybór, jeśli nie lubisz uczucia zatkanych uszu, a chcesz słuchać muzyki i rozmawiać przez cały dzień.",
+      "Każda słuchawka waży 4,6 g, a w środku jest głośnik dynamiczny z obsługą dźwięku SSC‑UHQ. Masz adaptacyjną redukcję szumów, Dźwięk 360, sześć mikrofonów i Bluetooth 6.1 z LE Audio. Bez redukcji szumów słuchasz do 6 godzin (do 30 godzin z etui), a słuchawki mają odporność IP54.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Słuchawki odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem. Jeśli coś się zepsuje, serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy mają końcówki douszne?",
+        "a": "Nie, Buds4 mają konstrukcję otwartą bez końcówek. Jeśli wolisz silikonowe końcówki, spójrz na Galaxy Buds4 Pro."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Słuchawki, etui ładujące i skrócona instrukcja. Kabla USB‑C nie ma w zestawie."
+      },
+      {
+        "q": "Czy etui ładuje się bezprzewodowo?",
+        "a": "Tak, ale ładowarkę bezprzewodową kupuje się osobno."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Czarny i Biały."
+      }
+    ],
+    "compat": [
+      "galaxy-s26"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/galaxy-buds4/czarny.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Handel/Color_Selection_Black_PC.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/galaxy-buds4/bialy.webp",
+        "source": {
+          "url": "https://images.samsung.com/pl/galaxy-buds4/buy/05_Color_Selection/Handel/Color_Selection_White_PC.png",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.samsung.com/pl/audio-sound/galaxy-buds4-pro/buy/",
+        "date": "2026-11-18",
+        "what": "kolory i SKU Buds4 (SM-R540, tylko Czarny i Biały), zawartość pudełka, zdjęcia (wspólna strona zakupu z Buds4 Pro)"
+      },
+      {
+        "url": "https://www.samsung.com/pl/audio-sound/galaxy-buds/galaxy-buds4-black-sm-r540nzkaeue/",
+        "date": "2026-11-18",
+        "what": "specyfikacja techniczna, IP54, FAQ (zestaw, kolory, etui bezprzewodowe)"
+      }
+    ]
+  }
+]

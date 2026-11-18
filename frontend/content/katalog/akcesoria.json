@@ -1,0 +1,6 @@
+[
+  { "key": "hammer-glass", "name": "Folia ochronna Hammer Glass", "href": "/hammer-glass", "note": "Wycinamy ją na miejscu pod Twój model i naklejamy w salonie." },
+  { "key": "etui", "name": "Etui", "href": null, "note": "Dobierzemy etui pod model i kolor — zapytaj przy zamówieniu." },
+  { "key": "ladowarka", "name": "Ładowarka USB‑C", "href": null, "note": "W pudełku jest tylko przewód — dobierzemy zasilacz o odpowiedniej mocy." },
+  { "key": "przeniesienie-danych", "name": "Przeniesienie danych", "href": null, "note": "TODO(krystian): potwierdzić usługę przy zakupie (zdjęcia, kontakty, aplikacje)." }
+]

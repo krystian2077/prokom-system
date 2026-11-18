@@ -1,0 +1,21 @@
+[
+  { "key": "iphone-pro", "brand": "apple", "kind": "phone", "name": "iPhone Pro", "forWho": "Dla tych, którzy dużo fotografują i nagrywają, i chcą najszybszego iPhone’a na kilka lat.", "order": 100 },
+  { "key": "iphone-duo", "brand": "apple", "kind": "phone", "name": "iPhone Duo", "forWho": "Składany iPhone: telefon w kieszeni i mały tablet po otwarciu.", "order": 95 },
+  { "key": "iphone-air", "brand": "apple", "kind": "phone", "name": "iPhone Air", "forWho": "Dla tych, którzy chcą dużego ekranu w możliwie cienkiej i lekkiej obudowie.", "order": 90 },
+  { "key": "iphone", "brand": "apple", "kind": "phone", "name": "iPhone", "forWho": "Na co dzień: zdjęcia, wiadomości, banki i nawigacja, bez dopłaty za funkcje Pro.", "order": 80 },
+  { "key": "ipad-pro", "brand": "apple", "kind": "tablet", "name": "iPad Pro", "forWho": "Do pracy twórczej, rysowania i montażu — najmocniejszy iPad z najlepszym ekranem.", "order": 70 },
+  { "key": "ipad-air", "brand": "apple", "kind": "tablet", "name": "iPad Air", "forWho": "Do nauki i pracy z rysikiem i klawiaturą, w dwóch rozmiarach.", "order": 65 },
+  { "key": "ipad", "brand": "apple", "kind": "tablet", "name": "iPad i iPad mini", "forWho": "Do domu, szkoły i podróży: filmy, notatki i gry w rozsądnym rozmiarze.", "order": 60 },
+  { "key": "macbook-neo", "brand": "apple", "kind": "laptop", "name": "MacBook Neo", "forWho": "Pierwszy Mac do nauki i codziennych spraw — lekki i prosty.", "order": 58 },
+  { "key": "macbook-air", "brand": "apple", "kind": "laptop", "name": "MacBook Air", "forWho": "Cichy laptop na cały dzień pracy biurowej i studiów, bez wentylatora.", "order": 56 },
+  { "key": "macbook-pro", "brand": "apple", "kind": "laptop", "name": "MacBook Pro", "forWho": "Do programowania, grafiki i montażu, gdy liczy się moc i jakość ekranu.", "order": 54 },
+  { "key": "mac", "brand": "apple", "kind": "desktop", "name": "iMac, Mac mini i Mac Studio", "forWho": "Komputer na biurko: od domowego iMaca po stację roboczą Mac Studio.", "order": 50 },
+  { "key": "apple-watch", "brand": "apple", "kind": "watch", "name": "Apple Watch", "forWho": "Powiadomienia, treningi i zdrowie na nadgarstku — dla właścicieli iPhone’a.", "order": 40 },
+  { "key": "airpods", "brand": "apple", "kind": "audio", "name": "AirPods", "forWho": "Słuchawki, które same łączą się z iPhone’em, iPadem i Makiem.", "order": 30 },
+  { "key": "galaxy-s", "brand": "samsung", "kind": "phone", "name": "Galaxy S", "forWho": "Flagowe Galaxy: najlepsze aparaty i ekrany Samsunga, Ultra z rysikiem S Pen.", "order": 100 },
+  { "key": "galaxy-z", "brand": "samsung", "kind": "phone", "name": "Galaxy Z", "forWho": "Składane Galaxy: Fold jako telefon i tablet w jednym, Flip — kompaktowy po złożeniu.", "order": 95 },
+  { "key": "galaxy-a", "brand": "samsung", "kind": "phone", "name": "Galaxy A", "forWho": "Rozsądne telefony na co dzień: duży ekran, mocna bateria i długie wsparcie.", "order": 80 },
+  { "key": "galaxy-tab", "brand": "samsung", "kind": "tablet", "name": "Galaxy Tab", "forWho": "Tablety z rysikiem S Pen w zestawie — do notatek, nauki i filmów.", "order": 60 },
+  { "key": "galaxy-watch", "brand": "samsung", "kind": "watch", "name": "Galaxy Watch", "forWho": "Zegarki dla telefonów z Androidem: treningi, sen i powiadomienia.", "order": 40 },
+  { "key": "galaxy-buds", "brand": "samsung", "kind": "audio", "name": "Galaxy Buds", "forWho": "Słuchawki do telefonów Galaxy, z redukcją hałasu.", "order": 30 }
+]

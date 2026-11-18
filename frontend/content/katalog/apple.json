@@ -1,0 +1,5090 @@
+[
+  {
+    "slug": "iphone-18-pro",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone-pro",
+    "name": "iPhone 18 Pro",
+    "order": 1000,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#2b2b2d"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      },
+      {
+        "key": "blekit-lodowca",
+        "name": "Błękit lodowca",
+        "hex": "#b9cfdc"
+      },
+      {
+        "key": "burgund",
+        "name": "Burgund",
+        "hex": "#6b2a35"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB"
+      },
+      {
+        "key": "2-tb",
+        "label": "2 TB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A20 Pro",
+      "Trzy aparaty 48 Mpix",
+      "Ekran 6,3″ ProMotion 120 Hz",
+      "8x zoom jakości optycznej"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,3″ Super Retina XDR (OLED), 2622 × 1206 px, 460 ppi, ProMotion do 120 Hz, niegasnący wyświetlacz, do 3000 nitów w plenerze"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A20 Pro: 6‑rdzeniowe CPU, 7‑rdzeniowe GPU, podwójny 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "System pro aparatów Fusion 48 MP: główny 48 MP ze zmienną przysłoną (ƒ/1,48–ƒ/4,0), ultraszerokokątny 48 MP, teleobiektyw 48 MP 4x (100 mm); 8x zoom jakości optycznej"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 18 MP, ƒ/1,9, autofokus"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 120 kl./s, ProRes RAW, Apple Log 2"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Do 23 godz. standardowego użytkowania; do 34 godz. odtwarzania wideo"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w ok. 15 min (zasilacz 60 W lub mocniejszy, przewód USB‑C); MagSafe i Qi2 do 25 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 3 do 10 Gb/s, DisplayPort)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G (modem Apple C2), Wi‑Fi 7, Bluetooth 6, NFC, UWB 2. gen., Thread; Dual SIM (nano‑SIM i eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "150,0 × 71,9 × 8,75 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "211 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały",
+        "value": "Aluminiowa obudowa unibody, Ceramic Shield 2 z przodu, Ceramic Shield z tyłu"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS 27",
+      "Przewód USB‑C do ładowania (1 m)"
+    ],
+    "description": [
+      "iPhone 18 Pro to mniejszy z dwóch modeli Pro w tej generacji – z ekranem 6,3″, który wygodnie mieści się w dłoni i w kieszeni. To propozycja dla Ciebie, jeśli dużo fotografujesz albo nagrywasz wideo, a nie chcesz nosić dużego telefonu.",
+      "W środku pracuje czip A20 Pro, a z tyłu masz trzy aparaty 48 Mpix: główny, szerokokątny i teleobiektyw z zoomem 4x, który pozwala na 8x zoom jakości optycznej. Ekran ProMotion odświeża obraz do 120 Hz, a bateria wytrzymuje do 23 godzin zwykłego użytkowania. Obudowa jest z aluminium i ma odporność IP68, a w telefonie zmieścisz kartę nano‑SIM i eSIM jednocześnie.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z aktualną ceną i dostępnością wybranej wersji. Telefon odbierzesz w naszym salonie w Rabce‑Zdroju albo w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Gdyby kiedyś coś się zepsuło, nasz serwis jest na miejscu i przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego przy iPhonie 18 Pro nie widzę ceny?",
+        "a": "Ceny zmieniają się często, więc nie wpisujemy ich na stronę. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      },
+      {
+        "q": "Czy w pudełku jest ładowarka?",
+        "a": "Nie. W zestawie jest telefon i przewód USB‑C (1 m). Szybkie ładowanie do 50% w około 15 minut wymaga zasilacza 60 W lub mocniejszego."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "256 GB, 512 GB, 1 TB albo 2 TB. Napisz w zapytaniu, która Cię interesuje."
+      },
+      {
+        "q": "Czy dostanę go w kolorze Burgund?",
+        "a": "Model występuje w kolorach Czarny, Srebrny, Błękit lodowca i Burgund. Dostępność konkretnego koloru potwierdzimy w odpowiedzi na zapytanie, a odbiór jest w Rabce‑Zdroju lub Zakopanem."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-pro-3",
+      "apple-watch-series-12"
+    ],
+    "tags": [
+      "size:compact",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/iphone-18-pro/czarny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-black-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/iphone-18-pro/srebrny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-silver-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "blekit-lodowca",
+        "src": "/tech/katalog/iphone-18-pro/blekit-lodowca.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-glacier-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "burgund",
+        "src": "/tech/katalog/iphone-18-pro/burgund.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-burgundy-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-18-pro/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/iphone-18-pro/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (sekcja product-viewer)"
+      }
+    ]
+  },
+  {
+    "slug": "iphone-18-pro-max",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone-pro",
+    "name": "iPhone 18 Pro Max",
+    "order": 999,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#2b2b2d"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      },
+      {
+        "key": "blekit-lodowca",
+        "name": "Błękit lodowca",
+        "hex": "#b9cfdc"
+      },
+      {
+        "key": "burgund",
+        "name": "Burgund",
+        "hex": "#6b2a35"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB"
+      },
+      {
+        "key": "2-tb",
+        "label": "2 TB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A20 Pro",
+      "Trzy aparaty 48 Mpix",
+      "Ekran 6,9″ ProMotion 120 Hz",
+      "Do 29 godz. użytkowania"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,9″ Super Retina XDR (OLED), 2868 × 1320 px, 460 ppi, ProMotion do 120 Hz, niegasnący wyświetlacz, do 3000 nitów w plenerze"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A20 Pro: 6‑rdzeniowe CPU, 7‑rdzeniowe GPU, podwójny 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "System pro aparatów Fusion 48 MP: główny 48 MP ze zmienną przysłoną (ƒ/1,48–ƒ/4,0), ultraszerokokątny 48 MP, teleobiektyw 48 MP 4x (100 mm); 8x zoom jakości optycznej"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 18 MP, ƒ/1,9, autofokus"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 120 kl./s, ProRes RAW, Apple Log 2"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Do 29 godz. standardowego użytkowania; do 43 godz. odtwarzania wideo"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w ok. 15 min (zasilacz 60 W lub mocniejszy, przewód USB‑C); MagSafe i Qi2 do 25 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 3 do 10 Gb/s, DisplayPort)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G (modem Apple C2), Wi‑Fi 7, Bluetooth 6, NFC, UWB 2. gen., Thread; Dual SIM (nano‑SIM i eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "163,4 × 78,0 × 8,75 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "249 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały",
+        "value": "Aluminiowa obudowa unibody, Ceramic Shield 2 z przodu, Ceramic Shield z tyłu"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS 27",
+      "Przewód USB‑C do ładowania (1 m)"
+    ],
+    "description": [
+      "iPhone 18 Pro Max to większy model Pro z ekranem 6,9″. Sprawdzi się, jeśli dużo oglądasz, czytasz i fotografujesz na telefonie, a duży ekran i dłuższa praca na baterii są dla Ciebie ważniejsze niż kompaktowe wymiary.",
+      "Ma ten sam czip A20 Pro i te same trzy aparaty 48 Mpix co iPhone 18 Pro, w tym teleobiektyw 4x i 8x zoom jakości optycznej. Różnica to większy ekran ProMotion do 120 Hz i bateria na do 29 godzin zwykłego użytkowania. Waży 249 g, ma aluminiową obudowę z odpornością IP68 i obsługuje nano‑SIM oraz eSIM.",
+      "Zapytanie wyślesz bez zakładania konta – w odpowiedzi podamy aktualną cenę i to, czy wybrana wersja jest dostępna. Odbierzesz go w salonie w Rabce‑Zdroju lub w Zakopanem, gdzie od ręki, w około 5 minut, nakleimy folię Hammer Glass dociętą do ekranu. A jeśli coś się kiedyś uszkodzi, serwis mamy na miejscu – zawsze z wyceną przed naprawą."
+    ],
+    "faq": [
+      {
+        "q": "Ile kosztuje iPhone 18 Pro Max?",
+        "a": "Cena zmienia się w czasie, dlatego podajemy ją w odpowiedzi na zapytanie – razem z aktualną dostępnością."
+      },
+      {
+        "q": "Czym różni się od iPhone’a 18 Pro?",
+        "a": "Ma większy ekran (6,9″ zamiast 6,3″) i dłuższy czas pracy – do 29 godzin zamiast do 23. Czip i aparaty są takie same."
+      },
+      {
+        "q": "Czy obsługuje eSIM?",
+        "a": "Tak. Ma Dual SIM: jedną kartę nano‑SIM i eSIM."
+      },
+      {
+        "q": "Gdzie mogę go odebrać?",
+        "a": "W naszym salonie w Rabce‑Zdroju albo w Zakopanem – w zapytaniu napisz, który punkt Ci pasuje, oraz kolor i pojemność."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-pro-3",
+      "apple-watch-series-12"
+    ],
+    "tags": [
+      "size:large",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/iphone-18-pro-max/czarny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-black-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/iphone-18-pro-max/srebrny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-silver-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "blekit-lodowca",
+        "src": "/tech/katalog/iphone-18-pro-max/blekit-lodowca.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-glacier-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "burgund",
+        "src": "/tech/katalog/iphone-18-pro-max/burgund.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-burgundy-202609?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-18-pro/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania (wspólna strona z 18 Pro)"
+      },
+      {
+        "url": "https://www.apple.com/pl/iphone-18-pro/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (sekcja product-viewer)"
+      }
+    ]
+  },
+  {
+    "slug": "iphone-duo",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone-duo",
+    "name": "iPhone Duo",
+    "order": 998,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "nocne-niebo",
+        "name": "Nocne niebo",
+        "hex": "#1f2433"
+      },
+      {
+        "key": "gwiezdna-biel",
+        "name": "Gwiezdna biel",
+        "hex": "#f2f1ec"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB"
+      },
+      {
+        "key": "2-tb",
+        "label": "2 TB"
+      }
+    ],
+    "keyFacts": [
+      "Składany ekran 7,6″",
+      "Zewnętrzny ekran 5,4″",
+      "Czip A20 Pro",
+      "Dwa aparaty 48 Mpix"
+    ],
+    "specs": [
+      {
+        "label": "Ekran wewnętrzny",
+        "value": "Składany 7,6″ Super Retina XDR (OLED), 1878 × 2670 px, 430 ppi, wykończenie nanostrukturalne, ProMotion do 120 Hz"
+      },
+      {
+        "label": "Ekran zewnętrzny",
+        "value": "5,4″ Super Retina XDR (OLED), 1398 × 2034 px, 460 ppi, ProMotion do 120 Hz"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A20 Pro: 6‑rdzeniowe CPU, 7‑rdzeniowe GPU, podwójny 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Dwa aparaty Fusion 48 MP: główny 48 MP ƒ/1,6 (26 mm) i ultraszerokokątny 48 MP ƒ/2,2; 2x zoom jakości optycznej"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Zewnętrzny Center Stage 12 MP ƒ/2,2; wewnętrzny aparat FaceTime pod ekranem ƒ/1,8"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 120 kl./s (aparat główny)"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Dwie baterie; do 24 godz. typowego użytkowania; wideo do 44 godz. (ekran zewnętrzny) / 31 godz. (wewnętrzny)"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w ok. 20 min (zasilacz 60 W lub mocniejszy, przewód USB‑C); MagSafe i Qi2 do 25 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 3 do 10 Gb/s, DisplayPort)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G z mmWave (modem Apple C2), Wi‑Fi 7, Bluetooth 6, NFC, UWB 2. gen.; tylko eSIM (Dual eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "Otwarty: 117,8 × 164,6 × 5,2 mm; zamknięty: 117,8 × 84,1 × 11,3 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "254 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały i biometria",
+        "value": "Składana konstrukcja z tytanu, Ceramic Shield 2 z przodu, Ceramic Shield z tyłu; Touch ID w przycisku bocznym"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS 27",
+      "Przewód USB‑C do ładowania (1 m)"
+    ],
+    "description": [
+      "iPhone Duo to składany iPhone: po zamknięciu używasz go jak zwykłego telefonu, a po otwarciu masz ekran zbliżony do małego tabletu. To dobry wybór, jeśli na telefonie pracujesz, czytasz dokumenty albo oglądasz filmy i chcesz mieć więcej miejsca bez noszenia drugiego urządzenia.",
+      "Wewnętrzny ekran ma 7,6″, a zewnętrzny 5,4″ – oba z odświeżaniem do 120 Hz. W środku jest czip A20 Pro i dwie baterie, które dają do 24 godzin typowego użytkowania, a z tyłu dwa aparaty 48 Mpix. Konstrukcja jest z tytanu, odporna wg IP68, a telefon odblokujesz przyciskiem bocznym z Touch ID. Działa z Apple Pencil (USB‑C).",
+      "Napisz do nas zapytanie – logowanie nie jest potrzebne – a wrócimy z aktualną ceną i dostępnością. Odbiór jest w salonie w Rabce‑Zdroju lub w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. W razie awarii masz u nas serwis na miejscu i wycenę przed każdą naprawą."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego na stronie nie ma ceny iPhone’a Duo?",
+        "a": "Bo ceny się zmieniają. Po zapytaniu podamy aktualną cenę i powiemy, czy wybrana wersja jest dostępna."
+      },
+      {
+        "q": "Czy włożę do niego zwykłą kartę SIM?",
+        "a": "Nie. iPhone Duo działa tylko z eSIM (można mieć dwie eSIM naraz) i nie ma miejsca na fizyczną kartę."
+      },
+      {
+        "q": "Czy mogę pisać po nim rysikiem?",
+        "a": "Tak, telefon działa z Apple Pencil (USB‑C)."
+      },
+      {
+        "q": "W jakich kolorach jest dostępny?",
+        "a": "Nocne niebo i Gwiezdna biel. Który kolor możemy przygotować do odbioru w Rabce‑Zdroju lub Zakopanem, napiszemy w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-pro-3"
+    ],
+    "tags": [
+      "size:fold",
+      "camera:pro",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "nocne-niebo",
+        "src": "/tech/katalog/iphone-duo/nocne-niebo.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "gwiezdna-biel",
+        "src": "/tech/katalog/iphone-duo/gwiezdna-biel.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-duo/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/shop/buy-iphone/iphone-duo",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (obrazy sklepu)"
+      }
+    ]
+  },
+  {
+    "slug": "iphone-air",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone-air",
+    "name": "iPhone Air",
+    "order": 960,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "gwiezdna-czern",
+        "name": "Gwiezdna czerń",
+        "hex": "#1e1e20"
+      },
+      {
+        "key": "bialy-oblok",
+        "name": "Biały obłok",
+        "hex": "#f5f5f2"
+      },
+      {
+        "key": "jasne-zloto",
+        "name": "Jasne złoto",
+        "hex": "#e8d9b8"
+      },
+      {
+        "key": "blekitny",
+        "name": "Błękitny",
+        "hex": "#b7cde3"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB"
+      }
+    ],
+    "keyFacts": [
+      "Grubość 5,64 mm",
+      "Czip A19 Pro",
+      "Konstrukcja z tytanu",
+      "Ekran 6,5″ ProMotion 120 Hz"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,5″ Super Retina XDR (OLED), 2736 × 1260 px, 460 ppi, ProMotion do 120 Hz, niegasnący wyświetlacz"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A19 Pro: 6‑rdzeniowe CPU, 5‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Fusion 48 MP, ƒ/1,6 (26 mm), OIS; 2x zoom jakości optycznej (12 MP)"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 18 MP, ƒ/1,9, autofokus"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Do 27 godz. odtwarzania wideo (do 40 godz. z akumulatorem MagSafe do iPhone’a Air)"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w 30 min (zasilacz 20 W lub mocniejszy); MagSafe i Qi2 do 20 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 2, do 480 Mb/s)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G (modem Apple C1X), Wi‑Fi 7, Bluetooth 6, NFC, UWB 2. gen., Thread; tylko eSIM (Dual eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "156,2 × 74,7 × 5,64 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "165 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały",
+        "value": "Konstrukcja z tytanu, Ceramic Shield 2 z przodu, Ceramic Shield z tyłu"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS 27",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Dokumentacja"
+    ],
+    "description": [
+      "iPhone Air to bardzo cienki iPhone – ma zaledwie 5,64 mm grubości i waży 165 g. To telefon dla Ciebie, jeśli chcesz duży ekran w lekkiej obudowie, a jeden dobry aparat z tyłu w zupełności Ci wystarczy.",
+      "Ekran ma 6,5″ i odświeżanie ProMotion do 120 Hz, a w środku pracuje czip A19 Pro. Z tyłu jest jeden aparat Fusion 48 Mpix z 2x zoomem jakości optycznej, z przodu aparat 18 Mpix. Obudowa jest z tytanu, odporna wg IP68, a bateria wytrzymuje do 27 godzin odtwarzania wideo. Telefon działa tylko z eSIM.",
+      "Wystarczy wysłać zapytanie bez logowania – odpowiemy, ile teraz kosztuje i czy mamy go w wybranej wersji. Odbierzesz go w Rabce‑Zdroju albo w Zakopanem, a w salonie w około 5 minut nakleimy na ekran dociętą folię Hammer Glass. Jeśli kiedyś będzie potrzebna naprawa, serwis jest na miejscu, a wycenę dostajesz zanim zaczniemy."
+    ],
+    "faq": [
+      {
+        "q": "Czemu przy modelu nie ma ceny?",
+        "a": "Ceny często się zmieniają, więc podajemy aktualną cenę i dostępność w odpowiedzi na Twoje zapytanie."
+      },
+      {
+        "q": "Czy iPhone Air ma slot na kartę SIM?",
+        "a": "Nie, działa wyłącznie z eSIM – możesz mieć dwie eSIM jednocześnie."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Telefon, przewód USB‑C do ładowania (1 m) i dokumentacja. Zasilacza nie ma w zestawie."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-5"
+    ],
+    "tags": [
+      "size:large",
+      "camera:basic",
+      "tier:pro"
+    ],
+    "images": [
+      {
+        "color": "gwiezdna-czern",
+        "src": "/tech/katalog/iphone-air/gwiezdna-czern.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy-oblok",
+        "src": "/tech/katalog/iphone-air/bialy-oblok.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasne-zloto",
+        "src": "/tech/katalog/iphone-air/jasne-zloto.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "blekitny",
+        "src": "/tech/katalog/iphone-air/blekitny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-air/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/shop/buy-iphone/iphone-air",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (obrazy sklepu)"
+      }
+    ]
+  },
+  {
+    "slug": "iphone-17",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone",
+    "name": "iPhone 17",
+    "order": 950,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#232325"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f5f5f3"
+      },
+      {
+        "key": "golebi",
+        "name": "Gołębi",
+        "hex": "#a9b8c9"
+      },
+      {
+        "key": "szalwia",
+        "name": "Szałwia",
+        "hex": "#b5bfa3"
+      },
+      {
+        "key": "lawenda",
+        "name": "Lawenda",
+        "hex": "#cdbfdc"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A19",
+      "Dwa aparaty 48 Mpix",
+      "Ekran 6,3″ ProMotion 120 Hz",
+      "Przedni aparat 18 Mpix"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,3″ Super Retina XDR (OLED), 2622 × 1206 px, 460 ppi, ProMotion do 120 Hz, niegasnący wyświetlacz, do 3000 nitów w plenerze"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A19: 6‑rdzeniowe CPU, 5‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Dwa aparaty Fusion 48 MP: główny 48 MP ƒ/1,6 (26 mm) i ultraszerokokątny 48 MP ƒ/2,2; 2x zoom jakości optycznej"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 18 MP, ƒ/1,9, autofokus"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 60 kl./s, wideo przestrzenne 1080p"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Do 30 godz. odtwarzania wideo"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w 20 min (zasilacz 40 W lub mocniejszy, przewód USB‑C); MagSafe i Qi2 do 25 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 2 do 480 Mb/s, DisplayPort)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7, Bluetooth 6, NFC, UWB 2. gen., Thread; Dual SIM (nano‑SIM i eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "149,6 × 71,5 × 7,95 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "177 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały",
+        "value": "Aluminium, Ceramic Shield 2 z przodu, barwione szkło z tyłu"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS 27",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Dokumentacja"
+    ],
+    "description": [
+      "iPhone 17 to podstawowy model z obecnej linii – z ekranem 6,3″, wygodny w jednej ręce. Sprawdzi się u Ciebie na co dzień: do zdjęć, wiadomości, map i filmów, bez dopłacania do funkcji z modeli Pro.",
+      "Ekran ProMotion odświeża obraz do 120 Hz i ma niegasnący wyświetlacz, a w środku pracuje czip A19. Z tyłu są dwa aparaty 48 Mpix – główny i szerokokątny – a z przodu aparat 18 Mpix. Bateria wystarcza na do 30 godzin odtwarzania wideo, obudowa ma odporność IP68, a w telefonie zmieścisz nano‑SIM i eSIM.",
+      "Zapytanie wyślesz bez logowania, a my odpiszemy z aktualną ceną i dostępnością. Telefon odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy folię Hammer Glass. A gdy coś się zepsuje, nasz serwis jest na miejscu i przed każdą naprawą podaje wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Gdzie sprawdzę cenę iPhone’a 17?",
+        "a": "W odpowiedzi na zapytanie. Ceny się zmieniają, więc zawsze podajemy aktualną – razem z dostępnością."
+      },
+      {
+        "q": "Jaką pojemność wybrać: 256 czy 512 GB?",
+        "a": "Jeśli robisz dużo zdjęć i nagrywasz wideo w 4K, rozważ 512 GB. Przy typowym użytkowaniu zwykle wystarcza 256 GB."
+      },
+      {
+        "q": "Jakie kolory są do wyboru?",
+        "a": "Czarny, Biały, Gołębi, Szałwia i Lawenda. Dostępność koloru potwierdzimy w odpowiedzi, a odbiór jest w Rabce‑Zdroju lub Zakopanem."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-5"
+    ],
+    "tags": [
+      "size:compact",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/iphone-17/czarny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-black-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/iphone-17/bialy.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-white-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "golebi",
+        "src": "/tech/katalog/iphone-17/golebi.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-mistblue-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "szalwia",
+        "src": "/tech/katalog/iphone-17/szalwia.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-sage-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "lawenda",
+        "src": "/tech/katalog/iphone-17/lawenda.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-lavender-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-17/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/iphone-17/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (sekcja product-viewer)"
+      }
+    ]
+  },
+  {
+    "slug": "iphone-17e",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone",
+    "name": "iPhone 17e",
+    "order": 940,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#222224"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f4f4f2"
+      },
+      {
+        "key": "jasnorozowy",
+        "name": "Jasnoróżowy",
+        "hex": "#f0d6d6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A19",
+      "Aparat Fusion 48 Mpix",
+      "Ekran 6,1″ OLED",
+      "Ładowanie MagSafe"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,1″ Super Retina XDR (OLED), 2532 × 1170 px, 460 ppi, 800 nitów (typowo), 1200 nitów (HDR)"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A19: 6‑rdzeniowe CPU, 4‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Fusion 48 MP, ƒ/1,6 (26 mm), OIS; 2x zoom do zdjęć 12 MP"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "TrueDepth 12 MP, ƒ/1,9, autofokus"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Do 26 godz. odtwarzania wideo"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w 30 min (zasilacz 20 W lub mocniejszy, przewód USB‑C); MagSafe i Qi2 do 15 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 2, do 480 Mb/s)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G (modem Apple C1X), Wi‑Fi 6, Bluetooth 5.3, NFC; Dual SIM (nano‑SIM i eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "146,7 × 71,5 × 7,80 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "170 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały",
+        "value": "Aluminium, Ceramic Shield 2 z przodu, szkło z tyłu"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS 27",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Dokumentacja"
+    ],
+    "description": [
+      "iPhone 17e to najprostszy model z obecnych iPhone’ów, z ekranem 6,1″. Jest dla Ciebie, jeśli chcesz nowego iPhone’a do codziennych rzeczy – rozmów, wiadomości, zdjęć – i nie potrzebujesz wielu aparatów.",
+      "Ma ekran OLED 6,1″ i czip A19. Z tyłu jest jeden aparat Fusion 48 Mpix z 2x zoomem do zdjęć 12 Mpix, z przodu aparat 12 Mpix. Bateria wytrzymuje do 26 godzin odtwarzania wideo, telefon ładujesz przewodem USB‑C albo bezprzewodowo przez MagSafe i Qi2. Obudowa jest odporna wg IP68, a w środku zmieścisz nano‑SIM i eSIM.",
+      "Wyślij zapytanie – bez zakładania konta – a odpiszemy z aktualną ceną i dostępnością. Odbiór jest w salonie w Rabce‑Zdroju albo w Zakopanem, a przy okazji w około 5 minut nakleimy folię ochronną Hammer Glass dociętą do ekranu. Jeśli coś się kiedyś uszkodzi, serwis jest u nas na miejscu, z wyceną przed naprawą."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego nie podajecie ceny na stronie?",
+        "a": "Ceny zmieniają się w czasie. Po zapytaniu odpiszemy z aktualną ceną i dostępnością."
+      },
+      {
+        "q": "Czy iPhone 17e ładuje się bezprzewodowo?",
+        "a": "Tak, obsługuje MagSafe i Qi2 do 15 W. Przewodowo naładujesz go do 50% w 30 minut z zasilaczem 20 W lub mocniejszym."
+      },
+      {
+        "q": "Czym różni się od iPhone’a 17?",
+        "a": "Ma mniejszy ekran (6,1″) bez ProMotion, jeden aparat z tyłu zamiast dwóch i aparat przedni 12 Mpix zamiast 18 Mpix."
+      },
+      {
+        "q": "W jakich kolorach go znajdę?",
+        "a": "Czarny, Biały i Jasnoróżowy. Napisz w zapytaniu, który kolor wolisz – potwierdzimy, czy jest dostępny."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-5"
+    ],
+    "tags": [
+      "size:compact",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/iphone-17e/czarny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-black-202603?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/iphone-17e/bialy.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-white-202603?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasnorozowy",
+        "src": "/tech/katalog/iphone-17e/jasnorozowy.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-softpink-202603?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-17e/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/shop/buy-iphone/iphone-17e",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (obrazy sklepu)"
+      }
+    ]
+  },
+  {
+    "slug": "iphone-16",
+    "brand": "apple",
+    "kind": "phone",
+    "family": "iphone",
+    "name": "iPhone 16",
+    "order": 900,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#2e2e30"
+      },
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2ef"
+      },
+      {
+        "key": "rozowy",
+        "name": "Różowy",
+        "hex": "#f2c6d8"
+      },
+      {
+        "key": "berylowa-zielen",
+        "name": "Berylowa zieleń",
+        "hex": "#a8cfc9"
+      },
+      {
+        "key": "ultramaryna",
+        "name": "Ultramaryna",
+        "hex": "#8c9ae8"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A18",
+      "Aparat Fusion 48 Mpix",
+      "Przycisk Sterowanie aparatem",
+      "Ekran 6,1″ z Dynamic Island"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "6,1″ Super Retina XDR (OLED), 2556 × 1179 px, 460 ppi, Dynamic Island, do 2000 nitów w plenerze"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A18: 6‑rdzeniowe CPU, 5‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Główny Fusion 48 MP ƒ/1,6 (26 mm) i ultraszerokokątny 12 MP ƒ/2,2; 2x zoom optyczny"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "TrueDepth 12 MP, ƒ/1,9, autofokus"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K Dolby Vision do 60 kl./s, wideo przestrzenne 1080p"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "Do 22 godz. odtwarzania wideo; do 80 godz. odtwarzania dźwięku"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w 30 min (zasilacz 20 W lub mocniejszy); MagSafe i Qi2 do 25 W"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 2 do 480 Mb/s, DisplayPort)"
+      },
+      {
+        "label": "Łączność",
+        "value": "5G, Wi‑Fi 7, Bluetooth 5.3, NFC, UWB 2. gen., Thread; Dual SIM (nano‑SIM i eSIM)"
+      },
+      {
+        "label": "Wymiary",
+        "value": "147,6 × 71,6 × 7,80 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "170 g"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP68 (do 6 m przez 30 min)"
+      },
+      {
+        "label": "Materiały",
+        "value": "Aluminium, Ceramic Shield z przodu, barwione szkło z tyłu"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPhone z systemem iOS",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Dokumentacja"
+    ],
+    "description": [
+      "iPhone 16 to model z poprzedniej generacji, z ekranem 6,1″ i Dynamic Island. Jest dla Ciebie, jeśli chcesz sprawdzonego iPhone’a na co dzień i wystarczy Ci pojemność 128 GB.",
+      "W środku pracuje czip A18, a z tyłu masz główny aparat Fusion 48 Mpix i aparat szerokokątny 12 Mpix. Z boku jest przycisk Sterowanie aparatem, który ułatwia szybkie robienie zdjęć. Bateria daje do 22 godzin odtwarzania wideo, obudowa jest odporna wg IP68, a telefon przyjmie kartę nano‑SIM i eSIM.",
+      "Zapytanie wyślesz bez logowania, a my podamy aktualną cenę i dostępność. Telefon odbierzesz w Rabce‑Zdroju albo w Zakopanem, a w salonie w około 5 minut przytniemy i nakleimy folię Hammer Glass. Jeżeli kiedyś trzeba będzie coś naprawić, serwis jest na miejscu i zawsze najpierw dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Ile teraz kosztuje iPhone 16?",
+        "a": "Cenę i dostępność podajemy w odpowiedzi na zapytanie, bo zmieniają się w czasie."
+      },
+      {
+        "q": "Jakie pojemności są dostępne?",
+        "a": "iPhone 16 występuje w wersji 128 GB – innych pojemności tego modelu nie ma do wyboru."
+      },
+      {
+        "q": "Do czego służy przycisk Sterowanie aparatem?",
+        "a": "To przycisk z boku telefonu, którym szybko uruchomisz aparat i zrobisz zdjęcie."
+      },
+      {
+        "q": "Które kolory mogę odebrać w salonie?",
+        "a": "Model występuje w kolorach Czarny, Biały, Różowy, Berylowa zieleń i Ultramaryna. Dostępne kolory potwierdzimy w odpowiedzi na zapytanie."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka",
+      "airpods-5"
+    ],
+    "tags": [
+      "size:compact",
+      "camera:basic",
+      "tier:basic"
+    ],
+    "images": [
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/iphone-16/czarny.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-black-select-202409?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/iphone-16/bialy.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-white-select-202409?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "rozowy",
+        "src": "/tech/katalog/iphone-16/rozowy.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-pink-select-202409?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "berylowa-zielen",
+        "src": "/tech/katalog/iphone-16/berylowa-zielen.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-teal-select-202409?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ultramaryna",
+        "src": "/tech/katalog/iphone-16/ultramaryna.webp",
+        "transparent": true,
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-ultramarine-select-202409?wid=1200&hei=1420&fmt=png-alpha",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/iphone-16/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/iphone-16/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (adres przekierowuje na stronę sklepu „Kup iPhone’a 16”)"
+      }
+    ]
+  },
+  {
+    "slug": "ipad-pro-13-m5",
+    "brand": "apple",
+    "kind": "tablet",
+    "family": "ipad-pro",
+    "name": "iPad Pro 13 cali (M5)",
+    "order": 891,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e6"
+      },
+      {
+        "key": "gwiezdna-czern",
+        "name": "Gwiezdna czerń",
+        "hex": "#2e2e30"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "16 GB"
+      },
+      {
+        "key": "2-tb",
+        "label": "2 TB",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple M5",
+      "Ekran tandemowy OLED 13″",
+      "Grubość 5,1 mm",
+      "Thunderbolt / USB 4"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "13″ Ultra Retina XDR (tandemowy OLED), 2752 × 2064 px, 264 ppi, ProMotion 10–120 Hz; opcjonalne szkło nanostrukturalne (1 TB i 2 TB)"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "Apple M5: 9‑rdzeniowe CPU (256/512 GB) lub 10‑rdzeniowe CPU (1/2 TB), 10‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB (256 i 512 GB) lub 16 GB (1 i 2 TB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Szerokokątny 12 MP, ƒ/1,8; skaner LiDAR"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 12 MP na dłuższym boku, ƒ/2,0"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "38,99 Wh; do 10 godz. przeglądania internetu przez Wi‑Fi lub oglądania wideo"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w ok. 30 min (zasilacz 60 W lub mocniejszy)"
+      },
+      {
+        "label": "Złącze",
+        "value": "Thunderbolt / USB 4 (do 40 Gb/s)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 7, Bluetooth 6, Thread; wersja Wi‑Fi + Cellular: 5G (modem Apple C1X), tylko eSIM"
+      },
+      {
+        "label": "Wymiary",
+        "value": "281,6 × 215,5 × 5,1 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "579 g (Wi‑Fi), 582 g (Wi‑Fi + Cellular)"
+      },
+      {
+        "label": "Audio",
+        "value": "Cztery głośniki, cztery mikrofony klasy studyjnej"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPad Pro",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Ściereczka do czyszczenia w opcji z nanostrukturalnym szkłem wyświetlacza"
+    ],
+    "description": [
+      "iPad Pro 13 cali z czipem M5 to duży tablet do pracy twórczej i biurowej. Jest dla Ciebie, jeśli potrzebujesz dużo miejsca na ekranie – do rysowania, edycji zdjęć i wideo albo pracy na kilku oknach naraz.",
+      "Ma 13‑calowy tandemowy ekran OLED z odświeżaniem 10–120 Hz, a w wersjach 1 TB i 2 TB opcjonalne szkło nanostrukturalne. Czip M5 współpracuje z 12 GB RAM (256 i 512 GB) albo 16 GB RAM (1 i 2 TB). Mimo dużego ekranu tablet ma 5,1 mm grubości i waży od 579 g, a do podłączania akcesoriów i monitora służy złącze Thunderbolt / USB 4.",
+      "Zapytanie wyślesz bez zakładania konta – odpowiemy z aktualną ceną i informacją o dostępności. Odbierzesz go w naszym salonie w Rabce‑Zdroju albo w Zakopanem, a na miejscu w około 5 minut nakleimy dociętą folię ochronną Hammer Glass. W razie usterki serwis jest na miejscu, zawsze z wyceną przed naprawą."
+    ],
+    "faq": [
+      {
+        "q": "Ile kosztuje iPad Pro 13 cali?",
+        "a": "Zależy od pojemności i wersji, a ceny się zmieniają. Napisz zapytanie – podamy aktualną cenę i dostępność."
+      },
+      {
+        "q": "Czy jest wersja z kartą SIM?",
+        "a": "Jest wersja Wi‑Fi + Cellular z 5G. Działa tylko z eSIM."
+      },
+      {
+        "q": "Co dostanę w pudełku?",
+        "a": "Tablet i przewód USB‑C (1 m). W wersji ze szkłem nanostrukturalnym dochodzi ściereczka do czyszczenia. Zasilacza nie ma w zestawie."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/ipad-pro-13-m5/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-pro/specs/e/images/specs/finish_silver__dgoqzxd7wx0m_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "gwiezdna-czern",
+        "src": "/tech/katalog/ipad-pro-13-m5/gwiezdna-czern.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-pro/specs/e/images/specs/finish_space_black__fuh4e8c1a1ua_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/ipad-pro/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, RAM, zawartość opakowania"
+      }
+    ]
+  },
+  {
+    "slug": "ipad-pro-11-m5",
+    "brand": "apple",
+    "kind": "tablet",
+    "family": "ipad-pro",
+    "name": "iPad Pro 11 cali (M5)",
+    "order": 890,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e6"
+      },
+      {
+        "key": "gwiezdna-czern",
+        "name": "Gwiezdna czerń",
+        "hex": "#2e2e30"
+      }
+    ],
+    "storage": [
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "16 GB"
+      },
+      {
+        "key": "2-tb",
+        "label": "2 TB",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple M5",
+      "Ekran tandemowy OLED 11″",
+      "Grubość 5,3 mm",
+      "Thunderbolt / USB 4"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "11″ Ultra Retina XDR (tandemowy OLED), 2420 × 1668 px, 264 ppi, ProMotion 10–120 Hz; opcjonalne szkło nanostrukturalne (1 TB i 2 TB)"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "Apple M5: 9‑rdzeniowe CPU (256/512 GB) lub 10‑rdzeniowe CPU (1/2 TB), 10‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB (256 i 512 GB) lub 16 GB (1 i 2 TB)"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Szerokokątny 12 MP, ƒ/1,8; skaner LiDAR"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 12 MP na dłuższym boku, ƒ/2,0"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "31,29 Wh; do 10 godz. przeglądania internetu przez Wi‑Fi lub oglądania wideo"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w ok. 30 min (zasilacz 60 W lub mocniejszy)"
+      },
+      {
+        "label": "Złącze",
+        "value": "Thunderbolt / USB 4 (do 40 Gb/s)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 7, Bluetooth 6, Thread; wersja Wi‑Fi + Cellular: 5G (modem Apple C1X), tylko eSIM"
+      },
+      {
+        "label": "Wymiary",
+        "value": "249,7 × 177,5 × 5,3 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "444 g (Wi‑Fi), 446 g (Wi‑Fi + Cellular)"
+      },
+      {
+        "label": "Audio",
+        "value": "Cztery głośniki, cztery mikrofony klasy studyjnej"
+      },
+      {
+        "label": "Biometria",
+        "value": "Face ID"
+      }
+    ],
+    "inBox": [
+      "iPad Pro",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Ściereczka do czyszczenia w opcji z nanostrukturalnym szkłem wyświetlacza"
+    ],
+    "description": [
+      "iPad Pro 11 cali z czipem M5 to tablet do poważniejszej pracy w poręcznym rozmiarze. Sprawdzi się u Ciebie, jeśli rysujesz, montujesz wideo, robisz notatki rysikiem albo chcesz tabletu, który zastąpi w wielu zadaniach laptopa.",
+      "Ekran 11″ to tandemowy OLED z odświeżaniem 10–120 Hz, a w wersjach 1 TB i 2 TB możesz wybrać szkło nanostrukturalne, które ogranicza odblaski. Czip M5 ma 12 GB RAM w wersjach 256 i 512 GB oraz 16 GB w wersjach 1 i 2 TB. Tablet ma 5,3 mm grubości, złącze Thunderbolt / USB 4, Face ID i działa z Apple Pencil Pro oraz Apple Pencil (USB‑C).",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością wybranej konfiguracji. Tablet odbierzesz w salonie w Rabce‑Zdroju lub w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy na ekran folię Hammer Glass. Gdyby coś się zepsuło, nasz serwis jest na miejscu, a wycenę dostajesz przed każdą naprawą."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego nie ma ceny iPada Pro na stronie?",
+        "a": "Ceny się zmieniają, a konfiguracji jest dużo. Po zapytaniu podamy aktualną cenę i dostępność wybranej wersji."
+      },
+      {
+        "q": "Która wersja ma więcej pamięci RAM?",
+        "a": "Wersje 1 TB i 2 TB mają 16 GB RAM i 10‑rdzeniowe CPU. Wersje 256 i 512 GB mają 12 GB RAM i 9‑rdzeniowe CPU."
+      },
+      {
+        "q": "Jakie rysiki działają z tym iPadem?",
+        "a": "Apple Pencil Pro i Apple Pencil (USB‑C)."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Srebrny i Gwiezdna czerń. Dostępność potwierdzimy w odpowiedzi, a odbiór jest w Rabce‑Zdroju lub Zakopanem."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/ipad-pro-11-m5/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-pro/specs/e/images/specs/finish_silver__dgoqzxd7wx0m_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "gwiezdna-czern",
+        "src": "/tech/katalog/ipad-pro-11-m5/gwiezdna-czern.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-pro/specs/e/images/specs/finish_space_black__fuh4e8c1a1ua_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/ipad-pro/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, RAM, zawartość opakowania"
+      }
+    ]
+  },
+  {
+    "slug": "ipad-air-13-m4",
+    "brand": "apple",
+    "kind": "tablet",
+    "family": "ipad-air",
+    "name": "iPad Air 13 cali (M4)",
+    "order": 881,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#a7bccf"
+      },
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#c9bedf"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#ece4d6"
+      },
+      {
+        "key": "gwiezdna-szarosc",
+        "name": "Gwiezdna szarość",
+        "hex": "#6e6e73"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "12 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple M4",
+      "12 GB RAM",
+      "Ekran Liquid Retina 13″",
+      "Wi‑Fi 7"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "13″ Liquid Retina (IPS, LED), 2732 × 2048 px, 264 ppi, pełna laminacja, 600 nitów"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "Apple M4: 8‑rdzeniowe CPU, 9‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Szerokokątny 12 MP, ƒ/1,8"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 12 MP na dłuższym boku, ƒ/2,0"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "36,59 Wh; do 10 godz. przeglądania internetu przez Wi‑Fi lub oglądania wideo"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 3 do 10 Gb/s, DisplayPort; monitor do 6K przy 60 Hz)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 7, Bluetooth 6, Thread; wersja Wi‑Fi + Cellular: 5G (modem Apple C1X), tylko eSIM"
+      },
+      {
+        "label": "Wymiary",
+        "value": "280,6 × 214,9 × 6,1 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "616 g (Wi‑Fi), 617 g (Wi‑Fi + Cellular)"
+      },
+      {
+        "label": "Audio",
+        "value": "Głośniki stereo (układ poziomy), dwa mikrofony"
+      },
+      {
+        "label": "Biometria",
+        "value": "Touch ID w przycisku górnym"
+      }
+    ],
+    "inBox": [
+      "iPad Air",
+      "Przewód USB‑C do ładowania (1 m)"
+    ],
+    "description": [
+      "iPad Air 13 cali z czipem M4 to duży ekran w lżejszej i prostszej wersji niż iPad Pro. Jest dla Ciebie, jeśli chcesz wygodnie oglądać filmy, pracować na dokumentach albo uczyć się na dużym ekranie.",
+      "Ekran Liquid Retina ma 13″ i jasność 600 nitów, a w środku pracuje czip M4 z 12 GB RAM. Tablet ma 6,1 mm grubości i waży od 616 g. Przez USB‑C podłączysz monitor do 6K, a łączność to Wi‑Fi 7 i Bluetooth 6; jest też wersja z 5G na eSIM.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z aktualną ceną i dostępnością. Tablet odbierzesz w Rabce‑Zdroju albo w Zakopanem, a w salonie w około 5 minut nakleimy folię Hammer Glass dociętą do ekranu. Gdyby kiedyś coś się zepsuło, serwis jest na miejscu i najpierw zawsze dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego na stronie nie ma ceny?",
+        "a": "Ceny zmieniają się w czasie. Po zapytaniu podamy aktualną cenę i dostępność wybranej wersji."
+      },
+      {
+        "q": "Czym różni się od wersji 11 cali?",
+        "a": "Ma większy ekran (13″) i jaśniejszy – 600 nitów zamiast 500. Czip M4 i 12 GB RAM są takie same."
+      },
+      {
+        "q": "Jakie pojemności mogę wybrać?",
+        "a": "128 GB, 256 GB, 512 GB lub 1 TB – każda z 12 GB RAM."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/ipad-air-13-m4/niebieski.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-blue-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/ipad-air-13-m4/fioletowy.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-purple-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/ipad-air-13-m4/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-starlight-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "gwiezdna-szarosc",
+        "src": "/tech/katalog/ipad-air-13-m4/gwiezdna-szarosc.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-space-gray-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/ipad-air/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, RAM, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/shop/buy-ipad/ipad-air",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (obrazy sklepu)"
+      }
+    ]
+  },
+  {
+    "slug": "ipad-air-11-m4",
+    "brand": "apple",
+    "kind": "tablet",
+    "family": "ipad-air",
+    "name": "iPad Air 11 cali (M4)",
+    "order": 880,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#a7bccf"
+      },
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#c9bedf"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#ece4d6"
+      },
+      {
+        "key": "gwiezdna-szarosc",
+        "name": "Gwiezdna szarość",
+        "hex": "#6e6e73"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB",
+        "ram": "12 GB"
+      },
+      {
+        "key": "1-tb",
+        "label": "1 TB",
+        "ram": "12 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple M4",
+      "12 GB RAM",
+      "Ekran Liquid Retina 11″",
+      "Wi‑Fi 7"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "11″ Liquid Retina (IPS, LED), 2360 × 1640 px, 264 ppi, pełna laminacja, 500 nitów"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "Apple M4: 8‑rdzeniowe CPU, 9‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "12 GB"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Szerokokątny 12 MP, ƒ/1,8"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 12 MP na dłuższym boku, ƒ/2,0"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "28,93 Wh; do 10 godz. przeglądania internetu przez Wi‑Fi lub oglądania wideo"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 3 do 10 Gb/s, DisplayPort; monitor do 6K przy 60 Hz)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 7, Bluetooth 6, Thread; wersja Wi‑Fi + Cellular: 5G (modem Apple C1X), tylko eSIM"
+      },
+      {
+        "label": "Wymiary",
+        "value": "247,6 × 178,5 × 6,1 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "464 g (Wi‑Fi), 465 g (Wi‑Fi + Cellular)"
+      },
+      {
+        "label": "Audio",
+        "value": "Głośniki stereo (układ poziomy), dwa mikrofony"
+      },
+      {
+        "label": "Biometria",
+        "value": "Touch ID w przycisku górnym"
+      }
+    ],
+    "inBox": [
+      "iPad Air",
+      "Przewód USB‑C do ładowania (1 m)"
+    ],
+    "description": [
+      "iPad Air 11 cali z czipem M4 to tablet, który łączy poręczny rozmiar z dużą wydajnością. Sprawdzi się u Ciebie do nauki, notatek, pracy w podróży i rozrywki, gdy iPad Pro to więcej, niż potrzebujesz.",
+      "Ma ekran Liquid Retina 11″ i czip M4 z 12 GB RAM w każdej wersji pamięci. Złącze USB‑C pozwala podłączyć monitor do 6K, a łączność obejmuje Wi‑Fi 7 i Bluetooth 6. Tablet odblokujesz przyciskiem górnym z Touch ID, waży od 464 g i działa z Apple Pencil Pro oraz Apple Pencil (USB‑C).",
+      "Napisz zapytanie – logowanie nie jest potrzebne – a wrócimy z aktualną ceną i dostępnością. Odbiór jest w salonie w Rabce‑Zdroju lub w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy na ekran folię Hammer Glass. Jeśli coś się kiedyś uszkodzi, nasz serwis jest na miejscu i przed naprawą zawsze podaje wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czemu nie widzę ceny iPada Air?",
+        "a": "Ceny się zmieniają, więc podajemy aktualną w odpowiedzi na zapytanie – razem z dostępnością."
+      },
+      {
+        "q": "Ile RAM ma ten iPad?",
+        "a": "12 GB we wszystkich wersjach: 128 GB, 256 GB, 512 GB i 1 TB."
+      },
+      {
+        "q": "Czy mogę używać Apple Pencil?",
+        "a": "Tak, działa z Apple Pencil Pro i Apple Pencil (USB‑C)."
+      },
+      {
+        "q": "Jakie kolory są dostępne?",
+        "a": "Niebieski, Fioletowy, Księżycowa poświata i Gwiezdna szarość. Który mamy do odbioru w Rabce‑Zdroju lub Zakopanem, napiszemy w odpowiedzi."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/ipad-air-11-m4/niebieski.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-blue-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/ipad-air-11-m4/fioletowy.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-purple-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/ipad-air-11-m4/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-starlight-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "gwiezdna-szarosc",
+        "src": "/tech/katalog/ipad-air-11-m4/gwiezdna-szarosc.webp",
+        "source": {
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-space-gray-wifi?wid=5120&hei=2880&fmt=jpeg&qlt=90",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/ipad-air/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, RAM, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/shop/buy-ipad/ipad-air",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (obrazy sklepu)"
+      }
+    ]
+  },
+  {
+    "slug": "ipad-mini-a20-pro",
+    "brand": "apple",
+    "kind": "tablet",
+    "family": "ipad",
+    "name": "iPad mini (A20 Pro)",
+    "order": 872,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "polnoc",
+        "name": "Północ",
+        "hex": "#2c3038"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#ece4d6"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A20 Pro",
+      "Ekran OLED 8,5″",
+      "Odporność IP67",
+      "Waga od 255 g"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "8,5″ Liquid Retina (OLED), 2316 × 1512 px, 326 ppi, pełna laminacja, do 600 nitów (SDR); opcjonalne szkło nanostrukturalne (256 i 512 GB)"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A20 Pro: 5‑rdzeniowe CPU (128/256 GB) lub 6‑rdzeniowe CPU (512 GB), 7‑rdzeniowe GPU, 16‑rdzeniowy (512 GB: podwójny) Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Szerokokątny 12 MP, ƒ/1,8"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 12 MP na dłuższym boku, ƒ/2,0"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "18,9 Wh; do 10 godz. przeglądania internetu przez Wi‑Fi lub oglądania wideo (do 9 godz. przez sieć komórkową)"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "Do 50% w ok. 30 min (zasilacz USB‑C 35 W lub mocniejszy)"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 3 do 10 Gb/s, DisplayPort; monitor do 4K przy 60 Hz)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 7, Bluetooth 6, Thread; wersja Wi‑Fi + Cellular: 5G (modem Apple C2), tylko eSIM"
+      },
+      {
+        "label": "Wymiary",
+        "value": "195,3 × 132,6 × 5,4 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "255 g (Wi‑Fi), 263 g (Wi‑Fi + Cellular)"
+      },
+      {
+        "label": "Odporność (IP)",
+        "value": "IP67 (do 1 m przez 30 min)"
+      },
+      {
+        "label": "Audio",
+        "value": "Dźwięk stereo z wykorzystaniem Acoustic Display, dwa mikrofony"
+      },
+      {
+        "label": "Biometria",
+        "value": "Touch ID w przycisku górnym"
+      }
+    ],
+    "inBox": [
+      "iPad mini",
+      "Przewód USB‑C do ładowania (1 m)",
+      "Ściereczka do czyszczenia w opcji ze szkłem nanostrukturalnym"
+    ],
+    "description": [
+      "iPad mini z czipem A20 Pro to mały tablet, który zmieścisz w torebce albo kieszeni kurtki. Jest dla Ciebie, jeśli chcesz czytać, robić notatki, nawigować w podróży czy grać, a pełnowymiarowy iPad jest za duży.",
+      "Ekran OLED ma 8,5″, a tablet waży od 255 g i ma 5,4 mm grubości. W środku pracuje czip A20 Pro, a obudowa ma odporność IP67. Z tyłu i z przodu są aparaty 12 Mpix, Touch ID jest w przycisku górnym, a w wersjach 256 i 512 GB możesz wybrać szkło nanostrukturalne. Działa z Apple Pencil Pro i Apple Pencil (USB‑C).",
+      "Wystarczy zapytanie bez logowania – odpiszemy z aktualną ceną i dostępnością. Odbiór jest w salonie w Rabce‑Zdroju albo w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy na ekran folię Hammer Glass. Jeśli kiedyś będzie potrzebna naprawa, nasz serwis jest na miejscu i przed rozpoczęciem podaje wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Dlaczego iPad mini nie ma ceny na stronie?",
+        "a": "Ceny się zmieniają, dlatego aktualną cenę i dostępność podajemy w odpowiedzi na zapytanie."
+      },
+      {
+        "q": "Czy iPad mini jest odporny na wodę?",
+        "a": "Ma odporność IP67 – do 1 m głębokości przez 30 minut."
+      },
+      {
+        "q": "Czym różnią się wersje pamięci?",
+        "a": "Wersja 512 GB ma 6‑rdzeniowe CPU i podwójny Neural Engine, wersje 128 i 256 GB – 5‑rdzeniowe CPU. Szkło nanostrukturalne jest opcją w wersjach 256 i 512 GB."
+      },
+      {
+        "q": "Jakie kolory są do wyboru?",
+        "a": "Północ i Księżycowa poświata. Napisz, który wolisz – potwierdzimy dostępność i przygotujemy odbiór w Rabce‑Zdroju lub Zakopanem."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "polnoc",
+        "src": "/tech/katalog/ipad-mini-a20-pro/polnoc.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-mini/a/images/specs/finish_midnight__8if2dx0mwlua_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/ipad-mini-a20-pro/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-mini/a/images/specs/finish_starlight__fcyojtfx96ai_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/ipad-mini/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania; adresy zdjęć w kolorach (arkusz CSS strony specs)"
+      }
+    ]
+  },
+  {
+    "slug": "ipad-11-a16",
+    "brand": "apple",
+    "kind": "tablet",
+    "family": "ipad",
+    "name": "iPad 11 cali (A16)",
+    "order": 870,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e6"
+      },
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#8fb4d9"
+      },
+      {
+        "key": "rozowy",
+        "name": "Różowy",
+        "hex": "#f0b6c6"
+      },
+      {
+        "key": "zolty",
+        "name": "Żółty",
+        "hex": "#f3d673"
+      }
+    ],
+    "storage": [
+      {
+        "key": "128-gb",
+        "label": "128 GB"
+      },
+      {
+        "key": "256-gb",
+        "label": "256 GB"
+      },
+      {
+        "key": "512-gb",
+        "label": "512 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip A16",
+      "Ekran Liquid Retina 11″",
+      "Aparat przedni na dłuższym boku",
+      "Cztery kolory"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "11″ Liquid Retina (IPS, LED), 2360 × 1640 px, 264 ppi, 500 nitów"
+      },
+      {
+        "label": "Procesor (czip)",
+        "value": "A16: 5‑rdzeniowe CPU, 4‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Aparat główny",
+        "value": "Szerokokątny 12 MP, ƒ/1,8"
+      },
+      {
+        "label": "Aparat przedni",
+        "value": "Center Stage 12 MP na dłuższym boku, ƒ/2,4"
+      },
+      {
+        "label": "Wideo",
+        "value": "4K do 60 kl./s"
+      },
+      {
+        "label": "Bateria / czas pracy",
+        "value": "28,93 Wh; do 10 godz. przeglądania internetu przez Wi‑Fi lub oglądania wideo (do 9 godz. przez sieć komórkową)"
+      },
+      {
+        "label": "Złącze",
+        "value": "USB‑C (USB 2.0 do 480 Mb/s, DisplayPort; monitor do 4K przy 60 Hz); Smart Connector"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 6, Bluetooth 5.3; wersja Wi‑Fi + Cellular: 5G, tylko eSIM"
+      },
+      {
+        "label": "Wymiary",
+        "value": "248,6 × 179,5 × 7 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "477 g (Wi‑Fi), 481 g (Wi‑Fi + Cellular)"
+      },
+      {
+        "label": "Audio",
+        "value": "Głośniki stereo (układ poziomy), dwa mikrofony"
+      },
+      {
+        "label": "Rysik",
+        "value": "Apple Pencil (USB‑C), Apple Pencil (1. generacji) przez przejściówkę"
+      },
+      {
+        "label": "Biometria",
+        "value": "Touch ID w przycisku górnym"
+      }
+    ],
+    "inBox": [
+      "iPad",
+      "Przewód USB‑C do ładowania (1 m)"
+    ],
+    "description": [
+      "iPad 11 cali z czipem A16 to podstawowy iPad – prosty w obsłudze i dobry na start. Sprawdzi się u Ciebie do nauki, oglądania filmów, przeglądania internetu i rozmów wideo, także dla dzieci czy seniorów.",
+      "Ma ekran Liquid Retina 11″ i czip A16. Przedni aparat 12 Mpix jest na dłuższym boku, więc w rozmowach wideo trzymasz tablet poziomo i dobrze Cię widać. Bateria wystarcza na do 10 godzin przeglądania internetu lub oglądania wideo, Touch ID jest w przycisku górnym. Działa z Apple Pencil (USB‑C) i przez przejściówkę z Apple Pencil 1. generacji.",
+      "Zapytanie wyślesz bez zakładania konta, a my odpowiemy z aktualną ceną i dostępnością. Odbierzesz go w naszym salonie w Rabce‑Zdroju lub w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. A jeśli coś się kiedyś stanie, serwis jest na miejscu, z wyceną przed każdą naprawą."
+    ],
+    "faq": [
+      {
+        "q": "Ile kosztuje podstawowy iPad?",
+        "a": "Cenę i dostępność podajemy w odpowiedzi na zapytanie, bo zmieniają się w czasie."
+      },
+      {
+        "q": "Jaki rysik pasuje do tego iPada?",
+        "a": "Apple Pencil (USB‑C), a Apple Pencil 1. generacji przez przejściówkę."
+      },
+      {
+        "q": "Czy jest wersja z internetem komórkowym?",
+        "a": "Tak, wersja Wi‑Fi + Cellular obsługuje 5G i działa tylko z eSIM."
+      },
+      {
+        "q": "W jakich kolorach mogę go odebrać?",
+        "a": "Srebrny, Niebieski, Różowy i Żółty. Dostępność koloru potwierdzimy w odpowiedzi, a odbiór jest w Rabce‑Zdroju lub Zakopanem."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "etui",
+      "ladowarka"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/ipad-11-a16/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-11/d/images/overview/ar/ar_ipad_silver__fdoed3gunyqa_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/ipad-11-a16/niebieski.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-11/d/images/overview/ar/ar_ipad_blue__d92pgjt4vnee_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "rozowy",
+        "src": "/tech/katalog/ipad-11-a16/rozowy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-11/d/images/overview/ar/ar_ipad_pink__b2aojrg2kbsi_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zolty",
+        "src": "/tech/katalog/ipad-11-a16/zolty.webp",
+        "source": {
+          "url": "https://www.apple.com/v/ipad-11/d/images/overview/ar/ar_ipad_yellow__fvf57b0nm526_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/ipad-11/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, pamięć, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/ipad-11/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (sekcja AR)"
+      }
+    ]
+  },
+  {
+    "slug": "macbook-pro-proled-xdr",
+    "brand": "apple",
+    "kind": "laptop",
+    "family": "macbook-pro",
+    "name": "MacBook Pro z wyświetlaczem PROLED XDR",
+    "order": 862,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "gwiezdna-czern",
+        "name": "Gwiezdna czerń",
+        "hex": "#2e2c2e"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      }
+    ],
+    "storage": [
+      {
+        "key": "14-2-m5-pro-15c-cpu-16c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "14,2″ · M5 Pro 15C CPU / 16C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      },
+      {
+        "key": "14-2-m5-pro-18c-cpu-20c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "14,2″ · M5 Pro 18C CPU / 20C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      },
+      {
+        "key": "14-2-m5-max-18c-cpu-32c-gpu-36-gb-ram-2-tb-ssd",
+        "label": "14,2″ · M5 Max 18C CPU / 32C GPU · 36 GB RAM · 2 TB SSD",
+        "ram": "36 GB"
+      },
+      {
+        "key": "14-2-m5-max-18c-cpu-40c-gpu-48-gb-ram-2-tb-ssd",
+        "label": "14,2″ · M5 Max 18C CPU / 40C GPU · 48 GB RAM · 2 TB SSD",
+        "ram": "48 GB"
+      },
+      {
+        "key": "16-3-m5-pro-18c-cpu-20c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "16,3″ · M5 Pro 18C CPU / 20C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      },
+      {
+        "key": "16-3-m5-max-18c-cpu-32c-gpu-36-gb-ram-2-tb-ssd",
+        "label": "16,3″ · M5 Max 18C CPU / 32C GPU · 36 GB RAM · 2 TB SSD",
+        "ram": "36 GB"
+      },
+      {
+        "key": "16-3-m5-max-18c-cpu-40c-gpu-48-gb-ram-2-tb-ssd",
+        "label": "16,3″ · M5 Max 18C CPU / 40C GPU · 48 GB RAM · 2 TB SSD",
+        "ram": "48 GB"
+      }
+    ],
+    "keyFacts": [
+      "Tandemowy wyświetlacz OLED z obsługą dotyku i Dynamic Island",
+      "Do 2000 nitów jasności szczytowej",
+      "Dwa rozmiary: 14,2″ i 16,3″",
+      "Do 16 TB SSD (M5 Max)"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Tandemowy OLED (PROLED XDR) 14,2″ (3024 × 1986 px) lub 16,3″ (3472 × 2266 px), 254 ppi, ProMotion 10–120 Hz, 1000 nitów na całym ekranie / 2000 nitów szczytowo, kontrast 10 000 000:1, P3 i Adobe RGB"
+      },
+      {
+        "label": "Dotyk",
+        "value": "Obsługa gestów Multi‑Touch na ekranie, Dynamic Island, powłoka antyodblaskowa; opcja szkła nanostrukturalnego"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple M5 Pro lub M5 Max"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "M5 Pro: 15C/16C lub 18C/20C; M5 Max: 18C CPU z 32C lub 40C GPU"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "M5 Pro: 24–64 GB; M5 Max: 36–128 GB"
+      },
+      {
+        "label": "Dysk",
+        "value": "M5 Pro: 1–4 TB SSD; M5 Max: 2–16 TB SSD"
+      },
+      {
+        "label": "Bateria",
+        "value": "14″: 72,6 Wh, do 22 h wideo (M5 Pro) / 20 h (M5 Max); 16″: 100 Wh, do 24 h wideo (M5 Pro) / 22 h (M5 Max)"
+      },
+      {
+        "label": "Złącza",
+        "value": "3 × Thunderbolt 5 (do 120 Gb/s), HDMI, SDXC, MagSafe 3, gniazdo 3,5 mm"
+      },
+      {
+        "label": "Kamera",
+        "value": "Center Stage 12 MP z Widokiem blatu, wideo 1080p, zaawansowana stabilizacja obrazu"
+      },
+      {
+        "label": "Audio",
+        "value": "Sześć głośników hi‑fi, Dolby Atmos, trzy mikrofony klasy studyjnej"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Wymiary",
+        "value": "14″: 1,50 × 31,08 × 21,63 cm; 16″: 1,60 × 35,55 × 24,42 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "14″: 1,38 kg (M5 Pro), 1,40 kg (M5 Max); 16″: 1,82 kg (M5 Pro), 1,84 kg (M5 Max)"
+      }
+    ],
+    "inBox": [
+      "MacBook Pro z wyświetlaczem PROLED XDR (14″ lub 16″)",
+      "Przewód z USB‑C na MagSafe 3 (2 m)",
+      "Ściereczka do czyszczenia (tylko w wersji ze szkłem nanostrukturalnym)",
+      "Zasilacz sprzedawany oddzielnie"
+    ],
+    "description": [
+      "MacBook Pro z wyświetlaczem PROLED XDR to laptop z tandemowym ekranem OLED, który obsługuje dotyk. Jest dla twórców, fotografów i filmowców, którzy pracują z kolorem i obrazem, oraz dla wszystkich, którzy chcą najlepszego ekranu w MacBooku.",
+      "Ekran występuje w dwóch rozmiarach – 14,2″ i 16,3″ – ma odświeżanie 10–120 Hz, do 2000 nitów jasności szczytowej, obsługę gestów Multi‑Touch i Dynamic Island. W środku czip M5 Pro (24–64 GB pamięci) lub M5 Max (36–128 GB) i dysk nawet do 16 TB. Bateria daje do 24 godzin wideo w wersji 16″ z M5 Pro, a porty to trzy Thunderbolt 5, HDMI, SDXC i MagSafe 3.",
+      "Zapytaj o wybrany rozmiar i konfigurację bez logowania – odpiszemy z ceną i dostępnością. Odbiór w naszym salonie w Rabce‑Zdroju lub w Zakopanem. Jeśli coś się zepsuje, serwis jest na miejscu, a przed naprawą zawsze dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy ten ekran naprawdę jest dotykowy?",
+        "a": "Tak, obsługuje gesty Multi‑Touch bezpośrednio na ekranie i ma Dynamic Island."
+      },
+      {
+        "q": "14″ czy 16″?",
+        "a": "14,2″ jest lżejszy (od 1,38 kg) i łatwiejszy w podróży. 16,3″ daje więcej miejsca na ekranie i większą baterię (100 Wh), ale waży od 1,82 kg."
+      },
+      {
+        "q": "Czy w zestawie jest zasilacz?",
+        "a": "Nie. W pudełku jest laptop i przewód z USB‑C na MagSafe 3 (2 m); ściereczka tylko w wersji ze szkłem nanostrukturalnym."
+      },
+      {
+        "q": "Ile kosztuje?",
+        "a": "Ceny zależą od rozmiaru i konfiguracji i się zmieniają. Wyślij zapytanie – odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "etui"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "gwiezdna-czern",
+        "src": "/tech/katalog/macbook-pro-proled-xdr/gwiezdna-czern.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-pro/proled-xdr-display/a/images/overview/product-viewer/pv_colors_spaceblack__f7rjyt5tgqmy_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/macbook-pro-proled-xdr/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-pro/proled-xdr-display/a/images/overview/product-viewer/pv_colors_silver__e9u5y7p26te2_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/macbook-pro/proled-xdr-display/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/macbook-pro/proled-xdr-display/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (przeglądarka produktu)"
+      }
+    ]
+  },
+  {
+    "slug": "macbook-pro-14",
+    "brand": "apple",
+    "kind": "laptop",
+    "family": "macbook-pro",
+    "name": "MacBook Pro 14″",
+    "order": 861,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "gwiezdna-czern",
+        "name": "Gwiezdna czerń",
+        "hex": "#2e2c2e"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m6-12c-cpu-12c-gpu-16-gb-ram-1-tb-ssd",
+        "label": "M6 12C CPU / 12C GPU · 16 GB RAM · 1 TB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m5-pro-15c-cpu-16c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "M5 Pro 15C CPU / 16C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      },
+      {
+        "key": "m5-max-18c-cpu-32c-gpu-36-gb-ram-2-tb-ssd",
+        "label": "M5 Max 18C CPU / 32C GPU · 36 GB RAM · 2 TB SSD",
+        "ram": "36 GB"
+      }
+    ],
+    "keyFacts": [
+      "Wybór czipu: M6, M5 Pro lub M5 Max",
+      "Wyświetlacz Liquid Retina XDR z ProMotion 120 Hz",
+      "Do 24 godzin strumieniowania wideo (M6)",
+      "HDMI, czytnik SDXC i MagSafe 3"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Liquid Retina XDR 14,2″, 3024 × 1964 px (254 ppi), ProMotion do 120 Hz, SDR do 1000 nitów (w plenerze), HDR do 1600 nitów szczytowo; opcja wyświetlacza nanostrukturalnego"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple M6, M5 Pro lub M5 Max"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "M6: 12C CPU / 12C GPU; M5 Pro: 15C/16C (opcja 18C/20C); M5 Max: 18C/32C (opcja 18C/40C)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "M6: 16–32 GB; M5 Pro: 24–64 GB; M5 Max: 36–128 GB"
+      },
+      {
+        "label": "Dysk",
+        "value": "M6 i M5 Pro: 1–4 TB SSD; M5 Max: 2–8 TB SSD"
+      },
+      {
+        "label": "Bateria",
+        "value": "72,4 Wh; M6: do 24 h wideo / 16 h internetu; M5 Pro: 22 h / 14 h; M5 Max: 20 h / 13 h"
+      },
+      {
+        "label": "Złącza",
+        "value": "M6: 3 × Thunderbolt 4; M5 Pro/Max: 3 × Thunderbolt 5; HDMI, SDXC, MagSafe 3, gniazdo 3,5 mm"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "M6: do 2; M5 Pro: do 3; M5 Max: do 4"
+      },
+      {
+        "label": "Kamera",
+        "value": "Center Stage 12 MP z Widokiem blatu, wideo 1080p"
+      },
+      {
+        "label": "Audio",
+        "value": "Sześć głośników hi‑fi, Dolby Atmos, trzy mikrofony klasy studyjnej, HDMI z dźwiękiem wielokanałowym"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Wymiary",
+        "value": "1,55 × 31,26 × 22,12 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "1,55 kg (M6), 1,60 kg (M5 Pro), 1,62 kg (M5 Max)"
+      }
+    ],
+    "inBox": [
+      "14‑calowy MacBook Pro",
+      "Przewód z USB‑C na MagSafe 3 (2 m)",
+      "Ściereczka do czyszczenia (tylko w wersji z wyświetlaczem nanostrukturalnym)",
+      "Zasilacz sprzedawany oddzielnie"
+    ],
+    "description": [
+      "MacBook Pro 14″ to laptop do poważnej pracy: montażu wideo, grafiki, programowania czy obróbki zdjęć. Jest dla osób, które potrzebują dużej mocy i dobrego ekranu, ale nadal chcą sprzętu, który łatwo zabrać ze sobą.",
+      "Wybierasz jeden z trzech czipów: M6, M5 Pro albo M5 Max – od 16 GB do nawet 128 GB pamięci i od 1 TB do 8 TB dysku. Ekran Liquid Retina XDR ma 14,2 cala, odświeżanie do 120 Hz i do 1600 nitów jasności w HDR. Na baterii z M6 pracuje do 24 godzin przy wideo, a na bokach ma HDMI, czytnik kart SDXC, MagSafe 3 i trzy porty Thunderbolt.",
+      "Napisz zapytanie – bez logowania – a odpowiemy z ceną i dostępnością wybranej wersji. Odbiór w salonie w Rabce‑Zdroju lub w Zakopanem. Jeśli kiedyś będzie potrzebna naprawa, serwis PRO-KOM Tech jest na miejscu i zawsze zaczyna od wyceny."
+    ],
+    "faq": [
+      {
+        "q": "M6, M5 Pro czy M5 Max?",
+        "a": "M6 to najdłuższa praca na baterii i zapas mocy na większość zadań. M5 Pro i M5 Max mają więcej rdzeni, Thunderbolt 5 i obsługę większej liczby monitorów – są dla montażu wideo, 3D i ciężkich projektów."
+      },
+      {
+        "q": "Czy zasilacz jest w zestawie?",
+        "a": "Nie. W pudełku jest laptop i przewód z USB‑C na MagSafe 3 (2 m); ściereczka do czyszczenia tylko w wersji z wyświetlaczem nanostrukturalnym."
+      },
+      {
+        "q": "Ile monitorów obsłuży?",
+        "a": "Z M6 do dwóch, z M5 Pro do trzech, a z M5 Max do czterech zewnętrznych wyświetlaczy."
+      },
+      {
+        "q": "Jaka jest cena?",
+        "a": "Ceny zależą od konfiguracji i się zmieniają. Wyślij zapytanie, a odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "etui"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/macbook-pro-14/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-pro/liquid-retina-xdr-display/specs/e/images/specs/14-inch/macbook_pro_14_inch__fjlrd633eki2_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/macbook-pro/liquid-retina-xdr-display/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania (adres /pl/macbook-pro/specs/ przekierowuje tutaj)"
+      }
+    ]
+  },
+  {
+    "slug": "macbook-pro-16",
+    "brand": "apple",
+    "kind": "laptop",
+    "family": "macbook-pro",
+    "name": "MacBook Pro 16″",
+    "order": 860,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "gwiezdna-czern",
+        "name": "Gwiezdna czerń",
+        "hex": "#2e2c2e"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m5-pro-18c-cpu-20c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "M5 Pro 18C CPU / 20C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      },
+      {
+        "key": "m5-max-18c-cpu-32c-gpu-36-gb-ram-2-tb-ssd",
+        "label": "M5 Max 18C CPU / 32C GPU · 36 GB RAM · 2 TB SSD",
+        "ram": "36 GB"
+      },
+      {
+        "key": "m5-max-18c-cpu-40c-gpu-48-gb-ram-2-tb-ssd",
+        "label": "M5 Max 18C CPU / 40C GPU · 48 GB RAM · 2 TB SSD",
+        "ram": "48 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip M5 Pro lub M5 Max",
+      "Do 24 godzin strumieniowania wideo",
+      "Trzy porty Thunderbolt 5",
+      "Do 128 GB pamięci RAM (M5 Max)"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Liquid Retina XDR 16,2″, 3456 × 2234 px (254 ppi), ProMotion do 120 Hz, SDR do 1000 nitów (w plenerze), HDR do 1600 nitów szczytowo; opcja wyświetlacza nanostrukturalnego"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple M5 Pro lub M5 Max"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "M5 Pro: 18C CPU / 20C GPU; M5 Max: 18C CPU / 32C lub 40C GPU"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "M5 Pro: 24–64 GB; M5 Max: 36–128 GB"
+      },
+      {
+        "label": "Dysk",
+        "value": "M5 Pro: 1–4 TB SSD; M5 Max: 2–8 TB SSD"
+      },
+      {
+        "label": "Bateria",
+        "value": "100 Wh; M5 Pro: do 24 h wideo / 17 h internetu; M5 Max: 22 h / 16 h"
+      },
+      {
+        "label": "Złącza",
+        "value": "3 × Thunderbolt 5 (do 120 Gb/s), HDMI, SDXC, MagSafe 3, gniazdo 3,5 mm"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "M5 Pro: do 3; M5 Max: do 4"
+      },
+      {
+        "label": "Kamera",
+        "value": "Center Stage 12 MP z Widokiem blatu, wideo 1080p"
+      },
+      {
+        "label": "Audio",
+        "value": "Sześć głośników hi‑fi, Dolby Atmos, trzy mikrofony klasy studyjnej, HDMI z dźwiękiem wielokanałowym"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Wymiary",
+        "value": "1,68 × 35,57 × 24,81 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "2,14 kg (M5 Pro), 2,15 kg (M5 Max)"
+      }
+    ],
+    "inBox": [
+      "16‑calowy MacBook Pro",
+      "Przewód z USB‑C na MagSafe 3 (2 m)",
+      "Ściereczka do czyszczenia (tylko w wersji z wyświetlaczem nanostrukturalnym)",
+      "Zasilacz sprzedawany oddzielnie"
+    ],
+    "description": [
+      "MacBook Pro 16″ to największy z klasycznych MacBooków Pro, stworzony do pracy, w której liczy się każda minuta: montażu filmów, animacji, muzyki czy dużych projektów programistycznych. Jest dla osób, dla których laptop to główne narzędzie pracy.",
+      "Do wyboru czip M5 Pro (24–64 GB pamięci) albo M5 Max (36–128 GB), dysk od 1 TB do 8 TB. Ekran Liquid Retina XDR ma 16,2 cala i odświeżanie do 120 Hz, a bateria 100 Wh daje do 24 godzin wideo z M5 Pro. Na pokładzie trzy porty Thunderbolt 5, HDMI, czytnik SDXC i MagSafe 3; waga to 2,14–2,15 kg.",
+      "Wyślij zapytanie bez zakładania konta – odpiszemy z ceną i dostępnością. Gotowy sprzęt odbierzesz w salonie w Rabce‑Zdroju albo w Zakopanem. W razie usterki serwis mamy na miejscu, a przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy jest wersja z czipem M6?",
+        "a": "Nie, 16‑calowy MacBook Pro ma do wyboru M5 Pro albo M5 Max."
+      },
+      {
+        "q": "Ile pamięci RAM wybrać?",
+        "a": "24 GB z M5 Pro wystarczy do większości profesjonalnych zadań. M5 Max z 36–48 GB lub więcej warto brać przy najcięższych projektach wideo i 3D."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Laptop i przewód z USB‑C na MagSafe 3 (2 m). Zasilacz sprzedawany jest oddzielnie."
+      },
+      {
+        "q": "Jakie kolory są dostępne?",
+        "a": "Gwiezdna czerń i srebrny. O dostępność wybranego koloru i konfiguracji zapytaj w formularzu."
+      }
+    ],
+    "compat": [
+      "etui"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/macbook-pro-16/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-pro/liquid-retina-xdr-display/specs/e/images/specs/16-inch/macbook_pro_16_inch__cqvg4x5ohjv6_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/macbook-pro/liquid-retina-xdr-display/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania (zakładka 16 cali)"
+      }
+    ]
+  },
+  {
+    "slug": "macbook-neo-13",
+    "brand": "apple",
+    "kind": "laptop",
+    "family": "macbook-neo",
+    "name": "MacBook Neo 13″",
+    "order": 855,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      },
+      {
+        "key": "subtelny-roz",
+        "name": "Subtelny róż",
+        "hex": "#e8cbc6"
+      },
+      {
+        "key": "cytrusowozolty",
+        "name": "Cytrusowożółty",
+        "hex": "#e4d98a"
+      },
+      {
+        "key": "indygo",
+        "name": "Indygo",
+        "hex": "#3f4a6b"
+      }
+    ],
+    "storage": [
+      {
+        "key": "8-gb-ram-256-gb-ssd",
+        "label": "8 GB RAM · 256 GB SSD",
+        "ram": "8 GB"
+      },
+      {
+        "key": "8-gb-ram-512-gb-ssd-z-touch-id",
+        "label": "8 GB RAM · 512 GB SSD (z Touch ID)",
+        "ram": "8 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple A18 Pro",
+      "Do 16 godzin strumieniowania wideo",
+      "Waga 1,23 kg",
+      "Cztery kolory: srebrny, subtelny róż, cytrusowożółty, indygo"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Liquid Retina 13″, IPS z podświetleniem LED, 2408 × 1506 px (219 ppi), 500 nitów, sRGB"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple A18 Pro"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "6‑rdzeniowe CPU (2 wydajnościowe + 4 energooszczędne), 5‑rdzeniowe GPU, 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "8 GB zunifikowanej pamięci"
+      },
+      {
+        "label": "Dysk",
+        "value": "SSD 256 GB lub 512 GB"
+      },
+      {
+        "label": "Bateria",
+        "value": "36,5 Wh; do 16 h strumieniowania wideo, do 11 h przeglądania internetu przez Wi‑Fi"
+      },
+      {
+        "label": "Złącza",
+        "value": "1 × USB 3 (USB‑C, do 10 Gb/s, DisplayPort, ładowanie), 1 × USB 2 (USB‑C, ładowanie), gniazdo słuchawkowe 3,5 mm"
+      },
+      {
+        "label": "Monitor zewnętrzny",
+        "value": "1 wyświetlacz do 4K przy 60 Hz"
+      },
+      {
+        "label": "Klawiatura",
+        "value": "Magic Keyboard; Touch ID tylko w wersji 512 GB"
+      },
+      {
+        "label": "Kamera",
+        "value": "FaceTime HD 1080p"
+      },
+      {
+        "label": "Audio",
+        "value": "System dwóch głośników, Dolby Atmos, dwa mikrofony"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 6E, Bluetooth 6"
+      },
+      {
+        "label": "Wymiary",
+        "value": "1,27 × 29,75 × 20,64 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "1,23 kg"
+      }
+    ],
+    "inBox": [
+      "MacBook Neo",
+      "Przewód USB‑C do ładowania (1,5 m)",
+      "Zasilacz sprzedawany oddzielnie"
+    ],
+    "description": [
+      "MacBook Neo 13″ to lekki laptop Apple na co dzień – do nauki, pracy biurowej, przeglądania internetu i filmów. Dobrze sprawdzi się u ucznia, studenta albo osoby, która chce prostego Maca do codziennych zadań.",
+      "W środku pracuje czip Apple A18 Pro z 6‑rdzeniowym CPU i 8 GB pamięci, a do wyboru masz dysk 256 GB lub 512 GB. Ekran ma 13 cali i 500 nitów jasności, bateria wytrzymuje do 16 godzin oglądania wideo, a całość waży 1,23 kg. Z boku znajdziesz dwa porty USB‑C i gniazdo słuchawkowe, a laptop występuje w czterech kolorach: srebrnym, subtelnym różu, cytrusowożółtym i indygo.",
+      "Wyślij nam zapytanie – bez logowania – a odpiszemy z ceną i dostępnością wybranej wersji. Laptop odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem. Gdyby coś się zepsuło, nasz serwis jest na miejscu, a przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym różnią się dwie wersje MacBooka Neo?",
+        "a": "Obie mają 8 GB pamięci. Wersja z dyskiem 512 GB ma dodatkowo Touch ID w klawiaturze, wersja 256 GB – nie."
+      },
+      {
+        "q": "Czy w pudełku jest zasilacz?",
+        "a": "Nie. W zestawie jest laptop i przewód USB‑C do ładowania (1,5 m), zasilacz kupuje się osobno."
+      },
+      {
+        "q": "Czy podłączę do niego monitor?",
+        "a": "Tak, jeden zewnętrzny wyświetlacz do 4K przy 60 Hz przez port USB 3 (USB‑C)."
+      },
+      {
+        "q": "Czy dostanę wybrany kolor od ręki?",
+        "a": "Dostępność kolorów się zmienia. Napisz w zapytaniu, który kolor Cię interesuje – sprawdzimy i odpiszemy."
+      }
+    ],
+    "compat": [
+      "etui"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/macbook-neo-13/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-neo/b/images/overview/product-viewer/pv_colors_silver__bhbd7o8mxxzm_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "subtelny-roz",
+        "src": "/tech/katalog/macbook-neo-13/subtelny-roz.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-neo/b/images/overview/product-viewer/pv_colors_blush__fji4uke74w2m_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "cytrusowozolty",
+        "src": "/tech/katalog/macbook-neo-13/cytrusowozolty.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-neo/b/images/overview/product-viewer/pv_colors_citrus__flplef60bpim_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "indygo",
+        "src": "/tech/katalog/macbook-neo-13/indygo.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-neo/b/images/overview/product-viewer/pv_colors_indigo__ee1m3vsakryq_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/macbook-neo/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/macbook-neo/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (przeglądarka produktu)"
+      }
+    ]
+  },
+  {
+    "slug": "macbook-air-15",
+    "brand": "apple",
+    "kind": "laptop",
+    "family": "macbook-air",
+    "name": "MacBook Air 15″ (M5)",
+    "order": 851,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "blekitny",
+        "name": "Błękitny",
+        "hex": "#c5d5e2"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#efe4d2"
+      },
+      {
+        "key": "polnoc",
+        "name": "Północ",
+        "hex": "#2e3641"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m5-10c-cpu-10c-gpu-16-gb-ram-512-gb-ssd",
+        "label": "M5 10C CPU / 10C GPU · 16 GB RAM · 512 GB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m5-10c-cpu-10c-gpu-16-gb-ram-1-tb-ssd",
+        "label": "M5 10C CPU / 10C GPU · 16 GB RAM · 1 TB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m5-10c-cpu-10c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "M5 10C CPU / 10C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      }
+    ],
+    "keyFacts": [
+      "Ekran Liquid Retina 15,3″",
+      "Czip Apple M5 z 10‑rdzeniowym GPU",
+      "Sześć głośników",
+      "Do 18 godzin strumieniowania wideo"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Liquid Retina 15,3″, IPS, 2880 × 1864 px (224 ppi), 500 nitów, P3, True Tone"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple M5, 16‑rdzeniowy Neural Engine, 153 GB/s przepustowości pamięci"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "10‑rdzeniowe CPU (4 super + 6 energooszczędnych), 10‑rdzeniowe GPU"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "16 GB lub 24 GB (konfiguracja do 32 GB)"
+      },
+      {
+        "label": "Dysk",
+        "value": "SSD 512 GB lub 1 TB (konfiguracja do 4 TB)"
+      },
+      {
+        "label": "Bateria",
+        "value": "66,5 Wh; do 18 h strumieniowania wideo, do 15 h przeglądania internetu przez Wi‑Fi"
+      },
+      {
+        "label": "Złącza",
+        "value": "MagSafe 3, 2 × Thunderbolt 4 (USB‑C, do 40 Gb/s), gniazdo słuchawkowe 3,5 mm"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "do 2 wyświetlaczy (2 × 6K 60 Hz lub 1 × 8K 60 Hz)"
+      },
+      {
+        "label": "Kamera",
+        "value": "Center Stage 12 MP z Widokiem blatu, wideo 1080p"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Klawiatura",
+        "value": "Podświetlana Magic Keyboard z Touch ID, gładzik Force Touch"
+      },
+      {
+        "label": "Audio",
+        "value": "System sześciu głośników z przetwornikami niskotonowymi force‑cancelling, Dolby Atmos, trzy mikrofony"
+      },
+      {
+        "label": "Wymiary",
+        "value": "1,15 × 34,04 × 23,76 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "1,51 kg"
+      }
+    ],
+    "inBox": [
+      "15‑calowy MacBook Air",
+      "Przewód z USB‑C na MagSafe 3 (2 m)",
+      "Zasilacz sprzedawany oddzielnie"
+    ],
+    "description": [
+      "MacBook Air 15″ z czipem M5 to propozycja dla tych, którzy chcą lekkiego laptopa, ale z większym ekranem. Przyda się przy pracy na dwóch oknach obok siebie, przy arkuszach, zdjęciach i filmach.",
+      "Ekran ma 15,3 cala i rozdzielczość 2880 × 1864 px, a każda wersja ma czip M5 z 10‑rdzeniowym CPU i 10‑rdzeniowym GPU. Do wyboru 16 GB lub 24 GB pamięci oraz dysk 512 GB lub 1 TB. Bateria wytrzymuje do 18 godzin wideo, ma sześć głośników zamiast czterech jak w modelu 13″, a laptop waży 1,51 kg.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z ceną i dostępnością konkretnej konfiguracji i koloru. Laptopa odbierzesz w naszym salonie w Rabce‑Zdroju lub w Zakopanem. W razie awarii serwis jest na miejscu – przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym 15″ różni się od 13″?",
+        "a": "Ma większy ekran (15,3″), zawsze 10‑rdzeniowe GPU, sześć głośników zamiast czterech i większą baterię (66,5 Wh). Jest też cięższy: 1,51 kg."
+      },
+      {
+        "q": "Którą konfigurację wybrać?",
+        "a": "Do typowej pracy wystarczy 16 GB i 512 GB. Jeśli trzymasz dużo zdjęć i filmów, weź 1 TB; 24 GB pamięci przyda się przy cięższych programach."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Laptop i przewód z USB‑C na MagSafe 3 (2 m). Zasilacz kupuje się oddzielnie."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Błękitny, srebrny, księżycowa poświata i północ. O dostępność konkretnego koloru zapytaj w formularzu – sprawdzimy."
+      }
+    ],
+    "compat": [
+      "etui"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "blekitny",
+        "src": "/tech/katalog/macbook-air-15/blekitny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_skyblue__eepkvlvjzcia_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/macbook-air-15/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_silver__dcf8hwixw2uu_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/macbook-air-15/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_starlight__dtojfd6ibywm_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "polnoc",
+        "src": "/tech/katalog/macbook-air-15/polnoc.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_midnight__fvf2p6124tqq_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/macbook-air/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania (zakładka 15 cali)"
+      },
+      {
+        "url": "https://www.apple.com/pl/macbook-air/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (sekcja design)"
+      }
+    ]
+  },
+  {
+    "slug": "macbook-air-13",
+    "brand": "apple",
+    "kind": "laptop",
+    "family": "macbook-air",
+    "name": "MacBook Air 13″ (M5)",
+    "order": 850,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "blekitny",
+        "name": "Błękitny",
+        "hex": "#c5d5e2"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#efe4d2"
+      },
+      {
+        "key": "polnoc",
+        "name": "Północ",
+        "hex": "#2e3641"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m5-10c-cpu-8c-gpu-16-gb-ram-512-gb-ssd",
+        "label": "M5 10C CPU / 8C GPU · 16 GB RAM · 512 GB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m5-10c-cpu-10c-gpu-16-gb-ram-1-tb-ssd",
+        "label": "M5 10C CPU / 10C GPU · 16 GB RAM · 1 TB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m5-10c-cpu-10c-gpu-24-gb-ram-1-tb-ssd",
+        "label": "M5 10C CPU / 10C GPU · 24 GB RAM · 1 TB SSD",
+        "ram": "24 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple M5",
+      "Do 18 godzin strumieniowania wideo",
+      "Wi‑Fi 7 i Bluetooth 6 (czip N1)",
+      "Waga 1,23 kg"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Liquid Retina 13,6″, IPS, 2560 × 1664 px (224 ppi), 500 nitów, P3, True Tone"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple M5, 16‑rdzeniowy Neural Engine, 153 GB/s przepustowości pamięci"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "10‑rdzeniowe CPU (4 super + 6 energooszczędnych); GPU 8‑ lub 10‑rdzeniowe"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "16 GB lub 24 GB (konfiguracja do 32 GB)"
+      },
+      {
+        "label": "Dysk",
+        "value": "SSD 512 GB lub 1 TB (konfiguracja do 4 TB)"
+      },
+      {
+        "label": "Bateria",
+        "value": "53,8 Wh; do 18 h strumieniowania wideo, do 15 h przeglądania internetu przez Wi‑Fi"
+      },
+      {
+        "label": "Złącza",
+        "value": "MagSafe 3, 2 × Thunderbolt 4 (USB‑C, do 40 Gb/s), gniazdo słuchawkowe 3,5 mm"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "do 2 wyświetlaczy (2 × 6K 60 Hz lub 1 × 8K 60 Hz)"
+      },
+      {
+        "label": "Kamera",
+        "value": "Center Stage 12 MP z Widokiem blatu, wideo 1080p"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Klawiatura",
+        "value": "Podświetlana Magic Keyboard z Touch ID, gładzik Force Touch"
+      },
+      {
+        "label": "Audio",
+        "value": "System czterech głośników, Dolby Atmos, trzy mikrofony"
+      },
+      {
+        "label": "Wymiary",
+        "value": "1,13 × 30,41 × 21,5 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "1,23 kg"
+      }
+    ],
+    "inBox": [
+      "13‑calowy MacBook Air",
+      "Przewód z USB‑C na MagSafe 3 (2 m)",
+      "Zasilacz sprzedawany oddzielnie"
+    ],
+    "description": [
+      "MacBook Air 13″ z czipem M5 to cienki i cichy laptop dla osób, które dużo pracują w ruchu: na uczelni, w biurze, w podróży. Ma zapas mocy na pracę z wieloma programami naraz, a przy tym mieści się w każdej torbie.",
+      "Ekran ma 13,6 cala, rozdzielczość 2560 × 1664 px i 500 nitów jasności. Czip M5 ma 10‑rdzeniowe CPU, a GPU – zależnie od wersji – 8 lub 10 rdzeni; pamięci jest 16 GB lub 24 GB, dysk 512 GB lub 1 TB. Bateria daje do 18 godzin oglądania wideo, laptop waży 1,23 kg, ma MagSafe 3, dwa porty Thunderbolt 4 oraz Wi‑Fi 7 i Bluetooth 6.",
+      "Zapytaj o wybraną konfigurację bez zakładania konta – odpowiemy z aktualną ceną i dostępnością. Odbiór w salonie PRO-KOM Tech w Rabce‑Zdroju albo w Zakopanem. A jeśli kiedyś coś się zepsuje, serwis jest u nas na miejscu i zawsze najpierw dostajesz wycenę naprawy."
+    ],
+    "faq": [
+      {
+        "q": "16 GB czy 24 GB pamięci?",
+        "a": "16 GB w zupełności wystarczy do nauki, biura i internetu. 24 GB warto wziąć, jeśli pracujesz na wielu ciężkich programach naraz albo chcesz mieć zapas na lata."
+      },
+      {
+        "q": "Czy zasilacz jest w zestawie?",
+        "a": "Nie. W pudełku jest laptop i przewód z USB‑C na MagSafe 3 (2 m); zasilacz sprzedawany jest oddzielnie."
+      },
+      {
+        "q": "Ile monitorów mogę podłączyć?",
+        "a": "Do dwóch zewnętrznych wyświetlaczy: dwa 6K przy 60 Hz albo jeden 8K przy 60 Hz."
+      },
+      {
+        "q": "Jaka jest cena?",
+        "a": "Ceny się zmieniają, dlatego nie podajemy ich na stronie. Wyślij zapytanie – odpiszemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "etui"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "blekitny",
+        "src": "/tech/katalog/macbook-air-13/blekitny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_skyblue__eepkvlvjzcia_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/macbook-air-13/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_silver__dcf8hwixw2uu_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/macbook-air-13/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_starlight__dtojfd6ibywm_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "polnoc",
+        "src": "/tech/katalog/macbook-air-13/polnoc.webp",
+        "source": {
+          "url": "https://www.apple.com/v/macbook-air/z/images/overview/design/color/design_top_midnight__fvf2p6124tqq_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/macbook-air/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/macbook-air/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (sekcja design)"
+      }
+    ]
+  },
+  {
+    "slug": "imac-24",
+    "brand": "apple",
+    "kind": "desktop",
+    "family": "mac",
+    "name": "iMac 24″ (M6)",
+    "order": 832,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#5a8bc2"
+      },
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#8f7fc4"
+      },
+      {
+        "key": "rozowy",
+        "name": "Różowy",
+        "hex": "#e9a3b4"
+      },
+      {
+        "key": "pomaranczowy",
+        "name": "Pomarańczowy",
+        "hex": "#f0926b"
+      },
+      {
+        "key": "zolty",
+        "name": "Żółty",
+        "hex": "#f2cf5c"
+      },
+      {
+        "key": "zielony",
+        "name": "Zielony",
+        "hex": "#6fae8b"
+      },
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m6-10c-cpu-10c-gpu-16-gb-ram-256-gb-ssd",
+        "label": "M6 10C CPU / 10C GPU · 16 GB RAM · 256 GB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m6-12c-cpu-12c-gpu-16-gb-ram-256-gb-ssd",
+        "label": "M6 12C CPU / 12C GPU · 16 GB RAM · 256 GB SSD",
+        "ram": "16 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip Apple M6",
+      "Wyświetlacz Retina 4,5K",
+      "Siedem kolorów",
+      "Kamera Center Stage 12 MP"
+    ],
+    "specs": [
+      {
+        "label": "Ekran",
+        "value": "Retina 4,5K 24″ (rzeczywista przekątna 23,5″), 4480 × 2520 px (218 ppi), 500 nitów, P3, True Tone; opcja szkła nanostrukturalnego (model 12C)"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple M6, podwójny 16‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "10C CPU / 10C GPU lub 12C CPU / 12C GPU"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "16 GB (konfiguracja: 24 GB w modelu 10C; 24 lub 32 GB w modelu 12C)"
+      },
+      {
+        "label": "Dysk",
+        "value": "SSD 256 GB (konfiguracja do 1 TB w modelu 10C, do 2 TB w modelu 12C)"
+      },
+      {
+        "label": "Złącza",
+        "value": "Model 10C: 2 × Thunderbolt / USB 4 (opcja Ethernet 2,5 Gb); model 12C: 4 × Thunderbolt 4 i Ethernet 2,5 Gb; gniazdo 3,5 mm"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "Model 10C: 1 (do 6K); model 12C: do 2"
+      },
+      {
+        "label": "Kamera",
+        "value": "Center Stage 12 MP z Widokiem blatu, wideo 1080p"
+      },
+      {
+        "label": "Audio",
+        "value": "Sześć głośników hi‑fi, Dolby Atmos, trzy mikrofony klasy studyjnej"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Akcesoria",
+        "value": "Model 10C: Magic Keyboard; model 12C: Magic Keyboard z Touch ID; Magic Mouse"
+      },
+      {
+        "label": "Wymiary",
+        "value": "Wysokość 46,1 cm, szerokość 54,7 cm, podstawka 14,7 × 13 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "4,42 kg (10C), 4,44 kg (12C)"
+      }
+    ],
+    "inBox": [
+      "iMac",
+      "Magic Keyboard (model 10C) lub Magic Keyboard z Touch ID (model 12C)",
+      "Mysz Magic Mouse",
+      "Zasilacz o mocy 143 W",
+      "Przewód zasilający (2 m)",
+      "Przewód USB‑C do ładowania",
+      "Ściereczka do czyszczenia (tylko w wersji ze szkłem nanostrukturalnym)"
+    ],
+    "description": [
+      "iMac 24″ z czipem M6 to komputer typu „wszystko w jednym” – ekran, komputer, głośniki i kamera w jednej smukłej obudowie. Świetnie pasuje do domu, recepcji czy małego biura, gdzie liczy się porządek na biurku.",
+      "Ekran Retina 4,5K ma rozdzielczość 4480 × 2520 px i 500 nitów jasności. Do wyboru dwa modele: z 10‑rdzeniowym albo 12‑rdzeniowym CPU, oba z 16 GB pamięci i dyskiem 256 GB. Wbudowana kamera 12 MP, sześć głośników, Wi‑Fi 7 i siedem kolorów obudowy – od niebieskiego po srebrny.",
+      "Wyślij zapytanie bez logowania, a odpowiemy z ceną i dostępnością wybranego modelu i koloru. Komputer odbierzesz w salonie w Rabce‑Zdroju lub w Zakopanem. Gdyby potrzebna była naprawa, nasz serwis jest na miejscu i zawsze najpierw podaje wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym różnią się dwa modele iMaca?",
+        "a": "Model 12‑rdzeniowy ma cztery porty Thunderbolt 4 i Ethernet w standardzie, obsługuje do dwóch monitorów i ma klawiaturę z Touch ID. Model 10‑rdzeniowy ma dwa porty i jeden dodatkowy monitor."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "iMac, klawiatura Magic Keyboard (z Touch ID w modelu 12‑rdzeniowym), mysz Magic Mouse, zasilacz 143 W, przewód zasilający i przewód USB‑C do ładowania."
+      },
+      {
+        "q": "Jakie kolory są do wyboru?",
+        "a": "Niebieski, fioletowy, różowy, pomarańczowy, żółty, zielony i srebrny. Dostępność koloru sprawdzimy po Twoim zapytaniu."
+      }
+    ],
+    "compat": [],
+    "tags": [],
+    "images": [
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/imac-24/niebieski.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_blue__c0vwfnvu230i_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/imac-24/fioletowy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_purple__faj1p03nvgii_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "rozowy",
+        "src": "/tech/katalog/imac-24/rozowy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_pink__e506dm1lok6e_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "pomaranczowy",
+        "src": "/tech/katalog/imac-24/pomaranczowy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_orange__gbrk0zz36z6u_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zolty",
+        "src": "/tech/katalog/imac-24/zolty.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_yellow__fgmsu137s8uq_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zielony",
+        "src": "/tech/katalog/imac-24/zielony.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_green__dcm38dpvwhyu_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/imac-24/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/imac/specs/c/images/specs/colors_silver__ermmyfbo4kq6_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/imac/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania, zdjęcia kolorów"
+      }
+    ]
+  },
+  {
+    "slug": "mac-studio",
+    "brand": "apple",
+    "kind": "desktop",
+    "family": "mac",
+    "name": "Mac Studio",
+    "order": 831,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m5-max-18c-cpu-32c-gpu-36-gb-ram-512-gb-ssd",
+        "label": "M5 Max 18C CPU / 32C GPU · 36 GB RAM · 512 GB SSD",
+        "ram": "36 GB"
+      },
+      {
+        "key": "m5-ultra-30c-cpu-64c-gpu-96-gb-ram-1-tb-ssd",
+        "label": "M5 Ultra 30C CPU / 64C GPU · 96 GB RAM · 1 TB SSD",
+        "ram": "96 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip M5 Max lub M5 Ultra",
+      "Do 512 GB pamięci RAM (M5 Ultra)",
+      "Obsługa do 8 monitorów (M5 Ultra)",
+      "Ethernet 10 Gb i czytnik SDXC"
+    ],
+    "specs": [
+      {
+        "label": "Czip",
+        "value": "Apple M5 Max lub M5 Ultra"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "M5 Max: 18C CPU / 32C GPU (opcja 40C GPU); M5 Ultra: 30C CPU / 64C GPU (opcja 36C/80C)"
+      },
+      {
+        "label": "Neural Engine",
+        "value": "16‑rdzeniowy (M5 Max), 32‑rdzeniowy (M5 Ultra)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "M5 Max: 36 GB (do 128 GB); M5 Ultra: 96 GB (do 512 GB)"
+      },
+      {
+        "label": "Dysk",
+        "value": "M5 Max: 512 GB–8 TB SSD; M5 Ultra: 1–16 TB SSD"
+      },
+      {
+        "label": "Złącza z tyłu",
+        "value": "4 × Thunderbolt 5, 2 × USB‑A (5 Gb/s), HDMI 2.1, Ethernet 10 Gb, gniazdo 3,5 mm"
+      },
+      {
+        "label": "Złącza z przodu",
+        "value": "M5 Max: 2 × USB‑C (10 Gb/s) i SDXC; M5 Ultra: 2 × Thunderbolt 5 i SDXC"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "M5 Max: do 5; M5 Ultra: do 8"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Pobór mocy",
+        "value": "maks. 480 W ciągle"
+      },
+      {
+        "label": "Wymiary",
+        "value": "9,5 × 19,7 × 19,7 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "2,7 kg (M5 Max), 3,6 kg (M5 Ultra)"
+      }
+    ],
+    "inBox": [
+      "Mac Studio",
+      "Przewód zasilający"
+    ],
+    "description": [
+      "Mac Studio to kompaktowa stacja robocza dla profesjonalistów: studiów graficznych, montażystów, muzyków i programistów pracujących z bardzo dużymi projektami. Stoi na biurku obok monitora i daje moc, której nie mają zwykłe komputery.",
+      "Do wyboru czip M5 Max z 36 GB pamięci albo M5 Ultra z 96 GB – w konfiguracji nawet do 512 GB pamięci i 16 TB dysku. Z tyłu cztery porty Thunderbolt 5, dwa USB‑A, HDMI 2.1 i Ethernet 10 Gb, z przodu czytnik SDXC i dwa dodatkowe porty. Z M5 Ultra obsłuży do ośmiu monitorów.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z ceną i dostępnością wybranej konfiguracji. Odbiór w salonie w Rabce‑Zdroju albo w Zakopanem. W razie usterki nasz serwis jest na miejscu i przed każdą naprawą przygotowuje wycenę."
+    ],
+    "faq": [
+      {
+        "q": "M5 Max czy M5 Ultra?",
+        "a": "M5 Max (18‑rdzeniowe CPU, 36 GB) wystarczy do większości profesjonalnych zadań. M5 Ultra (30‑rdzeniowe CPU, 96 GB) jest dla najcięższych projektów i pracy na wielu monitorach – do ośmiu."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Mac Studio i przewód zasilający. Monitor, klawiatura i mysz nie są w zestawie."
+      },
+      {
+        "q": "Jakie porty ma z przodu?",
+        "a": "Czytnik kart SDXC oraz dwa porty: USB‑C (10 Gb/s) w wersji z M5 Max albo Thunderbolt 5 w wersji z M5 Ultra."
+      }
+    ],
+    "compat": [],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/mac-studio/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/mac-studio/specs/b/images/specs/hero__d0yd117u6qy6_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/mac-studio/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      }
+    ]
+  },
+  {
+    "slug": "mac-mini",
+    "brand": "apple",
+    "kind": "desktop",
+    "family": "mac",
+    "name": "Mac mini",
+    "order": 830,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "srebrny",
+        "name": "Srebrny",
+        "hex": "#e3e4e5"
+      }
+    ],
+    "storage": [
+      {
+        "key": "m6-12c-cpu-12c-gpu-16-gb-ram-256-gb-ssd",
+        "label": "M6 12C CPU / 12C GPU · 16 GB RAM · 256 GB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m6-12c-cpu-12c-gpu-16-gb-ram-512-gb-ssd",
+        "label": "M6 12C CPU / 12C GPU · 16 GB RAM · 512 GB SSD",
+        "ram": "16 GB"
+      },
+      {
+        "key": "m6-12c-cpu-12c-gpu-24-gb-ram-512-gb-ssd",
+        "label": "M6 12C CPU / 12C GPU · 24 GB RAM · 512 GB SSD",
+        "ram": "24 GB"
+      },
+      {
+        "key": "m5-pro-15c-cpu-16c-gpu-24-gb-ram-512-gb-ssd",
+        "label": "M5 Pro 15C CPU / 16C GPU · 24 GB RAM · 512 GB SSD",
+        "ram": "24 GB"
+      }
+    ],
+    "keyFacts": [
+      "Czip M6 lub M5 Pro",
+      "Obudowa 12,7 × 12,7 cm",
+      "Porty USB‑C i gniazdo słuchawkowe z przodu",
+      "Ethernet 2,5 Gb w standardzie"
+    ],
+    "specs": [
+      {
+        "label": "Czip",
+        "value": "Apple M6 lub M5 Pro"
+      },
+      {
+        "label": "CPU / GPU",
+        "value": "M6: 12C CPU / 12C GPU; M5 Pro: 15C/16C (opcja 18C/20C)"
+      },
+      {
+        "label": "Pamięć RAM",
+        "value": "M6: 16 lub 24 GB (do 32 GB); M5 Pro: 24 GB (do 64 GB)"
+      },
+      {
+        "label": "Dysk",
+        "value": "M6: 256 GB–2 TB SSD; M5 Pro: 512 GB–8 TB SSD"
+      },
+      {
+        "label": "Złącza z przodu",
+        "value": "2 × USB‑C (USB 3, do 10 Gb/s), gniazdo słuchawkowe 3,5 mm"
+      },
+      {
+        "label": "Złącza z tyłu",
+        "value": "M6: 3 × Thunderbolt 4; M5 Pro: 3 × Thunderbolt 5; HDMI, Ethernet 2,5 Gb (opcja 10 Gb)"
+      },
+      {
+        "label": "Monitory zewnętrzne",
+        "value": "do 3"
+      },
+      {
+        "label": "Audio",
+        "value": "Wbudowany głośnik, HDMI z dźwiękiem wielokanałowym"
+      },
+      {
+        "label": "Łączność",
+        "value": "Czip Apple N1: Wi‑Fi 7, Bluetooth 6, Thread"
+      },
+      {
+        "label": "Pobór mocy",
+        "value": "maks. 155 W ciągle"
+      },
+      {
+        "label": "Wymiary",
+        "value": "5,0 × 12,7 × 12,7 cm"
+      },
+      {
+        "label": "Waga",
+        "value": "0,67 kg (M6), 0,73 kg (M5 Pro)"
+      }
+    ],
+    "inBox": [
+      "Mac mini",
+      "Przewód zasilający (1,8 m)"
+    ],
+    "description": [
+      "Mac mini to mały komputer stacjonarny, który mieści się w dłoni, a podłączasz do niego własny monitor, klawiaturę i mysz. To dobry wybór do domu, biura albo jako cichy komputer do pracy, który nie zajmuje miejsca na biurku.",
+      "Obudowa ma wymiary 12,7 × 12,7 cm i 5 cm wysokości. W środku czip M6 (16 lub 24 GB pamięci, dysk 256 lub 512 GB) albo mocniejszy M5 Pro z 24 GB pamięci. Z przodu są dwa porty USB‑C i gniazdo słuchawkowe, z tyłu Thunderbolt, HDMI i Ethernet 2,5 Gb; obsługuje do trzech monitorów.",
+      "Zapytaj o wybraną konfigurację bez logowania – odpiszemy z ceną i dostępnością. Odbiór w salonie PRO-KOM Tech w Rabce‑Zdroju lub w Zakopanem. Jeśli coś się zepsuje, serwis jest na miejscu, a przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy w zestawie jest klawiatura i mysz?",
+        "a": "Nie. W pudełku jest Mac mini i przewód zasilający (1,8 m). Monitor, klawiaturę i mysz podłączasz własne."
+      },
+      {
+        "q": "M6 czy M5 Pro?",
+        "a": "M6 wystarczy do biura, internetu i domowej obróbki zdjęć. M5 Pro ma więcej rdzeni i porty Thunderbolt 5 – przyda się przy montażu wideo i cięższych programach."
+      },
+      {
+        "q": "Ile monitorów mogę podłączyć?",
+        "a": "Do trzech zewnętrznych wyświetlaczy."
+      },
+      {
+        "q": "Jaka jest cena?",
+        "a": "Ceny się zmieniają, więc nie podajemy ich na stronie. Wyślij zapytanie, a odpowiemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [],
+    "tags": [],
+    "images": [
+      {
+        "color": "srebrny",
+        "src": "/tech/katalog/mac-mini/srebrny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/mac-mini/specs/b/images/specs/hero_silver__d8l8e7j5sk66_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/mac-mini/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      }
+    ]
+  },
+  {
+    "slug": "apple-watch-series-12",
+    "brand": "apple",
+    "kind": "watch",
+    "family": "apple-watch",
+    "name": "Apple Watch Series 12",
+    "order": 822,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "ciemny-braz",
+        "name": "Ciemny brąz",
+        "hex": "#4b3b2f"
+      },
+      {
+        "key": "jasne-zloto",
+        "name": "Jasne złoto",
+        "hex": "#e5d1ae"
+      },
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#1d1d1f"
+      },
+      {
+        "key": "gwiezdna-szarosc",
+        "name": "Gwiezdna szarość",
+        "hex": "#5f6266"
+      },
+      {
+        "key": "zywe-zloto",
+        "name": "Żywe złoto",
+        "hex": "#d3b076"
+      },
+      {
+        "key": "naturalny",
+        "name": "Naturalny",
+        "hex": "#c2bcb2"
+      },
+      {
+        "key": "biala-perla",
+        "name": "Biała perła",
+        "hex": "#f2efe9"
+      },
+      {
+        "key": "granatowa-noc",
+        "name": "Granatowa noc",
+        "hex": "#1f2a44"
+      }
+    ],
+    "storage": [
+      {
+        "key": "42-mm-gps",
+        "label": "42 mm · GPS"
+      },
+      {
+        "key": "42-mm-gps-cellular",
+        "label": "42 mm · GPS + Cellular"
+      },
+      {
+        "key": "46-mm-gps",
+        "label": "46 mm · GPS"
+      },
+      {
+        "key": "46-mm-gps-cellular",
+        "label": "46 mm · GPS + Cellular"
+      }
+    ],
+    "keyFacts": [
+      "Nowa koperta z ceramiki",
+      "Czip S11",
+      "Do 24 godzin pracy na baterii",
+      "Powiadomienia o nadciśnieniu i bezdechu sennym"
+    ],
+    "specs": [
+      {
+        "label": "Koperta",
+        "value": "Aluminium (ciemny brąz, jasne złoto, czarny, gwiezdna szarość), tytan (żywe złoto, naturalny) lub ceramika (biała perła, granatowa noc)"
+      },
+      {
+        "label": "Rozmiary",
+        "value": "42 mm lub 46 mm (ceramika: 43 / 47 mm wysokości), grubość 9,7 mm (ceramika 9,85 mm)"
+      },
+      {
+        "label": "Ekran",
+        "value": "Niegasnący Retina OLED LTPO3, do 2000 nitów, min. 1 nit; 42 mm: 374 × 446 px, 46 mm: 416 × 496 px"
+      },
+      {
+        "label": "Szkło",
+        "value": "Ceramic Shield 2 (aluminium), szkło szafirowe (tytan i ceramika)"
+      },
+      {
+        "label": "Czip",
+        "value": "S11, 64‑bitowy dwurdzeniowy procesor, 4‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć",
+        "value": "64 GB"
+      },
+      {
+        "label": "Czujniki zdrowia",
+        "value": "Elektryczny czujnik pracy serca 2. gen. (EKG), optyczny czujnik tętna, czujnik natlenienia krwi, czujnik temperatury"
+      },
+      {
+        "label": "Bateria",
+        "value": "do 24 h (do 38 h w trybie Niskie zużycie energii); 80% w ok. 30 min"
+      },
+      {
+        "label": "Odporność",
+        "value": "Wodoodporność 50 m (ISO 22810:2010), pył IP6X, pomiar głębokości do 6 m"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 4 (2,4 i 5 GHz), Bluetooth 5.3, GPS L1, UWB 2. gen.; LTE w modelach Cellular"
+      },
+      {
+        "label": "Waga",
+        "value": "46 mm: 39,5 g (alu GPS), 38,6 g (alu Cellular), 44,9 g (tytan), 51,3–52,9 g (ceramika); 42 mm: 31,5–42,8 g"
+      },
+      {
+        "label": "Zgodność",
+        "value": "iPhone 11 lub nowszy z iOS 27"
+      }
+    ],
+    "inBox": [
+      "Apple Watch Series 12",
+      "Pasek",
+      "Przewód USB‑C do szybkiego ładowania Apple Watch podłączany magnetycznie (1 m)"
+    ],
+    "description": [
+      "Apple Watch Series 12 to zegarek dla osób, które chcą mieć na nadgarstku powiadomienia, trening i dbanie o zdrowie w jednym. Pasuje zarówno do biegania, jak i do pracy w biurze – zwłaszcza w jednej z wersji z tytanu lub ceramiki.",
+      "Masz dwa rozmiary – 42 mm i 46 mm – oraz wersję GPS albo GPS + Cellular. Koperta jest z aluminium, tytanu lub ceramiki, w sumie w ośmiu kolorach. Zegarek ma czip S11, niegasnący ekran do 2000 nitów, EKG, pomiar tętna, natlenienia krwi i temperatury, a bateria wytrzymuje do 24 godzin i ładuje się do 80% w około 30 minut.",
+      "Wyślij zapytanie bez logowania – odpowiemy z ceną i dostępnością wybranej wersji. Zegarek odbierzesz w salonie w Rabce‑Zdroju lub w Zakopanem, a na miejscu w około 5 minut przytniemy i nakleimy folię ochronną Hammer Glass. Gdyby coś się stało, nasz serwis jest obok i przed naprawą zawsze dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Z jakim iPhone’em działa?",
+        "a": "Potrzebujesz iPhone’a 11 lub nowszego z iOS 27."
+      },
+      {
+        "q": "GPS czy GPS + Cellular?",
+        "a": "Wersja Cellular ma LTE, więc odbierzesz połączenia i wiadomości bez iPhone’a w pobliżu. Wersja GPS korzysta z łączności telefonu."
+      },
+      {
+        "q": "Czym różnią się koperty?",
+        "a": "Aluminiowa ma szkło Ceramic Shield 2, tytanowa i ceramiczna – szkło szafirowe. Ceramika jest najcięższa i występuje w kolorach biała perła i granatowa noc."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Zegarek, pasek i magnetyczny przewód USB‑C do szybkiego ładowania (1 m)."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "iphone-18-pro"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "ciemny-braz",
+        "src": "/tech/katalog/apple-watch-series-12/ciemny-braz.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-series-12/images/overview/product-viewer/product_finishes_aluminum_dark_bronze__cn6ty9h5yliu_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "jasne-zloto",
+        "src": "/tech/katalog/apple-watch-series-12/jasne-zloto.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-series-12/images/overview/product-viewer/product_finishes_aluminum_light_gold__cr815xqxzoia_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/apple-watch-series-12/czarny.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-series-12/images/overview/product-viewer/product_finishes_aluminum_black__ebajxwacb88y_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "gwiezdna-szarosc",
+        "src": "/tech/katalog/apple-watch-series-12/gwiezdna-szarosc.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-series-12/images/overview/product-viewer/product_finishes_aluminum_space_gray__d83ign704owi_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "zywe-zloto",
+        "src": "/tech/katalog/apple-watch-series-12/zywe-zloto.webp",
+        "source": {
+          "url": "https://www.apple.com/v/apple-watch-series-12/a/images/overview/product-viewer/product_finishes_titanium_radiant_gold__dhabqmjal4wi_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "naturalny",
+        "src": "/tech/katalog/apple-watch-series-12/naturalny.webp",
+        "source": {
+          "url": "https://www.apple.com/v/apple-watch-series-12/a/images/overview/product-viewer/product_finishes_titanium_natural__dcwev7ob2quu_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "biala-perla",
+        "src": "/tech/katalog/apple-watch-series-12/biala-perla.webp",
+        "source": {
+          "url": "https://www.apple.com/v/apple-watch-series-12/a/images/overview/product-viewer/product_finishes_ceramic_pearl_white__m797y0r8nsqy_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "granatowa-noc",
+        "src": "/tech/katalog/apple-watch-series-12/granatowa-noc.webp",
+        "source": {
+          "url": "https://www.apple.com/v/apple-watch-series-12/a/images/overview/product-viewer/product_finishes_ceramic_night_blue__c86m67tq2c8y_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/apple-watch-series-12/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/apple-watch-series-12/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (przeglądarka produktu)"
+      }
+    ]
+  },
+  {
+    "slug": "apple-watch-ultra-4",
+    "brand": "apple",
+    "kind": "watch",
+    "family": "apple-watch",
+    "name": "Apple Watch Ultra 4",
+    "order": 821,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "naturalny",
+        "name": "Naturalny",
+        "hex": "#c2bcb2"
+      },
+      {
+        "key": "czarny",
+        "name": "Czarny",
+        "hex": "#2b2a29"
+      }
+    ],
+    "storage": [
+      {
+        "key": "49-mm-gps-cellular",
+        "label": "49 mm · GPS + Cellular"
+      }
+    ],
+    "keyFacts": [
+      "Do 50 godzin pracy na baterii",
+      "Jasność do 3000 nitów",
+      "Nurkowanie rekreacyjne do 40 m",
+      "Tytanowa koperta 49 mm"
+    ],
+    "specs": [
+      {
+        "label": "Koperta",
+        "value": "Tytan Grade 5, 49 × 44 × 12 mm"
+      },
+      {
+        "label": "Ekran",
+        "value": "Niegasnący Retina OLED LTPO3, 422 × 514 px, do 3000 nitów, min. 1 nit, płaskie szkło szafirowe"
+      },
+      {
+        "label": "Czip",
+        "value": "S11, 64‑bitowy dwurdzeniowy procesor, 4‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć",
+        "value": "64 GB"
+      },
+      {
+        "label": "Czujniki zdrowia",
+        "value": "Elektryczny czujnik pracy serca 2. gen. (EKG), optyczny czujnik tętna, czujnik natlenienia krwi, czujnik temperatury"
+      },
+      {
+        "label": "Czujniki outdoor",
+        "value": "Głębokościomierz, czujnik temperatury wody, kompas, wysokościomierz"
+      },
+      {
+        "label": "Bateria",
+        "value": "do 50 h (do 84 h w trybie Niskie zużycie energii); 80% w ok. 45 min"
+      },
+      {
+        "label": "Odporność",
+        "value": "Wodoodporność 100 m, nurkowanie rekreacyjne do 40 m (EN13319), IP6X, MIL‑STD 810H"
+      },
+      {
+        "label": "Łączność",
+        "value": "LTE, Wi‑Fi 4 (2,4 i 5 GHz), Bluetooth 5.3, GPS o podwójnej częstotliwości, UWB 2. gen."
+      },
+      {
+        "label": "Audio",
+        "value": "Trzy mikrofony, dwa głośniki, syrena alarmowa"
+      },
+      {
+        "label": "Przyciski",
+        "value": "Programowalny przycisk czynności, Digital Crown, przycisk boczny"
+      },
+      {
+        "label": "Waga",
+        "value": "63 g (naturalny), 63,1 g (czarny)"
+      },
+      {
+        "label": "Zgodność",
+        "value": "iPhone 11 lub nowszy z iOS 27"
+      }
+    ],
+    "inBox": [
+      "Apple Watch Ultra 4",
+      "Pasek",
+      "Przewód USB‑C do szybkiego ładowania Apple Watch podłączany magnetycznie (1 m)"
+    ],
+    "description": [
+      "Apple Watch Ultra 4 to najbardziej wytrzymały zegarek Apple – dla ludzi gór, wody i długich wypraw. Jeśli chodzisz po Tatrach, biegasz w terenie albo nurkujesz, to model zbudowany właśnie pod takie warunki.",
+      "Koperta 49 mm jest z tytanu, ekran ma do 3000 nitów jasności i płaskie szkło szafirowe. Bateria wytrzymuje do 50 godzin, a w trybie niskiego zużycia energii do 84 godzin. Zegarek ma wodoodporność 100 m, pozwala na nurkowanie rekreacyjne do 40 m, ma GPS o podwójnej częstotliwości, LTE, kompas, wysokościomierz i syrenę alarmową.",
+      "Zapytaj o Ultra 4 bez zakładania konta – odpiszemy z ceną i dostępnością koloru. Odbiór w salonie w Rabce‑Zdroju lub w Zakopanem, gdzie w około 5 minut przytniemy i nakleimy na ekran folię Hammer Glass. A jeśli coś się zepsuje, serwis jest na miejscu i przed naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy potrzebuję iPhone’a?",
+        "a": "Tak, potrzebny jest iPhone 11 lub nowszy z iOS 27."
+      },
+      {
+        "q": "Czy jest wersja bez LTE?",
+        "a": "Nie, Ultra 4 występuje w jednym rozmiarze 49 mm, w wersji GPS + Cellular."
+      },
+      {
+        "q": "Jakie kolory są dostępne?",
+        "a": "Naturalny i czarny. O dostępność wybranego koloru zapytaj w formularzu."
+      },
+      {
+        "q": "Ile kosztuje?",
+        "a": "Ceny się zmieniają. Wyślij zapytanie, a odpowiemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "iphone-18-pro"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "naturalny",
+        "src": "/tech/katalog/apple-watch-ultra-4/naturalny.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-ultra-4/images/overview/product-viewer/product_finishes_natural__fcf2wz3wghea_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "czarny",
+        "src": "/tech/katalog/apple-watch-ultra-4/czarny.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-ultra-4/images/overview/product-viewer/product_finishes_black__d8fehns3thg2_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/apple-watch-ultra-4/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/apple-watch-ultra-4/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (przeglądarka produktu)"
+      }
+    ]
+  },
+  {
+    "slug": "apple-watch-se-3",
+    "brand": "apple",
+    "kind": "watch",
+    "family": "apple-watch",
+    "name": "Apple Watch SE 3",
+    "order": 810,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "polnoc",
+        "name": "Północ",
+        "hex": "#2e3641"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#efe4d2"
+      }
+    ],
+    "storage": [
+      {
+        "key": "40-mm-gps",
+        "label": "40 mm · GPS"
+      },
+      {
+        "key": "40-mm-gps-cellular",
+        "label": "40 mm · GPS + Cellular"
+      },
+      {
+        "key": "44-mm-gps",
+        "label": "44 mm · GPS"
+      },
+      {
+        "key": "44-mm-gps-cellular",
+        "label": "44 mm · GPS + Cellular"
+      }
+    ],
+    "keyFacts": [
+      "Czip S10",
+      "Niegasnący wyświetlacz",
+      "Wersje GPS i GPS + Cellular",
+      "Dwa rozmiary: 40 i 44 mm"
+    ],
+    "specs": [
+      {
+        "label": "Koperta",
+        "value": "Aluminium, 40 mm lub 44 mm, grubość 10,7 mm"
+      },
+      {
+        "label": "Ekran",
+        "value": "Niegasnący Retina OLED LTPO, do 1000 nitów, 326 ppi; 40 mm: 324 × 394 px, 44 mm: 368 × 448 px"
+      },
+      {
+        "label": "Szkło",
+        "value": "Ion‑X, 4× większa odporność na pęknięcia niż w SE 2"
+      },
+      {
+        "label": "Czip",
+        "value": "S10, 64‑bitowy dwurdzeniowy procesor, 4‑rdzeniowy Neural Engine"
+      },
+      {
+        "label": "Pamięć",
+        "value": "64 GB"
+      },
+      {
+        "label": "Czujniki",
+        "value": "Optyczny czujnik tętna 2. gen., czujnik temperatury, kompas, wysokościomierz"
+      },
+      {
+        "label": "Bateria",
+        "value": "do 18 h (do 32 h w trybie Niskie zużycie energii); 80% w ok. 45 min"
+      },
+      {
+        "label": "Odporność",
+        "value": "Wodoodporność 50 m (ISO 22810:2010)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Wi‑Fi 4 (2,4 GHz), Bluetooth 5.3, GPS L1; LTE w modelach Cellular"
+      },
+      {
+        "label": "Waga",
+        "value": "40 mm: 26,3 g (GPS) / 26,4 g (Cellular); 44 mm: 32,9 g / 33 g"
+      },
+      {
+        "label": "Zgodność",
+        "value": "iPhone 11 lub nowszy z iOS 27"
+      }
+    ],
+    "inBox": [
+      "Apple Watch SE 3",
+      "Pasek",
+      "Przewód USB‑C do szybkiego ładowania Apple Watch podłączany magnetycznie (1 m)"
+    ],
+    "description": [
+      "Apple Watch SE 3 to najprostszy sposób na zegarek Apple – na pierwszy smartwatch, dla nastolatka albo dla kogoś, kto chce powiadomień, liczenia kroków i treningów bez funkcji z wyższych modeli, których nie potrzebuje. Ma wszystko, czego trzeba na co dzień.",
+      "Masz do wyboru rozmiar 40 mm lub 44 mm oraz wersję GPS albo GPS + Cellular, w kolorach północ i księżycowa poświata. Zegarek ma czip S10, niegasnący ekran do 1000 nitów, szkło Ion‑X i 64 GB pamięci. Mierzy tętno i temperaturę, jest wodoszczelny do 50 m, a bateria wystarcza do 18 godzin.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z ceną i dostępnością wybranej wersji. Zegarek odbierzesz w salonie w Rabce‑Zdroju lub w Zakopanem – od razu, w około 5 minut, przytniemy i nakleimy folię ochronną Hammer Glass. W razie awarii serwis jest na miejscu, a każdą naprawę poprzedza wycena."
+    ],
+    "faq": [
+      {
+        "q": "Z jakim telefonem działa?",
+        "a": "Z iPhone’em 11 lub nowszym z iOS 27."
+      },
+      {
+        "q": "40 mm czy 44 mm?",
+        "a": "40 mm lepiej leży na drobniejszym nadgarstku, 44 mm ma większy ekran (368 × 448 px). Wybierz ten, który pasuje do Twojego nadgarstka."
+      },
+      {
+        "q": "Co dostaję w zestawie?",
+        "a": "Zegarek, pasek i magnetyczny przewód USB‑C do szybkiego ładowania (1 m)."
+      }
+    ],
+    "compat": [
+      "hammer-glass",
+      "iphone-17"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "polnoc",
+        "src": "/tech/katalog/apple-watch-se-3/polnoc.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-se-3/images/overview/product-viewer/product_finishes_midnight__jgmf0mnpvwq6_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/apple-watch-se-3/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://www.apple.com/pl/apple-watch-se-3/images/overview/product-viewer/product_finishes_starlight__enr6i85tuqwm_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/apple-watch-se-3/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      },
+      {
+        "url": "https://www.apple.com/pl/apple-watch-se-3/",
+        "date": "2026-11-18",
+        "what": "adresy zdjęć w kolorach (przeglądarka produktu)"
+      }
+    ]
+  },
+  {
+    "slug": "airpods-pro-3",
+    "brand": "apple",
+    "kind": "audio",
+    "family": "airpods",
+    "name": "AirPods Pro 3",
+    "order": 803,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      }
+    ],
+    "storage": [],
+    "keyFacts": [
+      "Pomiar tętna podczas treningów",
+      "Funkcja aparatu słuchowego",
+      "Do 8 godzin z ANC na jednym ładowaniu",
+      "Odporność IP57"
+    ],
+    "specs": [
+      {
+        "label": "Typ",
+        "value": "Słuchawki dokanałowe z silikonowymi wkładkami (XXS–L)"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple H2 w słuchawkach; ultraszerokopasmowy czip 2. gen. w etui MagSafe"
+      },
+      {
+        "label": "Audio",
+        "value": "Aktywna redukcja hałasu, tryb kontaktu, dźwięk adaptacyjny, redukcja głośnych dźwięków, spersonalizowany dźwięk przestrzenny"
+      },
+      {
+        "label": "Zdrowie słuchu",
+        "value": "Badanie słuchu, funkcja aparatu słuchowego, ochrona słuchu"
+      },
+      {
+        "label": "Czujniki",
+        "value": "Pomiar tętna podczas treningów, czujnik kontaktu ze skórą, sterowanie dotykowe"
+      },
+      {
+        "label": "Bateria (słuchawki)",
+        "value": "do 8 h z ANC; do 10 h w trybie kontaktu z funkcją aparatu słuchowego"
+      },
+      {
+        "label": "Bateria z etui",
+        "value": "do 24 h z ANC; 5 min ładowania = ok. 1 h"
+      },
+      {
+        "label": "Etui",
+        "value": "MagSafe, ładowarka Apple Watch, Qi, USB‑C; głośnik i uchwyt na smycz"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP57 – słuchawki i etui"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 5.3"
+      },
+      {
+        "label": "Słuchawka",
+        "value": "30,9 × 19,2 × 27,0 mm, 5,55 g"
+      },
+      {
+        "label": "Wymiary etui",
+        "value": "47,2 × 62,2 × 21,8 mm, 43,99 g"
+      }
+    ],
+    "inBox": [
+      "AirPods Pro 3",
+      "Etui ładujące MagSafe (USB‑C) z głośnikiem i uchwytem na smycz",
+      "Silikonowe wkładki douszne (XXS, XS, S, M, L)",
+      "Dokumentacja",
+      "Przewód USB‑C do ładowania sprzedawany oddzielnie"
+    ],
+    "description": [
+      "AirPods Pro 3 to dokanałowe słuchawki dla osób, które chcą najlepszego wyciszenia w małych słuchawkach Apple. Przydadzą się w podróży, na siłowni i w głośnym biurze, a funkcje zdrowia słuchu docenią też osoby, którym zależy na ochronie uszu.",
+      "Mają silikonowe wkładki w pięciu rozmiarach (XXS–L), czip H2, aktywną redukcję hałasu i tryb kontaktu. Mierzą tętno podczas treningów, oferują badanie słuchu i funkcję aparatu słuchowego. Na jednym ładowaniu grają do 8 godzin z ANC, z etui do 24 godzin, a słuchawki i etui MagSafe mają odporność IP57.",
+      "Zapytaj o AirPods Pro 3 bez logowania – odpiszemy z ceną i dostępnością. Odbiór w salonie w Rabce‑Zdroju albo w Zakopanem. W razie usterki serwis jest u nas na miejscu, a przed każdą naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy w zestawie jest przewód do ładowania?",
+        "a": "Nie, przewód USB‑C sprzedawany jest oddzielnie. W pudełku są słuchawki, etui MagSafe i wkładki w rozmiarach XXS, XS, S, M i L."
+      },
+      {
+        "q": "Jak ładuję etui?",
+        "a": "Przez USB‑C, na ładowarce MagSafe, Qi albo do Apple Watch. Etui ma też głośnik i uchwyt na smycz."
+      },
+      {
+        "q": "Czy mierzą tętno?",
+        "a": "Tak, podczas treningów. Mają też czujnik kontaktu ze skórą."
+      },
+      {
+        "q": "Jaka jest cena?",
+        "a": "Ceny się zmieniają, dlatego nie podajemy ich na stronie. Wyślij zapytanie, a odpowiemy z aktualną ceną i dostępnością."
+      }
+    ],
+    "compat": [
+      "iphone-18-pro"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/airpods-pro-3/bialy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-pro/o/images/specs/airpods__eqrzs6rwhu2q_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/airpods-pro/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania"
+      }
+    ]
+  },
+  {
+    "slug": "airpods-5-wireless",
+    "brand": "apple",
+    "kind": "audio",
+    "family": "airpods",
+    "name": "AirPods 5 z bezprzewodowym etui ładującym",
+    "order": 802,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      }
+    ],
+    "storage": [],
+    "keyFacts": [
+      "Ładowanie bezprzewodowe (Qi i ładowarka Apple Watch)",
+      "Regulacja głośności muśnięciem",
+      "Do 22 godzin z etui (ANC)",
+      "Głośnik w etui do funkcji Znajdź"
+    ],
+    "specs": [
+      {
+        "label": "Typ",
+        "value": "Słuchawki douszne, bezprzewodowe etui ładujące z głośnikiem"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple H2"
+      },
+      {
+        "label": "Audio",
+        "value": "Przetwornik Apple o dużej amplitudzie drgań, aktywna redukcja hałasu, tryb kontaktu, dźwięk adaptacyjny, spersonalizowany dźwięk przestrzenny"
+      },
+      {
+        "label": "Funkcje",
+        "value": "Izolacja głosu, wykrywanie rozmów, Tłumaczenie na żywo"
+      },
+      {
+        "label": "Sterowanie",
+        "value": "Czujnik nacisku z regulacją głośności muśnięciem palca"
+      },
+      {
+        "label": "Bateria (słuchawki)",
+        "value": "do 5 h z ANC, do 7 h bez kontroli hałasu"
+      },
+      {
+        "label": "Bateria z etui",
+        "value": "do 22 h z ANC; 5 min ładowania = ok. 1 h"
+      },
+      {
+        "label": "Ładowanie etui",
+        "value": "USB‑C, ładowarka do Apple Watch, ładowarki Qi; głośnik do funkcji Znajdź"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP57 (pył, pot, woda)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 5.3"
+      },
+      {
+        "label": "Słuchawka",
+        "value": "30,2 × 18,3 × 18,1 mm, 4,3 g"
+      },
+      {
+        "label": "Etui",
+        "value": "46,2 × 50,1 × 21,2 mm, 34,7 g"
+      }
+    ],
+    "inBox": [
+      "AirPods 5",
+      "Etui ładujące (USB‑C) z głośnikiem",
+      "Dokumentacja"
+    ],
+    "description": [
+      "AirPods 5 z bezprzewodowym etui ładującym to te same wygodne słuchawki douszne, ale z etui, które ładujesz bez kabla. Dobre dla osób, które mają już ładowarkę Qi albo do Apple Watch i chcą po prostu odłożyć słuchawki na podkładkę.",
+      "Słuchawki mają czip H2, aktywną redukcję hałasu i tryb kontaktu, a głośność zmieniasz muśnięciem palca. Grają do 5 godzin z ANC, z etui łącznie do 22 godzin. Etui ładujesz przez USB‑C, na ładowarce Qi lub do Apple Watch, a wbudowany głośnik pomaga je znaleźć funkcją Znajdź; całość jest odporna na pył i wodę (IP57).",
+      "Wyślij zapytanie bez zakładania konta, a odpowiemy z ceną i dostępnością. Słuchawki odbierzesz w salonie PRO-KOM Tech w Rabce‑Zdroju lub w Zakopanem. Jeśli coś się zepsuje, serwis jest na miejscu i przed naprawą dostajesz wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Na jakich ładowarkach naładuję etui?",
+        "a": "Przez USB‑C, na ładowarkach Qi oraz na ładowarce do Apple Watch."
+      },
+      {
+        "q": "Po co głośnik w etui?",
+        "a": "Etui wydaje dźwięk w funkcji Znajdź, więc łatwiej je odszukać, gdy się zgubi."
+      },
+      {
+        "q": "Czy warto dopłacić do tej wersji?",
+        "a": "Jeśli masz ładowarkę bezprzewodową, tak – zyskujesz też regulację głośności muśnięciem i godzinę dłuższej pracy na słuchawkach. Aktualną cenę obu wersji podamy w odpowiedzi na zapytanie."
+      }
+    ],
+    "compat": [
+      "iphone-17"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/airpods-5-wireless/bialy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-5/a/images/specs/hero_airpods_5gen_wireless__c73r67vwo7wy_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/airpods-5/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania (kolumna AirPods 5 z bezprzewodowym etui ładującym)"
+      }
+    ]
+  },
+  {
+    "slug": "airpods-5",
+    "brand": "apple",
+    "kind": "audio",
+    "family": "airpods",
+    "name": "AirPods 5",
+    "order": 801,
+    "isNew": true,
+    "colors": [
+      {
+        "key": "bialy",
+        "name": "Biały",
+        "hex": "#f2f2f0"
+      }
+    ],
+    "storage": [],
+    "keyFacts": [
+      "Aktywna redukcja hałasu",
+      "Czip H2",
+      "Odporność IP57",
+      "Do 20 godzin z etui (ANC)"
+    ],
+    "specs": [
+      {
+        "label": "Typ",
+        "value": "Słuchawki douszne, etui ładujące USB‑C"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple H2"
+      },
+      {
+        "label": "Audio",
+        "value": "Przetwornik Apple o dużej amplitudzie drgań, aktywna redukcja hałasu, tryb kontaktu, dźwięk adaptacyjny, spersonalizowany dźwięk przestrzenny"
+      },
+      {
+        "label": "Funkcje",
+        "value": "Izolacja głosu, wykrywanie rozmów, Tłumaczenie na żywo"
+      },
+      {
+        "label": "Sterowanie",
+        "value": "Czujnik nacisku"
+      },
+      {
+        "label": "Bateria (słuchawki)",
+        "value": "do 4 h z ANC, do 6 h bez kontroli hałasu"
+      },
+      {
+        "label": "Bateria z etui",
+        "value": "do 20 h z ANC; 5 min ładowania = ok. 1 h"
+      },
+      {
+        "label": "Ładowanie etui",
+        "value": "USB‑C"
+      },
+      {
+        "label": "Odporność",
+        "value": "IP57 (pył, pot, woda)"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 5.3"
+      },
+      {
+        "label": "Słuchawka",
+        "value": "30,2 × 18,3 × 18,1 mm, 4,3 g"
+      },
+      {
+        "label": "Etui",
+        "value": "46,2 × 50,1 × 21,2 mm, 32,3 g"
+      }
+    ],
+    "inBox": [
+      "AirPods 5",
+      "Etui ładujące (USB‑C)",
+      "Dokumentacja"
+    ],
+    "description": [
+      "AirPods 5 to douszne słuchawki bezprzewodowe dla osób, które nie lubią silikonowych wkładek w uchu, a chcą wyciszenia hałasu w autobusie czy na ulicy. Sprawdzą się do muzyki, podcastów i rozmów.",
+      "Mają czip H2, aktywną redukcję hałasu, tryb kontaktu i dźwięk adaptacyjny. Na jednym ładowaniu grają do 4 godzin z ANC, a z etui łącznie do 20 godzin; 5 minut ładowania daje około godziny słuchania. Słuchawki są odporne na pył, pot i wodę (IP57), a etui ładujesz przez USB‑C.",
+      "Zapytaj o AirPods 5 bez logowania – odpiszemy z ceną i dostępnością. Odbiór w salonie w Rabce‑Zdroju lub w Zakopanem. Gdyby coś przestało działać, serwis mamy na miejscu i przed naprawą zawsze podajemy wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czym różnią się od wersji z bezprzewodowym etui?",
+        "a": "Ta wersja ma etui ładowane tylko przez USB‑C. Wersja z bezprzewodowym etui ładuje się też na ładowarkach Qi i Apple Watch, ma głośnik w etui i nieco dłuższą pracę na baterii."
+      },
+      {
+        "q": "Czy w pudełku jest przewód?",
+        "a": "W zestawie są słuchawki, etui ładujące USB‑C i dokumentacja. Przewód nie jest wymieniony w zawartości opakowania."
+      },
+      {
+        "q": "Czy nadają się do biegania?",
+        "a": "Tak, mają odporność IP57 na pył, pot i wodę."
+      }
+    ],
+    "compat": [
+      "iphone-17"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "bialy",
+        "src": "/tech/katalog/airpods-5/bialy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-5/a/images/specs/hero_airpods_5gen__d26undxkde2q_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/airpods-5/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania (kolumna AirPods 5)"
+      }
+    ]
+  },
+  {
+    "slug": "airpods-max-2",
+    "brand": "apple",
+    "kind": "audio",
+    "family": "airpods",
+    "name": "AirPods Max 2",
+    "order": 800,
+    "isNew": false,
+    "colors": [
+      {
+        "key": "polnoc",
+        "name": "Północ",
+        "hex": "#2e3641"
+      },
+      {
+        "key": "ksiezycowa-poswiata",
+        "name": "Księżycowa poświata",
+        "hex": "#efe4d2"
+      },
+      {
+        "key": "niebieski",
+        "name": "Niebieski",
+        "hex": "#8ba9c8"
+      },
+      {
+        "key": "fioletowy",
+        "name": "Fioletowy",
+        "hex": "#b8a7cf"
+      },
+      {
+        "key": "pomaranczowy",
+        "name": "Pomarańczowy",
+        "hex": "#f2a673"
+      }
+    ],
+    "storage": [],
+    "keyFacts": [
+      "Czip H2 w obu nausznikach",
+      "Dźwięk Lossless przez USB‑C",
+      "Do 20 godzin z ANC",
+      "Pięć kolorów"
+    ],
+    "specs": [
+      {
+        "label": "Typ",
+        "value": "Słuchawki nauszne"
+      },
+      {
+        "label": "Czip",
+        "value": "Apple H2 w obu nausznikach"
+      },
+      {
+        "label": "Audio",
+        "value": "Przetwornik dynamiczny Apple, aktywna redukcja hałasu, tryb kontaktu, dźwięk adaptacyjny, spersonalizowany dźwięk przestrzenny"
+      },
+      {
+        "label": "Dźwięk przewodowy",
+        "value": "Lossless i ultraniskie opóźnienie przez USB‑C"
+      },
+      {
+        "label": "Funkcje",
+        "value": "Izolacja głosu, wykrywanie rozmów, redukcja głośnych dźwięków, Tłumaczenie na żywo"
+      },
+      {
+        "label": "Mikrofony",
+        "value": "9 (8 do ANC, 3 do głosu – 2 współdzielone z ANC)"
+      },
+      {
+        "label": "Sterowanie",
+        "value": "Digital Crown, przycisk trybu słuchania"
+      },
+      {
+        "label": "Bateria",
+        "value": "do 20 h z ANC; 5 min ładowania = ok. 1,5 h"
+      },
+      {
+        "label": "Ładowanie",
+        "value": "USB‑C"
+      },
+      {
+        "label": "Łączność",
+        "value": "Bluetooth 5.3"
+      },
+      {
+        "label": "Wymiary",
+        "value": "168,6 × 187,3 × 83,4 mm"
+      },
+      {
+        "label": "Waga",
+        "value": "386,2 g (z poduszkami); etui Smart Case 134,5 g"
+      }
+    ],
+    "inBox": [
+      "AirPods Max 2",
+      "Etui Smart Case",
+      "Przewód USB‑C do ładowania",
+      "Dokumentacja"
+    ],
+    "description": [
+      "AirPods Max 2 to nauszne słuchawki Apple dla osób, które chcą pełnego, przestrzennego dźwięku i mocnego wyciszenia – do długich podróży, pracy w skupieniu albo wieczornego słuchania muzyki. Duże nauszniki obejmują całe ucho, więc dobrze odcinają od otoczenia.",
+      "W obu nausznikach pracuje czip H2, a dziewięć mikrofonów obsługuje redukcję hałasu i rozmowy. Bateria wystarcza do 20 godzin z ANC, a 5 minut ładowania daje około 1,5 godziny słuchania. Po podłączeniu przez USB‑C grają dźwięk Lossless z bardzo małym opóźnieniem, sterujesz nimi koronką Digital Crown, a do wyboru jest pięć kolorów.",
+      "Wyślij zapytanie bez logowania, a odpiszemy z ceną i dostępnością wybranego koloru. Słuchawki odbierzesz w salonie w Rabce‑Zdroju lub w Zakopanem. Jeśli kiedyś coś się zepsuje, nasz serwis jest na miejscu i zawsze najpierw przygotowuje wycenę."
+    ],
+    "faq": [
+      {
+        "q": "Czy mogę słuchać przez kabel?",
+        "a": "Tak, przez USB‑C – wtedy dźwięk jest Lossless, z ultraniskim opóźnieniem."
+      },
+      {
+        "q": "Co jest w pudełku?",
+        "a": "Słuchawki, etui Smart Case, przewód USB‑C do ładowania i dokumentacja."
+      },
+      {
+        "q": "Jakie są kolory?",
+        "a": "Północ, księżycowa poświata, niebieski, fioletowy i pomarańczowy. Dostępność koloru sprawdzimy po Twoim zapytaniu."
+      }
+    ],
+    "compat": [
+      "iphone-18-pro",
+      "macbook-pro-14"
+    ],
+    "tags": [],
+    "images": [
+      {
+        "color": "polnoc",
+        "src": "/tech/katalog/airpods-max-2/polnoc.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-max/k/images/specs/hero_midnight__d5qsulrfqzu6_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "ksiezycowa-poswiata",
+        "src": "/tech/katalog/airpods-max-2/ksiezycowa-poswiata.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-max/k/images/specs/hero_starlight__yc0aejmzknm6_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "niebieski",
+        "src": "/tech/katalog/airpods-max-2/niebieski.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-max/k/images/specs/hero_blue__f6wblks3x02m_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "fioletowy",
+        "src": "/tech/katalog/airpods-max-2/fioletowy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-max/k/images/specs/hero_purple__skk4zesfid6y_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      },
+      {
+        "color": "pomaranczowy",
+        "src": "/tech/katalog/airpods-max-2/pomaranczowy.webp",
+        "source": {
+          "url": "https://www.apple.com/v/airpods-max/k/images/specs/hero_orange__dujzhx2hoo8y_large.jpg",
+          "date": "2026-11-18",
+          "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.apple.com/pl/airpods-max/specs/",
+        "date": "2026-11-18",
+        "what": "dane techniczne, kolory, konfiguracje, zawartość opakowania, zdjęcia kolorów"
+      }
+    ]
+  }
+]

@@ -1,0 +1,60 @@
+[
+  {
+    "brand": "apple",
+    "kind": "phone",
+    "title": "Dobierz iPhone’a w 3 pytaniach",
+    "questions": [
+      {
+        "q": "Jaki rozmiar Ci pasuje?",
+        "options": [
+          { "label": "Mniejszy, do jednej ręki", "tags": ["size:compact"] },
+          { "label": "Duży ekran", "tags": ["size:large"] },
+          { "label": "Składany — telefon i tablet", "tags": ["size:fold"] }
+        ]
+      },
+      {
+        "q": "Jak ważne są zdjęcia i filmy?",
+        "options": [
+          { "label": "Robię zwykłe zdjęcia", "tags": ["camera:basic"] },
+          { "label": "Dużo fotografuję i nagrywam", "tags": ["camera:pro"] }
+        ]
+      },
+      {
+        "q": "Czego szukasz?",
+        "options": [
+          { "label": "Rozsądny telefon na co dzień", "tags": ["tier:basic"] },
+          { "label": "Najlepszy, na kilka lat", "tags": ["tier:pro"] }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "samsung",
+    "kind": "phone",
+    "title": "Dobierz Galaxy w 3 pytaniach",
+    "questions": [
+      {
+        "q": "Jaki rozmiar Ci pasuje?",
+        "options": [
+          { "label": "Mniejszy, do jednej ręki", "tags": ["size:compact"] },
+          { "label": "Duży ekran", "tags": ["size:large"] },
+          { "label": "Składany", "tags": ["size:fold"] }
+        ]
+      },
+      {
+        "q": "Jak ważne są zdjęcia i filmy?",
+        "options": [
+          { "label": "Robię zwykłe zdjęcia", "tags": ["camera:basic"] },
+          { "label": "Dużo fotografuję i nagrywam", "tags": ["camera:pro"] }
+        ]
+      },
+      {
+        "q": "Czego szukasz?",
+        "options": [
+          { "label": "Rozsądny telefon na co dzień", "tags": ["tier:basic"] },
+          { "label": "Najlepszy, na kilka lat", "tags": ["tier:pro"] }
+        ]
+      }
+    ]
+  }
+]
