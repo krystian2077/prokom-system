@@ -298,3 +298,54 @@ html[data-tech-theme="dark"] .tech .t-themebtn__label--to-light { visibility: vi
 @media (min-width: 1024px) and (max-width: 1199.98px) {
   .tech .t-capsule .t-themebtn { height: 42px; padding: 0 10px 0 9px; gap: 6px; }
 }
+
+/* ---------- Brand bar premium (runda 18.11 §1.4, MOTYW-PASEK-LINII §4) ---------- */
+@media (min-width: 1024px) {
+  .tech .t-brandbar__lines { position: relative; isolation: isolate; align-items: center; gap: 6px; }
+  .tech .t-brandbar__lines a.t-bline {
+    position: relative; z-index: 1; display: flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px;
+    line-height: 1.1; font-weight: 600; color: var(--ink2); transition: color 180ms var(--m-ease-emph);
+  }
+  .tech .t-brandbar__lines a.t-bline:hover, .tech .t-brandbar__lines a.t-bline.is-hot { color: var(--ink); }
+  .tech .t-brandbar__lines a.t-bline:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px; }
+  /* the dash lives: 11 → 18 px with a soft glow; the current line keeps 18 px */
+  .tech .t-bline .t-dash { width: 11px; background: var(--line); transition: width 180ms var(--m-ease-emph), box-shadow 180ms var(--m-ease-out); }
+  html[data-tech-theme="dark"] .tech .t-bline .t-dash { background: var(--line-dark); }
+  .tech .t-bline:is(.is-hot, :focus-visible, .is-current) .t-dash { width: 18px; }
+  .tech .t-bline:is(.is-hot, :focus-visible) .t-dash { box-shadow: 0 0 10px color-mix(in srgb, var(--line) 55%, transparent); }
+  html[data-tech-theme="dark"] .tech .t-bline:is(.is-hot, :focus-visible) .t-dash { box-shadow: 0 0 10px color-mix(in srgb, var(--line-dark) 55%, transparent); }
+  /* the current line (Tech): a light pill in its own colour */
+  .tech .t-brandbar__lines a.t-bline.is-current { font-weight: 800; color: var(--ink); background: color-mix(in srgb, var(--line) 11%, transparent); }
+  html[data-tech-theme="dark"] .tech .t-brandbar__lines a.t-bline.is-current { background: color-mix(in srgb, var(--line-dark) 16%, transparent); }
+  /* one pill follows the pointer and the focus (usePill), back under the current line on leave */
+  .tech .t-brandbar__pill {
+    position: absolute; z-index: 0; left: 0; top: var(--pill-y, 0px); height: var(--pill-h, 0px); width: var(--pill-w, 0px);
+    transform: translateX(var(--pill-x, 0px)); border-radius: 999px; background: color-mix(in srgb, var(--bd) 60%, transparent); pointer-events: none;
+  }
+  .tech [data-pill-ready] > .t-brandbar__pill { transition: transform 180ms var(--m-ease-emph), width 180ms var(--m-ease-emph); }
+  /* description after 350 ms of pointing or on focus (never on touch) */
+  .tech .t-brandbar__tip {
+    position: absolute; z-index: 2; top: calc(100% + 6px); left: var(--tip-x, 0px); transform: translateX(-50%);
+    padding: 7px 11px; border-radius: 10px; background: var(--ink); color: var(--bg); font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap;
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.45); pointer-events: none; animation: t-brandbar-tip 160ms var(--m-ease-out) both;
+  }
+  /* above the capsule (a later sibling with the same z-index) only while a description shows */
+  .tech .t-header:has(.t-brandbar__tip) { z-index: 910; }
+  @keyframes t-brandbar-tip { from { opacity: 0; transform: translate(-50%, -3px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  /* entrance once per visit (sessionStorage) */
+  .tech .t-brandbar__lines.is-enter a.t-bline { animation: t-bline-in 260ms var(--m-ease-out) both; animation-delay: calc(var(--i, 0) * 30ms); }
+  @keyframes t-bline-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  /* right part: its own thin divider instead of a separator character */
+  .tech .t-brandbar__right { position: relative; padding-left: 20px; }
+  .tech .t-brandbar__right::before { content: ""; position: absolute; left: 0; top: 50%; width: 1px; height: 16px; margin-top: -8px; background: var(--bd); }
+}
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .tech .t-brandbar__lines { gap: 2px; }
+  .tech .t-brandbar__lines a.t-bline { padding: 6px 8px; }
+  .tech .t-brandbar__right { padding-left: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-brandbar__lines a.t-bline, .tech .t-bline .t-dash, .tech [data-pill-ready] > .t-brandbar__pill { transition: none; }
+  .tech .t-brandbar__lines.is-enter a.t-bline, .tech .t-brandbar__tip { animation: none; }
+}
+.tech.t-reduced .t-brandbar__lines.is-enter a.t-bline, .tech.t-reduced .t-brandbar__tip { animation: none; }
