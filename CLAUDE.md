@@ -14,6 +14,11 @@ Trwa **przebudowa strony publicznej na PRO-KOM Tech** i **przenosiny z Hetznera 
 7. **Produkcja i serwer:** żadnych zmian na serwerze, w DNS ani w bazie produkcyjnej bez wyraźnej zgody Krystiana w tej sesji. Przenosiny tylko według `docs/tech/MIGRACJA-VPS.md`.
 8. **Nowy pomysł w trakcie sesji = wpis do `docs/STAN.md` („Pomysły na później”), nie „przy okazji”.**
 
+## Audyt bezpieczeństwa (11.2026)
+- Plan, zasady i polecenia sesji: `docs/bezpieczenstwo/AUDYT-PLAN.md`; wyniki w `docs/bezpieczenstwo/ZNALEZISKA-2026-11.md`, konta w `DOSTEPY.md`.
+- Sesje AB1–AB3 są **tylko do odczytu** — zero zmian w kodzie, na serwerze, w DNS i w bazie; naprawy dopiero w AB4 osobnymi PR-ami.
+- Sekrety nigdy nie trafiają do plików, PR-ów, commitów ani odpowiedzi — tylko nazwy kluczy albo wartości zamaskowane (`sk-…abcd`).
+
 ## Gałęzie i PR-y
 - `master` = produkcja. `develop` = integracja (staging wdraża się z `develop` od TM).
 - Jedna sesja = jedno zadanie z `docs/zadania/tech.md`. Duże sesje robimy jako kilka PR-ów piętrowych (`feat/tech-…`), każdy do `develop`, squash merge, commit po polsku w trybie rozkazującym.
