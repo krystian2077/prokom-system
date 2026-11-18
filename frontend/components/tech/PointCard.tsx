@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GENERAL_EMAIL_LABEL, company, pointEmail, pointPhone, telHref } from "@/config/prokom";
 import type { VisiblePoint } from "@/lib/tech/points";
+import { AlsenBadge } from "./AlsenPartner";
 import { CEIDG_URL, inCity, isMainPoint, pointAddress, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { HoursChips } from "./HoursChips";
@@ -54,6 +55,7 @@ export function PointCard({ point, layout = "wide", as: H = "h2", trackFrom = "p
           <OpeningStatus points={[point]} variant="pill" skeletonCh={9} />
         </div>
         <H className="t-pointcard__name">{point.name}</H>
+        <AlsenBadge point={point} />
         <p className="t-pointcard__addr">
           {point.street ? `${point.street}, ` : null}
           <span className="t-nowrap">

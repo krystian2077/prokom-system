@@ -5,6 +5,7 @@ import { directionsUrl, footerColumns } from "@/lib/tech/nav";
 import { saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconCheck } from "./icons";
+import { FooterPartners } from "./AlsenPartner";
 import { LegalBar } from "./LegalBar";
 import { LinesBand } from "./LinesBand";
 import { Logo } from "./Logo";
@@ -89,6 +90,7 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
           </div>
         </div>
         <LinesBand />
+        <FooterPartners />
         <LegalBar />
       </div>
     </footer>

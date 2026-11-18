@@ -201,6 +201,24 @@ export const lines: Line[] = [
   { key: "gaming", name: "Gaming", label: "GAMING", domain: "prokomgaming.pl", description: "Komputery gamingowe · marka PRO-KOM", dash: "#D9A400", dashDark: "#F2C230" },
 ];
 
+/**
+ * Partners and authorisations (runda 18.11 §1.5). PRO-KOM is an authorised ALSEN partner — logo use
+ * agreed by Krystian 18.11.2026. No shop copying ALSEN prices or stock.
+ */
+export const partners = {
+  alsen: {
+    name: "ALSEN",
+    url: "https://www.alsen.pl/",
+    /** Trimmed logo from Krystian (seed/partnerzy/alsen.png); WebP for the page, PNG kept as the source. */
+    // TODO(krystian): docelowo SVG od ALSEN.
+    logo: { src: "/tech/partnerzy/alsen.webp", width: 630, height: 160 },
+    /** The point that is an ALSEN partner point. */
+    pointKey: "rabka" as PointKey,
+    // TODO(krystian): potwierdzić, że punkt partnerski ALSEN to salon przy ul. Orkana 16B — do tego czasu bez plakietki i bez adresu.
+    pointConfirmed: false,
+  },
+} as const;
+
 export const social = {
   facebook: "https://www.facebook.com/prokomrabka",
 } as const;
