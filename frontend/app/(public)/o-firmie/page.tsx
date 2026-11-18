@@ -4,6 +4,7 @@ import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
 import { AboutIconSvg, type AboutIcon } from "@/components/tech/about/about-icons";
 import { AboutRules, type AboutRule } from "@/components/tech/about/AboutRules";
 import { AboutSalon } from "@/components/tech/about/AboutSalon";
+import { AlsenBlock } from "@/components/tech/AlsenPartner";
 import { Spotlight } from "@/components/tech/about/Spotlight";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
@@ -237,6 +238,8 @@ export default function AboutPage() {
           </Spotlight>
         </div>
       </section>
+
+      <AlsenBlock />
 
       <CtaBand
         eyebrow="Następny krok"
