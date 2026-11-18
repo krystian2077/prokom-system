@@ -8,10 +8,11 @@
  * - contact data only from config/prokom.ts (points and phones render from there),
  * - no city × brand pages (doorway risk, SPEC §9) — one page per brand.
  *
- * Model lists: "current" = the brand's recent line-up, "older" = popular older models people
- * still bring in. TODO(krystian): confirm both lists with the service (which models we take,
- * parts availability) and add models released in autumn 2026 (iPhone 18 Pro, Galaxy Z Fold8 /
- * Flip8 …) once the service confirms them — the lists below stop at what we know for sure.
+ * Model lists: current models come from the catalogue (content/katalog, families below — checked
+ * with the manufacturers in T-R2a, so a new model shows up here with the catalogue); `older` =
+ * popular older models people still bring in. TODO(krystian): confirm the older lists with the
+ * service (which models we take, parts availability) and which repairs we do on MacBooks,
+ * Galaxy Z and Apple Watch (runda-1811-tech-marki.md §7.6).
  *
  * Tests: tests/tech/serwis-marek.test.ts (data, banned words, no prices, live repair links).
  */
@@ -30,7 +31,8 @@ export type ModelGroup = {
   icon: DeviceIcon;
   /** Backend category for /zgloszenie (KONTRAKT §1.1). */
   category: CategoryCode;
-  current: string[];
+  /** Catalogue family keys (content/katalog/rodziny.json) — their models are the current ones. */
+  families: string[];
   /** TODO(krystian): older models — confirm with the service which ones we still take. */
   older: string[];
 };
@@ -91,8 +93,14 @@ export const brandPages: BrandPage[] = [
         sub: "Ekran, bateria, tylna szybka, gniazdo, aparat",
         icon: "phone",
         category: "phone",
-        current: ["iPhone 17 Pro Max", "iPhone 17 Pro", "iPhone Air", "iPhone 17", "iPhone 16e", "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16"],
+        families: ["iphone-pro", "iphone-duo", "iphone-air", "iphone"],
         older: [
+          "iPhone 17 Pro Max",
+          "iPhone 17 Pro",
+          "iPhone 16e",
+          "iPhone 16 Pro Max",
+          "iPhone 16 Pro",
+          "iPhone 16 Plus",
           "iPhone 15 Pro Max",
           "iPhone 15 Pro",
           "iPhone 15 Plus",
@@ -122,8 +130,19 @@ export const brandPages: BrandPage[] = [
         sub: "Szybka i wyświetlacz, bateria, gniazdo ładowania",
         icon: "tablet",
         category: "tablet",
-        current: ["iPad Pro (M5)", "iPad Pro (M4)", "iPad Air (M3)", "iPad Air (M2)", "iPad (A16)", "iPad mini (A17 Pro)"],
-        older: ["iPad 10. generacji", "iPad 9. generacji", "iPad 8. generacji", "iPad Air 5. i 4. generacji", "iPad Pro 11″ i 12,9″ (2018–2022)", "iPad mini 6. generacji"],
+        families: ["ipad-pro", "ipad-air", "ipad"],
+        older: [
+          "iPad Pro (M4)",
+          "iPad Air (M3)",
+          "iPad Air (M2)",
+          "iPad mini (A17 Pro)",
+          "iPad 10. generacji",
+          "iPad 9. generacji",
+          "iPad 8. generacji",
+          "iPad Air 5. i 4. generacji",
+          "iPad Pro 11″ i 12,9″ (2018–2022)",
+          "iPad mini 6. generacji",
+        ],
       },
       {
         key: "macbook",
@@ -131,8 +150,17 @@ export const brandPages: BrandPage[] = [
         sub: "Matryca, klawiatura, bateria, zalanie, przegrzewanie",
         icon: "laptop",
         category: "laptop",
-        current: ["MacBook Air 13″ i 15″ (M4)", "MacBook Air 13″ i 15″ (M3)", "MacBook Pro 14″ (M5)", "MacBook Pro 14″ i 16″ (M4)"],
-        older: ["MacBook Air 13″ i 15″ (M2)", "MacBook Air (M1)", "MacBook Pro 14″ i 16″ (M1–M3)", "MacBook Pro 13″ (M1, M2)", "MacBook Pro z procesorem Intel (2016–2020)", "MacBook Air z procesorem Intel (2018–2020)"],
+        families: ["macbook-pro", "macbook-neo", "macbook-air"],
+        older: [
+          "MacBook Air 13″ i 15″ (M4)",
+          "MacBook Air 13″ i 15″ (M3)",
+          "MacBook Air 13″ i 15″ (M2)",
+          "MacBook Air (M1)",
+          "MacBook Pro 14″ i 16″ (M1–M4)",
+          "MacBook Pro 13″ (M1, M2)",
+          "MacBook Pro z procesorem Intel (2016–2020)",
+          "MacBook Air z procesorem Intel (2018–2020)",
+        ],
       },
       {
         key: "watch",
@@ -140,8 +168,18 @@ export const brandPages: BrandPage[] = [
         sub: "Szkło i wyświetlacz, bateria, ładowanie",
         icon: "watch",
         category: "smartwatch",
-        current: ["Apple Watch Series 11", "Apple Watch Ultra 3", "Apple Watch SE 3", "Apple Watch Series 10"],
-        older: ["Apple Watch Series 9", "Apple Watch Series 8", "Apple Watch Series 7", "Apple Watch Ultra 2", "Apple Watch Ultra", "Apple Watch SE (2. generacja)"],
+        families: ["apple-watch"],
+        older: [
+          "Apple Watch Series 11",
+          "Apple Watch Ultra 3",
+          "Apple Watch Series 10",
+          "Apple Watch Series 9",
+          "Apple Watch Series 8",
+          "Apple Watch Series 7",
+          "Apple Watch Ultra 2",
+          "Apple Watch Ultra",
+          "Apple Watch SE (2. generacja)",
+        ],
       },
     ],
     repairs: [
@@ -218,8 +256,26 @@ export const brandPages: BrandPage[] = [
         sub: "Ekran AMOLED, tylna szybka, bateria, gniazdo",
         icon: "phone",
         category: "phone",
-        current: ["Galaxy S26 Ultra", "Galaxy S26+", "Galaxy S26", "Galaxy S25 Ultra", "Galaxy S25 Edge", "Galaxy S25+", "Galaxy S25", "Galaxy S25 FE"],
-        older: ["Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S24 FE", "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23", "Galaxy S23 FE", "Galaxy S22 Ultra", "Galaxy S22", "Galaxy S21 / S21 FE", "Galaxy S20 FE"],
+        families: ["galaxy-s"],
+        older: [
+          "Galaxy S25 Ultra",
+          "Galaxy S25 Edge",
+          "Galaxy S25+",
+          "Galaxy S25",
+          "Galaxy S25 FE",
+          "Galaxy S24 Ultra",
+          "Galaxy S24+",
+          "Galaxy S24",
+          "Galaxy S24 FE",
+          "Galaxy S23 Ultra",
+          "Galaxy S23+",
+          "Galaxy S23",
+          "Galaxy S23 FE",
+          "Galaxy S22 Ultra",
+          "Galaxy S22",
+          "Galaxy S21 / S21 FE",
+          "Galaxy S20 FE",
+        ],
       },
       {
         key: "galaxy-a",
@@ -227,8 +283,24 @@ export const brandPages: BrandPage[] = [
         sub: "Ekran, bateria, gniazdo ładowania, aparat",
         icon: "phone",
         category: "phone",
-        current: ["Galaxy A56", "Galaxy A36", "Galaxy A26", "Galaxy A17", "Galaxy A16"],
-        older: ["Galaxy A55", "Galaxy A54", "Galaxy A53", "Galaxy A52 / A52s", "Galaxy A35", "Galaxy A34", "Galaxy A25", "Galaxy A15", "Galaxy A14", "Galaxy A13", "Galaxy A12"],
+        families: ["galaxy-a"],
+        older: [
+          "Galaxy A56",
+          "Galaxy A36",
+          "Galaxy A26",
+          "Galaxy A16",
+          "Galaxy A55",
+          "Galaxy A54",
+          "Galaxy A53",
+          "Galaxy A52 / A52s",
+          "Galaxy A35",
+          "Galaxy A34",
+          "Galaxy A25",
+          "Galaxy A15",
+          "Galaxy A14",
+          "Galaxy A13",
+          "Galaxy A12",
+        ],
       },
       {
         key: "galaxy-z",
@@ -236,8 +308,18 @@ export const brandPages: BrandPage[] = [
         sub: "Składane: ekran zewnętrzny i wewnętrzny, zawias, bateria",
         icon: "phone",
         category: "phone",
-        current: ["Galaxy Z Fold7", "Galaxy Z Flip7", "Galaxy Z Flip7 FE"],
-        older: ["Galaxy Z Fold6", "Galaxy Z Flip6", "Galaxy Z Fold5", "Galaxy Z Flip5", "Galaxy Z Fold4", "Galaxy Z Flip4"],
+        families: ["galaxy-z"],
+        older: [
+          "Galaxy Z Fold7",
+          "Galaxy Z Flip7",
+          "Galaxy Z Flip7 FE",
+          "Galaxy Z Fold6",
+          "Galaxy Z Flip6",
+          "Galaxy Z Fold5",
+          "Galaxy Z Flip5",
+          "Galaxy Z Fold4",
+          "Galaxy Z Flip4",
+        ],
       },
       {
         key: "galaxy-tab",
@@ -245,8 +327,21 @@ export const brandPages: BrandPage[] = [
         sub: "Szybka i wyświetlacz, bateria, gniazdo ładowania",
         icon: "tablet",
         category: "tablet",
-        current: ["Galaxy Tab S11 Ultra", "Galaxy Tab S11", "Galaxy Tab S10 FE", "Galaxy Tab A9+"],
-        older: ["Galaxy Tab S10 Ultra / S10+", "Galaxy Tab S9 Ultra / S9+ / S9", "Galaxy Tab S9 FE", "Galaxy Tab S8", "Galaxy Tab S7 / S7 FE", "Galaxy Tab A9", "Galaxy Tab A8", "Galaxy Tab A7 / A7 Lite"],
+        families: ["galaxy-tab"],
+        older: [
+          "Galaxy Tab S11 Ultra",
+          "Galaxy Tab S11",
+          "Galaxy Tab S10 FE",
+          "Galaxy Tab A9+",
+          "Galaxy Tab S10 Ultra / S10+",
+          "Galaxy Tab S9 Ultra / S9+ / S9",
+          "Galaxy Tab S9 FE",
+          "Galaxy Tab S8",
+          "Galaxy Tab S7 / S7 FE",
+          "Galaxy Tab A9",
+          "Galaxy Tab A8",
+          "Galaxy Tab A7 / A7 Lite",
+        ],
       },
     ],
     repairs: [

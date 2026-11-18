@@ -8,7 +8,7 @@ import { inCity, joinCities } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
-import { brandRepairCards, brandSeo, modelHref } from "@/lib/tech/serwis-marek";
+import { brandRepairCards, brandSeo, groupModels, modelHref } from "@/lib/tech/serwis-marek";
 import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
 import { submitHref } from "@/lib/tech/wizard-data";
 import { CtaBand } from "../CtaBand";
@@ -32,6 +32,8 @@ export function brandMetadata(page: BrandPage) {
  * Brand service page (/serwis-apple, /serwis-samsung — round 18.11, T-R2c): hero, "Wybierz
  * model", "Najczęstsze naprawy", "Części i gwarancja", "Jak oddać sprzęt", steps, FAQ, CTA.
  * Same building blocks as device pages (DevicePage). Server Component.
+ * TODO(krystian): link to the brand salon (/apple, /samsung) once T-R2b ships those pages (plan §4).
+ * The "Zgłoś naprawę" link carries only `category` — the form has no brand parameter (KONTRAKT §1.4).
  */
 export function BrandServicePage({ page }: { page: BrandPage }) {
   const published = publishedPoints(servicePoints);
@@ -107,28 +109,31 @@ function BrandModels({ page }: { page: BrandPage }) {
       alt
     >
       <ul className={`t-bmodels t-bmodels--${page.groups.length}`} data-t-stagger="">
-        {page.groups.map((g) => (
-          <li key={g.key} className="t-card t-bmodel">
-            <div className="t-bmodel__head">
-              <span className="t-ico" aria-hidden="true">
-                <DeviceGlyph icon={g.icon} size={24} />
-              </span>
-              <div>
-                <h3 className="t-h3 t-bmodel__t">{g.title}</h3>
-                <p className="t-bmodel__sub">{g.sub}</p>
+        {page.groups.map((g) => {
+          const { current, older } = groupModels(g);
+          return (
+            <li key={g.key} className="t-card t-bmodel">
+              <div className="t-bmodel__head">
+                <span className="t-ico" aria-hidden="true">
+                  <DeviceGlyph icon={g.icon} size={24} />
+                </span>
+                <div>
+                  <h3 className="t-h3 t-bmodel__t">{g.title}</h3>
+                  <p className="t-bmodel__sub">{g.sub}</p>
+                </div>
               </div>
-            </div>
-            <ModelChips models={g.current} category={g.category} />
-            {g.older.length ? (
-              <details className="t-bmodel__older">
-                <summary>
-                  Starsze modele <span>({g.older.length})</span>
-                </summary>
-                <ModelChips models={g.older} category={g.category} />
-              </details>
-            ) : null}
-          </li>
-        ))}
+              <ModelChips models={current} category={g.category} />
+              {older.length ? (
+                <details className="t-bmodel__older">
+                  <summary>
+                    Starsze modele <span>({older.length})</span>
+                  </summary>
+                  <ModelChips models={older} category={g.category} />
+                </details>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
       <p className="t-bmodels__none">
         Nie widzisz swojego modelu?{" "}

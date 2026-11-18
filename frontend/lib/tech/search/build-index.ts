@@ -11,6 +11,7 @@ import { BLOG_POSTS } from "@/lib/blog-posts";
 import { BLOG_CATEGORIES } from "../blog-taxonomy";
 import { brandPages } from "@/config/serwis-marek";
 import { courierPageHref } from "../courier";
+import { groupModels } from "../serwis-marek";
 import { devicePages } from "../devices";
 import { faqGroups } from "../faq-data";
 import { POINTS_HREF, PREP_GUIDE_HREF, PREP_GUIDE_READY, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, repairLinks, type DeviceIcon } from "../nav";
@@ -66,7 +67,12 @@ export function buildSearchIndex(draft: boolean = isDraftMode()): SearchEntry[] 
 
   // Brand service pages (round 18.11): models and repairs in the text, so "iphone 13" finds them.
   for (const b of brandPages) {
-    const models = b.groups.flatMap((g) => [g.title, ...g.current, ...g.older]).join(" ");
+    const models = b.groups
+      .flatMap((g) => {
+        const m = groupModels(g);
+        return [g.title, ...m.current, ...m.older];
+      })
+      .join(" ");
     add({ id: `marka:${b.path}`, group: "urzadzenia", title: b.h1, href: b.path, hint: b.short, aliases: `${b.brand} ${b.groups.map((g) => g.title).join(" ")}`, text: clip(`${b.lead} ${models}`, 600), icon: "phone", popularity: 80 });
   }
 

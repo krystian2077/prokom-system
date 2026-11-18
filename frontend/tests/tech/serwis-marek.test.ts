@@ -12,7 +12,8 @@ import { brandLinks } from "@/lib/tech/brand-links";
 import { CATEGORY_CODES, parseWizardParams } from "@/lib/tech/contract";
 import { isLive, repairPath } from "@/lib/tech/naprawy";
 import { buildSitemap } from "@/lib/tech/sitemap";
-import { brandRepairCards, brandSeo, modelHref } from "@/lib/tech/serwis-marek";
+import { brandRepairCards, brandSeo, groupModels, modelHref } from "@/lib/tech/serwis-marek";
+import { catalog, modelsOfFamily } from "@/lib/tech/catalog";
 import { buildSearchIndex } from "@/lib/tech/search/build-index";
 import { faultExists } from "@/lib/tech/devices";
 
@@ -48,12 +49,21 @@ describe("serwis marek — dane", () => {
     for (const b of brandPages) {
       for (const g of b.groups) {
         expect(CATEGORY_CODES, g.key).toContain(g.category);
-        expect(g.current.length, g.key).toBeGreaterThanOrEqual(3);
-        expect(g.older.length, g.key).toBeGreaterThanOrEqual(3);
-        const all = [...g.current, ...g.older];
+        for (const f of g.families) expect(catalog.families.some((x) => x.key === f), `${g.key}: ${f}`).toBe(true);
+        const { current, older } = groupModels(g);
+        expect(current.length, g.key).toBeGreaterThanOrEqual(2);
+        expect(older.length, g.key).toBeGreaterThanOrEqual(3);
+        const all = [...current, ...older];
         expect(new Set(all).size, `${g.key}: duplicate model`).toBe(all.length);
       }
     }
+  });
+
+  it("current models follow the catalogue; older ones never repeat a catalogue model", () => {
+    const g = brandPage("apple").groups[0];
+    expect(groupModels(g).current).toEqual(g.families.flatMap((f) => modelsOfFamily(f).map((m) => m.name)));
+    expect(groupModels(g).current).toContain("iPhone 18 Pro");
+    expect(groupModels({ families: ["iphone"], older: ["iPhone 17", "iPhone 12"] }).older).toEqual(["iPhone 12"]);
   });
 
   it("FAQ: 5–8 questions per brand, none shared between brands", () => {

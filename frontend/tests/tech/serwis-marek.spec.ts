@@ -12,7 +12,7 @@ const axeSource = fs.readFileSync(createRequire(__filename).resolve("axe-core/ax
 
 const PAGES = [
   { path: "/serwis-apple", h1: "Serwis iPhone, iPad i MacBook", model: "iPhone 15 Pro", older: true, category: "phone" },
-  { path: "/serwis-samsung", h1: "Serwis Samsung Galaxy", model: "Galaxy S25", older: false, category: "phone" },
+  { path: "/serwis-samsung", h1: "Serwis Samsung Galaxy", model: "Galaxy S26", older: false, category: "phone" },
 ] as const;
 const THEMES = ["light", "dark"] as const;
 

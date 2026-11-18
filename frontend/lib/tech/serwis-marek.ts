@@ -4,7 +4,8 @@
  */
 import type { ServicePoint } from "@/config/prokom";
 import { repairPages, type RepairPageData } from "@/config/naprawy";
-import { brandPages, type BrandPage, type BrandRepair } from "@/config/serwis-marek";
+import { brandPages, type BrandPage, type BrandRepair, type ModelGroup } from "@/config/serwis-marek";
+import { modelsOfFamily } from "./catalog";
 import { citiesTitle } from "./devices";
 import { isLive, repairPath } from "./naprawy";
 import { submitHref, type CategoryCode } from "./wizard-data";
@@ -43,4 +44,14 @@ export function brandRepairCards(page: BrandPage, pages: RepairPageData[] = repa
     }
     return [{ key: r.t, t: r.t, s: r.s, href: submitHref(r.category, r.usterka), device: r.category, usterka: r.usterka, live: false }];
   });
+}
+
+/**
+ * Models of a "Wybierz model" card: current = catalogue models of the group's families (newest
+ * first), older = the config list without anything the catalogue already shows.
+ */
+export function groupModels(g: Pick<ModelGroup, "families" | "older">): { current: string[]; older: string[] } {
+  const current = g.families.flatMap((f) => modelsOfFamily(f).map((m) => m.name));
+  const seen = new Set(current.map((n) => n.toLowerCase()));
+  return { current, older: g.older.filter((n) => !seen.has(n.toLowerCase())) };
 }
