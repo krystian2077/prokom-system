@@ -14,7 +14,7 @@ User = get_user_model()
 @pytest.mark.django_db
 def test_client_timeline_hides_internal_status_notes(api_client):
     staff = User.objects.create_user(email="staff-timeline@example.com", password="Pass1234!", role="staff")
-    client_user = User.objects.create_user(email="client-timeline@example.com", password="Pass1234!", role="client")
+    client_user = User.objects.create_user(email="client-timeline@example.com", password="Pass1234!", role="client", email_verified=True)
 
     client_obj = Client.objects.create(
         user=client_user,

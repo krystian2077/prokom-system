@@ -46,6 +46,18 @@ class ClientRegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Konto z tym adresem e-mail już istnieje. Zaloguj się."))
         return email
 
+    def validate(self, attrs):
+        # Audit AB4: the same password policy as the admin (AUTH_PASSWORD_VALIDATORS).
+        from django.contrib.auth.password_validation import validate_password
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        probe = User(email=attrs.get("email", ""), first_name=attrs.get("first_name", ""),
+                     last_name=attrs.get("last_name", ""))
+        try:
+            validate_password(attrs.get("password", ""), probe)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": list(exc.messages)})
+        return attrs
+
     def validate_phone(self, value):
         if value:
             from apps.common.validators import validate_polish_phone

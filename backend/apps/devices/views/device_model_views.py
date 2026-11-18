@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
+from apps.common.permissions import IsStaffOrAdminOrReadOnly
 from apps.devices.models import DeviceModel
 from apps.devices.serializers import DeviceModelSerializer, DeviceModelListSerializer
 from apps.devices.selectors import device_model_list
@@ -10,6 +11,7 @@ from apps.devices.selectors import device_model_list
 
 class DeviceModelViewSet(viewsets.ModelViewSet):
     """Lista i szczegóły modeli urządzeń."""
+    permission_classes = [IsStaffOrAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["brand", "category", "is_active"]
     search_fields = ["name", "full_name", "brand__name"]

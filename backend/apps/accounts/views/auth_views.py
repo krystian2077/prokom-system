@@ -58,6 +58,20 @@ def _assign_guest_repairs_to_user(user):
         repair.device.save(update_fields=["client"])
 
 
+from apps.accounts.authentication import issue_token  # noqa: E402
+
+
+def _password_problems(password, user=None):
+    """Audit AB4: AUTH_PASSWORD_VALIDATORS for every password set via the API (was length only)."""
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError as DjangoValidationError
+    try:
+        validate_password(password, user)
+    except DjangoValidationError as exc:
+        return list(exc.messages)
+    return []
+
+
 def _get_client_ip(request):
     xff = request.META.get("HTTP_X_FORWARDED_FOR")
     if xff:
@@ -93,24 +107,39 @@ def _check_login_ip_block(request):
 
 
 def _log_failed_login_and_maybe_lock(request, email_lower):
-    """Loguje nieudaną próbę. Przy >= 20 próbach na ten e-mail w 15 min blokuje konto i wysyła e-mail."""
+    """Loguje nieudaną próbę. Przy 20. próbie na ten e-mail w 15 min wysyła e-mail o blokadzie.
+
+    Audit AB4: the lock is temporary (_check_login_email_block, 15 min) — it used to set
+    is_active=False for good, so anyone could disable any account (also an admin).
+    """
     ip = _get_client_ip(request)
     if ip:
         LoginFailureLog.objects.create(ip_address=ip, email_lower=email_lower or "")
     since = dt.now() - timedelta(minutes=15)
     count = LoginFailureLog.objects.filter(email_lower=email_lower, created_at__gte=since).count()
-    if count >= 20:
+    if count == 20:
         user = User.objects.filter(email=email_lower).first()
         if user and user.is_active:
-            user.is_active = False
-            user.save(update_fields=["is_active"])
             from apps.communications.services.send import send_email
             send_email(
                 user.email,
                 "Konto PRO-KOM Tech zablokowane — zbyt wiele nieudanych logowań",
-                "Dzień dobry,\n\nTwoje konto zostało tymczasowo zablokowane z powodu zbyt wielu nieudanych prób logowania (zabezpieczenie przed nieautoryzowanym dostępem).\n\nSkontaktuj się z nami, aby odblokować konto.\n\n— PRO-KOM Tech",
+                "Dzień dobry,\n\nLogowanie na Twoje konto zostało zablokowane na 15 minut z powodu zbyt wielu nieudanych prób (zabezpieczenie przed nieautoryzowanym dostępem).\n\nJeśli to nie Ty — po odblokowaniu zmień hasło albo skontaktuj się z nami.\n\n— PRO-KOM Tech",
                 fail_silently=True,
             )
+
+
+def _check_login_email_block(email_lower):
+    """Audit AB4: >= 20 failed attempts on this e-mail in 15 min → 429 for 15 min (no deactivation)."""
+    if not email_lower:
+        return False, None
+    since = dt.now() - timedelta(minutes=15)
+    if LoginFailureLog.objects.filter(email_lower=email_lower, created_at__gte=since).count() >= 20:
+        return True, Response(
+            {"detail": "Zbyt wiele prób logowania na to konto. Spróbuj ponownie za 15 minut."},
+            status=status.HTTP_429_TOO_MANY_REQUESTS,
+        )
+    return False, None
 
 
 def _auto_mark_staff_present_on_login(user):
@@ -162,6 +191,9 @@ class LoginView(APIView):
         if blocked:
             return response
         email_from_request = (request.data.get("email") or "").strip().lower()
+        blocked, response = _check_login_email_block(email_from_request)
+        if blocked:
+            return response
         serializer = LoginSerializer(data=request.data, context={"request": request})
         try:
             serializer.is_valid(raise_exception=True)
@@ -176,7 +208,7 @@ class LoginView(APIView):
             from rest_framework.exceptions import ValidationError
             raise ValidationError("Nieprawidłowy e-mail lub hasło.")
         _log_login(request, user, "success")
-        token, _ = Token.objects.get_or_create(user=user)
+        token = issue_token(user)
         return Response(
             {
                 "token": token.key,
@@ -186,7 +218,7 @@ class LoginView(APIView):
         )
 
 
-class StaffLoginView(APIView):
+class StaffLoginView(APIView):  # same temporary e-mail lock as LoginView (audit AB4)
     """
     POST /api/v1/accounts/staff-login/
     Logowanie wyłącznie dla ról staff/admin (panel pracownika).
@@ -204,6 +236,9 @@ class StaffLoginView(APIView):
             return response
 
         email_from_request = (request.data.get("email") or "").strip().lower()
+        blocked, response = _check_login_email_block(email_from_request)
+        if blocked:
+            return response
         serializer = LoginSerializer(data=request.data, context={"request": request})
 
         try:
@@ -233,7 +268,7 @@ class StaffLoginView(APIView):
         user = User.objects.select_related("staff_profile").get(pk=user.pk)
         _auto_mark_staff_present_on_login(user)
         _log_login(request, user, "success")
-        token, _ = Token.objects.get_or_create(user=user)
+        token = issue_token(user)
         return Response(
             {
                 "token": token.key,
@@ -397,7 +432,7 @@ class VerifyEmailView(APIView):
         _assign_guest_repairs_to_user(user)
 
         _log_login(request, user, "success")
-        token, _ = Token.objects.get_or_create(user=user)
+        token = issue_token(user)
         return Response(
             {
                 "token": token.key,
@@ -424,16 +459,9 @@ class ResendVerificationCodeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user = User.objects.filter(email=email).first()
-        if not user:
-            return Response(
-                {"detail": "Nieprawidłowy adres e-mail."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if getattr(user, "email_verified", False):
-            return Response(
-                {"detail": "Konto jest już zweryfikowane."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        if not user or getattr(user, "email_verified", False):
+            # Audit AB4: the same answer as a successful send — no hint whether an account exists.
+            return Response({"email": email}, status=status.HTTP_200_OK)
 
         now = dt.now()
         one_hour_ago = now - timedelta(hours=1)
@@ -583,9 +611,14 @@ class ResetPasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user = token_obj.user
+        problems = _password_problems(new_password, user)
+        if problems:
+            return Response({"detail": " ".join(problems)}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(new_password)
         user.save(update_fields=["password"])
-        token_obj.delete()
+        # Audit AB4: a reset ends every session (API token) and drops other reset links.
+        Token.objects.filter(user=user).delete()
+        PasswordResetToken.objects.filter(user=user).delete()
         return Response(
             {"detail": "Hasło zostało zmienione. Możesz się zalogować."},
             status=status.HTTP_200_OK,
@@ -619,6 +652,9 @@ class ChangePasswordView(APIView):
                 {"detail": "Aktualne hasło jest nieprawidłowe."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        problems = _password_problems(new_password, user)
+        if problems:
+            return Response({"detail": " ".join(problems)}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(new_password)
         update_fields = ["password"]
         if getattr(user, "must_change_password", False):

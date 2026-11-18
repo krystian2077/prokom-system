@@ -16,6 +16,16 @@ class IsStaffOrAdmin(BasePermission):
         return request.user.role in ("staff", "admin")
 
 
+class IsAdminRole(BasePermission):
+    """Dostęp tylko dla roli admin."""
+    message = "Brak uprawnień. Wymagana rola administratora."
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        return request.user.role == "admin"
+
+
 class IsStaffOrAdminOrReadOnly(BasePermission):
     """Staff/Admin: pełny dostęp. Inni: tylko odczyt (GET)."""
     message = "Edycja wymaga uprawnień pracownika lub administratora."
@@ -36,5 +46,9 @@ def get_client_for_user(user):
     if not user or not user.is_authenticated:
         return None
     if user.role != "client":
+        return None
+    # Audit AB4: no client data until the e-mail is verified (the client panel sends an
+    # unverified account to the verification page right after login).
+    if not getattr(user, "email_verified", False):
         return None
     return getattr(user, "client_profile", None)

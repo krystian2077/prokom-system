@@ -468,6 +468,8 @@ class StaffResetPasswordView(APIView):
                 new_password = get_random_string(12)
             user.set_password(new_password)
             user.save(update_fields=["password"])
+            from rest_framework.authtoken.models import Token
+            Token.objects.filter(user=user).delete()  # audit AB4: end the old session
             return Response({"message": "Hasło ustawione.", "temporary_password": new_password if len(new_password) == 12 and not request.data.get("new_password") else None})
         if action == "send_link":
             from django.contrib.auth.tokens import default_token_generator

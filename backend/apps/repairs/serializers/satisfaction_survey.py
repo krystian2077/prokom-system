@@ -26,14 +26,16 @@ class SatisfactionSurveySubmitSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Ankietę można wypełnić po odebraniu naprawy.")
         if SatisfactionSurvey.objects.filter(repair=value).exists():
             raise serializers.ValidationError("Ankieta dla tej naprawy została już wysłana.")
-        client = getattr(request.user, "client_profile", None)
+        from apps.common.permissions import get_client_for_user
+        client = get_client_for_user(request.user)  # audit AB4: verified clients only
         if not client or value.client_id != client.id:
             raise serializers.ValidationError("To nie Twoja naprawa.")
         return value
 
     def create(self, validated_data):
         request = self.context.get("request")
-        client = request.user.client_profile
+        from apps.common.permissions import get_client_for_user
+        client = get_client_for_user(request.user)
         return SatisfactionSurvey.objects.create(
             client=client,
             **validated_data,
