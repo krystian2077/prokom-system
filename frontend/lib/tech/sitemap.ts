@@ -27,6 +27,9 @@ export const STATIC_ROUTES: { path: string; priority: number; freq: Freq }[] = [
   { path: "/serwis-drukarek", priority: 0.7, freq: "monthly" },
   { path: "/serwis-konsol", priority: 0.7, freq: "monthly" },
   { path: "/odzyskiwanie-danych", priority: 0.75, freq: "monthly" },
+  // Brand service pages (round 18.11, config/serwis-marek.ts) — no city × brand pages.
+  { path: "/serwis-apple", priority: 0.8, freq: "monthly" },
+  { path: "/serwis-samsung", priority: 0.8, freq: "monthly" },
   { path: "/hammer-glass", priority: 0.85, freq: "monthly" },
   { path: "/obslugiwane-miejscowosci", priority: 0.8, freq: "monthly" },
   { path: "/kontakt", priority: 0.8, freq: "yearly" },

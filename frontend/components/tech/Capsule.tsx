@@ -7,6 +7,7 @@ import { pointPhone, telHref } from "@/config/prokom";
 import { hoursSummary } from "@/lib/tech/hours";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { prefersReducedMotion } from "@/lib/tech/motion";
+import { brandLinks } from "@/lib/tech/brand-links";
 import { courierPageHref } from "@/lib/tech/courier";
 import { ACCOUNT_HREF, POINTS_HREF, PREP_GUIDE_HREF, PREP_GUIDE_READY, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, directionsUrl, inTriangle, isActive, mainNav, repairLinks, type NavItem, type Pt } from "@/lib/tech/nav";
 import { requestSearch } from "@/lib/tech/search/open";
@@ -447,6 +448,17 @@ function MegaRepairs() {
             Jak przygotować sprzęt
           </Link>
         ) : null}
+        <span className="t-mega__brands">
+          <span className="t-mega__brandslbl">Marki:</span>
+          {brandLinks.map((b, i) => (
+            <span key={b.href} className="t-mega__brand">
+              {i ? <span aria-hidden="true">·</span> : null}
+              <Link href={b.href} className="t-mega__barlink" data-mega-nav="" aria-label={`Serwis ${b.label}`}>
+                {b.label}
+              </Link>
+            </span>
+          ))}
+        </span>
       </nav>
     </div>
   );

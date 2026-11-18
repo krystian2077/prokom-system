@@ -1,0 +1,81 @@
+/* Brand service pages /serwis-apple, /serwis-samsung (round 18.11, T-R2c).
+   Every selector under .tech (tests/tech/fundament.test.ts). Builds on tech-pages.css blocks. */
+
+/* ---------- Hero visual ---------- */
+.tech .t-brandart { position: relative; width: min(100%, 340px); aspect-ratio: 1.1; margin-inline: auto; }
+.tech .t-brandart__item { position: absolute; display: block; animation: t-brandfl 7s ease-in-out 3 alternate; }
+.tech .t-brandart__img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 36px rgba(0, 0, 0, 0.6)); }
+.tech .t-brandart__item--laptop { left: 0; top: 4%; width: 68%; --r: -3deg; }
+.tech .t-brandart__item--tablet { right: 4%; bottom: 0; width: 40%; --r: 5deg; z-index: 1; }
+.tech .t-brandart__item--phone { left: 34%; bottom: 2%; width: 22%; --r: -7deg; z-index: 2; }
+.tech .t-brandart--samsung { aspect-ratio: 1; }
+.tech .t-brandart__item--galaxy { left: 50%; top: 2%; width: 74%; margin-left: -37%; --r: -4deg; }
+@keyframes t-brandfl { from { transform: translateY(0) rotate(var(--r)); } to { transform: translateY(-10px) rotate(var(--r)); } }
+@media (prefers-reduced-motion: reduce) { .tech .t-brandart__item { animation: none !important; transform: rotate(var(--r)); } }
+.tech.t-reduced .t-brandart__item { animation: none !important; transform: rotate(var(--r)); }
+@media (min-width: 768px) { .tech .t-brandart { width: min(100%, 420px); } }
+@media (min-width: 1024px) { .tech .t-brandart { width: min(100%, 480px); } }
+
+/* ---------- Wybierz model ---------- */
+.tech .t-bmodels { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+.tech .t-bmodel { display: flex; flex-direction: column; gap: 16px; padding: 20px 20px 18px; min-width: 0; }
+.tech .t-bmodel__head { display: flex; align-items: center; gap: 14px; }
+.tech .t-ui .t-bmodel__t { margin: 0; font-size: 20px; line-height: 1.15; }
+.tech .t-bmodel__sub { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink2); }
+.tech .t-bmodel__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tech .t-bchip {
+  display: inline-flex; align-items: center; min-height: 40px; box-sizing: border-box; padding: 8px 14px; border-radius: 12px;
+  background: var(--bg2); border: 1px solid transparent; color: var(--ink); font-size: 14px; font-weight: 700; line-height: 1.25;
+  transition: background var(--m-micro, 120ms) ease, border-color var(--m-micro, 120ms) ease, color var(--m-micro, 120ms) ease, transform var(--m-micro, 120ms) ease;
+}
+.tech .t-bchip:active { transform: scale(0.97); }
+@media (hover: hover) { .tech .t-bchip:hover { background: var(--soft); border-color: var(--softbd); color: var(--acct); } }
+.tech .t-bmodel__older { border-top: 1px solid var(--bd); padding-top: 12px; margin-top: auto; }
+.tech .t-bmodel__older summary {
+  display: flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; list-style: none;
+  font-size: 14.5px; font-weight: 800; color: var(--acct);
+}
+.tech .t-bmodel__older summary::-webkit-details-marker { display: none; }
+.tech .t-bmodel__older summary span { color: var(--ink2); font-weight: 700; }
+.tech .t-bmodel__older summary::after {
+  content: ""; width: 8px; height: 8px; margin-left: 2px; border: solid currentColor; border-width: 0 2px 2px 0;
+  transform: translateY(-2px) rotate(45deg); transition: transform var(--m-small, 200ms) var(--m-ease-out, ease);
+}
+.tech .t-bmodel__older[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.tech .t-bmodel__older .t-bmodel__chips { padding: 6px 0 4px; }
+.tech .t-bmodels__none { margin: 20px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink2); }
+.tech .t-bmodels__none a { font-weight: 800; color: var(--acct); text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 768px) { .tech .t-bmodels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- Najczęstsze naprawy ---------- */
+.tech .t-brepairs > li { display: flex; }
+.tech .t-brepair {
+  display: flex; flex-direction: column; gap: 10px; width: 100%; padding: 20px 20px 18px; box-sizing: border-box; color: var(--ink);
+  transition: translate var(--m-small, 200ms) var(--m-ease-out, ease), border-color var(--m-small, 200ms) ease, box-shadow var(--m-small, 200ms) ease;
+}
+.tech .t-brepair__t { font: 800 18px var(--t-font-head); font-stretch: 108%; line-height: 1.2; }
+.tech .t-brepair__s { font-size: 14.5px; line-height: 1.55; color: var(--ink2); }
+.tech .t-brepair__go { display: inline-flex; align-items: center; gap: 7px; margin-top: auto; padding-top: 4px; font-size: 14.5px; font-weight: 800; color: var(--acct); }
+.tech .t-brepair__go svg { transition: transform var(--m-small, 200ms) var(--m-ease-out, ease); }
+@media (hover: hover) {
+  .tech .t-brepair:hover { translate: 0 -3px; border-color: var(--softbd); }
+  .tech .t-brepair:hover .t-brepair__go svg { transform: translateX(3px); }
+  .tech .t-brepair:hover .t-symptoms__ico { background: var(--acc); color: var(--onacc); border-color: transparent; transform: rotate(-6deg) scale(1.06); }
+}
+
+/* ---------- Części i gwarancja ---------- */
+.tech .t-bparts__list { list-style: none; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+.tech .t-bparts__list li { display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: var(--ink2); }
+.tech .t-bparts__list b { display: block; margin-bottom: 2px; font: 800 16.5px var(--t-font-head); font-stretch: 108%; color: var(--ink); }
+.tech .t-bparts__ok { flex-shrink: 0; width: 24px; height: 24px; margin-top: 1px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--okbg); color: var(--ok); }
+.tech .t-bparts__notes { list-style: none; margin: 0; padding: 0; }
+
+/* ---------- Mega menu "Naprawy": row "Marki: Apple · Samsung" (Capsule.tsx) ---------- */
+.tech .t-mega__brands { display: inline-flex; align-items: center; gap: 10px; }
+.tech .t-mega__brandslbl { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink2); }
+.tech .t-mega__brand { display: inline-flex; align-items: center; gap: 10px; }
+.tech .t-mega__brand > span[aria-hidden] { color: var(--ink2); opacity: 0.6; }
+.tech .t-mega__brand .t-mega__barlink { color: var(--ink); font-weight: 800; }
+.tech .t-mega__brand .t-mega__barlink:hover { color: var(--acct); }
+.tech .t-bmodels__salon { margin: 8px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink2); }
+.tech .t-bmodels__salon a { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; color: var(--acct); }

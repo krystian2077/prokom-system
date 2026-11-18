@@ -10,7 +10,9 @@ import { line } from "@/config/prokom";
 import { BLOG_POSTS } from "@/lib/blog-posts";
 import { catalog, modelPath } from "../catalog";
 import { BLOG_CATEGORIES } from "../blog-taxonomy";
+import { brandPages } from "@/config/serwis-marek";
 import { courierPageHref } from "../courier";
+import { groupModels } from "../serwis-marek";
 import { devicePages } from "../devices";
 import { faqGroups } from "../faq-data";
 import { POINTS_HREF, PREP_GUIDE_HREF, PREP_GUIDE_READY, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, repairLinks, type DeviceIcon } from "../nav";
@@ -62,6 +64,17 @@ export function buildSearchIndex(draft: boolean = isDraftMode()): SearchEntry[] 
     const device = wizardDevices.find((d) => d.icon === link.icon);
     const aliases = [page?.short, device?.label].filter(Boolean).join(" ");
     add({ id: `urzadzenie:${link.href}`, group: "urzadzenia", title: link.label, href: link.href, hint: page?.card ?? "Ekran, bateria, gniazdo ładowania, pomoc po zalaniu.", text, aliases, icon: deviceIcon(link.icon), popularity: 85 });
+  }
+
+  // Brand service pages (round 18.11): models and repairs in the text, so "iphone 13" finds them.
+  for (const b of brandPages) {
+    const models = b.groups
+      .flatMap((g) => {
+        const m = groupModels(g);
+        return [g.title, ...m.current, ...m.older];
+      })
+      .join(" ");
+    add({ id: `marka:${b.path}`, group: "urzadzenia", title: b.h1, href: b.path, hint: b.short, aliases: `${b.brand} ${b.groups.map((g) => g.title).join(" ")}`, text: clip(`${b.lead} ${models}`, 600), icon: "phone", popularity: 80 });
   }
 
   // Repair pages and wizard faults: a fault with its own page leads there, the rest to the form.
