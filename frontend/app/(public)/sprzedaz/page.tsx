@@ -2,8 +2,9 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CatalogBrowser, type BrowserItem } from "@/components/tech/catalog/CatalogBrowser";
 import { ModelCard } from "@/components/tech/catalog/ModelCard";
+import { RecentlyViewed } from "@/components/tech/catalog/RecentlyViewed";
 import { JsonLd } from "@/components/tech/JsonLd";
-import { BRAND_NAMES, catalog, KIND_NAMES, sortedModels } from "@/lib/tech/catalog";
+import { BRAND_NAMES, catalog, KIND_NAMES, recentEntries, sortedModels } from "@/lib/tech/catalog";
 import { collectionJsonLd } from "@/lib/tech/catalog/seo";
 import { normalizeText } from "@/lib/tech/search/normalize";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
@@ -83,6 +84,7 @@ export default function SalesPage() {
       </section>
       <section className="t-section t-section--flush-top" id="katalog" data-rail="Katalog" aria-label="Katalog">
         <div className="t-container">
+          <RecentlyViewed entries={recentEntries()} />
           <CatalogBrowser items={items} />
         </div>
       </section>

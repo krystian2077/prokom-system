@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BRAND_NAMES, catalog, compatOf, findModel, modelPath } from "@/lib/tech/catalog";
+import { BRAND_NAMES, catalog, compatOf, findModel, modelPath, recentEntries } from "@/lib/tech/catalog";
 import { productJsonLd } from "@/lib/tech/catalog/seo";
 import { breadcrumbJsonLd, faqJsonLd, type Crumb } from "@/lib/tech/seo";
 import { Breadcrumbs } from "../Breadcrumbs";
@@ -8,6 +8,8 @@ import { Faq } from "../Faq";
 import { JsonLd } from "../JsonLd";
 import { ModelCard } from "./ModelCard";
 import { ModelConfigurator } from "./ModelConfigurator";
+import { BundleButton } from "./BundleButton";
+import { RecentlyViewed, RememberModel } from "./RecentlyViewed";
 
 const SERVICE_HREF = { apple: "/serwis-apple", samsung: "/serwis-samsung" } as const;
 const SALON_HREF = { apple: "/apple", samsung: "/samsung" } as const;
@@ -35,6 +37,7 @@ export function ModelPage({ brand, slug }: { brand: string; slug: string }) {
       <JsonLd data={productJsonLd(m)} />
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <JsonLd data={faqJsonLd(m.faq)} />
+      <RememberModel slug={m.slug} />
 
       <section className="t-section--hero" id="model" data-rail={m.name}>
         <div className="t-container">
@@ -111,6 +114,11 @@ export function ModelPage({ brand, slug }: { brand: string; slug: string }) {
         <section className="t-section t-section--tight" id="pasuje" data-rail="Pasuje do" aria-labelledby="t-model-compat">
           <div className="t-container">
             <h2 id="t-model-compat" className="t-h2 t-h2--sm">Pasuje do</h2>
+            <BundleButton
+              model={m}
+              models={compat.models.slice(0, 2)}
+              accessories={compat.accessories.filter((a) => !a.note.startsWith("TODO")).map((a) => ({ key: a.key, name: a.name }))}
+            />
             <ul className="t-model__compat">
               {compat.accessories.map((a) => (
                 <li key={a.key} className="t-card">
@@ -152,6 +160,10 @@ export function ModelPage({ brand, slug }: { brand: string; slug: string }) {
           <Faq items={m.faq} />
         </div>
       </section>
+
+      <div className="t-container">
+        <RecentlyViewed entries={recentEntries()} exclude={m.slug} />
+      </div>
 
       {siblings.length ? (
         <section className="t-section t-section--alt" id="podobne" data-rail="Podobne" aria-labelledby="t-model-more">
