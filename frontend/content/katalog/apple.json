@@ -154,8 +154,9 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/iphone-18-pro/czarny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_black__dseo2tvypuc2_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-black-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -163,8 +164,9 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/iphone-18-pro/srebrny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_silver__c0oudn0fzw4m_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-silver-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -172,8 +174,9 @@
       {
         "color": "blekit-lodowca",
         "src": "/tech/katalog/iphone-18-pro/blekit-lodowca.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_glacier__fkxlpbz0ruy6_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-glacier-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -181,8 +184,9 @@
       {
         "color": "burgund",
         "src": "/tech/katalog/iphone-18-pro/burgund.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_burgundy__f95it7a6dnyq_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-finish-select-burgundy-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -356,8 +360,9 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/iphone-18-pro-max/czarny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_black__dseo2tvypuc2_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-black-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -365,8 +370,9 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/iphone-18-pro-max/srebrny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_silver__c0oudn0fzw4m_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-silver-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -374,8 +380,9 @@
       {
         "color": "blekit-lodowca",
         "src": "/tech/katalog/iphone-18-pro-max/blekit-lodowca.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_glacier__fkxlpbz0ruy6_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-glacier-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -383,8 +390,9 @@
       {
         "color": "burgund",
         "src": "/tech/katalog/iphone-18-pro-max/burgund.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-18-pro/a/images/overview/product-viewer/color_burgundy__f95it7a6dnyq_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-18-pro-max-finish-select-burgundy-202609?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -547,8 +555,9 @@
       {
         "color": "nocne-niebo",
         "src": "/tech/katalog/iphone-duo/nocne-niebo.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609_GEO_EMEA?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -556,8 +565,9 @@
       {
         "color": "gwiezdna-biel",
         "src": "/tech/katalog/iphone-duo/gwiezdna-biel.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609_GEO_EMEA?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -723,8 +733,9 @@
       {
         "color": "gwiezdna-czern",
         "src": "/tech/katalog/iphone-air/gwiezdna-czern.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509_GEO_EMEA?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -732,8 +743,9 @@
       {
         "color": "bialy-oblok",
         "src": "/tech/katalog/iphone-air/bialy-oblok.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509_GEO_EMEA?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -741,8 +753,9 @@
       {
         "color": "jasne-zloto",
         "src": "/tech/katalog/iphone-air/jasne-zloto.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509_GEO_EMEA?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -750,8 +763,9 @@
       {
         "color": "blekitny",
         "src": "/tech/katalog/iphone-air/blekitny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509_GEO_EMEA?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -918,8 +932,9 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/iphone-17/czarny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-17/i/images/overview/product-viewer/colors_black__fzuhc3kqvmq2_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-black-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -927,8 +942,9 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/iphone-17/bialy.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-17/i/images/overview/product-viewer/colors_white__979ypubjzdum_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-white-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -936,8 +952,9 @@
       {
         "color": "golebi",
         "src": "/tech/katalog/iphone-17/golebi.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-17/i/images/overview/product-viewer/colors_mist_blue__700uff6zu2qa_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-mistblue-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -945,8 +962,9 @@
       {
         "color": "szalwia",
         "src": "/tech/katalog/iphone-17/szalwia.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-17/i/images/overview/product-viewer/colors_sage__cr1jt90v1yoi_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-sage-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -954,8 +972,9 @@
       {
         "color": "lawenda",
         "src": "/tech/katalog/iphone-17/lawenda.webp",
+        "transparent": true,
         "source": {
-          "url": "https://www.apple.com/v/iphone-17/i/images/overview/product-viewer/colors_lavender__bcaie9a8npj6_large.jpg",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-lavender-202509_GEO_EMEA?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1116,8 +1135,9 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/iphone-17e/czarny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-black-202603?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-black-202603?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1125,8 +1145,9 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/iphone-17e/bialy.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-white-202603?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-white-202603?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1134,8 +1155,9 @@
       {
         "color": "jasnorozowy",
         "src": "/tech/katalog/iphone-17e/jasnorozowy.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-softpink-202603?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17e-finish-select-softpink-202603?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1302,8 +1324,9 @@
       {
         "color": "czarny",
         "src": "/tech/katalog/iphone-16/czarny.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-black-select-202409?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-black-select-202409?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1311,8 +1334,9 @@
       {
         "color": "bialy",
         "src": "/tech/katalog/iphone-16/bialy.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-white-select-202409?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-white-select-202409?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1320,8 +1344,9 @@
       {
         "color": "rozowy",
         "src": "/tech/katalog/iphone-16/rozowy.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-pink-select-202409?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-pink-select-202409?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1329,8 +1354,9 @@
       {
         "color": "berylowa-zielen",
         "src": "/tech/katalog/iphone-16/berylowa-zielen.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-teal-select-202409?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-teal-select-202409?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
@@ -1338,8 +1364,9 @@
       {
         "color": "ultramaryna",
         "src": "/tech/katalog/iphone-16/ultramaryna.webp",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-ultramarine-select-202409?wid=940&hei=1112&fmt=png-alpha",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-ultramarine-select-202409?wid=1200&hei=1420&fmt=png-alpha",
           "date": "2026-11-18",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }

@@ -41,6 +41,8 @@ export type CatalogImage = {
   color: string;
   /** Path under public/ (downloaded file) — null until the file is in the repo. */
   src: string | null;
+  /** Cut-out product shot (transparent background): shown free-standing with the glow, not as a tile. */
+  transparent?: boolean;
   /** Original URL, who and when, and the permission (Krystian 18.11.2026: photos from manufacturers allowed). */
   source: { url: string | null; date: string; consent: string };
 };

@@ -97,12 +97,32 @@ async function downloadPhoto(url, slug, colorKey) {
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   const buf = Buffer.from(await res.arrayBuffer());
   fs.mkdirSync(dir, { recursive: true });
-  await sharp(buf).resize({ width: 720, height: 720, fit: "inside", withoutEnlargement: true }).webp({ quality: 78 }).toFile(file);
+  await sharp(buf).trim().resize({ width: 720, height: 720, fit: "inside", withoutEnlargement: true }).webp({ quality: 80, alphaQuality: 90 }).toFile(file);
   return rel;
 }
 
+/** Better product shots chosen later (e.g. iphone-photos.json): { slug: { "Kolor": { url, transparent } } }. */
+const OVERRIDES = Object.assign({}, ...["iphone-photos.json"].map((f) => readJson(path.join(SRC, f)) ?? {}));
+
 async function build(brand, specFiles, copyFiles) {
   const specs = specFiles.flatMap((f) => readJson(path.join(SRC, f)) ?? []);
+  for (const s of specs) {
+    const o = OVERRIDES[s.slug];
+    if (!o) continue;
+    for (const [colorName, v] of Object.entries(o)) {
+      if (!v?.url) continue;
+      const key = slugify(colorName);
+      s.images = [...(s.images ?? []).filter((i) => !(i.color && slugify(i.color) === key)), { color: colorName, url: v.url, transparent: !!v.transparent }];
+      const file = path.join(PUB, s.slug, `${key}.webp`);
+      // replace the earlier download once (marker file keeps it from re-downloading on every run)
+      const marker = path.join(SRC, ".overrides", `${s.slug}--${key}`);
+      if (DOWNLOAD && fs.existsSync(file) && !fs.existsSync(marker)) fs.unlinkSync(file);
+      if (DOWNLOAD) {
+        fs.mkdirSync(path.dirname(marker), { recursive: true });
+        fs.writeFileSync(marker, v.url);
+      }
+    }
+  }
   const copy = Object.assign({}, ...copyFiles.map((f) => readJson(path.join(SRC, f)) ?? {}));
   const out = [];
   const report = [];
@@ -130,7 +150,7 @@ async function build(brand, specFiles, copyFiles) {
           report.push(`zdjęcie nie pobrane ${s.slug}/${col.key}: ${e.message}`);
         }
       } else if (fs.existsSync(path.join(PUB, s.slug, `${col.key}.webp`))) src = `/tech/katalog/${s.slug}/${col.key}.webp`;
-      images.push({ color: col.key, src, source: { url: img.url, date: TODAY, consent: CONSENT } });
+      images.push({ color: col.key, src, ...(img.transparent ? { transparent: true } : {}), source: { url: img.url, date: TODAY, consent: CONSENT } });
     }
     const specsRows = (s.specs ?? []).filter((r) => r.value).slice(0, 14);
     out.push({
