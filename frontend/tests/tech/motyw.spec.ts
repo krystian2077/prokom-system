@@ -115,7 +115,7 @@ test.describe("desktop 1440", () => {
 });
 
 /** Everything stays inside the capsule (18.11: „Zgłoś naprawę” stuck out at 1440 next to the labelled button). */
-for (const width of [1024, 1100, 1200, 1280, 1360, 1440, 1600]) {
+for (const width of [1024, 1100, 1200, 1280, 1320, 1360, 1440, 1600, 1920]) {
   test(`capsule ${width}: actions stay inside, no Blog in the main menu`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await pinDaylight(page);

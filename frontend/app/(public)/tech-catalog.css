@@ -272,3 +272,35 @@ html[data-tech-theme="dark"] .tech .t-mcard__dots i { box-shadow: inset 0 0 0 1p
 .tech .t-model__head .t-crumbs ol { color: var(--ink2); }
 .tech .t-model__head .t-crumbs a:hover { color: var(--ink); }
 .tech .t-model__head .t-crumbs [aria-current] { color: var(--ink); }
+
+/* ---------- Capsule „Sprzedaż” mega menu and the enquiry icon (runda 18.11 v2 §2) ---------- */
+.tech .t-mega__sales { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr) minmax(0, 1fr); gap: 18px; padding: 22px; }
+.tech .t-mega__salescol { display: flex; flex-direction: column; gap: 10px; padding: 6px 8px; animation: t-mega-item var(--m-panel, 320ms) var(--m-ease-emph, ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
+.tech .t-mega__salescol ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.tech .t-mega__salescol ul a { display: flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 12px; font-weight: 700; color: var(--ink); }
+.tech .t-mega__salescol ul a:hover, .tech .t-mega__salescol ul a:focus-visible { background: var(--bg2); }
+.tech .t-mega__enq { display: flex; flex-direction: column; gap: 8px; }
+.tech .t-mega__enq .t-enqlink { align-self: flex-start; }
+.tech .t-navlink { position: relative; }
+.tech .t-navbadge { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; display: grid; place-items: center; border-radius: 999px; background: var(--acc); color: var(--onacc); font-size: 11px; font-weight: 800; line-height: 1; pointer-events: none; }
+.tech .t-mega__salescol--apple ul { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 8px; }
+.tech .t-mega__enq .t-mega__barlink { color: #d9cfcc; }
+.tech .t-mega__enq .t-mega__barlink:hover { color: #fff; }
+.tech .t-sheet__enq { justify-content: flex-start; }
+.tech .t-sheet__enq svg { flex-shrink: 0; }
+/* room for „Sprzedaż” in the capsule (18.11): „Konto” as an icon on every desktop width (the name stays „Konto klienta”) */
+@media (min-width: 1024px) {
+  .tech .t-capsule__account span { display: none; }
+  .tech .t-capsule__account { width: 44px; padding: 0; justify-content: center; }
+}
+/* …and no „Ctrl K” hint in the capsule (the shortcut still works, aria-keyshortcuts says so) */
+@media (min-width: 1024px) {
+  .tech .t-capsearch__kbd { display: none; }
+}
+/* …and a little less padding between the six menu items */
+@media (min-width: 1280px) { .tech .t-capsule .t-navlink { padding-inline: 10px; } }
+@media (min-width: 1024px) and (max-width: 1279.98px) { .tech .t-capsule .t-navlink { padding-inline: 5px; } }
+@media (min-width: 1280px) and (max-width: 1439.98px) {
+  .tech .t-capsule .t-cta__long { display: none; }
+  .tech .t-capsule .t-cta__short { display: inline; }
+}

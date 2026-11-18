@@ -12,6 +12,7 @@ import { MyRepairs } from "./MyRepairs";
 import { OpeningStatus } from "./OpeningStatus";
 import { useShell, type SheetMode } from "./ShellContext";
 import { ThemeSegmented } from "./ThemeToggle";
+import { EnquiryLink } from "./catalog/EnquiryLink";
 
 const TITLES: Record<SheetMode, string> = { menu: "Menu", naprawy: "Naprawy" };
 const CLOSE_DRAG_PX = 110;
@@ -204,6 +205,7 @@ export function MenuSheet() {
                   Konto klienta
                   <IconChevronRight />
                 </Link>
+                <EnquiryLink className="t-sheet__item t-sheet__enq" label="Twoje zapytanie" />
               </nav>
               <div className="t-sheet__call">
                 <div>

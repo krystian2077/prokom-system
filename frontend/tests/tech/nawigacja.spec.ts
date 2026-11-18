@@ -8,7 +8,8 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
   test("keyboard: ↓ opens and focuses the panel, ↑/↓ inside, →/← between items, Esc returns focus, Tab out closes", async ({ page }) => {
     await page.goto("/");
     const naprawy = page.locator(".t-capsule").getByRole("button", { name: "Naprawy" });
-    const punkty = page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" });
+    // „Sprzedaż” sits between „Naprawy” and „Punkty serwisowe” (runda 18.11 v2)
+    const punkty = page.locator(".t-capsule").getByRole("button", { name: "Sprzedaż" });
     await naprawy.focus();
     await page.keyboard.press("ArrowDown");
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
