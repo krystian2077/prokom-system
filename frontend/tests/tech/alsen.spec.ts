@@ -15,8 +15,9 @@ for (const theme of ["light", "dark"] as const) {
       const card = page.locator("#dlaczego [data-alsen]");
       await expect(card).toContainText("Autoryzowany partner ALSEN");
       const logo = card.getByRole("img", { name: "ALSEN" });
+      await logo.scrollIntoViewIfNeeded();
       await expect(logo).toBeVisible();
-      expect(await logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+      await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
       const link = card.getByRole("link", { name: /alsen\.pl/ });
       await expect(link).toHaveAttribute("href", "https://www.alsen.pl/");
       await expect(link).toHaveAttribute("target", "_blank");
