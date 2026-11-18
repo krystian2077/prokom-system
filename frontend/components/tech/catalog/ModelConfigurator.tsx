@@ -55,7 +55,7 @@ export function ModelConfigurator({ model }: { model: CatalogModel }) {
         <fieldset className="t-mconf__set">
           <legend>
             Kolor: <b>{c?.name}</b>
-            {c?.officialStoreOnly ? <span className="t-mconf__hint"> — kolor z Oficjalnych Sklepów Samsung, sprawdzimy dostępność</span> : null}
+            {c?.officialStoreOnly ? <span className="t-mconf__hint"> — ten kolor Samsung sprzedaje tylko bezpośrednio, sprawdzimy dostępność</span> : null}
           </legend>
           <div className="t-mconf__swatches" role="radiogroup" aria-label="Kolor">
             {model.colors.map((x) => (
