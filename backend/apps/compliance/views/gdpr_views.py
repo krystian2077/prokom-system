@@ -22,6 +22,8 @@ class ExportMyDataView(APIView):
                 {"detail": "Eksport dotyczy kont klientów."},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        if not getattr(user, "email_verified", False):  # audit AB4
+            return Response({"detail": "Najpierw potwierdź adres e-mail."}, status=status.HTTP_403_FORBIDDEN)
         client = getattr(user, "client_profile", None)
         if not client:
             return Response(
@@ -111,6 +113,8 @@ class RequestAccountDeletionView(APIView):
                 {"detail": "Usunięcie konta dotyczy kont klientów."},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        if not getattr(user, "email_verified", False):  # audit AB4
+            return Response({"detail": "Najpierw potwierdź adres e-mail."}, status=status.HTTP_403_FORBIDDEN)
         client = getattr(user, "client_profile", None)
         reason = (request.data.get("reason") or "").strip() if isinstance(request.data, dict) else ""
         gdpr = None

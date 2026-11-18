@@ -58,6 +58,9 @@ def _assign_guest_repairs_to_user(user):
         repair.device.save(update_fields=["client"])
 
 
+from apps.accounts.authentication import issue_token  # noqa: E402
+
+
 def _password_problems(password, user=None):
     """Audit AB4: AUTH_PASSWORD_VALIDATORS for every password set via the API (was length only)."""
     from django.contrib.auth.password_validation import validate_password
@@ -205,7 +208,7 @@ class LoginView(APIView):
             from rest_framework.exceptions import ValidationError
             raise ValidationError("Nieprawidłowy e-mail lub hasło.")
         _log_login(request, user, "success")
-        token, _ = Token.objects.get_or_create(user=user)
+        token = issue_token(user)
         return Response(
             {
                 "token": token.key,
@@ -215,7 +218,7 @@ class LoginView(APIView):
         )
 
 
-class StaffLoginView(APIView):
+class StaffLoginView(APIView):  # same temporary e-mail lock as LoginView (audit AB4)
     """
     POST /api/v1/accounts/staff-login/
     Logowanie wyłącznie dla ról staff/admin (panel pracownika).
@@ -233,6 +236,9 @@ class StaffLoginView(APIView):
             return response
 
         email_from_request = (request.data.get("email") or "").strip().lower()
+        blocked, response = _check_login_email_block(email_from_request)
+        if blocked:
+            return response
         serializer = LoginSerializer(data=request.data, context={"request": request})
 
         try:
@@ -262,7 +268,7 @@ class StaffLoginView(APIView):
         user = User.objects.select_related("staff_profile").get(pk=user.pk)
         _auto_mark_staff_present_on_login(user)
         _log_login(request, user, "success")
-        token, _ = Token.objects.get_or_create(user=user)
+        token = issue_token(user)
         return Response(
             {
                 "token": token.key,
@@ -426,7 +432,7 @@ class VerifyEmailView(APIView):
         _assign_guest_repairs_to_user(user)
 
         _log_login(request, user, "success")
-        token, _ = Token.objects.get_or_create(user=user)
+        token = issue_token(user)
         return Response(
             {
                 "token": token.key,
@@ -593,9 +599,6 @@ class ResetPasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         token_obj = PasswordResetToken.objects.filter(token=token_str).select_related("user").first()
-        problems = _password_problems(new_password, token_obj.user if token_obj else None)
-        if problems:
-            return Response({"detail": " ".join(problems)}, status=status.HTTP_400_BAD_REQUEST)
         if not token_obj:
             return Response(
                 {"detail": "Link jest nieprawidłowy lub wygasł. Poproś o nowy link."},
@@ -608,6 +611,9 @@ class ResetPasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user = token_obj.user
+        problems = _password_problems(new_password, user)
+        if problems:
+            return Response({"detail": " ".join(problems)}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(new_password)
         user.save(update_fields=["password"])
         # Audit AB4: a reset ends every session (API token) and drops other reset links.

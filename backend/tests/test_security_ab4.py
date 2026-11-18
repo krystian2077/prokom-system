@@ -225,3 +225,41 @@ def test_api_schema_is_not_public(api_client):
     assert api_client.get("/api/schema/").status_code in (401, 403)
     _auth(api_client, _user("klient@example.com"))
     assert api_client.get("/api/schema/").status_code == 403
+
+
+# --- review fixes: staff login lock (P1), fresh token at login (P2), direct profile reads (P3) ---
+
+@pytest.mark.django_db
+def test_staff_login_is_locked_too(api_client):
+    staff = _user("pracownik@example.com", role="staff")
+    LoginFailureLog.objects.bulk_create(
+        [LoginFailureLog(ip_address=f"10.0.1.{i}", email_lower=staff.email) for i in range(20)]
+    )
+    response = api_client.post("/api/v1/accounts/staff-login/", {"email": staff.email, "password": STRONG}, format="json")
+    assert response.status_code == 429
+
+
+@pytest.mark.django_db
+def test_login_replaces_an_expired_token(api_client):
+    user = _user("klient@example.com")
+    old = Token.objects.create(user=user)
+    Token.objects.filter(pk=old.pk).update(created=timezone.now() - timedelta(hours=13))
+    response = api_client.post("/api/v1/accounts/login/", {"email": user.email, "password": STRONG}, format="json")
+    assert response.status_code == 200, response.content
+    assert response.data["token"] != old.key
+    api_client.credentials(HTTP_AUTHORIZATION=f"Token {response.data['token']}")
+    assert api_client.get("/api/v1/accounts/me/").status_code == 200
+
+
+@pytest.mark.django_db
+def test_unverified_client_gets_no_profile_or_gdpr_data(api_client):
+    _auth(api_client, _user("niezweryfikowany@example.com", verified=False))
+    assert api_client.get("/api/v1/clients/me/").status_code == 404
+    assert api_client.get("/api/v1/compliance/export-my-data/").status_code == 403
+    assert api_client.post("/api/v1/compliance/request-account-deletion/", {}, format="json").status_code == 403
+
+
+@pytest.mark.django_db
+def test_api_docs_not_for_plain_staff(api_client):
+    _auth(api_client, _user("staff@example.com", role="staff"))
+    assert api_client.get("/api/schema/").status_code == 403

@@ -238,7 +238,7 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     # Audit AB4: schema and docs only for Django admin users (was public in production).
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    "SERVE_PERMISSIONS": ["apps.common.permissions.IsAdminRole"],
 }
 
 # =============================================================================

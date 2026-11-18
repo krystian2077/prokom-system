@@ -91,6 +91,11 @@ class ClaimRepairByTokenView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user_client = get_client_for_user(request.user)
+        if not user_client and not getattr(request.user, "email_verified", False):
+            return Response(
+                {"detail": "Potwierdź adres e-mail, aby przypisać naprawę."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         if not user_client:
             return Response(
                 {"detail": "Brak profilu klienta. Skontaktuj się z serwisem."},

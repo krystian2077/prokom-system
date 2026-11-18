@@ -17,9 +17,8 @@ class ClientMeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def _get_client(self, request):
-        if request.user.role != "client":
-            return None
-        return getattr(request.user, "client_profile", None)
+        from apps.common.permissions import get_client_for_user
+        return get_client_for_user(request.user)  # audit AB4: none before e-mail verification
 
     def get(self, request):
         client = self._get_client(request)

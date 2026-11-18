@@ -144,7 +144,8 @@ class GoogleAuthView(APIView):
         if not user.is_active:
             return Response({"detail": "Konto jest nieaktywne."}, status=status.HTTP_403_FORBIDDEN)
 
-        token_obj, _ = Token.objects.get_or_create(user=user)
+        from apps.accounts.authentication import issue_token
+        token_obj = issue_token(user)
 
         return Response(
             {

@@ -10,8 +10,8 @@ from apps.devices.selectors import brand_list
 
 
 class BrandViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsStaffOrAdminOrReadOnly]
     """Lista i szczegóły marek (read-only dla listy, pełna edycja w adminie)."""
+    permission_classes = [IsStaffOrAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["is_active"]
     search_fields = ["name", "slug"]
