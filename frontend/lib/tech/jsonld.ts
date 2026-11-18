@@ -2,7 +2,7 @@
  * Site-wide JSON-LD for the public layout (docs/tech/SPEC.md §9, §12.1):
  * Organization (PRO-KOM) + one LocalBusiness per PUBLISHED point. Drafts never appear.
  */
-import { company, line, servicePoints, social, type ServicePoint } from "@/config/prokom";
+import { company, line, pointEmail, pointPhone, servicePoints, social, type ServicePoint } from "@/config/prokom";
 import { SITE_URL } from "@/lib/site-config";
 import { publishedPoints } from "./points";
 
@@ -27,8 +27,8 @@ export function localBusiness(p: ServicePoint) {
     "@id": `${SITE_URL}/#punkt-${p.key}`,
     name: `${line.name} — ${p.name}`,
     url: SITE_URL,
-    telephone: phoneE164(p.phone ?? line.phone),
-    email: line.email,
+    telephone: phoneE164(pointPhone(p)),
+    email: pointEmail(p).email,
     image: `${SITE_URL}/images/og-prokom.jpg`,
     parentOrganization: { "@id": `${SITE_URL}/#organization` },
     address: {

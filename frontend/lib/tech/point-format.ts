@@ -2,7 +2,7 @@
  * Text helpers for service point cards and pages (TD4). Everything comes from
  * config/prokom.ts — no contact literals here (tests/tech/literaly.test.ts).
  */
-import { company, line, pointPhone, type DaysKey, type ServicePoint } from "@/config/prokom";
+import { company, pointPhone, type DaysKey, type ServicePoint } from "@/config/prokom";
 import { formatTime } from "./hours";
 
 const DAY_LABEL: Record<DaysKey, string> = { "pn–pt": "Pon–Pt", sob: "Sobota", nd: "Niedziela" };
@@ -58,10 +58,9 @@ export function isMainPoint(point: Pick<ServicePoint, "city">): boolean {
   return point.city === company.hq.city;
 }
 
-/** Display form of a point phone: the line phone has its own display form, others are shown as stored without +48. */
-export function pointPhoneDisplay(point: ServicePoint): string {
-  const phone = pointPhone(point);
-  return phone === line.phone ? line.phoneDisplay : phone.replace(/^\+48\s*/, "");
+/** Display form of a point's own phone: as stored, without +48. */
+export function pointPhoneDisplay(point: Pick<ServicePoint, "phone">): string {
+  return pointPhone(point).replace(/^\+48\s*/, "");
 }
 
 /** Locative city name for sentences ("w Rabce-Zdroju", "w Zakopanem"). */

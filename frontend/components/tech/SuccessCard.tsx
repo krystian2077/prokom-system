@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { line, type ServicePoint } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, type ServicePoint } from "@/config/prokom";
 import { trackHref, type DeviceCategory, type SubmitResponse } from "@/lib/tech/contract";
 import { courierDestination, courierPageHref, courierPoints, courierWhereText } from "@/lib/tech/courier";
 import { hoursSummary } from "@/lib/tech/hours";
@@ -123,7 +123,7 @@ export function SuccessCard({ response, deviceLabel, category, point, courier, c
     void copy(link, "link");
   };
 
-  const pointLines = point ? [`${line.name} · ${point.name}`, [point.street, `${point.postal} ${point.city}`].filter(Boolean).join(", "), hoursSummary(point)].filter(Boolean) : [line.name, `Serwis: ${line.phoneDisplay}`];
+  const pointLines = point ? [`${line.name} · ${point.name}`, [point.street, `${point.postal} ${point.city}`].filter(Boolean).join(", "), hoursSummary(point)].filter(Boolean) : [line.name, `${GENERAL_PHONE_LABEL}: ${line.phoneDisplay}`];
 
   const saveImage = () => {
     const canvas = document.createElement("canvas");

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { line, lines, telHref } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, lines, telHref } from "@/config/prokom";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { TRACK_HREF } from "@/lib/tech/nav";
 import { IconArrow } from "./icons";
@@ -33,7 +33,7 @@ export function BrandBar({ points }: { points: VisiblePoint[] }) {
             <IconArrow />
           </Link>
           <a href={telHref(line.phone)} className="t-brandbar__phone" data-track="telefon_klik" data-track-miejsce="pasek_marki">
-            Serwis: <strong>{line.phoneDisplay}</strong>
+            {GENERAL_PHONE_LABEL}: <strong>{line.phoneDisplay}</strong>
           </a>
         </div>
       </div>

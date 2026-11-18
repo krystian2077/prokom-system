@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { line, servicePoints, telHref } from "@/config/prokom";
+import { GENERAL_EMAIL_LABEL, GENERAL_PHONE_LABEL, line, servicePoints, telHref } from "@/config/prokom";
 import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
 import { AboutIconSvg } from "@/components/tech/about/about-icons";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
@@ -73,7 +73,7 @@ export default function PointsPage() {
                     "Przynieś sprzęt bez umawiania albo zgłoś naprawę online. Status naprawy sprawdzisz potem z telefonu."}
               </p>
               <div className="t-bigphone t-pts2-hero__phone">
-                <span className="t-bigphone__label">Najszybciej — zadzwoń</span>
+                <span className="t-bigphone__label">{GENERAL_PHONE_LABEL} — {two ? "oba punkty" : "zadzwoń"}</span>
                 <a href={telHref(line.phone)} className="t-bigphone__num" data-track="telefon_klik" data-track-miejsce="punkty_hero">
                   {line.phoneDisplay}
                 </a>
@@ -101,7 +101,7 @@ export default function PointsPage() {
                   </div>
                 ) : null}
                 <div>
-                  <dt>E-mail</dt>
+                  <dt>{GENERAL_EMAIL_LABEL}</dt>
                   <dd>
                     <a href={`mailto:${line.email}`} data-t-inline="">{line.email}</a>
                   </dd>
