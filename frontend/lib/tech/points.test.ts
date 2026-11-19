@@ -38,7 +38,7 @@ describe("point contact (runda 18.11 §1.2)", () => {
   const rabka = servicePoints.find((p) => p.key === "rabka")!;
   const zakopane = servicePoints.find((p) => p.key === "zakopane")!;
   it("every point has its own phone, different from the general number and from each other", () => {
-    expect(pointPhone(rabka)).toBe("+48 18 541 20 55");
+    expect(pointPhone(rabka)).toBe("+48 18 267 65 11");
     expect(pointPhone(zakopane)).toBe("+48 18 541 20 15");
     for (const p of servicePoints) expect(pointPhone(p)).not.toBe(line.phone);
   });

@@ -88,7 +88,7 @@ describe("serwis marek — zasady treści (SPEC §8, runda 18.11)", () => {
     expect(text).not.toMatch(/whats\s*app|paczkomat|koszyk|do koszyka/i);
   });
   it("no contact literals (data only from config/prokom.ts)", () => {
-    expect(text).not.toMatch(/883[\s-]?200[\s-]?151|18[\s-]?541|@prokomserwis\.pl|Orkana\s+16|Staszica\s+8/);
+    expect(text).not.toMatch(/883[\s-]?200[\s-]?151|18[\s-]?541|18[\s-]?267|@prokomserwis\.pl|Orkana\s+16|Staszica\s+8/);
   });
   it("keeps the word 'serwis' in H1 and titles", () => {
     for (const b of brandPages) {

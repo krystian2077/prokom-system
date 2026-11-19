@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { partners, type ServicePoint } from "@/config/prokom";
-import { showsAlsenBadge } from "@/lib/tech/partners";
+import { alsenPoint, showsAlsenBadge } from "@/lib/tech/partners";
 
 const alsen = partners.alsen;
 
@@ -20,8 +20,9 @@ function AlsenLink({ children, className }: { children: React.ReactNode; classNa
   );
 }
 
-// TODO(krystian): treść o partnerstwie do akceptacji (bez liczb sieci, dopóki ich nie potwierdzimy).
-const LEAD = "PRO-KOM jest autoryzowanym partnerem ALSEN — sieci sprzedaży komputerów i elektroniki: laptopy, komputery, podzespoły, urządzenia peryferyjne, smartfony, RTV i AGD. W naszych salonach zapytasz o sprzęt z oferty sieci i odbierzesz go na miejscu.";
+// No network figures (alsen.pl gives contradictory ones). Ordering scope and partner point: Krystian 19.11.2026.
+const partnerPoint = alsenPoint();
+const LEAD = `PRO-KOM jest autoryzowanym partnerem ALSEN — sieci sprzedaży komputerów i elektroniki: laptopy, komputery, podzespoły, urządzenia peryferyjne, smartfony, RTV i AGD. Przez nas zamówisz wszystko, co jest na alsen.pl, i odbierzesz to w punkcie partnerskim: ${partnerPoint.street}, ${partnerPoint.city}.`;
 
 /** „O firmie”: a short block about the partnership. */
 export function AlsenBlock() {
