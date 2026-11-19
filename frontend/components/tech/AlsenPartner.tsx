@@ -21,21 +21,7 @@ function AlsenLink({ children, className }: { children: React.ReactNode; classNa
 }
 
 // TODO(krystian): treść o partnerstwie do akceptacji (bez liczb sieci, dopóki ich nie potwierdzimy).
-const LEAD = "PRO-KOM jest autoryzowanym partnerem sieci ALSEN.";
-
-/** Home page, „Dlaczego PRO-KOM Tech”: a wide card under the reasons. */
-export function AlsenCard() {
-  return (
-    <div className="t-card t-alsen" data-alsen="">
-      <AlsenLogo height={40} className="t-alsen__logo" />
-      <div className="t-alsen__text">
-        <span className="t-h3 t-alsen__t">Autoryzowany partner ALSEN</span>
-        <span className="t-alsen__s">{LEAD}</span>
-      </div>
-      <AlsenLink className="t-alsen__link">alsen.pl ↗</AlsenLink>
-    </div>
-  );
-}
+const LEAD = "PRO-KOM jest autoryzowanym partnerem ALSEN — sieci sprzedaży komputerów i elektroniki: laptopy, komputery, podzespoły, urządzenia peryferyjne, smartfony, RTV i AGD. W naszych salonach zapytasz o sprzęt z oferty sieci i odbierzesz go na miejscu.";
 
 /** „O firmie”: a short block about the partnership. */
 export function AlsenBlock() {

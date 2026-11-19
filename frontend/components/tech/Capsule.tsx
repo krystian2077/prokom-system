@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
@@ -514,39 +515,69 @@ function MegaPoints({ points }: { points: VisiblePoint[] }) {
 }
 
 /**
- * „Sprzedaż” (runda 18.11 v2 §2): Apple and Samsung departments in two columns with the salon link,
- * and the enquiry card with the live count. No prices.
+ * „Sprzedaż” (runda 18.11 v2 §2, redesign 19.11): two salon tiles with a hero product and the
+ * departments, and an aside with the way into the whole catalogue, the newest models and the
+ * enquiry. Data from the server (ShellContext.sales) — no catalogue in the client bundle. No prices.
  */
 function MegaSales() {
-  const columns = salesColumns();
+  const { sales } = useShell();
+  const fallback = salesColumns();
+  const salons = sales?.salons ?? fallback.map((c) => ({ brand: c.brand, title: c.title, href: c.salon, img: null, transparent: false, bg: null, departments: c.links }));
   let n = 0;
   return (
     <div className="t-mega__sales">
-      {columns.map((c) => (
-        <nav key={c.brand} className={`t-mega__salescol t-mega__salescol--${c.brand}`} aria-label={`Salon ${c.title}`} style={{ "--i": n++ } as CSSProperties}>
-          <span className="t-eyb">{c.title}</span>
-          <ul>
-            {c.links.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} data-mega-nav="">
-                  {l.label}
-                </Link>
+      {salons.map((s) => (
+        <div key={s.brand} className={`t-msalon t-msalon--${s.brand}`} style={{ "--i": n++ } as CSSProperties}>
+          <Link href={s.href} className="t-msalon__main" data-mega-nav="">
+            <span className="t-msalon__kick">Salon</span>
+            <b className="t-msalon__title">{s.title}</b>
+            <span className="t-msalon__go">
+              Wejdź do salonu <IconArrow size={14} />
+            </span>
+            {s.img ? (
+              <span className={`t-msalon__img${s.transparent ? " is-cutout" : ""}`} style={s.bg ? ({ "--photo-bg": s.bg } as CSSProperties) : undefined}>
+                <Image src={s.img} alt="" width={260} height={260} sizes="200px" />
+              </span>
+            ) : null}
+          </Link>
+          <ul className="t-msalon__depts" aria-label={`Działy: ${s.title}`}>
+            {s.departments.map((d) => (
+              <li key={d.href}>
+                <Link href={d.href}>{d.label}</Link>
               </li>
             ))}
           </ul>
-          <Link href={c.salon} className="t-mega__more" data-mega-nav="">
-            Salon {c.title} <IconArrow />
-          </Link>
-        </nav>
+        </div>
       ))}
-      <div className="t-mega__submit t-mega__enq" style={{ "--i": n++ } as CSSProperties}>
-        <span className="t-eyb">Bez cen na stronie</span>
-        <b>Zapytaj o cenę i dostępność</b>
-        <span>Wybierz model, kolor i pamięć, dodaj do zapytania — odpowiemy, a sprzęt odbierzesz w salonie.</span>
-        <EnquiryLink className="t-hbtn t-hbtn--acc t-mega__cta" label="Twoje zapytanie" megaNav />
-        <Link href={SALES_HREF} className="t-mega__barlink" data-mega-nav="">
-          Cały katalog
+      <div className="t-msales__aside" style={{ "--i": n++ } as CSSProperties}>
+        <Link href={SALES_HREF} className="t-msales__all" data-mega-nav="">
+          <span className="t-msales__allt">Cały katalog</span>
+          <span className="t-msales__alls">{sales ? `${sales.count} modeli · ` : ""}Apple i Samsung · filtry i porównanie</span>
+          <span className="t-msales__allgo" aria-hidden="true">
+            <IconArrow size={18} strokeWidth={2.6} />
+          </span>
         </Link>
+        {sales?.newest.length ? (
+          <div className="t-msales__new">
+            <span className="t-eyb">Nowości</span>
+            <ul>
+              {sales.newest.slice(0, 4).map((m) => (
+                <li key={m.href}>
+                  <Link href={m.href} data-mega-nav="">
+                    <span className={`t-msales__thumb${m.transparent ? " is-cutout" : ""}`} style={m.bg ? ({ "--photo-bg": m.bg } as CSSProperties) : undefined}>
+                      {m.img ? <Image src={m.img} alt="" width={56} height={56} sizes="56px" /> : null}
+                    </span>
+                    <span>{m.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        <div className="t-msales__enq">
+          <span>Bez cen na stronie — zapytaj, odpowiemy z ceną i dostępnością.</span>
+          <EnquiryLink className="t-msales__enqbtn" label="Twoje zapytanie" megaNav />
+        </div>
       </div>
     </div>
   );

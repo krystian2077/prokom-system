@@ -2,7 +2,6 @@ import { company } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
 import { saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
-import { AlsenCard } from "../AlsenPartner";
 import { IconPath } from "../icons";
 
 /** "Dlaczego PRO-KOM Tech" (design T.Main `#dlaczego`). Unconfirmed numbers and the Google rating stay hidden. */
@@ -41,7 +40,6 @@ export function WhySection({ points }: { points: VisiblePoint[] }) {
             </div>
           ))}
         </div>
-        <AlsenCard />
       </div>
     </section>
   );

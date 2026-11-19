@@ -76,7 +76,7 @@ test.describe("desktop 1440", () => {
   test("side rail lists the home sections, FAQ works with the keyboard", async ({ page }) => {
     await page.goto("/");
     const rail = page.locator("nav.t-rail");
-    await expect(rail.locator("a[href^='#']")).toHaveCount(9);
+    await expect(rail.locator("a[href^='#']")).toHaveCount(11); // + Sprzedaż, Partner ALSEN (19.11)
     const faq = page.locator(".t-faq__item").nth(1);
     await expect(faq).not.toHaveAttribute("open", "");
     await faq.locator("summary").focus();

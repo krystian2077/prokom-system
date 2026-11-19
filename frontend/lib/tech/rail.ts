@@ -90,6 +90,13 @@ export type RailIconName =
 /** Section ids of every Tech page (and of the repair page templates) → icon. */
 const BY_ID: Record<string, RailIconName> = {
   start: "start",
+  // sales catalogue on the home page and the ALSEN partner section (19.11)
+  sprzedaz: "box",
+  alsen: "link",
+  katalog: "box",
+  dobor: "check",
+  porownaj: "list",
+  zapytanie: "form",
   naprawy: "devices",
   urzadzenia: "devices",
   "inne-urzadzenia": "devices",
@@ -186,6 +193,8 @@ export const HOME_SECTIONS: { id: string; label: string }[] = [
   { id: "punkty", label: "Punkty serwisowe" },
   { id: "proces", label: "Jak to działa" },
   { id: "hammer", label: "Hammer Glass" },
+  { id: "sprzedaz", label: "Sprzedaż" },
+  { id: "alsen", label: "Partner ALSEN" },
   { id: "dlaczego", label: "Dlaczego" },
   { id: "okolice", label: "Miejscowości" },
   { id: "faq", label: "Pytania" },

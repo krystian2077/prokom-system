@@ -4,6 +4,7 @@ PRO-KOM Serwis — Clients App — Admin
 """
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from .models import Client, ClientConsent, ClientNote, ClientAddress
 
 
@@ -100,9 +101,9 @@ class ClientAdmin(admin.ModelAdmin):
     def vip_badge(self, obj):
         """Badge VIP."""
         if obj.is_vip:
-            return format_html('<span style="color: gold;">⭐ VIP</span>')
+            return mark_safe('<span style="color: gold;">⭐ VIP</span>')
         elif obj.is_blacklisted:
-            return format_html('<span style="color: red;">⚠️ Blacklist</span>')
+            return mark_safe('<span style="color: red;">⚠️ Blacklist</span>')
         return "—"
     vip_badge.short_description = "Status"
 
@@ -132,8 +133,8 @@ class ClientConsentAdmin(admin.ModelAdmin):
     def consent_status(self, obj):
         """Status zgody z kolorowym badge."""
         if obj.is_granted:
-            return format_html('<span style="color: green;">✓ Udzielona</span>')
-        return format_html('<span style="color: red;">✗ Nie udzielona</span>')
+            return mark_safe('<span style="color: green;">✓ Udzielona</span>')
+        return mark_safe('<span style="color: red;">✗ Nie udzielona</span>')
     consent_status.short_description = "Status"
 
 
