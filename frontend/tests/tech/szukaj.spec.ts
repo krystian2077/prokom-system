@@ -28,10 +28,12 @@ const dialog = (page: Page) => page.getByRole("dialog", { name: "Szukaj na stron
 const field = (page: Page) => page.getByRole("combobox", { name: "Szukaj na stronie" });
 /** Ctrl K once the page is hydrated (a key pressed before that is lost, as for any visitor). */
 async function openWithKeys(page: Page) {
+  // Ctrl K toggles the window, and on a cold server its lazy chunk can take longer than one try:
+  // press again only while it is still closed, or a late window gets closed by the next press.
   await expect(async () => {
-    await page.keyboard.press("Control+k");
-    await expect(dialog(page)).toBeVisible({ timeout: 500 });
-  }).toPass({ timeout: 10_000 });
+    if (!(await dialog(page).isVisible())) await page.keyboard.press("Control+k");
+    await expect(dialog(page)).toBeVisible({ timeout: 1500 });
+  }).toPass({ timeout: 15_000 });
 }
 
 test.describe("okno wyszukiwania (1440)", () => {
