@@ -4,6 +4,8 @@ PRO-KOM Serwis — Publiczne zgłoszenie naprawy (formularz online)
 Endpoint AllowAny — bez logowania. Jeśli request jest z tokenem (zalogowany klient),
 naprawa jest przypisywana do konta tego klienta.
 """
+import logging
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +14,9 @@ from rest_framework.permissions import AllowAny
 from apps.common.permissions import get_client_for_user
 from apps.repairs.serializers.public_submit import PublicRepairSubmitSerializer
 from apps.repairs.services import submit_repair_from_public_form
+from apps.repairs.services.public_submit import PublicSubmitError
+
+logger = logging.getLogger(__name__)
 
 
 class PublicRepairSubmitView(APIView):
@@ -71,9 +76,14 @@ class PublicRepairSubmitView(APIView):
                 visual_condition_description=(device_data.get("visual_condition_description") or "").strip(),
                 client_id=linked_client_id,
             )
+        except PublicSubmitError as e:
+            # Business validation messages from the service are safe to show.
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            # Do not echo exception text to an anonymous caller (may contain internals or PII).
+            logger.warning("public repair submit failed: %s", type(e).__name__)
             return Response(
-                {"detail": str(e)},
+                {"detail": "Nie udało się przyjąć zgłoszenia. Sprawdź dane i spróbuj ponownie lub zadzwoń do serwisu."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

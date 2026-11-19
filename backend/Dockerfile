@@ -15,7 +15,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN mkdir -p /app/staticfiles /app/media
+# Unprivileged runtime user (audit T-21). Writable: static/media volumes and local backups.
+RUN useradd --uid 10001 --create-home --home-dir /home/app app \
+    && mkdir -p /app/staticfiles /app/media /app/backups \
+    && chown app:app /app/staticfiles /app/media /app/backups
+
+USER app
 
 EXPOSE 8000
 

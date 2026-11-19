@@ -3,7 +3,7 @@ Generowanie i wysyłka kodu OTP do weryfikacji e-maila.
 Kod 6-cyfrowy, ważny 15 minut. Każdy nowy kod unieważnia poprzednie dla danego użytkownika.
 """
 import logging
-import random
+import secrets
 import sys
 from django.utils import timezone
 from datetime import timedelta
@@ -25,7 +25,7 @@ def generate_and_send_verification_code(user, log_send=True):
     """
     EmailVerificationCode.objects.filter(user=user).delete()
 
-    code = "".join(str(random.randint(0, 9)) for _ in range(6))
+    code = f"{secrets.randbelow(1_000_000):06d}"
     expires_at = timezone.now() + timedelta(minutes=15)
     verification = EmailVerificationCode.objects.create(
         user=user,

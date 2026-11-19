@@ -2,6 +2,7 @@
 Webhook na przychodzące e-maile (np. SendGrid / Mailgun Inbound).
 Oczekuje JSON i nagłówka X-Inbound-Secret zgodnego z EMAIL_INBOUND_WEBHOOK_SECRET.
 """
+import hmac
 from email.utils import parseaddr
 from django.conf import settings
 from rest_framework import status
@@ -25,7 +26,9 @@ class EmailInboundWebhookView(APIView):
                 {"detail": "Webhook nie jest skonfigurowany (EMAIL_INBOUND_WEBHOOK_SECRET)."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
-        if (request.headers.get("X-Inbound-Secret") or "").strip() != secret:
+        provided = (request.headers.get("X-Inbound-Secret") or "").strip()
+        # Constant-time comparison: no timing side channel on the shared secret.
+        if not hmac.compare_digest(provided.encode(), secret.encode()):
             return Response({"detail": "Brak autoryzacji."}, status=status.HTTP_401_UNAUTHORIZED)
 
         raw_from = (request.data.get("from_email") or request.data.get("from") or "").strip()

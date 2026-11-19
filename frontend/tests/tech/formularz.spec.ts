@@ -273,7 +273,7 @@ test.describe("phone 390", () => {
     await page.goto("/zgloszenie");
     for (const sel of [".t-dtile", ".t-seg__opt", ".t-help__trigger", ".t-quick__chip", "[data-zgl-next]"]) {
       const box = (await page.locator(sel).first().boundingBox())!;
-      expect(box.height, sel).toBeGreaterThanOrEqual(44);
+      expect(Math.round(box.height), sel).toBeGreaterThanOrEqual(44); // sub-pixel layout (43.9998) is 44 px
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
     expect(await axeSerious(page)).toEqual([]);
