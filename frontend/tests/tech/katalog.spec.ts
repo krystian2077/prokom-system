@@ -212,7 +212,32 @@ test.describe("strona główna: sprzedaż (1440)", () => {
     expect(await sec.locator(".t-hnew").count()).toBeGreaterThan(3);
     await expect(sec.getByRole("link", { name: /Zobacz cały katalog/ })).toHaveAttribute("href", "/sprzedaz");
     expect(await sec.innerText()).not.toMatch(NO_PRICE);
+    // the Apple tile shows the silver iPhone (Krystian 19.11)
+    await expect(sec.locator(".t-hsalon--apple img")).toHaveAttribute("src", /iphone-18-pro%2Fsrebrny|iphone-18-pro\/srebrny/);
   });
+  test("„Sprzedaż” and „Partner ALSEN” come right after „Najczęstsze naprawy” (Krystian 19.11)", async ({ page }) => {
+    await page.goto("/");
+    const ids = await page.$$eval("main section[id]", (s) => s.map((e) => e.id));
+    const at = ids.indexOf("usterki");
+    expect(ids.slice(at, at + 4)).toEqual(["usterki", "sprzedaz", "alsen", "punkty"]);
+  });
+});
+
+test.describe("salon hero: devices on the stage (1440)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  for (const brand of ["apple", "samsung"] as const) {
+    test(`/${brand}: cut-out devices next to the title, decorative only`, async ({ page }) => {
+      await page.goto(`/${brand}`);
+      const stage = page.locator("[data-salon-stage]");
+      await expect(stage).toHaveAttribute("aria-hidden", "true");
+      const imgs = stage.locator("img");
+      expect(await imgs.count()).toBeGreaterThanOrEqual(3);
+      await expect.poll(() => imgs.evaluateAll((list) => list.every((i) => (i as HTMLImageElement).complete && (i as HTMLImageElement).naturalWidth > 0))).toBe(true);
+      const h1 = (await page.locator("h1").boundingBox())!;
+      const box = (await stage.boundingBox())!;
+      expect(box.x).toBeGreaterThan(h1.x + 200); // beside the title, not under it
+    });
+  }
 });
 
 test.describe("phone 360", () => {

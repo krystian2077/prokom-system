@@ -21,6 +21,9 @@ for (const theme of ["light", "dark"] as const) {
       await logo.scrollIntoViewIfNeeded();
       await expect(logo).toBeVisible();
       await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+      await expect(card.getByRole("heading", { level: 2 })).toContainText("Wszystko z alsen.pl");
+      await expect(card.getByRole("list", { name: "Jak zamówić przez PRO-KOM" }).getByRole("listitem")).toHaveCount(3);
+      await expect(card.getByRole("link", { name: "Zapytaj o produkt" })).toHaveAttribute("href", "/kontakt");
       const link = card.getByRole("link", { name: /^alsen\.pl/ });
       await expect(link).toHaveAttribute("href", "https://www.alsen.pl/");
       await expect(link).toHaveAttribute("target", "_blank");
