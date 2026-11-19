@@ -28,7 +28,6 @@ import { hoursSummary } from "@/lib/tech/hours";
 import { ACCOUNT_HREF } from "@/lib/tech/nav";
 import { isDraftMode } from "@/lib/tech/points";
 import { courierWhereText } from "@/lib/tech/courier";
-import { RepairFormHead } from "./PageHeads";
 import { polishText } from "@/lib/tech/typo";
 import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, appendFault, chosenPoint, courierLines, faultSuggestions, hasFault, type StepNo } from "@/lib/tech/repair-form";
 import { EASE, prefersReducedMotion } from "@/lib/tech/motion";
@@ -402,7 +401,7 @@ export function RepairForm() {
     const point = key ? points.find((p) => p.key === key) ?? null : null;
     const label = DEVICE_CATEGORIES.find((c) => c.value === f.category)?.label ?? "";
     return (
-      <div className="t-ui t-container t-zgl t-zgl--done">
+      <div className="t-zgl__done">
         <SuccessCard
           response={done.response}
           deviceLabel={[label, [f.brand.trim(), f.model.trim()].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}
@@ -778,11 +777,11 @@ export function RepairForm() {
   const nextLabel = step < 5 ? `Dalej: ${(FORM_STEPS[step as 1 | 2 | 3 | 4]?.long ?? "").toLocaleLowerCase("pl")}` : sending ? "Wysyłanie…" : "Wyślij zgłoszenie";
   const stepHasErrors = (n: StepNo) => Object.entries(errors).some(([k, v]) => v?.length && FIELD_STEP[k as FormField] === n);
 
+  // The page owns the grid and the header (server HTML, outside Suspense): the header is not
+  // replaced after hydration, so it stays the LCP element. Here: the form column and the summary.
   return (
-    <div className="t-ui t-container t-zgl">
+    <>
       <div className="t-zgl__main">
-        <RepairFormHead />
-
         {restored ? (
           <div className="t-zgl__restored" role="status">
             <span className="t-zgl__restoredico" aria-hidden="true">
@@ -925,6 +924,6 @@ export function RepairForm() {
           Wolisz zadzwonić? <a href={telHref(line.phone)} data-track="telefon_klik" data-track-miejsce="zgloszenie">{line.phoneDisplay}</a>
         </p>
       </aside>
-    </div>
+    </>
   );
 }

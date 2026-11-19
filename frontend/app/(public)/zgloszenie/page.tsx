@@ -5,20 +5,16 @@ import { RepairFormHead } from "@/components/tech/PageHeads";
 /**
  * /zgloszenie — the one repair form (TD3 PR 2, KONTRAKT §1–§2).
  */
-// The form renders on the client (search params). The placeholder has the form's height (CLS)
-// and the same header as the form, so the server HTML carries the H1 and the lead (LCP, SEO).
+// The form renders on the client (search params). The header is server HTML outside Suspense, so
+// it is not replaced after hydration (stays the LCP element, H1 for SEO); the placeholder has the
+// height of the form column (CLS).
 export default function ZgloszeniePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="t-ui t-container t-zgl t-zgl-ph" aria-busy="true">
-          <div className="t-zgl__main">
-            <RepairFormHead />
-          </div>
-        </div>
-      }
-    >
-      <RepairForm />
-    </Suspense>
+    <div className="t-ui t-container t-zgl">
+      <RepairFormHead />
+      <Suspense fallback={<div className="t-zgl__main t-zgl-ph" aria-busy="true" />}>
+        <RepairForm />
+      </Suspense>
+    </div>
   );
 }
