@@ -105,7 +105,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <ThemeBoot />
       <SwRegister />
       <div className={`tech ${archivo.variable} ${manrope.variable}`}>
-        {/* Old pages render inside the new shell until TD2–TD5 rebuild them (ConditionalPublicLayout stays until TD6). */}
+        {/* Every public page renders inside the Tech shell (header, rail, footer). */}
         <TechShell>{children}</TechShell>
       </div>
     </>
