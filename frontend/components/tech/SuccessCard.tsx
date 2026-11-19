@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { GENERAL_PHONE_LABEL, line, type ServicePoint } from "@/config/prokom";
 import { trackHref, type DeviceCategory, type SubmitResponse } from "@/lib/tech/contract";
 import { courierDestination, courierPageHref, courierPoints, courierWhereText } from "@/lib/tech/courier";
@@ -13,6 +13,21 @@ import { IconArrow, IconCheck } from "./icons";
 import { NavigateButtons } from "./NavigateButtons";
 import { OpeningStatus } from "./OpeningStatus";
 import { PrepChecklist } from "./PrepChecklist";
+
+/** „PROKOM/RMA/2/2026” may wrap only after a slash (a <wbr> adds no text: copy and tests see the number). */
+function breakAfterSlashes(value: string): ReactNode {
+  const parts = value.split("/");
+  return parts.map((part, i) => (
+    <Fragment key={i}>
+      {part}
+      {i < parts.length - 1 ? (
+        <>
+          /<wbr />
+        </>
+      ) : null}
+    </Fragment>
+  ));
+}
 
 type Props = {
   response: SubmitResponse;
@@ -150,7 +165,7 @@ export function SuccessCard({ response, deviceLabel, category, point, courier, c
         <div className="t-success__ticket">
           <div className="t-success__number">
             <span className="t-label">Numer zgłoszenia</span>
-            <b data-repair-number="">{number}</b>
+            <b data-repair-number="">{breakAfterSlashes(number)}</b>
             <span className="t-success__device">{deviceLabel}</span>
             <button type="button" className="t-btn t-btn--sm t-btn--ghost" onClick={() => copy(number, "number")}>
               {copied === "number" ? "Skopiowano" : "Kopiuj numer"}
