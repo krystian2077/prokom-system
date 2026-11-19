@@ -109,19 +109,20 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 9. Format tablicy wschodu/zachodu wspólny z prokom-web: minuty UTC (Tech) vs czas warszawski (kontrakt §2.2).
 
 ## Pomysły na później
+- [zgłoszenie 19.11] Ekran sukcesu na telefonie (390 px): numer zgłoszenia łamie się w środku („PROKOM/RMA/2/20” + „26”) — łamać tylko po ukośnikach (`overflow-wrap` + `<wbr>` po „/”) albo zmniejszyć krój numeru.
 - [katalog 19.11] View Transitions katalog → karta (§3) — nie zrobione (Next 14 bez wbudowanego API dla nawigacji klienta). Przechył kart zrobiony w #144.
 - [katalog 19.11] Lighthouse telefon `/sprzedaz` i karty modelu vs `/serwis-telefonow` — brak Lighthouse w zależnościach, zmierzyć na stagingu.
 - [katalog 19.11] Paski Apple Watch na zdjęciach są z gotowych zestawów sklepu (kolor koperty się zgadza).
 - [marki 18.11] Formularz zgłoszenia nie ma parametru marki ani modelu (KONTRAKT §1.4: tylko `category`, `usterka`, `punkt`, `dostawa`), więc strony `/serwis-apple` i `/serwis-samsung` niosą model w `usterka` („Model: … Usterka:”). Rozszerzenie `parseWizardParams` o `marka`/`model` (tylko frontend, pola `brand`/`model` już są w formularzu) wypełniłoby od razu właściwe pola — osobny mały PR za zgodą Krystiana.
 - [perf 17.11] Lighthouse telefon (lab, 5 pomiarów) zatrzymuje się na 65–68 przez sieć, nie JS: ~650 kB CSS blokującego render na każdej stronie (globals.css z Tailwindem paneli 238 kB + 11 plików `tech-*.css` ~400 kB, na głównej 70–100% nieużyte), 5 preloadów krojów (Archivo latin+latin-ext ~178 kB, Manrope ~41 kB, DM Sans z root layoutu 38 kB — strona publiczna go nie używa) i ~250 kB gz JS root layoutu (Google GSI, react-query, AuthContext). Dźwignie: przenieść `tech-form.css`/`tech-helper.css` do `/zgloszenie` (uwaga na kolejność kaskady), DM Sans i GSI tylko dla paneli/konta (zmiana root layoutu/providera — za zgodą).
-- [perf 17.11] `/zgloszenie`: LCP przesuwa się na moment hydratacji, bo `RepairForm` renderuje własny `RepairFormHead`, który zastępuje ten z fallbacku Suspense (nowe węzły = nowy kandydat LCP). Nagłówek poza Suspense (zmiana `RepairForm.tsx` + `page.tsx`) skróciłby LCP o ~2,5 s w pomiarze CDP.
+- [perf 17.11, ZROBIONE 19.11 #158 — lokalnie LCP 792 → 296 ms] `/zgloszenie`: LCP przesuwa się na moment hydratacji, bo `RepairForm` renderuje własny `RepairFormHead`, który zastępuje ten z fallbacku Suspense (nowe węzły = nowy kandydat LCP). Nagłówek poza Suspense (zmiana `RepairForm.tsx` + `page.tsx`) skróciłby LCP o ~2,5 s w pomiarze CDP.
 - [perf 17.11] `content-visibility: auto` dla sekcji poniżej zgięcia sprawdzone i odrzucone: zysk TBT w granicach szumu, a pełnostronicowe zrzuty (`scripts/tech/zrzuty.mjs`, Playwright fullPage) pokazują puste sekcje.
 - [blog 17.11, ZROBIONE 19.11 #137] `lib/blog-posts.ts` ma 30× wpisany na sztywno telefon, adres i stare godziny („pon–pt 9:00–17:00, sob 9:00–14:00”) — zastąpić danymi z `config/prokom.ts` (CLAUDE.md §4) albo usunąć stopki z treści. Do tego sekcje „Dlaczego to ważne dla SEO i AI?” / „…dla SEO?” (wpisy o oryginalnych częściach GSM i drukarkach) piszą do wyszukiwarek, nie do klienta — przepisać.
 - [blog 17.11] Formularz zgłoszenia nadal oferuje preferowany kontakt „SMS” (`lib/tech/contract.ts`, `repair-form.ts`), a SMS w backendzie to atrapa — decyzja Krystiana, czy ukryć tę opcję.
 - [przegląd 15.11] Drukarki (Canon, Brother) i konsole (Xbox, Nintendo) nie mają znaków w `brand-logos.ts` — karty marek na tych stronach zostają tekstowe.
 - [przegląd 15.11] W kartach marek z logo-napisem (Lenovo, ASUS, Samsung) nazwa stoi drugi raz w nagłówku karty — ewentualnie ukryć ją wizualnie (zostawić dla czytników).
 - [przegląd 15.11] `/o-firmie`: „2004” trzy razy nad zgięciem; pasek punktów na głównej: Zakopane łamie się na dwie linie, Rabka nie.
-- [konto] `components/layout/PublicNavbar.tsx` i `PublicFooter.tsx` po #67 nie są nigdzie używane — usunąć w sprzątaniu (sprawdzić `literaly.test`, który je wymienia).
+- [konto, ZROBIONE 19.11 #156] `components/layout/PublicNavbar.tsx` i `PublicFooter.tsx` po #67 nie są nigdzie używane — usunąć w sprzątaniu (sprawdzić `literaly.test`, który je wymienia).
 - [konto] Klucz `prokom-client-panel-theme` i `contexts/ClientPanelThemeContext.tsx` po #73 nieużywane przez konto (konto ma motyw strony `pk-theme`) — usunąć za zgodą (strefa zakazana).
 - [konto] Lista `/repairs/` nie zwraca `device.category`, więc na liście napraw konta ikona urządzenia jest ogólna (w szczegółach właściwa) — dopisać do backlogu backendu albo użyć kategorii z innego pola.
 - [konto] Na stagingu obejrzeć naprawę z wyceną `wait_decision` (tabela, Akceptuję/Odrzucam, pasek na telefonie) i wątek wiadomości — lokalnie brak takich danych.
@@ -132,7 +133,7 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 - [przegląd wizualny] **Promienie kart** — 17 różnych wartości (14–44 px); ujednolicić do skali tokenów (np. 14 / 22 / 28 / 36) w jednym przejściu po wszystkich komponentach, ze zrzutami przed/po.
 - [TD6] Kontrast `.t-lines__label` i `.t-intent--acc .t-intent__s` (axe serious ×309) — poprawia TP #44; po scaleniu sprawdzić `a11y.spec` bez naruszeń poważnych.
 - [TD6] `public/sw.js` przy instalacji wkleja cały CSS (~500 kB) do kopii `/offline` — po #51/#52 mniej, docelowo minimalny CSS strony offline.
-- [TD6] Komentarz w `app/(public)/layout.tsx` wspomina `ConditionalPublicLayout` (usunięty w #51) — poprawić po scaleniu TP (każdy PR TP zmienia ten plik).
+- [TD6, ZROBIONE 19.11 #156] Komentarz w `app/(public)/layout.tsx` wspomina `ConditionalPublicLayout` (usunięty w #51) — poprawić po scaleniu TP (każdy PR TP zmienia ten plik).
 - [TD5] Ujednolicić `serviceJsonLd` (dziś `lib/tech/service-jsonld.ts` z TD5 i `lib/tech/seo.ts` z TD4) — TD6.
 - [TD5] „Jak to działa?” przy kurierze w formularzu i kreatorze jako arkusz (SPEC §12.10), dziś link — po publikacji `/naprawa-kurierem`.
 - [TD5] Catch-all 404 pokazuje skórkę Tech także dla nieistniejących adresów `/panel/…`, `/client/…` (istniejące strony paneli bez zmian; SW tam się nie rejestruje).
