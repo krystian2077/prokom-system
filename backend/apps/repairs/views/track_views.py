@@ -28,6 +28,44 @@ def _phone_last4(phone):
     return digits[-4:] if len(digits) >= 4 else digits
 
 
+import logging  # noqa: E402
+
+logger = logging.getLogger(__name__)
+
+TRACK_FAILS_PER_REPAIR = 10
+TRACK_FAILS_WINDOW_SECONDS = 60 * 60
+
+
+def _track_fail_key(repair_id):
+    return f"track-fail:{repair_id}"
+
+
+def _reserve_track_attempt(repair_id):
+    """Counts an attempt for this repair (atomic add/incr) and returns the count in the window."""
+    from django.core.cache import cache
+    key = _track_fail_key(repair_id)
+    if cache.add(key, 1, TRACK_FAILS_WINDOW_SECONDS):
+        return 1
+    try:
+        count = cache.incr(key)
+    except ValueError:  # expired between add and incr
+        cache.set(key, 1, TRACK_FAILS_WINDOW_SECONDS)
+        return 1
+    # Django's RedisCache.incr may recreate an expired key without a TTL: never keep it forever.
+    if count == 1:
+        cache.touch(key, TRACK_FAILS_WINDOW_SECONDS)
+    return count
+
+
+def _release_track_attempt(repair_id):
+    """A correct answer does not count against the repair."""
+    from django.core.cache import cache
+    try:
+        cache.decr(_track_fail_key(repair_id))
+    except ValueError:
+        pass
+
+
 class TrackRepairView(APIView):
     """
     GET /api/v1/repairs/track/?ref=PROKOM/RMA/1/2025&phone_last4=1234
@@ -60,6 +98,21 @@ class TrackRepairView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Audit AB4 (T-11): repair numbers are sequential and the secret is 4 digits, so wrong
+        # answers are also counted per repair (any IP): after 10 in an hour the repair locks for
+        # an hour. The per-IP throttle alone allowed spreading guesses over many addresses.
+        # Every attempt is reserved atomically BEFORE the digits are checked, so parallel requests
+        # cannot all slip past the limit; a correct answer gives its reservation back.
+        attempts = _reserve_track_attempt(repair.pk)
+        if attempts > TRACK_FAILS_PER_REPAIR:
+            if attempts == TRACK_FAILS_PER_REPAIR + 1:
+                logger.warning("track: repair locked after %d wrong answers", TRACK_FAILS_PER_REPAIR,
+                               extra={"repair_id": str(repair.pk)})
+            return Response(
+                {"detail": "Zbyt wiele prób dla tego zgłoszenia. Spróbuj ponownie później albo skontaktuj się z serwisem."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
         # Telefon z profilu klienta albo podany przy tym zgłoszeniu (contact_phone).
         allowed = {_phone_last4(repair.client.phone), _phone_last4(getattr(repair, "contact_phone", "") or "")}
         allowed.discard("")
@@ -69,6 +122,7 @@ class TrackRepairView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        _release_track_attempt(repair.pk)
         return Response(
             build_public_tracking_payload(repair),
             status=status.HTTP_200_OK,
