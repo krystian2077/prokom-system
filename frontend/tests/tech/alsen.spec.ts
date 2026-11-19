@@ -10,9 +10,12 @@ for (const theme of ["light", "dark"] as const) {
       await page.addInitScript((t) => localStorage.setItem("pk-theme", t), theme);
     });
 
-    test("home „Dlaczego”: partner card with the logo and a link in a new tab", async ({ page }) => {
+    test("home: ALSEN section with the logo, the network's categories and a link in a new tab", async ({ page }) => {
       await page.goto("/");
-      const card = page.locator("#dlaczego [data-alsen]");
+      const card = page.locator("#alsen");
+      // the whole network's offer, not only Apple and Samsung (Krystian 19.11)
+      await expect(card.getByRole("list", { name: "Oferta sieci ALSEN" }).getByRole("listitem")).toHaveCount(6);
+      await expect(card).not.toContainText(/sklep/i);
       await expect(card).toContainText("Autoryzowany partner ALSEN");
       const logo = card.getByRole("img", { name: "ALSEN" });
       await logo.scrollIntoViewIfNeeded();

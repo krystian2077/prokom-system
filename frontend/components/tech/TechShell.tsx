@@ -11,6 +11,7 @@ import { NoticeBar } from "./NoticeBar";
 import { LazySearchDialog } from "./search/LazySearchDialog";
 import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
+import { buildSalesNav } from "@/lib/tech/catalog/sales-nav";
 import { TabBar } from "./TabBar";
 import { ThemeCarry } from "./ThemeCarry";
 import { TrackClicks } from "./TrackClicks";
@@ -26,7 +27,7 @@ export function TechShell({ children }: { children: ReactNode }) {
   // Mega menu „Naprawy”: a fault with its own live page links there, the rest to the form.
   const faultPages = Object.fromEntries(liveRepairs().map((r) => [`${r.device}:${r.usterka}`, repairPath(r.slug)]));
   return (
-    <ShellProvider points={points} faultPages={faultPages}>
+    <ShellProvider points={points} faultPages={faultPages} sales={buildSalesNav()}>
       <div className="t-shell" id="top">
         <a href="#tresc" className="t-skip t-ui">
           Przejdź do treści
