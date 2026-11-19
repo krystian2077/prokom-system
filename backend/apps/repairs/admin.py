@@ -4,6 +4,7 @@ PRO-KOM Serwis — Repairs App — Admin
 """
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils import timezone
 from .models import (
     RepairRequest,
@@ -329,8 +330,8 @@ class RepairAssignmentAdmin(admin.ModelAdmin):
     def is_current_badge(self, obj):
         """Badge czy aktualne."""
         if obj.is_current:
-            return format_html('<span style="color: green;">✓ Aktualne</span>')
-        return format_html('<span style="color: gray;">Archiwalne</span>')
+            return mark_safe('<span style="color: green;">✓ Aktualne</span>')
+        return mark_safe('<span style="color: gray;">Archiwalne</span>')
     is_current_badge.short_description = "Status"
 
 
@@ -390,8 +391,8 @@ class RepairNoteAdmin(admin.ModelAdmin):
     def note_type(self, obj):
         """Typ notatki z ikoną."""
         if obj.is_internal:
-            return format_html('<span style="color: orange;">🔒 Wewnętrzna</span>')
-        return format_html('<span style="color: blue;">👁️ Publiczna</span>')
+            return mark_safe('<span style="color: orange;">🔒 Wewnętrzna</span>')
+        return mark_safe('<span style="color: blue;">👁️ Publiczna</span>')
     note_type.short_description = "Typ"
 
 
