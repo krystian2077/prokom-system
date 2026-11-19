@@ -352,18 +352,8 @@ html[data-tech-theme="dark"] .tech .t-themebtn__label--to-light { visibility: vi
 
 /* moved from tech-catalog.css (19.11): the capsule is shared with /client, which loads tech-nav.css but not tech-catalog.css */
 /* ---------- Capsule „Sprzedaż” mega menu and the enquiry icon (runda 18.11 v2 §2) ---------- */
-.tech .t-mega__sales { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr) minmax(0, 1fr); gap: 18px; padding: 22px; }
-.tech .t-mega__salescol { display: flex; flex-direction: column; gap: 10px; padding: 6px 8px; animation: t-mega-item var(--m-panel, 320ms) var(--m-ease-emph, ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
-.tech .t-mega__salescol ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-.tech .t-mega__salescol ul a { display: flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 12px; font-weight: 700; color: var(--ink); }
-.tech .t-mega__salescol ul a:hover, .tech .t-mega__salescol ul a:focus-visible { background: var(--bg2); }
-.tech .t-mega__enq { display: flex; flex-direction: column; gap: 8px; }
-.tech .t-mega__enq .t-enqlink { align-self: flex-start; }
 .tech .t-navlink { position: relative; }
 .tech .t-navbadge { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; display: grid; place-items: center; border-radius: 999px; background: var(--acc); color: var(--onacc); font-size: 11px; font-weight: 800; line-height: 1; pointer-events: none; }
-.tech .t-mega__salescol--apple ul { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 8px; }
-.tech .t-mega__enq .t-mega__barlink { color: #d9cfcc; }
-.tech .t-mega__enq .t-mega__barlink:hover { color: #fff; }
 .tech .t-sheet__enq { justify-content: flex-start; }
 .tech .t-sheet__enq svg { flex-shrink: 0; }
 /* room for „Sprzedaż” in the capsule (18.11): „Konto” as an icon on every desktop width (the name stays „Konto klienta”) */
@@ -384,3 +374,56 @@ html[data-tech-theme="dark"] .tech .t-themebtn__label--to-light { visibility: vi
 }
 .tech .t-enqlink { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: inherit; }
 .tech .t-enqlink__n { min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; display: inline-grid; place-items: center; border-radius: 999px; background: var(--acc); color: var(--onacc); font-size: 12px; font-weight: 800; }
+
+/* ---------- „Sprzedaż” mega menu, redesign 19.11: salon tiles + the way into the whole catalogue ---------- */
+.tech .t-mega__sales { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.05fr); gap: 16px; padding: 20px; }
+.tech .t-msalon { display: flex; flex-direction: column; gap: 12px; min-width: 0; animation: t-mega-item var(--m-panel, 320ms) var(--m-ease-emph, ease) both; animation-delay: calc(var(--i, 0) * 50ms); }
+.tech .t-msalon__main {
+  --tile-glow: rgba(226, 72, 58, 0.42);
+  position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 4px; min-height: 216px; box-sizing: border-box; padding: 20px 22px;
+  border-radius: 22px; color: #fff; background: radial-gradient(120% 90% at 85% 100%, var(--tile-glow), transparent 60%), linear-gradient(180deg, #221a19, #140f0e);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08); transition: transform var(--m-panel, 320ms) var(--m-ease-emph, ease), box-shadow var(--m-panel, 320ms);
+}
+.tech .t-msalon--samsung .t-msalon__main { --tile-glow: rgba(76, 120, 255, 0.4); }
+.tech .t-msalon__main:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 18px 34px -18px rgba(0, 0, 0, 0.6); }
+.tech .t-msalon__main:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
+.tech .t-msalon__kick { font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #f29185; }
+.tech .t-msalon__title { font-family: var(--t-font-head); font-stretch: 108%; font-size: 34px; line-height: 1; letter-spacing: -0.02em; }
+.tech .t-msalon__go { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800; color: #f6c9c3; }
+.tech .t-msalon__img { position: absolute; z-index: -1; right: -6px; bottom: -6px; width: 168px; height: 168px; display: grid; place-items: center; }
+.tech .t-msalon__img img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.5)); transition: transform var(--m-panel, 320ms) var(--m-ease-emph, ease); }
+.tech .t-msalon__img:not(.is-cutout) { right: 14px; bottom: 14px; width: 150px; height: 112px; border-radius: 14px; overflow: hidden; background: var(--photo-bg, #fff); }
+.tech .t-msalon__img:not(.is-cutout) img { filter: none; padding: 8%; box-sizing: border-box; }
+.tech .t-msalon__main:hover .t-msalon__img img { transform: scale(1.04) rotate(-2deg); }
+.tech .t-msalon__depts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tech .t-msalon__depts a { display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 999px; background: var(--bg2); color: var(--ink); font-size: 13px; font-weight: 700; }
+.tech .t-msalon__depts a:hover, .tech .t-msalon__depts a:focus-visible { background: var(--soft); color: var(--acct); }
+.tech .t-msales__aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; animation: t-mega-item var(--m-panel, 320ms) var(--m-ease-emph, ease) both; animation-delay: calc(var(--i, 0) * 50ms); }
+.tech .t-msales__all {
+  position: relative; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; column-gap: 12px; padding: 16px 18px; border-radius: 20px;
+  background: var(--cta-grad); color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 14px 28px -14px rgba(196, 54, 43, 0.75);
+}
+.tech .t-msales__all:hover { filter: brightness(1.06); }
+.tech .t-msales__all:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.tech .t-msales__allt { font-family: var(--t-font-head); font-size: 21px; line-height: 1.1; }
+.tech .t-msales__alls { grid-row: 2; font-size: 13px; color: rgba(255, 255, 255, 0.85); }
+.tech .t-msales__allgo { grid-row: 1 / span 2; grid-column: 2; align-self: center; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.18); }
+.tech .t-msales__new ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
+.tech .t-msales__new a { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 2px 8px; border-radius: 12px; font-size: 14px; font-weight: 700; color: var(--ink); }
+.tech .t-msales__new a:hover, .tech .t-msales__new a:focus-visible { background: var(--bg2); }
+.tech .t-msales__thumb { flex: none; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: var(--photo-bg, var(--bg2)); }
+.tech .t-msales__thumb.is-cutout { background: var(--bg2); }
+.tech .t-msales__thumb img { width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box; }
+.tech .t-msales__enq { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 16px; border: 1px dashed var(--bd2); font-size: 13px; color: var(--ink2); }
+.tech .t-msales__enqbtn { align-self: flex-start; padding: 0 14px; border-radius: 999px; border: 1px solid var(--bd2); font-weight: 800; color: var(--ink); }
+.tech .t-msales__enqbtn:hover { border-color: var(--ink2); }
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .tech .t-mega__sales { gap: 12px; padding: 16px; }
+  .tech .t-msalon__title { font-size: 28px; }
+  .tech .t-msalon__img { width: 140px; height: 140px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-msalon, .tech .t-msales__aside { animation: none; }
+  .tech .t-msalon__main, .tech .t-msalon__img img { transition: none; }
+}
+

@@ -171,9 +171,13 @@ test.describe("nawigacja sprzedaży (1440)", () => {
     await expect(cap.locator(".t-navbadge")).toHaveCount(0); // nothing on the list yet
     await cap.getByRole("button", { name: "Sprzedaż" }).click();
     const panel = page.locator('.t-mega[data-mega="sprzedaz"]');
-    await expect(panel.getByRole("navigation", { name: "Salon Apple" }).getByRole("link", { name: "iPhone Pro" })).toHaveAttribute("href", "/apple#iphone-pro");
-    await expect(panel.getByRole("navigation", { name: "Salon Samsung" }).getByRole("link", { name: "Galaxy S" })).toHaveAttribute("href", "/samsung#galaxy-s");
-    await expect(panel.getByRole("link", { name: "Cały katalog" })).toHaveAttribute("href", "/sprzedaz");
+    // redesign 19.11: salon tiles with departments, the whole catalogue as the main call to action
+    await expect(panel.getByRole("list", { name: "Działy: Apple" }).getByRole("link", { name: "iPhone Pro" })).toHaveAttribute("href", "/apple#iphone-pro");
+    await expect(panel.getByRole("list", { name: "Działy: Samsung" }).getByRole("link", { name: "Galaxy S", exact: true })).toHaveAttribute("href", "/samsung#galaxy-s");
+    await expect(panel.locator(".t-msalon__main").first()).toHaveAttribute("href", "/apple");
+    await expect(panel.locator(".t-msales__all")).toHaveAttribute("href", "/sprzedaz");
+    await expect(panel.locator(".t-msales__all")).toContainText(/\d+ modeli/);
+    expect(await panel.locator(".t-msales__new li").count()).toBeGreaterThan(0);
     await page.keyboard.press("Escape");
     await page.goto("/sprzedaz/apple/iphone-17");
     await page.getByRole("button", { name: "Dodaj do zapytania" }).click();
@@ -193,6 +197,21 @@ test.describe("nawigacja sprzedaży (1440)", () => {
     await expect(dialog.getByRole("option", { name: /Galaxy S26 Ultra/ }).first()).toBeVisible();
     await dialog.getByRole("combobox").fill("salon apple");
     await expect(dialog.getByRole("option", { name: /Salon Apple/ }).first()).toBeVisible();
+  });
+});
+
+test.describe("strona główna: sprzedaż (1440)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test("the home page shows both salons, the newest models and the way into the whole catalogue — no prices", async ({ page }) => {
+    await pinDaylight(page);
+    await page.goto("/");
+    const sec = page.locator("#sprzedaz");
+    await expect(sec.getByRole("heading", { level: 2 })).toContainText("Wybierz go u nas");
+    await expect(sec.locator(".t-hsalon")).toHaveCount(2);
+    await expect(sec.locator(".t-hsalon").first()).toHaveAttribute("href", "/apple");
+    expect(await sec.locator(".t-hnew").count()).toBeGreaterThan(3);
+    await expect(sec.getByRole("link", { name: /Zobacz cały katalog/ })).toHaveAttribute("href", "/sprzedaz");
+    expect(await sec.innerText()).not.toMatch(NO_PRICE);
   });
 });
 
