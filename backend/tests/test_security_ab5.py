@@ -7,7 +7,8 @@ from rest_framework.authtoken.models import Token
 
 from apps.accounts.models import PasswordResetToken
 from apps.accounts.services.email_verification import generate_and_send_verification_code
-from apps.clients.models import ClientAddress, ClientNote
+from apps.clients.models import Client, ClientAddress, ClientNote
+from apps.compliance.models import GdprRequest
 from apps.devices.models import Device
 from apps.repairs.services.public_submit import submit_repair_from_public_form
 
@@ -63,7 +64,23 @@ def test_account_deletion_wipes_personal_data_but_keeps_repair(api_client):
     assert device is not None and device.password == "" and device.imei == "" and device.notes == ""
     assert not PasswordResetToken.objects.filter(user=user).exists()
     repair.refresh_from_db()
-    assert repair.repair_number
+    assert repair.repair_number and repair.contact_phone == "" and repair.client_notes == ""
+    assert GdprRequest.objects.get(client=client).status == "completed"
+    assert not Token.objects.filter(user=user).exists()
+    # A second request does nothing (account already gone).
+    assert api_client.post(URL_DELETE, {"password": STRONG}, format="json").status_code in (401, 403)
+
+
+@pytest.mark.django_db
+def test_account_without_password_deletes_without_it_and_guest_profiles_go_too(api_client):
+    user, client, _, token = _client_with_repair("google@example.com")
+    user.set_unusable_password()
+    user.save()
+    guest = Client.objects.create(first_name="Anna", last_name="Nowak", email="google@example.com", phone="600100200")
+    api_client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+    assert api_client.post(URL_DELETE, {}, format="json").status_code == 200
+    guest.refresh_from_db()
+    assert guest.email.endswith("@anon.local") and guest.phone == ""
 
 
 @pytest.mark.django_db
@@ -72,21 +89,28 @@ def test_inbound_webhook_rejects_wrong_secret(api_client, settings):
     url = "/api/v1/communications/inbound-email/"
     r = api_client.post(url, {"from_email": "a@b.pl", "body": "x"}, format="json", HTTP_X_INBOUND_SECRET="zly")
     assert r.status_code == 401
+    good = api_client.post(url, {"from_email": "a@b.pl", "body": "x"}, format="json", HTTP_X_INBOUND_SECRET="dobry-sekret")
+    assert good.status_code != 401
 
 
 @pytest.mark.django_db
 def test_public_submit_hides_internal_errors(api_client):
     payload = {
         "client": {"first_name": "Jan", "last_name": "Kowalski", "email": "jan@example.com", "phone": "600100200"},
-        "device": {"category": "phone", "problem_description": "Nie włącza się"},
+        "device": {
+            "category": "phone", "problem_description": "Nie włącza się",
+            "brand_name": "Apple", "model_name": "iPhone 12",
+        },
     }
     with patch(
         "apps.repairs.views.public_submit_views.submit_repair_from_public_form",
         side_effect=RuntimeError("relation repairs_secret does not exist"),
-    ):
+    ) as service:
         r = api_client.post("/api/v1/repairs/submit/", payload, format="json")
+    service.assert_called_once()
     assert r.status_code == 400
     assert "repairs_secret" not in str(r.data)
+    assert r.data["detail"].startswith("Nie udało się przyjąć zgłoszenia")
 
 
 @pytest.mark.django_db

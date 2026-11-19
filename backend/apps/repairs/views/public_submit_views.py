@@ -14,6 +14,7 @@ from rest_framework.permissions import AllowAny
 from apps.common.permissions import get_client_for_user
 from apps.repairs.serializers.public_submit import PublicRepairSubmitSerializer
 from apps.repairs.services import submit_repair_from_public_form
+from apps.repairs.services.public_submit import PublicSubmitError
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ class PublicRepairSubmitView(APIView):
                 visual_condition_description=(device_data.get("visual_condition_description") or "").strip(),
                 client_id=linked_client_id,
             )
-        except ValueError as e:
+        except PublicSubmitError as e:
             # Business validation messages from the service are safe to show.
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:

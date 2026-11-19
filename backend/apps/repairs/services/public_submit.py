@@ -18,6 +18,10 @@ from apps.repairs.services.repair_creation import create_repair_request
 logger = logging.getLogger(__name__)
 
 
+class PublicSubmitError(ValueError):
+    """Business error whose message is safe to show to an anonymous caller."""
+
+
 @transaction.atomic
 def submit_repair_from_public_form(
     *,
@@ -70,7 +74,7 @@ def submit_repair_from_public_form(
     if client_id:
         client = client_by_id(client_id)
         if not client:
-            raise ValueError("Nie znaleziono konta klienta.")
+            raise PublicSubmitError("Nie znaleziono konta klienta.")
         client.first_name = first_name.strip() or client.first_name
         client.last_name = last_name.strip() or client.last_name
         client.phone = phone.strip() or client.phone

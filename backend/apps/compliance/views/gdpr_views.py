@@ -50,10 +50,13 @@ class ExportMyDataView(APIView):
                 "status": r.get_status_display(),
                 "created_at": str(r.created_at),
                 "problem_description": r.problem_description or "",
+                "contact_phone": r.contact_phone,
+                "client_notes": r.client_notes,
+                "visual_condition_description": r.visual_condition_description,
             }
             for r in repairs
         ]
-        devices = Device.objects.filter(client=client).order_by("-created_at")
+        devices = Device.objects.filter(client=client).select_related("device_model").order_by("-created_at")
         device_list = [
             {
                 "category": d.get_category_display(),
@@ -89,6 +92,10 @@ class ExportMyDataView(APIView):
                     "city": client.city,
                     "postal_code": client.postal_code,
                     "country": client.country,
+                    "company_name": client.company_name,
+                    "nip": client.nip,
+                    "company_email": client.company_email,
+                    "company_phone": client.company_phone,
                 },
                 "devices_count": devices.count(),
                 "devices": device_list,
@@ -135,6 +142,10 @@ class RequestAccountDeletionView(APIView):
         client = getattr(user, "client_profile", None)
         reason = (request.data.get("reason") or "").strip() if isinstance(request.data, dict) else ""
         with transaction.atomic():
+            # Lock the account row: two parallel requests must not both run (review P6).
+            user = type(user).objects.select_for_update().get(pk=user.pk)
+            if not user.is_active:
+                return Response({"detail": "Konto jest już usunięte."}, status=status.HTTP_409_CONFLICT)
             gdpr = None
             if client:
                 gdpr = GdprRequest.objects.create(

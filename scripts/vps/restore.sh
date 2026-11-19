@@ -109,7 +109,8 @@ log "repairs in the restored database: $(docker exec "$pg" psql -U prokom -d "$d
 
 log "media volume $media_volume"
 docker run --rm -i -v "$media_volume:/media" "$helper_image" \
-  sh -c 'find /media -mindepth 1 -delete && tar -C /media -xf -' <"$work/media.tar"
+  sh -c 'find /media -mindepth 1 -delete && tar -C /media -xf - && chown -R 10001:10001 /media' <"$work/media.tar"
+# chown: the backend runs as uid 10001 (audit T-21); old archives hold root-owned files.
 
 if [ "$start_app" = 0 ] || [ "${#stopped[@]}" -eq 0 ]; then
   log "done — app left stopped; next: (staging: anonimizuj.sql), then docker compose … up -d --wait and scripts/vps/smoke.sh"
