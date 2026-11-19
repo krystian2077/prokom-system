@@ -9,6 +9,7 @@ import { CardTilt } from "./CardTilt";
 import { ModelCard } from "./ModelCard";
 import { SalonCompare } from "./SalonCompare";
 import { SalonQuiz } from "./SalonQuiz";
+import { SalonStage } from "./SalonStage";
 
 const COPY: Record<Brand, { lead: string; service: string }> = {
   apple: {
@@ -48,12 +49,15 @@ export function SalonPage({ brand }: { brand: Brand }) {
       <section className="t-section--hero" id="salon" data-rail={`Salon ${name}`}>
         <div className="t-container">
           <div className="t-bsalon__hero">
-            <Breadcrumbs items={crumbs} />
-            <span className="t-eyb t-eyb--dark">Sprzedaż · PRO-KOM Tech</span>
-            <h1 className="t-bsalon__h1">
-              Salon <span className="t-bsalon__brand">{name}</span>
-            </h1>
-            <p className="t-bsalon__lead">{COPY[brand].lead}</p>
+            <div className="t-bsalon__intro">
+              <Breadcrumbs items={crumbs} />
+              <span className="t-eyb t-eyb--dark">Sprzedaż · PRO-KOM Tech</span>
+              <h1 className="t-bsalon__h1">
+                Salon <span className="t-bsalon__brand">{name}</span>
+              </h1>
+              <p className="t-bsalon__lead">{COPY[brand].lead}</p>
+            </div>
+            <SalonStage brand={brand} />
             <nav className="t-bsalon__depts" aria-label={`Działy salonu ${name}`}>
               {families.map((f) => (
                 <a key={f.key} href={`#${f.key}`} className="t-bsalon__dept">

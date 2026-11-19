@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { line, servicePoints } from "@/config/prokom";
 import { BrandMarquee } from "@/components/tech/home/BrandMarquee";
 import { CommonRepairs } from "@/components/tech/home/CommonRepairs";
@@ -46,11 +46,11 @@ export default function HomePage() {
       />
       <DeviceGrid />
       <CommonRepairs />
+      <SalesSection />
+      <AlsenSection />
       <PointsSection points={points} />
       <ProcessSection point={points.find((p) => !p.draft) ?? points[0]} />
       <HammerBlock />
-      <SalesSection />
-      <AlsenSection />
       <WhySection points={points} />
       <TownsSection points={points} />
       <HomeFaq points={points} />
