@@ -132,6 +132,36 @@ test.describe("dodatki (1440)", () => {
   });
 });
 
+test.describe("przechył kart (1440)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test("a card tilts towards the mouse; reduced motion keeps it flat", async ({ page }) => {
+    await pinDaylight(page);
+    await page.goto("/sprzedaz");
+    const card = page.locator(".t-mcard__link").first();
+    await card.scrollIntoViewIfNeeded();
+    const box = (await card.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.85, box.y + box.height * 0.2);
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.15);
+    await expect(card).toHaveAttribute("data-tilt", "");
+    expect(await card.evaluate((el) => getComputedStyle(el).getPropertyValue("--ry").trim())).toMatch(/^\d/);
+    // off the card (the gap between cards / the page) → flat again
+    await page.mouse.move(box.x + box.width / 2, box.y - 30, { steps: 5 });
+    await expect(card).not.toHaveAttribute("data-tilt", "");
+  });
+  test("reduced motion: no tilt", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await pinDaylight(page);
+    await page.goto("/sprzedaz");
+    const card = page.locator(".t-mcard__link").first();
+    await card.scrollIntoViewIfNeeded();
+    const box = (await card.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.85, box.y + box.height * 0.2);
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.15);
+    await page.waitForTimeout(200);
+    await expect(card).not.toHaveAttribute("data-tilt", "");
+  });
+});
+
 test.describe("nawigacja sprzedaży (1440)", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
   test("„Sprzedaż” mega menu: both salons, enquiry card; the count badge appears after adding", async ({ page }) => {

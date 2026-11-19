@@ -283,3 +283,15 @@ html[data-tech-theme="dark"] .tech .t-mcard__dots i { box-shadow: inset 0 0 0 1p
 .tech .t-bundle b { font-family: var(--t-font-head); font-size: 18px; }
 .tech .t-bundle span { font-size: 14px; color: var(--ink2); }
 html[data-tech-theme="dark"] .tech .t-bundle { background: color-mix(in srgb, var(--acc) 12%, var(--card)); border-color: color-mix(in srgb, var(--acc) 30%, transparent); }
+
+/* ---------- Card tilt towards the pointer (CardTilt sets --rx/--ry; mouse only, no reduced motion) ---------- */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .tech .t-mcard { perspective: 900px; }
+  .tech .t-mcard__link[data-tilt] {
+    transform: translateY(-4px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 120ms var(--m-ease-out, ease), box-shadow var(--m-panel, 320ms), border-color var(--m-small, 160ms);
+  }
+  .tech .t-mcard__link[data-tilt] .t-mvis { transform: translateZ(24px); }
+  .tech .t-mcard__link .t-mvis { transition: transform var(--m-panel, 320ms) var(--m-ease-out, ease); }
+}
+.tech.t-reduced .t-mcard__link[data-tilt] { transform: none; }
