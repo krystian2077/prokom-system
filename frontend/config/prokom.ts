@@ -74,9 +74,8 @@ export const servicePoints: ServicePoint[] = [
       { days: "sob", open: "09:00", close: "14:00" },
       { days: "nd", open: null, close: null },
     ],
-    // The number pro-kom.eu shows as „serwis PRO-KOM Tech Rabka” (runda 18.11 §1.2).
-    // TODO(krystian): potwierdzenie szefa, że to numer punktu w Rabce.
-    phone: "+48 18 541 20 55",
+    // Rabka point number — confirmed by Krystian 19.11.2026 (same as the Google business profile).
+    phone: "+48 18 267 65 11",
     // TODO(krystian): rabka@prokomserwis.pl — decyzja szefa (alias do kontakt@ czy skrzynka); wpisać po założeniu w SH 1.
     email: null,
     mapsUrl: null,
@@ -214,8 +213,8 @@ export const partners = {
     logo: { src: "/tech/partnerzy/alsen.webp", width: 630, height: 160 },
     /** The point that is an ALSEN partner point. */
     pointKey: "rabka" as PointKey,
-    // TODO(krystian): potwierdzić, że punkt partnerski ALSEN to salon przy ul. Orkana 16B — do tego czasu bez plakietki i bez adresu.
-    pointConfirmed: false,
+    /** The ALSEN partner point is the Rabka salon, ul. Orkana 16B (Krystian 19.11.2026). */
+    pointConfirmed: true,
   },
 } as const;
 

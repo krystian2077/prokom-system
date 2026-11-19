@@ -100,9 +100,9 @@ Aktualizuje `/koniec-sesji` na końcu każdej sesji. Najnowsze na górze.
 
 ## Pytania i decyzje — runda 18.11 (Krystian / [SZEF])
 1. [SZEF] Nazwa numeru ogólnego 883 200 151 — dziś „Infolinia” (`GENERAL_PHONE_LABEL`).
-2. [SZEF] Numer punktu Rabka **18 541 20 55** — potwierdzić.
+2. ✔ 19.11 (Krystian): numer punktu Rabka **18 267 65 11** (jak w wizytówce Google; wcześniejsze 18 541 20 55 było błędne). Numer ogólny 883 200 151 bez zmian.
 3. E-maile punktów: aliasy do `kontakt@` czy osobne skrzynki (`rabka@`, `zakopane@`) — do tego czasu „E-mail ogólny”.
-4. Adres punktu partnerskiego ALSEN = salon Orkana 16B? Po potwierdzeniu `pointConfirmed: true` (plakietka na karcie punktu). Zdanie o partnerstwie do akceptacji; zdjęcie wnętrza z szyldem — nasze?
+4. ✔ 19.11 (Krystian): punkt partnerski ALSEN = salon ul. Orkana 16B (`pointConfirmed: true`, plakietka „Punkt partnerski ALSEN” na karcie Rabki); klient może zamówić przez nas wszystko, co jest na alsen.pl (teksty na głównej i w `/o-firmie`). Otwarte: zdjęcie wnętrza z szyldem — nasze?
 5. Kapsuła: „Punkty” zamiast „Punkty serwisowe” i „Konto” jako ikona (żeby zmieściła się „Sprzedaż”) — OK?
 6. Katalog: obietnica czasu odpowiedzi na zapytanie (dziś bez liczby), faktura VAT na firmę (FAQ), raty (nie).
 7. Katalog: czy zostają modele spoza listy z §0 (iPhone Duo/Air/17e/16, MacBook Neo, PROLED XDR, Galaxy Z) — dodane, bo producent je sprzedaje w PL.

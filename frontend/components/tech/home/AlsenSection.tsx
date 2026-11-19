@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { partners } from "@/config/prokom";
 import { SALES_HREF } from "@/lib/tech/catalog/nav";
+import { alsenPoint } from "@/lib/tech/partners";
+import { inCity } from "@/lib/tech/point-format";
 import { AlsenLogo } from "../AlsenPartner";
 import { IconArrow } from "../icons";
 
 // Categories exactly as in the alsen.pl menu (read 19.11.2026; „RTV i AGD” and „Inteligentny dom” from the home page).
 export const ALSEN_CATEGORIES = ["Laptopy i komputery", "Podzespoły komputerowe", "Urządzenia peryferyjne", "Smartfony i lifestyle", "RTV i AGD", "Inteligentny dom"] as const;
 
-// TODO(krystian): potwierdzić, co klient może zamówić przez nas z oferty ALSEN (zamówienie i odbiór w salonie) — tekst poniżej to założenie z umowy partnerskiej.
+// Krystian 19.11.2026: customers can order through us everything that is on alsen.pl; the partner point is the Rabka salon.
+const partnerPoint = alsenPoint();
+const partnerAddress = `${partnerPoint.street}, ${partnerPoint.city}`;
+
 const POINTS = [
-  { t: "Cała oferta sieci ALSEN", s: "Laptopy, komputery, podzespoły, urządzenia peryferyjne, smartfony, RTV i AGD — zapytaj w salonie o to, czego szukasz.", href: "/kontakt", cta: "Zapytaj" },
+  { t: "Wszystko z alsen.pl", s: `Laptopy, komputery, podzespoły, urządzenia peryferyjne, smartfony, RTV i AGD — zamówisz przez nas każdy produkt z oferty sieci i odbierzesz go w punkcie partnerskim: ${partnerAddress}.`, href: "/kontakt", cta: "Zapytaj" },
   { t: "Apple i Samsung w katalogu", s: "iPhone, iPad, Mac, Galaxy i reszta — kolory i wersje na stronie, cenę i dostępność podamy w odpowiedzi.", href: SALES_HREF, cta: "Katalog" },
   { t: "Odbiór i serwis na miejscu", s: "Rabka-Zdrój i Zakopane: sprzęt odbierzesz w salonie, a gdyby coś się zepsuło — serwis z wyceną przed naprawą.", href: "/punkty-serwisowe", cta: "Punkty" },
 ] as const;
@@ -32,7 +37,7 @@ export function AlsenSection() {
               <h2 id="t-halsen-h" className="t-h2 t-halsen__h">
                 Autoryzowany partner ALSEN
               </h2>
-              <p className="t-lead t-halsen__lead">PRO-KOM jest autoryzowanym partnerem ALSEN — sieci sprzedaży komputerów i elektroniki. W naszych salonach zapytasz o sprzęt z oferty sieci, odbierzesz go na miejscu i masz serwis pod ręką.</p>
+              <p className="t-lead t-halsen__lead">PRO-KOM jest autoryzowanym partnerem ALSEN — sieci sprzedaży komputerów i elektroniki. Przez nas zamówisz wszystko, co jest na alsen.pl, odbierzesz to w salonie {inCity(partnerPoint.city)} i masz serwis pod ręką.</p>
               <ul className="t-halsen__cats" aria-label="Oferta sieci ALSEN">
                 {ALSEN_CATEGORIES.map((c) => (
                   <li key={c}>{c}</li>
