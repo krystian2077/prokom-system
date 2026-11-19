@@ -145,6 +145,10 @@ else
 fi
 
 # 5. Static files into the shared volume, then the whole stack, healthchecks, smoke test.
+# The image runs as uid 10001 (audit T-21); volumes made by older root images get the owner
+# here (idempotent, root only for this one throwaway container).
+run_logged "${compose[@]}" run --rm --no-deps -T --user root --entrypoint chown backend \
+  -R 10001:10001 /app/staticfiles /app/media || fail
 run_logged manage collectstatic --noinput || fail
 start || fail
 smoke || fail
