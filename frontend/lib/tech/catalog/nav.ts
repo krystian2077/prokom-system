@@ -22,3 +22,13 @@ export function salesColumns(): { brand: Brand; title: string; salon: string; li
     links: all.filter((f) => f.brand === brand).map((f) => ({ label: f.name, href: `${SALON_HREF[brand]}#${f.key}` })),
   }));
 }
+
+/** Data for the „Sprzedaż” menu and the home page section, built on the server (no catalogue in the client bundle). */
+export type SalesTeaser = { name: string; href: string; img: string | null; transparent: boolean; bg: string | null; brand: Brand };
+export type SalesNav = {
+  count: number;
+  /** Salon tiles: one hero product each. */
+  salons: { brand: Brand; title: string; href: string; img: string | null; transparent: boolean; bg: string | null; departments: SalesLink[] }[];
+  /** Newest models (one per family), newest first. */
+  newest: SalesTeaser[];
+};

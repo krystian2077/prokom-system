@@ -8,6 +8,8 @@ import { HammerBlock } from "@/components/tech/home/HammerBlock";
 import { Hero } from "@/components/tech/home/Hero";
 import { HomeFaq } from "@/components/tech/home/HomeFaq";
 import { PointsSection } from "@/components/tech/home/PointsSection";
+import { SalesSection } from "@/components/tech/home/SalesSection";
+import { AlsenSection } from "@/components/tech/home/AlsenSection";
 import { ProcessSection } from "@/components/tech/home/ProcessSection";
 import { TownsSection } from "@/components/tech/home/TownsSection";
 import { WhySection } from "@/components/tech/home/WhySection";
@@ -47,6 +49,8 @@ export default function HomePage() {
       <PointsSection points={points} />
       <ProcessSection point={points.find((p) => !p.draft) ?? points[0]} />
       <HammerBlock />
+      <SalesSection />
+      <AlsenSection />
       <WhySection points={points} />
       <TownsSection points={points} />
       <HomeFaq points={points} />
