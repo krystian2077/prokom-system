@@ -1,7 +1,9 @@
 """
 PRO-KOM Serwis — Główny plik URL
 """
+from django import forms
 from django.contrib import admin
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -14,6 +16,28 @@ from apps.repairs.views.staff_views import StaffRepairsListView, StaffRepairDeta
 admin.site.site_header = "PRO-KOM Serwis — Panel Admina"
 admin.site.site_title = "PRO-KOM Admin"
 admin.site.index_title = "Panel administracyjny"
+# Audit AB4 (T-13): the Django admin only for superusers. Every employee has is_staff (panel
+# accounts), but the staff panel is /panel in Next.js — the full database admin is not for them.
+admin.site.has_permission = lambda request: bool(
+    request.user.is_active and request.user.is_superuser
+)
+
+
+class _SuperuserAdminLoginForm(AdminAuthenticationForm):
+    """The admin login form accepts only superusers (by default any is_staff account logs in and
+    gets a Django session that also works in the API — around token expiry and the e-mail lock)."""
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if not user.is_superuser:
+            raise forms.ValidationError(
+                self.error_messages["invalid_login"],
+                code="invalid_login",
+                params={"username": self.username_field.verbose_name},
+            )
+
+
+admin.site.login_form = _SuperuserAdminLoginForm
 
 urlpatterns = [
     # Django Admin
