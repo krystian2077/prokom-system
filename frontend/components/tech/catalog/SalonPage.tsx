@@ -5,6 +5,7 @@ import type { Brand, Kind } from "@/lib/tech/catalog/types";
 import { breadcrumbJsonLd, type Crumb } from "@/lib/tech/seo";
 import { Breadcrumbs } from "../Breadcrumbs";
 import { JsonLd } from "../JsonLd";
+import { CardTilt } from "./CardTilt";
 import { ModelCard } from "./ModelCard";
 import { SalonCompare } from "./SalonCompare";
 import { SalonQuiz } from "./SalonQuiz";
@@ -42,6 +43,7 @@ export function SalonPage({ brand }: { brand: Brand }) {
     <div className={`t-ui t-page t-bsalon t-bsalon--${brand}`}>
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <JsonLd data={collectionJsonLd(`Salon ${name}`, path, models)} />
+      <CardTilt />
 
       <section className="t-section--hero" id="salon" data-rail={`Salon ${name}`}>
         <div className="t-container">

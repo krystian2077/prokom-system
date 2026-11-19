@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CatalogBrowser, type BrowserItem } from "@/components/tech/catalog/CatalogBrowser";
+import { CardTilt } from "@/components/tech/catalog/CardTilt";
 import { ModelCard } from "@/components/tech/catalog/ModelCard";
 import { RecentlyViewed } from "@/components/tech/catalog/RecentlyViewed";
 import { JsonLd } from "@/components/tech/JsonLd";
@@ -86,6 +87,7 @@ export default function SalesPage() {
         <div className="t-container">
           <RecentlyViewed entries={recentEntries()} />
           <CatalogBrowser items={items} />
+          <CardTilt />
         </div>
       </section>
     </div>
