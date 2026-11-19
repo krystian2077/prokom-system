@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.common.models import BaseModel, TimestampedModel
 from apps.common.enums import DeviceCategory
 from apps.common.validators import validate_imei, validate_serial_number
+from apps.common.uploads import RandomName, validate_image_upload
 
 
 class Brand(TimestampedModel):
@@ -30,7 +31,8 @@ class Brand(TimestampedModel):
 
     logo = models.FileField(
         _("logo"),
-        upload_to="brands/logos/",
+        upload_to=RandomName("brands/logos", dated=False),
+        validators=[validate_image_upload],
         null=True,
         blank=True
     )
@@ -115,7 +117,8 @@ class DeviceModel(TimestampedModel):
     # Obrazy
     image = models.FileField(
         _("zdjęcie"),
-        upload_to="devices/models/",
+        upload_to=RandomName("devices/models", dated=False),
+        validators=[validate_image_upload],
         null=True,
         blank=True
     )
@@ -352,7 +355,8 @@ class DeviceImage(TimestampedModel):
 
     image = models.FileField(
         _("zdjęcie"),
-        upload_to="devices/photos/%Y/%m/"
+        upload_to=RandomName("devices/photos"),
+        validators=[validate_image_upload],
     )
 
     caption = models.CharField(

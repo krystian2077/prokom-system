@@ -22,6 +22,7 @@ from apps.common.enums import (
 )
 from django.db import transaction
 from django.utils import timezone
+from apps.common.uploads import RandomName, validate_image_upload
 
 
 class RepairNumberSequence(models.Model):
@@ -480,7 +481,8 @@ class RepairRequest(BaseModel):
     package_notes = models.TextField(_("notatki do odbioru paczki"), blank=True)
     package_photo = models.ImageField(
         _("zdjęcie paczki/urządzenia"),
-        upload_to="repairs/package_photos/%Y/%m/",
+        upload_to=RandomName("repairs/package_photos"),
+        validators=[validate_image_upload],
         null=True,
         blank=True,
     )
@@ -778,7 +780,8 @@ class RepairImage(TimestampedModel):
 
     image = models.FileField(
         _("zdjęcie"),
-        upload_to="repairs/photos/%Y/%m/"
+        upload_to=RandomName("repairs/photos"),
+        validators=[validate_image_upload],
     )
 
     caption = models.CharField(

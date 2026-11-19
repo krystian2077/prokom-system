@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from apps.common.uploads import RandomName, validate_image_upload
 
 
 class UserRole(models.TextChoices):
@@ -161,7 +162,13 @@ class StaffProfile(models.Model):
     )
     position = models.CharField(_("stanowisko"), max_length=100, blank=True)
     bio = models.TextField(_("opis"), blank=True)
-    avatar = models.FileField(_("zdjęcie"), upload_to="staff/avatars/", null=True, blank=True)
+    avatar = models.FileField(
+        _("zdjęcie"),
+        upload_to=RandomName("staff/avatars", dated=False),
+        validators=[validate_image_upload],
+        null=True,
+        blank=True,
+    )
     is_available = models.BooleanField(_("dostępny do przypisania"), default=True)
 
     # Rozszerzenie (prokom.md): specjalizacja, kalendarz, podpisy
