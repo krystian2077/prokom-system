@@ -21,7 +21,7 @@ for (const theme of ["light", "dark"] as const) {
       await logo.scrollIntoViewIfNeeded();
       await expect(logo).toBeVisible();
       await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
-      const link = card.getByRole("link", { name: /alsen\.pl/ });
+      const link = card.getByRole("link", { name: /^alsen\.pl/ });
       await expect(link).toHaveAttribute("href", "https://www.alsen.pl/");
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveAttribute("rel", /noopener/);
@@ -47,10 +47,20 @@ test.describe("1440", () => {
     await expect(block.getByRole("heading", { level: 2, name: "Autoryzowany partner ALSEN" })).toBeVisible();
     await expect(block).not.toContainText(/\d+\s+(sklep|salon)/);
   });
-  test("point badge stays hidden until the partner point's address is confirmed", async ({ page }) => {
-    for (const path of ["/punkty-serwisowe", "/serwis-telefonow-rabka-zdroj"]) {
-      await page.goto(path);
-      await expect(page.locator(".t-alsen-badge")).toHaveCount(0);
-    }
+  test("„Punkt partnerski ALSEN” badge only on the Rabka point (confirmed 19.11)", async ({ page }) => {
+    await page.goto("/punkty-serwisowe");
+    await expect(page.locator(".t-alsen-badge")).toHaveCount(1);
+    await expect(page.locator(".t-pointcard", { has: page.locator(".t-alsen-badge") })).toContainText("Orkana 16B");
+    await page.goto("/serwis-telefonow-rabka-zdroj");
+    await expect(page.locator(".t-alsen-badge")).toHaveCount(1);
+    await page.goto("/serwis-telefonow-zakopane");
+    await expect(page.locator(".t-alsen-badge")).toHaveCount(0);
+  });
+  test("home and „O firmie”: everything from alsen.pl can be ordered, pickup at the partner point", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#alsen")).toContainText("zamówisz wszystko, co jest na alsen.pl");
+    await expect(page.locator("#alsen")).toContainText("ul. Orkana 16B, Rabka-Zdrój");
+    await page.goto("/o-firmie");
+    await expect(page.locator("#partner")).toContainText("ul. Orkana 16B, Rabka-Zdrój");
   });
 });
