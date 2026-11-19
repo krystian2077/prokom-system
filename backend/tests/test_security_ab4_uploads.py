@@ -58,3 +58,32 @@ def test_repair_photo_upload_gets_a_random_name_and_html_is_refused(api_client, 
                           {"repair": str(repair.id), "image": SimpleUploadedFile("x.html", b"<script>alert(1)</script>", content_type="text/html")},
                           format="multipart")
     assert bad.status_code == 400
+
+
+@pytest.mark.django_db
+def test_old_stored_files_do_not_block_saving(settings, tmp_path):
+    from apps.devices.models import Brand
+    settings.MEDIA_ROOT = tmp_path
+    brand = Brand.objects.create(name="Stara Marka", slug="stara-marka")
+    brand.logo.name = "brands/logos/stare-logo.svg"  # stored before AB4, file not even on disk
+    brand.save()
+    brand.full_clean()  # what the admin runs on save — must not complain about the old file
+
+
+@pytest.mark.django_db
+def test_package_photo_upload_is_validated(api_client, settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
+    with patch("apps.communications.services.send.send_repair_submission_confirmation"):
+        repair, _ = submit_repair_from_public_form(
+            first_name="Anna", last_name="Nowak", email="pkg@example.com", phone="600100200",
+            category="phone", problem_description="Ekran",
+        )
+    staff = User.objects.create_user(email="st2@example.com", password="Mocne-Haslo-2026!x", role="staff")
+    token, _ = Token.objects.get_or_create(user=staff)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+    bad = api_client.post(f"/api/v1/repairs/{repair.id}/mark-package-received/",
+                          {"package_ok": "true", "package_photo": SimpleUploadedFile("x.svg", b"<svg/>", content_type="image/svg+xml")},
+                          format="multipart")
+    assert bad.status_code == 400
+    repair.refresh_from_db()
+    assert not repair.package_photo

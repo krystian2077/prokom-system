@@ -38,7 +38,12 @@ class RandomName:
 
 
 def validate_image_upload(file):
-    """Only image formats (no SVG/HTML), at most 20 MB."""
+    """Only image formats (no SVG/HTML), at most 20 MB — for new uploads only."""
+    # A file already stored (FieldFile, committed) was accepted under the old rules: re-checking it
+    # on every admin save would block editing old records (an SVG logo, a PDF in photos) and
+    # `size` of a missing file raises — validate what is being uploaded now.
+    if getattr(file, "_committed", False):
+        return
     ext = os.path.splitext(getattr(file, "name", "") or "")[1].lower()
     if ext not in IMAGE_EXTENSIONS:
         raise ValidationError("Dozwolone są tylko zdjęcia: JPG, PNG, WebP, GIF albo HEIC.")

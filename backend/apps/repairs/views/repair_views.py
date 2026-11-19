@@ -634,6 +634,13 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
         repair.request_number_attached = data.get("request_number_attached")
         repair.package_notes = data.get("package_notes", "") or repair.package_notes
         if request.FILES.get("package_photo"):
+            # Audit AB4 (T-10): this path bypassed the field validators (assigned straight to the model).
+            from django.core.exceptions import ValidationError as DjangoValidationError
+            from apps.common.uploads import validate_image_upload
+            try:
+                validate_image_upload(request.FILES["package_photo"])
+            except DjangoValidationError as exc:
+                return Response({"package_photo": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
             repair.package_photo = request.FILES["package_photo"]
         repair.save(update_fields=[
             "package_received_at", "package_received_by_id", "package_ok",
