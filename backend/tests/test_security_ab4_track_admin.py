@@ -50,3 +50,27 @@ def test_django_admin_only_for_superusers(client):
     boss = User.objects.create_superuser(email="szef@example.com", password="Mocne-Haslo-2026!x")
     client.force_login(boss)
     assert client.get("/admin/").status_code == 200
+
+
+@pytest.mark.django_db
+def test_nine_wrong_answers_then_the_right_one_still_works(api_client):
+    cache.clear()
+    repair = _repair()
+    for i in range(9):
+        api_client.get("/api/v1/repairs/track/", {"ref": repair.repair_number, "phone_last4": f"{i:04d}"})
+    r = api_client.get("/api/v1/repairs/track/", {"ref": repair.repair_number, "phone_last4": "0200"})
+    assert r.status_code == 200
+
+
+@pytest.mark.django_db
+def test_admin_login_form_refuses_staff_and_accepts_superuser(client):
+    User.objects.create_user(email="pracownik2@example.com", password="Mocne-Haslo-2026!x", role="staff",
+                             is_staff=True)
+    r = client.post("/admin/login/", {"username": "pracownik2@example.com", "password": "Mocne-Haslo-2026!x"})
+    assert r.status_code == 200  # the form again, with an error — no session
+    assert "_auth_user_id" not in client.session
+
+    User.objects.create_superuser(email="szef2@example.com", password="Mocne-Haslo-2026!x")
+    r = client.post("/admin/login/", {"username": "szef2@example.com", "password": "Mocne-Haslo-2026!x"})
+    assert r.status_code == 302
+    assert "_auth_user_id" in client.session
