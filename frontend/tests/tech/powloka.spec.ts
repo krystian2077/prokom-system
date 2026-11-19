@@ -1,5 +1,6 @@
 /** TD1 PR 2: shell behaviour (SPEC §6–§7, §12.1, RESPONSYWNOSC §2–§4). */
 import { expect, test } from "@playwright/test";
+import { pinDaylight } from "./zegar";
 
 test.describe("desktop 1440", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -31,7 +32,7 @@ test.describe("desktop 1440", () => {
   test("points mega menu and footer show both published points", async ({ page }) => {
     await page.goto("/");
     await page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" }).click();
-    const panel = page.locator(".t-mega").nth(1);
+    const panel = page.locator('.t-mega[data-mega="punkty"]');
     await expect(panel.getByText("Rabka-Zdrój", { exact: true })).toBeVisible();
     await expect(panel.getByText("Zakopane", { exact: true })).toBeVisible();
     await expect(page.locator(".t-footer")).toContainText("Zakopane");
@@ -46,6 +47,7 @@ test.describe("desktop 1440", () => {
 
   test("theme toggle switches data-tech-theme only", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
+    await pinDaylight(page);
     await page.goto("/");
     const html = page.locator("html");
     await expect(html).toHaveAttribute("data-tech-theme", "light");
@@ -88,6 +90,7 @@ test.describe("phone 390", () => {
 
   test("Menu sheet: theme Jasny / Ciemny / Auto", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
+    await pinDaylight(page);
     await page.goto("/");
     await page.locator("[data-t-tabbar]").getByRole("button", { name: "Menu" }).click();
     await page.getByRole("radio", { name: "Ciemny" }).click();

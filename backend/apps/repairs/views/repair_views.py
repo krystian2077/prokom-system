@@ -87,7 +87,10 @@ class RepairRequestViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         from rest_framework.permissions import IsAuthenticated
-        if self.action in ("create", "update", "partial_update", "destroy"):
+        if self.action == "destroy":
+            from apps.common.permissions import IsAdminRole
+            return [IsAuthenticated(), IsAdminRole()]
+        if self.action in ("create", "update", "partial_update"):
             return [IsAuthenticated(), IsStaffOrAdmin()]
         return [IsAuthenticated()]
     filterset_fields = [

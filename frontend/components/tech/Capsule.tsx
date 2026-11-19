@@ -7,12 +7,15 @@ import { pointPhone, telHref } from "@/config/prokom";
 import { hoursSummary } from "@/lib/tech/hours";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { prefersReducedMotion } from "@/lib/tech/motion";
+import { brandLinks } from "@/lib/tech/brand-links";
 import { courierPageHref } from "@/lib/tech/courier";
 import { ACCOUNT_HREF, POINTS_HREF, PREP_GUIDE_HREF, PREP_GUIDE_READY, REPAIRS_HREF, SUBMIT_HREF, TRACK_HREF, directionsUrl, inTriangle, isActive, mainNav, repairLinks, type NavItem, type Pt } from "@/lib/tech/nav";
 import { requestSearch } from "@/lib/tech/search/open";
 import { submitHref, wizardDevices } from "@/lib/tech/wizard-data";
 import { DeviceGlyph, IconArrow, IconChevronDown, IconPin, IconSearch, IconUser, IconWrench } from "./icons";
 import { Logo } from "./Logo";
+import { EnquiryBadge, EnquiryLink } from "./catalog/EnquiryLink";
+import { SALES_HREF, salesColumns } from "@/lib/tech/catalog/nav";
 import { OpeningStatus } from "./OpeningStatus";
 import { OsmMap } from "./OsmMap";
 import { useShell } from "./ShellContext";
@@ -30,11 +33,12 @@ const noSubscription = () => () => {};
 const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
 /**
- * Main capsule (design T.Naglowek, PREMIUM §3). ≥ 1024: sticky, narrows on scroll
- * (transform only), sliding pill under the hot/active item, mega menus in one shared
- * box (switches panels without closing), hover intent + safe triangle, full keyboard,
- * dimmed and blurred page under an open menu. < 1024: logo, "Zgłoś" and search; hides
- * on scroll down and returns on scroll up. Without JS the mega triggers are plain links.
+ * Main capsule (design T.Naglowek, PREMIUM §3). Sticky to the whole page on every width; hides
+ * on scroll down and returns on scroll up (not while a mega menu is open or focus is inside).
+ * ≥ 1024: narrows on scroll (transform only), sliding pill under the hot/active item, mega menus
+ * in one shared box (switches panels without closing), hover intent + safe triangle, full
+ * keyboard, dimmed and blurred page under an open menu. < 1024: logo, "Zgłoś" and search.
+ * Without JS the mega triggers are plain links.
  */
 export function Capsule() {
   const pathname = usePathname() || "/";
@@ -127,7 +131,12 @@ export function Capsule() {
   }, [open]);
   useEffect(() => () => clearTimers(), []);
 
-  // scroll: phones hide/show, desktop narrows
+  // An open mega menu or focus inside the capsule keeps it on screen (it must not slip away from
+  // under the pointer or the keyboard). Read inside the scroll handler through a ref.
+  const holdRef = useRef(false);
+  holdRef.current = open !== null;
+
+  // scroll (runda 18.11 §1.1): hides going down and returns going up on every width; ≥ 1024 also narrows
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023.98px)");
     let last = window.scrollY;
@@ -137,7 +146,8 @@ export function Capsule() {
       ticking = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        if (!mq.matches || y < 80) setHidden(false);
+        const held = holdRef.current || !!rootRef.current?.contains(document.activeElement);
+        if (y < 80 || held) setHidden(false);
         else if (Math.abs(y - last) > 6) setHidden(y > last);
         setCompact(!mq.matches && y > COMPACT_AT_PX);
         last = y;
@@ -257,13 +267,14 @@ export function Capsule() {
                     className={cls}
                     aria-current={active ? "page" : undefined}
                     data-nav={item.key}
+                    aria-label={item.short ? item.label : undefined}
                     onMouseEnter={() => {
                       setHot(item.key);
                       if (open) scheduleClose();
                     }}
                     onFocus={() => setHot(item.key)}
                   >
-                    {item.label}
+                    {item.short ?? item.label}
                   </Link>
                 );
               }
@@ -282,6 +293,7 @@ export function Capsule() {
                   aria-current={active ? "page" : undefined}
                   data-nav={item.key}
                   data-mega={mega}
+                  aria-label={item.short ? item.label : undefined}
                   onMouseEnter={(e) => {
                     overMega.current = mega;
                     setHot(item.key);
@@ -307,7 +319,8 @@ export function Capsule() {
                     }
                   }}
                 >
-                  {item.label}
+                  {item.short ?? item.label}
+                  {item.key === "sprzedaz" ? <EnquiryBadge /> : null}
                   <IconChevronDown />
                 </button>
               );
@@ -343,7 +356,7 @@ export function Capsule() {
           {js && (armed || open) ? (
             <div ref={boxRef} className={`t-megabox${open ? " is-open" : ""}`} data-open={open ?? undefined}>
               <div className="t-megabox__bg" aria-hidden="true" />
-              {(["naprawy", "punkty"] as Mega[]).map((m) => (
+              {(["naprawy", "sprzedaz", "punkty"] as Mega[]).map((m) => (
                 <div
                   key={m}
                   id={`${uid}-${m}`}
@@ -353,7 +366,7 @@ export function Capsule() {
                   onKeyDown={(e) => onPanelKey(e, m)}
                   onMouseEnter={() => window.clearTimeout(openTimer.current)}
                 >
-                  <div className="t-mega__panel">{m === "naprawy" ? <MegaRepairs /> : <MegaPoints points={points.filter((p) => !p.draft)} />}</div>
+                  <div className="t-mega__panel">{m === "naprawy" ? <MegaRepairs /> : m === "sprzedaz" ? <MegaSales /> : <MegaPoints points={points.filter((p) => !p.draft)} />}</div>
                 </div>
               ))}
             </div>
@@ -435,6 +448,17 @@ function MegaRepairs() {
             Jak przygotować sprzęt
           </Link>
         ) : null}
+        <span className="t-mega__brands">
+          <span className="t-mega__brandslbl">Marki:</span>
+          {brandLinks.map((b, i) => (
+            <span key={b.href} className="t-mega__brand">
+              {i ? <span aria-hidden="true">·</span> : null}
+              <Link href={b.href} className="t-mega__barlink" data-mega-nav="" aria-label={`Serwis ${b.label}`}>
+                {b.label}
+              </Link>
+            </span>
+          ))}
+        </span>
       </nav>
     </div>
   );
@@ -485,6 +509,45 @@ function MegaPoints({ points }: { points: VisiblePoint[] }) {
           Kontakt
         </Link>
       </nav>
+    </div>
+  );
+}
+
+/**
+ * „Sprzedaż” (runda 18.11 v2 §2): Apple and Samsung departments in two columns with the salon link,
+ * and the enquiry card with the live count. No prices.
+ */
+function MegaSales() {
+  const columns = salesColumns();
+  let n = 0;
+  return (
+    <div className="t-mega__sales">
+      {columns.map((c) => (
+        <nav key={c.brand} className={`t-mega__salescol t-mega__salescol--${c.brand}`} aria-label={`Salon ${c.title}`} style={{ "--i": n++ } as CSSProperties}>
+          <span className="t-eyb">{c.title}</span>
+          <ul>
+            {c.links.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} data-mega-nav="">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link href={c.salon} className="t-mega__more" data-mega-nav="">
+            Salon {c.title} <IconArrow />
+          </Link>
+        </nav>
+      ))}
+      <div className="t-mega__submit t-mega__enq" style={{ "--i": n++ } as CSSProperties}>
+        <span className="t-eyb">Bez cen na stronie</span>
+        <b>Zapytaj o cenę i dostępność</b>
+        <span>Wybierz model, kolor i pamięć, dodaj do zapytania — odpowiemy, a sprzęt odbierzesz w salonie.</span>
+        <EnquiryLink className="t-hbtn t-hbtn--acc t-mega__cta" label="Twoje zapytanie" megaNav />
+        <Link href={SALES_HREF} className="t-mega__barlink" data-mega-nav="">
+          Cały katalog
+        </Link>
+      </div>
     </div>
   );
 }

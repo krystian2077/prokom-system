@@ -4,6 +4,7 @@ import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
 import { AboutIconSvg, type AboutIcon } from "@/components/tech/about/about-icons";
 import { AboutRules, type AboutRule } from "@/components/tech/about/AboutRules";
 import { AboutSalon } from "@/components/tech/about/AboutSalon";
+import { AlsenBlock } from "@/components/tech/AlsenPartner";
 import { Spotlight } from "@/components/tech/about/Spotlight";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
@@ -49,7 +50,7 @@ export default function AboutPage() {
   const stats = [
     since ? { key: "since", icon: "clock", b: since.text, s: `Rok założenia firmy ${inCity(company.hq.city)}`, c: since } : null,
     two ? { key: "points", icon: "pin", b: String(published.length), s: `Punkty serwisowe: ${joinCities(published)}`, c: null } : null,
-    foils ? { key: "foils", icon: "layers", b: foils.text, s: "Rodzajów folii Hammer Glass wycinanych na miejscu", c: foils } : null,
+    foils ? { key: "foils", icon: "layers", b: foils.text, s: "rodzajów folii Hammer Glass wycinanych na miejscu", c: foils } : null,
     linesClaim ? { key: "lines", icon: "grid", b: linesClaim.text, s: "Linie PRO-KOM i marka PRO-KOM Gaming", c: linesClaim } : null,
   ].filter((x): x is Stat => x !== null);
 
@@ -237,6 +238,8 @@ export default function AboutPage() {
           </Spotlight>
         </div>
       </section>
+
+      <AlsenBlock />
 
       <CtaBand
         eyebrow="Następny krok"

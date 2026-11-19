@@ -1,6 +1,6 @@
 """Wysyłka wiadomości z szablonu do naprawy."""
 from rest_framework import views, status
-from rest_framework.permissions import IsAuthenticated
+from apps.common.permissions import IsStaffOrAdmin
 from rest_framework.response import Response
 
 from apps.communications.models import MessageTemplate
@@ -13,7 +13,7 @@ class SendMessageAction(views.APIView):
     POST: Wyślij wiadomość z szablonu do klienta powiązanego z naprawą.
     Body: { "template_id": <id>, "repair_id": "<uuid>" }
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStaffOrAdmin]
 
     def post(self, request):
         template_id = request.data.get("template_id")

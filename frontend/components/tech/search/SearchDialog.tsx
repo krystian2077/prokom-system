@@ -6,6 +6,7 @@ import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useSt
 import { line, telHref } from "@/config/prokom";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { highlight } from "@/lib/tech/search/engine";
+import { loadIndex } from "@/lib/tech/search/load-index";
 import { onSearchRequest } from "@/lib/tech/search/open";
 import { MAX_QUERY, buildProvider, type SearchEntry, type SearchGroup, type SearchResult } from "@/lib/tech/search/provider";
 import { matchActions, quickActions, type QuickAction } from "@/lib/tech/search/quick-actions";
@@ -17,26 +18,9 @@ import { IconArrow, IconClose, IconSearch } from "../icons";
 import { IconClock, SearchIcon } from "../rail-icons";
 import { QuickActionItem, QuickActionTiles, useQuickRun } from "./QuickActions";
 
-/** Built at build time from the Tech data (app/(public)/szukaj/indeks.json/route.ts). */
-export const INDEX_URL = "/szukaj/indeks.json";
+export { INDEX_URL } from "@/lib/tech/search/load-index";
 /** The measurement waits until the visitor stops typing. */
 const MEASURE_AFTER_MS = 1200;
-
-/** One fetch per page load, shared by every caller (the shell stays mounted across pages). */
-let indexRequest: Promise<SearchEntry[]> | null = null;
-function loadIndex(): Promise<SearchEntry[]> {
-  indexRequest ??= fetch(INDEX_URL)
-    .then((r) => {
-      if (!r.ok) throw new Error(`index ${r.status}`);
-      return r.json() as Promise<SearchEntry[]>;
-    })
-    .catch(() => {
-      // A passing error is not kept: the next request to search tries again.
-      indexRequest = null;
-      return Promise.reject(new Error("index"));
-    });
-  return indexRequest;
-}
 
 function lockScroll(): () => void {
   const body = document.body;
@@ -55,6 +39,9 @@ type Item = { type: "result"; result: SearchResult } | { type: "action"; action:
 
 const sec = (i: number) => ({ "--i": i }) as CSSProperties;
 
+/** Set by LazySearchDialog: `request` — a pending open (new object = open again), `onReady` — listeners attached. */
+export type SearchDialogProps = { request?: { phrase?: string } | null; onReady?: () => void };
+
 /**
  * Search window of PRO-KOM Tech — the „mega” search of the PRO-KOM lines (prokom-web Biznes
  * `SearchDialog`: quick actions, popular phrases, shortcuts with counts) in the Tech look.
@@ -67,7 +54,7 @@ const sec = (i: number) => ({ "--i": i }) as CSSProperties;
  * Typing: matching actions on top, then groups with the hit highlighted; nothing found → tips,
  * phone, form, contact. The index comes as JSON when the browser is idle or at the first request.
  */
-export function SearchDialog() {
+export function SearchDialog({ request, onReady }: SearchDialogProps = {}) {
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -149,6 +136,15 @@ export function SearchDialog() {
   }, [show]);
 
   useEffect(() => onSearchRequest((phrase) => show(phrase)), [show]);
+
+  // LazySearchDialog: a request made before this chunk arrived opens the window once it is here.
+  const showRef = useRef(show);
+  showRef.current = show;
+  useEffect(() => {
+    if (request) showRef.current(request.phrase);
+  }, [request]);
+  // Declared after the listeners above, so they are already attached when the loader lets go.
+  useEffect(() => onReady?.(), [onReady]);
 
   const provider = useMemo(() => (entries ? buildProvider(entries) : null), [entries]);
   const categories = useMemo(() => (provider ? countCategories(provider) : null), [provider]);

@@ -5,8 +5,9 @@
  */
 import { courierService } from "@/config/prokom";
 
-export type NavKey = "naprawy" | "punkty" | "hammer" | "blog" | "ofirmie" | "kontakt";
-export type NavItem = { key: NavKey; label: string; href: string; mega?: "naprawy" | "punkty"; match: string[] };
+export type NavKey = "naprawy" | "sprzedaz" | "punkty" | "hammer" | "ofirmie" | "kontakt";
+/** `short`: the label in the capsule when the full one does not fit (the full one stays the accessible name). */
+export type NavItem = { key: NavKey; label: string; short?: string; href: string; mega?: "naprawy" | "sprzedaz" | "punkty"; match: string[] };
 
 export const mainNav: NavItem[] = [
   {
@@ -16,9 +17,11 @@ export const mainNav: NavItem[] = [
     mega: "naprawy",
     match: ["/uslugi", "/serwis-", "/odzyskiwanie-danych", "/naprawy", "/naprawa-kurierem"],
   },
-  { key: "punkty", label: "Punkty serwisowe", href: "/punkty-serwisowe", mega: "punkty", match: ["/punkty-serwisowe", "/obslugiwane-miejscowosci"] },
+  // Sales catalogue (runda 18.11 v2): Apple and Samsung salons, enquiry list — no prices.
+  { key: "sprzedaz", label: "Sprzedaż", href: "/sprzedaz", mega: "sprzedaz", match: ["/sprzedaz", "/apple", "/samsung", "/zapytanie"] },
+  { key: "punkty", label: "Punkty serwisowe", short: "Punkty", href: "/punkty-serwisowe", mega: "punkty", match: ["/punkty-serwisowe", "/obslugiwane-miejscowosci"] },
   { key: "hammer", label: "Hammer Glass", href: "/hammer-glass", match: ["/hammer-glass"] },
-  { key: "blog", label: "Blog", href: "/blog", match: ["/blog"] },
+  // Blog left the capsule 18.11.2026 (Krystian): room for the labelled theme button; it stays in the footer and search.
   { key: "ofirmie", label: "O firmie", href: "/o-firmie", match: ["/o-firmie"] },
   { key: "kontakt", label: "Kontakt", href: "/kontakt", match: ["/kontakt"] },
 ];
@@ -80,7 +83,8 @@ export const legalLinks: { label: string; href: string }[] = [
   { label: "Polityka prywatności", href: "/polityka-prywatnosci" },
   { label: "Cookies", href: "/polityka-prywatnosci#cookies" },
   // TODO(krystian): "Dostępność" from the design needs a page (TD5) — hidden until it exists.
-  { label: "Mapa strony", href: "/sitemap.xml" },
+  // No HTML sitemap page: /sitemap.xml is raw XML for crawlers (audit 16.11).
+  { label: "Wszystkie naprawy", href: "/uslugi" },
 ];
 
 export const ACCOUNT_HREF = "/client/login";

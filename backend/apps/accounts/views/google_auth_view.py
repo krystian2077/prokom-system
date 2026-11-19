@@ -18,10 +18,30 @@ from rest_framework.authtoken.models import Token
 
 from apps.accounts.models import User, UserRole
 from apps.clients.models import Client
-from apps.clients.selectors import client_by_email
 
 
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
+GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
+
+
+def _token_is_for_this_app(access_token: str) -> bool:
+    """Audit AB4: the access token must be issued to our OAuth client (aud/azp = GOOGLE_CLIENT_ID).
+
+    userinfo alone accepts a token issued to any other app, so a site the user signed in to
+    with Google could log in here as that user.
+    """
+    from django.conf import settings
+    client_id = getattr(settings, "GOOGLE_CLIENT_ID", "")
+    if not client_id:
+        return False
+    try:
+        resp = httpx.get(GOOGLE_TOKENINFO_URL, params={"access_token": access_token}, timeout=10)
+        if resp.status_code != 200:
+            return False
+        data = resp.json()
+        return client_id in (data.get("aud"), data.get("azp"))
+    except Exception:
+        return False
 
 
 def _get_google_user_info(access_token: str) -> dict | None:
@@ -59,6 +79,11 @@ class GoogleAuthView(APIView):
         if not access_token:
             return Response({"detail": "Brak access_token."}, status=status.HTTP_400_BAD_REQUEST)
 
+        if not _token_is_for_this_app(access_token):
+            return Response(
+                {"detail": "Nieprawidłowy token Google. Spróbuj ponownie."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         info = _get_google_user_info(access_token)
         if not info:
             return Response(
@@ -82,8 +107,14 @@ class GoogleAuthView(APIView):
                     status=status.HTTP_403_FORBIDDEN,
                 )
             if not user.email_verified:
+                # Audit AB4: an unverified account may have been registered by someone else on
+                # this address. Google proves the owner now: drop that password and its session.
                 user.email_verified = True
-                user.save(update_fields=["email_verified"])
+                user.set_unusable_password()
+                user.save(update_fields=["email_verified", "password"])
+                Token.objects.filter(user=user).delete()
+                from apps.accounts.views.auth_views import _assign_guest_repairs_to_user
+                _assign_guest_repairs_to_user(user)
         except User.DoesNotExist:
             user = User.objects.create_user(
                 email=email,
@@ -93,7 +124,7 @@ class GoogleAuthView(APIView):
                 role=UserRole.CLIENT,
                 email_verified=True,
             )
-            client = client_by_email(email)
+            client = Client.objects.filter(email=email, is_deleted=False, user__isnull=True).first()
             if client:
                 client.user = user
                 client.first_name = first_name or client.first_name
@@ -113,7 +144,8 @@ class GoogleAuthView(APIView):
         if not user.is_active:
             return Response({"detail": "Konto jest nieaktywne."}, status=status.HTTP_403_FORBIDDEN)
 
-        token_obj, _ = Token.objects.get_or_create(user=user)
+        from apps.accounts.authentication import issue_token
+        token_obj = issue_token(user)
 
         return Response(
             {

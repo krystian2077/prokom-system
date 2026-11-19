@@ -1,5 +1,6 @@
 /** TP PR 2: premium navigation (docs/tech/PREMIUM.md §3). */
 import { expect, test, type Page } from "@playwright/test";
+import { pinDaylight } from "./zegar";
 
 test.describe("desktop 1440 — capsule and mega menu", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -7,7 +8,8 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
   test("keyboard: ↓ opens and focuses the panel, ↑/↓ inside, →/← between items, Esc returns focus, Tab out closes", async ({ page }) => {
     await page.goto("/");
     const naprawy = page.locator(".t-capsule").getByRole("button", { name: "Naprawy" });
-    const punkty = page.locator(".t-capsule").getByRole("button", { name: "Punkty serwisowe" });
+    // „Sprzedaż” sits between „Naprawy” and „Punkty serwisowe” (runda 18.11 v2)
+    const punkty = page.locator(".t-capsule").getByRole("button", { name: "Sprzedaż" });
     await naprawy.focus();
     await page.keyboard.press("ArrowDown");
     await expect(naprawy).toHaveAttribute("aria-expanded", "true");
@@ -139,7 +141,11 @@ test.describe("desktop 1440 — capsule and mega menu", () => {
     const h = (await capsule.boundingBox())!.height;
     await page.mouse.wheel(0, 900);
     await expect(page.locator(".t-capwrap")).toHaveClass(/is-compact/);
+    await page.mouse.wheel(0, -100); // going down hides it (runda 18.11 §1.1); a nudge up brings it back
+    await expect(page.locator(".t-capwrap")).not.toHaveClass(/is-hidden/);
+    await page.waitForTimeout(450);
     const after = (await capsule.boundingBox())!;
+    expect(after.y).toBeGreaterThanOrEqual(0); // on screen, not scrolled away with the header
     expect(after.y).toBeLessThan(20);
     expect(await capsule.evaluate((el) => (el as HTMLElement).offsetHeight)).toBe(Math.round(h)); // layout untouched
   });
@@ -214,6 +220,7 @@ test.describe("phone 390 — tab bar and menu sheet", () => {
 
   test("theme segmented control has a sliding pill and switches the theme", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
+    await pinDaylight(page);
     await page.goto("/");
     await page.locator("[data-t-tabbar]").getByRole("button", { name: "Menu" }).click();
     const seg = page.locator(".t-segmented");

@@ -32,6 +32,7 @@ import { RepairFormHead } from "./PageHeads";
 import { polishText } from "@/lib/tech/typo";
 import { CATEGORY_ICON, DEVICE_HINTS, FORM_STEPS, appendFault, chosenPoint, courierLines, faultSuggestions, hasFault, type StepNo } from "@/lib/tech/repair-form";
 import { EASE, prefersReducedMotion } from "@/lib/tech/motion";
+import { DRAFT_SAVE_DELAY_MS, chooseStart, clearDraft, parseDraft, readDraftRaw, serializeDraft, writeDraftRaw } from "@/lib/tech/repair-draft";
 import { submitRepair } from "@/lib/tech/requests";
 import { trackEvent } from "@/lib/tech/track-event";
 import { DEVICE_CATEGORIES, HAMMER_GLASS_INTEREST } from "@/types/repair";
@@ -144,15 +145,57 @@ export function RepairForm() {
     setErrors((e) => (msg ? { ...e, [field]: msg } : e[field] ? { ...e, [field]: undefined } : e));
   }, []);
 
-  // Wizard parameters (KONTRAKT §1.4) and the start event.
+  // Wizard parameters (KONTRAKT §1.4), the stored draft (rule in lib/tech/repair-draft.ts) and the start event.
+  const [restored, setRestored] = useState(false);
+  const [pickupTouched, setPickupTouched] = useState(false);
+  const draftBase = useRef<RepairFormState>(emptyRepairForm());
+  const draftReady = useRef(false);
+  const sent = useRef(false);
   useEffect(() => {
     const prefill = parseWizardParams(new URLSearchParams(sp.toString()), { draft: isDraftMode() });
-    if (Object.keys(prefill).length) setForm((f) => ({ ...f, ...prefill }));
+    draftBase.current = { ...emptyRepairForm(), ...prefill };
     if (!started.current) {
       started.current = true;
+      const now = Date.now();
+      const decision = chooseStart(parseDraft(readDraftRaw(), emptyRepairForm(), now), prefill, now);
+      if (decision.use === "draft") {
+        const d = decision.draft;
+        setForm({ ...d.form, consent: false });
+        setStep(d.step);
+        setMaxStep(d.maxStep);
+        setPickupTouched(d.pickupTouched);
+        setRestored(true);
+      } else {
+        clearDraft();
+        if (Object.keys(prefill).length) setForm((f) => ({ ...f, ...prefill }));
+      }
+      draftReady.current = true;
       trackEvent("zgloszenie_start", { zrodlo: sp.has("category") || sp.has("usterka") ? "kreator" : "przycisk" });
-    }
+    } else if (Object.keys(prefill).length) setForm((f) => ({ ...f, ...prefill }));
   }, [sp]);
+
+  // Autosave (debounced); nothing worth keeping = the key is removed. Stops after a successful send.
+  useEffect(() => {
+    if (!draftReady.current || done) return;
+    const t = window.setTimeout(() => {
+      if (!sent.current) writeDraftRaw(serializeDraft({ form, step, maxStep, pickupTouched }, draftBase.current, Date.now()));
+    }, DRAFT_SAVE_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [form, step, maxStep, pickupTouched, done]);
+
+  /** "Zacznij od nowa": drops the draft and returns to step 1 (keeping only the wizard prefill). */
+  const startOver = () => {
+    clearDraft();
+    setForm(draftBase.current);
+    setStep(1);
+    setMaxStep(1);
+    setPickupTouched(false);
+    setErrors({});
+    setTouched(new Set());
+    setGeneral([]);
+    setRestored(false);
+    focusStep(1);
+  };
 
   // Logged-in client: contact data from /clients/me/ (KONTRAKT §1.5), never overwriting what was typed.
   useEffect(() => {
@@ -199,7 +242,6 @@ export function RepairForm() {
   // Pick-up point: asked only with two visible points; with one it is that point when needed.
   const askPickup = form.returnMethod === "in_person" && points.length > 1;
   // Until the client picks one, the pick-up point follows the drop-off point.
-  const [pickupTouched, setPickupTouched] = useState(false);
   useEffect(() => {
     const needs = form.returnMethod === "in_person";
     const fallback: PointKey | null = !needs ? null : form.dropoff && form.dropoff !== "courier" ? form.dropoff : form.dropoff === "courier" ? form.courierPoint ?? points[0]?.key ?? null : null;
@@ -336,6 +378,8 @@ export function RepairForm() {
     const result = await submitRepair(buildSubmitPayload(form), { token: isClient ? token : null });
     setSending(false);
     if (result.ok) {
+      sent.current = true;
+      clearDraft();
       const point = chosenPoint(form);
       trackEvent("zgloszenie_wyslane", { kategoria: form.category ?? "other", dostawa: form.dropoff === "courier" ? "kurier" : "punkt", ...(point ? { punkt: point } : {}) });
       setDone({ response: result.data, form });
@@ -738,6 +782,19 @@ export function RepairForm() {
     <div className="t-ui t-container t-zgl">
       <div className="t-zgl__main">
         <RepairFormHead />
+
+        {restored ? (
+          <div className="t-zgl__restored" role="status">
+            <span className="t-zgl__restoredico" aria-hidden="true">
+              <IconCheck size={14} strokeWidth={3} />
+            </span>
+            <span className="t-zgl__restoredt">Przywróciliśmy Twoje zgłoszenie</span>
+            <span className="t-zgl__restoreddot" aria-hidden="true">·</span>
+            <button type="button" className="t-zgl__restart" onClick={startOver} data-zgl-restart="">
+              Zacznij od nowa
+            </button>
+          </div>
+        ) : null}
 
         <div className="t-stepper" ref={stepsRef} style={{ ["--zgl-progress" as string]: (step - 1) / 4 }}>
           <span className="t-stepper__pill" aria-hidden="true" />

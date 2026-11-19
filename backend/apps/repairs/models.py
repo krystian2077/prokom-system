@@ -335,6 +335,14 @@ class RepairRequest(BaseModel):
         help_text=_("Szybkie przyjęcie — do uzupełnienia później"),
     )
 
+    # Z formularza publicznego: telefon podany przy TYM zgłoszeniu (klient o tym samym e-mailu
+    # mógł podać inny numer niż w profilu; śledzenie statusu przyjmuje oba).
+    contact_phone = models.CharField(
+        _("telefon podany w zgłoszeniu"),
+        max_length=20,
+        blank=True,
+        default="",
+    )
     # Z formularza publicznego: dodatkowe uwagi klienta, stan urządzenia
     client_notes = models.TextField(
         _("dodatkowe uwagi klienta"),

@@ -1,5 +1,7 @@
 /** TD4 PR 1: /punkty-serwisowe, /kontakt, /o-firmie (SPEC §5, §6, §12.1, §12.8; KONTRAKT §4). Production build (no draft). */
 import { expect, test, type Page } from "@playwright/test";
+import { GENERAL_EMAIL_LABEL, GENERAL_PHONE_LABEL, line, pointPhone, servicePoints, telHref } from "../../config/prokom";
+import { pointPhoneDisplay } from "../../lib/tech/point-format";
 
 const PAGES = ["/punkty-serwisowe", "/kontakt", "/o-firmie"];
 
@@ -127,4 +129,54 @@ test("free parking at both salons comes from parkingNote (15.11)", async ({ page
   await expect(page.getByText(/Gdzie zaparkować/)).toHaveCount(1);
   await page.goto("/serwis-telefonow-zakopane");
   await expect(page.locator("main")).toContainText("Bezpłatny parking.");
+});
+
+/** Runda 18.11 §1.2 (D5): a page about one point shows only that point's contact. */
+test.describe("kontakt punktów (runda 18.11)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  const rabka = servicePoints.find((p) => p.key === "rabka")!;
+  const zakopane = servicePoints.find((p) => p.key === "zakopane")!;
+  const shows = (p: typeof rabka) => `a[href="${telHref(pointPhone(p))}"]`;
+
+  for (const [path, own, other] of [
+    ["/serwis-telefonow-rabka-zdroj", rabka, zakopane],
+    ["/serwis-telefonow-zakopane", zakopane, rabka],
+  ] as const) {
+    test(`${path}: only the ${own.name} phone in the page body, never the other point's`, async ({ page }) => {
+      await page.goto(path);
+      const main = page.locator("main");
+      await expect(main.locator(shows(own)).first()).toBeVisible();
+      await expect(main.locator(shows(other))).toHaveCount(0);
+      await expect(main).not.toContainText(pointPhoneDisplay(other));
+      // the general number is not the point's number on its own page
+      await expect(main.locator(`.t-loc-hero a[href="${telHref(line.phone)}"]`)).toHaveCount(0);
+    });
+  }
+
+  test("/punkty-serwisowe and /kontakt: both points with their own phone + the general number labelled", async ({ page }) => {
+    for (const path of ["/punkty-serwisowe", "/kontakt"]) {
+      await page.goto(path);
+      const main = page.locator("main");
+      await expect(main.locator(shows(rabka)).first()).toBeVisible();
+      await expect(main.locator(shows(zakopane)).first()).toBeVisible();
+      await expect(main.locator(`a[href="${telHref(line.phone)}"]`).first()).toBeVisible();
+      await expect(main).toContainText(GENERAL_PHONE_LABEL);
+      await expect(main).toContainText(GENERAL_EMAIL_LABEL);
+    }
+  });
+
+  test("brand bar and footer: the general number with its label", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".t-brandbar__phone")).toContainText(`${GENERAL_PHONE_LABEL}: ${line.phoneDisplay}`);
+    await expect(page.locator(".t-footer__phone")).toContainText(GENERAL_PHONE_LABEL);
+  });
+
+  test("JSON-LD: each LocalBusiness carries its own point's phone", async ({ page }) => {
+    await page.goto("/");
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const graph = blocks.flatMap((t) => (JSON.parse(t)["@graph"] ?? []) as { "@type": string; "@id": string; telephone?: string }[]);
+    const tel = (key: string) => graph.find((n) => n["@type"] === "LocalBusiness" && n["@id"].endsWith(`#punkt-${key}`))?.telephone;
+    expect(tel("rabka")).toBe(pointPhone(rabka).replace(/[^\d+]/g, ""));
+    expect(tel("zakopane")).toBe(pointPhone(zakopane).replace(/[^\d+]/g, ""));
+  });
 });

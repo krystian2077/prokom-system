@@ -201,3 +201,23 @@ export function logoSpellsName(logo: BrandLogo, name: string): boolean {
   const [, , w, h] = logo.box.split(/\s+/).map(Number);
   return w / h >= 2.5 && logo.title.toLowerCase() === name.trim().toLowerCase();
 }
+
+/**
+ * Brands shown as their name in the site font instead of a mark on service, catalogue and salon
+ * pages (round 18.11, plan runda-1811-tech-marki.md §0):
+ * - Apple: no mark with the apple — the name "Apple" as text,
+ * - Samsung: the wordmark only once the distributor's rules allow it — TODO(krystian); until
+ *   then text as well.
+ * The home marquee (BrandMarquee) and the brand chips on the home page (CommonRepairs) keep the
+ * marks — TODO(krystian): open decision (plan §7.7).
+ */
+export const TEXT_MARK_BRANDS: ReadonlySet<string> = new Set(["apple", "samsung"]);
+
+export function isTextMark(logo: Pick<BrandLogo, "slug">): boolean {
+  return TEXT_MARK_BRANDS.has(logo.slug);
+}
+
+/** Card heading already shown by the mark: a text mark (it prints the card name) or a wordmark that spells it. */
+export function cardMarkSpellsName(logo: BrandLogo, name: string): boolean {
+  return isTextMark(logo) || logoSpellsName(logo, name);
+}

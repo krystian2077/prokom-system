@@ -33,7 +33,9 @@ describe("point-format", () => {
     expect(joinCities([rabka, zakopane])).toBe("Rabka-Zdrój i Zakopane");
     expect(isMainPoint(rabka)).toBe(true);
     expect(isMainPoint(zakopane)).toBe(false);
-    expect(pointPhoneDisplay(rabka)).toBe(line.phoneDisplay);
+    // runda 18.11 §1.2: each point shows its own number, never the general one
+    expect(pointPhoneDisplay(rabka)).not.toBe(line.phoneDisplay);
+    expect(pointPhoneDisplay(rabka)).not.toMatch(/^\+48/);
     expect(pointPhoneDisplay(zakopane)).not.toMatch(/^\+48/);
   });
 });

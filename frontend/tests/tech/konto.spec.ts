@@ -13,6 +13,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { randomBytes } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
+import { pinDaylight } from "./zegar";
 
 const API = process.env.TECH_API_URL || "http://localhost:8000";
 const credsFile = path.join(__dirname, ".client-test.local.json");
@@ -79,6 +80,7 @@ test.describe("konto klienta — ekrany logowania", () => {
 
   test("motyw konta to motyw strony publicznej, panel pracownika bez zmian", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
+    await pinDaylight(page);
     await page.addInitScript(() => {
       try {
         if (!sessionStorage.getItem("seeded")) {

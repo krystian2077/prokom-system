@@ -13,7 +13,7 @@ import { categoryOf, relatedPosts, serviceLinkOf } from "@/lib/tech/blog-taxonom
 import { repairForPost, repairPath } from "@/lib/tech/naprawy";
 import { formatPostDate, renderPostContent } from "@/lib/tech/blog-render";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
-import { breadcrumbJsonLd, faqJsonLd, type Crumb } from "@/lib/tech/seo";
+import { breadcrumbJsonLd, faqJsonLd, POST_TITLE_SUFFIX_MAX, type Crumb } from "@/lib/tech/seo";
 import { SITE_URL } from "@/lib/site-config";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     // Post titles are kept as they are (SPEC §12.11); `absolute` skips the suffix only when
     // the title is already long, so the full title stays readable in search results.
-    title: post.title.length > 44 ? { absolute: post.title } : post.title,
+    title: post.title.length > POST_TITLE_SUFFIX_MAX ? { absolute: post.title } : post.title,
     description: post.description,
     keywords: post.tags,
     alternates: { canonical: url },

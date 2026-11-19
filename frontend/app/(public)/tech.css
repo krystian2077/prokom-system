@@ -335,7 +335,8 @@ html[data-tech-theme="dark"] .tech {
 .tech .t-capsule .t-cta__short { display: inline; }
 .tech .t-capsule .t-iconbtn { width: 44px; height: 44px; border-radius: 13px; }
 @media (min-width: 1024px) {
-  .tech .t-capwrap { position: relative; padding-top: 4px; transform: none !important; }
+  /* sticky to the whole page (direct child of .t-shell); hides going down, returns going up (runda 18.11 §1.1) */
+  .tech .t-capwrap { padding-top: 4px; }
   .tech .t-capsule { height: 72px; padding: 0 12px 0 26px; border-radius: 22px; box-shadow: var(--cap-inset), var(--sh); }
   .tech .t-capsule__logo .t-logo { --l-size: 28px !important; }
   .tech .t-capsule__nav { display: flex; align-items: center; gap: 2px; }
@@ -464,6 +465,10 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-footer__contact { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; white-space: nowrap; }
 .tech .t-footer a.t-footer__phone { font-family: var(--t-font-head); font-weight: 800; font-size: 22px; color: var(--foot-ink-strong); }
 .tech .t-footer a.t-footer__mail { color: var(--foot-acc); font-weight: 700; font-size: 13px; }
+/* label of the general number (GENERAL_PHONE_LABEL, runda 18.11 §1.2) */
+.tech .t-footer__plabel, .tech .t-sheet__plabel { font-family: var(--t-font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.72; line-height: 1.3; }
+.tech .t-footer__plabel { display: inline-block; margin-right: 10px; vertical-align: 0.25em; }
+.tech .t-sheet__plabel { display: block; }
 .tech .t-footer__cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tech .t-footer__cards.is-single { grid-template-columns: minmax(0, 1fr); }
 .tech .t-footer__card { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); }
@@ -573,6 +578,7 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-sheet__phone { font-family: var(--t-font-head); font-weight: 800; font-size: 22px; }
 .tech .t-sheet__lines { display: flex; flex-wrap: wrap; gap: 6px; }
 .tech .t-sheet__lines a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 12px; border-radius: 11px; background: var(--bg2); font-size: 13px; font-weight: 700; }
+.tech .t-sheet__themenote { margin: 8px 2px 0; font-size: 13px; line-height: 1.45; color: var(--ink2); }
 .tech .t-sheet__lines a[aria-current] { box-shadow: inset 0 0 0 1.5px var(--acc); }
 .tech .t-sheet__devices { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .tech .t-sheet__device { min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 16px; border: 1.5px solid var(--bd); background: var(--card); font-size: 13.5px; font-weight: 700; text-align: center; padding: 6px; }

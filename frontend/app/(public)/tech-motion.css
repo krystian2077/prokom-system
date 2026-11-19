@@ -156,6 +156,8 @@
 .tech.t-theme-switching *::before,
 .tech.t-theme-switching *::after { transition: none !important; }
 .tech.t-theme-fade { animation: t-fade-in var(--m-small) var(--m-ease-out); }
+/* Auto theme changed on return to the tab (night fell): a calm 300 ms fade, no circle (MOTYW-PASEK-LINII §2.3) */
+.tech.t-theme-autofade { animation: t-fade-in 300ms var(--m-ease-out); }
 @keyframes t-fade-in {
   0% { opacity: 0.55; }
   100% { opacity: 1; }

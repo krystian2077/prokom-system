@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, telHref } from "@/config/prokom";
 import { hoursSummary } from "@/lib/tech/hours";
 import { directionsUrl, footerColumns } from "@/lib/tech/nav";
 import { saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconCheck } from "./icons";
+import { FooterPartners } from "./AlsenPartner";
 import { LegalBar } from "./LegalBar";
 import { LinesBand } from "./LinesBand";
 import { Logo } from "./Logo";
@@ -53,6 +54,7 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
             <span className="t-footer__h">Punkty serwisowe</span>
             <div className="t-footer__contact">
               <a href={telHref(line.phone)} className="t-footer__phone" data-track="telefon_klik" data-track-miejsce="stopka">
+                <span className="t-footer__plabel">{GENERAL_PHONE_LABEL}</span>
                 {line.phoneDisplay}
               </a>
               <a href={`mailto:${line.email}`} className="t-footer__mail">
@@ -88,6 +90,7 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
           </div>
         </div>
         <LinesBand />
+        <FooterPartners />
         <LegalBar />
       </div>
     </footer>

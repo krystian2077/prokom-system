@@ -93,6 +93,67 @@ test.describe("desktop 1440", () => {
     await expect(page.locator(".t-alert")).toContainText("Zbyt wiele zgłoszeń z tego urządzenia. Zadzwoń:");
   });
 
+  test("draft: a refresh after steps 1–2 restores data and step; a successful send clears it", async ({ page }) => {
+    const DRAFT = "pk-tech-zgloszenie-szkic:v1";
+    const stored = () => page.evaluate((k) => sessionStorage.getItem(k), DRAFT);
+    await mockSubmit(page, (route) => reply(route, "submit-201-phone-rabka"));
+    await page.goto("/zgloszenie");
+    await expect(page.locator(".t-zgl__restored")).toHaveCount(0);
+    const form = page.locator(".t-zgl__form");
+    await form.getByRole("radio", { name: "Telefon" }).click();
+    await page.getByLabel("Marka *").fill("Samsung");
+    await page.getByLabel("Model *").fill("Galaxy S23");
+    await page.getByRole("radio", { name: "Tak" }).click();
+    await page.getByLabel("Co się dzieje? *").fill("Pęknięty ekran po upadku.");
+    await page.locator("[data-zgl-next]").click();
+    await page.getByRole("radio", { name: /Osobiście · Rabka-Zdrój/ }).click();
+    await page.locator("[data-zgl-next]").click();
+    await expect(page.locator("#zgl-step-3.is-open")).toBeVisible();
+    await expect.poll(stored).toContain('"step":3');
+
+    await page.reload();
+    await expect(page.locator(".t-zgl__restored")).toContainText("Przywróciliśmy Twoje zgłoszenie");
+    await expect(page.locator("#zgl-step-3.is-open")).toBeVisible();
+    await expect(page.locator(".t-zgl__sum")).toContainText("Samsung Galaxy S23");
+    await expect(page.locator(".t-zgl__sum")).toContainText("Rabka-Zdrój, osobiście");
+    await page.locator(".t-steps__item").first().getByRole("button").click();
+    await expect(page.getByLabel("Marka *")).toHaveValue("Samsung");
+    await expect(page.getByLabel("Co się dzieje? *")).toHaveValue("Pęknięty ekran po upadku.");
+
+    // on to the end: the consent is never stored, the draft disappears after 201
+    await page.locator(".t-steps__item").nth(2).getByRole("button").click();
+    await page.locator("[data-zgl-next]").click();
+    await page.getByLabel("Imię *").fill("Jan");
+    await page.getByLabel("Nazwisko *").fill("Testowy");
+    await page.getByLabel("E-mail *").fill("jan.testowy@example.com");
+    await page.getByLabel("Telefon *").fill("+48 500 100 234");
+    await page.locator("[data-zgl-next]").click();
+    await page.locator("label.t-check", { hasText: "regulamin" }).locator("input").check();
+    await expect.poll(stored).toContain('"step":5');
+    expect(await stored()).not.toContain("consent");
+    await page.locator("[data-zgl-next]").click();
+    await expect(page.getByRole("heading", { name: "Zgłoszenie przyjęte" })).toBeVisible();
+    await expect.poll(stored).toBeNull();
+    await page.reload();
+    await expect(page.locator(".t-zgl__restored")).toHaveCount(0);
+    await expect(page.getByLabel("Model *")).toHaveValue("");
+  });
+
+  test("draft: a refreshed wizard link restores what was typed; 'Zacznij od nowa' keeps only the wizard prefill", async ({ page }) => {
+    const DRAFT = "pk-tech-zgloszenie-szkic:v1";
+    await page.goto("/zgloszenie?category=laptop");
+    await page.getByLabel("Model *").fill("ThinkPad T14");
+    await expect.poll(() => page.evaluate((k) => sessionStorage.getItem(k), DRAFT)).toContain("ThinkPad T14");
+    await page.reload();
+    await expect(page.locator(".t-zgl__restored")).toBeVisible();
+    await expect(page.getByLabel("Model *")).toHaveValue("ThinkPad T14");
+    await page.locator("[data-zgl-restart]").click();
+    await expect(page.locator(".t-zgl__restored")).toHaveCount(0);
+    await expect(page.getByLabel("Model *")).toHaveValue("");
+    await expect(page.locator(".t-zgl__form").getByRole("radio", { name: "Laptop" })).toHaveAttribute("aria-checked", "true");
+    await expect.poll(() => page.evaluate((k) => sessionStorage.getItem(k), DRAFT)).toBeNull();
+  });
+
   test("wizard parameters prefill the form; unpublished point and paczkomat are ignored", async ({ page }) => {
     await page.goto("/zgloszenie?category=laptop&usterka=Nie%20%C5%82aduje%20si%C4%99&punkt=rabka&dostawa=punkt");
     await expect(page.locator(".t-zgl__form").getByRole("radio", { name: "Laptop" })).toHaveAttribute("aria-checked", "true");

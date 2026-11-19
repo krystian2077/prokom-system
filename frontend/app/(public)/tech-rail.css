@@ -312,31 +312,39 @@ html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3,
 .tech .t-sdlg__row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .tech .t-sdlg__row .t-sdlg__title { margin: 0; }
 
-/* Quick action tiles: one row; wide enough → fills the window, narrower → scrolls sideways. */
+/* Quick actions: five slim pills in one row (icon + two short lines); narrower → scrolls sideways. */
 .tech .t-qa {
-  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(76px, 1fr); gap: 8px;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(max-content, 1fr); gap: 8px;
   margin: 0 -14px; padding: 2px 14px 6px; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: 14px;
   scrollbar-width: none; overscroll-behavior-x: contain;
 }
 .tech .t-qa::-webkit-scrollbar { display: none; }
 .tech .t-qa__tile {
-  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px;
-  min-width: 0; min-height: 96px; box-sizing: border-box; padding: 12px 4px 10px; scroll-snap-align: start;
-  border: 1px solid var(--bd); border-radius: 18px; background: var(--card); color: var(--ink);
-  font: inherit; text-align: center; text-decoration: none; cursor: pointer;
+  position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px;
+  min-width: 0; min-height: 52px; box-sizing: border-box; padding: 6px 14px 6px 6px; scroll-snap-align: start;
+  border: 1px solid var(--bd); border-radius: 16px; background: var(--card); color: var(--ink);
+  font: inherit; text-align: left; text-decoration: none; cursor: pointer; white-space: nowrap;
   box-shadow: inset 0 1px 0 var(--hair-top, transparent), 0 1px 2px rgba(18, 22, 19, 0.04);
   transition: transform var(--m-small) var(--m-ease-out), border-color var(--m-small) var(--m-ease-out), box-shadow var(--m-small) var(--m-ease-out), background-color var(--m-small) var(--m-ease-out);
 }
 .tech .t-sdlg[open] .t-qa__tile { animation: t-sdlg-rise 380ms var(--m-ease-emph) both; animation-delay: calc(90ms + var(--i, 0) * 28ms); }
 .tech .t-qa__icon {
-  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 13px;
+  display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 12px;
   background: color-mix(in srgb, var(--acc) 11%, var(--card)); color: var(--acct);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc) 16%, transparent);
   transition: transform var(--m-small) var(--m-ease-spring), background-color var(--m-small) var(--m-ease-out), color var(--m-small) var(--m-ease-out);
 }
-/* two lines for every label, so the small lines under them sit on one baseline */
-.tech .t-qa__label { display: flex; align-items: center; justify-content: center; min-height: 2.4em; max-width: 100%; font: 750 12.5px/1.2 var(--t-font-body); letter-spacing: -0.005em; }
-.tech .t-qa__sub { margin-top: auto; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink3, var(--ink2)); font: 600 11px/1.2 var(--t-font-body); }
+.tech .t-qa__text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tech .t-qa__label { font: 750 13.5px/1.2 var(--t-font-body); letter-spacing: -0.005em; }
+.tech .t-qa__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink3, var(--ink2)); font: 600 11.5px/1.2 var(--t-font-body); }
+/* ≥ 768: the five pills share the row evenly, nothing leaves the window */
+@media (min-width: 768px) {
+  .tech .t-qa:not(.t-qa--page) { display: flex; margin: 0; padding: 2px 0 6px; overflow: visible; }
+  .tech .t-qa:not(.t-qa--page) > .t-qa__tile { flex: 1 1 auto; }
+  .tech .t-qa__tile { gap: 8px; padding: 6px 10px 6px 6px; }
+  .tech .t-qa__icon { width: 34px; height: 34px; border-radius: 11px; }
+  .tech .t-qa__label { font-size: 13px; }
+}
 @media (hover: hover) {
   .tech .t-qa__tile:hover { transform: translateY(-2px); border-color: var(--softbd, var(--acc)); box-shadow: inset 0 1px 0 var(--hair-top, transparent), 0 14px 26px -16px rgba(196, 54, 43, 0.45); }
   .tech .t-qa__tile:hover .t-qa__icon { transform: scale(1.06); background: var(--acc); color: var(--onacc, #fff); }
@@ -471,10 +479,10 @@ html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3,
 @media (max-width: 767.98px) {
   .tech .t-sdlg__body { padding: 16px 12px calc(24px + env(safe-area-inset-bottom, 0px)); gap: 22px; }
   .tech .t-qa {
-    grid-auto-columns: 84px; margin: 0 -12px; padding: 2px 12px 6px; scroll-padding-inline: 12px;
+    grid-auto-columns: max-content; margin: 0 -12px; padding: 2px 12px 6px; scroll-padding-inline: 12px;
     -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
   }
-  .tech .t-qa__tile { min-height: 92px; }
+  .tech .t-qa__tile { min-height: 52px; }
   .tech .t-sdlg__field input { font-size: 17px; }
   /* chips: two rows that scroll sideways, so the categories stay in sight */
   .tech .t-sdlg .t-sdlg__chips {
@@ -521,13 +529,13 @@ html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3,
 .tech .t-szukaj__sec:nth-of-type(3) { animation-delay: 120ms; }
 .tech .t-szukaj__sec :is(.t-szukaj__title, .t-sdlg__chips) { padding-inline: 0; }
 .tech .t-szukaj__sec .t-szukaj__title { margin-bottom: 12px; }
-.tech .t-qa--page { margin: 0; padding: 2px 0 6px; grid-auto-columns: minmax(84px, 1fr); }
-.tech .t-qa--page .t-qa__tile { min-height: 104px; }
+.tech .t-qa--page { margin: 0; padding: 2px 0 6px; grid-auto-columns: minmax(max-content, 1fr); }
+.tech .t-qa--page .t-qa__tile { min-height: 56px; }
 .tech .t-szukaj__cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
 .tech .t-szukaj__cats .t-sdlg__cat { min-height: 64px; text-decoration: none; }
 .tech .t-szukaj__cats .t-sdlg__cat:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
 @media (max-width: 899.98px) {
-  .tech .t-qa--page { margin: 0 calc(-1 * var(--t-gutter, 16px)); padding-inline: var(--t-gutter, 16px); grid-auto-columns: 88px; scroll-padding-inline: var(--t-gutter, 16px); }
+  .tech .t-qa--page { margin: 0 calc(-1 * var(--t-gutter, 16px)); padding-inline: var(--t-gutter, 16px); grid-auto-columns: max-content; scroll-padding-inline: var(--t-gutter, 16px); }
 }
 @media (max-width: 719.98px) {
   .tech .t-szukaj__cats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -543,4 +551,26 @@ html[data-tech-theme="dark"] .tech .t-sdlg::backdrop { background: rgba(5, 3, 3,
   .tech :is(.t-sdlg__sec, .t-sdlg__chips > *, .t-qa__tile, .t-sdlg__cats > li, .t-sdlg__list > .t-sdlg__group, .t-sdlg__none, .t-sdlg__clear, .t-qa__icon, .t-sdlg__skel, .t-szukaj__sec) { animation: none !important; }
   .tech :is(.t-qa__tile, .t-qa__icon, .t-sdlg__cat, .t-sdlg__caticon, .t-sdlg__chip) { transition: none; }
   .tech .t-main [data-arrive] :is(h1, h2) { animation: none; }
+}
+
+/* ---------- Theme entry above „Do góry” (runda 18.11 §1.3, MOTYW-PASEK-LINII §6) ---------- */
+.tech .t-rail__themewrap { flex: none; display: flex; flex-direction: column; }
+.tech .t-rail__theme .t-rail__icon { color: inherit; }
+/* moon and sun share the icon cell; data-tech-theme picks one (same rule as the capsule button) */
+.tech .t-rail__themeico { display: grid; place-items: center; }
+.tech .t-rail__themeico > svg { grid-area: 1 / 1; width: 21px; height: 21px; }
+/* Jasny · Ciemny · Auto unfolds with the rail (no jump when folded) */
+.tech .t-rail__themes { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--m-small) var(--m-ease-out) var(--rail-close-delay); }
+.tech .t-rail__themes > * { min-height: 0; overflow: hidden; }
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) .t-rail__themes { grid-template-rows: 1fr; transition-delay: var(--rail-open-delay); }
+.tech .t-rail__seg { position: relative; isolation: isolate; display: flex; gap: 2px; margin: 2px 8px 6px 46px; padding: 3px; border-radius: 999px; background: var(--bg2); visibility: hidden; transition: visibility 0s linear var(--rail-close-delay); }
+.tech .t-rail:is(:hover, :focus-within):not([data-collapsed]) .t-rail__seg { visibility: visible; transition-delay: 0s; }
+.tech .t-rail__seg > button { position: relative; z-index: 1; flex: 1; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: none; color: var(--ink2); font: 700 12.5px/1 var(--t-font-body); cursor: pointer; }
+.tech .t-rail__seg > button.is-on { color: var(--ink); background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+.tech [data-pill-ready].t-rail__seg > button.is-on { background: transparent; box-shadow: none; }
+.tech .t-rail__seg > .t-pilltabs__pill { top: 3px; bottom: auto; height: 28px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+html[data-tech-theme="dark"] .tech .t-rail__seg > .t-pilltabs__pill,
+html[data-tech-theme="dark"] .tech .t-rail__seg > button.is-on { background: var(--raised); }
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-rail__themes, .tech .t-rail__seg { transition: none; }
 }

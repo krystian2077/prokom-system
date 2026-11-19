@@ -3,8 +3,8 @@ import { line, servicePoints, telHref } from "@/config/prokom";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
-import { BrandLogo } from "@/components/tech/BrandLogo";
-import { cardBrandLogos, logoSpellsName } from "@/components/tech/brand-logos";
+import { CardBrandMark } from "@/components/tech/BrandLogo";
+import { cardBrandLogos, cardMarkSpellsName } from "@/components/tech/brand-logos";
 import { deviceSeo, hubCards, type DevicePage as DevicePageData } from "@/lib/tech/devices";
 import { REPAIRS_HREF } from "@/lib/tech/nav";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
@@ -17,7 +17,7 @@ import { DeviceIntake, DeviceIntro, DevicePosts, DeviceSymptoms, DeviceWarranty,
 import { RepairSteps } from "./RepairSteps";
 import { FaultVisual } from "../subhero/FaultVisual";
 import { SubHero } from "../subhero/SubHero";
-import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
+import { DATA_RECOVERY_PROMISES, HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
 
 export function deviceMetadata(page: DevicePageData) {
   return pageMetadata({ ...deviceSeo(page, publishedPoints(servicePoints)), path: page.path });
@@ -120,10 +120,10 @@ export function DevicePage({ page }: { page: DevicePageData }) {
               <li key={k.n} className="t-card t-kinds__item">
                 {kindLogos ? (
                   <span className="t-kinds__logo">
-                    <BrandLogo brand={kindLogos[i]} hidden />
+                    <CardBrandMark logo={kindLogos[i]} name={k.n} />
                   </span>
                 ) : null}
-                <span className={kindLogos && logoSpellsName(kindLogos[i], k.n) ? "t-h3 t-visually-hidden" : "t-h3"}>{k.n}</span>
+                <span className={kindLogos && cardMarkSpellsName(kindLogos[i], k.n) ? "t-h3 t-visually-hidden" : "t-h3"}>{k.n}</span>
                 <span>{k.s}</span>
               </li>
             ))}
@@ -133,7 +133,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
 
       <DeviceIntake note={page.extra.intake} points={visible} />
       <RepairSteps title="Cztery kroki do sprawnego sprzętu" />
-      <DeviceWarranty text={page.extra.warranty} />
+      <DeviceWarranty text={page.extra.warranty} title={page.category === "data_recovery" ? "Odzysk danych a gwarancja" : undefined} />
       <DataSafety />
       {HAMMER[page.category] ? <HammerTeaser what={HAMMER[page.category]!} /> : null}
 
@@ -149,7 +149,7 @@ export function DevicePage({ page }: { page: DevicePageData }) {
                 <p>{page.note.text}</p>
               </div>
             ) : null}
-            <QuickPromise />
+            <QuickPromise category={page.category} />
           </div>
           <Faq items={page.faq} />
         </div>
@@ -171,13 +171,16 @@ export function DevicePage({ page }: { page: DevicePageData }) {
 const HAMMER: Partial<Record<string, string>> = { tablet: "do Twojego tabletu", smartwatch: "do Twojego zegarka" };
 
 /** Confirmed promises only (SPEC §8): quote before repair, resign, warranty, status online. */
-function QuickPromise() {
+function QuickPromise({ category }: { category: string }) {
+  const items =
+    category === "data_recovery"
+      ? DATA_RECOVERY_PROMISES
+      : ["Wycena przed naprawą", "Możesz zrezygnować", "Gwarancja na usługę i części", "Status naprawy online"];
   return (
     <ul className="t-dev-promises">
-      <li>Wycena przed naprawą</li>
-      <li>Możesz zrezygnować</li>
-      <li>Gwarancja na usługę i części</li>
-      <li>Status naprawy online</li>
+      {items.map((t) => (
+        <li key={t}>{t}</li>
+      ))}
     </ul>
   );
 }

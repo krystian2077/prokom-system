@@ -25,6 +25,16 @@ export const line = {
   email: "kontakt@prokomserwis.pl",
 } as const;
 
+/**
+ * Label of the line's general number (`line.phone`) wherever it stands for the whole service:
+ * brand bar, footer, CTAs, FAQ, menu (runda 18.11 §1.2). A page about one point shows only
+ * that point's own phone and e-mail.
+ */
+// TODO(krystian): nazwa numeru ogólnego od szefa („Infolinia”?) — zmiana tylko tutaj.
+export const GENERAL_PHONE_LABEL = "Infolinia";
+/** Label of `line.email` shown in place of a point's own address while the point has none. */
+export const GENERAL_EMAIL_LABEL = "E-mail ogólny";
+
 export type PointKey = "rabka" | "zakopane";
 
 /** Day groups used in `hours`. */
@@ -38,8 +48,13 @@ export type ServicePoint = {
   city: string;
   geo: { lat: number; lng: number } | null;
   hours: { days: DaysKey; open: string | null; close: string | null }[];
-  /** null = line.phone */
-  phone: string | null;
+  /** The point's own number (shown wherever one point is meant; never replaced by line.phone). */
+  phone: string;
+  /**
+   * The point's own e-mail; null = none yet → the page shows line.email labelled GENERAL_EMAIL_LABEL.
+   * The mailbox or alias must exist (DirectAdmin SH 1) before an address goes here.
+   */
+  email: string | null;
   mapsUrl: string | null;
   /** Where to park (free parking at both salons, Krystian 15.11.2026). null = not shown. */
   parkingNote: string | null;
@@ -59,7 +74,11 @@ export const servicePoints: ServicePoint[] = [
       { days: "sob", open: "09:00", close: "14:00" },
       { days: "nd", open: null, close: null },
     ],
-    phone: null,
+    // The number pro-kom.eu shows as „serwis PRO-KOM Tech Rabka” (runda 18.11 §1.2).
+    // TODO(krystian): potwierdzenie szefa, że to numer punktu w Rabce.
+    phone: "+48 18 541 20 55",
+    // TODO(krystian): rabka@prokomserwis.pl — decyzja szefa (alias do kontakt@ czy skrzynka); wpisać po założeniu w SH 1.
+    email: null,
     mapsUrl: null,
     parkingNote: "Bezpłatny parking przy salonie.",
     published: true,
@@ -78,6 +97,8 @@ export const servicePoints: ServicePoint[] = [
       { days: "nd", open: null, close: null },
     ],
     phone: "+48 18 541 20 15",
+    // TODO(krystian): zakopane@prokomserwis.pl — decyzja szefa (alias do kontakt@ czy skrzynka); wpisać po założeniu w SH 1.
+    email: null,
     mapsUrl: null,
     parkingNote: "Bezpłatny parking.",
     published: true,
@@ -180,6 +201,24 @@ export const lines: Line[] = [
   { key: "gaming", name: "Gaming", label: "GAMING", domain: "prokomgaming.pl", description: "Komputery gamingowe · marka PRO-KOM", dash: "#D9A400", dashDark: "#F2C230" },
 ];
 
+/**
+ * Partners and authorisations (runda 18.11 §1.5). PRO-KOM is an authorised ALSEN partner — logo use
+ * agreed by Krystian 18.11.2026. No shop copying ALSEN prices or stock.
+ */
+export const partners = {
+  alsen: {
+    name: "ALSEN",
+    url: "https://www.alsen.pl/",
+    /** Trimmed logo from Krystian (seed/partnerzy/alsen.png); WebP for the page, PNG kept as the source. */
+    // TODO(krystian): docelowo SVG od ALSEN.
+    logo: { src: "/tech/partnerzy/alsen.webp", width: 630, height: 160 },
+    /** The point that is an ALSEN partner point. */
+    pointKey: "rabka" as PointKey,
+    // TODO(krystian): potwierdzić, że punkt partnerski ALSEN to salon przy ul. Orkana 16B — do tego czasu bez plakietki i bez adresu.
+    pointConfirmed: false,
+  },
+} as const;
+
 export const social = {
   facebook: "https://www.facebook.com/prokomrabka",
 } as const;
@@ -189,6 +228,12 @@ export function telHref(phone: string): string {
   return `tel:${phone.replace(/[^\d+]/g, "")}`;
 }
 
-export function pointPhone(p: ServicePoint): string {
-  return p.phone ?? line.phone;
+/** A point's own phone (runda 18.11 §1.2: no fallback to the general number). */
+export function pointPhone(p: Pick<ServicePoint, "phone">): string {
+  return p.phone;
+}
+
+/** A point's e-mail, or line.email marked `general` (shown with GENERAL_EMAIL_LABEL) while it has none. */
+export function pointEmail(p: Pick<ServicePoint, "email">): { email: string; general: boolean } {
+  return p.email ? { email: p.email, general: false } : { email: line.email, general: true };
 }

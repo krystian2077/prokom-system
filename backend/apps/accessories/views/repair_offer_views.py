@@ -2,7 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from apps.common.permissions import IsStaffOrAdmin
 
 from apps.accessories.models import RepairAccessoryOffer, AccessoryProduct
 from apps.accessories.serializers import (
@@ -18,7 +18,7 @@ class RepairAccessoryOfferViewSet(viewsets.ReadOnlyModelViewSet):
     Tworzenie: POST z product_id, quantity, note (w kontekście naprawy).
     """
     serializer_class = RepairAccessoryOfferSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStaffOrAdmin]
     filterset_fields = ["repair", "accepted"]
 
     def get_queryset(self):

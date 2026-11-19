@@ -83,7 +83,7 @@ export function DeviceIntake({ note, points, what = "sprzęt" }: { note: string;
   );
 }
 
-export function DeviceWarranty({ text }: { text: string }) {
+export function DeviceWarranty({ text, title = "Gwarancja na usługę i wymienione części" }: { text: string; title?: string }) {
   return (
     <section className="t-section t-section--tight" id="gwarancja" data-rail="Gwarancja">
       <div className="t-container">
@@ -93,7 +93,7 @@ export function DeviceWarranty({ text }: { text: string }) {
           </span>
           <div>
             <span className="t-eyebrow">Gwarancja</span>
-            <h2 className="t-h2 t-h2--sm">Gwarancja na usługę i wymienione części</h2>
+            <h2 className="t-h2 t-h2--sm">{title}</h2>
             <p className="t-lead">{text}</p>
           </div>
         </div>

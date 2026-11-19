@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { company, line, servicePoints, telHref } from "@/config/prokom";
+import { GENERAL_EMAIL_LABEL, GENERAL_PHONE_LABEL, company, line, pointEmail, pointPhone, servicePoints, telHref } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { Faq } from "@/components/tech/Faq";
 import { IconChevronRight } from "@/components/tech/icons";
@@ -10,7 +10,7 @@ import { LineCards } from "@/components/tech/LineCards";
 import { OpeningStatus } from "@/components/tech/OpeningStatus";
 import { PageIconSvg } from "@/components/tech/page-icons";
 import { AboutIconSvg } from "@/components/tech/about/about-icons";
-import { hoursLong, inCity, isMainPoint } from "@/lib/tech/point-format";
+import { hoursLong, inCity, isMainPoint, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
@@ -53,6 +53,7 @@ export default function ContactPage() {
                 Zadzwoń albo napisz.
                 <span>{two ? "Odpowiadamy w godzinach pracy punktów." : "Odpowiadamy w godzinach pracy punktu."}</span>
               </h1>
+              <span className="t-ct2-hero__plabel">{GENERAL_PHONE_LABEL} · oba punkty</span>
               <a href={telHref(line.phone)} className="t-ct2-hero__phone" data-track="telefon_klik" data-track-miejsce="kontakt_hero">
                 {line.phoneDisplay}
               </a>
@@ -73,7 +74,7 @@ export default function ContactPage() {
                   <PageIconSvg icon="mail" />
                 </span>
                 <span className="t-ct2-tile__txt">
-                  <span className="t-ct2-tile__kick">E-mail</span>
+                  <span className="t-ct2-tile__kick">{GENERAL_EMAIL_LABEL}</span>
                   {/* break only after "@" on narrow phones, never inside the domain */}
                   <b>
                     {line.email.split("@")[0]}@<wbr />
@@ -83,7 +84,8 @@ export default function ContactPage() {
                 <IconChevronRight className="t-ct2-tile__arrow" />
               </a>
               {points.map((p) => (
-                <Link key={p.key} href={POINTS_HREF} className={`t-ct2-tile${p.draft ? " t-draft" : ""}`}>
+                // one point = its own phone and e-mail (runda 18.11 §1.2); the name is the card's link
+                <div key={p.key} className={`t-ct2-tile t-ct2-tile--point${p.draft ? " t-draft" : ""}`}>
                   <span className="t-ct2-tile__ico" aria-hidden="true">
                     <PageIconSvg icon="pin" />
                   </span>
@@ -92,15 +94,25 @@ export default function ContactPage() {
                       {isMainPoint(p) ? "Punkt główny" : `Punkt ${inCity(p.city)}`}
                       {p.draft ? <span className="t-draft-badge">do uzupełnienia</span> : null}
                     </span>
-                    <b className="t-ct2-tile__city">{p.name}</b>
+                    <b className="t-ct2-tile__city">
+                      <Link href={POINTS_HREF} className="t-ct2-tile__link" data-t-inline="">
+                        {p.name}
+                      </Link>
+                    </b>
                     <span className="t-ct2-tile__sub">
                       {p.street ? `${p.street} · ` : ""}
                       {hoursLong(p)}
                     </span>
                     <OpeningStatus points={[p]} className="t-status--stage-text t-ct2-tile__status" skeletonCh={18} />
+                    <span className="t-ct2-tile__links">
+                      <a href={telHref(pointPhone(p))} data-track="telefon_klik" data-track-miejsce={`kontakt_${p.key}`}>
+                        tel. {pointPhoneDisplay(p)}
+                      </a>
+                      {pointEmail(p).general ? null : <a href={`mailto:${pointEmail(p).email}`}>{pointEmail(p).email}</a>}
+                    </span>
                   </span>
                   <IconChevronRight className="t-ct2-tile__arrow" />
-                </Link>
+                </div>
               ))}
               <p className="t-ct2-hero__note">
                 {company.name} · NIP {company.nip}

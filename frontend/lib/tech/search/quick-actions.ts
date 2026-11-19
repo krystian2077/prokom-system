@@ -6,7 +6,7 @@
  * appears only when published (never a draft, also on staging). Client-safe and pure: the window
  * and `/szukaj` render the same list.
  */
-import { line, pointPhone, servicePoints, telHref, type ServicePoint } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, pointPhone, servicePoints, telHref, type ServicePoint } from "@/config/prokom";
 import { getOpeningStatus } from "../hours";
 import { SUBMIT_HREF, TRACK_HREF, directionsUrl } from "../nav";
 import { publishedPoints } from "../points";
@@ -89,8 +89,8 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
     kind: "call",
     label: `Zadzwoń · ${line.phoneDisplay}`,
     short: "Zadzwoń",
-    sub: main ? pointName(main) : line.phoneDisplay,
-    hint: main ? `${line.phoneDisplay} · ${pointName(main)}` : line.phoneDisplay,
+    sub: main ? pointName(main) : GENERAL_PHONE_LABEL,
+    hint: main ? `${line.phoneDisplay} · ${pointName(main)}` : `${line.phoneDisplay} · ${GENERAL_PHONE_LABEL.toLowerCase()}`,
     icon: "call",
     href: telHref(line.phone),
     track: { event: "telefon_klik", params: { miejsce: "szukaj" } },
@@ -152,7 +152,7 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
     id: "track",
     kind: "track",
     label: "Sprawdź status naprawy",
-    short: "Status naprawy",
+    short: "Status",
     sub: "Po numerze",
     hint: "Po numerze zgłoszenia",
     icon: "track",
@@ -187,6 +187,12 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
 export function routeActions(points: readonly ServicePoint[] = publishedPoints(servicePoints)): QuickAction[] {
   return points.filter((p) => p.published && p.geo).map((p) => routeAction(p, `route:${p.key}`));
 }
+
+/**
+ * Kinds shown as tiles in the empty window (Krystian 17.11: nine tiles were too much). The rest
+ * (copy, e-mail, contact, theme) still answer a query such as „kopiuj” or „motyw”.
+ */
+export const TILE_KINDS: ReadonlySet<QuickAction["kind"]> = new Set<QuickAction["kind"]>(["call", "call2", "route", "submit", "track"]);
 
 /** Most actions shown above the results. */
 export const MATCHED_ACTIONS_MAX = 3;

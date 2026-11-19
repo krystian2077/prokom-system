@@ -19,6 +19,7 @@ const IGNORE = /(\.test\.ts|\.spec\.ts)$/;
 const CONTACT_LITERALS: [string, RegExp][] = [
   ["telefon serwisu", /883[\s-]?200[\s-]?151/],
   ["telefon Zakopane", /18[\s-]?541[\s-]?20[\s-]?15/],
+  ["telefon Rabka", /18[\s-]?541[\s-]?20[\s-]?55/],
   ["e-mail", /[\w.+-]+@(pro-kom\.eu|prokomserwis\.pl)/i],
   ["adres Rabka", /Orkana\s+16/i],
   ["adres Zakopane", /Staszica\s+8/i],
@@ -42,7 +43,9 @@ function walk(dir: string): string[] {
     return EXT.test(e.name) && !IGNORE.test(e.name) ? [rel] : [];
   });
 }
-const files = SCAN_DIRS.flatMap(walk);
+/** Single files outside the scanned folders (blog content, 19.11: contacts from config/prokom.ts). */
+const SCAN_FILES = ["lib/blog-posts.ts"];
+const files = [...SCAN_DIRS.flatMap(walk), ...SCAN_FILES.filter((f) => fs.existsSync(path.join(FRONTEND, f)))];
 const read = (rel: string) => fs.readFileSync(path.join(FRONTEND, rel), "utf8");
 
 function contactHits(rel: string): string[] {

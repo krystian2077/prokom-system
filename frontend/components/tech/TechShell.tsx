@@ -8,15 +8,17 @@ import { Footer } from "./Footer";
 import { MenuSheet } from "./MenuSheet";
 import { MotionRoot } from "./MotionRoot";
 import { NoticeBar } from "./NoticeBar";
-import { SearchDialog } from "./search/SearchDialog";
+import { LazySearchDialog } from "./search/LazySearchDialog";
 import { SectionRail } from "./SectionRail";
 import { ShellProvider } from "./ShellContext";
 import { TabBar } from "./TabBar";
+import { ThemeCarry } from "./ThemeCarry";
 import { TrackClicks } from "./TrackClicks";
 import { Typeset } from "./Typeset";
 
 /**
- * Public-site shell (SPEC §7, RESPONSYWNOSC): notice, brand bar and capsule on top,
+ * Public-site shell (SPEC §7, RESPONSYWNOSC): notice and brand bar on top (they scroll away),
+ * the capsule right under them (sticky to the whole page),
  * side rail ≥ 1424, footer, search window (Ctrl/⌘ K, „/”); on phones and tablet portrait the bottom tab bar and sheets.
  */
 export function TechShell({ children }: { children: ReactNode }) {
@@ -32,8 +34,10 @@ export function TechShell({ children }: { children: ReactNode }) {
         <div className="t-header t-ui" data-t-region="header">
           <NoticeBar notices={notices} />
           <BrandBar points={points} />
-          <Capsule />
         </div>
+        {/* Outside .t-header on purpose: `sticky` holds only within the parent, and the header is
+            just as tall as the notice + brand bar, so the capsule scrolled away with them (runda 18.11 §1.1). */}
+        <Capsule />
         <SectionRail />
         <main id="tresc" className="t-main" tabIndex={-1}>
           {children}
@@ -42,9 +46,10 @@ export function TechShell({ children }: { children: ReactNode }) {
         <div className="t-ui">
           <TabBar />
           <MenuSheet />
-          <SearchDialog />
+          <LazySearchDialog />
         </div>
         <TrackClicks />
+        <ThemeCarry />
         <MotionRoot />
         <Typeset />
       </div>

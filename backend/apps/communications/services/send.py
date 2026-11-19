@@ -310,7 +310,7 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         "email": getattr(settings, "SERWIS_PRINT_EMAIL", "sklep@pro-kom.eu"),
         "website": getattr(settings, "SERWIS_PRINT_WEBSITE", "www.pro-kom.eu"),
     }
-    client_phone = (getattr(repair.client, "phone", None) or "").strip()
+    client_phone = (getattr(repair, "contact_phone", "") or getattr(repair.client, "phone", None) or "").strip()
     phone_last4 = _phone_last4_email(client_phone)
     track_url = f"{base}/track"
     track_url_with_ref = f"{base}/track?ref={repair.repair_number}"

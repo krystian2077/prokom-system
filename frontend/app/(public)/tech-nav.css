@@ -222,6 +222,8 @@ html[data-tech-theme="dark"] .tech .t-tabbar { box-shadow: var(--cap-inset), 0 2
     overflow: hidden;
     filter: brightness(0.92);
   }
+  /* the capsule shrinks with the page (no clipping: its shadow stays); a hidden one stays hidden */
+  .tech.t-sheet-open .t-capwrap:not(.is-hidden) { transform: scale(0.94); filter: brightness(0.92); }
 }
 .tech .t-sheet__scrim { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .tech .t-sheet__panel { transition: transform var(--m-panel) var(--m-ease-emph), visibility 0s linear var(--m-panel); }
@@ -250,7 +252,135 @@ html[data-tech-theme="dark"] .tech .t-segmented > .t-pilltabs__pill { background
 @media (prefers-reduced-motion: reduce) {
   .tech .t-capwrap.is-compact .t-capsule { transform: none; }
   .tech.t-sheet-open .t-header,
+  .tech.t-sheet-open .t-capwrap:not(.is-hidden),
   .tech.t-sheet-open .t-main,
   .tech.t-sheet-open [data-t-region="footer"] { transform: none; filter: none; }
 }
 .tech.t-reduced .t-capwrap.is-compact .t-capsule { transform: none; }
+
+/* ---------- Theme button with a label (runda 18.11 §1.3, MOTYW-PASEK-LINII §1) ---------- */
+.tech .t-themebtn {
+  height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px 0 12px; flex-shrink: 0;
+  border-radius: 14px; border: 1px solid var(--capbd); background: transparent; color: var(--ink);
+  font: inherit; font-size: 13.5px; font-weight: 600; white-space: nowrap; cursor: pointer;
+}
+.tech .t-themebtn:hover { background: var(--bg2); }
+.tech .t-themebtn:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+/* the two icons and the two labels each share one cell: the button keeps the longer label's width */
+.tech .t-themebtn__icons, .tech .t-themebtn__labels { display: inline-grid; }
+.tech .t-themebtn__icons > *, .tech .t-themebtn__labels > * { grid-area: 1 / 1; }
+.tech .t-themebtn__icons { width: 18px; height: 18px; color: var(--acct); }
+.tech .t-themebtn__ico { transition: transform var(--m-small) var(--m-ease-out); }
+.tech .t-themebtn__labels { text-align: left; }
+/* light page → „Ciemny motyw” + moon; dark page → „Jasny motyw” + sun (attribute set before paint) */
+.tech .t-themebtn__ico--to-light, .tech .t-themebtn__label--to-light { visibility: hidden; }
+html[data-tech-theme="dark"] .tech .t-themebtn__ico--to-dark,
+html[data-tech-theme="dark"] .tech .t-themebtn__label--to-dark { visibility: hidden; }
+html[data-tech-theme="dark"] .tech .t-themebtn__ico--to-light,
+html[data-tech-theme="dark"] .tech .t-themebtn__label--to-light { visibility: visible; }
+@media (hover: hover) {
+  .tech .t-themebtn:hover .t-themebtn__ico { transform: rotate(20deg); }
+}
+/* after a click (class restarted from JS): the new icon turns in (90°) and the label slides 4 px as
+   the circle reaches the button; the hidden pair animates unseen */
+.tech .t-themebtn.is-anim .t-themebtn__ico { animation: t-themebtn-ico 200ms var(--m-ease-out) both; }
+.tech .t-themebtn.is-anim .t-themebtn__label { animation: t-themebtn-label 200ms var(--m-ease-out) 120ms both; }
+@keyframes t-themebtn-ico { from { opacity: 0; transform: rotate(-90deg); } to { opacity: 1; transform: none; } }
+@keyframes t-themebtn-label { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-themebtn .t-themebtn__ico, .tech .t-themebtn .t-themebtn__label { animation: none !important; transition: none; transform: none !important; }
+}
+.tech.t-reduced .t-themebtn .t-themebtn__ico, .tech.t-reduced .t-themebtn .t-themebtn__label { animation: none !important; transform: none !important; }
+/* 1024–1359: „Ciemny” / „Jasny” — the rest stays in the accessible name */
+@media (min-width: 1024px) and (max-width: 1359.98px) {
+  .tech .t-capsule .t-themebtn__rest { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .tech .t-capsule .t-themebtn { height: 42px; padding: 0 10px 0 9px; gap: 6px; }
+}
+
+/* ---------- Brand bar premium (runda 18.11 §1.4, MOTYW-PASEK-LINII §4) ---------- */
+@media (min-width: 1024px) {
+  .tech .t-brandbar__lines { position: relative; isolation: isolate; align-items: center; gap: 6px; }
+  .tech .t-brandbar__lines a.t-bline {
+    position: relative; z-index: 1; display: flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px;
+    line-height: 1.1; font-weight: 600; color: var(--ink2); transition: color 180ms var(--m-ease-emph);
+  }
+  .tech .t-brandbar__lines a.t-bline:hover, .tech .t-brandbar__lines a.t-bline.is-hot { color: var(--ink); }
+  .tech .t-brandbar__lines a.t-bline:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px; }
+  /* the dash lives: 11 → 18 px with a soft glow; the current line keeps 18 px */
+  .tech .t-bline .t-dash { width: 11px; background: var(--line); transition: width 180ms var(--m-ease-emph), box-shadow 180ms var(--m-ease-out); }
+  html[data-tech-theme="dark"] .tech .t-bline .t-dash { background: var(--line-dark); }
+  .tech .t-bline:is(.is-hot, :focus-visible, .is-current) .t-dash { width: 18px; }
+  .tech .t-bline:is(.is-hot, :focus-visible) .t-dash { box-shadow: 0 0 10px color-mix(in srgb, var(--line) 55%, transparent); }
+  html[data-tech-theme="dark"] .tech .t-bline:is(.is-hot, :focus-visible) .t-dash { box-shadow: 0 0 10px color-mix(in srgb, var(--line-dark) 55%, transparent); }
+  /* the current line (Tech): a light pill in its own colour */
+  .tech .t-brandbar__lines a.t-bline.is-current { font-weight: 800; color: var(--ink); background: color-mix(in srgb, var(--line) 11%, transparent); }
+  html[data-tech-theme="dark"] .tech .t-brandbar__lines a.t-bline.is-current { background: color-mix(in srgb, var(--line-dark) 16%, transparent); }
+  /* one pill follows the pointer and the focus (usePill), back under the current line on leave */
+  .tech .t-brandbar__pill {
+    position: absolute; z-index: 0; left: 0; top: var(--pill-y, 0px); height: var(--pill-h, 0px); width: var(--pill-w, 0px);
+    transform: translateX(var(--pill-x, 0px)); border-radius: 999px; background: color-mix(in srgb, var(--bd) 60%, transparent); pointer-events: none;
+  }
+  .tech [data-pill-ready] > .t-brandbar__pill { transition: transform 180ms var(--m-ease-emph), width 180ms var(--m-ease-emph); }
+  /* description after 350 ms of pointing or on focus (never on touch) */
+  .tech .t-brandbar__tip {
+    position: absolute; z-index: 2; top: calc(100% + 6px); left: var(--tip-x, 0px); transform: translateX(-50%);
+    padding: 7px 11px; border-radius: 10px; background: var(--ink); color: var(--bg); font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap;
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.45); pointer-events: none; animation: t-brandbar-tip 160ms var(--m-ease-out) both;
+  }
+  /* above the capsule (a later sibling with the same z-index) only while a description shows */
+  .tech .t-header:has(.t-brandbar__tip) { z-index: 910; }
+  @keyframes t-brandbar-tip { from { opacity: 0; transform: translate(-50%, -3px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  /* entrance once per visit (sessionStorage) */
+  .tech .t-brandbar__lines.is-enter a.t-bline { animation: t-bline-in 260ms var(--m-ease-out) both; animation-delay: calc(var(--i, 0) * 30ms); }
+  @keyframes t-bline-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  /* right part: its own thin divider instead of a separator character */
+  .tech .t-brandbar__right { position: relative; padding-left: 20px; }
+  .tech .t-brandbar__right::before { content: ""; position: absolute; left: 0; top: 50%; width: 1px; height: 16px; margin-top: -8px; background: var(--bd); }
+}
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .tech .t-brandbar__lines { gap: 2px; }
+  .tech .t-brandbar__lines a.t-bline { padding: 6px 8px; }
+  .tech .t-brandbar__right { padding-left: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tech .t-brandbar__lines a.t-bline, .tech .t-bline .t-dash, .tech [data-pill-ready] > .t-brandbar__pill { transition: none; }
+  .tech .t-brandbar__lines.is-enter a.t-bline, .tech .t-brandbar__tip { animation: none; }
+}
+.tech.t-reduced .t-brandbar__lines.is-enter a.t-bline, .tech.t-reduced .t-brandbar__tip { animation: none; }
+
+/* moved from tech-catalog.css (19.11): the capsule is shared with /client, which loads tech-nav.css but not tech-catalog.css */
+/* ---------- Capsule „Sprzedaż” mega menu and the enquiry icon (runda 18.11 v2 §2) ---------- */
+.tech .t-mega__sales { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr) minmax(0, 1fr); gap: 18px; padding: 22px; }
+.tech .t-mega__salescol { display: flex; flex-direction: column; gap: 10px; padding: 6px 8px; animation: t-mega-item var(--m-panel, 320ms) var(--m-ease-emph, ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
+.tech .t-mega__salescol ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.tech .t-mega__salescol ul a { display: flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 12px; font-weight: 700; color: var(--ink); }
+.tech .t-mega__salescol ul a:hover, .tech .t-mega__salescol ul a:focus-visible { background: var(--bg2); }
+.tech .t-mega__enq { display: flex; flex-direction: column; gap: 8px; }
+.tech .t-mega__enq .t-enqlink { align-self: flex-start; }
+.tech .t-navlink { position: relative; }
+.tech .t-navbadge { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; display: grid; place-items: center; border-radius: 999px; background: var(--acc); color: var(--onacc); font-size: 11px; font-weight: 800; line-height: 1; pointer-events: none; }
+.tech .t-mega__salescol--apple ul { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 8px; }
+.tech .t-mega__enq .t-mega__barlink { color: #d9cfcc; }
+.tech .t-mega__enq .t-mega__barlink:hover { color: #fff; }
+.tech .t-sheet__enq { justify-content: flex-start; }
+.tech .t-sheet__enq svg { flex-shrink: 0; }
+/* room for „Sprzedaż” in the capsule (18.11): „Konto” as an icon on every desktop width (the name stays „Konto klienta”) */
+@media (min-width: 1024px) {
+  .tech .t-capsule__account span { display: none; }
+  .tech .t-capsule__account { width: 44px; padding: 0; justify-content: center; }
+}
+/* …and no „Ctrl K” hint in the capsule (the shortcut still works, aria-keyshortcuts says so) */
+@media (min-width: 1024px) {
+  .tech .t-capsearch__kbd { display: none; }
+}
+/* …and a little less padding between the six menu items */
+@media (min-width: 1280px) { .tech .t-capsule .t-navlink { padding-inline: 10px; } }
+@media (min-width: 1024px) and (max-width: 1279.98px) { .tech .t-capsule .t-navlink { padding-inline: 5px; } }
+@media (min-width: 1280px) and (max-width: 1439.98px) {
+  .tech .t-capsule .t-cta__long { display: none; }
+  .tech .t-capsule .t-cta__short { display: inline; }
+}
+.tech .t-enqlink { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: inherit; }
+.tech .t-enqlink__n { min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; display: inline-grid; place-items: center; border-radius: 999px; background: var(--acc); color: var(--onacc); font-size: 12px; font-weight: 800; }

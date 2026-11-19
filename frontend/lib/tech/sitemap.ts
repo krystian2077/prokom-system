@@ -6,6 +6,7 @@ import { courierInSitemap } from "./courier-page";
 import { liveRepairs, repairPath } from "./naprawy";
 import { publishedLocalPages } from "./local-pages";
 import { SITE_URL } from "@/lib/site-config";
+import { catalog, modelPath } from "./catalog";
 
 type Freq = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -26,6 +27,9 @@ export const STATIC_ROUTES: { path: string; priority: number; freq: Freq }[] = [
   { path: "/serwis-drukarek", priority: 0.7, freq: "monthly" },
   { path: "/serwis-konsol", priority: 0.7, freq: "monthly" },
   { path: "/odzyskiwanie-danych", priority: 0.75, freq: "monthly" },
+  // Brand service pages (round 18.11, config/serwis-marek.ts) — no city × brand pages.
+  { path: "/serwis-apple", priority: 0.8, freq: "monthly" },
+  { path: "/serwis-samsung", priority: 0.8, freq: "monthly" },
   { path: "/hammer-glass", priority: 0.85, freq: "monthly" },
   { path: "/obslugiwane-miejscowosci", priority: 0.8, freq: "monthly" },
   { path: "/kontakt", priority: 0.8, freq: "yearly" },
@@ -76,5 +80,13 @@ export function buildSitemap(now: Date = SITEMAP_DATE, points: ServicePoint[] = 
   ];
   // Repair pages: published && verified only (SPEC §12.4, TD5b).
   const repairs: MetadataRoute.Sitemap = liveRepairs().map((r) => ({ url: url(repairPath(r.slug)), lastModified: now, changeFrequency: "monthly", priority: 0.75 }));
-  return [...pages, ...locals, ...blog, ...blogCategories, ...td5, ...repairs];
+  // Sales catalogue (runda 18.11 v2): the catalogue, both salons and every model page (one URL per
+  // model — colours are ?kolor= with a clean canonical). /zapytanie is personal and stays out.
+  const sales: MetadataRoute.Sitemap = [
+    { url: url("/sprzedaz"), lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: url("/apple"), lastModified: now, changeFrequency: "weekly", priority: 0.75 },
+    { url: url("/samsung"), lastModified: now, changeFrequency: "weekly", priority: 0.75 },
+    ...catalog.models.map((m) => ({ url: url(modelPath(m)), lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
+  ];
+  return [...pages, ...locals, ...blog, ...blogCategories, ...td5, ...repairs, ...sales];
 }
