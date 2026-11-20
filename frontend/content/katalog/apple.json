@@ -1525,20 +1525,20 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/ipad-pro-13-m5/srebrny.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-13inch-silver-glossy-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-13inch-silver-glossy-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "gwiezdna-czern",
         "src": "/tech/katalog/ipad-pro-13-m5/gwiezdna-czern.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-13inch-spaceblack-glossy-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-13inch-spaceblack-glossy-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -1695,20 +1695,20 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/ipad-pro-11-m5/srebrny.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-11inch-silver-glossy-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-11inch-silver-glossy-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "gwiezdna-czern",
         "src": "/tech/katalog/ipad-pro-11-m5/gwiezdna-czern.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-11inch-spaceblack-glossy-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-finish-select-202405-11inch-spaceblack-glossy-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -1866,40 +1866,40 @@
       {
         "color": "niebieski",
         "src": "/tech/katalog/ipad-air-13-m4/niebieski.webp",
-        "bg": "#f8f6f9",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-blue-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-blue-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "fioletowy",
         "src": "/tech/katalog/ipad-air-13-m4/fioletowy.webp",
-        "bg": "#f8f6f9",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-purple-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-purple-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "ksiezycowa-poswiata",
         "src": "/tech/katalog/ipad-air-13-m4/ksiezycowa-poswiata.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-starlight-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-starlight-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "gwiezdna-szarosc",
         "src": "/tech/katalog/ipad-air-13-m4/gwiezdna-szarosc.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-space-gray-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-13inch-space-gray-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -2066,40 +2066,40 @@
       {
         "color": "niebieski",
         "src": "/tech/katalog/ipad-air-11-m4/niebieski.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-blue-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-blue-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "fioletowy",
         "src": "/tech/katalog/ipad-air-11-m4/fioletowy.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-purple-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-purple-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "ksiezycowa-poswiata",
         "src": "/tech/katalog/ipad-air-11-m4/ksiezycowa-poswiata.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-starlight-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-starlight-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "gwiezdna-szarosc",
         "src": "/tech/katalog/ipad-air-11-m4/gwiezdna-szarosc.webp",
-        "bg": "#f7f7f7",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-space-gray-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-finish-select-gallery-202405-11inch-space-gray-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -2253,20 +2253,20 @@
       {
         "color": "polnoc",
         "src": "/tech/katalog/ipad-mini-a20-pro/polnoc.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-202610-midnight-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-202610-midnight-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "ksiezycowa-poswiata",
         "src": "/tech/katalog/ipad-mini-a20-pro/ksiezycowa-poswiata.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-202610-starlight-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-202610-starlight-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -2420,40 +2420,40 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/ipad-11-a16/srebrny.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-silver-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-silver-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "niebieski",
         "src": "/tech/katalog/ipad-11-a16/niebieski.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-blue-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-blue-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "rozowy",
         "src": "/tech/katalog/ipad-11-a16/rozowy.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-pink-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-pink-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "zolty",
         "src": "/tech/katalog/ipad-11-a16/zolty.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-yellow-wifi?wid=2560&hei=1440&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-finish-select-202503-yellow-wifi?wid=2560&hei=1440&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -2625,20 +2625,20 @@
       {
         "color": "gwiezdna-czern",
         "src": "/tech/katalog/macbook-pro-proled-xdr/gwiezdna-czern.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-specs-select-202610-14inch-spaceblack?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-specs-select-202610-14inch-spaceblack?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "srebrny",
         "src": "/tech/katalog/macbook-pro-proled-xdr/srebrny.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-specs-select-202610-14inch-silver?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-specs-select-202610-14inch-silver?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -2790,20 +2790,20 @@
       {
         "color": "gwiezdna-czern",
         "src": "/tech/katalog/macbook-pro-14/gwiezdna-czern.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-14inch-spaceblack?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-14inch-spaceblack?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "srebrny",
         "src": "/tech/katalog/macbook-pro-14/srebrny.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-14inch-silver?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-14inch-silver?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -2950,20 +2950,20 @@
       {
         "color": "gwiezdna-czern",
         "src": "/tech/katalog/macbook-pro-16/gwiezdna-czern.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-16inch-spaceblack?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-16inch-spaceblack?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       },
       {
         "color": "srebrny",
         "src": "/tech/katalog/macbook-pro-16/srebrny.webp",
-        "bg": "#f6f6f6",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-16inch-silver?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-specs-select-202610-16inch-silver?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -3904,10 +3904,10 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/mac-studio/srebrny.webp",
-        "bg": "#f5f7f9",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-chip-unselect-202608-gallery-1?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-chip-unselect-202608-gallery-1?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }
@@ -4046,10 +4046,10 @@
       {
         "color": "srebrny",
         "src": "/tech/katalog/mac-mini/srebrny.webp",
-        "bg": "#f6fafb",
+        "transparent": true,
         "source": {
-          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-mini-chip-unselect-202608-gallery-1?wid=2000&hei=1282&fmt=jpeg&qlt=90",
-          "date": "2026-11-18",
+          "url": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-mini-chip-unselect-202608-gallery-1?wid=3000&hei=1923&fmt=png-alpha",
+          "date": "2026-11-20",
           "consent": "Krystian 18.11.2026: zdjęcia od producentów — zgoda"
         }
       }

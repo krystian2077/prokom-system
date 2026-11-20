@@ -10,6 +10,19 @@ describe("katalog: reguły danych (runda 18.11 v2 §0, §5)", () => {
     expect(catalogErrors(catalog)).toEqual([]);
   });
 
+  it("every colour has a real photo — no drawn placeholder on the page (Krystian 20.11)", () => {
+    const missing = catalog.models.flatMap((m) => m.colors.filter((c) => !m.images.some((i) => i.color === c.key)).map((c) => `${m.slug}/${c.key}`));
+    expect(missing).toEqual([]);
+  });
+
+  it("photo URLs carry the source date, and the file behind each one exists (30-day cache, Krystian 20.11)", () => {
+    for (const m of catalog.models)
+      for (const i of m.images.filter((x) => x.src)) {
+        expect(i.src, m.slug).toBe(`${i.src!.split("?")[0]}?v=${i.source.date.replace(/-/g, "")}`);
+        expect(fs.existsSync(path.resolve(__dirname, "../../../public", `.${i.src!.split("?")[0]}`)), i.src!).toBe(true);
+      }
+  });
+
   it("covers both brands and every department of the salons", () => {
     for (const brand of ["apple", "samsung"] as const) {
       expect(catalog.models.some((m) => m.brand === brand)).toBe(true);

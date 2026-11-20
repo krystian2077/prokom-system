@@ -11,8 +11,22 @@ import type { Accessory, Brand, Catalog, CatalogModel, Family, Kind, Quiz } from
 
 export * from "./types";
 
+/**
+ * Files under /tech/* are cached for 30 days (next.config publicFilesCache), so a photo replaced
+ * under the same name stayed old in returning visitors' browsers (Krystian 20.11, Samsung).
+ * The photo's source date goes into the URL: a new photo (new date) means a new address.
+ * Next 15+: allow the query in `images.localPatterns` (search: "?v=*") when upgrading.
+ */
+export function versionedSrc(src: string, date: string): string {
+  return `${src}?v=${date.replace(/-/g, "")}`;
+}
+
+function withImageVersions(models: CatalogModel[]): CatalogModel[] {
+  return models.map((m) => ({ ...m, images: m.images.map((i) => (i.src ? { ...i, src: versionedSrc(i.src, i.source.date) } : i)) }));
+}
+
 export const catalog: Catalog = {
-  models: [...(apple as CatalogModel[]), ...(samsung as CatalogModel[])],
+  models: withImageVersions([...(apple as CatalogModel[]), ...(samsung as CatalogModel[])]),
   families: families as Family[],
   accessories: accessories as Accessory[],
   quizzes: quizzes as Quiz[],

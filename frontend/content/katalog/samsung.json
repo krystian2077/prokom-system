@@ -1900,16 +1900,6 @@
         "key": "czarny",
         "name": "Czarny",
         "hex": "#1f1f22"
-      },
-      {
-        "key": "niebieski",
-        "name": "Niebieski",
-        "hex": "#3f5f9a"
-      },
-      {
-        "key": "jasnorozowy",
-        "name": "Jasnoróżowy",
-        "hex": "#f2ccd4"
       }
     ],
     "storage": [
@@ -2062,19 +2052,9 @@
     "isNew": false,
     "colors": [
       {
-        "key": "czarny",
-        "name": "Czarny",
-        "hex": "#1f1f22"
-      },
-      {
         "key": "szary",
         "name": "Szary",
         "hex": "#8a8c8f"
-      },
-      {
-        "key": "jasnoniebieski",
-        "name": "Jasnoniebieski",
-        "hex": "#b8d0e6"
       }
     ],
     "storage": [
