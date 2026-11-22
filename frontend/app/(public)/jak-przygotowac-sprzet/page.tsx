@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { line } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { DataSafety } from "@/components/tech/DataSafety";
@@ -10,6 +10,7 @@ import { PREP_GUIDE_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { PREP_TABS } from "@/lib/tech/prep-guide";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { SITE_URL } from "@/lib/site-config";
+import { PointPhonesInline } from "@/components/tech/PointCalls";
 
 const TITLE = "Jak przygotować telefon lub laptop do serwisu";
 const DESCRIPTION =
@@ -67,9 +68,7 @@ export default function PrepGuidePage() {
           <PrepTabs tabs={PREP_TABS} />
           <p className="t-prepguide__note">
             Masz pytanie przed przyjściem? Zadzwoń:{" "}
-            <a href={telHref(line.phone)} className="t-inline-link" data-t-inline="" data-track="telefon_klik" data-track-miejsce="poradnik">
-              {line.phoneDisplay}
-            </a>
+            <PointPhonesInline track="poradnik" />
           </p>
         </div>
       </section>

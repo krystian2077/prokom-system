@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { GENERAL_EMAIL_LABEL, GENERAL_PHONE_LABEL, line, servicePoints, telHref } from "@/config/prokom";
+import { GENERAL_EMAIL_LABEL, line, servicePoints, telHref } from "@/config/prokom";
+import { GeneralLineNote, PointPhonesBig } from "@/components/tech/PointCalls";
 import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
 import { AboutIconSvg } from "@/components/tech/about/about-icons";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
@@ -72,18 +73,11 @@ export default function PointsPage() {
                   : // Single-point fallback, used only while a point is unpublished (SPEC §5).
                     "Przynieś sprzęt bez umawiania albo zgłoś naprawę online. Status naprawy sprawdzisz potem z telefonu."}
               </p>
-              <div className="t-bigphone t-pts2-hero__phone">
-                <span className="t-bigphone__label">{GENERAL_PHONE_LABEL} — {two ? "oba punkty" : "zadzwoń"}</span>
-                <a href={telHref(line.phone)} className="t-bigphone__num" data-track="telefon_klik" data-track-miejsce="punkty_hero">
-                  {line.phoneDisplay}
-                </a>
-              </div>
+              {/* boss 22.11: the points' own numbers are the main ones; the general line only as a note */}
+              <PointPhonesBig track="punkty_hero" className="t-pts2-hero__phone" />
+              <GeneralLineNote track="punkty_hero" />
               <div className="t-ab-hero__actions">
-                <a href={telHref(line.phone)} className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit" data-track="telefon_klik" data-track-miejsce="punkty_hero_przycisk">
-                  <AboutIconSvg icon="phone" size={18} />
-                  Zadzwoń teraz
-                </a>
-                <Link href="/kontakt#formularz" className="t-hbtn t-hbtn--ghost t-ab-hero__ghost">
+                <Link href="/kontakt#formularz" className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit">
                   Napisz do nas
                 </Link>
               </div>

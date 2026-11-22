@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { line } from "@/config/prokom";
+import { PointCalls } from "../PointCalls";
 import { POINTS_HREF, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import type { VisiblePoint } from "@/lib/tech/points";
-import { IconArrow, IconCheck, IconPhoneCall, IconPin, IconWrench } from "../icons";
+import { IconArrow, IconCheck, IconPin, IconWrench } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
+import { AlsenLogo } from "../AlsenPartner";
 import { HeroDevices } from "./HeroDevices";
 import { polishText } from "@/lib/tech/typo";
 
@@ -38,15 +40,13 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
                 <IconWrench size={18} />
                 Zgłoś naprawę online
               </Link>
-              <a href={telHref(line.phone)} className="t-hbtn t-hbtn--ghost" data-track="telefon_klik" data-track-miejsce="hero">
-                <IconPhoneCall size={18} />
-                <span className="t-hero__tel--wide">{line.phoneDisplay}</span>
-                <span className="t-hero__tel--phone">Zadzwoń</span>
-              </a>
-              <Link href={TRACK_HREF} className="t-hbtn t-hbtn--ghost t-hero__track">
-                Status naprawy
-              </Link>
+              {/* boss 22.11: the two points' own numbers, not the general line */}
+              <PointCalls track="hero" size="lg" className="t-hero__calls" />
             </div>
+            <Link href={TRACK_HREF} className="t-hero__track">
+              Sprawdź status naprawy
+              <IconArrow size={15} strokeWidth={2.6} />
+            </Link>
             <ul className="t-hero__promises">
               {PROMISES.map((p) => (
                 <li key={p}>
@@ -57,6 +57,19 @@ export function Hero({ points, publishedNames }: { points: VisiblePoint[]; publi
             </ul>
           </div>
           <HeroDevices />
+          {/* Boss 22.11: the ALSEN partnership visible in the hero — a glass plate on the stage, leads to the ALSEN section. */}
+          <Link href="#alsen" className="t-hero__alsen" data-track="alsen_hero">
+            <span className="t-hero__alsenplate">
+              <AlsenLogo height={24} className="t-hero__alsenlogo" />
+            </span>
+            <span className="t-hero__alsentxt">
+              <small>Autoryzowany partner</small>
+              <b>Wszystko z alsen.pl zamówisz u nas</b>
+            </span>
+            <span className="t-hero__alsenarr" aria-hidden="true">
+              <IconArrow size={16} strokeWidth={2.6} />
+            </span>
+          </Link>
         </div>
 
         <div className={`t-hero__points${points.length === 1 ? " is-single" : ""}`}>

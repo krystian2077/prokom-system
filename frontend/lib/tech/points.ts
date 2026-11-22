@@ -24,6 +24,14 @@ export function publishedPoints(points: ServicePoint[] = servicePoints): Service
   return points.filter((p) => p.published);
 }
 
+/**
+ * Points a customer can call (boss 22.11: the points' own numbers are the main ones; the general
+ * line is only a quiet „Infolinia” note). Published points; on staging drafts too, flagged.
+ */
+export function callPoints(points: VisiblePoint[] = visiblePoints()): VisiblePoint[] {
+  return points.filter((p) => p.phone);
+}
+
 /** The single notice active today (SPEC §12.9), or null. */
 export function activeNotice(now: Date, list: Notice[] = allNotices): Notice | null {
   return list.find((n) => isActiveToday(n.from, n.to, now)) ?? null;

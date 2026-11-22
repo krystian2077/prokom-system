@@ -83,22 +83,8 @@ export type QuickActionsInput = { points?: readonly ServicePoint[]; now?: Date }
 export function quickActions({ points = publishedPoints(servicePoints), now }: QuickActionsInput = {}): QuickAction[] {
   const published = points.filter((p) => p.published);
   const out: QuickAction[] = [];
-  const main = published.find((p) => pointPhone(p) === line.phone) ?? null;
-  out.push({
-    id: "call",
-    kind: "call",
-    label: `Zadzwoń · ${line.phoneDisplay}`,
-    short: "Zadzwoń",
-    sub: main ? pointName(main) : GENERAL_PHONE_LABEL,
-    hint: main ? `${line.phoneDisplay} · ${pointName(main)}` : `${line.phoneDisplay} · ${GENERAL_PHONE_LABEL.toLowerCase()}`,
-    icon: "call",
-    href: telHref(line.phone),
-    track: { event: "telefon_klik", params: { miejsce: "szukaj" } },
-    words: words("zadzwon", "dzwon", "tel", "numer", "kontakt", "infolinia", ...(main ? [main.city] : [])),
-  });
-  // Another published point with its own number („Drugi numer” of the pattern).
+  // Boss 22.11: the points' own numbers first; the general line follows as „Infolinia”.
   for (const p of published) {
-    if (pointPhone(p) === line.phone) continue;
     out.push({
       id: `call2:${p.key}`,
       kind: "call2",
@@ -109,9 +95,21 @@ export function quickActions({ points = publishedPoints(servicePoints), now }: Q
       icon: "call",
       href: telHref(pointPhone(p)),
       track: { event: "telefon_klik", params: { miejsce: `szukaj_${p.key}` } },
-      words: words("zadzwon", "dzwon", "tel", "numer", "drugi", p.city),
+      words: words("zadzwon", "dzwon", "tel", "numer", p.city),
     });
   }
+  out.push({
+    id: "call",
+    kind: "call",
+    label: `${GENERAL_PHONE_LABEL} · ${line.phoneDisplay}`,
+    short: GENERAL_PHONE_LABEL,
+    sub: GENERAL_PHONE_LABEL,
+    hint: `${line.phoneDisplay} · ${GENERAL_PHONE_LABEL.toLowerCase()}`,
+    icon: "call",
+    href: telHref(line.phone),
+    track: { event: "telefon_klik", params: { miejsce: "szukaj" } },
+    words: words("zadzwon", "dzwon", "tel", "numer", "kontakt", "infolinia"),
+  });
   out.push({
     id: "copy",
     kind: "copy",

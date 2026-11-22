@@ -17,6 +17,7 @@ import { trackEvent } from "@/lib/tech/track-event";
 import { IconArrow, IconClose, IconSearch } from "../icons";
 import { IconClock, SearchIcon } from "../rail-icons";
 import { QuickActionItem, QuickActionTiles, useQuickRun } from "./QuickActions";
+import { PointCalls } from "../PointCalls";
 
 export { INDEX_URL } from "@/lib/tech/search/load-index";
 /** The measurement waits until the visitor stops typing. */
@@ -517,9 +518,7 @@ export function SearchDialog({ request, onReady }: SearchDialogProps = {}) {
                 <li>Opisz objaw: „nie ładuje”, „zalany”, „grzeje się”.</li>
               </ul>
               <div className="t-sdlg__noneactions">
-                <a href={tel} className="t-btn t-btn--acc t-btn--sm" data-track="telefon_klik" data-track-miejsce="szukaj">
-                  Zadzwoń: {line.phoneDisplay}
-                </a>
+                <PointCalls track="szukaj" size="sm" />
                 <Link href={SUBMIT_HREF} className="t-btn t-btn--ghost t-btn--sm" data-track="zgloszenie_start" data-track-zrodlo="przycisk" onClick={onLinkClick}>
                   Zgłoś naprawę
                 </Link>

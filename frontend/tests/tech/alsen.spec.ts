@@ -30,6 +30,23 @@ for (const theme of ["light", "dark"] as const) {
       await expect(link).toHaveAttribute("rel", /noopener/);
     });
 
+    test("hero: ALSEN partner plate on the stage, beside the devices, leading to the ALSEN section (boss 22.11)", async ({ page }) => {
+      await page.goto("/");
+      const plate = page.locator("#start").getByRole("link", { name: /Autoryzowany partner.*alsen\.pl/ });
+      await expect(plate).toBeVisible();
+      await expect(plate).toHaveAttribute("href", "#alsen");
+      const logo = plate.getByRole("img", { name: "ALSEN" });
+      await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+      // inside the stage, under the devices, not over the copy
+      const box = (await plate.boundingBox())!;
+      const stage = (await page.locator(".t-hero__stage").boundingBox())!;
+      const devices = (await page.locator(".t-hero__devices").boundingBox())!;
+      const promises = (await page.locator(".t-hero__promises").boundingBox())!;
+      expect(box.y + box.height).toBeLessThanOrEqual(stage.y + stage.height);
+      expect(box.x).toBeGreaterThan(promises.x + promises.width);
+      expect(box.y).toBeGreaterThan(devices.y + devices.height * 0.8);
+    });
+
     test("footer: „Partnerzy” row with ALSEN above the legal bar", async ({ page }) => {
       await page.goto("/kontakt");
       const row = page.locator(".t-footer__partners");

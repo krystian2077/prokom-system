@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { line, servicePoints, telHref } from "@/config/prokom";
+import { servicePoints } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { JsonLd } from "@/components/tech/JsonLd";
@@ -11,6 +11,7 @@ import { hoursLong, joinCities, pointAddress } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { pointGenitive, towns } from "@/lib/tech/towns";
+import { PointCalls } from "@/components/tech/PointCalls";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -115,9 +116,7 @@ export default function TownsPage() {
             <div className="t-card t-howto__card">
               <h3>Telefonicznie</h3>
               <p>Zadzwoń, doradzimy i wstępnie ocenimy usterkę.</p>
-              <a href={telHref(line.phone)} className="t-towncard__more" data-track="telefon_klik" data-track-miejsce="miejscowosci">
-                {line.phoneDisplay}
-              </a>
+              <PointCalls track="miejscowosci" size="sm" className="t-pcalls--block" />
             </div>
           </div>
         </div>

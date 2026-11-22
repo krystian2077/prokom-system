@@ -9,6 +9,7 @@ import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { joinCities } from "@/lib/tech/point-format";
 import { publishedPoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
+import { PointPhonesInline } from "@/components/tech/PointCalls";
 
 const published = publishedPoints(servicePoints);
 
@@ -39,9 +40,7 @@ export default function FaqPage() {
             </h1>
             <p className="t-bhero__lead">
               Nie ma tu Twojego pytania? Zadzwoń:{" "}
-              <a href={telHref(line.phone)} data-track="telefon_klik" data-track-miejsce="faq" className="t-bhero__tel" data-t-inline="">
-                {line.phoneDisplay}
-              </a>
+              <PointPhonesInline track="faq" />
             </p>
             <nav aria-label="Tematy" className="t-faqnav">
               {all.map((g) => (

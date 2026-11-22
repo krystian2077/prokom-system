@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { GENERAL_PHONE_LABEL, line, lines, telHref } from "@/config/prokom";
+import { line, lines } from "@/config/prokom";
 import { ACCOUNT_HREF, REPAIRS_HREF, SUBMIT_HREF, mainNav, repairLinks } from "@/lib/tech/nav";
 import { requestSearch } from "@/lib/tech/search/open";
 import { DeviceGlyph, IconArrow, IconChevronRight, IconClose, IconSearch } from "./icons";
 import { InstallHint } from "./InstallHint";
 import { MyRepairs } from "./MyRepairs";
 import { OpeningStatus } from "./OpeningStatus";
+import { GeneralLineNote, PointCalls } from "./PointCalls";
 import { useShell, type SheetMode } from "./ShellContext";
 import { ThemeSegmented } from "./ThemeToggle";
 import { EnquiryLink } from "./catalog/EnquiryLink";
@@ -207,17 +208,11 @@ export function MenuSheet() {
                 </Link>
                 <EnquiryLink className="t-sheet__item t-sheet__enq" label="Twoje zapytanie" />
               </nav>
-              <div className="t-sheet__call">
-                <div>
-                  <OpeningStatus points={points} variant="pill" withName={points.length > 1} skeletonCh={16} />
-                  <span className="t-sheet__phone">
-                    <span className="t-sheet__plabel">{GENERAL_PHONE_LABEL}</span>
-                    {line.phoneDisplay}
-                  </span>
-                </div>
-                <a href={telHref(line.phone)} className="t-btn t-btn--acc t-btn--sm" data-track="telefon_klik" data-track-miejsce="menu">
-                  Zadzwoń
-                </a>
+              {/* boss 22.11: the points' own numbers first, the general line only as a note */}
+              <div className="t-sheet__call t-sheet__call--points">
+                <OpeningStatus points={points} variant="pill" withName={points.length > 1} skeletonCh={16} />
+                <PointCalls track="menu" points={points} className="t-pcalls--block" />
+                <GeneralLineNote track="menu" />
               </div>
               <MyRepairs compact />
               <span className="t-label">Linie PRO-KOM</span>

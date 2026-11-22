@@ -63,6 +63,11 @@ export function pointPhoneDisplay(point: Pick<ServicePoint, "phone">): string {
   return pointPhone(point).replace(/^\+48\s*/, "");
 }
 
+/** Plain text for sentences and markdown: „<city> <number>, <city> <number>”. */
+export function pointPhonesText(points: Pick<ServicePoint, "name" | "phone">[]): string {
+  return points.map((p) => `${p.name} ${pointPhoneDisplay(p)}`).join(", ");
+}
+
 /** Locative city name for sentences ("w Rabce-Zdroju", "w Zakopanem"). */
 const LOCATIVE: Record<string, string> = { "Rabka-Zdrój": "Rabce-Zdroju", Zakopane: "Zakopanem" };
 export function inCity(city: string): string {

@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { GENERAL_PHONE_LABEL, line, telHref } from "@/config/prokom";
+import { line, telHref } from "@/config/prokom";
+import { GeneralLineNote } from "./PointCalls";
 import { hoursSummary } from "@/lib/tech/hours";
 import { directionsUrl, footerColumns } from "@/lib/tech/nav";
-import { saturdayPromise } from "@/lib/tech/point-format";
+import { pointPhoneDisplay, saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { IconCheck } from "./icons";
 import { FooterPartners } from "./AlsenPartner";
@@ -53,10 +54,8 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
           <div className="t-footer__points">
             <span className="t-footer__h">Punkty serwisowe</span>
             <div className="t-footer__contact">
-              <a href={telHref(line.phone)} className="t-footer__phone" data-track="telefon_klik" data-track-miejsce="stopka">
-                <span className="t-footer__plabel">{GENERAL_PHONE_LABEL}</span>
-                {line.phoneDisplay}
-              </a>
+              {/* boss 22.11: each point's own number is on its card; the general line is only a note */}
+              <GeneralLineNote track="stopka" className="t-footer__genline" />
               <a href={`mailto:${line.email}`} className="t-footer__mail">
                 {line.email}
               </a>
@@ -74,6 +73,9 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
                     {p.name}
                     {p.draft ? <span className="t-draft-badge">do uzupełnienia</span> : null}
                   </span>
+                  <a href={telHref(p.phone)} className="t-footer__pphone" data-track="telefon_klik" data-track-miejsce="stopka" data-track-punkt={p.key}>
+                    {pointPhoneDisplay(p)}
+                  </a>
                   <span className="t-footer__addr">
                     {p.street}
                     <br />
