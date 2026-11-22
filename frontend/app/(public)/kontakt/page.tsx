@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GENERAL_EMAIL_LABEL, GENERAL_PHONE_LABEL, company, line, pointEmail, pointPhone, servicePoints, telHref } from "@/config/prokom";
+import { GENERAL_EMAIL_LABEL, company, line, pointEmail, pointPhone, servicePoints, telHref } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { Faq } from "@/components/tech/Faq";
 import { IconChevronRight } from "@/components/tech/icons";
@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/tech/JsonLd";
 import { LineCards } from "@/components/tech/LineCards";
 import { OpeningStatus } from "@/components/tech/OpeningStatus";
 import { PageIconSvg } from "@/components/tech/page-icons";
-import { AboutIconSvg } from "@/components/tech/about/about-icons";
+import { GeneralLineNote, PointPhonesBig } from "@/components/tech/PointCalls";
 import { hoursLong, inCity, isMainPoint, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
@@ -53,17 +53,12 @@ export default function ContactPage() {
                 Zadzwoń albo napisz.
                 <span>{two ? "Odpowiadamy w godzinach pracy punktów." : "Odpowiadamy w godzinach pracy punktu."}</span>
               </h1>
-              <span className="t-ct2-hero__plabel">{GENERAL_PHONE_LABEL} · oba punkty</span>
-              <a href={telHref(line.phone)} className="t-ct2-hero__phone" data-track="telefon_klik" data-track-miejsce="kontakt_hero">
-                {line.phoneDisplay}
-              </a>
+              {/* boss 22.11: the points' own numbers are the main ones; the general line only as a note */}
+              <PointPhonesBig track="kontakt_hero" />
+              <GeneralLineNote track="kontakt_hero" />
               <OpeningStatus points={published} withName className="t-status--stage-text t-ct2-hero__status" skeletonCh={30} />
               <div className="t-ab-hero__actions">
-                <a href={telHref(line.phone)} className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit" data-track="telefon_klik" data-track-miejsce="kontakt_hero_przycisk">
-                  <AboutIconSvg icon="phone" size={18} />
-                  Zadzwoń teraz
-                </a>
-                <a href="#formularz" className="t-hbtn t-hbtn--ghost t-ab-hero__ghost">
+                <a href="#formularz" className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit">
                   Napisz wiadomość
                 </a>
               </div>

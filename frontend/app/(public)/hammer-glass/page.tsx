@@ -1,6 +1,7 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
-import { line, servicePoints, telHref } from "@/config/prokom";
+import { line, servicePoints } from "@/config/prokom";
+import { PointCalls } from "@/components/tech/PointCalls";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { FilmPicker } from "@/components/tech/hammer/FilmPicker";
@@ -227,9 +228,7 @@ export default function HammerGlassPage() {
                 <Link href={POINTS_HREF} className="t-pbtn t-pbtn--stage">
                   Punkty i godziny otwarcia
                 </Link>
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark" data-track="telefon_klik" data-track-miejsce="hammer_glass">
-                  {line.phoneDisplay}
-                </a>
+                <PointCalls track="hammer_glass" size="lg" />
               </div>
             </div>
             <div className="t-hg-cta__img">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { line, telHref } from "@/config/prokom";
+import { PointCalls } from "../PointCalls";
 import { claim } from "@/lib/tech/claims";
 import { courierPageHref } from "@/lib/tech/courier";
 import { POINTS_HREF } from "@/lib/tech/nav";
@@ -8,7 +8,7 @@ import type { VisiblePoint } from "@/lib/tech/points";
 import type { Crumb } from "@/lib/tech/seo";
 import type { HeroPromise } from "@/lib/tech/subhero";
 import { Breadcrumbs } from "../Breadcrumbs";
-import { IconArrow, IconCheck, IconPath, IconPhoneCall, IconPin, IconWrench } from "../icons";
+import { IconArrow, IconCheck, IconPath, IconPin, IconWrench } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
 
 export type SubHeroProps = {
@@ -66,10 +66,7 @@ export function SubHero({ crumbs, eyebrow, title, accent, lead, primary, trackPl
                 <IconWrench size={18} />
                 {primary.label}
               </Link>
-              <a href={telHref(line.phone)} className="t-hbtn t-hbtn--ghost t-shero__tel" data-track="telefon_klik" data-track-miejsce={trackPlace}>
-                <IconPhoneCall size={18} />
-                {line.phoneDisplay}
-              </a>
+              <PointCalls track={trackPlace} size="lg" className="t-shero__calls" />
             </div>
             <ul className="t-shero__promises">
               {promises.map((p) => (

@@ -631,6 +631,53 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-hbtn--acc { background: var(--acc); color: var(--onacc); box-shadow: 0 14px 28px -14px rgba(196, 54, 43, 0.7); }
 .tech .t-hbtn--ghost { border: 1.5px solid var(--bd2); background: var(--card); color: var(--ink); }
 .tech .t-hbtn--block { width: 100%; }
+
+/* Point call buttons (boss 22.11): one segment per point — city above, number below. Colours from
+   currentColor, so the same group sits on the dark stage, the light card and the CTA band. */
+.tech .t-pcalls {
+  --pc-h: 52px; display: inline-flex; align-items: stretch; flex: none; max-width: 100%; box-sizing: border-box;
+  border-radius: 16px; border: 1.5px solid color-mix(in srgb, currentColor 26%, transparent); overflow: hidden;
+}
+.tech .t-pcalls--sm { --pc-h: 44px; border-radius: 14px; }
+.tech .t-pcalls--lg { --pc-h: 58px; }
+.tech .t-pcall {
+  flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; gap: 10px; min-height: var(--pc-h); box-sizing: border-box;
+  padding: 0 18px; color: inherit; text-decoration: none; white-space: nowrap; transition: background 0.15s ease;
+}
+.tech .t-pcall + .t-pcall { border-left: 1.5px solid color-mix(in srgb, currentColor 18%, transparent); }
+.tech .t-pcall:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+.tech .t-pcall:focus-visible { outline: 3px solid var(--acc); outline-offset: -3px; }
+.tech .t-pcall__ico { flex: none; opacity: 0.85; }
+.tech .t-pcall__txt { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+.tech .t-pcall__txt small { font-size: 11px; font-weight: 700; letter-spacing: 0.02em; opacity: 0.72; }
+.tech .t-pcall__txt b { margin-top: 2px; font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tech .t-pcalls--sm .t-pcall { padding: 0 13px; gap: 8px; }
+.tech .t-pcalls--sm .t-pcall__txt small { font-size: 10.5px; }
+.tech .t-pcalls--sm .t-pcall__txt b { font-size: 14px; }
+.tech .t-pcalls--block { display: flex; width: 100%; }
+/* the general line as a quiet note under the point numbers */
+.tech .t-ctaband__calls, .tech .t-cta-band__calls { color: #ffffff; }
+@media (max-width: 767.98px) {
+  .tech .t-ctaband__calls, .tech .t-cta-band__calls { display: flex; width: 100%; }
+}
+.tech .t-bigphones { display: grid; gap: 10px 28px; margin-top: 18px; }
+@media (min-width: 480px) { .tech .t-bigphones { grid-template-columns: repeat(2, max-content); } }
+.tech .t-bigphones__item { display: flex; flex-direction: column; gap: 2px; color: inherit; text-decoration: none; }
+.tech .t-bigphones__item span { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--acct); }
+.tech .t-bigphones__item b { font-family: var(--t-font-head); font-stretch: 108%; font-size: clamp(28px, 2vw + 16px, 38px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tech .t-bigphones__item:hover b { color: var(--acct); }
+.tech .t-bigphones + .t-genline { display: block; margin-top: 10px; }
+.tech .t-footer a.t-footer__pphone { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--t-font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; color: var(--foot-ink-strong); font-variant-numeric: tabular-nums; }
+.tech .t-footer .t-genline { color: inherit; }
+.tech .t-footer__genline { display: block; padding: 12px 0; line-height: 20px; }
+/* on the dark hero stages (/kontakt, /punkty-serwisowe) the note keeps AA contrast */
+.tech .t-ab-hero .t-genline { color: #c9bfbd; }
+.tech .t-sheet__call--points { flex-direction: column; align-items: stretch; gap: 10px; }
+.tech .t-sheet__call--points .t-status { align-self: flex-start; }
+.tech .t-sheet__call--points > .t-pcalls { flex: none; flex-direction: row; align-items: stretch; gap: 0; }
+.tech .t-faqwrap__calls { margin: 4px 0; }
+.tech .t-genline { font-size: 13px; font-weight: 600; color: var(--ink2); }
+.tech .t-genline a { display: inline-flex; align-items: center; min-height: 44px; vertical-align: middle; color: inherit; font-weight: 800; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
 .tech .t-sbtn {
   height: 44px; display: inline-flex; align-items: center; gap: 10px; padding: 0 18px; border-radius: 14px;
   background: #e2483a; color: #1a0806; font-size: 14px; font-weight: 800; white-space: nowrap;
@@ -682,6 +729,8 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 .tech .t-hero__actions .t-hero__submit { grid-column: 1 / -1; height: 56px; }
 .tech .t-hero__actions .t-hero__submit svg { display: none; }
 .tech .t-hero__actions .t-hbtn--ghost svg { display: none; }
+.tech .t-hero__calls { grid-column: 1 / -1; display: flex; width: 100%; color: var(--ink); background: var(--card); }
+.tech .t-hero__track { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; min-height: 44px; margin-top: 4px; font-size: 14px; font-weight: 800; color: var(--acct); text-decoration: none; }
 .tech .t-hero__promises { display: none; }
 .tech .t-hero__devices { display: none; }
 
@@ -719,7 +768,8 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
   .tech .t-hero__lead { margin-top: 22px; font-size: 19px; color: #d6ccca; max-width: 470px; }
   .tech .t-hero__lead--wide, .tech .t-hero__tel--wide { display: inline; }
   .tech .t-hero__lead--phone, .tech .t-hero__tel--phone, .tech .t-hero__track { display: none; }
-  .tech .t-hero__actions { display: flex; gap: 12px; margin-top: 32px; }
+  .tech .t-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .tech .t-hero__calls { display: inline-flex; width: auto; color: #ffffff; background: transparent; }
   .tech .t-hero__actions .t-hbtn, .tech .t-hero__actions .t-hero__submit { height: 58px; padding: 0 26px; font-size: 16px; }
   .tech .t-hero__actions .t-hero__submit { background: #e2483a; color: #1a0806; }
   .tech .t-hero__actions svg, .tech .t-hero__actions .t-hero__submit svg, .tech .t-hero__actions .t-hbtn--ghost svg { display: inline; }

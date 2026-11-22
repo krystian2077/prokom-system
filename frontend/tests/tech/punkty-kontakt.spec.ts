@@ -168,7 +168,8 @@ test.describe("kontakt punktów (runda 18.11)", () => {
   test("brand bar and footer: the general number with its label", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(".t-brandbar__phone")).toContainText(`${GENERAL_PHONE_LABEL}: ${line.phoneDisplay}`);
-    await expect(page.locator(".t-footer__phone")).toContainText(GENERAL_PHONE_LABEL);
+    // boss 22.11: in the footer the general number is only a note; each point card has its own
+    await expect(page.locator(".t-footer .t-genline")).toContainText(GENERAL_PHONE_LABEL);
   });
 
   test("JSON-LD: each LocalBusiness carries its own point's phone", async ({ page }) => {

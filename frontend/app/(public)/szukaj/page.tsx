@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { IconArrow, IconSearch } from "@/components/tech/icons";
 import { SearchIcon } from "@/components/tech/rail-icons";
@@ -12,6 +11,7 @@ import { highlight } from "@/lib/tech/search/engine";
 import { MAX_QUERY, PAGE_GROUP_LIMIT, buildProvider } from "@/lib/tech/search/provider";
 import { POPULAR_PHRASES, countCategories, resultsLabel } from "@/lib/tech/search/shortcuts";
 import type { Crumb } from "@/lib/tech/seo";
+import { PointCalls } from "@/components/tech/PointCalls";
 
 type Props = { searchParams: { q?: string | string[] } };
 
@@ -122,9 +122,7 @@ export default function SearchPage({ searchParams }: Props) {
             <div className="t-szukaj__none">
               <p>Opisz usterkę w zgłoszeniu albo zadzwoń — podpowiemy, czy to naprawimy.</p>
               <div className="t-sdlg__noneactions">
-                <a href={telHref(line.phone)} className="t-btn t-btn--acc t-btn--sm" data-track="telefon_klik" data-track-miejsce="szukaj">
-                  Zadzwoń: {line.phoneDisplay}
-                </a>
+                <PointCalls track="szukaj" size="sm" />
                 <Link href={SUBMIT_HREF} className="t-btn t-btn--ghost t-btn--sm">
                   Zgłoś naprawę <IconArrow />
                 </Link>

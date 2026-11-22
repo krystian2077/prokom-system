@@ -103,7 +103,9 @@ test.describe("phone 390", () => {
   test("Menu sheet: phone number in 2 taps", async ({ page }) => {
     await page.goto("/");
     await page.locator("[data-t-tabbar]").getByRole("button", { name: "Menu" }).click();
-    await expect(page.getByRole("dialog").locator('a[href^="tel:"]')).toBeVisible();
+    // boss 22.11: the points' own numbers come first in the sheet
+    await expect(page.getByRole("dialog").locator('a.t-pcall[href^="tel:"]')).toHaveCount(2);
+    await expect(page.getByRole("dialog").locator('a.t-pcall[href^="tel:"]').first()).toBeVisible();
   });
 
   test("Naprawy tab opens the repairs sheet; the capsule loupe opens the search window", async ({ page }) => {

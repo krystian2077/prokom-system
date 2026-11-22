@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { PointCalls } from "../PointCalls";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import type { VisiblePoint } from "@/lib/tech/points";
 import { pointLocative } from "@/lib/tech/towns";
@@ -27,9 +27,7 @@ export function CtaBand({ points }: { points: VisiblePoint[] }) {
               <Link href={SUBMIT_HREF} className="t-sbtn t-sbtn--lg" data-track="zgloszenie_start" data-track-zrodlo="przycisk">
                 Zgłoś naprawę online
               </Link>
-              <a href={telHref(line.phone)} className="t-sbtn t-sbtn--lg t-sbtn--ghost" data-track="telefon_klik" data-track-miejsce="glowna-cta">
-                Zadzwoń: {line.phoneDisplay}
-              </a>
+              <PointCalls track="glowna-cta" className="t-cta-band__calls" />
             </div>
           </div>
           <div className="t-cta-band__points">

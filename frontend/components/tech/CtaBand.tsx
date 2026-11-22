@@ -1,16 +1,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { IconArrow } from "./icons";
+import { PointCalls } from "./PointCalls";
 
 type Action = { label: ReactNode; href: string; tel?: boolean; track?: string };
 
 /** Dark stage band with a call to action (design `.stg` CTA on #punkty-serwisowe, #o-firmie). */
 export function CtaBand({ eyebrow, title, primary, secondary }: { eyebrow: string; title: string; primary: Action; secondary?: Action }) {
+  // a phone action always means the points' own numbers (boss 22.11), never the general line
   const link = (a: Action, cls: string, arrow = false) =>
     a.tel ? (
-      <a href={a.href} className={cls} data-track="telefon_klik" data-track-miejsce={a.track ?? "cta"}>
-        {a.label}
-      </a>
+      <PointCalls track={a.track ?? "cta"} size="lg" className="t-ctaband__calls" />
     ) : (
       <Link href={a.href} className={cls}>
         {a.label}

@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { line } from "@/config/prokom";
 import type { RepairPageData } from "@/config/naprawy";
 import { DataSafety } from "@/components/tech/DataSafety";
 import { Faq } from "@/components/tech/Faq";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { PrepChecklist } from "@/components/tech/PrepChecklist";
-import { IconArrow, IconCheck, IconPhoneCall } from "@/components/tech/icons";
+import { IconArrow, IconCheck } from "@/components/tech/icons";
+import { PointCalls } from "@/components/tech/PointCalls";
 import { courierPageHref } from "@/lib/tech/courier";
 import { devicePages } from "@/lib/tech/devices";
 import { isLive, repairBySlug, repairPath } from "@/lib/tech/naprawy";
@@ -266,9 +267,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
               <b>Nie ma tu Twojego pytania?</b>
               <p>Zadzwoń albo opisz problem w zgłoszeniu.</p>
               <div className="t-rfaq__btns">
-                <a href={telHref(line.phone)} className="t-pbtn t-pbtn--stage t-pbtn--m" data-track="telefon_klik" data-track-miejsce="naprawa_faq">
-                  <IconPhoneCall size={16} /> {line.phoneDisplay}
-                </a>
+                <PointCalls track="naprawa_faq" className="t-rfaq__calls" />
                 <Link href={submit} className="t-pbtn t-pbtn--ghost-dark t-pbtn--m">
                   Opisz problem
                 </Link>
@@ -357,9 +356,7 @@ export function RepairPage({ page }: { page: RepairPageData }) {
               <Link href={submit} className="t-hbtn t-hbtn--acc t-shine t-rcta__go">
                 Zgłoś tę naprawę <IconArrow size={16} strokeWidth={2.6} />
               </Link>
-              <a href={telHref(line.phone)} className="t-pbtn t-pbtn--ghost-dark t-rcta__tel" data-track="telefon_klik" data-track-miejsce="naprawa_cta">
-                <IconPhoneCall size={17} /> {line.phoneDisplay}
-              </a>
+              <PointCalls track="naprawa_cta" size="lg" className="t-rcta__calls" />
               <Link href={devicePath} className="t-rcta__more">
                 {deviceName} <IconArrow size={14} />
               </Link>

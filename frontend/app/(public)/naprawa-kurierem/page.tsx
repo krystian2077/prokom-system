@@ -13,6 +13,7 @@ import { PREP_GUIDE_HREF, TRACK_HREF } from "@/lib/tech/nav";
 import { hoursLong, inCity, pointAddress, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb, type FaqItem } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
+import { PointPhonesInline } from "@/components/tech/PointCalls";
 
 const PATH = "/naprawa-kurierem";
 const DESCRIPTION =
@@ -180,10 +181,7 @@ export default function CourierPage() {
             <ul className="t-ticklist t-ticklist--warn">
               <li>
                 Urządzenia ze spuchniętą albo uszkodzoną baterią — przewoźnicy zwykle nie przyjmują uszkodzonych baterii litowych.{" "}
-                <a href={telHref(line.phone)} className="t-inline-link" data-t-inline="" data-track="telefon_klik" data-track-miejsce="kurier">
-                  Zadzwoń
-                </a>
-                , doradzimy.
+                Zadzwoń, doradzimy: <PointPhonesInline track="kurier" />.
               </li>
               <li>Sprzętu po świeżym zalaniu bez wcześniejszego kontaktu — liczy się czas, lepiej zadzwonić.</li>
               <li>Akcesoriów niezwiązanych z usterką.</li>

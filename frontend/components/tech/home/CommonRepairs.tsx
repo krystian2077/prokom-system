@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { line } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
 import { submitHref } from "@/lib/tech/wizard-data";
 import { IconArrow, IconPath, type HomeIcon } from "../icons";
 import { BrandLogo } from "../BrandLogo";
+import { pointPhonesText } from "@/lib/tech/point-format";
+import { callPoints } from "@/lib/tech/points";
 
 // TODO(krystian): home page keeps the marks here too, like the marquee (open decision, plan §7.7).
 const BRANDS = ["Apple", "Samsung", "Xiaomi", "Motorola", "realme", "Huawei"];
@@ -15,7 +16,7 @@ const REST: { t: string; s: string; icon: HomeIcon; fault?: string; tag?: string
   { t: "Tylna klapka i obudowa", s: "Pęknięte plecki, wygięta ramka, przyciski.", icon: "back", fault: "Przyciski i obudowa" },
   { t: "Głośnik i mikrofon", s: "Rozmówca Cię nie słyszy, dźwięk trzeszczy.", icon: "spk", fault: "Głośnik lub mikrofon" },
   { t: "Naprawa po zalaniu", s: "Nie włączaj i nie ładuj. Przynieś jak najszybciej.", icon: "drop", fault: "Po zalaniu", tag: "pilne" },
-  { t: "Inna usterka?", s: `Opisz ją w zgłoszeniu albo zadzwoń: ${line.phoneDisplay}.`, icon: "help", soft: true },
+  { t: "Inna usterka?", s: `Opisz ją w zgłoszeniu albo zadzwoń: ${pointPhonesText(callPoints())}.`, icon: "help", soft: true },
 ];
 
 /** "Najczęstsze naprawy telefonów" (design T.Main `#usterki`). */
