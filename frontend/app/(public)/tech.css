@@ -805,6 +805,83 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 @media (min-width: 768px) and (max-width: 1023.98px) {
   .tech .t-hero__devices { --hd-w: clamp(230px, calc(100% - 470px), 330px); --hd-r: 16px; top: auto; bottom: 66px; }
 }
+
+/* ALSEN partner plate (boss 22.11). Phone: a card under the buttons; ≥768: frosted glass on the dark
+   stage — tablet in the free corner above the devices, desktop under the devices beside the promises. */
+.tech .t-hero__alsen {
+  position: relative; display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 10px 16px 10px 10px;
+  border-radius: 20px; background: var(--card); border: 1px solid var(--bd); color: var(--ink); text-decoration: none;
+  overflow: hidden; isolation: isolate; transition: transform 0.25s var(--m-ease-emph, ease), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.tech .t-hero__alsenplate {
+  flex: none; display: grid; place-items: center; height: 46px; padding: 0 13px; border-radius: 13px;
+  background: #ffffff; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 8px 18px -10px rgba(170, 20, 30, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.tech .t-hero__alsenlogo { display: block; width: auto; height: 24px; }
+.tech .t-hero__alsentxt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tech .t-hero__alsentxt small { font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: var(--acct); }
+@media (max-width: 767.98px) {
+  .tech .t-hero__alsen { gap: 12px; padding: 9px 12px 9px 9px; }
+  .tech .t-hero__alsenplate { height: 40px; padding: 0 10px; border-radius: 11px; }
+  .tech .t-hero__alsenlogo { height: 20px; }
+  .tech .t-hero__alsentxt b { font-size: 14px; }
+  .tech .t-hero__alsenarr { width: 28px; height: 28px; }
+}
+.tech .t-hero__alsentxt b { font-size: 14.5px; font-weight: 800; line-height: 1.25; }
+.tech .t-hero__alsenarr {
+  flex: none; margin-left: auto; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  color: var(--acct); background: color-mix(in srgb, var(--acc) 12%, transparent); transition: transform 0.25s var(--m-ease-emph, ease);
+}
+/* a light sweep across the plate on hover */
+.tech .t-hero__alsen::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; transform: translateX(-120%);
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.16) 48%, transparent 66%);
+}
+@media (hover: hover) {
+  .tech .t-hero__alsen:hover { transform: translateY(-2px); }
+  .tech .t-hero__alsen:hover .t-hero__alsenarr { transform: translateX(3px); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .tech .t-hero__alsen:hover::after { transform: translateX(120%); transition: transform 0.9s var(--m-ease-emph, ease); }
+}
+.tech .t-hero__alsen:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
+
+@media (min-width: 768px) {
+  .tech .t-hero__alsen {
+    position: absolute; z-index: 1; margin: 0; color: #ffffff;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04) 60%, rgba(226, 72, 58, 0.1));
+    border-color: rgba(255, 255, 255, 0.17);
+    box-shadow: 0 28px 56px -28px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
+  }
+  .tech .t-hero__alsen:hover { border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 32px 60px -26px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(226, 72, 58, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+  .tech .t-hero__alsentxt small { color: #f29185; letter-spacing: 0.13em; }
+  .tech .t-hero__alsentxt b { color: #ffffff; }
+  .tech .t-hero__alsenarr { color: #ffffff; background: rgba(255, 255, 255, 0.12); }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .tech .t-hero__alsen {
+    top: clamp(40px, 5.4vw, 52px); right: 16px; width: clamp(230px, calc(100% - 470px), 330px); box-sizing: border-box;
+    flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px;
+  }
+  .tech .t-hero__alsenplate { height: 42px; }
+  .tech .t-hero__alsenarr { position: absolute; top: 18px; right: 14px; }
+}
+@media (min-width: 1024px) {
+  .tech .t-hero__alsen {
+    right: clamp(20px, 3.4vw, 64px); bottom: calc(46px + clamp(18px, 2vw, 30px)); width: min(420px, 38%); box-sizing: border-box;
+    padding: 11px 14px 11px 11px; gap: 16px;
+  }
+  .tech .t-hero__alsenplate { height: 52px; padding: 0 15px; }
+  .tech .t-hero__alsenlogo { height: 26px; }
+  .tech .t-hero__alsentxt b { font-size: 15.5px; }
+}
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .tech .t-hero__alsenplate { height: 46px; padding: 0 12px; }
+  .tech .t-hero__alsenlogo { height: 22px; }
+  .tech .t-hero__alsentxt b { font-size: 14px; }
+  .tech .t-hero__alsentxt small { letter-spacing: 0.08em; }
+}
 @media (min-width: 1024px) {
   .tech .t-ui .t-hero__h1 { white-space: nowrap; }
   .tech .t-hero__plink { font-size: 14px; gap: 7px; }
