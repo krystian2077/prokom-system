@@ -100,7 +100,7 @@ test.describe("okno wyszukiwania (1440)", () => {
     await openWithKeys(page);
     await field(page).fill("qwxzv");
     await expect(dialog(page)).toContainText("Nie znaleźliśmy „qwxzv”");
-    await expect(dialog(page).locator('a[href^="tel:"]')).toBeVisible();
+    await expect(dialog(page).locator('a.t-pcall[href^="tel:"]').first()).toBeVisible();
     await expect(dialog(page).getByRole("link", { name: "Zgłoś naprawę" })).toHaveAttribute("href", "/zgloszenie");
   });
 
@@ -228,7 +228,8 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
     await field(page).fill("zadzwoń");
     const list = page.getByRole("listbox", { name: "Wyniki wyszukiwania" });
     await expect(list.getByRole("group", { name: "Szybkie akcje" })).toBeVisible();
-    await expect(list.getByRole("option").first()).toHaveAttribute("href", telHref(line.phone));
+    // boss 22.11: the first point's own number leads; the general line follows
+    await expect(list.getByRole("option").first()).toHaveAttribute("href", telHref(pointPhone(servicePoints[0])));
     await field(page).fill("kopiuj numer");
     await expect(list.getByRole("option").first()).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("Enter");
@@ -242,7 +243,7 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
     await page.keyboard.press("Tab");
     await expect(dialog(page).getByRole("button", { name: "Zamknij wyszukiwarkę" })).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(dialog(page).locator('[data-qa="call"]')).toBeFocused();
+    await expect(dialog(page).locator('[data-qa="call2"]').first()).toBeFocused();
     await field(page).fill("ekran");
     await dialog(page).getByRole("button", { name: "Wyczyść pole" }).click();
     await expect(field(page)).toHaveValue("");
@@ -255,7 +256,7 @@ test.describe("mega wyszukiwanie: akcje, frazy, skróty (1440)", () => {
     await openWithKeys(page);
     await field(page).fill("qwxzv");
     await expect(dialog(page).locator(".t-sdlg__tips li")).toHaveCount(3);
-    await expect(dialog(page).getByRole("link", { name: /Zadzwoń/ })).toHaveAttribute("href", telHref(line.phone));
+    await expect(dialog(page).locator("a.t-pcall").first()).toHaveAttribute("href", telHref(pointPhone(servicePoints[0])));
     await dialog(page).locator(".t-sdlg__nonepop").getByRole("button", { name: "Pęknięty ekran" }).click();
     await expect(field(page)).toHaveValue("pęknięty ekran");
   });

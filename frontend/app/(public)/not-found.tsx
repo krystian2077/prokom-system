@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { line, telHref } from "@/config/prokom";
 import { DeviceGlyph, IconArrow } from "@/components/tech/icons";
 import { repairLinks, SUBMIT_HREF, TRACK_HREF } from "@/lib/tech/nav";
+import { PointPhonesInline } from "@/components/tech/PointCalls";
 
 export const metadata: Metadata = { title: "Nie ma takiej strony", robots: { index: false, follow: true } };
 
@@ -34,9 +34,7 @@ export default function NotFound() {
               </div>
               <p className="t-bhero__lead">
                 Potrzebujesz pomocy? Zadzwoń:{" "}
-                <a href={telHref(line.phone)} className="t-bhero__tel" data-t-inline="" data-track="telefon_klik" data-track-miejsce="404">
-                  {line.phoneDisplay}
-                </a>
+                <PointPhonesInline track="404" />
               </p>
             </div>
           </div>

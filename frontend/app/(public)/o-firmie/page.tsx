@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { company, line, servicePoints, telHref } from "@/config/prokom";
+import { company, line, servicePoints } from "@/config/prokom";
 import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
 import { AboutIconSvg, type AboutIcon } from "@/components/tech/about/about-icons";
 import { AboutRules, type AboutRule } from "@/components/tech/about/AboutRules";
@@ -16,6 +16,7 @@ import { CEIDG_URL, hoursLong, inCity, joinCities } from "@/lib/tech/point-forma
 import { publishedPoints, type VisiblePoint } from "@/lib/tech/points";
 import { POINTS_HREF, SUBMIT_HREF } from "@/lib/tech/nav";
 import { breadcrumbJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
+import { PointPhonesInline } from "@/components/tech/PointCalls";
 
 const published = publishedPoints(servicePoints);
 const two = published.length > 1;
@@ -127,10 +128,9 @@ export default function AboutPage() {
               <div>
                 <dt>Serwis</dt>
                 <dd>
-                  <a href={telHref(line.phone)} data-track="telefon_klik" data-track-miejsce="o_firmie" data-t-inline="">
-                    {line.phoneDisplay}
-                  </a>{" "}
-                  · <a href={`mailto:${line.email}`} data-t-inline="">{line.email}</a>
+                  <PointPhonesInline track="o_firmie" />
+                  {" · "}
+                  <a href={`mailto:${line.email}`} data-t-inline="">{line.email}</a>
                 </dd>
               </div>
               <div>

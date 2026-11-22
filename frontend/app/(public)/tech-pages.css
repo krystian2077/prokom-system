@@ -44,8 +44,8 @@
 .tech .t-shero__actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 22px; }
 .tech .t-shero__actions .t-hbtn { height: 54px; padding: 0 20px; font-size: 15.5px; }
 .tech .t-shero__submit { background: #e2483a; color: #1a0806; box-shadow: 0 18px 34px -16px rgba(226, 72, 58, 0.8); }
-.tech .t-shero__tel { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.24); color: #fff; }
-.tech .t-shero__tel:hover { background: rgba(255, 255, 255, 0.08); }
+.tech .t-shero__calls { display: flex; width: 100%; background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.24); color: #fff; }
+@media (min-width: 768px) { .tech .t-shero__calls { display: inline-flex; width: auto; } }
 .tech .t-shero__promises { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 22px 0 0; padding: 0; list-style: none; }
 .tech .t-shero__promises li { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: #c9bfbd; }
 .tech .t-shero__promises svg { color: #f29185; flex-shrink: 0; }

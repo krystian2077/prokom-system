@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { courierService, line, servicePoints, telHref, type PointKey } from "@/config/prokom";
+import { courierService, line, servicePoints, type PointKey } from "@/config/prokom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import {
@@ -44,6 +44,7 @@ import { SuccessCard } from "./SuccessCard";
 import { Choice, DotsIcon, FieldError, Segmented, TextField, aria, fieldId, radioKeys } from "./zgloszenie/FormParts";
 import { ModelHelper } from "./zgloszenie/ModelHelper";
 import { usePill } from "./usePill";
+import { PointPhonesInline } from "./PointCalls";
 
 /** Hammer Glass films exist for these devices (SPEC §6 /hammer-glass). */
 const FILM_DEVICES = BRAND_REQUIRED;
@@ -921,7 +922,7 @@ export function RepairForm() {
           </Link>
         ) : null}
         <p className="t-zgl__call">
-          Wolisz zadzwonić? <a href={telHref(line.phone)} data-track="telefon_klik" data-track-miejsce="zgloszenie">{line.phoneDisplay}</a>
+          Wolisz zadzwonić? <PointPhonesInline track="zgloszenie" />
         </p>
       </aside>
     </>

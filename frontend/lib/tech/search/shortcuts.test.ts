@@ -70,7 +70,8 @@ describe("szybkie akcje", () => {
   const byKind = (kind: string) => actions.filter((a) => a.kind === kind);
 
   it("come in the order of the pattern and every one is unique", () => {
-    expect(actions.map((a) => a.kind)).toEqual(["call", "call2", "call2", "copy", "mail", "route", "submit", "track", "contact", "theme"]);
+    // boss 22.11: the points' own numbers first, then the general line („Infolinia”)
+    expect(actions.map((a) => a.kind)).toEqual(["call2", "call2", "call", "copy", "mail", "route", "submit", "track", "contact", "theme"]);
     expect(new Set(actions.map((a) => a.id)).size).toBe(actions.length);
   });
 
@@ -116,7 +117,7 @@ describe("szybkie akcje", () => {
   });
 
   it("match a query by their words, at most a few", () => {
-    expect(matchActions(actions, "zadzwoń").map((a) => a.kind)).toEqual(["call", "call2", "call2"]);
+    expect(matchActions(actions, "zadzwoń").map((a) => a.kind)).toEqual(["call2", "call2", "call"]);
     expect(matchActions(actions, "kopiuj").map((a) => a.kind)).toEqual(["copy"]);
     expect(matchActions(actions, "motyw ciemny").map((a) => a.kind)).toEqual(["theme"]);
     expect(matchActions(actions, "dojazd zakopane").map((a) => a.id)).toEqual(["route:zakopane"]);

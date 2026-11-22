@@ -1,5 +1,9 @@
 import { line, servicePoints } from "@/config/prokom";
-import { hoursLong } from "@/lib/tech/point-format";
+import { hoursLong, pointPhonesText } from "@/lib/tech/point-format";
+import { callPoints } from "@/lib/tech/points";
+
+// Boss 22.11: posts give the points' own numbers, not the general line.
+const POINT_PHONES = pointPhonesText(callPoints());
 
 /** Contact data in the posts comes from config/prokom.ts (CLAUDE.md §4) — never typed into the text. */
 const RABKA = servicePoints.find((p) => p.key === "rabka")!;
@@ -101,7 +105,7 @@ W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju wymieniamy baterie do większ
 
 Prostą wymianę baterii realizujemy często tego samego dnia.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -172,7 +176,7 @@ Jeśli priorytetem jest **twardość i odporność na zarysowania** — wybierz 
 
 Folie Hammer Glass CUT wycinamy i montujemy na miejscu w serwisie PRO-KOM przy ${RABKA.street} w Rabce-Zdroju. Posiadamy ploter VersaBlade i bazę 10 000+ modeli. Montaż trwa około 5 minut.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój
     `.trim(),
   },
@@ -236,7 +240,7 @@ To zależy od kilku czynników:
 
 PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju. Przyjedź jak najszybciej po zalaniu. Obsługujemy też klientów wysyłkowo z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -296,7 +300,7 @@ Większość współczesnych telefonów ładuje się przez USB-C. Standard Power
 
 Wybieraj ładowarki z oznaczeniem CE i danymi producenta. Sprawdź, czy obsługują standard szybkiego ładowania Twojego telefonu, i dobierz kabel o odpowiedniej mocy. Jeśli telefon mimo dobrej ładowarki ładuje się wolno albo się grzeje, przyczyną może być port ładowania lub zużyta bateria — to sprawdzimy w serwisie.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -352,7 +356,7 @@ Dla iPhone 12 i nowszych. Ma wbudowany magnes zgodny z ekosystemem MagSafe.
 
 Dobieraj etui do dokładnego modelu telefonu — otwory na aparaty, przyciski i port muszą się zgadzać. Etui nie powinno naciskać na ekran ani przyciski, a przy ładowaniu indukcyjnym sprawdź, czy nie jest za grube. Ekran dodatkowo ochroni folia Hammer Glass CUT, którą wycinamy na wymiar w serwisie.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -416,7 +420,7 @@ Jeśli telefon po zmianie ładowarki ładuje się wolno albo się grzeje — prz
 ## Gdzie jesteśmy?
 
 **Adres:** ${RABKA.street}, 34-700 Rabka-Zdrój
-**Tel:** ${line.phoneDisplay}
+**Tel.:** ${POINT_PHONES}
 **Godziny:** ${RABKA_HOURS}
     `.trim(),
   },
@@ -465,7 +469,7 @@ Dokładny zakres naprawy zależy głównie od modelu telefonu, rodzaju wyświetl
 
 Serwis PRO-KOM przy ${RABKA.street} w Rabce-Zdroju. Wymieniamy ekrany na poczekaniu lub w ciągu jednego dnia.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -523,7 +527,7 @@ Zużyta bateria może powodować problemy z ładowaniem. Telefon ładuje się do
 - **Bateria jest zużyta** — wymiana przywraca pełną sprawność.
 - **Problem z płytą główną** — rzadsze, ale możliwe po zalaniu lub upadku.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -587,7 +591,7 @@ Przed oddaniem telefonu testujemy go — sprawdzamy, czy naprawa się powiodła.
 
 Nie tylko z Rabki-Zdroju. Obsługujemy klientów z Mszany Dolnej, Jordanowa, Raby Wyżnej, Nowego Targu i Czarnego Dunajca — osobiście i przez wysyłkę kurierską.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -640,7 +644,7 @@ GaN to skrót od galium nitride (azotek galu) — materiał półprzewodnikowy, 
 
 Wybieraj ładowarki GaN znanych producentów, z oznaczeniem CE i obsługą USB-C Power Delivery. Do ładowania laptopa użyj kabla USB-C, który obsługuje pełną moc ładowarki — przy 100W potrzebny jest kabel 5A.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -710,7 +714,7 @@ Telefony Samsung z serii Galaxy to jedne z najczęściej serwisowanych smartfon�
 
 W PRO-KOM Tech diagnozujemy i naprawiamy telefony Samsung: wymiana baterii, portów ładowania, ekranów i innych podzespołów. Diagnoza jest bezpłatna, a naprawę rozpoczynamy dopiero po Twojej akceptacji zakresu prac.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -780,7 +784,7 @@ iPhone uchodzi za niezawodny, ale jak każde urządzenie zużywa się i bywa pod
 
 W PRO-KOM Tech naprawiamy iPhone: wymiana baterii, ekranów, portów ładowania oraz diagnostyka usterek po zalaniu. Przed naprawą zawsze dostajesz wycenę, a sama diagnoza jest bezpłatna.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1164,7 +1168,7 @@ Ciekawą opcją jest **laptop poleasingowy** — certyfikowany sprzęt biznesowe
 
 W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju ocenimy usterkę bezpłatnie i powiemy, czy naprawa się opłaca. Obsługujemy klientów z Rabki-Zdroju, Mszany Dolnej, Jordanowa, Nowego Targu i okolic.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1238,7 +1242,7 @@ Jeśli powyższe nie pomaga, laptop wymaga:
 
 W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju czyścimy laptopy i wymieniamy pastę termalną. Po serwisie temperatury wyraźnie spadają, a laptop działa sprawnie i cicho.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1300,7 +1304,7 @@ Główne różnice:
 
 W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju wymieniamy dyski i przenosimy system wraz z danymi. Po wymianie laptop uruchamia się kilkukrotnie szybciej.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1371,7 +1375,7 @@ Jednym z pierwszych pytań, jakie słyszymy w serwisie, jest to, jak wygląda ca
 
 W PRO-KOM Tech przy ${RABKA.street} w Rabce-Zdroju diagnoza jest w większości przypadków bezpłatna. Zakres naprawy przedstawiamy przed realizacją. Jeśli się nie zgadzasz — możesz zabrać sprzęt bez zobowiązań.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1448,7 +1452,7 @@ EliteBook to flagowce HP z HP Wolf Security. ProBook to dobra opcja dla małych 
 
 PRO-KOM oferuje laptopy biznesowe nowe i poleasingowe. Możemy doradzić, skonfigurować i serwisować zakupiony sprzęt.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1523,7 +1527,7 @@ To inny kategoria niż "używany" laptop kupiony od osoby prywatnej — laptopy 
 
 PRO-KOM oferuje laptopy poleasingowe od certyfikowanego partnera — z gwarancją, sprawdzone i gotowe do pracy. Możemy też serwisować zakupiony sprzęt.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1592,7 +1596,7 @@ Rzeczywisty czas pracy powyżej **8 godzin** — szukaj laptopów z baterią 50 
 
 Jeśli Twój obecny laptop zwalnia albo się psuje, w PRO-KOM sprawdzimy, czy wystarczy naprawa lub modernizacja (np. dysk SSD, więcej RAM), zanim zdecydujesz się na nowy sprzęt. Diagnoza jest bezpłatna.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1920,7 +1924,7 @@ Tani zasilacz może zniszczyć całą resztę zestawu przy awarii.
 
 Jeśli składasz komputer sam i coś nie działa — zestaw nie startuje, przegrzewa się albo restartuje w grach — w PRO-KOM zdiagnozujemy podzespoły, sprawdzimy temperatury i stabilność oraz zainstalujemy system ze sterownikami.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -1990,7 +1994,7 @@ Jeśli grasz głównie w domu — PC stacjonarny da Ci więcej za mniejsze pieni
 
 Niezależnie od wyboru, w PRO-KOM serwisujemy zarówno komputery stacjonarne, jak i laptopy gamingowe — od czyszczenia i wymiany pasty termoprzewodzącej po modernizację.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2065,7 +2069,7 @@ Wymiana karty graficznej na nowszą pozwoli grać lub pracować z grafiką na wy
 
 W PRO-KOM doradzamy w doborze komponentów, instalujemy i testujemy. Możemy też ocenić, czy upgrade ma sens w Twoim konkretnym przypadku.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2154,7 +2158,7 @@ Dobry zasilacz od sprawdzonego producenta (Corsair, be quiet!, Seasonic, EVGA) t
 
 W PRO-KOM pomagamy dobrać kompatybilne podzespoły i instalujemy je w Twoim sprzęcie.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2235,7 +2239,7 @@ Wiele programów uruchamia się automatycznie ze startem systemu i spowalnia ła
 
 W PRO-KOM Tech przy ${RABKA.street} diagnoza jest bezpłatna. Ocenimy przyczynę spowolnienia i zaproponujemy optymalne rozwiązanie.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2308,7 +2312,7 @@ Bardzo małe komputery jak Intel NUC czy ASUS Mini PC. Wydajność biurowa w wyj
 
 PRO-KOM oferuje komputery biznesowe — nowe i poleasingowe, sprawdzone z gwarancją. Doradzamy, konfigurujemy i serwisujemy.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2602,7 +2606,7 @@ Drukarka laserowa używa tonera (proszku) i ciepła do utrwalenia wydruku na pap
 
 W PRO-KOM Tech przy ${RABKA.street} serwisujemy drukarki atramentowe i laserowe wszystkich popularnych marek.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2684,7 +2688,7 @@ Pojemnik na nadmiar tuszu jest pełny. Wymaga serwisu — fizyczne opróżnienie
 
 W PRO-KOM Tech przy ${RABKA.street} naprawiamy drukarki HP, Canon, Epson, Brother, Kyocera i innych marek.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2764,7 +2768,7 @@ Jeśli powyższe kroki nie pomogły, problem może być sprzętowy:
 - Problem z płytą elektroniczną.
 - Zatkane głowice wymagające profesjonalnego czyszczenia.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2844,7 +2848,7 @@ Sprawdzone drukarki z szeroką dostępnością serwisu i materiałów. Seria HP 
 
 PRO-KOM oferuje drukarki biurowe i serwisuje sprzęt różnych marek. Doradzamy w wyborze odpowiedniego modelu do potrzeb Twojej firmy.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },
@@ -2908,7 +2912,7 @@ Szczególnie warto naprawiać:
 
 W PRO-KOM Tech przy ${RABKA.street} serwisujemy drukarki HP, Canon, Epson, Brother, Kyocera i inne. Przyjmujemy sprzęt domowy i biurowy z Rabki-Zdroju oraz z okolic — Mszany Dolnej, Jordanowa, Nowego Targu i Czarnego Dunajca.
 
-**Zadzwoń:** ${line.phoneDisplay}
+**Zadzwoń:** ${POINT_PHONES}
 **Adres:** ${RABKA.street}, Rabka-Zdrój (${RABKA_HOURS})
     `.trim(),
   },

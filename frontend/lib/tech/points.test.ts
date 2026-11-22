@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { GENERAL_EMAIL_LABEL, GENERAL_PHONE_LABEL, line, pointEmail, pointPhone, servicePoints, type ServicePoint } from "@/config/prokom";
-import { activeNotice, isDraftMode, publishedPoints, visiblePoints } from "./points";
+import { activeNotice, callPoints, isDraftMode, publishedPoints, visiblePoints } from "./points";
+import { pointPhonesText } from "./point-format";
 
 /** Test data: the real config with Zakopane switched back to unpublished. */
 const zakopaneUnpublished: ServicePoint[] = servicePoints.map((p) =>
@@ -50,6 +51,13 @@ describe("point contact (runda 18.11 §1.2)", () => {
     expect(pointEmail({ email: "rabka@prokomserwis.pl" })).toEqual({ email: "rabka@prokomserwis.pl", general: false });
     // until the mailboxes exist (DirectAdmin SH 1), no point shows an own address
     expect(servicePoints.every((p) => p.email === null)).toBe(true);
+  });
+  it("call numbers are the points' own, both published, in config order (boss 22.11)", () => {
+    const calls = callPoints(visiblePoints(false));
+    expect(calls.map((p) => p.key)).toEqual(["rabka", "zakopane"]);
+    expect(calls.map((p) => p.phone)).not.toContain(line.phone);
+    expect(pointPhonesText(calls)).toBe("Rabka-Zdrój 18 267 65 11, Zakopane 18 541 20 15");
+    expect(callPoints(visiblePoints(false, [{ ...rabka }, { ...zakopane, published: false }])).map((p) => p.key)).toEqual(["rabka"]);
   });
   it("one label for the general number and the general e-mail", () => {
     expect(GENERAL_PHONE_LABEL).toBe("Infolinia");

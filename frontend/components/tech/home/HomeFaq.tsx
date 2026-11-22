@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { line, telHref } from "@/config/prokom";
+import { line } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
 import { courierPaysText } from "@/lib/tech/courier";
 import type { VisiblePoint } from "@/lib/tech/points";
@@ -8,6 +8,7 @@ import { faqJsonLd } from "@/lib/tech/seo";
 import { Faq } from "../Faq";
 import { IconArrow } from "../icons";
 import { OpeningStatus } from "../OpeningStatus";
+import { PointCalls } from "../PointCalls";
 
 /**
  * "Zanim oddasz sprzęt" (design T.Main `#faq`). Answers come from the current site FAQ
@@ -50,9 +51,7 @@ export function HomeFaq({ points }: { points: VisiblePoint[] }) {
           <p className="t-lead">Najczęstsze pytania o cenę, czas, dane i gwarancję.</p>
           <div className="t-card t-faqwrap__contact">
             <OpeningStatus points={points.filter((p) => !p.draft)} variant="pill" skeletonCh={14} />
-            <a href={telHref(line.phone)} className="t-faqwrap__tel" data-track="telefon_klik" data-track-miejsce="glowna-faq">
-              {line.phoneDisplay}
-            </a>
+            <PointCalls track="glowna-faq" className="t-pcalls--block t-faqwrap__calls" />
             <a href={`mailto:${line.email}`} className="t-faqwrap__mail">
               {line.email}
             </a>

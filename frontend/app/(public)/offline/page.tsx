@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { line, pointPhone, servicePoints, telHref } from "@/config/prokom";
+import { pointPhone, servicePoints, telHref } from "@/config/prokom";
 import { hoursRows, pointAddress, pointPhoneDisplay } from "@/lib/tech/point-format";
 import { publishedPoints } from "@/lib/tech/points";
+import { PointCalls } from "@/components/tech/PointCalls";
 
 export const metadata: Metadata = { title: "Brak połączenia", robots: { index: false, follow: false } };
 
@@ -23,9 +24,7 @@ export default function OfflinePage() {
             </h1>
             <p className="t-bhero__lead">Gdy połączenie wróci, strona zadziała jak zwykle. Pilna sprawa? Zadzwoń do serwisu.</p>
             <div className="t-btnrow">
-              <a href={telHref(line.phone)} className="t-pbtn t-pbtn--stage">
-                Zadzwoń: {line.phoneDisplay}
-              </a>
+              <PointCalls track="offline" size="lg" />
               <a href="/" className="t-pbtn t-pbtn--ghost-dark">
                 Spróbuj ponownie
               </a>

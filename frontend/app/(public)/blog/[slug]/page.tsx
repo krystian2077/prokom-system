@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { line, telHref } from "@/config/prokom";
+import { line } from "@/config/prokom";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
 import { Faq } from "@/components/tech/Faq";
@@ -15,6 +15,7 @@ import { formatPostDate, renderPostContent } from "@/lib/tech/blog-render";
 import { SUBMIT_HREF } from "@/lib/tech/nav";
 import { breadcrumbJsonLd, faqJsonLd, POST_TITLE_SUFFIX_MAX, type Crumb } from "@/lib/tech/seo";
 import { SITE_URL } from "@/lib/site-config";
+import { PointCalls } from "@/components/tech/PointCalls";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -154,9 +155,7 @@ export default async function BlogPostPage({ params }: Props) {
               <Link href={SUBMIT_HREF} className="t-pbtn t-pbtn--acc t-pbtn--m" data-track="zgloszenie_start" data-track-zrodlo="blog">
                 Zgłoś naprawę
               </Link>
-              <a href={telHref(line.phone)} className="t-post__tel" data-track="telefon_klik" data-track-miejsce="blog">
-                {line.phoneDisplay}
-              </a>
+              <PointCalls track="blog" size="sm" />
             </div>
             <Link href={catPath} className="t-post__back">
               ← Więcej: {cat.name}
