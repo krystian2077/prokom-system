@@ -76,6 +76,13 @@ export function Footer({ points, publishedCount }: { points: VisiblePoint[]; pub
                   <a href={telHref(p.phone)} className="t-footer__pphone" data-track="telefon_klik" data-track-miejsce="stopka" data-track-punkt={p.key}>
                     {pointPhoneDisplay(p)}
                   </a>
+                  {p.email ? (
+                    <a href={`mailto:${p.email}`} className="t-footer__pmail" data-track="email_klik" data-track-miejsce="stopka" data-track-punkt={p.key}>
+                      {/* break only after "@", never inside the domain */}
+                      {p.email.split("@")[0]}@<wbr />
+                      {p.email.split("@")[1]}
+                    </a>
+                  ) : null}
                   <span className="t-footer__addr">
                     {p.street}
                     <br />

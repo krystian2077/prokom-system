@@ -37,11 +37,16 @@ test.describe("1440 contact", () => {
     test(`${path}: big point numbers, the general line only as a small note`, async ({ page }) => {
       await page.goto(path);
       const big = page.locator(".t-bigphones").first();
-      for (const p of points) await expect(big.locator(`a[href="${telHref(p.phone)}"]`)).toContainText(p.name);
+      for (const p of points) {
+        const item = big.locator(".t-bigphones__item", { has: page.locator(`a[href="${telHref(p.phone)}"]`) });
+        await expect(item).toContainText(p.name);
+        // boss 22.11: each point's own mailbox under its number
+        await expect(item.locator(`a[href="mailto:${p.email}"]`)).toBeVisible();
+      }
       const note = page.locator(".t-genline").first();
       await expect(note).toContainText("Infolinia");
       await expect(note.locator(`a[href="${general}"]`)).toBeVisible();
-      const bigSize = await big.locator("b").first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+      const bigSize = await big.locator(".t-bigphones__tel").first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
       const noteSize = await note.evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
       expect(bigSize).toBeGreaterThan(noteSize * 2);
     });
@@ -50,7 +55,27 @@ test.describe("1440 contact", () => {
   test("footer: each point card carries its own number; the general line is a note", async ({ page }) => {
     await page.goto("/o-firmie");
     const footer = page.locator(".t-footer");
-    for (const p of points) await expect(footer.locator(`.t-footer__card a[href="${telHref(p.phone)}"]`)).toHaveCount(1);
+    for (const p of points) {
+      await expect(footer.locator(`.t-footer__card a[href="${telHref(p.phone)}"]`)).toHaveCount(1);
+      await expect(footer.locator(`.t-footer__card a[href="mailto:${p.email}"]`)).toHaveCount(1);
+    }
     await expect(footer.locator(".t-genline")).toContainText("Infolinia");
   });
+});
+
+test.describe("1440 point pages", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test.beforeEach(async ({ page }) => pinDaylight(page));
+  const [rabka, zakopane] = points;
+  for (const [path, own, other] of [
+    ["/serwis-telefonow-rabka-zdroj", rabka, zakopane],
+    ["/serwis-telefonow-zakopane", zakopane, rabka],
+  ] as const) {
+    test(`${path}: the point's own e-mail in the body, never the other point's`, async ({ page }) => {
+      await page.goto(path);
+      const main = page.locator("main");
+      await expect(main.locator(`a[href="mailto:${own.email}"]`).first()).toBeVisible();
+      await expect(main).not.toContainText(other.email!);
+    });
+  }
 });
