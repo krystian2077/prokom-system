@@ -77,7 +77,7 @@ export const servicePoints: ServicePoint[] = [
     // Rabka point number — confirmed by Krystian 19.11.2026 (same as the Google business profile).
     phone: "+48 18 267 65 11",
     // TODO(krystian): rabka@prokomserwis.pl — decyzja szefa (alias do kontakt@ czy skrzynka); wpisać po założeniu w SH 1.
-    email: null,
+    email: "rabka@prokomserwis.pl", // mailbox created in Seohost SH 1 on 23.11.2026 (boss request 22.11)
     mapsUrl: null,
     parkingNote: "Bezpłatny parking przy salonie.",
     published: true,
@@ -97,7 +97,7 @@ export const servicePoints: ServicePoint[] = [
     ],
     phone: "+48 18 541 20 15",
     // TODO(krystian): zakopane@prokomserwis.pl — decyzja szefa (alias do kontakt@ czy skrzynka); wpisać po założeniu w SH 1.
-    email: null,
+    email: "zakopane@prokomserwis.pl", // mailbox created in Seohost SH 1 on 23.11.2026 (boss request 22.11)
     mapsUrl: null,
     parkingNote: "Bezpłatny parking.",
     published: true,

@@ -1,8 +1,9 @@
 import { Fragment } from "react";
-import { GENERAL_PHONE_LABEL, line, telHref } from "@/config/prokom";
+import { GENERAL_PHONE_LABEL, line, pointEmail, telHref } from "@/config/prokom";
 import { pointPhoneDisplay } from "@/lib/tech/point-format";
 import { callPoints, type VisiblePoint } from "@/lib/tech/points";
 import { IconPhoneCall } from "./icons";
+import { PageIconSvg } from "./page-icons";
 
 /**
  * Boss 22.11: the main numbers are the two points' own (Rabka-Zdrój, Zakopane); the general line
@@ -33,12 +34,24 @@ export function PointCalls({ track, className = "", points = callPoints(), size 
 export function PointPhonesBig({ track, className = "", points = callPoints() }: { track: string; className?: string; points?: VisiblePoint[] }) {
   return (
     <div className={`t-bigphones ${className}`}>
-      {points.map((p) => (
-        <a key={p.key} href={telHref(p.phone)} className={`t-bigphones__item${p.draft ? " t-draft" : ""}`} data-track="telefon_klik" data-track-miejsce={track} data-track-punkt={p.key}>
-          <span>{p.name}</span>
-          <b>{pointPhoneDisplay(p)}</b>
-        </a>
-      ))}
+      {points.map((p) => {
+        const mail = pointEmail(p);
+        return (
+          <div key={p.key} className={`t-bigphones__item${p.draft ? " t-draft" : ""}`}>
+            <span className="t-bigphones__city">{p.name}</span>
+            <a href={telHref(p.phone)} className="t-bigphones__tel" data-track="telefon_klik" data-track-miejsce={track} data-track-punkt={p.key}>
+              {pointPhoneDisplay(p)}
+            </a>
+            {/* boss 22.11: each point has its own mailbox; until then the general one is not repeated here */}
+            {mail.general ? null : (
+              <a href={`mailto:${mail.email}`} className="t-bigphones__mail" data-track="email_klik" data-track-miejsce={track} data-track-punkt={p.key}>
+                <PageIconSvg icon="mail" size={15} />
+                {mail.email}
+              </a>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

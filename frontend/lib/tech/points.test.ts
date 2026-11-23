@@ -49,8 +49,9 @@ describe("point contact (runda 18.11 §1.2)", () => {
   it("a point without its own e-mail falls back to line.email marked general", () => {
     expect(pointEmail({ email: null })).toEqual({ email: line.email, general: true });
     expect(pointEmail({ email: "rabka@prokomserwis.pl" })).toEqual({ email: "rabka@prokomserwis.pl", general: false });
-    // until the mailboxes exist (DirectAdmin SH 1), no point shows an own address
-    expect(servicePoints.every((p) => p.email === null)).toBe(true);
+    // boss 22.11: own mailboxes, created in Seohost SH 1 on 23.11.2026
+    expect(servicePoints.map((p) => p.email)).toEqual(["rabka@prokomserwis.pl", "zakopane@prokomserwis.pl"]);
+    for (const p of servicePoints) expect(pointEmail(p)).toEqual({ email: p.email, general: false });
   });
   it("call numbers are the points' own, both published, in config order (boss 22.11)", () => {
     const calls = callPoints(visiblePoints(false));
