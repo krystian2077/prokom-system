@@ -111,9 +111,10 @@ EMAIL_SERVICE_POINTS = {
         "hours2": "Sob 9:00–14:00",
         "hours3": "Nd nieczynne",
         "hours_short": "Pn–Pt 9:00–17:00, Sob 9:00–14:00",
-        "phone": "883 200 151",
-        "tel": "+48883200151",
-        "map": "https://www.google.com/maps/dir/?api=1&destination=49.613,19.9629",
+        "phone": "18 267 65 11",
+        "tel": "+48182676511",
+        "email": "rabka@prokomserwis.pl",
+        "map": "https://www.google.com/maps/dir/?api=1&destination=49.60994,19.95339",
         "note": "Bezpłatny parking przy salonie.",
     },
     "Zakopane": {
@@ -128,7 +129,8 @@ EMAIL_SERVICE_POINTS = {
         "hours_short": "Pn–Pt 10:00–16:30",
         "phone": "18 541 20 15",
         "tel": "+48185412015",
-        "map": "https://www.google.com/maps/dir/?api=1&destination=49.2978,19.9539",
+        "email": "zakopane@prokomserwis.pl",
+        "map": "https://www.google.com/maps/dir/?api=1&destination=49.29322,19.95699",
         "note": "Bezpłatny parking.",
     },
 }
@@ -368,7 +370,7 @@ def send_repair_submission_confirmation(repair, fail_silently=True, *, intake_st
         logistics_plain += f"- Punkt odbioru: {_point_label(logistics['pickup_point'])}\n"
     if logistics["return_address_display"]:
         logistics_plain += f"- Adres odesłania: {logistics['return_address_display']}\n"
-    contact_plain = "Kontakt: Rabka-Zdrój tel. 883 200 151, Zakopane tel. 18 541 20 15, kontakt@prokomserwis.pl\n\n"
+    contact_plain = "Kontakt: Rabka-Zdrój tel. 18 267 65 11, rabka@prokomserwis.pl · Zakopane tel. 18 541 20 15, zakopane@prokomserwis.pl · kontakt@prokomserwis.pl\n\n"
 
     if intake_stationary:
         body_plain = (
