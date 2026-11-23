@@ -662,13 +662,18 @@ html[data-tech-theme="dark"] .tech .t-footer { box-shadow: inset 0 1px 0 rgba(25
 }
 .tech .t-bigphones { display: grid; gap: 10px 28px; margin-top: 18px; }
 @media (min-width: 480px) { .tech .t-bigphones { grid-template-columns: repeat(2, max-content); } }
-.tech .t-bigphones__item { display: flex; flex-direction: column; gap: 2px; color: inherit; text-decoration: none; }
-.tech .t-bigphones__item span { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--acct); }
-.tech .t-bigphones__item b { font-family: var(--t-font-head); font-stretch: 108%; font-size: clamp(28px, 2vw + 16px, 38px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.tech .t-bigphones__item:hover b { color: var(--acct); }
-.tech .t-bigphones + .t-genline { display: block; margin-top: 10px; }
+.tech .t-bigphones__item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.tech .t-bigphones__city { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--acct); }
+.tech .t-bigphones__tel { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; font-family: var(--t-font-head); font-stretch: 108%; font-size: clamp(28px, 2vw + 16px, 38px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tech .t-bigphones__tel:hover { color: var(--acct); }
+/* the point's own mailbox right under its number (boss 22.11) */
+.tech .t-bigphones__mail { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 14.5px; font-weight: 700; color: inherit; opacity: 0.86; text-decoration: none; overflow-wrap: anywhere; }
+.tech .t-bigphones__mail svg { flex: none; color: var(--acct); }
+.tech .t-bigphones__mail:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }.tech .t-bigphones + .t-genline { display: block; margin-top: 10px; }
 .tech .t-footer a.t-footer__pphone { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--t-font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; color: var(--foot-ink-strong); font-variant-numeric: tabular-nums; }
 .tech .t-footer .t-genline { color: inherit; }
+.tech .t-footer a.t-footer__pmail { display: inline-flex; align-items: center; min-height: 44px; margin-top: -8px; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--foot-ink-strong); opacity: 0.85; overflow-wrap: normal; word-break: normal; }
+.tech .t-footer a.t-footer__pmail:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
 .tech .t-footer__genline { display: block; padding: 12px 0; line-height: 20px; }
 /* on the dark hero stages (/kontakt, /punkty-serwisowe) the note keeps AA contrast */
 .tech .t-ab-hero .t-genline { color: #c9bfbd; }
