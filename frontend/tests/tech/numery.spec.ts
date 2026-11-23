@@ -33,7 +33,7 @@ test.describe("1440 contact", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
   test.beforeEach(async ({ page }) => pinDaylight(page));
 
-  for (const path of ["/kontakt", "/punkty-serwisowe"]) {
+  for (const path of ["/kontakt"]) {
     test(`${path}: big point numbers, the general line only as a small note`, async ({ page }) => {
       await page.goto(path);
       const big = page.locator(".t-bigphones").first();
@@ -51,6 +51,20 @@ test.describe("1440 contact", () => {
       expect(bigSize).toBeGreaterThan(noteSize * 2);
     });
   }
+
+  test("/punkty-serwisowe: each salon card has its own big number and mailbox; the general line is a note (23.11)", async ({ page }) => {
+    await page.goto("/punkty-serwisowe");
+    for (const p of points) {
+      const card = page.locator(`#${p.key}`);
+      await expect(card.locator(`.t-pccontact a[href="${telHref(p.phone)}"]`)).toBeVisible();
+      await expect(card.locator(`.t-pccontact a[href="mailto:${p.email}"]`)).toBeVisible();
+      await expect(card.locator(".t-pcmap")).toBeVisible();
+    }
+    await expect(page.locator("main .t-genline")).toContainText("Infolinia");
+    // one path, no repeats: no hero phone cards and no phone CTA band on this page
+    await expect(page.locator("main .t-bigphones")).toHaveCount(0);
+    await expect(page.locator("main .t-ctaband")).toHaveCount(0);
+  });
 
   test("footer: each point card carries its own number; the general line is a note", async ({ page }) => {
     await page.goto("/o-firmie");

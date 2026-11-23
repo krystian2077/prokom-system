@@ -68,7 +68,7 @@ export const servicePoints: ServicePoint[] = [
     street: "ul. Orkana 16B",
     postal: "34-700",
     city: "Rabka-Zdrój",
-    geo: { lat: 49.613, lng: 19.9629 },
+    geo: { lat: 49.60994, lng: 19.95339 }, // OSM node of „16B, Władysława Orkana” (Nominatim, 23.11.2026); the old pin was ~750 m off
     hours: [
       { days: "pn–pt", open: "09:00", close: "17:00" },
       { days: "sob", open: "09:00", close: "14:00" },
@@ -89,7 +89,7 @@ export const servicePoints: ServicePoint[] = [
     postal: "34-500",
     city: "Zakopane",
     // Shop pin from Krystian, 15.11.2026 (ul. Stanisława Staszica 8, by Krupówki).
-    geo: { lat: 49.2978, lng: 19.9539 },
+    geo: { lat: 49.29322, lng: 19.95699 }, // OSM building „8, Stanisława Staszica” (Nominatim, 23.11.2026); the old pin was ~550 m off
     hours: [
       { days: "pn–pt", open: "10:00", close: "16:30" },
       { days: "sob", open: null, close: null },
