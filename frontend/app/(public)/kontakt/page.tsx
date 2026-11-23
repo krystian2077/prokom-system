@@ -56,7 +56,6 @@ export default function ContactPage() {
               {/* boss 22.11: the points' own numbers are the main ones; the general line only as a note */}
               <PointPhonesBig track="kontakt_hero" />
               <GeneralLineNote track="kontakt_hero" />
-              <OpeningStatus points={published} withName className="t-status--stage-text t-ct2-hero__status" skeletonCh={30} />
               <div className="t-ab-hero__actions">
                 <a href="#formularz" className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit">
                   Napisz wiadomość
