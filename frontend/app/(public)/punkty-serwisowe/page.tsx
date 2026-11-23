@@ -1,21 +1,20 @@
 import Link from "next/link";
-import { GENERAL_EMAIL_LABEL, line, servicePoints, telHref } from "@/config/prokom";
-import { GeneralLineNote, PointPhonesBig } from "@/components/tech/PointCalls";
-import { AboutHeroArt } from "@/components/tech/about/AboutHeroArt";
+import { servicePoints } from "@/config/prokom";
+import { GeneralLineNote } from "@/components/tech/PointCalls";
 import { AboutIconSvg } from "@/components/tech/about/about-icons";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
-import { CtaBand } from "@/components/tech/CtaBand";
 import { CourierTeaser } from "@/components/tech/device/CourierTeaser";
 import { Faq } from "@/components/tech/Faq";
 import { NearestPoint } from "@/components/tech/home/NearestPoint";
 import { PodhaleMap } from "@/components/tech/home/PodhaleMap";
-import { IconCheck } from "@/components/tech/icons";
+import { IconArrow, IconCheck } from "@/components/tech/icons";
 import { IntentCards } from "@/components/tech/IntentCards";
 import { JsonLd } from "@/components/tech/JsonLd";
 import { OpeningStatus } from "@/components/tech/OpeningStatus";
 import { PointCard } from "@/components/tech/PointCard";
 import { claim } from "@/lib/tech/claims";
-import { inCity, joinCities, saturdayHours } from "@/lib/tech/point-format";
+import { SUBMIT_HREF } from "@/lib/tech/nav";
+import { inCity, joinCities } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { visitFaq, visitLead } from "@/lib/tech/visit-faq";
@@ -42,10 +41,14 @@ const CRUMBS: Crumb[] = [
 const TICKS = ["Jedno zgłoszenie online", "Jeden status naprawy", "Oddajesz w jednym punkcie, odbierasz w drugim"];
 const PLOTTER = "Ploter w obu salonach dopasowuje folię do Twojego modelu na miejscu, także po naprawie.";
 
+/**
+ * Points page (Krystian 23.11: „najwyższy poziom, intuicyjnie i z sensem”): one path, no repeats —
+ * where (hero: nearest point + Podhale map) → when and how (one card per salon: live status,
+ * big number and mailbox, real street map, week hours, route) → what you come with → FAQ.
+ */
 export default function PointsPage() {
   const points = visiblePoints();
   const faq = visitFaq(published);
-  const saturday = saturdayHours(main);
   const courier = claim("courierWholeCountry");
   return (
     <div className="t-ui t-page t-visit">
@@ -54,126 +57,93 @@ export default function PointsPage() {
 
       <section className="t-section--hero" id="punkty" data-rail="Punkty serwisowe">
         <div className="t-container">
-          <div className="t-ab-hero t-pts2-hero">
-            <div className="t-ab-hero__text">
+          <div className="t-pts2-net t-pts3-hero">
+            <div className="t-pts2-net__text">
               <Breadcrumbs items={CRUMBS} />
-              <OpeningStatus points={published} withName variant="pill" className="t-status--stage t-pts2-hero__status" skeletonCh={26} />
-              <h1 className="t-ab-hero__h1 t-pts2-hero__h1">
+              <h1 className="t-pts3-hero__h1">
                 {two ? (
                   <>
-                    Dwa punkty serwisowe: <span>{polishText(published[0].city, true)} i&nbsp;{polishText(published[1].city, true)}</span>
+                    Punkty serwisowe <span>{polishText(published[0].city, true)} i&nbsp;{polishText(published[1].city, true)}</span>
                   </>
                 ) : (
                   <>Punkt serwisowy {inCity(main.city)}</>
                 )}
               </h1>
-              <p className="t-ab-hero__lead">
+              <p className="t-pts2-net__lead">
                 {two
-                  ? "Przynieś sprzęt bez umawiania albo zgłoś naprawę online. W obu punktach pracujemy w jednym systemie, więc status sprawdzisz z telefonu."
+                  ? "Przyjdź bez umawiania albo zgłoś naprawę online. Oba salony pracują w jednym systemie: te same naprawy, ta sama gwarancja. Wybierz punkt, do którego masz bliżej."
                   : // Single-point fallback, used only while a point is unpublished (SPEC §5).
-                    "Przynieś sprzęt bez umawiania albo zgłoś naprawę online. Status naprawy sprawdzisz potem z telefonu."}
+                    "Przyjdź bez umawiania albo zgłoś naprawę online. Status naprawy sprawdzisz potem z telefonu."}
               </p>
-              {/* boss 22.11: the points' own numbers are the main ones; the general line only as a note */}
-              <PointPhonesBig track="punkty_hero" className="t-pts2-hero__phone" />
-              <GeneralLineNote track="punkty_hero" />
-              <div className="t-ab-hero__actions">
-                <Link href="/kontakt#formularz" className="t-hbtn t-hbtn--acc t-shine t-ab-hero__submit">
-                  Napisz do nas
+              {/* live status of every point, one line each (not only the first) */}
+              <ul className="t-pts3-hero__status" aria-label="Czy punkty są teraz otwarte">
+                {published.map((p) => (
+                  <li key={p.key}>
+                    <OpeningStatus points={[p]} withName className="t-status--stage-text" skeletonCh={24} />
+                  </li>
+                ))}
+              </ul>
+              {points.length > 1 ? <NearestPoint visible={points.map((p) => p.key)} /> : null}
+              <ul className="t-pts2-net__ticks">
+                {TICKS.map((t) => (
+                  <li key={t}>
+                    <IconCheck size={16} />
+                    {t}
+                  </li>
+                ))}
+                {courier ? (
+                  <li className={courier.draft ? "t-draft" : undefined}>
+                    <IconCheck size={16} />
+                    Kurier {courier.text}
+                  </li>
+                ) : null}
+              </ul>
+              <div className="t-pts3-hero__actions">
+                <a href="#salony" className="t-hbtn t-hbtn--acc t-shine">
+                  Adresy, godziny i telefony
+                  <IconArrow size={16} strokeWidth={2.6} />
+                </a>
+                <Link href={SUBMIT_HREF} className="t-hbtn t-hbtn--ghost t-pts3-hero__ghost" data-track="zgloszenie_start" data-track-zrodlo="punkty_hero">
+                  Zgłoś naprawę online
                 </Link>
               </div>
-              <dl className="t-facts t-pts2-hero__facts">
-                <div>
-                  <dt>Wycena</dt>
-                  <dd>przed naprawą</dd>
-                </div>
-                {saturday ? (
-                  <div>
-                    <dt>Soboty</dt>
-                    <dd>
-                      {main.city} {saturday}
-                    </dd>
-                  </div>
-                ) : null}
-                <div>
-                  <dt>{GENERAL_EMAIL_LABEL}</dt>
-                  <dd>
-                    <a href={`mailto:${line.email}`} data-t-inline="">{line.email}</a>
-                  </dd>
-                </div>
-              </dl>
             </div>
-            <div className="t-ab-hero__visual">
-              <AboutHeroArt year={null} points={published.map((p) => ({ key: p.key, city: p.city, draft: false }))} />
+            <div className="t-pts2-net__map">
+              <PodhaleMap points={points.map((p) => ({ key: p.key, name: p.name, draft: p.draft }))} />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="t-section t-section--tight t-pts2-salons" id="salony" data-rail="Salony">
+      <section className="t-section t-section--tight t-pts2-salons" id="salony" data-rail="Salony" aria-labelledby="t-pts3-salony-h">
         <div className="t-container">
+          <div className="t-pts3-head">
+            <span className="t-eyebrow">Salony PRO-KOM Tech</span>
+            <h2 id="t-pts3-salony-h" className="t-h2">
+              {two ? "Adresy, godziny i kontakt" : "Adres, godziny i kontakt"}
+            </h2>
+          </div>
           <div className={`t-pts2-cards${points.length === 1 ? " is-single" : ""}`}>
             {points.map((p) => (
               <PointCard key={p.key} id={p.key} point={p} layout="feature" trackFrom="punkty" className="t-card" />
             ))}
           </div>
+          <div className="t-pts3-below">
+            <GeneralLineNote track="punkty" />
+            <p className="t-pts3-below__hg">
+              <span className="t-pts2-net__hgico" aria-hidden="true">
+                <AboutIconSvg icon="layers" size={18} />
+              </span>
+              <span>
+                <b>Hammer Glass</b> {PLOTTER}
+              </span>
+            </p>
+          </div>
+          <CourierTeaser className="t-pts2-courier" />
         </div>
       </section>
 
-      {points.length > 1 ? (
-        <section className="t-section t-section--tight t-pts2-net-sec" id="gdzie-blizej" data-rail="Gdzie bliżej">
-          <div className="t-container">
-            <div className="t-pts2-net">
-              <div className="t-pts2-net__text">
-                <span className="t-eyebrow t-eyebrow--stage">Punkty serwisowe</span>
-                <h2 className="t-h2 t-pts2-net__h">
-                  Dwa punkty.
-                  <br />
-                  Jeden serwis.
-                </h2>
-                <p className="t-pts2-net__lead">
-                  {points.map((p) => p.name).join(" i ")} pracują w jednym systemie. Te same naprawy, te same części, ta sama gwarancja. Wybierasz punkt, do którego masz bliżej.
-                </p>
-                <NearestPoint visible={points.map((p) => p.key)} />
-                <ul className="t-pts2-net__ticks">
-                  {TICKS.map((t) => (
-                    <li key={t}>
-                      <IconCheck size={16} />
-                      {t}
-                    </li>
-                  ))}
-                  {courier ? (
-                    <li className={courier.draft ? "t-draft" : undefined}>
-                      <IconCheck size={16} />
-                      Kurier {courier.text}
-                    </li>
-                  ) : null}
-                </ul>
-                <p className="t-pts2-net__hg">
-                  <span className="t-pts2-net__hgico" aria-hidden="true">
-                    <AboutIconSvg icon="layers" size={18} />
-                  </span>
-                  <span>
-                    <b>Hammer Glass</b> {PLOTTER}
-                  </span>
-                </p>
-              </div>
-              <div className="t-pts2-net__map">
-                <PodhaleMap points={points.map((p) => ({ key: p.key, name: p.name, draft: p.draft }))} />
-              </div>
-            </div>
-            <CourierTeaser className="t-pts2-courier" />
-          </div>
-        </section>
-      ) : null}
-
       <IntentCards title="Z czym przychodzisz?" id="z-czym" />
-
-      <CtaBand
-        eyebrow="Kontakt"
-        title="Masz pytanie przed wizytą? Napisz albo zadzwoń."
-        primary={{ label: "Napisz do nas", href: "/kontakt#formularz" }}
-        secondary={{ label: line.phoneDisplay, href: telHref(line.phone), tel: true, track: "punkty_cta" }}
-      />
 
       <section className="t-section t-section--alt" id="pytania" data-rail="Pytania o wizytę">
         <div className="t-container t-faqsplit">

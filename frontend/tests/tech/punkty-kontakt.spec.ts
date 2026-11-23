@@ -28,12 +28,12 @@ test.describe("desktop 1440", () => {
 
   test("points page: card with live status, hours, phone and route to Google Maps", async ({ page }) => {
     await page.goto("/punkty-serwisowe");
-    await expect(page.locator("h1")).toHaveText(/Dwa punkty serwisowe: Rabka-\u2060?Zdrój i\s+Zakopane/); // headings get a word joiner after the hyphen (components/tech/Typeset.tsx)
+    await expect(page.locator("h1")).toHaveText(/Punkty serwisowe\s*Rabka-\u2060?Zdrój i\s+Zakopane/); // headings get a word joiner after the hyphen (components/tech/Typeset.tsx)
     await expect(page.locator(".t-pointcard")).toHaveCount(2);
     const zak = page.locator(".t-pointcard").nth(1);
     await expect(zak).toContainText("Staszica");
     await expect(zak.getByRole("link", { name: "Zgłoś naprawę tutaj" })).toHaveAttribute("href", "/zgloszenie?punkt=zakopane");
-    await expect(zak.locator(".t-navto__desktop")).toHaveAttribute("href", /destination=49\.2978,19\.9539$/);
+    await expect(zak.locator(".t-navto__desktop")).toHaveAttribute("href", /destination=49\.29322,19\.95699$/);
     const card = page.locator(".t-pointcard").first();
     await expect(card.locator(".t-status")).toHaveText(/^(Otwarte do|Zamykamy za|Otwieramy dziś|Zamknięte)/);
     await expect(card.locator(".t-hours li")).toHaveCount(3);
@@ -161,7 +161,8 @@ test.describe("kontakt punktów (runda 18.11)", () => {
       await expect(main.locator(shows(zakopane)).first()).toBeVisible();
       await expect(main.locator(`a[href="${telHref(line.phone)}"]`).first()).toBeVisible();
       await expect(main).toContainText(GENERAL_PHONE_LABEL);
-      await expect(main).toContainText(GENERAL_EMAIL_LABEL);
+      // the general mailbox stays on /kontakt; /punkty-serwisowe shows each salon's own (Krystian 23.11)
+      if (path === "/kontakt") await expect(main).toContainText(GENERAL_EMAIL_LABEL);
     }
   });
 

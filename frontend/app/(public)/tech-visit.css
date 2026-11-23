@@ -18,6 +18,63 @@
   .tech .t-pts2-hero .t-ab-hero__text { padding: 44px 0 52px; }
 }
 
+/* ---------- Points v3 (Krystian 23.11: one path, no repeats) ---------- */
+/* hero = the dark Podhale stage: nearest point on the left, the map on the right */
+.tech .t-pts3-hero .t-crumbs { color: #c9bfbd; }
+.tech .t-pts3-hero .t-crumbs ol { font-size: 12.5px; }
+.tech .t-ui .t-pts3-hero__h1 { font-size: clamp(38px, 2.4vw + 24px, 64px); line-height: 1.02; letter-spacing: -0.035em; color: #ffffff; }
+.tech .t-pts3-hero__h1 span { display: block; color: #f0584a; }
+.tech .t-pts3-hero__status { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 14.5px; font-weight: 700; }
+.tech .t-pts3-hero__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.tech .t-pts3-hero__actions .t-hbtn { height: 54px; padding: 0 22px; font-size: 15.5px; }
+.tech .t-pts3-hero .t-pts3-hero__ghost { background: transparent; border-color: rgba(255, 255, 255, 0.26); color: #ffffff; }
+.tech .t-pts3-hero .t-pts3-hero__ghost:hover { background: rgba(255, 255, 255, 0.07); }
+@media (max-width: 479.98px) { .tech .t-pts3-hero__actions .t-hbtn { flex: 1 1 100%; } }
+@media (min-width: 1024px) { .tech .t-pts3-hero { min-height: 620px; } }
+/* salons section head and the strip under the cards */
+.tech .t-pts3-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: clamp(18px, 2vw, 28px); }
+.tech .t-pts3-below { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-top: 18px; }
+.tech .t-pts3-below__hg { display: flex; align-items: flex-start; gap: 12px; max-width: 620px; margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink2); }
+.tech .t-pts3-below__hg b { color: var(--ink); }
+.tech .t-pts3-below .t-pts2-net__hgico { background: color-mix(in srgb, var(--acc) 12%, transparent); color: var(--acct); }
+
+.tech .t-pointcard__namerow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.tech .t-pointcard__namerow > * { margin: 0; }
+
+/* real street map in the salon card (static OSM image) */
+.tech .t-pcmap { position: relative; height: clamp(210px, 18vw, 270px); border-radius: 22px; overflow: hidden; background: #f2efe9; }
+.tech .t-pcmap__img { object-fit: cover; }
+html[data-tech-theme="dark"] .tech .t-pcmap__img { filter: invert(0.9) hue-rotate(180deg) saturate(0.7) brightness(0.92) contrast(0.92); }
+.tech .t-pcmap__pin {
+  position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; transform: translate(-50%, -100%); border-radius: 50% 50% 50% 0;
+  background: #e2483a; rotate: -45deg; box-shadow: 0 10px 22px -6px rgba(140, 20, 10, 0.7);
+}
+.tech .t-pcmap__pin::after { content: ""; position: absolute; inset: 11px; border-radius: 50%; background: #ffffff; }
+.tech .t-pcmap::before {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 90px; height: 90px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(226, 72, 58, 0.28), rgba(226, 72, 58, 0) 70%); z-index: 1;
+}
+.tech .t-pcmap__pin { z-index: 2; }
+.tech .t-pcmap__attr { position: absolute; right: 8px; bottom: 6px; z-index: 2; padding: 2px 7px; border-radius: 6px; font-size: 10.5px; font-weight: 600; color: #333; background: rgba(255, 255, 255, 0.82); }
+/* the salon card's own number and mailbox */
+.tech .t-pccontact { display: grid; gap: 8px; }
+@media (min-width: 560px) { .tech .t-pccontact { grid-template-columns: auto minmax(0, 1fr); align-items: center; } }
+.tech .t-pccontact__tel {
+  display: flex; align-items: center; gap: 12px; min-height: 56px; padding-right: 8px; color: var(--ink); text-decoration: none;
+  font-family: var(--t-font-head); font-stretch: 108%; font-size: clamp(26px, 1.2vw + 16px, 32px); font-weight: 800; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.tech .t-pccontact__ico { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--acc); color: var(--onacc); box-shadow: 0 10px 22px -12px rgba(196, 54, 43, 0.8); }
+.tech .t-pccontact__tel:hover .t-pccontact__num { color: var(--acct); }
+.tech .t-pccontact__mail {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; border-radius: 14px; min-width: 0;
+  background: var(--bg2); color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 700; line-height: 1.25; transition: background 0.15s ease;
+}
+html[data-tech-theme="dark"] .tech .t-pccontact__mail { background: var(--raised); }
+.tech .t-pccontact__mail svg { flex: none; color: var(--acct); }
+.tech .t-pccontact__mail span { min-width: 0; }
+.tech .t-pccontact__mail:hover { background: color-mix(in srgb, var(--acc) 10%, var(--bg2)); }
+.tech .t-pccontact a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+
 /* ---------- Points: salon feature cards ---------- */
 .tech .t-pts2-cards { display: grid; gap: clamp(14px, 1.6vw, 22px); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 1024px) { .tech .t-pts2-cards:not(.is-single) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
