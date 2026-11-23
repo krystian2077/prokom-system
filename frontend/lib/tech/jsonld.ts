@@ -2,7 +2,7 @@
  * Site-wide JSON-LD for the public layout (docs/tech/SPEC.md §9, §12.1):
  * Organization (PRO-KOM) + one LocalBusiness per PUBLISHED point. Drafts never appear.
  */
-import { company, line, pointEmail, pointPhone, servicePoints, social, type ServicePoint } from "@/config/prokom";
+import { company, line, lines, pointEmail, pointPhone, servicePoints, social, type ServicePoint } from "@/config/prokom";
 import { SITE_URL } from "@/lib/site-config";
 import { publishedPoints } from "./points";
 
@@ -70,7 +70,8 @@ export function siteJsonLd(points: ServicePoint[] = servicePoints) {
           addressLocality: company.hq.city,
           addressCountry: "PL",
         },
-        sameAs: [social.facebook],
+        // The other PRO-KOM sites (one legal entity) tie the lines together for search engines and AI.
+        sameAs: [social.facebook, ...lines.filter((l) => l.key !== "tech").map((l) => `https://${l.domain}/`)],
       },
       ...published.map(localBusiness),
     ],
