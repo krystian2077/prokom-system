@@ -2,7 +2,8 @@ import { company } from "@/config/prokom";
 import { claim } from "@/lib/tech/claims";
 import { saturdayPromise } from "@/lib/tech/point-format";
 import type { VisiblePoint } from "@/lib/tech/points";
-import { IconPath } from "../icons";
+import Link from "next/link";
+import { IconArrow, IconPath } from "../icons";
 
 /** "Dlaczego PRO-KOM Tech" (design T.Main `#dlaczego`). Unconfirmed numbers and the Google rating stay hidden. */
 export function WhySection({ points }: { points: VisiblePoint[] }) {
@@ -40,6 +41,12 @@ export function WhySection({ points }: { points: VisiblePoint[] }) {
             </div>
           ))}
         </div>
+        {/* boss 23.11: a short trust strip; the documents and years are on /o-firmie */}
+        <Link href="/o-firmie#certyfikaty" className="t-whytrust">
+          <span className="t-whytrust__k">Programy i certyfikaty</span>
+          <span className="t-whytrust__v">Apple iLeader · wcześniej Samsung GOLD i SILVER oraz Dell Partner · szkolenia producentów</span>
+          <IconArrow size={16} strokeWidth={2.6} className="t-whytrust__arrow" />
+        </Link>
       </div>
     </section>
   );

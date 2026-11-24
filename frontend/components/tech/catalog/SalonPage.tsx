@@ -10,6 +10,7 @@ import { ModelCard } from "./ModelCard";
 import { SalonCompare } from "./SalonCompare";
 import { SalonQuiz } from "./SalonQuiz";
 import { SalonStage } from "./SalonStage";
+import { AppleBusiness } from "./AppleBusiness";
 
 const COPY: Record<Brand, { lead: string; service: string }> = {
   apple: {
@@ -108,6 +109,8 @@ export function SalonPage({ brand }: { brand: Brand }) {
           </div>
         </section>
       ))}
+
+      {brand === "apple" ? <AppleBusiness /> : null}
 
       <section className="t-section t-section--alt" id="porownaj" data-rail="Porównaj" aria-labelledby="t-bsalon-cmp">
         <div className="t-container">
