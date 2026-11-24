@@ -104,7 +104,8 @@ test.describe("desktop 1440", () => {
   test("salon Samsung lists every department and links to the brand service", async ({ page }) => {
     await page.goto("/samsung");
     for (const name of ["Galaxy S", "Galaxy Z", "Galaxy A", "Galaxy Tab", "Galaxy Watch", "Galaxy Buds"]) await expect(page.getByRole("heading", { level: 3, name, exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Serwis Samsung/ })).toHaveAttribute("href", "/serwis-samsung");
+    // the business band links to the brand service too (24.11), so look in the service section
+    await expect(page.locator("#serwis").getByRole("link", { name: /Serwis Samsung/ })).toHaveAttribute("href", "/serwis-samsung");
   });
 });
 

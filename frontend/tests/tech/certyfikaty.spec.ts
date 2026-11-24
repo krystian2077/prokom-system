@@ -18,9 +18,16 @@ test("/apple: „Apple dla firm i instytucji” with DEP, CTO and AppleCare+, sa
   await expect(band.locator("img")).toHaveCount(0);
 });
 
-test("/samsung has no Apple business band", async ({ page }) => {
+test("/samsung: „Samsung dla firm i instytucji” — Galaxy, Knox, service; the KNOX partnership only in the past tense (24.11)", async ({ page }) => {
   await page.goto("/samsung");
-  await expect(page.locator("#dla-firm")).toHaveCount(0);
+  const band = page.locator("#dla-firm");
+  await expect(band.getByRole("heading", { level: 2 })).toContainText("Galaxy dla całego zespołu");
+  await expect(band.locator(".t-abiz__card")).toHaveCount(3);
+  await expect(band).toContainText("Samsung Knox");
+  await expect(band).toContainText("W latach 2022–2024");
+  await expect(band).not.toContainText(/apple|jesteśmy (certyfikowanym|autoryzowanym)/i);
+  await expect(band.getByRole("link", { name: "Serwis Samsung" })).toHaveAttribute("href", "/serwis-samsung");
+  await expect(band.locator("img")).toHaveCount(0);
 });
 
 test("/o-firmie: current Apple programme first, then every certificate with its years; the document opens and closes", async ({ page }) => {
@@ -30,7 +37,8 @@ test("/o-firmie: current Apple programme first, then every certificate with its 
   await expect(sec.locator(".t-certapple a")).toHaveAttribute("href", "/apple#dla-firm");
   const items = sec.locator(".t-cert");
   await expect(items).toHaveCount(certificates.length);
-  for (const [i, c] of certificates.entries()) {
+  for (let i = 0; i < certificates.length; i++) {
+    const c = certificates[i];
     await expect(items.nth(i).locator(".t-cert__chip")).toContainText(c.period);
     await expect(items.nth(i)).toContainText(c.title);
   }
