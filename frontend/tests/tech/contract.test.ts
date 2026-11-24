@@ -391,6 +391,13 @@ describe("wizard parameters (KONTRAKT §1.4)", () => {
   it("dostawa=kurier sets courier and ignores punkt", () => {
     expect(parseWizardParams(new URLSearchParams("category=phone&dostawa=kurier&punkt=rabka"), draftOff)).toEqual({ category: "phone", dropoff: "courier" });
   });
+  it("marka and model fill the brand and model fields, trimmed to the field limits", () => {
+    expect(parseWizardParams(new URLSearchParams("category=phone&marka=%20Samsung%20&model=Galaxy%20S26"), draftOff)).toEqual({ category: "phone", brand: "Samsung", model: "Galaxy S26" });
+    const long = parseWizardParams(new URLSearchParams(`marka=${"a".repeat(150)}&model=${"b".repeat(250)}`), draftOff);
+    expect(long.brand).toHaveLength(100);
+    expect(long.model).toHaveLength(200);
+    expect(parseWizardParams(new URLSearchParams("marka=&model=%20"), draftOff)).toEqual({});
+  });
   it("ignores unknown values and unpublished points (without draft)", () => {
     expect(parseWizardParams(new URLSearchParams("category=drone&punkt=krakow&dostawa=paczkomat&x=1"), draftOff)).toEqual({});
     const unpublished: ServicePoint[] = servicePoints.map((p) => (p.key === "zakopane" ? { ...p, published: false } : p));

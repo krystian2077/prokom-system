@@ -98,6 +98,13 @@ describe("chooseStart (draft vs wizard parameters)", () => {
     expect(chooseStart(draftOf(filled(), NOW - DRAFT_URL_PRIORITY_MS), { category: "laptop" }, NOW).use).toBe("draft");
   });
 
+  it("brand page link (marka, model): agrees only with the same brand and model", () => {
+    const d = draftOf(filled({ brand: "Apple", model: "iPhone 15 Pro" }), NOW - 3 * 60 * MIN);
+    expect(chooseStart(d, { category: "phone", brand: "apple", model: "iPhone 15 Pro" }, NOW).use).toBe("draft");
+    expect(chooseStart(d, { category: "phone", brand: "Apple", model: "iPhone 13" }, NOW).use).toBe("url");
+    expect(chooseStart(d, { category: "phone", brand: "Samsung" }, NOW).use).toBe("url");
+  });
+
   it("new wizard link, draft older than 1 h → URL", () => {
     expect(chooseStart(draftOf(filled(), NOW - DRAFT_URL_PRIORITY_MS - 1), { category: "laptop" }, NOW).use).toBe("url");
   });
