@@ -425,3 +425,58 @@ html[data-tech-theme="dark"] .tech :is(.t-ab-salon__park, .t-ab-salon__tel) { ba
 }
 .tech.t-reduced .t-ab-art__trace,
 .tech.t-reduced .t-ab-flow__scan { display: none; }
+
+/* ---------- Programmes and certificates (/o-firmie, boss 23.11) ---------- */
+.tech .t-certsec { display: grid; gap: clamp(18px, 2vw, 28px); }
+.tech .t-certsec__head { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+.tech .t-certapple {
+  position: relative; isolation: isolate; overflow: hidden; display: grid; gap: 14px; padding: clamp(20px, 2.6vw, 32px); border-radius: 28px; color: #fff;
+  background: radial-gradient(520px 320px at 90% 0%, rgba(226, 72, 58, 0.28), rgba(226, 72, 58, 0) 70%), linear-gradient(180deg, #1b1413, var(--stage));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), var(--sh-2);
+}
+.tech .t-certapple__chip { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #0f2a12; background: #7bd36a; }
+.tech .t-certapple__brand { font-family: var(--t-font-head); font-stretch: 108%; font-size: clamp(22px, 1vw + 16px, 30px); font-weight: 800; letter-spacing: -0.02em; }
+.tech .t-certapple__list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 768px) { .tech .t-certapple__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tech .t-certapple__list li { display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); }
+.tech .t-certapple__list b { font-size: 16px; font-weight: 800; }
+.tech .t-certapple__list span { font-size: 14px; color: #d6ccca; }
+.tech .t-certapple__note { margin: 0; font-size: 13.5px; line-height: 1.5; color: #c9bfbd; }
+.tech .t-certapple__link { justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 800; color: #f29185; text-decoration: none; }
+.tech .t-certapple__link:hover { color: #ffd9d4; }
+.tech .t-certs { display: grid; gap: clamp(12px, 1.4vw, 18px); grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); margin: 0; padding: 0; list-style: none; }
+.tech .t-cert { display: flex; flex-direction: column; gap: 12px; padding: 10px; border-radius: 22px; background: var(--card); border: 1px solid var(--bd); box-shadow: var(--sh-1); }
+html[data-tech-theme="dark"] .tech .t-cert { border-color: var(--hair); }
+.tech .t-cert__thumb {
+  position: relative; display: grid; place-items: center; height: 190px; padding: 12px; border: 0; border-radius: 16px; cursor: zoom-in;
+  background: var(--bg2); overflow: hidden; transition: transform 0.25s var(--m-ease-emph, ease);
+}
+html[data-tech-theme="dark"] .tech .t-cert__thumb { background: var(--raised); }
+.tech .t-cert__thumb img { width: auto; max-width: 100%; height: auto; max-height: 100%; border-radius: 6px; box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.45); }
+.tech .t-cert__zoom { position: absolute; right: 10px; bottom: 10px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: #fff; background: rgba(20, 14, 13, 0.72); }
+@media (hover: hover) { .tech .t-cert__thumb:hover { transform: translateY(-2px); } }
+.tech .t-cert__thumb:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.tech .t-cert__body { display: flex; flex-direction: column; gap: 5px; padding: 0 6px 6px; }
+.tech .t-cert__chip { align-self: flex-start; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 800; color: var(--ink2); background: var(--bg2); }
+html[data-tech-theme="dark"] .tech .t-cert__chip { background: var(--raised); }
+.tech .t-cert__title { font-size: 15.5px; font-weight: 800; line-height: 1.3; }
+.tech .t-cert__scope { font-size: 13.5px; line-height: 1.45; color: var(--ink2); }
+.tech .t-certdlg { max-width: min(1040px, 94vw); max-height: 92vh; padding: 0; border: 0; border-radius: 22px; background: var(--card); color: var(--ink); box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.7); overflow: auto; }
+.tech .t-certdlg::backdrop { background: rgba(12, 8, 7, 0.72); backdrop-filter: blur(4px); }
+.tech .t-certdlg__fig { margin: 0; padding: clamp(12px, 2vw, 20px); }
+.tech .t-certdlg__fig img { display: block; width: 100%; height: auto; max-height: 78vh; object-fit: contain; border-radius: 10px; }
+.tech .t-certdlg__fig figcaption { margin-top: 12px; font-size: 14px; color: var(--ink2); }
+.tech .t-certdlg__fig figcaption b { color: var(--ink); }
+.tech .t-certdlg__close { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(20, 14, 13, 0.78); }
+.tech .t-certdlg__close:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+
+/* ---------- Home "Dlaczego": trust strip linking to the certificates ---------- */
+.tech .t-whytrust {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 16px; padding: 14px 18px; min-height: 44px; border-radius: 18px;
+  background: var(--card); border: 1px solid var(--bd); color: var(--ink); text-decoration: none; transition: border-color 0.15s ease, transform 0.2s ease;
+}
+html[data-tech-theme="dark"] .tech .t-whytrust { border-color: var(--hair); }
+.tech .t-whytrust__k { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--acct); }
+.tech .t-whytrust__v { flex: 1 1 280px; font-size: 14.5px; font-weight: 700; }
+.tech .t-whytrust__arrow { color: var(--acct); }
+@media (hover: hover) { .tech .t-whytrust:hover { border-color: var(--softbd); transform: translateY(-1px); } }
