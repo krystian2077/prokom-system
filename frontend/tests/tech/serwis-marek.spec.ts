@@ -11,8 +11,8 @@ import { expect, test, type Page } from "@playwright/test";
 const axeSource = fs.readFileSync(createRequire(__filename).resolve("axe-core/axe.min.js"), "utf8");
 
 const PAGES = [
-  { path: "/serwis-apple", h1: "Serwis iPhone, iPad i MacBook", model: "iPhone 15 Pro", older: true, category: "phone" },
-  { path: "/serwis-samsung", h1: "Serwis Samsung Galaxy", model: "Galaxy S26", older: false, category: "phone" },
+  { path: "/serwis-apple", brand: "Apple", h1: "Serwis iPhone, iPad i MacBook", model: "iPhone 15 Pro", older: true, category: "phone" },
+  { path: "/serwis-samsung", brand: "Samsung", h1: "Serwis Samsung Galaxy", model: "Galaxy S26", older: false, category: "phone" },
 ] as const;
 const THEMES = ["light", "dark"] as const;
 
@@ -53,7 +53,7 @@ for (const p of PAGES) {
 
     test("form links: hero, model chip (model in the description), repairs, points with phone", async ({ page }) => {
       await page.goto(p.path);
-      await expect(page.locator(".t-shero__submit")).toHaveAttribute("href", `/zgloszenie?category=${p.category}`);
+      await expect(page.locator(".t-shero__submit")).toHaveAttribute("href", `/zgloszenie?category=${p.category}&marka=${p.brand}`);
       const chip = page.getByRole("link", { name: `Zgłoś naprawę: ${p.model}`, exact: true });
       if (p.older) {
         await expect(chip).toBeHidden();
@@ -63,7 +63,9 @@ for (const p of PAGES) {
       const href = (await chip.getAttribute("href"))!;
       const q = new URL(href, "http://x").searchParams;
       expect(q.get("category")).toBe(p.category);
-      expect(q.get("usterka")).toBe(`Model: ${p.model}. Usterka:`);
+      expect(q.get("marka")).toBe(p.brand);
+      expect(q.get("model")).toBe(p.model);
+      expect(q.get("usterka")).toBeNull();
       for (const h of await page.locator("#naprawy a").evaluateAll((a) => a.map((x) => x.getAttribute("href") ?? ""))) expect(h).toMatch(/^\/(naprawy\/[a-z0-9-]+|zgloszenie\?category=)/);
       // salons with live status and their own phone
       const salons = page.locator("#jak-oddac .t-salon:not(.t-salon--courier)");
@@ -73,7 +75,8 @@ for (const p of PAGES) {
       // the chip opens the form with the model in the description
       await chip.click();
       await expect(page).toHaveURL(/\/zgloszenie\?/);
-      await expect(page.locator("textarea").first()).toHaveValue(`Model: ${p.model}. Usterka:`);
+      await expect(page.getByLabel(/^Marka/)).toHaveValue(p.brand);
+      await expect(page.getByLabel(/^Model/)).toHaveValue(p.model);
     });
 
     for (const theme of THEMES) {

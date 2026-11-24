@@ -8,9 +8,8 @@ import { inCity, joinCities } from "@/lib/tech/point-format";
 import { publishedPoints, visiblePoints } from "@/lib/tech/points";
 import { breadcrumbJsonLd, faqJsonLd, pageMetadata, type Crumb } from "@/lib/tech/seo";
 import { serviceJsonLd } from "@/lib/tech/service-jsonld";
-import { brandRepairCards, brandSeo, groupModels, modelHref } from "@/lib/tech/serwis-marek";
+import { brandRepairCards, brandSeo, brandSubmitHref, groupModels, modelHref } from "@/lib/tech/serwis-marek";
 import { HERO_SCENES, heroPromises } from "@/lib/tech/subhero";
-import { submitHref } from "@/lib/tech/wizard-data";
 import { CtaBand } from "../CtaBand";
 import { DataSafety } from "../DataSafety";
 import { Faq } from "../Faq";
@@ -33,7 +32,7 @@ export function brandMetadata(page: BrandPage) {
  * model", "Najczęstsze naprawy", "Części i gwarancja", "Jak oddać sprzęt", steps, FAQ, CTA.
  * Same building blocks as device pages (DevicePage). Server Component.
  * Links to the brand salon (/apple, /samsung — catalogue from T-R2b) under "Wybierz model" (plan §4).
- * The "Zgłoś naprawę" link carries only `category` — the form has no brand parameter (KONTRAKT §1.4).
+ * Form links carry `category` + `marka` (+ `model` from a chip) — KONTRAKT §1.4.
  */
 export function BrandServicePage({ page }: { page: BrandPage }) {
   const published = publishedPoints(servicePoints);
@@ -45,7 +44,7 @@ export function BrandServicePage({ page }: { page: BrandPage }) {
     { name: page.short, path: page.path },
   ];
   const seo = brandSeo(page, published);
-  const submit = submitHref(page.category);
+  const submit = brandSubmitHref(page);
 
   return (
     <div className="t-ui t-page t-dev t-brand">
@@ -105,7 +104,7 @@ function BrandModels({ page }: { page: BrandPage }) {
       rail="Modele"
       eyebrow="Wybierz model"
       title={`Jaki masz sprzęt ${page.brand}?`}
-      lead="Kliknij swój model — formularz zgłoszenia otworzy się z modelem w opisie. Wystarczy dopisać, co się stało."
+      lead="Kliknij swój model — formularz zgłoszenia otworzy się z wpisaną marką i modelem. Wystarczy opisać, co się stało."
       alt
     >
       <ul className={`t-bmodels t-bmodels--${page.groups.length}`} data-t-stagger="">
@@ -122,13 +121,13 @@ function BrandModels({ page }: { page: BrandPage }) {
                   <p className="t-bmodel__sub">{g.sub}</p>
                 </div>
               </div>
-              <ModelChips models={current} category={g.category} />
+              <ModelChips models={current} category={g.category} brand={page.brand} />
               {older.length ? (
                 <details className="t-bmodel__older">
                   <summary>
                     Starsze modele <span>({older.length})</span>
                   </summary>
-                  <ModelChips models={older} category={g.category} />
+                  <ModelChips models={older} category={g.category} brand={page.brand} />
                 </details>
               ) : null}
             </li>
@@ -137,7 +136,7 @@ function BrandModels({ page }: { page: BrandPage }) {
       </ul>
       <p className="t-bmodels__none">
         Nie widzisz swojego modelu?{" "}
-        <Link href={submitHref(page.category)}>
+        <Link href={brandSubmitHref(page)}>
           Zgłoś naprawę
         </Link>{" "}
         i wpisz model w formularzu — przyjmujemy też inne modele {page.brand}.
@@ -153,12 +152,12 @@ function BrandModels({ page }: { page: BrandPage }) {
   );
 }
 
-function ModelChips({ models, category }: { models: string[]; category: BrandPage["category"] }) {
+function ModelChips({ models, category, brand }: { models: string[]; category: BrandPage["category"]; brand: string }) {
   return (
     <ul className="t-bmodel__chips">
       {models.map((m) => (
         <li key={m}>
-          <Link href={modelHref(category, m)} className="t-bchip" aria-label={`Zgłoś naprawę: ${m}`} data-track="zgloszenie_start" data-track-zrodlo="model_marki">
+          <Link href={modelHref(category, brand, m)} className="t-bchip" aria-label={`Zgłoś naprawę: ${m}`} data-track="zgloszenie_start" data-track-zrodlo="model_marki">
             {m}
           </Link>
         </li>

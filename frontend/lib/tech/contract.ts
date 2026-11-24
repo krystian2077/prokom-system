@@ -43,6 +43,9 @@ export const CONTACT_OPTIONS: readonly { value: PreferredContact; label: string 
 export const NOTES_MAX = 2000;
 export const VISUAL_MAX = 2000;
 export const PROBLEM_FROM_URL_MAX = 500;
+/** Same limits as the brand / model fields (validateRepairForm). */
+export const BRAND_FROM_URL_MAX = 100;
+export const MODEL_FROM_URL_MAX = 200;
 
 /* ---------- Requests and responses ---------- */
 
@@ -436,10 +439,10 @@ export function phoneLast4(phone: string): string {
 
 /* ---------- Wizard parameters (KONTRAKT §1.4) ---------- */
 
-export type WizardPrefill = { category?: DeviceCategory; problem?: string; dropoff?: Dropoff };
+export type WizardPrefill = { category?: DeviceCategory; brand?: string; model?: string; problem?: string; dropoff?: Dropoff };
 
 /**
- * /zgloszenie?category=<kod>&usterka=<tekst>&punkt=rabka|zakopane&dostawa=punkt|kurier
+ * /zgloszenie?category=<kod>&marka=<tekst>&model=<tekst>&usterka=<tekst>&punkt=rabka|zakopane&dostawa=punkt|kurier
  * Unknown values are ignored; a point is accepted only if it is visible (published, or draft mode).
  */
 export function parseWizardParams(
@@ -449,6 +452,10 @@ export function parseWizardParams(
   const out: WizardPrefill = {};
   const category = sp.get("category");
   if (isDeviceCategory(category)) out.category = category;
+  const marka = sp.get("marka")?.trim();
+  if (marka) out.brand = marka.slice(0, BRAND_FROM_URL_MAX);
+  const model = sp.get("model")?.trim();
+  if (model) out.model = model.slice(0, MODEL_FROM_URL_MAX);
   const usterka = sp.get("usterka")?.trim();
   if (usterka) out.problem = usterka.slice(0, PROBLEM_FROM_URL_MAX);
   const dostawa = sp.get("dostawa");

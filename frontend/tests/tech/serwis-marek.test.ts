@@ -12,7 +12,7 @@ import { brandLinks } from "@/lib/tech/brand-links";
 import { CATEGORY_CODES, parseWizardParams } from "@/lib/tech/contract";
 import { isLive, repairPath } from "@/lib/tech/naprawy";
 import { buildSitemap } from "@/lib/tech/sitemap";
-import { brandRepairCards, brandSeo, groupModels, modelHref } from "@/lib/tech/serwis-marek";
+import { brandRepairCards, brandSeo, brandSubmitHref, groupModels, modelHref } from "@/lib/tech/serwis-marek";
 import { catalog, modelsOfFamily } from "@/lib/tech/catalog";
 import { buildSearchIndex } from "@/lib/tech/search/build-index";
 import { faultExists } from "@/lib/tech/devices";
@@ -118,19 +118,24 @@ describe("serwis marek — naprawy i linki zgłoszenia", () => {
     const cards = brandRepairCards(brandPage("apple"), pages);
     const screen = cards.find((c) => c.key === "wymiana-ekranu-iphone")!;
     expect(screen.live).toBe(false);
-    expect(screen.href).toMatch(/^\/zgloszenie\?category=phone&usterka=/);
+    expect(screen.href).toMatch(/^\/zgloszenie\?category=phone&usterka=.+&marka=Apple$/);
     for (const c of brandRepairCards(brandPage("apple"))) {
       const p = repairPages.find((x) => x.slug === c.key);
       if (p) expect(c.href).toBe(isLive(p) ? repairPath(p.slug) : expect.stringMatching(/^\/zgloszenie\?/));
     }
   });
 
-  it("model chip → form with the category and the model in the description (KONTRAKT §1.4)", () => {
-    const href = modelHref("phone", "iPhone 15 Pro");
-    const prefill = parseWizardParams(new URL(href, "http://x").searchParams);
-    expect(prefill.category).toBe("phone");
-    expect(prefill.problem).toBe("Model: iPhone 15 Pro. Usterka:");
-    expect(new URL(modelHref("laptop", "MacBook Air (M1)"), "http://x").searchParams.get("category")).toBe("laptop");
+  it("model chip → form with category, brand and model fields filled in (KONTRAKT §1.4)", () => {
+    const prefill = parseWizardParams(new URL(modelHref("phone", "Apple", "iPhone 15 Pro"), "http://x").searchParams);
+    expect(prefill).toEqual({ category: "phone", brand: "Apple", model: "iPhone 15 Pro" });
+    const mac = parseWizardParams(new URL(modelHref("laptop", "Apple", "MacBook Air 13″ i 15″ (M4)"), "http://x").searchParams);
+    expect(mac).toEqual({ category: "laptop", brand: "Apple", model: "MacBook Air 13″ i 15″ (M4)" });
+  });
+
+  it("hero button → form with category and brand", () => {
+    for (const b of brandPages) {
+      expect(parseWizardParams(new URL(brandSubmitHref(b), "http://x").searchParams)).toEqual({ category: b.category, brand: b.brand });
+    }
   });
 });
 
