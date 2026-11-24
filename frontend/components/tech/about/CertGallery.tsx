@@ -17,7 +17,7 @@ export function CertGallery({ items }: { items: Certificate[] }) {
   };
   return (
     <>
-      <ul className="t-certs" aria-label="Certyfikaty i szkolenia">
+      <ul className="t-certs" aria-label="Certyfikaty i szkolenia" data-t-reveal="">
         {items.map((c) => (
           <li key={c.key} className="t-cert">
             <button type="button" className="t-cert__thumb" onClick={() => show(c)} aria-label={`Powiększ dokument: ${c.title}, ${c.period}`}>

@@ -19,7 +19,7 @@ export function AppleBusiness() {
       <div className="t-container">
         <div className="t-abiz">
           <span className="t-abiz__glow" aria-hidden="true" />
-          <div className="t-abiz__head">
+          <div className="t-abiz__head" data-t-reveal="">
             <span className="t-abiz__kick">
               <i aria-hidden="true" />
               Apple dla firm i instytucji
@@ -35,7 +35,7 @@ export function AppleBusiness() {
               </Link>
             </div>
           </div>
-          <ul className="t-abiz__cards">
+          <ul className="t-abiz__cards" data-t-reveal="">
             {applePrograms.map((p, i) => (
               <li key={p.key} className="t-abiz__card">
                 <span className="t-abiz__ico" aria-hidden="true">
