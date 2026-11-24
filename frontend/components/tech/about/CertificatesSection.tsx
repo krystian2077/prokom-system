@@ -19,7 +19,7 @@ export function CertificatesSection() {
             </h2>
             <p className="t-lead">Dziś działamy w programie Apple iLeader. Niżej statusy partnerskie i szkolenia producentów, które zdobyliśmy przez lata — z datami z dokumentów.</p>
           </div>
-          <div className="t-certapple">
+          <div className="t-certapple" data-t-reveal="">
             <span className="t-certapple__chip">Aktualnie</span>
             <span className="t-certapple__brand">Apple · program iLeader (AB)</span>
             <ul className="t-certapple__list">
