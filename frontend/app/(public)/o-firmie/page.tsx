@@ -5,6 +5,7 @@ import { AboutIconSvg, type AboutIcon } from "@/components/tech/about/about-icon
 import { AboutRules, type AboutRule } from "@/components/tech/about/AboutRules";
 import { AboutSalon } from "@/components/tech/about/AboutSalon";
 import { AlsenBlock } from "@/components/tech/AlsenPartner";
+import { CertificatesSection } from "@/components/tech/about/CertificatesSection";
 import { Spotlight } from "@/components/tech/about/Spotlight";
 import { Breadcrumbs } from "@/components/tech/Breadcrumbs";
 import { CtaBand } from "@/components/tech/CtaBand";
@@ -240,6 +241,8 @@ export default function AboutPage() {
       </section>
 
       <AlsenBlock />
+
+      <CertificatesSection />
 
       <CtaBand
         eyebrow="Następny krok"
