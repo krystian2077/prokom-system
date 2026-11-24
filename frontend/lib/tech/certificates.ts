@@ -96,4 +96,31 @@ export const applePrograms = [
   },
 ] as const;
 
-export const APPLE_PROGRAM_NOTE = "Partner programu iLeader dystrybutora AB. DEP, CTO i AppleCare+ dotyczą sprzedaży i wdrożeń sprzętu Apple.";
+/**
+ * Samsung for business (Krystian 24.11: promote Samsung and Samsung Business at the top level).
+ * Honest: there is no current Samsung partner status — the KNOX partnership is told in the past tense.
+ */
+export const samsungPrograms = [
+  {
+    key: "team",
+    title: "Galaxy dla zespołu",
+    lead: "Dobór i oferta dla firmy",
+    text: "Pomożemy wybrać telefony, tablety i zegarki Galaxy do pracy zespołu i przygotujemy jedną ofertę na całość, razem z akcesoriami.",
+  },
+  {
+    key: "knox",
+    title: "Samsung Knox",
+    lead: "Bezpieczeństwo i zarządzanie",
+    text: "Galaxy mają wbudowaną platformę bezpieczeństwa Samsung Knox. Pomożemy ją skonfigurować i wdrożyć zarządzanie urządzeniami w firmie (MDM).",
+  },
+  {
+    key: "service",
+    title: "Serwis Samsung na miejscu",
+    lead: "Rabka-Zdrój i Zakopane",
+    text: "Diagnoza i naprawa sprzętu Samsung w naszych salonach, wycena zawsze przed naprawą. Krótka droga, gdy coś się zepsuje.",
+  },
+] as const;
+
+export const SAMSUNG_PROGRAM_NOTE = "W latach 2022–2024 byliśmy certyfikowanym partnerem Samsung w obszarze rozwiązań KNOX i urządzeń mobilnych (statusy GOLD Mobility i Mobile Experience SILVER).";
+
+export const APPLE_PROGRAM_NOTE ="Partner programu iLeader dystrybutora AB. DEP, CTO i AppleCare+ dotyczą sprzedaży i wdrożeń sprzętu Apple.";
