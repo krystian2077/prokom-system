@@ -102,6 +102,8 @@ export function parseDraft(raw: string | null, template: RepairFormState, now: n
 /** Every value from the URL is already in the draft (the description may have been extended). */
 export function draftAgreesWithPrefill(form: DraftForm, prefill: WizardPrefill): boolean {
   if (prefill.category !== undefined && form.category !== prefill.category) return false;
+  if (prefill.brand !== undefined && form.brand.trim().toLocaleLowerCase("pl") !== prefill.brand.toLocaleLowerCase("pl")) return false;
+  if (prefill.model !== undefined && form.model.trim().toLocaleLowerCase("pl") !== prefill.model.toLocaleLowerCase("pl")) return false;
   if (prefill.dropoff !== undefined && form.dropoff !== prefill.dropoff) return false;
   if (prefill.problem !== undefined && !form.problem.toLocaleLowerCase("pl").includes(prefill.problem.toLocaleLowerCase("pl"))) return false;
   return true;

@@ -71,8 +71,9 @@ Komunikat przy `delivery` wspomina paczkomat, którego nie oferujemy. W TD3 zdec
 Mapuj klucze na pola formularza i przewijaj do pierwszego błędu. Komunikaty backendu pokazuj dosłownie (są po polsku). Kształtów nie zgaduj: test kontraktu ma fixtures dla każdego z tych błędów.
 
 ### 1.4 Wejście z kreatora (tylko frontend)
-`/zgloszenie?category=<kod>&usterka=<tekst>&punkt=rabka|zakopane&dostawa=punkt|kurier`
+`/zgloszenie?category=<kod>&marka=<tekst>&model=<tekst>&usterka=<tekst>&punkt=rabka|zakopane&dostawa=punkt|kurier`
 - `category` czyta dzisiejszy formularz i zostaje.
+- `marka` i `model` wypełniają pola `brand` i `model` (do edycji, obcięte do 100 i 200 znaków jak w walidacji). Dodane 24.11.2026 dla stron `/serwis-apple` i `/serwis-samsung` — tylko frontend, backend dostaje te same pola co zawsze.
 - `usterka` wypełnia `problem_description` (do edycji).
 - `punkt` wypełnia wybór punktu (§2), `dostawa=kurier` ustawia `delivery_method = courier`.
 - Nieznana wartość parametru = ignoruj (bez błędu).

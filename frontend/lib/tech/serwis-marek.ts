@@ -18,13 +18,14 @@ export function brandSeo(page: BrandPage, points: Pick<ServicePoint, "city">[]):
   return { title: `${page.title} — ${cities}`, description: `${page.descStart} ${cities}. ${page.descEnd}` };
 }
 
-/**
- * Model chip → /zgloszenie with the category and the model at the start of the description.
- * The form reads only `category` and `usterka` (KONTRAKT §1.4) — there is no brand / model
- * parameter, so the model travels in `usterka` (→ problem_description, editable).
- */
-export function modelHref(category: CategoryCode, model: string): string {
-  return submitHref(category, `Model: ${model}. Usterka:`);
+/** Hero / CTA → /zgloszenie with the category and the brand filled in (KONTRAKT §1.4). */
+export function brandSubmitHref(page: Pick<BrandPage, "category" | "brand">): string {
+  return submitHref(page.category, undefined, { marka: page.brand });
+}
+
+/** Model chip → /zgloszenie with the category, brand and model fields filled in (KONTRAKT §1.4). */
+export function modelHref(category: CategoryCode, brand: string, model: string): string {
+  return submitHref(category, undefined, { marka: brand, model });
 }
 
 export type RepairCard = { key: string; t: string; s: string; href: string; device: CategoryCode; usterka: string; live: boolean };
@@ -40,9 +41,9 @@ export function brandRepairCards(page: BrandPage, pages: RepairPageData[] = repa
       const p = pages.find((x) => x.slug === r.slug);
       if (!p) return [];
       const live = isLive(p);
-      return [{ key: p.slug, t: p.h1, s: r.s, href: live ? repairPath(p.slug) : submitHref(p.device, p.usterka), device: p.device, usterka: p.usterka, live }];
+      return [{ key: p.slug, t: p.h1, s: r.s, href: live ? repairPath(p.slug) : submitHref(p.device, p.usterka, { marka: page.brand }), device: p.device, usterka: p.usterka, live }];
     }
-    return [{ key: r.t, t: r.t, s: r.s, href: submitHref(r.category, r.usterka), device: r.category, usterka: r.usterka, live: false }];
+    return [{ key: r.t, t: r.t, s: r.s, href: submitHref(r.category, r.usterka, { marka: page.brand }), device: r.category, usterka: r.usterka, live: false }];
   });
 }
 
